@@ -1,0 +1,32 @@
+Element Tools
+The Element Tools command displays a form where the user can select from the many available elements related commands available. These commands are broken up into “Room and Area Elements,” “View and Sheet Elements,” and “Linked Elements.”
+http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
+---------------------------------------------------------------------------------
+Parameter Tools
+The Parameter Tools command displays a form where the user can select from the many available parameter related commands available. These commands are broken up into “Strings and Text,” “Calculation,” and “Elements and Symbols,” and “External Data (Excel and Access).”
+http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
+---------------------------------------------------------------------------------
+Export Revisions
+All revision cloud data is exported to an external CSV file. The resulting CSV file will include the names, dates, and comments for each revision cloud placed in the model.
+http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
+---------------------------------------------------------------------------------
+Batch Export
+Select a directory to export all file based non system families to with each family (*.rfa) file placed into a subdirectory of the selected export directory named to match the category of which the family originates.
+http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
+---------------------------------------------------------------------------------
+Door Mark
+Auto number door’s “Mark” instance parameter using the room that the door is adjacent to as a prefix. Where more than one door exists within a room, the door’s “Mark” instance parameter will include an alpha sequential suffix.
+http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
+---------------------------------------------------------------------------------
+Import Image
+Import various external images into the model into drafting views named to match the image file name. It is possible to override the overall width or height.
+http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
+---------------------------------------------------------------------------------
+Database Link
+The Database Link tool can be used to synchronize data between a Microsoft Access or SQL database. It is possible to export to a new Microsoft Access database, but for SQL the database must exist.
+http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
+---------------------------------------------------------------------------------
+Sheet Manager
+The Sheet Manager tool is used to manage sheets from either Microsoft Excel or a Microsoft Access database. This tool supports the creation of new sheet elements as well as updating existing sheets in the model.
+http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
+---------------------------------------------------------------------------------
