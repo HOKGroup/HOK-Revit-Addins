@@ -1,0 +1,202 @@
+﻿<Window x:Class="HOK.ColorSchemeEditor.MainWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d" 
+             d:DesignHeight="800" d:DesignWidth="850" Name="mainWindow" SizeToContent="WidthAndHeight" Title="Color Scheme Editor" MinHeight="800" MaxHeight="800" MinWidth="900" MaxWidth="900" Icon="/HOK.ColorSchemeEditor;component/Images/hoklogo.ico" WindowStartupLocation="CenterScreen" Closing="mainWindow_Closing">
+    <Window.Resources>
+        <Style TargetType="{x:Type TabItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid>
+                            <Border Name="Border" BorderBrush="Gray" BorderThickness="0.5,0.5,0.5,0.5" CornerRadius="4,4,0,0" >
+                                <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="12,4,12,4"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="LightGray" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="buttonTemplate">
+            <Button Background="{Binding BackgroundColor}" Click="Button_Click" />
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70" />
+            <RowDefinition Height="70" />
+            <RowDefinition />
+            <RowDefinition Height="70" />
+        </Grid.RowDefinitions>
+
+        <TextBox Height="23" HorizontalAlignment="Left" Margin="81,42,0,0" Name="textBoxFilePath" VerticalAlignment="Top" Width="766" IsReadOnly="True"/>
+        <Label Content="BCF File:" Height="28" HorizontalAlignment="Left" Margin="21,40,0,0" Name="labelBcfFile" VerticalAlignment="Top" />
+
+        <GroupBox Header="View Selection" HorizontalAlignment="Stretch" Margin="5,5,5,5" Name="groupBox1" VerticalAlignment="Stretch" Grid.Row="1">
+            <Grid>
+                <RadioButton Content="View Override Color" Height="16" HorizontalAlignment="Left" Margin="23,10,0,0" Name="radioButtonView" VerticalAlignment="Top" IsChecked="True" />
+                <Label Content="View Name: " Height="28" HorizontalAlignment="Left" Margin="179,5,0,0" Name="label1" VerticalAlignment="Top" />
+                <ComboBox Height="23" Margin="261,8,0,0" Name="comboBoxView" VerticalAlignment="Top" HorizontalAlignment="Left" Width="170" SelectionChanged="comboBoxView_SelectionChanged" />
+            </Grid>
+        </GroupBox>
+
+        <TabControl Grid.Row="2" HorizontalAlignment="Stretch" Margin="5,5,5,5" Name="tabControlSelection" VerticalAlignment="Stretch">
+            <TabItem Header="Color Schemes" Name="tabItemScheme">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="Schemes" HorizontalAlignment="Stretch" Margin="5,5,5,5" Name="groupBoxSchemes" VerticalAlignment="Stretch" >
+                        <Grid>
+                            <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Stretch" Margin="5,5,5,35" Name="dataGridSchemes" VerticalAlignment="Stretch" Background="White" ItemsSource="{Binding}" SelectionChanged="dataGridSchemes_SelectionChanged" HorizontalGridLinesBrush="LightGray" VerticalGridLinesBrush="LightGray" HeadersVisibility="Column" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Scheme Name" Width="*" Binding="{Binding SchemeName}"  />
+                                    <DataGridTextColumn Header="View Name" Width="*" Binding="{Binding ViewName}"/>
+                                </DataGrid.Columns>
+
+                            </DataGrid>
+                            <Button HorizontalAlignment="Left" Margin="10,0,0,5" Name="buttonNew" Width="23" Background="{x:Null}" BorderBrush="{x:Null}" Height="23" VerticalAlignment="Bottom" Click="buttonNew_Click">
+                                <Image Source="Images/new.png" />
+                            </Button>
+                            <Button HorizontalAlignment="Left" Margin="35,0,0,5" Name="buttonCopy" Width="23" Background="{x:Null}" BorderBrush="{x:Null}" Height="23" VerticalAlignment="Bottom" Click="buttonCopy_Click">
+                                <Image Source="Images/copy.png"  />
+                            </Button>
+                            <Button Height="23" HorizontalAlignment="Left" Margin="61,0,0,5" Name="buttonRename" VerticalAlignment="Bottom" Width="23" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonRename_Click">
+                                <Button.Content>
+                                    <Image Source="Images/rename.png" />
+                                </Button.Content>
+                            </Button>
+                            <Button Height="23" HorizontalAlignment="Left" Margin="90,0,0,5" Name="buttonDelete" VerticalAlignment="Bottom" Width="23" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonDelete_Click">
+                                <Button.Content>
+                                    <Image Source="Images/delete.png" />
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </GroupBox>
+                    
+                    <GroupBox Grid.Column="1" Header="Scheme Definitions" HorizontalAlignment="Stretch" Margin="0,5,5,5" Name="groupBox2" VerticalAlignment="Stretch">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="80" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Label Content="Color By:" Height="28" Margin="174,26,0,0" Name="labelColorBy" VerticalAlignment="Top" HorizontalAlignment="Left" Width="57" />
+                            <DataGrid AutoGenerateColumns="False" Grid.Row="1" HorizontalAlignment="Stretch" Margin="45,0,10,10" Name="dataGridDefinition" VerticalAlignment="Stretch" Background="White" ItemsSource="{Binding}" SelectionChanged="dataGridDefinition_SelectionChanged" HorizontalGridLinesBrush="Gray" VerticalGridLinesBrush="Gray" HeadersVisibility="Column" SelectionMode="Single">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Value" Width="*" Binding="{Binding ParameterValue}"/>
+                                    <DataGridTemplateColumn Header="Color" Width="*" CellTemplate="{StaticResource buttonTemplate}"/>
+                                    <DataGridTextColumn Header="Red-Green-Blue" Width="*" Binding="{Binding RGB}"/>
+                                    <DataGridTextColumn Header="In Use" Width="*" Binding="{Binding InUse}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <ComboBox Margin="237,27,0,30" Name="comboBoxColor" HorizontalAlignment="Left" Width="138" SelectionChanged="comboBoxColor_SelectionChanged"/>
+                            <Button Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="8,85,0,0" Name="buttonAdd" VerticalAlignment="Top" Width="23" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonAdd_Click">
+                                <Button.Content>
+                                    <Image Source="Images/plus.png" />
+                                </Button.Content>
+                            </Button>
+                            <Button Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="8,150,0,0" Name="buttonRemove" VerticalAlignment="Top" Width="23" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonRemove_Click" IsEnabled="True">
+                                <Button.Content>
+                                    <Image Source="Images/minus.png" />
+                                </Button.Content>
+                            </Button>
+                            <RadioButton Content="By Value" Height="16" Margin="0,21,150,0" Name="radioButtonByValue" VerticalAlignment="Top" HorizontalAlignment="Right" Width="62" IsChecked="True" Checked="radioButtonByValue_Checked" />
+                            <RadioButton Content="By Range" Height="16" Margin="0,43,142,0" Name="radioButtonByRange" VerticalAlignment="Top" HorizontalAlignment="Right" Width="72" Checked="radioButtonByRange_Checked" />
+                            <Button Content="Element Filters . ." Height="23" HorizontalAlignment="Left" Margin="45,27,0,0" Name="buttonCategories" VerticalAlignment="Top" Width="123" Click="buttonCategories_Click" />
+                            <xctk:IntegerUpDown Value="3" Width="42" Height="20" Margin="0,41,94,19" HorizontalAlignment="Right" Minimum="3" Maximum="500" ValueChanged="IntegerUpDown_ValueChanged" Name="integerUpDown" />
+                            <CheckBox Content="Auto Split" Height="16" Margin="0,43,19,0" Name="checkBoxSplit" VerticalAlignment="Top" HorizontalAlignment="Right" Width="69" Checked="checkBoxSplit_Checked" Unchecked="checkBoxSplit_Unchecked" />
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <ToolBarTray Height="30" HorizontalAlignment="Stretch" Name="toolBarTray" VerticalAlignment="Top" Background="{x:Null}" >
+            <ToolBar Band="1" BandIndex="1" VerticalContentAlignment="Stretch">
+                <Button Name="buttonNewBCF" Click="buttonNewBCF_Click">
+                    <StackPanel Orientation="Horizontal" Margin="5,0">
+                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/asterisk.png" />
+                        <TextBlock>Create New</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="buttonOpenBCF" Margin="5,0" Click="buttonOpenBCF_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/open.ico" />
+                        <TextBlock>Open Color Scheme</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="buttonSaveBCF" Margin="5,0" Click="buttonSaveBCF_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/save.ico" Stretch="None" />
+                        <TextBlock>Save BCF</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="buttonSaveAsBCF" Margin="5,0" Click="buttonSaveAsBCF_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/saveas.ico" Stretch="None" />
+                        <TextBlock>Save As</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="buttonSettings" Margin="5,0" IsEnabled="False">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/setting.ico" Stretch="None" />
+                        <TextBlock>Settings</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="buttonHelp" Margin="5,0" IsEnabled="False">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/help.png" Stretch="None" />
+                        <TextBlock>Help</TextBlock>
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <StatusBar Grid.Row="3" Height="23" HorizontalAlignment="Stretch" Margin="0,47,0,0" Name="statusBar1" VerticalAlignment="Bottom">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="250"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Text="Ready" Name="statusLable" Visibility="Hidden" />
+            </StatusBarItem>
+            <StatusBarItem  Grid.Column="1">
+                <ProgressBar Value="0" Width="150" Height="16" Name="progressBar" Visibility="Hidden"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <Button Margin="21,9,0,0" Name="buttonImport" Grid.Row="3" HorizontalAlignment="Left" Width="130" Height="23" VerticalAlignment="Top" Click="buttonImport_Click">
+            <StackPanel Orientation="Horizontal">
+                <Image Margin="0,1,5,0" Source="Images/color.png" />
+                <TextBlock>Import Schemes</TextBlock>
+            </StackPanel>
+        </Button>
+
+        <Button Content="Update All" Grid.Row="3" Height="23" Margin="0,12,10,0" x:Name="buttonUpdateAll" VerticalAlignment="Top" HorizontalAlignment="Right" Width="89" Click="buttonUpdateAll_Click" ToolTip="Apply override colors by all loaded color schemes." />
+        <Button Content="Update Selected" Grid.Row="3" Height="23" Margin="0,12,104,0" Name="buttonApply" VerticalAlignment="Top" HorizontalAlignment="Right" Width="105" Click="buttonApply_Click" ToolTip="Apply override colors by the selected color scheme." />
+        <Button x:Name="buttonIsolate" Content="Isolate / Reset View" HorizontalAlignment="Right" Margin="0,12,214,0" Grid.Row="3" VerticalAlignment="Top" Width="123" ToolTip="Apply override colors and isolate the active view." Click="buttonIsolate_Click"/>
+        <Button x:Name="buttonClear" Content="Clear Colors" HorizontalAlignment="Right" Margin="0,12,342,0" Grid.Row="3" VerticalAlignment="Top" Width="90" ToolTip="Clear override colors " Click="buttonClear_Click"/>
+        <Button Content="Close" Height="23" Margin="0,12,437,0" Name="buttonClose" VerticalAlignment="Top" Grid.Row="3" HorizontalAlignment="Right" Width="75" Click="buttonClose_Click" />
+        <CheckBox Content="Save on Close" Grid.Row="3" Height="16" Margin="0,16,531,0" Name="checkBoxSave" VerticalAlignment="Top" HorizontalAlignment="Right" Width="92" IsChecked="True" />
+        
+        
+    </Grid>
+</Window>

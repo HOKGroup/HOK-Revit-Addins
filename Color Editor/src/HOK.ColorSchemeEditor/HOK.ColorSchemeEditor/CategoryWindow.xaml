@@ -1,0 +1,91 @@
+﻿<Window x:Class="HOK.ColorSchemeEditor.CategoryWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300" Width="660" Height="500" Title="Select Elements" WindowStartupLocation="CenterOwner" Icon="/HOK.ColorSchemeEditor;component/Images/hoklogo.ico">
+    <Window.Resources>
+        <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="False" />
+            <Setter Property="IsSelected" Value="{Binding IsInitiallySelected, Mode=OneTime}" />
+            <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+        </Style>
+        <HierarchicalDataTemplate x:Key="CheckBoxItemTemplate" ItemsSource="{Binding Children, Mode=OneTime}">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Focusable="False" IsChecked="{Binding IsChecked}" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" />
+                <TextBlock Text="{Binding Name, Mode=OneTime}" Margin="2,0"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <Button Content="Cancel" Grid.Row="1" Height="23" Margin="0,11,12,0" Name="buttonCancel" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Click="buttonCancel_Click" />
+        <Button Content="OK" Height="23" HorizontalAlignment="Right" Margin="0,11,93,0" Name="buttonOK" VerticalAlignment="Top" Width="75" Grid.Row="1" Click="buttonOK_Click" />
+        <Grid HorizontalAlignment="Stretch" Margin="5" Name="grid1" VerticalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Categories" HorizontalAlignment="Stretch" Margin="5" Name="groupBox1" VerticalAlignment="Stretch">
+                <Grid>
+                    <Label Content="Select categories to create color schemes." Height="28" Margin="6,8,19,0" Name="labelCategory" VerticalAlignment="Top" />
+                    <CheckBox Content="Hide un-checked categories" Height="16" HorizontalAlignment="Left" Margin="7,38,0,0" Name="checkBoxHide" VerticalAlignment="Top" Checked="checkBoxHide_Checked" Unchecked="checkBoxHide_Unchecked" />
+                    <Button HorizontalAlignment="Left" Margin="7,0,0,7" Name="buttonCheckAll" Width="23" Height="23" VerticalAlignment="Bottom" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonCheckAll_Click">
+                        <Button.Content>
+                            <Image Source="/HOK.ColorSchemeEditor;component/Images/checkAll.png" />
+                        </Button.Content>
+                    </Button>
+                    <Button HorizontalAlignment="Left" Margin="30,0,0,7" Name="buttonCheckNone" Width="23" Height="23" VerticalAlignment="Bottom" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonCheckNone_Click">
+                        <Button.Content>
+                            <Image Source="/HOK.ColorSchemeEditor;component/Images/uncheck.png" />
+                        </Button.Content>
+                    </Button>
+                    <TreeView x:Name="treeViewCategory" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneTime}" ItemTemplate="{StaticResource CheckBoxItemTemplate}" HorizontalAlignment="Stretch" Margin="6,57,6,36" VerticalAlignment="Stretch" IsTextSearchEnabled="True" KeyDown="treeViewCategory_KeyDown" />
+                    <CheckBox Content="Include elements in linked files" Margin="0,0,10,10" Name="checkBoxLink" HorizontalAlignment="Right" Width="186" Height="16" VerticalAlignment="Bottom" Checked="checkBoxLink_Checked" Unchecked="checkBoxLink_Unchecked" IsEnabled="False" />
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Filter Rules" HorizontalAlignment="Stretch" Margin="5" Name="groupBoxRules" VerticalAlignment="Stretch" Grid.Column="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="70" />
+                        <ColumnDefinition Width="245*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="10" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label Content="Filter By:" Grid.Row="1" Height="28" HorizontalAlignment="Left" Margin="6,7,0,0" Name="labelFilterBy" VerticalAlignment="Top" />
+                    <ComboBox Grid.Column="1" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="0,12,0,0" Name="comboBoxFilterBy1" VerticalAlignment="Top" Width="190" SelectionChanged="comboBoxFilterBy1_SelectionChanged" />
+                    <ComboBox Grid.Column="1" Grid.Row="2" Height="23" HorizontalAlignment="Left" Margin="0,12,0,0" Name="comboBoxCriteria1" VerticalAlignment="Top" Width="190" />
+                    <ComboBox Background="White" Grid.Column="1" Grid.Row="3" Height="23" HorizontalAlignment="Left" Margin="0,12,0,0" Name="comboBoxValue1" VerticalAlignment="Top" Width="190" IsEditable="True"/>
+                    <Label Content="And:" Grid.Row="5" Height="28" HorizontalAlignment="Left" Margin="27,7,0,0" Name="labelAnd1" VerticalAlignment="Top" />
+                    <ComboBox Grid.Column="1" Grid.Row="5" Height="23" HorizontalAlignment="Left" Margin="0,12,0,0" Name="comboBoxFilterBy2" VerticalAlignment="Top" Width="190" SelectionChanged="comboBoxFilterBy2_SelectionChanged" />
+                    <ComboBox Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="6" Height="23" HorizontalAlignment="Left" Margin="0,12,0,0" Name="comboBoxCriteria2" VerticalAlignment="Top" Width="190" />
+                    <ComboBox Background="White" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="7" Height="23" HorizontalAlignment="Left" Margin="0,12,0,0" Name="comboBoxValue2" VerticalAlignment="Top" Width="190" IsEditable="True" />
+                    <Label Content="And:" Grid.Row="9" Grid.RowSpan="2" Height="28" HorizontalAlignment="Left" Margin="27,12,0,0" Name="labelAnd2" VerticalAlignment="Top" />
+                    <ComboBox Grid.Column="1" Grid.Row="9" Height="23" HorizontalAlignment="Left" Margin="0,12,0,0" Name="comboBoxFilterBy3" VerticalAlignment="Top" Width="190" SelectionChanged="comboBoxFilterBy3_SelectionChanged" />
+                    <ComboBox Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="10" Height="23" HorizontalAlignment="Left" Margin="0,12,0,0" Name="comboBoxCriteria3" VerticalAlignment="Top" Width="190" />
+                    <ComboBox Background="White" Grid.Column="1" Grid.ColumnSpan="2" Grid.Row="11" Height="23" HorizontalAlignment="Left" Margin="0,12,0,0" Name="comboBoxValue3" VerticalAlignment="Top" Width="190" IsEditable="True" />
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <Button Content="Enable Filters" Grid.Row="1" Height="23" HorizontalAlignment="Left" Margin="12,11,0,0" Name="buttonParameter" VerticalAlignment="Top" Width="92" Click="buttonParameter_Click" />
+    </Grid>
+</Window>

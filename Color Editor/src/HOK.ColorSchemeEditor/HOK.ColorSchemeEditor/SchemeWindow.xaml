@@ -1,0 +1,54 @@
+﻿<Window x:Class="HOK.ColorSchemeEditor.SchemeWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             SizeToContent="WidthAndHeight" Width="300" Height="450" Icon="/HOK.ColorSchemeEditor;component/Images/hoklogo.ico" Title="Import Color Schemes" MinWidth="300" MinHeight="450" WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <DataTemplate x:Key="CheckBoxItemTemplate">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding SchemeName, Mode=OneTime}" Margin="2,0"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="45" />
+        </Grid.RowDefinitions>
+        <Button Content="Cancel" Grid.Row="1" Height="23" HorizontalAlignment="Right" Margin="0,10,11,0" Name="buttonCancel" VerticalAlignment="Top" Width="75" Click="buttonCancel_Click" />
+        <Button Content="OK" Height="23" HorizontalAlignment="Right" Margin="0,10,93,0" Name="buttonOK" VerticalAlignment="Top" Width="75" Grid.Row="1" Click="buttonOK_Click" />
+        <GroupBox Header="Color Schemes" HorizontalAlignment="Stretch" Margin="5" Name="groupBox" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30" />
+                    <RowDefinition />
+                    <RowDefinition Height="30" />
+                </Grid.RowDefinitions>
+                <ListView Grid.Row="1" HorizontalAlignment="Stretch" Margin="5" Name="listViewSchemes" VerticalAlignment="Stretch" ItemsSource="{Binding}">
+                    <ListView.View>
+                        <GridView>
+                            <GridView.Columns>
+                                <GridViewColumn Header="Color Scheme Name"  Width="160" CellTemplate="{StaticResource CheckBoxItemTemplate}"/>
+                                <GridViewColumn Header="Definitions" Width="80" DisplayMemberBinding="{Binding Count}"/>
+                            </GridView.Columns>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <Button Grid.Row="2" HorizontalAlignment="Left" Margin="7,0,0,7" Name="buttonCheckAll" Width="23" Height="23" VerticalAlignment="Bottom" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonCheckAll_Click">
+                    <Button.Content>
+                        <Image Source="/HOK.ColorSchemeEditor;component/Images/checkAll.png" />
+                    </Button.Content>
+                </Button>
+                <Button Grid.Row="2" HorizontalAlignment="Left" Margin="30,0,0,7" Name="buttonCheckNone" Width="23" Height="23" VerticalAlignment="Bottom" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonCheckNone_Click">
+                    <Button.Content>
+                        <Image Source="/HOK.ColorSchemeEditor;component/Images/uncheck.png" />
+                    </Button.Content>
+                </Button>
+                <Label Content="Select color schemes to be imported" Height="28" HorizontalAlignment="Left" Margin="6,2,0,0" Name="labelSelect" VerticalAlignment="Top" Foreground="Gray" />
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>
