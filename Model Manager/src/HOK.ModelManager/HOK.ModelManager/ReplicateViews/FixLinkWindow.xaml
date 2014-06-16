@@ -1,0 +1,69 @@
+﻿<Window x:Class="HOK.ModelManager.ReplicateViews.FixLinkWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Icon="/HOK.ModelManager;component/Images/hok.png" Title="Fix Links" MinHeight="600" MinWidth="800" Height="600" Width="900" WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="250" />
+            <ColumnDefinition Width="50" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        
+        <GroupBox Header="Select a Source View" HorizontalAlignment="Stretch" Margin="10,10,5,0" Name="groupBoxSource" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <ListView Grid.Row="1"  HorizontalAlignment="Stretch" Margin="10,0,10,10" Name="listViewSource" VerticalAlignment="Stretch" BorderBrush="Gray" SelectionMode="Single" />
+                <TextBlock TextWrapping="Wrap" Text="Source Model Title" Height="34" HorizontalAlignment="Left" Margin="10,6,0,0" Name="textSourceTitle" VerticalAlignment="Top" Width="203" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="1" Header="Select a Recipient View" HorizontalAlignment="Stretch" Margin="5,10,10,0" Name="groupBox2" VerticalAlignment="Stretch" >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock TextWrapping="Wrap" Text="Recipient Model Title" Height="34" HorizontalAlignment="Left" Margin="10,6,0,0" Name="textRecipientTitle" VerticalAlignment="Top" Width="203" />
+                <ListView Margin="10,0,10,10" Name="listViewRecipient" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="1" SelectionMode="Single" BorderBrush="Gray" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="3" Header="Linked Drafting Views" HorizontalAlignment="Stretch" Margin="10,10,10,0" Name="groupBoxMap" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Label Content="Add/Remove Links" Height="28" HorizontalAlignment="Left" Margin="14,6,0,0" Name="labelMap" VerticalAlignment="Top" />
+                <ListView HorizontalAlignment="Stretch" Margin="10,0,10,10" Name="listViewMap" VerticalAlignment="Stretch" Grid.Row="1" Foreground="Gray" SelectionMode="Multiple" BorderBrush="Gray">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Source View" DisplayMemberBinding="{Binding SourceItemName}" Width="150"/>
+                            <GridViewColumn Header="Recipient View" DisplayMemberBinding="{Binding DestItemName}" Width="150"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
+        </GroupBox>
+        
+        <Button Grid.Column="2" Grid.ColumnSpan="2" Height="30" HorizontalAlignment="Left" Margin="0,142,0,0" Name="buttonAdd" VerticalAlignment="Top" Width="51" Click="buttonAdd_Click" ToolTip="Add Links">
+            <Image Margin="1" Source="/HOK.ModelManager;component/Images/forward.png" />
+        </Button>
+        <Button Height="30" HorizontalAlignment="Left" Margin="0,299,0,0" Name="buttonDelete" VerticalAlignment="Top" Width="51" Grid.Column="2" Grid.ColumnSpan="2" Click="buttonDelete_Click" ToolTip="Remove Links">
+            <Image Margin="1" Source="/HOK.ModelManager;component/Images/backward.png" />
+        </Button>
+
+        <Button Content="Cancel" Grid.Column="3" Grid.Row="2" Height="23" Margin="0,14,13,0" Name="buttonCancel" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Click="buttonCancel_Click" />
+        <Button Content="OK" Height="23" HorizontalAlignment="Right" Margin="0,14,94,0" Name="buttonOK" VerticalAlignment="Top" Width="75" Grid.Column="3" Grid.Row="2" Click="buttonOK_Click" />
+    
+    </Grid>
+</Window>

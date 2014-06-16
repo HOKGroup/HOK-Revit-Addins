@@ -1,0 +1,181 @@
+﻿<Window x:Class="HOK.ModelManager.ManagerWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"   
+             mc:Ignorable="d" Title="HOK Model Manager" MinHeight="800" MinWidth="850" Icon="Images/hok.png" Height="800" Width="850" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="{x:Type TabItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid>
+                            <Border Name="Border" BorderBrush="Gray" BorderThickness="0.5,0.5,0.5,0.5" CornerRadius="4,4,0,0" >
+                                <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="12,4,12,4"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="LightGray" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="True" />
+            <Setter Property="IsSelected" Value="{Binding IsInitiallySelected, Mode=OneTime}" />
+            <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+        </Style>
+        <HierarchicalDataTemplate x:Key="CheckBoxItemTemplate" ItemsSource="{Binding Children, Mode=OneTime}">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Focusable="False" IsChecked="{Binding IsChecked}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Name, Mode=OneTime}" Margin="2,0" Foreground="{Binding TextColor}">
+                    <TextBlock.ToolTip>
+                        <ToolTip>
+                            <TextBlock Text="{Binding ToolTip}"/>
+                        </ToolTip>
+                    </TextBlock.ToolTip>
+                </TextBlock>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="NodeItemTemplate" ItemsSource="{Binding Children, Mode=OneTime}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding Name, Mode=OneTime}" Margin="2,0" Foreground="{Binding TextColor}">
+                    <TextBlock.ToolTip>
+                        <ToolTip>
+                            <TextBlock Text="{Binding ToolTip}"/>
+                        </ToolTip>
+                    </TextBlock.ToolTip>
+                </TextBlock>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+
+        <Label  Content="Source Model:" Height="28" HorizontalAlignment="Left" Margin="12,21,0,0" Name="SourceModel" VerticalAlignment="Top" />
+        <Label Content="Recipient Model:" Height="28" HorizontalAlignment="Left" Margin="12,21,0,0" Name="RecipientModel" VerticalAlignment="Top" Grid.Column="1" />
+        <ComboBox Height="23" HorizontalAlignment="Left" Margin="104,21,0,0" Name="comboBoxSource" VerticalAlignment="Top" Width="200" SelectionChanged="comboBoxSource_SelectionChanged" />
+        <ComboBox Height="23" HorizontalAlignment="Left" Margin="117,21,0,0" Name="comboBoxRecipient" VerticalAlignment="Top" Width="200" Grid.Column="1" SelectionChanged="comboBoxRecipient_SelectionChanged" />
+        
+        <TabControl Grid.Row="1" HorizontalAlignment="Stretch" Margin="7,15,7,7" Name="tabControl1" VerticalAlignment="Stretch" Grid.ColumnSpan="2" BorderThickness="1" BorderBrush="#FFCBCBCB">
+            <TabItem Header="Drafting Views" Name="tabItemView" >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40" />
+                        <RowDefinition />
+                        <RowDefinition Height="50" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <CheckBox Content="Select All Linked Views" Grid.Row="2" Height="16" Margin="26,17,0,0" Name="checkBoxLinked" VerticalAlignment="Top" Checked="checkBoxLinked_Checked" Unchecked="checkBoxLinked_Unchecked" HorizontalAlignment="Left" Width="137" />
+                    <Label Content="View by:" Height="28" HorizontalAlignment="Left" Margin="17,6,0,0" Name="label1" VerticalAlignment="Top" />
+                    <ComboBox Height="23" HorizontalAlignment="Left" Margin="77,11,0,0" Name="comboBoxViewBy" VerticalAlignment="Top" Width="136" SelectionChanged="comboBoxViewBy_SelectionChanged" />
+                    <GroupBox Grid.Row="1" Header="Drafting Views in Source Model" HorizontalAlignment="Stretch" Margin="10,0,5,0" Name="groupBox1" VerticalAlignment="Stretch">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TreeView x:Name="treeViewSource" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneTime}" ItemTemplate="{StaticResource CheckBoxItemTemplate}" Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,5,10,10" VerticalAlignment="Stretch" SelectedItemChanged="treeViewSource_SelectedItemChanged" />
+                            <Button Height="23" Margin="0,3,11,0" Name="buttonRefresh" VerticalAlignment="Top" HorizontalAlignment="Right" Width="106">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Margin="0,1,5,0" Source="Images/refresh.png" />
+                                    <TextBlock>Refresh Views</TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button  Height="23" HorizontalAlignment="Left" Margin="10,3,0,0" Name="buttonCheck" VerticalAlignment="Top" Width="23" Click="buttonCheck_Click" Tag="Checked">
+                                <Button.Content>
+                                    <Image  Source="Images/check.png"/>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="Drafting Views in Recipient Model" HorizontalAlignment="Stretch" Margin="5,0,10,0" Name="groupBox2" VerticalAlignment="Stretch" Grid.Column="1" Grid.Row="1">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TreeView x:Name="treeViewRecipient" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneTime}" ItemTemplate="{StaticResource NodeItemTemplate}" Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,5,10,10" VerticalAlignment="Stretch" />
+                            <Button Height="23" Margin="0,3,10,0" Name="buttonFix" VerticalAlignment="Top" HorizontalAlignment="Right" Width="134" Click="buttonFix_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Margin="0,1,5,0" Source="Images/fix.png" />
+                                    <TextBlock>Fix or Create Links</TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </GroupBox>
+                    <Button  Grid.Column="1" Grid.Row="2" Height="25" Margin="0,11,18,0" Name="buttonUpdate" VerticalAlignment="Top" HorizontalAlignment="Right" Width="112" Click="buttonUpdate_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Margin="0,1,6,0" Source="Images/view.png" />
+                            <TextBlock>Update Views</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <CheckBox Content="Enforce Sheet Mirroring" Height="16" Margin="185,17,0,0" Name="checkBoxSheet" VerticalAlignment="Top" Grid.Row="2" HorizontalAlignment="Left" Width="153" ToolTip="This option will enable to create associated sheets with same names." />
+                </Grid>
+            </TabItem>
+            <TabItem Header="Legends" Name="tabItemLegend" >
+                <Grid />
+            </TabItem>
+            <TabItem Header="Schedules" Name="tabItemSchedule" />
+        </TabControl>
+        
+        <Button Content="Close" Grid.Row="2" Height="23" HorizontalAlignment="Right" Margin="0,0,22,29" Name="buttonClose" VerticalAlignment="Bottom" Width="75" Grid.Column="1" Click="buttonClose_Click" />
+        <StatusBar Grid.Row="2" Height="23" HorizontalAlignment="Stretch" Margin="0,40,0,0" Name="statusBar" VerticalAlignment="Bottom" Grid.ColumnSpan="2" Visibility="Visible">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Text="Updating Links Info..." Name="statusLable" Visibility="Hidden" />
+            </StatusBarItem>
+            <StatusBarItem  Grid.Column="1">
+                <ProgressBar Value="0" Width="140" Height="16" Name="progressBar" Visibility="Hidden" IsIndeterminate="True" />
+            </StatusBarItem>
+        </StatusBar>
+        <Button Grid.Column="1" Grid.Row="2" Margin="0,8,103,29" Name="buttonSave" HorizontalAlignment="Right" Width="107" IsEnabled="False">
+            <StackPanel Orientation="Horizontal">
+                <Image Margin="0,1,5,0" Source="Images/makefile.png" />
+                <TextBlock>Save Settings</TextBlock>
+            </StackPanel>
+        </Button>
+        <Button Grid.Column="1" Grid.Row="2" Margin="0,7,216,30" Name="buttonManage" HorizontalAlignment="Right" Width="123">
+            <StackPanel Orientation="Horizontal">
+                <Image Margin="0,1,5,0" Source="Images/settings.png" />
+                <TextBlock>Manage Source</TextBlock>
+            </StackPanel>
+        </Button>
+        <Button Height="23" HorizontalAlignment="Left" Margin="313,21,0,0" Name="buttonOpen" VerticalAlignment="Top" Width="25" >
+            <StackPanel Orientation="Horizontal">
+                <Image Margin="0,1,5,0" Source="Images/open.png" />
+            </StackPanel>
+        </Button>
+        <Label Height="28" HorizontalAlignment="Left" Margin="14,59,0,0" Name="labelWarning" VerticalAlignment="Top" Grid.Column="1" Grid.RowSpan="2" Foreground="Red" FontStyle="Italic">(*) Please select a different source model from the recipient model.</Label>
+        <TextBlock Grid.Row="2" Height="23" HorizontalAlignment="Left" Margin="38,8,0,0" Name="textBlockHelp" VerticalAlignment="Top">
+            <Hyperlink NavigateUri="http://assets.hok.com/app/buildingsmart/ModelManager/ModelManager_Instruction.pdf" RequestNavigate="Hyperlink_RequestNavigate">Help</Hyperlink>
+        </TextBlock>
+    </Grid>
+</Window>

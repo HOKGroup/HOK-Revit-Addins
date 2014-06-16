@@ -1,0 +1,79 @@
+﻿<Window x:Class="HOK.ModelManager.ReplicateViews.PreviewWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="800" Icon="/HOK.ModelManager;component/Images/hok.png" Title="Confirm Views to Sync" MinWidth="800" MinHeight="600" Closed="Window_Closed" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70" />
+            <RowDefinition MinHeight="300" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="70" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="70" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Label Content="Source Model: " Height="28" HorizontalAlignment="Left" Margin="20,12,0,0" Name="SourceModel" VerticalAlignment="Top" />
+        <Label Content="Source Model Name" Height="28" HorizontalAlignment="Left" Margin="115,12,0,0" Name="SourceModelName" VerticalAlignment="Top" />
+        <Label Content="Recipient Model: " Height="28" HorizontalAlignment="Left" Margin="0,12,0,0" Name="RecipientModel" VerticalAlignment="Top" Grid.Column="2" />
+        <Label Content="Recipient Model Name " Height="28" HorizontalAlignment="Left" Margin="108,12,0,0" Name="RecipientModelName" VerticalAlignment="Top" Grid.Column="2" />
+        <TextBox Grid.Row="3" Height="30" Name="textBoxPage" VerticalAlignment="Top" Grid.Column="1" Margin="0,7,0,0" IsReadOnly="True" />
+        
+        <Button  Grid.Row="3" Height="25" Margin="0,7,20,0" Name="buttonBack" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Click="buttonBack_Click">
+            <Image Margin="1" Source="/HOK.ModelManager;component/Images/backward.png" />
+        </Button>
+        <Button Height="25" HorizontalAlignment="Left" Margin="20,7,0,0" Name="buttonNext" VerticalAlignment="Top" Width="60" Grid.Column="2" Grid.Row="3" Click="buttonNext_Click">
+            <Image Margin="1" Source="/HOK.ModelManager;component/Images/forward.png" />
+        </Button>
+        <Label Content="Source View Name" Grid.Row="2" Height="28" HorizontalAlignment="Left" Margin="30,0,0,0" Name="SourceView" VerticalAlignment="Top" />
+        <Label Content="Recipient View Name" Height="28" HorizontalAlignment="Left" Margin="30,0,0,0" Name="RecipientView" VerticalAlignment="Top" Grid.Column="2" Grid.Row="2" />
+        
+        <CheckBox Content="Dont't Include This View" Grid.Row="3" Height="16" HorizontalAlignment="Left" Margin="30,12,0,0" Name="checkBoxSkip" VerticalAlignment="Top"/>
+        
+        <Button Content="Update Without Review" Grid.Column="2" Grid.Row="4" Height="25" Margin="0,8,217,0" Name="buttonUpdateAll" VerticalAlignment="Top" HorizontalAlignment="Right" Width="137" Click="buttonUpdateAll_Click" />
+        <Button Grid.Column="2" Grid.Row="4" Height="25" Margin="0,8,101,0" Name="buttonUpdateViews" VerticalAlignment="Top" HorizontalAlignment="Right" Width="110" Click="buttonUpdateViews_Click" IsEnabled="False">
+            <StackPanel Orientation="Horizontal">
+                <Image Margin="0,1,6,0" Source="/HOK.ModelManager;component/Images/view.png" />
+                <TextBlock>Update Views</TextBlock>
+            </StackPanel>
+        </Button>
+        <Button Content="Cancel" Grid.Column="2" Grid.Row="4" Height="25" Margin="0,8,20,0" Name="buttonCancel" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Click="buttonCancel_Click" />
+        <ContentControl Grid.Row="1" HorizontalAlignment="Stretch" Margin="20,0,0,0" Name="contentSource" VerticalAlignment="Stretch" />
+        <ContentControl Grid.Column="2" Grid.Row="1" HorizontalAlignment="Stretch" Margin="0,0,20,0" Name="contentRecipient" VerticalAlignment="Stretch">
+            <Image  Name="imageRecipient" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        </ContentControl>
+        <Button Grid.Column="2" Height="25" Margin="0,13,25,0" Name="buttonRefresh" VerticalAlignment="Top" HorizontalAlignment="Right" Width="25" Click="buttonRefresh_Click">
+            <Button.Content>
+                <Image Source="/HOK.ModelManager;component/Images/refreshImage.png" />
+            </Button.Content>
+        </Button>
+        
+        <StatusBar Grid.Row="4" Height="23" HorizontalAlignment="Stretch" Margin="0,40,0,0" Name="statusBar" VerticalAlignment="Bottom" Grid.ColumnSpan="3">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Text="Ready" Name="statusLable" Visibility="Hidden" />
+            </StatusBarItem>
+            <StatusBarItem  Grid.Column="1">
+                <ProgressBar Value="0" Width="140" Height="16" Name="progressBar" Visibility="Hidden" SmallChange="1" IsIndeterminate="False" />
+            </StatusBarItem>
+        </StatusBar>
+        <Label Content="Source Sheet: " Height="28" HorizontalAlignment="Left" Margin="24,36,0,0" Name="label1" VerticalAlignment="Top" />
+        <Label Content="Source Sheet Name" Height="28" HorizontalAlignment="Left" Margin="115,36,0,0" Name="SourceSheetName" VerticalAlignment="Top" />
+        <Label Content="Recipient Sheet: " Height="28" HorizontalAlignment="Left" Margin="4,36,0,0" Name="label3" VerticalAlignment="Top" Grid.Column="2" />
+        <Label Content="Recipient Sheet Name " Height="28" HorizontalAlignment="Left" Margin="108,36,0,0" Name="RecipientSheetName" VerticalAlignment="Top" Grid.Column="2" />
+    </Grid>
+</Window>
