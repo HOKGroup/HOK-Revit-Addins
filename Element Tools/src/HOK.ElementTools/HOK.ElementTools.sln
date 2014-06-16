@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HOK.ElementTools", "HOK.ElementTools\HOK.ElementTools.vbproj", "{5E2C8756-742E-4726-8736-F150469B6C3A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		2013|Any CPU = 2013|Any CPU
+		2014|Any CPU = 2014|Any CPU
+		2015|Any CPU = 2015|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.2013|Any CPU.ActiveCfg = 2013|Any CPU
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.2013|Any CPU.Build.0 = 2013|Any CPU
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.2014|Any CPU.ActiveCfg = 2014|Any CPU
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.2014|Any CPU.Build.0 = 2014|Any CPU
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.2015|Any CPU.ActiveCfg = 2015|Any CPU
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.2015|Any CPU.Build.0 = 2015|Any CPU
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E2C8756-742E-4726-8736-F150469B6C3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
