@@ -1,0 +1,8 @@
+﻿HOK Addins
+\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\HOK AddIns Installer.application
+dRofus
+http://db.drofus.com/deploy/dRofus.application
+dRofus Beta
+http://db.drofus.com/deploy_beta/dRofus_BETA.application
+CASE Addins
+http://www.case-dev.com/revit/installer$/FreeAddInManager/CaseRevitAddInManager.application

@@ -1,0 +1,32 @@
+HOK KnowledgeNet BIM Resources (Must be inside HOK firewall)
+http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
+HOK KnowledgeNet BIM Standards (Must be inside HOK firewall)
+http://www.knowledgenet.hok.com/BIM%20Resources/BIMStandards/HOK%20BIM%20Standards.pdf
+HOK BIM Solutions
+http://hokbimsolutions.blogspot.com/
+HOK Training Videos
+http://www.knowledgenet.hok.com/BIM%20Resources/Videos/TrainingVideos.asp
+HOK rGuide Library
+http://hok.rguidelibrary.com/LoginForm.spr
+--------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------
+Autodesk User Group International (AUGI)
+http://www.augi.com/
+Autodesk Revit Site
+http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=3781831
+Autodesk Discussion Groups
+http://discussion.autodesk.com/index.jspa
+Autodesk Labs
+http://labs.autodesk.com/
+--------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------
+dRofus Install Instructions:
+https://docs.google.com/document/d/11FKqTT-YxJr5jWeaHQmWFPLCPABr5A69580ANcVig9Y/pub
+--------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------
+Email Help
+Email Help
+--------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------
+Version 2013-02-26
+------------------
