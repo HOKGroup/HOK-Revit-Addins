@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>HOK ModelManager</Name>
+    <Assembly>HOK-Addin.bundle\Contents_External\HOK.ModelManager.dll</Assembly>
+    <AddInId>67F7649B-0084-4E5A-86E9-C3F7570AB1F6</AddInId>
+    <FullClassName>HOK.ModelManager.AppCommand</FullClassName>
+    <VendorId>JKIM</VendorId>
+    <VendorDescription>JKIM</VendorDescription>
+  </AddIn>
+</RevitAddIns>
