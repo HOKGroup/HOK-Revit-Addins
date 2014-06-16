@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Mit XMLSpy v2011 rel. 3 (http://www.altova.com) von Klaus Linhard (IABI e.V.) bearbeitet -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="ColorSchemeInfo">
+    <xs:annotation>
+      <xs:documentation>Color Scheme</xs:documentation>
+    </xs:annotation>
+   
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ColorSchemes" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ColorScheme" type="ColorScheme" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ColorFilters" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ColorFilter" type="ColorFilter" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name ="ColorScheme">
+    <xs:sequence>
+      <xs:element name="SchemeName" type ="xs:string"/>
+      <xs:element name="Categories" type="Categories"/>
+      <xs:element name ="ParameterName" type="xs:string"/>
+      <xs:element name="ColorDefinitions" type="ColorDefinitions" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name ="SchemeId" type ="Guid"/>
+  </xs:complexType>
+
+  <xs:complexType name ="Categories">
+    <xs:sequence>
+      <xs:element name="Category" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name ="ColorDefinitions">
+    <xs:sequence>
+      <xs:element name="ColorDefinition" type="ColorDefinition" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="ColorDefinition">
+    <xs:sequence>
+      <xs:element name="ParameterValue" type="xs:string" minOccurs="0"/>
+      <xs:element name="Color" type="xs:hexBinary"/>
+    </xs:sequence>
+    <xs:attribute name="UserDefined" type ="xs:boolean" default="false"/>
+  </xs:complexType>
+
+  <xs:simpleType name="ColorBy">
+    <xs:restriction base ="xs:string">
+      <xs:enumeration value="ByValue"/>
+      <xs:enumeration value="ByRange"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Guid">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name ="ColorFilter">
+    <xs:sequence>
+      <xs:element name="FilterName" type ="xs:string"/>
+      <xs:element name="Categories" type="Categories"/>
+      <xs:element name="FilterRules" type="FilterRules" minOccurs="0"/>
+      <xs:element name ="Color" type ="xs:hexBinary"/>
+    </xs:sequence>
+    <xs:attribute name ="FilterId" type ="Guid"/>
+  </xs:complexType>
+
+  <xs:complexType name="FilterRules">
+    <xs:sequence>
+      <xs:element name ="FilterRule" type="FilterRule" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name ="FilterRule">
+    <xs:sequence>
+      <xs:element name="ParameterName" type ="xs:string"/>
+      <xs:element name ="CriteriaName" type ="CriteriaName"/>
+      <xs:element name ="RuleValue" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="CriteriaName">
+    <xs:restriction base ="xs:string">
+      <xs:enumeration value="begins with"/>
+      <xs:enumeration value="contains"/>
+      <xs:enumeration value="ends with"/>
+      <xs:enumeration value="equals"/>
+      <xs:enumeration value="is greater than"/>
+      <xs:enumeration value="is greater than or equal to"/>
+      <xs:enumeration value="is less than"/>
+      <xs:enumeration value="is less than or equal to"/>
+      <xs:enumeration value="does not begin with"/>
+      <xs:enumeration value="does not contain"/>
+      <xs:enumeration value="does not end with"/>
+      <xs:enumeration value="does not equal"/>
+      <xs:enumeration value="n/a"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+</xs:schema>
