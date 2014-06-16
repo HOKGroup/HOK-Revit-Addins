@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{B1FB0FCE-6DE8-4D1A-9F33-95108EAD2DE5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>HOK.ParameterTools</RootNamespace>
+    <AssemblyName>HOK.ParameterTools</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>Off</OptionStrict>
+    <OptionInfer>On</OptionInfer>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>HOK.ParameterTools.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>HOK.ParameterTools.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2013|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\2013\</OutputPath>
+    <DocumentationFile>HOK.ParameterTools.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>RELEASE2013</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2014|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\2014\</OutputPath>
+    <DocumentationFile>HOK.ParameterTools.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>RELEASE2014</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2015|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\2015\</OutputPath>
+    <DocumentationFile>HOK.ParameterTools.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>RELEASE2015</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI, Version=2013.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2013'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI, Version=2013.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2013'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Text" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Clases\clsPara.vb" />
+    <Compile Include="Clases\clsRPNparser.vb" />
+    <Compile Include="Clases\clsSortableBindingList.vb" />
+    <Compile Include="cmdParameterTools.vb" />
+    <Compile Include="constParameterTools.vb" />
+    <Compile Include="Clases\clsParaMini.vb" />
+    <Compile Include="Forms\form_ParamParent.Designer.vb">
+      <DependentUpon>form_ParamParent.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\form_ParamParent.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\form_ParamRollUp.Designer.vb">
+      <DependentUpon>form_ParamRollUp.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\form_ParamRollUp.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\form_ParamScheduleKey.Designer.vb">
+      <DependentUpon>form_ParamScheduleKey.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\form_ParamScheduleKey.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\form_ParamWriteToExcel.Designer.vb">
+      <DependentUpon>form_ParamWriteToExcel.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\form_ParamWriteToExcel.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\form_ParamCalculate.Designer.vb">
+      <DependentUpon>form_ParamCalculate.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\form_ParamCalculate.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\form_ParamMenu.Designer.vb">
+      <DependentUpon>form_ParamMenu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\form_ParamMenu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Forms\form_ParamProgressBar.Designer.vb">
+      <DependentUpon>form_ParamProgressBar.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\form_ParamProgressBar.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Clases\clsScheduleKeyItem.vb" />
+    <Compile Include="Clases\clsScheduleKeySet.vb" />
+    <Compile Include="Clases\clsSettings.vb" />
+    <Compile Include="Forms\form_ParamStringCalculate.Designer.vb">
+      <DependentUpon>form_ParamStringCalculate.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\form_ParamStringCalculate.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Clases\clsUtilityExcel.vb" />
+    <Compile Include="Clases\clsUtilityIni.vb" />
+    <Compile Include="Clases\clsUtilityProperties.vb" />
+    <Compile Include="Forms\New Forms\form_FormulaHelp.Designer.vb">
+      <DependentUpon>form_FormulaHelp.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\New Forms\form_FormulaHelp.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\New Forms\form_ParameterCalculation.Designer.vb">
+      <DependentUpon>form_ParameterCalculation.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\New Forms\form_ParameterCalculation.vb">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Forms\form_ParamParent.resx">
+      <DependentUpon>form_ParamParent.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\form_ParamRollUp.resx">
+      <DependentUpon>form_ParamRollUp.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\form_ParamScheduleKey.resx">
+      <DependentUpon>form_ParamScheduleKey.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\form_ParamWriteToExcel.resx">
+      <DependentUpon>form_ParamWriteToExcel.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\form_ParamCalculate.resx">
+      <DependentUpon>form_ParamCalculate.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\form_ParamMenu.resx">
+      <DependentUpon>form_ParamMenu.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\form_ParamProgressBar.resx">
+      <DependentUpon>form_ParamProgressBar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\form_ParamStringCalculate.resx">
+      <DependentUpon>form_ParamStringCalculate.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\New Forms\form_FormulaHelp.resx">
+      <DependentUpon>form_FormulaHelp.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\New Forms\form_ParameterCalculation.resx">
+      <DependentUpon>form_ParameterCalculation.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
