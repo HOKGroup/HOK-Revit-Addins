@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>Google.Apis.Drive.v2</id>
+    <version>1.7.0.111-beta</version>
+    <title>Google.Apis.Drive.v2 Client Library</title>
+    <authors>Google Inc.</authors>
+    <owners>Google Inc.</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://code.google.com/p/google-api-dotnet-client/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Google APIs Client Library for working with Drive v2.
+          Supported Platforms:
+
+          - .NET Framework 4 and 4.5
+
+          - Windows Store apps
+
+          - Windows Phone 7.5 and 8
+
+          - Portable Class Libraries</description>
+    <tags>Google</tags>
+    <dependencies>
+      <dependency id="Google.Apis" version="1.7.0-beta" />
+      <dependency id="Google.Apis.Auth" version="1.7.0-beta" />
+    </dependencies>
+  </metadata>
+</package>
