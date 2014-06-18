@@ -1,0 +1,16 @@
+v.0.1.6
+New
+-Isolate/Reset view: after overriding colors by elements, a temporary view will be created with isolating the colored elements
+ double-click the command button will reset the view.
+ 
+-Clear Colors: If a view corresponding to a color scheme has contained colored elements by this tool,
+it will remove the overriding colors and restore back to the initial state of the model element color.
+
+- Empty Value Entry: If some of filtered elements have empty value of the selected parameter, 
+it will create an default color definition entry called <empty value>
+
+Fix
+-Restoring custom entries when switching back and forth between "By Value" and "By Range"
+-Displaying Yes/No value insteading of raw integer value 0/1
+-Extensible storage to memorize the recently opened BCF file
+-Color Definition entries with parameter values as displayed in Revit UI such as "245.00 SF" with their units 
