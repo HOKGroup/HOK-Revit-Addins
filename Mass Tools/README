@@ -1,0 +1,4 @@
+V.0.2.8
+Deprecated 
+- Color columns are removed from Mass from Rooms/Areas/Floors windows.
+  this color picker feature should be replaced by our Color Editor tool. 
