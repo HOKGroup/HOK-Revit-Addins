@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HOK Model Reporting for Multi-Versions of Revit")]
-[assembly: AssemblyDescription("HOK Model Reporting for Multi-Versions of Revit")]
+[assembly: AssemblyTitle("HOK Model Reporting for Revit (Multi-Versions)")]
+[assembly: AssemblyDescription("HOK Model Reporting for Revit (Multi-Versions)")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.ModelReporting")]
