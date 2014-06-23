@@ -1,0 +1,12 @@
+v.10.1.3
+New
+-Properties: 
+"LocalFileName" for the file path of the local Revit project file, 
+"LocalFileLocation" for the office location of the local file stored
+
+-EventType:
+"OPEN-DETACHED" event type will be recorded when the Revit project is on work-shared but detached from the central model.
+
+Fix
+-the feature that creates unique document Ids to be stored in extensible sotrage are deprecated. 
+Each Revit document will be distingushed by their file name when multiple files are opened.
