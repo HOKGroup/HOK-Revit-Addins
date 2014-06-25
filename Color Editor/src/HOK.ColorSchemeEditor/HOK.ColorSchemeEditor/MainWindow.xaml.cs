@@ -608,6 +608,7 @@ namespace HOK.ColorSchemeEditor
                     }
                     SelectParameter(selectedColorScheme);
                     SelectView(selectedColorScheme);
+
                 }
                 userInput = true;
             }
@@ -1291,6 +1292,26 @@ namespace HOK.ColorSchemeEditor
                 if (null != colorScheme.SelectedViewInfo)
                 {
                     comboBoxView.SelectedItem = colorScheme.SelectedViewInfo;
+                    //enable or disable the clear color and isolate button
+                    buttonIsolate.IsEnabled = false;
+                    buttonClear.IsEnabled = false;
+
+                    View activeView = m_doc.ActiveView;
+                    if (null != activeView)
+                    {
+                        if (activeView.Id.IntegerValue == colorScheme.SelectedViewInfo.ViewId.IntegerValue)
+                        {
+                            buttonIsolate.IsEnabled = true;
+                            buttonClear.IsEnabled = true;
+                            buttonIsolate.ToolTip = "Apply override colors and isolate the active view.";
+                            buttonClear.ToolTip = "Clear override colors.";
+                        }
+                        else
+                        {
+                            buttonIsolate.ToolTip = "Please make sure the selected view is opened in the background as the active view.";
+                            buttonClear.ToolTip = "Please make sure the selected view is opened in the background as the active view.";
+                        }
+                    }
                 }
                 
             }
