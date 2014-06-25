@@ -1,3 +1,11 @@
+v.0.1.7
+Fix
+-Clear Colors: this button will be only enabled when the active view in the background Revit is same as the selected view.
+-Isolate On/Off: the text of the button, Isolate/Reset View, has been changed to Isolate On/Off. 
+                 Like the Clear Colors button, this will be also enabled when the active view is same as the selected view.
+
+
+
 v.0.1.6
 New
 -Isolate/Reset view: after overriding colors by elements, a temporary view will be created with isolating the colored elements
