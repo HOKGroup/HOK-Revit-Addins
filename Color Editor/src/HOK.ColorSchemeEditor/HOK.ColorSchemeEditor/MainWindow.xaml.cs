@@ -188,6 +188,9 @@ namespace HOK.ColorSchemeEditor
                         sortableSchemeViews.Sort();
 
                         dataGridSchemes.SelectedItem = viewModel;
+
+                        buttonSaveBCF.IsEnabled = true;
+                        buttonSaveAsBCF.IsEnabled = true;
                     }
                 }
             }
@@ -877,6 +880,10 @@ namespace HOK.ColorSchemeEditor
                 comboBoxColor.ItemsSource = null;
                 dataGridDefinition.ItemsSource = null;
 
+                buttonSaveBCF.IsEnabled = false;
+                buttonSaveAsBCF.IsEnabled = false;
+                buttonIsolate.IsEnabled = false;
+                buttonClear.IsEnabled = false;
             }
             catch (Exception ex)
             {
@@ -1024,41 +1031,43 @@ namespace HOK.ColorSchemeEditor
         {
             try
             {
-                ViewInfo selectedViewInfo = selectedColorScheme.SelectedViewInfo;
-                View selectedView = selectedViewInfo.ViewObj;
-
-                if (selectedView.IsInTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate))
+                if (null != selectedColorScheme.SelectedViewInfo)
                 {
-                    using (Transaction trans = new Transaction(m_doc))
+                    ViewInfo selectedViewInfo = selectedColorScheme.SelectedViewInfo;
+                    View selectedView = selectedViewInfo.ViewObj;
+
+                    if (selectedView.IsInTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate))
                     {
-                        trans.Start("Reset View");
-                        try
+                        using (Transaction trans = new Transaction(m_doc))
                         {
-                            selectedView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
-                            trans.Commit();
+                            trans.Start("Reset View");
+                            try
+                            {
+                                selectedView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+                                trans.Commit();
+                            }
+                            catch { trans.RollBack(); }
                         }
-                        catch { trans.RollBack(); }
+                    }
+                    else
+                    {
+                        SaveChanges(selectedColorScheme);
+
+                        List<ElementId> coloredElements = ApplyColors(selectedColorScheme);
+
+                        using (Transaction trans = new Transaction(m_doc))
+                        {
+                            trans.Start("Isolate");
+                            try
+                            {
+                                selectedView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+                                selectedView.IsolateElementsTemporary(coloredElements);
+                                trans.Commit();
+                            }
+                            catch { trans.RollBack(); }
+                        }
                     }
                 }
-                else
-                {
-                    SaveChanges(selectedColorScheme);
-
-                    List<ElementId> coloredElements = ApplyColors(selectedColorScheme);
-
-                    using (Transaction trans = new Transaction(m_doc))
-                    {
-                        trans.Start("Isolate");
-                        try
-                        {
-                            selectedView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
-                            selectedView.IsolateElementsTemporary(coloredElements);
-                            trans.Commit();
-                        }
-                        catch { trans.RollBack(); }
-                    }
-                }
-
             }
             catch (Exception ex)
             {
@@ -1071,46 +1080,49 @@ namespace HOK.ColorSchemeEditor
             try
             {
                 string schemeId = selectedColorScheme.SchemeId;
-                if (colorEditorSettings.ColoredElements.ContainsKey(schemeId))
+                if (!string.IsNullOrEmpty(schemeId))
                 {
-                    IList<ElementId> elementIds = colorEditorSettings.ColoredElements[schemeId];
-
-                    ViewInfo selectedViewInfo = selectedColorScheme.SelectedViewInfo;
-                    View selectedView = selectedViewInfo.ViewObj;
-
-                    OverrideGraphicSettings settings = new OverrideGraphicSettings();
-                    settings.SetProjectionFillColor(Autodesk.Revit.DB.Color.InvalidColorValue);
-                    settings.SetCutFillColor(Autodesk.Revit.DB.Color.InvalidColorValue);
-                    settings.SetProjectionFillPatternId(ElementId.InvalidElementId);
-                    settings.SetCutFillPatternId(ElementId.InvalidElementId);
-
-                    bool result = false;
-                    using (Transaction trans = new Transaction(m_doc))
+                    if (colorEditorSettings.ColoredElements.ContainsKey(schemeId))
                     {
-                        trans.Start("Clear Override Colors");
-                        try
+                        IList<ElementId> elementIds = colorEditorSettings.ColoredElements[schemeId];
+
+                        ViewInfo selectedViewInfo = selectedColorScheme.SelectedViewInfo;
+                        View selectedView = selectedViewInfo.ViewObj;
+
+                        OverrideGraphicSettings settings = new OverrideGraphicSettings();
+                        settings.SetProjectionFillColor(Autodesk.Revit.DB.Color.InvalidColorValue);
+                        settings.SetCutFillColor(Autodesk.Revit.DB.Color.InvalidColorValue);
+                        settings.SetProjectionFillPatternId(ElementId.InvalidElementId);
+                        settings.SetCutFillPatternId(ElementId.InvalidElementId);
+
+                        bool result = false;
+                        using (Transaction trans = new Transaction(m_doc))
                         {
-                            if (null != selectedView)
+                            trans.Start("Clear Override Colors");
+                            try
                             {
-                                foreach (ElementId eId in elementIds)
+                                if (null != selectedView)
                                 {
-                                    selectedView.SetElementOverrides(eId, settings);
+                                    foreach (ElementId eId in elementIds)
+                                    {
+                                        selectedView.SetElementOverrides(eId, settings);
+                                    }
                                 }
+                                trans.Commit();
+                                result = true;
                             }
-                            trans.Commit();
-                            result = true;
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show("Failed to clear override colors.\n" + ex.Message, "Clear Override Colors", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                trans.RollBack();
+                                result = false;
+                            }
                         }
-                        catch (Exception ex)
+                        if (result)
                         {
-                            MessageBox.Show("Failed to clear override colors.\n" + ex.Message, "Clear Override Colors", MessageBoxButton.OK, MessageBoxImage.Warning);
-                            trans.RollBack();
-                            result = false;
+                            colorEditorSettings.ColoredElements.Remove(schemeId);
+                            DataStorageUtil.UpdateDataStorage(m_doc, colorEditorSettings);
                         }
-                    }
-                    if (result)
-                    {
-                        colorEditorSettings.ColoredElements.Remove(schemeId);
-                        DataStorageUtil.UpdateDataStorage(m_doc, colorEditorSettings);
                     }
                 }
             }
@@ -1203,6 +1215,9 @@ namespace HOK.ColorSchemeEditor
                     }
                     sortableSchemeViews.Sort();
                     dataGridSchemes.SelectedItem = sortableSchemeViews[0];
+                    
+                    buttonSaveBCF.IsEnabled = true;
+                    buttonSaveAsBCF.IsEnabled = true;
                 }
 
             }

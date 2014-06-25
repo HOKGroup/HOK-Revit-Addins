@@ -138,13 +138,13 @@
                         <TextBlock>Open Color Scheme</TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Name="buttonSaveBCF" Margin="5,0" Click="buttonSaveBCF_Click">
+                <Button Name="buttonSaveBCF" Margin="5,0" Click="buttonSaveBCF_Click" IsEnabled="False">
                     <StackPanel Orientation="Horizontal">
                         <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/save.ico" Stretch="None" />
                         <TextBlock>Save BCF</TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Name="buttonSaveAsBCF" Margin="5,0" Click="buttonSaveAsBCF_Click">
+                <Button Name="buttonSaveAsBCF" Margin="5,0" Click="buttonSaveAsBCF_Click" IsEnabled="False">
                     <StackPanel Orientation="Horizontal">
                         <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/saveas.ico" Stretch="None" />
                         <TextBlock>Save As</TextBlock>
@@ -192,8 +192,8 @@
 
         <Button Content="Update All" Grid.Row="3" Height="23" Margin="0,12,10,0" x:Name="buttonUpdateAll" VerticalAlignment="Top" HorizontalAlignment="Right" Width="89" Click="buttonUpdateAll_Click" ToolTip="Apply override colors by all loaded color schemes." />
         <Button Content="Update Selected" Grid.Row="3" Height="23" Margin="0,12,104,0" Name="buttonApply" VerticalAlignment="Top" HorizontalAlignment="Right" Width="105" Click="buttonApply_Click" ToolTip="Apply override colors by the selected color scheme." />
-        <Button x:Name="buttonIsolate" Content="Isolate On / Off" HorizontalAlignment="Right" Margin="0,12,214,0" Grid.Row="3" VerticalAlignment="Top" Width="123" ToolTip="Apply override colors and isolate the active view." ToolTipService.ShowOnDisabled="True" Click="buttonIsolate_Click"/>
-        <Button x:Name="buttonClear" Content="Clear Colors" HorizontalAlignment="Right" Margin="0,12,342,0" Grid.Row="3" VerticalAlignment="Top" Width="90" ToolTip="Clear override colors " ToolTipService.ShowOnDisabled="True" Click="buttonClear_Click"/>
+        <Button x:Name="buttonIsolate" Content="Isolate On / Off" HorizontalAlignment="Right" Margin="0,12,214,0" Grid.Row="3" VerticalAlignment="Top" Width="123" ToolTip="Apply override colors and isolate the active view." ToolTipService.ShowOnDisabled="True" Click="buttonIsolate_Click" IsEnabled="False"/>
+        <Button x:Name="buttonClear" Content="Clear Colors" HorizontalAlignment="Right" Margin="0,12,342,0" Grid.Row="3" VerticalAlignment="Top" Width="90" ToolTip="Clear override colors " ToolTipService.ShowOnDisabled="True" Click="buttonClear_Click" IsEnabled="False"/>
         <Button Content="Close" Height="23" Margin="0,12,437,0" Name="buttonClose" VerticalAlignment="Top" Grid.Row="3" HorizontalAlignment="Right" Width="75" Click="buttonClose_Click" />
         <CheckBox Content="Save on Close" Grid.Row="3" Height="16" Margin="0,16,531,0" Name="checkBoxSave" VerticalAlignment="Top" HorizontalAlignment="Right" Width="92" IsChecked="True" />
         
