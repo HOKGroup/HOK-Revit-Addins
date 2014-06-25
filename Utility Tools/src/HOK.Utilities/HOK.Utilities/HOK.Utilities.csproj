@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.Utilities</RootNamespace>
     <AssemblyName>HOK.Utilities</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -35,53 +35,50 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2013|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <OutputPath>bin\2013\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2013</DefineConstants>
+    <DefineConstants>RELEASE2013</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2014|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <OutputPath>bin\2014\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2014</DefineConstants>
+    <DefineConstants>RELEASE2014</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2015|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <OutputPath>bin\2015\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2015</DefineConstants>
+    <DefineConstants>RELEASE2015</DefineConstants>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="RevitAPI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="RevitAPI, Version=2013.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2013'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI, Version=2013.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2013'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -166,10 +163,14 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\hoklogo.ico" />
     <EmbeddedResource Include="Resources\workset.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\arrowhead.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\camera.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\copy.png">
@@ -196,14 +197,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\hoklogo.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\camera.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
