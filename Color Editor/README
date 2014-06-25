@@ -1,3 +1,8 @@
+v.0.1.8
+Fix
+- Save and Save As Buttons will be disabled if the Color Editor UI doesn't contain any of color shcemes components.
+
+
 v.0.1.7
 Fix
 -Clear Colors: this button will be only enabled when the active view in the background Revit is same as the selected view.
