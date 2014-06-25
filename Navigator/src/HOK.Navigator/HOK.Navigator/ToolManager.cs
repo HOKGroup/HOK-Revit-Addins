@@ -120,22 +120,30 @@ namespace HOK.Navigator
                             tp.StandardVersion = FileVersionInfo.GetVersionInfo(standardPath);
                             Version stdVersion = new Version(tp.StandardVersion.FileVersion);
 
-                            if (instVersion.CompareTo(stdVersion) < 0)
+                            if (instVersion.Major != stdVersion.Major) //when major version number is different
                             {
-                                //installed version is eariler than standard version
                                 tp.IsBeta = false;
                                 outDatedTools.Add(tp.ToolName, tp);
                             }
-                            else if (instVersion.CompareTo(stdVersion) > 0)
+                            else
                             {
-                                if (File.Exists(betaPath))
+                                if (instVersion.CompareTo(stdVersion) < 0)
                                 {
-                                    tp.BetaVersion = FileVersionInfo.GetVersionInfo(betaPath);
-                                    Version btVersion = new Version(tp.BetaVersion.FileVersion);
-                                    if (instVersion.CompareTo(btVersion) < 0)
+                                    //installed version is eariler than standard version
+                                    tp.IsBeta = false;
+                                    outDatedTools.Add(tp.ToolName, tp);
+                                }
+                                else if (instVersion.CompareTo(stdVersion) > 0)
+                                {
+                                    if (File.Exists(betaPath))
                                     {
-                                        tp.IsBeta = true;
-                                        outDatedTools.Add(tp.ToolName, tp);
+                                        tp.BetaVersion = FileVersionInfo.GetVersionInfo(betaPath);
+                                        Version btVersion = new Version(tp.BetaVersion.FileVersion);
+                                        if (instVersion.CompareTo(btVersion) < 0)
+                                        {
+                                            tp.IsBeta = true;
+                                            outDatedTools.Add(tp.ToolName, tp);
+                                        }
                                     }
                                 }
                             }
