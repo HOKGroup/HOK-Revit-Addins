@@ -1,0 +1,6 @@
+V.0.1.11
+Fix
+- When retrieving out dated dll files for addins, 
+  it will check whether the major component of the version number of the installed dll is equivalent to the released one.
+  
+  e.g.) 2014.xx.xx.xx should be replaced if the released version number is 2015.xx.xx.xx
