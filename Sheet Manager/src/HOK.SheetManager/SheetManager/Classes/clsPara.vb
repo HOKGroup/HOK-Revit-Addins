@@ -186,11 +186,11 @@ Public Class clsPara
     Public Shared Function GetParameterValue(ByVal parameter As Parameter) As String
         Select Case parameter.StorageType
             Case StorageType.Double
-                Return parameter.AsDouble
+                Return parameter.AsDouble.ToString
             Case StorageType.ElementId
-                Return parameter.AsElementId.IntegerValue
+                Return parameter.AsElementId.IntegerValue.ToString
             Case StorageType.Integer
-                Return parameter.AsInteger
+                Return parameter.AsInteger.ToString
             Case StorageType.None
                 Return parameter.AsValueString
             Case StorageType.String
@@ -213,12 +213,12 @@ Public Class clsPara
             Select Case parameter.StorageType
                 Case StorageType.Double
                     Dim m_Double As Double
-                    If Double.TryParse(value, m_Double) Then
+                    If Double.TryParse(value.ToString, m_Double) Then
                         parameter.Set(m_Double)
                     End If
                 Case StorageType.ElementId
                     Dim m_ElementId As Integer
-                    If Integer.TryParse(value, m_ElementId) Then
+                    If Integer.TryParse(value.ToString, m_ElementId) Then
                         Dim myElementId As ElementId = New ElementId(m_ElementId)
                         parameter.[Set](myElementId)
                     End If
@@ -242,7 +242,7 @@ Public Class clsPara
                         Case "X"
                             m_Int = 1
                         Case Else
-                            m_Int = value.ToString
+                            'm_Int = value.ToString
                     End Select
                     parameter.Set(m_Int)
                 Case StorageType.String

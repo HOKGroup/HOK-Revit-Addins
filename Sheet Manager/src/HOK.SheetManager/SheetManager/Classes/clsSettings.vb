@@ -49,19 +49,19 @@ Public Class clsSettings
             m_Dlg.MainInstruction = "SheetMaker.ini File Not Found"
             m_Dlg.MainContent = "Failed to find INI file." & vbLf & "Please create a new INI file or open an existing file."
             m_Dlg.AllowCancellation = True
-            m_Dlg.AddCommandLink(1, "Create a New INI File.")
-            m_Dlg.AddCommandLink(2, "Open an Existing INI File.")
+            m_Dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Create a New INI File.")
+            m_Dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Open an Existing INI File.")
 
             Dim result As TaskDialogResult = m_Dlg.Show
             Select Case result
-                Case 1
+                Case TaskDialogResult.CommandLink1
                     Dim folderDialog As FolderBrowserDialog = New FolderBrowserDialog()
                     folderDialog.Description = "Select the directory that you want to use As the default."
                     Dim fdr As DialogResult = folderDialog.ShowDialog()
                     If (result = DialogResult.OK) Then
                         m_IniPath = folderDialog.SelectedPath & "\" & m_IniFileName
                     End If
-                Case 2
+                Case TaskDialogResult.CommandLink2
                     Dim openfileDialog As OpenFileDialog = New OpenFileDialog()
                     openfileDialog.DefaultExt = "ini"
                     openfileDialog.Filter = "ini files (*.ini)|*.ini"
@@ -86,12 +86,12 @@ Public Class clsSettings
         GetSheetsAndTitleblockInstances()
 
         ' Get the Views
-        Dim m_dViews As New List(Of Element)
+        Dim m_dViews As IList(Of Element)
         Dim m_dViewSheet As ViewSheet
         Dim m_dView As Autodesk.Revit.DB.View
         Dim CollectorViews As New FilteredElementCollector(m_Doc)
         CollectorViews.OfCategory(BuiltInCategory.OST_Views)
-        m_dViews = CollectorViews.ToElements
+        m_dViews = CollectorViews.ToElements()
         ' Verify what we've collected
         For Each elementTest As Element In m_dViews
             m_dView = TryCast(elementTest, Autodesk.Revit.DB.View)
@@ -121,7 +121,7 @@ Public Class clsSettings
         ' Get all Sheets as Titleblocks
         Dim m_ColTblk As New FilteredElementCollector(m_Doc)
         m_ColTblk.WhereElementIsNotElementType()
-        Dim m_Tblk As New List(Of Element)
+        Dim m_Tblk As IList(Of Element)
         m_Tblk = m_ColTblk.OfCategory(BuiltInCategory.OST_TitleBlocks).ToElements
 
         ' List all Paras...
@@ -157,7 +157,7 @@ Public Class clsSettings
         ' Get all Sheets as Sheets
         Dim m_ColSheets As New FilteredElementCollector(m_Doc)
         m_ColSheets.WhereElementIsNotElementType()
-        Dim m_ListSheets As New List(Of Element)
+        Dim m_ListSheets As IList(Of Element)
         m_ListSheets = m_ColSheets.OfCategory(BuiltInCategory.OST_Sheets).ToElements
 
         ' List all Paras...

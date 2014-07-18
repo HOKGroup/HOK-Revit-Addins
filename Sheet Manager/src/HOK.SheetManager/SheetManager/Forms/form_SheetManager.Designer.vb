@@ -273,7 +273,7 @@ Partial Class form_SheetManager
         Me.MaximizeBox = False
         Me.MaximumSize = New System.Drawing.Size(870, 570)
         Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(870, 548)
+        Me.MinimumSize = New System.Drawing.Size(870, 570)
         Me.Name = "form_SheetManager"
         Me.Text = "Sheet Management"
         Me.GroupBoxTitleblocks.ResumeLayout(False)

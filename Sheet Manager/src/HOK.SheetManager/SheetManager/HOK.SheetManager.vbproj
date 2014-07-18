@@ -52,40 +52,22 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2013|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <DefineDebug>true</DefineDebug>
-    <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\2013\</OutputPath>
-    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>bin\2013\</OutputPath>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>RELEASE2013</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2014|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <DefineDebug>true</DefineDebug>
-    <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\2014\</OutputPath>
-    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>bin\2014\</OutputPath>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>RELEASE2014</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2015|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <DefineDebug>true</DefineDebug>
-    <DefineTrace>true</DefineTrace>
-    <OutputPath>bin\2015\</OutputPath>
-    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>bin\2015\</OutputPath>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>RELEASE2015</DefineConstants>
   </PropertyGroup>
@@ -99,34 +81,28 @@
     <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="RevitAPI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="RevitAPI, Version=2013.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2013'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI, Version=2013.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2013'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />

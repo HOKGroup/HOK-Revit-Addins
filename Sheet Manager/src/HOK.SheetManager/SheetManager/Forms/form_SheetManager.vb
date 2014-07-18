@@ -26,7 +26,7 @@ Public Class form_SheetManager
     Private m_UtilitySql As New clsUtilitySQL
     Private m_UtilityInterop As clsUtilityInterop
     Private m_TitleBlock As FamilySymbol = Nothing
-    Private m_TitleBlocks As New List(Of Element)
+    Private m_TitleBlocks As IList(Of Element)
     Private m_Sheets As New List(Of Element)
     Private m_DataTable As System.Data.DataTable
     Private m_ImageList As New System.Windows.Forms.ImageList
@@ -70,49 +70,58 @@ Public Class form_SheetManager
         ' Default to Excel if it Exists, otherwise use Access
         If File.Exists(m_Settings.ExcelPath) Then
 
-            ' Excel
-            m_isExcel = True
+            Try
+                ' Excel
+                m_isExcel = True
 
-            ' Load the Excel File Data
-            LabelFilePath.Text = m_Settings.ExcelPath
-
-            ' Launch the App and Load the Worksheet List
-            If m_UtilityInterop.StartExcel() Then
-                openFileDialog1.FileName = m_Settings.ExcelPath
-                FillTemplateList()
-
-                ' Grey out the Access button 
-                Me.ButtonConnectAccess.Image = HOK.SheetManager.My.Resources.BW_MsAccess
-
-            Else
-                ListBoxTableSet.Items.Clear()
-                LabelFilePath.Text = "Click Access or Excel File to Continue"
-            End If
-
-        Else
-            ' Try Access
-            If File.Exists(m_Settings.AccessPath) Then
-
-                ' Access
-                m_isExcel = False
-
-                ' Load the Access File Data
-                LabelFilePath.Text = m_Settings.AccessPath
+                ' Load the Excel File Data
+                LabelFilePath.Text = m_Settings.ExcelPath
 
                 ' Launch the App and Load the Worksheet List
-                If m_UtilityInterop.StartAccess Then
-                    openFileDialog1.FileName = m_Settings.AccessPath
+                If m_UtilityInterop.StartExcel() Then
+                    openFileDialog1.FileName = m_Settings.ExcelPath
                     FillTemplateList()
 
-                    ' Grey out the Excel button
-                    Me.ButtonConnectExcel.Image = HOK.SheetManager.My.Resources.excel2007logo_BW
+                    ' Grey out the Access button 
+                    Me.ButtonConnectAccess.Image = HOK.SheetManager.My.Resources.BW_MsAccess
 
                 Else
                     ListBoxTableSet.Items.Clear()
                     LabelFilePath.Text = "Click Access or Excel File to Continue"
                 End If
+            Catch ex As Exception
+                Dim message As String = ex.Message
+            End Try
+        Else
 
-            End If
+            Try
+                ' Try Access
+                If File.Exists(m_Settings.AccessPath) Then
+
+                    ' Access
+                    m_isExcel = False
+
+                    ' Load the Access File Data
+                    LabelFilePath.Text = m_Settings.AccessPath
+
+                    ' Launch the App and Load the Worksheet List
+                    If m_UtilityInterop.StartAccess Then
+                        openFileDialog1.FileName = m_Settings.AccessPath
+                        FillTemplateList()
+
+                        ' Grey out the Excel button
+                        Me.ButtonConnectExcel.Image = HOK.SheetManager.My.Resources.excel2007logo_BW
+
+                    Else
+                        ListBoxTableSet.Items.Clear()
+                        LabelFilePath.Text = "Click Access or Excel File to Continue"
+                    End If
+
+                End If
+            Catch ex As Exception
+                Dim message As String = ex.Message
+            End Try
+            
         End If
 
         ' Always check on load
@@ -220,183 +229,190 @@ Public Class form_SheetManager
             .Visible = True
         End With
 
-        ' Show sheet's in tree view... icons to show updates versus new sheets
-        For Each row As DataRow In m_DataTable.Rows
+        Try
+            ' Show sheet's in tree view... icons to show updates versus new sheets
+            For Each row As DataRow In m_DataTable.Rows
 
-            Dim sheetNumber As String = row("Sheet Number").ToString
+                Dim sheetNumber As String = row("Sheet Number").ToString
 
-            'Check for empty sheet number, which can arise with Excel case
-            If sheetNumber = "" Then
-                Continue For
-            Else
-                ' Create the parent node
-                Dim tn1 As New System.Windows.Forms.TreeNode
-                tn1.Text = sheetNumber
-                tn1.Tag = sheetNumber
-                tn1.Name = sheetNumber
-                Me.TreeViewSheets.Nodes.Add(tn1)
+                'Check for empty sheet number, which can arise with Excel case
+                If sheetNumber = "" Then
+                    Me.ProgressBar1.Increment(1)
+                    Continue For
+                Else
+                    ' Create the parent node
+                    Dim tn1 As New System.Windows.Forms.TreeNode
+                    tn1.Text = sheetNumber
+                    tn1.Tag = sheetNumber
+                    tn1.Name = sheetNumber
+                    Me.TreeViewSheets.Nodes.Add(tn1)
 
-                ' Is it an existing sheet?
-                If m_Settings.Sheets.ContainsKey(sheetNumber) Then
-                    ' Find discrepancies
-                    tn1.ImageIndex = 0
-                    tn1.SelectedImageIndex = 0
+                    ' Is it an existing sheet?
+                    If m_Settings.Sheets.ContainsKey(sheetNumber) And m_Settings.clsTblksList.ContainsKey(sheetNumber) And m_Settings.clsSheetsList.ContainsKey(sheetNumber) Then
 
-                    ' The Titleblock Element Instance
-                    Dim m_TblkItem As Element = m_Settings.clsTblksList(row("Sheet Number")).Element
-                    ' The Sheet Element
-                    Dim m_SheetItem As ViewSheet = m_Settings.clsSheetsList(row("Sheet Number")).Sheet
+                        ' Find discrepancies
+                        tn1.ImageIndex = 0
+                        tn1.SelectedImageIndex = 0
 
-                    ' Iterate the columns in the datarow
-                    For Each dc As DataColumn In m_DataTable.Columns
+                        ' The Titleblock Element Instance
+                        Dim m_TblkItem As Element = m_Settings.clsTblksList(sheetNumber).Element
+                        ' The Sheet Element
+                        Dim m_SheetItem As ViewSheet = m_Settings.clsSheetsList(sheetNumber).Sheet
+
+                        ' Iterate the columns in the datarow
+                        For Each dc As DataColumn In m_DataTable.Columns
 
 #If RELEASE2013 Or RELEASE2014 Then
-                        Dim m_pTblk As Parameter = m_TblkItem.Parameter(dc.ColumnName)
-                        Dim m_pSht As Parameter = m_SheetItem.Parameter(dc.ColumnName)
+                            Dim m_pTblk As Parameter = m_TblkItem.Parameter(dc.ColumnName)
+                            Dim m_pSht As Parameter = m_SheetItem.Parameter(dc.ColumnName)
 #ElseIf RELEASE2015 Then
                         Dim m_pTblk As Parameter = m_TblkItem.LookupParameter(dc.ColumnName)
                         Dim m_pSht As Parameter = m_SheetItem.LookupParameter(dc.ColumnName)
 #End If
 
-                        If m_pTblk IsNot Nothing Then
+                            If m_pTblk IsNot Nothing Then
 
-                            Dim m_para As New clsPara(m_pTblk)
+                                Dim m_para As New clsPara(m_pTblk)
 
-                            Try
+                                Try
 
-                                ' Is this a Y/N parameter
-                                If m_para.DisplayUnitType.ToUpper = "YESNO" Then
+                                    ' Is this a Y/N parameter
+                                    If m_para.DisplayUnitType.ToUpper = "YESNO" Then
 
-                                    Dim isDiscrepancy As Boolean = False
+                                        Dim isDiscrepancy As Boolean = False
 
-                                    Select Case row(m_para.Name).ToString.ToUpper
-                                        Case "1"
-                                            If m_para.Value <> 1 Then isDiscrepancy = True
-                                        Case "Y"
-                                            If m_para.Value <> 1 Then isDiscrepancy = True
-                                        Case "YES"
-                                            If m_para.Value <> 1 Then isDiscrepancy = True
-                                        Case "X"
-                                            If m_para.Value <> 1 Then isDiscrepancy = True
-                                        Case "0"
-                                            If m_para.Value <> 0 Then isDiscrepancy = True
-                                        Case "N"
-                                            If m_para.Value <> 0 Then isDiscrepancy = True
-                                        Case "NO"
-                                            If m_para.Value <> 0 Then isDiscrepancy = True
-                                        Case ""
-                                            If m_para.Value <> 0 Then isDiscrepancy = True
-                                    End Select
+                                        Select Case row(m_para.Name).ToString.ToUpper
+                                            Case "1"
+                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "Y"
+                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "YES"
+                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "X"
+                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "0"
+                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                            Case "N"
+                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                            Case "NO"
+                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                            Case ""
+                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                        End Select
 
-                                    If isDiscrepancy = True Then
-                                        ' This is a discrepancy
-                                        Dim tn2 As New System.Windows.Forms.TreeNode
-                                        tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
-                                        tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                        tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                        Me.TreeViewSheets.Nodes(row("Sheet Number").ToString).Nodes.Add(tn2)
-                                        tn2.ImageIndex = 1
-                                        tn2.SelectedImageIndex = 1
+                                        If isDiscrepancy = True Then
+                                            ' This is a discrepancy
+                                            Dim tn2 As New System.Windows.Forms.TreeNode
+                                            tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
+                                            tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
+                                            tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
+                                            Me.TreeViewSheets.Nodes(row("Sheet Number").ToString).Nodes.Add(tn2)
+                                            tn2.ImageIndex = 1
+                                            tn2.SelectedImageIndex = 1
+                                        End If
+                                    Else
+                                        ' These are not YesNo Parameters
+                                        If m_para.Value <> row(m_para.Name).ToString Then
+                                            ' This is a discrepancy
+                                            Dim tn2 As New System.Windows.Forms.TreeNode
+                                            tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
+                                            tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
+                                            tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
+                                            Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
+                                            tn2.ImageIndex = 1
+                                            tn2.SelectedImageIndex = 1
+
+                                        End If
                                     End If
-                                Else
-                                    ' These are not YesNo Parameters
-                                    If m_para.Value <> row(m_para.Name).ToString Then
-                                        ' This is a discrepancy
-                                        Dim tn2 As New System.Windows.Forms.TreeNode
-                                        tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
-                                        tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                        tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                        Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
-                                        tn2.ImageIndex = 1
-                                        tn2.SelectedImageIndex = 1
 
+                                Catch ex As Exception
+
+                                End Try
+
+                            End If
+
+
+                            If m_pSht IsNot Nothing Then
+
+                                Dim m_para As New clsPara(m_pSht)
+
+                                Try
+
+                                    ' Is this a Y/N parameter
+                                    If m_para.DisplayUnitType.ToUpper = "YESNO" Then
+
+                                        Dim isDiscrepancy As Boolean = False
+
+                                        Select Case row(m_para.Name).ToString.ToUpper
+                                            Case "1"
+                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "Y"
+                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "YES"
+                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "X"
+                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "0"
+                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                            Case "N"
+                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                            Case "NO"
+                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                            Case ""
+                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                        End Select
+
+                                        If isDiscrepancy = True Then
+                                            ' This is a discrepancy
+                                            Dim tn2 As New System.Windows.Forms.TreeNode
+                                            tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
+                                            tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
+                                            tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
+                                            Me.TreeViewSheets.Nodes(row("Sheet Number").ToString).Nodes.Add(tn2)
+                                            tn2.ImageIndex = 1
+                                            tn2.SelectedImageIndex = 1
+                                        End If
+                                    Else
+                                        ' These are not YesNo Parameters
+                                        If m_para.Value <> row(m_para.Name).ToString Then
+                                            ' This is a discrepancy
+                                            Dim tn2 As New System.Windows.Forms.TreeNode
+                                            tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
+                                            tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
+                                            tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
+                                            Me.TreeViewSheets.Nodes(row("Sheet Number").ToString).Nodes.Add(tn2)
+                                            tn2.ImageIndex = 1
+                                            tn2.SelectedImageIndex = 1
+
+                                        End If
                                     End If
-                                End If
 
-                            Catch ex As Exception
+                                Catch ex As Exception
 
-                            End Try
+                                End Try
 
-                        End If
-
-
-                        If m_pSht IsNot Nothing Then
-
-                            Dim m_para As New clsPara(m_pSht)
-
-                            Try
-
-                                ' Is this a Y/N parameter
-                                If m_para.DisplayUnitType.ToUpper = "YESNO" Then
-
-                                    Dim isDiscrepancy As Boolean = False
-
-                                    Select Case row(m_para.Name).ToString.ToUpper
-                                        Case "1"
-                                            If m_para.Value <> 1 Then isDiscrepancy = True
-                                        Case "Y"
-                                            If m_para.Value <> 1 Then isDiscrepancy = True
-                                        Case "YES"
-                                            If m_para.Value <> 1 Then isDiscrepancy = True
-                                        Case "X"
-                                            If m_para.Value <> 1 Then isDiscrepancy = True
-                                        Case "0"
-                                            If m_para.Value <> 0 Then isDiscrepancy = True
-                                        Case "N"
-                                            If m_para.Value <> 0 Then isDiscrepancy = True
-                                        Case "NO"
-                                            If m_para.Value <> 0 Then isDiscrepancy = True
-                                        Case ""
-                                            If m_para.Value <> 0 Then isDiscrepancy = True
-                                    End Select
-
-                                    If isDiscrepancy = True Then
-                                        ' This is a discrepancy
-                                        Dim tn2 As New System.Windows.Forms.TreeNode
-                                        tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
-                                        tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                        tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                        Me.TreeViewSheets.Nodes(row("Sheet Number").ToString).Nodes.Add(tn2)
-                                        tn2.ImageIndex = 1
-                                        tn2.SelectedImageIndex = 1
-                                    End If
-                                Else
-                                    ' These are not YesNo Parameters
-                                    If m_para.Value <> row(m_para.Name).ToString Then
-                                        ' This is a discrepancy
-                                        Dim tn2 As New System.Windows.Forms.TreeNode
-                                        tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
-                                        tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                        tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                        Me.TreeViewSheets.Nodes(row("Sheet Number").ToString).Nodes.Add(tn2)
-                                        tn2.ImageIndex = 1
-                                        tn2.SelectedImageIndex = 1
-
-                                    End If
-                                End If
-
-                            Catch ex As Exception
-
-                            End Try
-
-                        End If
+                            End If
 
 
-                    Next
+                        Next
 
-                    ' If no discrepancies, then remove the parent node
-                    'If Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Count = 0 Then
-                    'Me.TreeViewSheets.Nodes.Remove(tn1)
-                    'End If
+                        ' If no discrepancies, then remove the parent node
+                        'If Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Count = 0 Then
+                        'Me.TreeViewSheets.Nodes.Remove(tn1)
+                        'End If
+
+                    End If
 
                 End If
 
-            End If
+                ' Step the progrssbar
+                Me.ProgressBar1.Increment(1)
 
-            ' Step the progrssbar
-            Me.ProgressBar1.Increment(1)
-
-        Next
+            Next
+        Catch ex As Exception
+            Dim message As String = ex.Message
+        End Try
+        
 
         ' Tell the user if no discrepancies found
         If Me.TreeViewSheets.Nodes.Count < 1 Then
@@ -892,15 +908,15 @@ Public Class form_SheetManager
         m_Dlg.MainInstruction = "Warning"
         m_Dlg.MainContent = "This command will overwrite data." & vbLf & "Be sure that the proper data dable is selected before proceeding."
         m_Dlg.AllowCancellation = True
-        m_Dlg.AddCommandLink(1, "Continue with Export")
-        m_Dlg.AddCommandLink(2, "Cancel and do Nothing")
+        m_Dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Continue with Export")
+        m_Dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Cancel and do Nothing")
 
         Dim result As TaskDialogResult = m_Dlg.Show
         Select Case result
-            Case 1
+            Case TaskDialogResult.CommandLink1
                 ' Continue
 
-            Case 2
+            Case TaskDialogResult.CommandLink2
                 ' Cancel
                 MsgBox("Canceling Export", MsgBoxStyle.Exclamation, "Canceling")
                 Exit Sub
@@ -1040,19 +1056,22 @@ Public Class form_SheetManager
         ListBoxTableSet.Items.Clear()
 
         If m_isExcel = True Then
-            m_UtilityInterop.FillDataTableFromExcelSheetNames("TemplateId")
-            dataTableLocal = m_UtilityInterop.DataTable
+            Try
+                m_UtilityInterop.FillDataTableFromExcelSheetNames("TemplateId")
+                dataTableLocal = m_UtilityInterop.DataTable
 
-            For Each row As DataRow In dataTableLocal.Rows
-                ListBoxTableSet.Items.Add(row("TemplateId").ToString)
-            Next
-            If ListBoxTableSet.Items.Count = 0 Then
-                ShowRevitTaskDialog("Sheet Manager", "Processing Stopped", "No valid sheets in Excel file." & vbCr & "Nothing to do.")
-                Return
-            End If
-            'Always set to first, if there is only one then that's it.
-            ListBoxTableSet.SelectedIndex = 0
-
+                For Each row As DataRow In dataTableLocal.Rows
+                    ListBoxTableSet.Items.Add(row("TemplateId").ToString)
+                Next
+                If ListBoxTableSet.Items.Count = 0 Then
+                    ShowRevitTaskDialog("Sheet Manager", "Processing Stopped", "No valid sheets in Excel file." & vbCr & "Nothing to do.")
+                    Return
+                End If
+                'Always set to first, if there is only one then that's it.
+                ListBoxTableSet.SelectedIndex = 0
+            Catch ex As Exception
+                Dim message As String = ex.Message
+            End Try
         Else
             Try
 
@@ -1222,21 +1241,21 @@ UpdateExistingElement:
 
                             Select Case infoRow(m_Para.Name).ToString.ToUpper
                                 Case "1"
-                                    If m_Para.Value <> 1 Then isDiscrepancy = True
+                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
                                 Case "Y"
-                                    If m_Para.Value <> 1 Then isDiscrepancy = True
+                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
                                 Case "YES"
-                                    If m_Para.Value <> 1 Then isDiscrepancy = True
+                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
                                 Case "X"
-                                    If m_Para.Value <> 1 Then isDiscrepancy = True
+                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
                                 Case "0"
-                                    If m_Para.Value <> 0 Then isDiscrepancy = True
+                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
                                 Case "N"
-                                    If m_Para.Value <> 0 Then isDiscrepancy = True
+                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
                                 Case "NO"
-                                    If m_Para.Value <> 0 Then isDiscrepancy = True
+                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
                                 Case ""
-                                    If m_Para.Value <> 0 Then isDiscrepancy = True
+                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
                             End Select
 
                             If isDiscrepancy = True Then
@@ -1275,7 +1294,7 @@ UpdateExistingElement:
 
                         ' Find the Titleblock Family
                         Dim m_TBeleCol As New FilteredElementCollector(m_Settings.Document)
-                        Dim m_ListTBs As New List(Of Element)
+                        Dim m_ListTBs As IList(Of Element)
                         m_ListTBs = m_TBeleCol.OfCategory(BuiltInCategory.OST_TitleBlocks).ToElements
 
                         ' Find the Right one...
@@ -1328,21 +1347,21 @@ UpdateExistingElement:
 
                                 Select Case infoRow(m_Para.Name).ToString.ToUpper
                                     Case "1"
-                                        If m_Para.Value <> 1 Then isDiscrepancy = True
+                                        If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
                                     Case "Y"
-                                        If m_Para.Value <> 1 Then isDiscrepancy = True
+                                        If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
                                     Case "YES"
-                                        If m_Para.Value <> 1 Then isDiscrepancy = True
+                                        If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
                                     Case "X"
-                                        If m_Para.Value <> 1 Then isDiscrepancy = True
+                                        If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
                                     Case "0"
-                                        If m_Para.Value <> 0 Then isDiscrepancy = True
+                                        If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
                                     Case "N"
-                                        If m_Para.Value <> 0 Then isDiscrepancy = True
+                                        If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
                                     Case "NO"
-                                        If m_Para.Value <> 0 Then isDiscrepancy = True
+                                        If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
                                     Case ""
-                                        If m_Para.Value <> 0 Then isDiscrepancy = True
+                                        If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
                                 End Select
 
                                 If isDiscrepancy = True Then
