@@ -34,13 +34,24 @@ Public Class clsSettings
         m_CommandData = commandData
         m_Doc = m_CommandData.Application.ActiveUIDocument.Document
         ' Calculate the location for which to save the ini file
+        Dim directoryName As String = String.Empty
         If m_Doc.IsWorkshared = True Then
             ' Save workshared ini's at location of model
-            m_IniPath = Path.GetDirectoryName(m_Doc.GetWorksharingCentralModelPath().ToString()) & "\" & m_IniFileName
-        Else
+            If (String.IsNullOrEmpty(m_Doc.GetWorksharingCentralModelPath().ToString())) Then
+                directoryName = Path.GetDirectoryName(m_Doc.GetWorksharingCentralModelPath().ToString())
+            ElseIf String.IsNullOrEmpty(m_Doc.PathName) = False Then
+                directoryName = Path.GetDirectoryName(m_Doc.PathName)
+            End If
+
+        ElseIf String.IsNullOrEmpty(m_Doc.PathName) = False Then
             ' Save non workshared ini's at local model
-            m_IniPath = Path.GetDirectoryName(m_Doc.PathName) & "\" & m_IniFileName
+            directoryName = Path.GetDirectoryName(m_Doc.PathName)
         End If
+
+        If String.IsNullOrEmpty(directoryName) = False Then
+            m_IniPath = Path.Combine(directoryName, m_IniFileName)
+        End If
+
 
         If Not File.Exists(m_IniPath) Then
             ' Files not saved will have their ini saved in the base model directory
@@ -57,9 +68,13 @@ Public Class clsSettings
                 Case TaskDialogResult.CommandLink1
                     Dim folderDialog As FolderBrowserDialog = New FolderBrowserDialog()
                     folderDialog.Description = "Select the directory that you want to use As the default."
+                    If (Directory.Exists(directoryName)) Then
+                        folderDialog.SelectedPath = directoryName
+                    End If
                     Dim fdr As DialogResult = folderDialog.ShowDialog()
-                    If (result = DialogResult.OK) Then
+                    If (fdr = DialogResult.OK) Then
                         m_IniPath = folderDialog.SelectedPath & "\" & m_IniFileName
+                        WriteIniFile()
                     End If
                 Case TaskDialogResult.CommandLink2
                     Dim openfileDialog As OpenFileDialog = New OpenFileDialog()
@@ -107,9 +122,9 @@ Public Class clsSettings
 
         'Reading ini overrides defaults
         ReadIniFile()
-        
 
-           
+
+
     End Sub
 
     ''' <summary>

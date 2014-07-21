@@ -67,6 +67,12 @@ Public Class form_SheetManager
         ' Dialog Title with Version data
         Me.Text = "Sheet Manager - " & m_Settings.ApplicationVersion
 
+        If File.Exists(m_Settings.IniPath()) Then
+            iniPathLabel.Text = "INI Path: " & m_Settings.IniPath()
+        Else
+            iniPathLabel.Text = "INI Path: Not Found"
+        End If
+
         ' Default to Excel if it Exists, otherwise use Access
         If File.Exists(m_Settings.ExcelPath) Then
 
@@ -121,7 +127,7 @@ Public Class form_SheetManager
             Catch ex As Exception
                 Dim message As String = ex.Message
             End Try
-            
+
         End If
 
         ' Always check on load
@@ -1580,6 +1586,7 @@ TransactionFinalization:
             ' Error, no valid file
         Else
             m_Settings.ExcelPath = openFileDialog1.FileName
+            m_Settings.WriteIniFile()
         End If
 
         ' Launch the App and Load the Worksheet List
@@ -1630,6 +1637,7 @@ TransactionFinalization:
             ' Error, no valid file
         Else
             m_Settings.AccessPath = openFileDialog1.FileName
+            m_Settings.WriteIniFile()
         End If
 
         ' Launch the App and Load the Worksheet List

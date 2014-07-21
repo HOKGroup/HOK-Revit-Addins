@@ -43,10 +43,13 @@ Partial Class form_SheetManager
         Me.ButtonConnectExcel = New System.Windows.Forms.Button()
         Me.linkAbout = New System.Windows.Forms.LinkLabel()
         Me.linkHelp = New System.Windows.Forms.LinkLabel()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.iniPathLabel = New System.Windows.Forms.ToolStripStatusLabel()
         Me.GroupBoxTitleblocks.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBoxSheets.SuspendLayout()
+        Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'ListBoxTableSet
@@ -231,7 +234,7 @@ Partial Class form_SheetManager
         '
         Me.linkAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.linkAbout.AutoSize = True
-        Me.linkAbout.Location = New System.Drawing.Point(64, 510)
+        Me.linkAbout.Location = New System.Drawing.Point(63, 516)
         Me.linkAbout.Name = "linkAbout"
         Me.linkAbout.Size = New System.Drawing.Size(35, 13)
         Me.linkAbout.TabIndex = 50
@@ -242,18 +245,33 @@ Partial Class form_SheetManager
         '
         Me.linkHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.linkHelp.AutoSize = True
-        Me.linkHelp.Location = New System.Drawing.Point(18, 510)
+        Me.linkHelp.Location = New System.Drawing.Point(18, 516)
         Me.linkHelp.Name = "linkHelp"
         Me.linkHelp.Size = New System.Drawing.Size(29, 13)
         Me.linkHelp.TabIndex = 49
         Me.linkHelp.TabStop = True
         Me.linkHelp.Text = "Help"
         '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.iniPathLabel})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 540)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(854, 22)
+        Me.StatusStrip1.TabIndex = 51
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'iniPathLabel
+        '
+        Me.iniPathLabel.Name = "iniPathLabel"
+        Me.iniPathLabel.Size = New System.Drawing.Size(0, 17)
+        '
         'form_SheetManager
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(854, 532)
+        Me.ClientSize = New System.Drawing.Size(854, 562)
+        Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.linkAbout)
         Me.Controls.Add(Me.linkHelp)
         Me.Controls.Add(Me.GroupBoxSheets)
@@ -271,15 +289,17 @@ Partial Class form_SheetManager
         Me.Controls.Add(Me.ProgressBar1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
-        Me.MaximumSize = New System.Drawing.Size(870, 570)
+        Me.MaximumSize = New System.Drawing.Size(870, 600)
         Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(870, 570)
+        Me.MinimumSize = New System.Drawing.Size(870, 600)
         Me.Name = "form_SheetManager"
         Me.Text = "Sheet Management"
         Me.GroupBoxTitleblocks.ResumeLayout(False)
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBoxSheets.ResumeLayout(False)
+        Me.StatusStrip1.ResumeLayout(False)
+        Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -304,4 +324,6 @@ Partial Class form_SheetManager
     Friend WithEvents GroupBoxSheets As System.Windows.Forms.GroupBox
     Private WithEvents linkAbout As System.Windows.Forms.LinkLabel
     Private WithEvents linkHelp As System.Windows.Forms.LinkLabel
+    Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip
+    Friend WithEvents iniPathLabel As System.Windows.Forms.ToolStripStatusLabel
 End Class

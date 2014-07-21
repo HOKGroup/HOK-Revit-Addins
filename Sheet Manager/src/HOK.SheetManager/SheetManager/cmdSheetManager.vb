@@ -37,6 +37,7 @@ Public Class cmdSheetManager
             ' Construct and display the main dialog
             Using m_dlg As New form_SheetManager(m_Settings)
                 m_dlg.ShowDialog()
+
                 Return Result.Succeeded
             End Using
 
