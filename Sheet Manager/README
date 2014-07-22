@@ -1,3 +1,10 @@
+v.0.1.5
+Fix
+The option of "Create .ini" will create a SheetMaker.ini file in a user-selected directory
+
+New
+The file path of the .ini will be shown in the status label in the bottom of the main UI.
+
 v.0.1.4
 Fix
 Errors occured when some of sheets are already placed in the Revit project but title blocks
