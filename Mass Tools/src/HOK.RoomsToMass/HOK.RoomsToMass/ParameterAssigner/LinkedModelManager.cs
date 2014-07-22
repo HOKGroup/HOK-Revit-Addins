@@ -64,6 +64,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
         public List<Element> ElementContainer { get; set; } //from host project
         public List<Element> FilteredContainer { get; set; }
         public int ElementCount { get; set; }//from host project
+        public List<Element> LinkedElementContainer { get; set; }
+        public int LinkedElementCount { get; set; }
         public bool IsHost { get; set; }
         public string LInkedFileName { get; set; }
     }
@@ -75,10 +77,15 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             m_elem = element;
         }
+
+        public Document Doc { get; set; }
         public int ElementId { get { try { return m_elem.Id.IntegerValue; } catch { return 0; } } }
         public string ElementName { get { try { return m_elem.Name; } catch { return ""; } } }
         public int HostElementId { get; set; }
         public Element ElementObj { get { return m_elem; } set { m_elem = value; } }
+
+        public Element CopiedElement { get; set; }
+        public ElementId CopiedElementId { get; set; }
 
         public int CategoryId { get { try { return m_elem.Category.Id.IntegerValue; } catch { return 0; } } }
         public string CategoryName { get { try { return m_elem.Category.Name; } catch { return ""; } } }
@@ -87,6 +94,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         public Dictionary<int/*massId*/, double/*percentage of intersected*/> OpverappingMaps { get; set; }
         
         //use for split options
+        public bool LinkedElement { get; set; }
         public int SelectedMassId { get; set; }
         public List<Element> PrimaryElements { get; set; } //splited element from selected mass
         public List<Element> SecondaryElements { get; set; } //result of the differecne operation of the mass

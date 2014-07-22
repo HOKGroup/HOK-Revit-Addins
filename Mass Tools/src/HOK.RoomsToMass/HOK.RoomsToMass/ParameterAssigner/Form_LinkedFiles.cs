@@ -30,6 +30,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private bool progressFormOpend = false;
         private List<int> categoryIds = new List<int>();
         private Dictionary<int/*categoryId*/, Dictionary<int, ParameterProperties>> parameterMaps = new Dictionary<int, Dictionary<int, ParameterProperties>>();
+        private List<Document> linkedDocuments = new List<Document>();
 
         public Dictionary<string, int> WorksetDictionary { get { return worksetDictionary; } set { worksetDictionary = value; } }
         public List<MassProperties> IntegratedMassList { get { return integratedMassList; } set { integratedMassList = value; } }
@@ -39,6 +40,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         public List<string> MassParameters { get { return massParameters; } set { massParameters = value; } }
         public MassSource SelectedSourceType { get { return selectedSourceType; } set { selectedSourceType = value; } }
         public Dictionary<int, Dictionary<int, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
+        public List<Document> LinkedDocuments { get { return linkedDocuments; } set { linkedDocuments = value; } }
 
         public Form_LinkedFiles(UIApplication uiapp)
         {
@@ -47,6 +49,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
             InitializeComponent();
             selectedSourceType = MassSource.OnlyHost;
+            CollectLinkedDocuments();
             CollectWorksets();
             DisplayRvtLinkTypes();
             FindSelectedMass();
@@ -69,6 +72,29 @@ namespace HOK.RoomsToMass.ParameterAssigner
             {
                 MessageBox.Show("Failed to collect workset from the host project.\n" + ex.Message, "LinkedModelManager:CollectWorksets", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 LogFileManager.AppendLog("CollectWorksets", ex.Message);
+            }
+        }
+
+        private void CollectLinkedDocuments()
+        {
+            try
+            {
+                foreach (Document document in m_app.Application.Documents)
+                {
+#if RELEASE2014 ||RELEASE2015
+                    if (document.IsLinked)
+                    {
+                        linkedDocuments.Add(document);
+                    }
+#elif RELEASE2013
+                    linkedDocuments.Add(document);
+#endif
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to collect linked documents.\n" + ex.Message, "LinkedModelManager:CollectLinkedDocuments", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                LogFileManager.AppendLog("CollectLinkedDocuments", ex.Message);
             }
         }
 
@@ -294,7 +320,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         {
                             if (unionSolid.Volume > 0)
                             {
-                                mp.ElementContainer = FindElementsInMass(mp.MassSolid, mp.MassId);
+                                mp.ElementContainer = FindElementsInMass(m_doc, mp.MassSolid, mp.MassId, false);
+                                /*
+                                foreach (Document linkedDoc in linkedDocuments)
+                                {
+                                    List<Element> filteredElements = FindElementsInMass(linkedDoc, mp.MassSolid, mp.MassId, true);
+                                    mp.ElementContainer.AddRange(filteredElements);
+                                }
+                                 */
                                 mp.ElementCount = mp.ElementContainer.Count;
                             }
                         }
@@ -405,7 +438,13 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                 {
                                     if (unionSolid.Volume > 0)
                                     {
-                                        mp.ElementContainer = FindElementsInMass(mp.MassSolid, mp.MassId);
+                                        mp.ElementContainer = FindElementsInMass(m_doc, mp.MassSolid, mp.MassId, false);
+                                                                           
+                                        foreach (Document linkedDoc in linkedDocuments)
+                                        {
+                                            List<Element> filteredElements=FindElementsInMass(linkedDoc, mp.MassSolid, mp.MassId, true);
+                                            mp.ElementContainer.AddRange(filteredElements);
+                                        }
                                         mp.ElementCount = mp.ElementContainer.Count;
                                     }
                                 }
@@ -446,12 +485,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
         }
 
-        private List<Element> FindElementsInMass(Solid massSolid, int massId)
+        private List<Element> FindElementsInMass(Document doc, Solid massSolid, int massId, bool linkedElment)
         {
             List<Element> elementList = new List<Element>();
             try
             {
-                FilteredElementCollector elementCollector = new FilteredElementCollector(m_doc);
+                FilteredElementCollector elementCollector = new FilteredElementCollector(doc);
                 elementCollector.WherePasses(new ElementIntersectsSolidFilter(massSolid)).WhereElementIsNotElementType();
                 elementList = elementCollector.ToElements().ToList();
 
@@ -461,6 +500,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     if (!elementDictionary.ContainsKey(elementId))
                     {
                         ElementProperties ep = new ElementProperties(element);
+                        ep.Doc = doc;
+                        ep.LinkedElement = linkedElment;
                         CollectParameterValues(element);
 
                         FamilyInstance fi = element as FamilyInstance;

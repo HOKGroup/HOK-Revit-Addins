@@ -22,11 +22,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
             BuiltInParameter.RBS_OFFSET_PARAM/*pipes*/
         };
 
-        private Document doc;
+        private Document primaryDoc;
 
         public ElementSpliter(Document document)
         {
-            doc = document;
+            primaryDoc = document;
         }
 
         public ElementProperties SplitElement( ElementProperties ep)
@@ -37,7 +37,49 @@ namespace HOK.RoomsToMass.ParameterAssigner
             List<Element> secondaryElements = new List<Element>();
             try
             {
-                using (Transaction trans = new Transaction(doc))
+#if RELEASE2014 || RELEASE2015 
+                if (ep.LinkedElement)
+                {
+                    using (Transaction trans = new Transaction(primaryDoc))
+                    {
+                        trans.Start("Copy Element");
+                        try
+                        {
+                            List<ElementId> toCopy = new List<ElementId>();
+                            toCopy.Add(ep.ElementObj.Id);
+                            if (ep.ElementObj is HostObject)
+                            {
+                                HostObject host = ep.ElementObj as HostObject;
+                                IList<ElementId> eIds = host.FindInserts(false, false, false, false);
+                                toCopy.AddRange(eIds);
+                            }
+
+                            CopyPasteOptions options = new CopyPasteOptions();
+                            options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
+                            ICollection<ElementId> copiedElements = ElementTransformUtils.CopyElements(ep.Doc, toCopy, primaryDoc, Transform.Identity, options);
+                            if (copiedElements.Count > 0)
+                            {
+                                Element copiedElement = primaryDoc.GetElement(copiedElements.First());
+                                if (null != copiedElement)
+                                {
+                                    ep.CopiedElement = copiedElement;
+                                    ep.CopiedElementId = copiedElement.Id;
+                                }
+                            }
+                            trans.Commit();
+                        }
+                        catch
+                        {
+                            trans.RollBack();
+                        }
+                    }
+                }
+#elif RELEASE2013
+                
+#endif
+                if (null == ep.CopiedElement) { ep.SplitSucceed = false; return ep; }
+
+                using (Transaction trans = new Transaction(primaryDoc))
                 {
                     FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
                     FailureHandler failureHandler = new FailureHandler();
@@ -63,10 +105,13 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             {
                                 SplitWalls(ep, out primaryElements, out secondaryElements);
                             }
+                            trans.Commit();
+                            trans.Start("Place Family Instances");
                             if (primaryElements.Count > 0 && secondaryElements.Count > 0)
                             {
                                 PlaceFamilyInstances(ep, primaryElements, secondaryElements);
                             }
+                            
                             break;
                         case "Roofs":
                             trans.Start("New Split Roofs");
@@ -107,7 +152,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         if (failureHandler.FailureMessageInfoList.Count > 0)
                         {
                             ep.SplitSucceed = false;
-                            LogFileManager.AppendLog("SplitElement", doc, ep.ElementObj, failureHandler.FailureMessageInfoList);
+                            LogFileManager.AppendLog("SplitElement", primaryDoc, ep.ElementObj, failureHandler.FailureMessageInfoList);
                         }
                         else
                         {
@@ -127,8 +172,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 
                 //if fails, return null
             }
-            catch 
+            catch(Exception ex) 
             {
+                string message = ex.Message;
                 //MessageBox.Show("["+ep.ElementId+"]"+ep.ElementName+"\nFailed to split element.\n" + ex.Message, "ElementSpliter:SplitElement", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 //LogFileManager.AppendLog("SplitElement", ex.Message);
             }
@@ -144,18 +190,19 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 Solid massSolid = ep.MassContainers[ep.SelectedMassId];
                 Solid intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation(massSolid, ep.ElementSolid, BooleanOperationsType.Intersect);
                 List<CurveArray> profiles = GetFloorBoundary(intersectSolid);
-                Floor floor = ep.ElementObj as Floor;
+
+                Floor floor = ep.CopiedElement as Floor;
                 FloorType floortype = floor.FloorType;
 #if RELEASE2013
                 ElementId levelId = floor.Level.Id;
 #elif RELEASE2014||RELEASE2015
                 ElementId levelId = floor.LevelId;
 #endif
-                Level level = doc.GetElement(levelId) as Level;
+                Level level = primaryDoc.GetElement(levelId) as Level;
                 bool structural = floortype.IsFoundationSlab;
                 foreach (CurveArray profile in profiles)
                 {
-                    Floor primaryFloor = doc.Create.NewFloor(profile, floortype, level, structural);
+                    Floor primaryFloor = primaryDoc.Create.NewFloor(profile, floortype, level, structural);
                     if (null != primaryFloor)
                     {
                         primaryElements.Add(primaryFloor);
@@ -178,18 +225,18 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 Solid massSolid = ep.MassContainers[ep.SelectedMassId];
                 Solid differenceSolid = BooleanOperationsUtils.ExecuteBooleanOperation(ep.ElementSolid, massSolid, BooleanOperationsType.Difference);
                 List<CurveArray> profiles = GetFloorBoundary(differenceSolid);
-                Floor floor = ep.ElementObj as Floor;
+                Floor floor = ep.CopiedElement as Floor;
                 FloorType floortype = floor.FloorType;
 #if RELEASE2013
                 ElementId levelId = floor.Level.Id;
 #elif RELEASE2014||RELEASE2015
                 ElementId levelId = floor.LevelId;
 #endif
-                Level level = doc.GetElement(levelId) as Level;
+                Level level = primaryDoc.GetElement(levelId) as Level;
                 bool structural = floortype.IsFoundationSlab;
                 foreach (CurveArray profile in profiles)
                 {
-                    Floor secondaryFloor = doc.Create.NewFloor(profile, floortype, level, structural);
+                    Floor secondaryFloor = primaryDoc.Create.NewFloor(profile, floortype, level, structural);
                     if (null != secondaryFloor)
                     {
                         secondaryElements.Add(secondaryFloor);
@@ -249,15 +296,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
             try
             {
                 trans.Start("Delete a Wall");
-                Wall wall=ep.ElementObj as Wall;
-                ElementId elementId=new ElementId(ep.ElementId);
-                ICollection<ElementId> elementIds = doc.Delete(elementId);
+                Wall wall=ep.CopiedElement as Wall;
+                ICollection<ElementId> elementIds = primaryDoc.Delete(ep.CopiedElementId);
                 trans.RollBack();
 
                 Sketch sketch = null;
                 foreach (ElementId eId in elementIds)
                 {
-                    Element element = doc.GetElement(eId);
+                    Element element = primaryDoc.GetElement(eId);
                     if (element is Sketch)
                     {
                         sketch = element as Sketch;
@@ -300,7 +346,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 List<Curve> profile = GetWallProfile(ep, intersectSolid);
                 if (profile.Count > 0)
                 {
-                    Wall wall = ep.ElementObj as Wall;
+                    Wall wall = ep.CopiedElement as Wall;
                     ElementId wallTypeId = wall.WallType.Id;
 #if RELEASE2013
                     ElementId levelId = wall.Level.Id;
@@ -314,7 +360,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         isStructural = false;
                     }
                     Wall primaryWall = null;
-                    try { primaryWall = Wall.Create(doc, profile, wallTypeId, levelId, isStructural); doc.Regenerate(); }
+                    try { primaryWall = Wall.Create(primaryDoc, profile, wallTypeId, levelId, isStructural); primaryDoc.Regenerate(); }
                     catch { return primaryElements; }
                     
                     if (null != primaryWall)
@@ -344,7 +390,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 List<Curve> profile = GetWallProfile(ep, differenceSolid);
                 if (profile.Count > 0)
                 {
-                    Wall wall = ep.ElementObj as Wall;
+                    Wall wall = ep.CopiedElement as Wall;
                     ElementId wallTypeId = wall.WallType.Id;
 #if RELEASE2013
                     ElementId levelId = wall.Level.Id;
@@ -358,7 +404,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         isStructural = false;
                     }
                     Wall secondaryWall = null;
-                    try { secondaryWall = Wall.Create(doc, profile, wallTypeId, levelId, isStructural); doc.Regenerate(); }
+                    try { secondaryWall = Wall.Create(primaryDoc, profile, wallTypeId, levelId, isStructural); primaryDoc.Regenerate(); }
                     catch { return secondaryElements; }
 
                     if (null != secondaryWall)
@@ -384,7 +430,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             secondaryElementsList = new List<Element>();
             try
             {
-                Wall wall = ep.ElementObj as Wall;
+                Wall wall = ep.CopiedElement as Wall;
                 double height=wall.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM).AsDouble();
                 double offset=wall.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET).AsDouble();
                 bool wallStructural=true;
@@ -404,12 +450,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     ElementId wallLevelId = wall.LevelId;
 #endif
 
-                    try { newWall = Wall.Create(doc, newLocationCurves[0], wall.WallType.Id, wallLevelId, height, offset, wall.Flipped, wallStructural); }
+                    try { newWall = Wall.Create(primaryDoc, newLocationCurves[0], wall.WallType.Id, wallLevelId, height, offset, wall.Flipped, wallStructural); }
                     catch { }
                     if (null != newWall) { primaryElementsList.Add(newWall); }
 
                     newWall = null;
-                    try { newWall = Wall.Create(doc, newLocationCurves[1], wall.WallType.Id, wallLevelId, height, offset, wall.Flipped, wallStructural); }
+                    try { newWall = Wall.Create(primaryDoc, newLocationCurves[1], wall.WallType.Id, wallLevelId, height, offset, wall.Flipped, wallStructural); }
                     catch { }
                     if (null != newWall) { secondaryElementsList.Add(newWall); }
                 }
@@ -426,7 +472,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             List<Curve> profile = new List<Curve>();
             try
             {
-                Wall wall = ep.ElementObj as Wall;
+                Wall wall = ep.CopiedElement as Wall;
                 XYZ orientation = wall.Orientation;
                 XYZ offsetVector = orientation.Normalize().Negate().Multiply(0.5 * wall.Width);
 #if RELEASE2013
@@ -467,14 +513,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         private void PlaceFamilyInstances(ElementProperties ep, List<Element> primaryElements, List<Element> secondaryElements)
         {
-            Wall wall = ep.ElementObj as Wall;
+            Wall wall = ep.CopiedElement as Wall;
             try
             {
                 IList<ElementId> attachedElementIds = wall.FindInserts(false, false, false, false);
                 List<FamilyInstance> familyInstances = new List<FamilyInstance>();
                 foreach (ElementId elementId in attachedElementIds)
                 {
-                    Element element = doc.GetElement(elementId);
+                    Element element = primaryDoc.GetElement(elementId);
                     if (element is FamilyInstance)
                     {
                         familyInstances.Add(element as FamilyInstance);
@@ -483,7 +529,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 Dictionary<Element, Outline> outlines = new Dictionary<Element, Outline>();
                 foreach (Element element in primaryElements)
                 {
-                    BoundingBoxXYZ box = element.get_BoundingBox(doc.ActiveView);
+                    BoundingBoxXYZ box = element.get_BoundingBox(null);
                     if(null!=box)
                     {
                         Outline outline = new Outline(box.Min, box.Max);
@@ -492,7 +538,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 }
                 foreach (Element element in secondaryElements)
                 {
-                    BoundingBoxXYZ box = element.get_BoundingBox(doc.ActiveView);
+                    BoundingBoxXYZ box = element.get_BoundingBox(null);
                     if (null != box)
                     {
                         Outline outline = new Outline(box.Min, box.Max);
@@ -508,7 +554,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 #elif RELEASE2014||RELEASE2015
                     ElementId elementId = familyInstance.LevelId;
 #endif
-                    Level instanceLevel = doc.GetElement(elementId) as Level;
+                    Level instanceLevel = primaryDoc.GetElement(elementId) as Level;
                     XYZ point = location.Point;
                     foreach (Element element in outlines.Keys)
                     {
@@ -516,7 +562,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         if (outline.Contains(point,0))
                         {
                             FamilyInstance newInstance = null;
-                            try { newInstance = doc.Create.NewFamilyInstance(point, familyInstance.Symbol, element, instanceLevel, familyInstance.StructuralType); }
+                            try { newInstance = primaryDoc.Create.NewFamilyInstance(point, familyInstance.Symbol, element, instanceLevel, familyInstance.StructuralType); }
                             catch { continue; }
                             if (null != newInstance)
                             {
@@ -680,13 +726,13 @@ namespace HOK.RoomsToMass.ParameterAssigner
             List<Element> primaryElements = new List<Element>();
             try
             {
-                FootPrintRoof footPrintRoof = ep.ElementObj as FootPrintRoof;
+                FootPrintRoof footPrintRoof = ep.CopiedElement as FootPrintRoof;
 #if RELEASE2013
                 ElementId elementId = footPrintRoof.Level.Id;
 #elif RELEASE2014||RELEASE2015
                 ElementId elementId = footPrintRoof.LevelId;
 #endif
-                Level roofLevel = doc.GetElement(elementId) as Level;
+                Level roofLevel = primaryDoc.GetElement(elementId) as Level;
                 if (null != footPrintRoof)
                 {
                     List<CurveArray> profiles = GetRoofFootPrint(ep, true);
@@ -697,7 +743,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         {
                             ModelCurveArray modelCurveMapping = new ModelCurveArray();
                             FootPrintRoof newRoof = null;
-                            newRoof = doc.Create.NewFootPrintRoof(profile, roofLevel, footPrintRoof.RoofType, out modelCurveMapping);
+                            newRoof = primaryDoc.Create.NewFootPrintRoof(profile, roofLevel, footPrintRoof.RoofType, out modelCurveMapping);
                             if (null != newRoof)
                             {
                                 if (footPrintRoof.SlabShapeEditor.IsEnabled)
@@ -724,14 +770,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
             List<Element> secondaryElements = new List<Element>();
             try
             {
-                FootPrintRoof footPrintRoof = ep.ElementObj as FootPrintRoof;
+                FootPrintRoof footPrintRoof = ep.CopiedElement as FootPrintRoof;
 #if RELEASE2013
                 ElementId elementId = footPrintRoof.Level.Id;
 #elif RELEASE2014||RELEASE2015
                 ElementId elementId = footPrintRoof.LevelId;
 #endif
 
-                Level roofLevel = doc.GetElement(elementId) as Level;
+                Level roofLevel = primaryDoc.GetElement(elementId) as Level;
                 if (null != footPrintRoof)
                 {
                     List<CurveArray> profiles = GetRoofFootPrint(ep, false);
@@ -741,7 +787,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         {
                             ModelCurveArray modelCurveMapping = new ModelCurveArray();
                             FootPrintRoof newRoof = null;
-                            newRoof = doc.Create.NewFootPrintRoof(profile, roofLevel, footPrintRoof.RoofType, out modelCurveMapping);
+                            newRoof = primaryDoc.Create.NewFootPrintRoof(profile, roofLevel, footPrintRoof.RoofType, out modelCurveMapping);
                             if (null != newRoof)
                             {
                                 if (footPrintRoof.SlabShapeEditor.IsEnabled)
@@ -769,7 +815,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             try
             {
                 //extrusion of roof profile>> intersect to mass solid>> get bottom face to get roof profile
-                FootPrintRoof footPrintRoof = ep.ElementObj as FootPrintRoof;
+                FootPrintRoof footPrintRoof = ep.CopiedElement as FootPrintRoof;
                 if (null != footPrintRoof)
                 {
                     ModelCurveArrArray roofProfile = footPrintRoof.GetProfiles();
@@ -901,7 +947,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             secondaryElementsList = new List<Element>();
             try
             {
-                FamilyInstance originInstance = ep.ElementObj as FamilyInstance;
+                FamilyInstance originInstance = ep.CopiedElement as FamilyInstance;
                 if (null != originInstance)
                 {
                     LocationCurve locationCurve = originInstance.Location as LocationCurve;
@@ -913,12 +959,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     {
                         FamilyInstance newBeam = null;
                         Level hostLevel = originInstance.Host as Level;
-                        try { newBeam = doc.Create.NewFamilyInstance(newLocationCurves[0], originInstance.Symbol, hostLevel, originInstance.StructuralType); }
+                        try { newBeam = primaryDoc.Create.NewFamilyInstance(newLocationCurves[0], originInstance.Symbol, hostLevel, originInstance.StructuralType); }
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
                         if (null != newBeam) { primaryElementsList.Add(newBeam); }
 
                         newBeam = null;
-                        try { newBeam = doc.Create.NewFamilyInstance(newLocationCurves[1], originInstance.Symbol, hostLevel, originInstance.StructuralType); }
+                        try { newBeam = primaryDoc.Create.NewFamilyInstance(newLocationCurves[1], originInstance.Symbol, hostLevel, originInstance.StructuralType); }
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
                         if (null != newBeam) { secondaryElementsList.Add(newBeam); }
                     }
@@ -992,14 +1038,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
             secondaryElementsList = new List<Element>();
             try
             {
-                FamilyInstance originInstance = ep.ElementObj as FamilyInstance;
+                FamilyInstance originInstance = ep.CopiedElement as FamilyInstance;
 #if RELEASE2013
                 ElementId elementId = originInstance.Level.Id;
 #elif RELEASE2014||RELEASE2015
                 ElementId elementId = originInstance.LevelId;
 #endif
 
-                Level instanceLevel = doc.GetElement(elementId) as Level;
+                Level instanceLevel = primaryDoc.GetElement(elementId) as Level;
                 if (null != originInstance)
                 {
                     Curve curve = null;
@@ -1010,14 +1056,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     }
                     else if (originInstance.Location is LocationPoint)
                     {
-                        BoundingBoxXYZ boundingBox = originInstance.get_BoundingBox(doc.ActiveView);
+                        BoundingBoxXYZ boundingBox = originInstance.get_BoundingBox(primaryDoc.ActiveView);
                         LocationPoint locationPoint = originInstance.Location as LocationPoint;
                         XYZ pointXYZ = locationPoint.Point;
                         XYZ startPoint = new XYZ(pointXYZ.X, pointXYZ.Y, boundingBox.Min.Z);
                         XYZ endPoint = new XYZ(pointXYZ.X, pointXYZ.Y, boundingBox.Max.Z);
 
 #if RELEASE2013
-                        curve = doc.Application.Create.NewLineBound(startPoint, endPoint);
+                        curve = primaryDoc.Application.Create.NewLineBound(startPoint, endPoint);
 #elif RELEASE2014||RELEASE2015
                         curve = Autodesk.Revit.DB.Line.CreateBound(startPoint, endPoint);
 #endif
@@ -1031,17 +1077,16 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         {
                             FamilyInstance newColumn = null;
 
-                            try { newColumn = doc.Create.NewFamilyInstance(newCurves[0], originInstance.Symbol, instanceLevel, originInstance.StructuralType); }
+                            try { newColumn = primaryDoc.Create.NewFamilyInstance(newCurves[0], originInstance.Symbol, instanceLevel, originInstance.StructuralType); }
                             catch (Exception ex) { MessageBox.Show(ex.Message); }
                             if (null != newColumn) { primaryElementsList.Add(newColumn); }
 
                             newColumn = null;
-                            try { newColumn = doc.Create.NewFamilyInstance(newCurves[1], originInstance.Symbol, instanceLevel, originInstance.StructuralType); }
+                            try { newColumn = primaryDoc.Create.NewFamilyInstance(newCurves[1], originInstance.Symbol, instanceLevel, originInstance.StructuralType); }
                             catch (Exception ex) { MessageBox.Show(ex.Message); }
                             if (null != newColumn) { secondaryElementsList.Add(newColumn); }
                         }
                     }
-
                 }
             }
             catch 
@@ -1112,7 +1157,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             secondaryElementsList = new List<Element>();
             try
             {
-                Pipe originPipe = ep.ElementObj as Pipe;
+                Pipe originPipe = ep.CopiedElement as Pipe;
 
                 if (null != originPipe)
                 {
@@ -1124,22 +1169,22 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     {
                         Pipe newPipe = null;
 #if RELEASE2013
-                        try { newPipe = doc.Create.NewPipe(curve.get_EndPoint(0), intersectingPoint, originPipe.PipeType); }
+                        try { newPipe = primaryDoc.Create.NewPipe(curve.get_EndPoint(0), intersectingPoint, originPipe.PipeType); }
 #elif RELEASE2014
-                        try { newPipe = doc.Create.NewPipe(curve.GetEndPoint(0), intersectingPoint, originPipe.PipeType); }
+                        try { newPipe = primaryDoc.Create.NewPipe(curve.GetEndPoint(0), intersectingPoint, originPipe.PipeType); }
 #elif RELEASE2015
-                        try { newPipe = Pipe.Create(doc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.LevelId, curve.GetEndPoint(0), intersectingPoint); }
+                        try { newPipe = Pipe.Create(primaryDoc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.LevelId, curve.GetEndPoint(0), intersectingPoint); }
 #endif
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
                         if (null != newPipe) { primaryElementsList.Add(newPipe); }
 
                         newPipe = null;
 #if RELEASE2013
-                        try { newPipe = doc.Create.NewPipe(intersectingPoint, curve.get_EndPoint(1), originPipe.PipeType); }
+                        try { newPipe = primaryDoc.Create.NewPipe(intersectingPoint, curve.get_EndPoint(1), originPipe.PipeType); }
 #elif RELEASE2014
-                        try { newPipe = doc.Create.NewPipe(intersectingPoint, curve.GetEndPoint(1), originPipe.PipeType); }
+                        try { newPipe = primaryDoc.Create.NewPipe(intersectingPoint, curve.GetEndPoint(1), originPipe.PipeType); }
 #elif RELEASE2015
-                        try { newPipe = Pipe.Create(doc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.LevelId, intersectingPoint, curve.GetEndPoint(0)); }
+                        try { newPipe = Pipe.Create(primaryDoc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.LevelId, intersectingPoint, curve.GetEndPoint(0)); }
 #endif
                         
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -1191,7 +1236,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             secondaryElementsList = new List<Element>();
             try
             {
-                Duct originDuct = ep.ElementObj as Duct;
+                Duct originDuct = ep.CopiedElement as Duct;
 
                 if (null != originDuct)
                 {
@@ -1203,9 +1248,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     {
                         Duct newDuct = null;
 #if RELEASE2013
-                        try { newDuct = doc.Create.NewDuct(curve.get_EndPoint(0), intersectingPoint, originDuct.DuctType); }
+                        try { newDuct = primaryDoc.Create.NewDuct(curve.get_EndPoint(0), intersectingPoint, originDuct.DuctType); }
 #elif RELEASE2014||RELEASE2015
-                            try { newDuct = doc.Create.NewDuct(curve.GetEndPoint(0), intersectingPoint, originDuct.DuctType); }
+                        try { newDuct = primaryDoc.Create.NewDuct(curve.GetEndPoint(0), intersectingPoint, originDuct.DuctType); }
 #endif
 
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -1213,9 +1258,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                         newDuct = null;
 #if RELEASE2013
-                        try { newDuct = doc.Create.NewDuct(intersectingPoint, curve.get_EndPoint(1), originDuct.DuctType); }
+                        try { newDuct = primaryDoc.Create.NewDuct(intersectingPoint, curve.get_EndPoint(1), originDuct.DuctType); }
 #elif RELEASE2014||RELEASE2015
-                        try { newDuct = doc.Create.NewDuct(intersectingPoint, curve.GetEndPoint(1), originDuct.DuctType); }
+                        try { newDuct = primaryDoc.Create.NewDuct(intersectingPoint, curve.GetEndPoint(1), originDuct.DuctType); }
 #endif
 
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -1239,7 +1284,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             secondaryElementsList = new List<Element>();
             try
             {
-                Conduit originConduit = ep.ElementObj as Conduit;
+                Conduit originConduit = ep.CopiedElement as Conduit;
 
                 if (null != originConduit)
                 {
@@ -1251,9 +1296,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     {
                         Conduit newConduit = null;
 #if RELEASE2013
-                        try { newConduit = Conduit.Create(doc, originConduit.GetTypeId(), curve.get_EndPoint(0), intersectingPoint, originConduit.ReferenceLevel.Id); }
+                        try { newConduit = Conduit.Create(primaryDoc, originConduit.GetTypeId(), curve.get_EndPoint(0), intersectingPoint, originConduit.ReferenceLevel.Id); }
 #elif RELEASE2014||RELEASE2015
-                        try { newConduit = Conduit.Create(doc, originConduit.GetTypeId(), curve.GetEndPoint(0), intersectingPoint, originConduit.ReferenceLevel.Id); }
+                        try { newConduit = Conduit.Create(primaryDoc, originConduit.GetTypeId(), curve.GetEndPoint(0), intersectingPoint, originConduit.ReferenceLevel.Id); }
 #endif
 
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -1261,9 +1306,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                         newConduit = null;
 #if RELEASE2013
-                        try { newConduit = Conduit.Create(doc, originConduit.GetTypeId(), intersectingPoint, curve.get_EndPoint(1), originConduit.ReferenceLevel.Id); }
+                        try { newConduit = Conduit.Create(primaryDoc, originConduit.GetTypeId(), intersectingPoint, curve.get_EndPoint(1), originConduit.ReferenceLevel.Id); }
 #elif RELEASE2014||RELEASE2015
-                        try { newConduit = Conduit.Create(doc, originConduit.GetTypeId(), intersectingPoint, curve.GetEndPoint(1), originConduit.ReferenceLevel.Id); }
+                        try { newConduit = Conduit.Create(primaryDoc, originConduit.GetTypeId(), intersectingPoint, curve.GetEndPoint(1), originConduit.ReferenceLevel.Id); }
 #endif
 
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -1302,16 +1347,16 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 {
                     secondaryIds.Add(element.Id);
                 }
-                
-                using (Transaction trans = new Transaction(doc))
+
+                using (Transaction trans = new Transaction(primaryDoc))
                 {
                     trans.Start("Transfer parameters");
-                    Element originalElement = ep.ElementObj;
+                    Element originalElement = ep.CopiedElement;
                     foreach (Parameter param in originalElement.Parameters)
                     {
                         string paramName = param.Definition.Name;
                         if (paramName.Contains("Extensions")) { continue; }
-                        if (param.IsReadOnly) { continue; }
+                        //if (param.IsReadOnly) { continue; }
                         if (!param.HasValue) { continue; }
                         InternalDefinition definition = param.Definition as InternalDefinition;
                         if (null != definition)
@@ -1342,20 +1387,23 @@ namespace HOK.RoomsToMass.ParameterAssigner
 #endif
                             if (null != parameter)
                             {
-                                switch (parameter.StorageType)
+                                if (!parameter.IsReadOnly)
                                 {
-                                    case StorageType.ElementId:
-                                        parameter.Set(param.AsElementId());
-                                        break;
-                                    case StorageType.String:
-                                        parameter.Set(param.AsString());
-                                        break;
-                                    case StorageType.Double:
-                                        parameter.Set(param.AsDouble());
-                                        break;
-                                    case StorageType.Integer:
-                                        parameter.Set(param.AsInteger());
-                                        break;
+                                    switch (parameter.StorageType)
+                                    {
+                                        case StorageType.ElementId:
+                                            parameter.Set(param.AsElementId());
+                                            break;
+                                        case StorageType.String:
+                                            parameter.Set(param.AsString());
+                                            break;
+                                        case StorageType.Double:
+                                            parameter.Set(param.AsDouble());
+                                            break;
+                                        case StorageType.Integer:
+                                            parameter.Set(param.AsInteger());
+                                            break;
+                                    }
                                 }
                             }
                         }
@@ -1368,20 +1416,23 @@ namespace HOK.RoomsToMass.ParameterAssigner
 #endif
                             if (null != parameter)
                             {
-                                switch (parameter.StorageType)
+                                if (!parameter.IsReadOnly)
                                 {
-                                    case StorageType.ElementId:
-                                        parameter.Set(param.AsElementId());
-                                        break;
-                                    case StorageType.String:
-                                        parameter.Set(param.AsString());
-                                        break;
-                                    case StorageType.Double:
-                                        parameter.Set(param.AsDouble());
-                                        break;
-                                    case StorageType.Integer:
-                                        parameter.Set(param.AsInteger());
-                                        break;
+                                    switch (parameter.StorageType)
+                                    {
+                                        case StorageType.ElementId:
+                                            parameter.Set(param.AsElementId());
+                                            break;
+                                        case StorageType.String:
+                                            parameter.Set(param.AsString());
+                                            break;
+                                        case StorageType.Double:
+                                            parameter.Set(param.AsDouble());
+                                            break;
+                                        case StorageType.Integer:
+                                            parameter.Set(param.AsInteger());
+                                            break;
+                                    }
                                 }
                             }
                         }
@@ -1394,7 +1445,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                 foreach (ElementId elementId in primaryIds)
                 {
-                    Element element = doc.GetElement(elementId);
+                    Element element = primaryDoc.GetElement(elementId);
                     if (null != element)
                     {
                         primaryElements.Add(element);
@@ -1404,7 +1455,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 
                 foreach (ElementId elementId in secondaryIds)
                 {
-                    Element element = doc.GetElement(elementId);
+                    Element element = primaryDoc.GetElement(elementId);
                     if (null != element)
                     {
                         secondaryElements.Add(element);
@@ -1426,12 +1477,10 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                using (Transaction trans = new Transaction(doc))
+                using (Transaction trans = new Transaction(primaryDoc))
                 {
                     trans.Start("Delete original element");
-                    ElementId elementId = new ElementId(ep.ElementId);
-                    Element element = doc.GetElement(elementId);
-                    try { doc.Delete(element.Id); trans.Commit(); }
+                    try { primaryDoc.Delete(ep.CopiedElementId); trans.Commit(); }
                     catch { }
                 }
             }
@@ -1441,4 +1490,25 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
         }
     }
+
+#if RELEASE2014 || RELEASE2015
+    public class HideAndAcceptDuplicateTypeNamesHandler : IDuplicateTypeNamesHandler
+    {
+        #region IDuplicateTypeNamesHandler Members
+
+        /// <summary>
+        /// Implementation of the IDuplicateTypeNameHandler
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public DuplicateTypeAction OnDuplicateTypeNamesFound(DuplicateTypeNamesHandlerArgs args)
+        {
+            // Always use duplicate destination types when asked
+            return DuplicateTypeAction.UseDestinationTypes;
+        }
+
+        #endregion
+    }
+#endif
+    
 }

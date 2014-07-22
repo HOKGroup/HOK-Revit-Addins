@@ -48,7 +48,6 @@ namespace HOK.RoomsToMass
 
                     }
                 }
-                
 
                 return Result.Succeeded;
             }

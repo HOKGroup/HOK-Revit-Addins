@@ -56,6 +56,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
             m_doc = m_app.ActiveUIDocument.Document;
 
             InitializeComponent();
+
+#if RELEASE2013
+            bttnSplit.Enabled = false;
+#endif
+            
             toolStripProgressBar.Visible = false;
 
             splitDataManager = new SplitINIDataManager(m_app);
@@ -333,7 +338,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                 if (massList.Count > 0)
                 {
-                    if (CheckOverlapping(massList, false))
+                    if (CheckOverlappingToAssign(massList))
                     {
                         foreach (MassProperties mp in massList)
                         {
@@ -629,7 +634,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                 if (massList.Count > 0)
                 {
-                    if (CheckOverlapping(massList, true))
+                    if (CheckOverlappingToSplit(massList))
                     {
                         toolStripStatusLabel.Text = "Spliting Elements . .";
                         toolStripProgressBar.Maximum = intersectingElements.Count;
@@ -755,7 +760,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
         }
 
-        private bool CheckOverlapping(List<MassProperties> selectedMass, bool splitElement)
+        private bool CheckOverlappingToSplit(List<MassProperties> selectedMass)
         {
             bool result = false;
             try
@@ -766,7 +771,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 foreach (int elementId in elementDictionary.Keys)
                 {
                     ElementProperties ep = elementDictionary[elementId];
-                    if (splitElement && !categoryNames.Contains(ep.CategoryName)) { continue; }
+                    if (!ep.LinkedElement) { continue; }//elements in host model won't be split
+                    if (!categoryNames.Contains(ep.CategoryName)) { continue; }
                     if (checkBoxFilter.Checked)
                     {
                         if (!selectedCategoryIds.Contains(ep.CategoryId)) { continue; }
@@ -811,14 +817,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         }
                     }
 
-                    Form_OverlapMass overlapForm = new Form_OverlapMass(m_app, splitElement, intersectingElements, massdictionary, massIds, intersectingCategories);
+                    Form_OverlapMass overlapForm = new Form_OverlapMass(m_app, true, intersectingElements, massdictionary, massIds, intersectingCategories);
                     if (ratio != 0)
                     {
                         overlapForm.SetDeterminant(ratio);
                         overlapForm.SetFollowByHost(followHost);
                     }
 
-                    if ( overlapForm.ShowDialog()== DialogResult.OK)
+                    if (overlapForm.ShowDialog() == DialogResult.OK)
                     {
                         intersectingElements = new Dictionary<int, ElementProperties>();
                         unassignedElements = new Dictionary<int, ElementProperties>();
@@ -848,6 +854,101 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
         }
 
+        private bool CheckOverlappingToAssign(List<MassProperties> selectedMass)
+        {
+            bool result = false;
+            try
+            {
+                intersectingElements = new Dictionary<int, ElementProperties>();
+                List<string> intersectingCategories = new List<string>();
+                List<int> massIds = new List<int>();//massIds that will be displayed in the overapping form
+                foreach (int elementId in elementDictionary.Keys)
+                {
+                    ElementProperties ep = elementDictionary[elementId];
+                    if (ep.LinkedElement) { continue; } //parameters in linked models cannot be assigned
+                    if (!categoryNames.Contains(ep.CategoryName)) { continue; }
+                    if (checkBoxFilter.Checked)
+                    {
+                        if (!selectedCategoryIds.Contains(ep.CategoryId)) { continue; }
+                    }
+                    if (null != ep.MassContainers)
+                    {
+                        if (ep.MassContainers.Count > 1)
+                        {
+                            foreach (MassProperties mp in selectedMass)
+                            {
+                                if (ep.MassContainers.ContainsKey(mp.MassId))
+                                {
+                                    intersectingElements.Add(ep.ElementId, ep);
+                                    if (!intersectingCategories.Contains(ep.CategoryName)) { intersectingCategories.Add(ep.CategoryName); }
+
+                                    foreach (int massId in ep.MassContainers.Keys)
+                                    {
+                                        if (!massIds.Contains(massId))
+                                        {
+                                            massIds.Add(massId);
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (intersectingElements.Count > 0)
+                {
+                    Dictionary<int, MassProperties> massdictionary = new Dictionary<int, MassProperties>();
+                    foreach (DataGridViewRow row in dataGridViewMass.Rows)
+                    {
+                        if (null != row.Tag)
+                        {
+                            MassProperties mp = row.Tag as MassProperties;
+                            if (!massdictionary.ContainsKey(mp.MassId))
+                            {
+                                massdictionary.Add(mp.MassId, mp);
+                            }
+                        }
+                    }
+
+                    Form_OverlapMass overlapForm = new Form_OverlapMass(m_app, false, intersectingElements, massdictionary, massIds, intersectingCategories);
+                    if (ratio != 0)
+                    {
+                        overlapForm.SetDeterminant(ratio);
+                        overlapForm.SetFollowByHost(followHost);
+                    }
+
+                    if (overlapForm.ShowDialog() == DialogResult.OK)
+                    {
+                        intersectingElements = new Dictionary<int, ElementProperties>();
+                        unassignedElements = new Dictionary<int, ElementProperties>();
+                        intersectingElements = overlapForm.IntersectingElements;
+                        unassignedElements = overlapForm.UnassignedElements;
+                        splitCategories = overlapForm.CategoriesToSplit;
+                        overlapForm.Close();
+                        result = true;
+                    }
+                    else
+                    {
+                        toolStripStatusLabel.Text = "Ready";
+                        toolStripProgressBar.Visible = false;
+                        result = false;
+                    }
+                }
+                else
+                {
+                    result = true;
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to find overlapping elements.\n" + ex.Message, "Form_Assigner:CheckOverlapping", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return result;
+            }
+        }
+
+        
         private void dataGridViewMass_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             try
