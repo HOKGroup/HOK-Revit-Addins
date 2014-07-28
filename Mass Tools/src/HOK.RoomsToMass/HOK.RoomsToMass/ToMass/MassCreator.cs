@@ -796,10 +796,7 @@ namespace HOK.RoomsToMass.ToMass
 
         public List<FailureMessageInfo> FailureMessageInfoList { get { return failureMessageInfoList; } set { failureMessageInfoList = value; } }
 
-        public FailureHandler()
-        {
-        }
-
+        
         public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
         {
 

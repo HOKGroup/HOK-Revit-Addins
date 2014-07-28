@@ -7,6 +7,8 @@ using Autodesk.Revit.DB;
 using System.Windows.Forms;
 using HOK.RoomsToMass.ParameterAssigner;
 using Autodesk.Revit.UI.Events;
+using Autodesk.Revit.DB.Events;
+using HOK.RoomsToMass.ToMass;
 
 namespace HOK.RoomsToMass
 {
@@ -25,7 +27,8 @@ namespace HOK.RoomsToMass
             {
                 m_app = commandData.Application;
                 m_doc = m_app.ActiveUIDocument.Document;
-               
+
+                m_app.Application.FailuresProcessing += new EventHandler<FailuresProcessingEventArgs>(OnFailuresProcessing);
                 
                 Form_LinkedFiles linkedFilesForm = new Form_LinkedFiles(m_app);
                 if (linkedFilesForm.ShowDialog() == DialogResult.OK)
@@ -57,6 +60,45 @@ namespace HOK.RoomsToMass
                 return Result.Failed;
             }
         }
+
+        private void OnFailuresProcessing(object sender, FailuresProcessingEventArgs e)
+        {
+            FailuresAccessor failuresAccessor = e.GetFailuresAccessor();
+
+            string transactionName = failuresAccessor.GetTransactionName();
+            IList<FailureMessageAccessor> fmas = failuresAccessor.GetFailureMessages();
+            if (fmas.Count == 0)
+            {
+                e.SetProcessingResult(FailureProcessingResult.Continue);
+                return;
+            }
+            else
+            {
+                foreach (FailureMessageAccessor fma in fmas)
+                {
+                    FailureSeverity severity = fma.GetSeverity();
+                    try
+                    {
+                        if (severity == FailureSeverity.Warning)
+                        {
+                            failuresAccessor.DeleteWarning(fma);
+                            e.SetProcessingResult(FailureProcessingResult.Continue);
+                        }
+                        else
+                        {
+                            e.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
+                        }
+                    }
+                    catch { }
+                }
+            }
+        }
+            
+    
+
+            
+            
+            
 
         
     }

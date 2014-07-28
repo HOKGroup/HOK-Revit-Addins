@@ -17,6 +17,10 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private BuiltInParameter[] parametersToSkip = new BuiltInParameter[] 
         { 
             BuiltInParameter.WALL_USER_HEIGHT_PARAM/*wall*/, 
+            BuiltInParameter.WALL_BASE_OFFSET/*wall*/,
+            BuiltInParameter.WALL_TOP_OFFSET/*wall*/,
+            BuiltInParameter.SCHEDULE_BASE_LEVEL_OFFSET_PARAM/*columns*/,
+            BuiltInParameter.SCHEDULE_TOP_LEVEL_OFFSET_PARAM/*columns*/,
             BuiltInParameter.FAMILY_BASE_LEVEL_OFFSET_PARAM/*columns*/, 
             BuiltInParameter.FAMILY_TOP_LEVEL_OFFSET_PARAM/*columns*/,
             BuiltInParameter.RBS_OFFSET_PARAM/*pipes*/
@@ -43,6 +47,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     using (Transaction trans = new Transaction(primaryDoc))
                     {
                         trans.Start("Copy Element");
+                        FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
+                        FailureHandler failureHandler = new FailureHandler();
+                        failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                        failureHandlingOptions.SetClearAfterRollback(true);
+                        trans.SetFailureHandlingOptions(failureHandlingOptions);
                         try
                         {
                             List<ElementId> toCopy = new List<ElementId>();
@@ -56,7 +65,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                             CopyPasteOptions options = new CopyPasteOptions();
                             options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
-                            ICollection<ElementId> copiedElements = ElementTransformUtils.CopyElements(ep.Doc, toCopy, primaryDoc, Transform.Identity, options);
+                            ICollection<ElementId> copiedElements = ElementTransformUtils.CopyElements(ep.Doc, toCopy, primaryDoc, ep.TransformValue, options);
                             if (copiedElements.Count > 0)
                             {
                                 Element copiedElement = primaryDoc.GetElement(copiedElements.First());
@@ -84,6 +93,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
                     FailureHandler failureHandler = new FailureHandler();
                     failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                    failureHandlingOptions.SetClearAfterRollback(true);
                     trans.SetFailureHandlingOptions(failureHandlingOptions);
 
                     switch (ep.CategoryName)
@@ -209,8 +219,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     }
                 }
             }
-            catch 
+            catch(Exception ex)
             {
+                string message = ex.Message;
                 //MessageBox.Show("[" + ep.ElementId + "]" + ep.ElementName + "\nFailed to split floors.\n" + ex.Message, "ElementSpliter:SplitFloor", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 //LogFileManager.AppendLog("NewPrimaryFloor", ex.Message);
             }
@@ -243,8 +254,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     }
                 }
             }
-            catch 
+            catch(Exception ex) 
             {
+                string message = ex.Message;
                 //MessageBox.Show("[" + ep.ElementId + "]" + ep.ElementName + "\nFailed to split floors.\n" + ex.Message, "ElementSpliter:SplitFloor", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 //LogFileManager.AppendLog("NewSecondaryFloor", ex.Message);
             }
@@ -270,7 +282,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                     CurveArray curveArray = new CurveArray();
                                     foreach (Edge edge in edgeArray)
                                     {
-                                        Curve curve = edge.AsCurve();
+                                        Curve curve = edge.AsCurveFollowingFace(face);
                                         curveArray.Append(curve);
                                     }
                                     profileList.Add(curveArray);
@@ -1173,7 +1185,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 #elif RELEASE2014
                         try { newPipe = primaryDoc.Create.NewPipe(curve.GetEndPoint(0), intersectingPoint, originPipe.PipeType); }
 #elif RELEASE2015
-                        try { newPipe = Pipe.Create(primaryDoc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.LevelId, curve.GetEndPoint(0), intersectingPoint); }
+                        try { newPipe = Pipe.Create(primaryDoc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.ReferenceLevel.Id, curve.GetEndPoint(0), intersectingPoint); }
 #endif
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
                         if (null != newPipe) { primaryElementsList.Add(newPipe); }
@@ -1184,7 +1196,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 #elif RELEASE2014
                         try { newPipe = primaryDoc.Create.NewPipe(intersectingPoint, curve.GetEndPoint(1), originPipe.PipeType); }
 #elif RELEASE2015
-                        try { newPipe = Pipe.Create(primaryDoc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.LevelId, intersectingPoint, curve.GetEndPoint(0)); }
+                        try { newPipe = Pipe.Create(primaryDoc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.ReferenceLevel.Id, intersectingPoint, curve.GetEndPoint(1)); }
 #endif
                         
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -1351,6 +1363,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 using (Transaction trans = new Transaction(primaryDoc))
                 {
                     trans.Start("Transfer parameters");
+                    FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
+                    FailureHandler failureHandler = new FailureHandler();
+                    failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                    failureHandlingOptions.SetClearAfterRollback(true);
+                    trans.SetFailureHandlingOptions(failureHandlingOptions);
+
                     Element originalElement = ep.CopiedElement;
                     foreach (Parameter param in originalElement.Parameters)
                     {
@@ -1392,12 +1410,13 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                     switch (parameter.StorageType)
                                     {
                                         case StorageType.ElementId:
-                                            parameter.Set(param.AsElementId());
+                                            //parameter.Set(param.AsElementId());
                                             break;
                                         case StorageType.String:
                                             parameter.Set(param.AsString());
                                             break;
                                         case StorageType.Double:
+
                                             parameter.Set(param.AsDouble());
                                             break;
                                         case StorageType.Integer:
@@ -1421,7 +1440,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                     switch (parameter.StorageType)
                                     {
                                         case StorageType.ElementId:
-                                            parameter.Set(param.AsElementId());
+                                            //parameter.Set(param.AsElementId());
                                             break;
                                         case StorageType.String:
                                             parameter.Set(param.AsString());

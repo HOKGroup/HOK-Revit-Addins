@@ -779,7 +779,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     }
                     if (null != ep.MassContainers)
                     {
-                        if (ep.MassContainers.Count > 1)
+                        if (ep.MassContainers.Count > 0)
                         {
                             foreach (MassProperties mp in selectedMass)
                             {
@@ -832,7 +832,10 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         unassignedElements = overlapForm.UnassignedElements;
                         splitCategories = overlapForm.CategoriesToSplit;
                         overlapForm.Close();
-                        result = true;
+                        if (intersectingElements.Count > 0)
+                        {
+                            result = true;
+                        }
                     }
                     else
                     {
@@ -843,7 +846,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 }
                 else
                 {
-                    result = true;
+                    result = false;
                 }
                 return result;
             }
@@ -948,7 +951,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
         }
 
-        
         private void dataGridViewMass_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -966,9 +968,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         if (checkBoxFilter.Checked) { elementList = mp.FilteredContainer; }
                         else { elementList = mp.ElementContainer; }
 
-                        foreach (Element elemenet in elementList)
+                        foreach (Element element in elementList)
                         {
-                            newSelection.Add(elemenet);
+#if RELEASE2013
+                            if (element.Document.Title != m_doc.Title) { continue; }
+#elif RELEASE2014
+                            if (element.Document.IsLinked) { continue; }
+#endif
+                            newSelection.Add(element);
                         }
                         uidoc.ShowElements(newSelection);
                         uidoc.Selection.Elements = newSelection;
@@ -979,9 +986,10 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         else { elementList = mp.ElementContainer; }
                         List<ElementId> elementIds = new List<ElementId>();
 
-                        foreach (Element elemenet in elementList)
+                        foreach (Element element in elementList)
                         {
-                            elementIds.Add(elemenet.Id);
+                            if (element.Document.IsLinked) { continue; }
+                            elementIds.Add(element.Id);
                         }
                         uidoc.ShowElements(elementIds);
                         selection.SetElementIds(elementIds);

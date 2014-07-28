@@ -30,7 +30,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private bool progressFormOpend = false;
         private List<int> categoryIds = new List<int>();
         private Dictionary<int/*categoryId*/, Dictionary<int, ParameterProperties>> parameterMaps = new Dictionary<int, Dictionary<int, ParameterProperties>>();
-        private List<Document> linkedDocuments = new List<Document>();
 
         public Dictionary<string, int> WorksetDictionary { get { return worksetDictionary; } set { worksetDictionary = value; } }
         public List<MassProperties> IntegratedMassList { get { return integratedMassList; } set { integratedMassList = value; } }
@@ -40,7 +39,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         public List<string> MassParameters { get { return massParameters; } set { massParameters = value; } }
         public MassSource SelectedSourceType { get { return selectedSourceType; } set { selectedSourceType = value; } }
         public Dictionary<int, Dictionary<int, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
-        public List<Document> LinkedDocuments { get { return linkedDocuments; } set { linkedDocuments = value; } }
+        
 
         public Form_LinkedFiles(UIApplication uiapp)
         {
@@ -49,7 +48,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
             InitializeComponent();
             selectedSourceType = MassSource.OnlyHost;
-            CollectLinkedDocuments();
             CollectWorksets();
             DisplayRvtLinkTypes();
             FindSelectedMass();
@@ -75,28 +73,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
         }
 
-        private void CollectLinkedDocuments()
-        {
-            try
-            {
-                foreach (Document document in m_app.Application.Documents)
-                {
-#if RELEASE2014 ||RELEASE2015
-                    if (document.IsLinked)
-                    {
-                        linkedDocuments.Add(document);
-                    }
-#elif RELEASE2013
-                    linkedDocuments.Add(document);
-#endif
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to collect linked documents.\n" + ex.Message, "LinkedModelManager:CollectLinkedDocuments", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("CollectLinkedDocuments", ex.Message);
-            }
-        }
+        
 
         private void DisplayRvtLinkTypes()
         {
@@ -111,6 +88,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 {
                     LinkedInstanceProperties lip = new LinkedInstanceProperties(instance);
                     ElementId typeId = instance.GetTypeId();
+                   
                     RevitLinkType linkType = m_doc.GetElement(typeId) as RevitLinkType;
                     lip.FileName = linkType.Name;
                     lip.TypeId = linkType.Id.IntegerValue;
@@ -321,13 +299,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             if (unionSolid.Volume > 0)
                             {
                                 mp.ElementContainer = FindElementsInMass(m_doc, mp.MassSolid, mp.MassId, false);
-                                /*
-                                foreach (Document linkedDoc in linkedDocuments)
-                                {
-                                    List<Element> filteredElements = FindElementsInMass(linkedDoc, mp.MassSolid, mp.MassId, true);
-                                    mp.ElementContainer.AddRange(filteredElements);
-                                }
-                                 */
+                                List<Element> linkedElements = FindElementsInLInkedFiles(fi, geomElement);
+                                mp.ElementContainer.AddRange(linkedElements);
                                 mp.ElementCount = mp.ElementContainer.Count;
                             }
                         }
@@ -409,7 +382,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             if (null != fi)
                             {
                                 MassProperties mp = new MassProperties(fi);
-
                                 Solid unionSolid = null;
                                 Options opt = m_app.Application.Create.NewGeometryOptions();
                                 opt.ComputeReferences = true;
@@ -434,17 +406,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                     }
                                 }
                                 mp.MassSolid = unionSolid;
+                                
                                 if (null != unionSolid)
                                 {
                                     if (unionSolid.Volume > 0)
                                     {
                                         mp.ElementContainer = FindElementsInMass(m_doc, mp.MassSolid, mp.MassId, false);
-                                                                           
-                                        foreach (Document linkedDoc in linkedDocuments)
-                                        {
-                                            List<Element> filteredElements=FindElementsInMass(linkedDoc, mp.MassSolid, mp.MassId, true);
-                                            mp.ElementContainer.AddRange(filteredElements);
-                                        }
+                                        List<Element> linkedElements = FindElementsInLInkedFiles(fi, geomElement);
+                                        mp.ElementContainer.AddRange(linkedElements);
                                         mp.ElementCount = mp.ElementContainer.Count;
                                     }
                                 }
@@ -485,13 +454,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
         }
 
-        private List<Element> FindElementsInMass(Document doc, Solid massSolid, int massId, bool linkedElment)
+        private List<Element> FindElementsInMass(Document doc, Solid massSolid, int massId, bool linkedElement)
         {
             List<Element> elementList = new List<Element>();
             try
             {
                 FilteredElementCollector elementCollector = new FilteredElementCollector(doc);
-                elementCollector.WherePasses(new ElementIntersectsSolidFilter(massSolid)).WhereElementIsNotElementType();
+                ElementCategoryFilter catFilter = new ElementCategoryFilter(BuiltInCategory.OST_RvtLinks,true);
+                elementCollector.WherePasses(catFilter).WherePasses(new ElementIntersectsSolidFilter(massSolid)).WhereElementIsNotElementType();
                 elementList = elementCollector.ToElements().ToList();
 
                 foreach (Element element in elementList)
@@ -500,8 +470,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     if (!elementDictionary.ContainsKey(elementId))
                     {
                         ElementProperties ep = new ElementProperties(element);
-                        ep.Doc = doc;
-                        ep.LinkedElement = linkedElment;
+                        ep.LinkedElement = linkedElement;
                         CollectParameterValues(element);
 
                         FamilyInstance fi = element as FamilyInstance;
@@ -543,6 +512,134 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
         }
 
+        private List<Element> FindElementsInLInkedFiles(FamilyInstance massInstance, GeometryElement geomElement)
+        {
+            List<Element> foundElements = new List<Element>();
+            try
+            {
+                Options opt = m_app.Application.Create.NewGeometryOptions();
+                opt.ComputeReferences = true;
+                opt.DetailLevel = Autodesk.Revit.DB.ViewDetailLevel.Fine;
+
+                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+                collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType();
+                List<RevitLinkInstance> revitLinkInstances = collector.ToElements().Cast<RevitLinkInstance>().ToList();
+
+                foreach (RevitLinkInstance linkInstance in revitLinkInstances)
+                {
+                    ElementId typeId = linkInstance.GetTypeId();
+                    RevitLinkType linkType = m_doc.GetElement(typeId) as RevitLinkType;
+                    string linkDocName = linkType.Name;
+
+                    Document linkedDoc = null;
+                    foreach (Document document in m_app.Application.Documents)
+                    {
+                        if (linkDocName.Contains(document.Title))
+                        {
+                            linkedDoc = document; break;
+                        }
+                    }
+
+                    Transform transformValue = linkInstance.GetTotalTransform();
+
+                    if (null != linkedDoc && null != transformValue)
+                    {
+                        GeometryElement transformedElement = geomElement.GetTransformed(transformValue.Inverse);
+                        Solid originalSolid = GetSolid(geomElement);
+                        Solid transformedSolid = GetSolid(transformedElement);
+
+                        if (null != transformedSolid)
+                        {
+                            FilteredElementCollector elementCollector = new FilteredElementCollector(linkedDoc);
+                            elementCollector.WherePasses(new ElementIntersectsSolidFilter(transformedSolid)).WhereElementIsNotElementType();
+                            List<Element> elementList = elementCollector.ToElements().ToList();
+
+                            foreach (Element element in elementList)
+                            {
+                                int elementId = element.Id.IntegerValue;
+                                if (!elementDictionary.ContainsKey(elementId))
+                                {
+                                    ElementProperties ep = new ElementProperties(element);
+                                    ep.Doc = linkedDoc;
+                                    ep.TransformValue = transformValue;
+#if RELEASE2014||RELEASE2015
+                                    ep.LinkedElement = true;
+#endif
+
+                                    CollectParameterValues(element);
+
+                                    FamilyInstance fi = element as FamilyInstance;
+                                    if (null != fi)
+                                    {
+                                        if (null != fi.Host) { ep.HostElementId = fi.Host.Id.IntegerValue; }
+                                    }
+
+                                    Dictionary<int, Solid> massContainers = new Dictionary<int, Solid>();
+                                    massContainers.Add(massInstance.Id.IntegerValue, originalSolid); //adjusted to the host coordinate system
+                                    ep.MassContainers = massContainers;
+                                    elementDictionary.Add(ep.ElementId, ep);
+
+                                    if (!categoryIds.Contains(element.Category.Id.IntegerValue) && null != element.Category.Name)
+                                    {
+                                        elementCategories.Add(element.Category, false);
+                                        categoryIds.Add(element.Category.Id.IntegerValue);
+                                    }
+                                }
+                                else
+                                {
+                                    ElementProperties ep = elementDictionary[elementId];
+                                    if (!ep.MassContainers.ContainsKey(massInstance.Id.IntegerValue))
+                                    {
+                                        ep.MassContainers.Add(massInstance.Id.IntegerValue, originalSolid);
+                                        elementDictionary.Remove(elementId);
+                                        elementDictionary.Add(elementId, ep);
+                                    }
+                                }
+                            }
+                            foundElements.AddRange(elementList);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to find elements in mass.\n"+ex.Message, "FindElementsInMass", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return foundElements;
+        }
+
+        private Solid GetSolid(GeometryElement geoElement)
+        {
+            Solid unionSolid = null;
+            try
+            {
+                Options opt = m_app.Application.Create.NewGeometryOptions();
+                opt.ComputeReferences = true;
+                opt.DetailLevel = Autodesk.Revit.DB.ViewDetailLevel.Fine;
+
+                foreach (GeometryObject obj in geoElement)
+                {
+                    Solid solid = obj as Solid;
+                    if (null != solid)
+                    {
+                        if (solid.Volume > 0)
+                        {
+                            if (unionSolid == null) { unionSolid = solid; }
+                            else
+                            {
+                                unionSolid = BooleanOperationsUtils.ExecuteBooleanOperation(unionSolid, solid, BooleanOperationsType.Union);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get solid.\n"+ex.Message, "Get Solid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return unionSolid;
+        }
+
         private void CollectParameterValues(Element element)
         {
             try
@@ -563,14 +660,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                             if (paramDictionary.ContainsKey(param.Id.IntegerValue))
                             {
-                                paramDictionary[param.Id.IntegerValue].AddValue(param);
+                                //paramDictionary[param.Id.IntegerValue].AddValue(param);
+                                paramDictionary.Remove(param.Id.IntegerValue);
                             }
-                            else
-                            {
-                                ParameterProperties pp = new ParameterProperties(param);
-                                pp.AddValue(param);
-                                paramDictionary.Add(pp.ParamId, pp);
-                            }
+                            ParameterProperties pp = new ParameterProperties(param);
+                            pp.AddValue(param);
+                            paramDictionary.Add(pp.ParamId, pp);
                         }
                         parameterMaps.Remove(category.Id.IntegerValue);
                     }
@@ -584,10 +679,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             }
 
                             if (param.Definition.Name.Contains("Extensions.")) { continue; }
-                            //ParameterProperties pp = new ParameterProperties();
-                            ParameterProperties pp = new ParameterProperties(param);
-                            pp.AddValue(param);
-                            paramDictionary.Add(pp.ParamId, pp);
+                            if (!paramDictionary.ContainsKey(param.Id.IntegerValue))
+                            {
+                                ParameterProperties pp = new ParameterProperties(param);
+                                pp.AddValue(param);
+                                paramDictionary.Add(pp.ParamId, pp);
+                            }
                         }
                     }
                     parameterMaps.Add(category.Id.IntegerValue, paramDictionary);
@@ -621,7 +718,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 {
                     progressForm.PerformStep();
                     ElementProperties ep = elementDictionary[elementId];
-                    if (ep.MassContainers.Count > 1)
+                    if (ep.MassContainers.Count > 0)
                     {
                         Solid unionSolid = null;
                         Options opt = m_app.Application.Create.NewGeometryOptions();
@@ -629,11 +726,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         opt.DetailLevel = Autodesk.Revit.DB.ViewDetailLevel.Fine;
 
                         GeometryElement geomElement = ep.ElementObj.get_Geometry(new Options(opt));
-                        if (ep.ElementObj is FamilyInstance)
-                        {
-                            geomElement = geomElement.GetTransformed(Transform.Identity);
-                        }
-                        
+                        geomElement = geomElement.GetTransformed(ep.TransformValue);
+                      
                         foreach (GeometryObject obj in geomElement)
                         {
                             Solid solid = obj as Solid;

@@ -43,6 +43,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2014|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
+	<Optimize>false</Optimize>
     <OutputPath>bin\2014\</OutputPath>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>RELEASE2014</DefineConstants>

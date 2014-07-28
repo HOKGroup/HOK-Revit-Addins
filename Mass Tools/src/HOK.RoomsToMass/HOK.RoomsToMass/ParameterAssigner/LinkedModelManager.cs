@@ -26,7 +26,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         public string InstanceName { get; set; }
         public string FileName { get; set; }
         public Document LinkedDocument { get; set; }
-        public Transform TransformValue { get { try { return m_instance.GetTransform(); } catch { return null; } } }
+        public Transform TransformValue { get { try { return m_instance.GetTotalTransform(); } catch { return null; } } }
         public List<Element> MassElements { get; set; }
         public Dictionary<int/*massId*/, MassProperties> MassContainers { get; set; }
     }
@@ -72,34 +72,70 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
     public class ElementProperties
     {
-        private Element m_elem;
+        private Element m_elem = null;
+        private Document doc = null;
+        private int elementId = -1;
+        private string elementName = "";
+        private int hostElementId = -1;
+
+        private Element copiedElement = null;
+        private ElementId copiedElementId = Autodesk.Revit.DB.ElementId.InvalidElementId;
+        private Transform transformValue = Transform.Identity;
+
+        private int categoryId = -1;
+        private string categoryName = "";
+        private Dictionary<int, Solid> massContainers = new Dictionary<int, Solid>();
+        private Solid elementSolid = null;
+        private Dictionary<int, double> overappingMaps = new Dictionary<int, double>();
+
+        private bool linkedElement = false;
+        private int selectedMassId = -1;
+        private List<Element> primaryElements = new List<Element>();
+        private List<Element> secondaryElements = new List<Element>();
+        private bool splitSucceed = false;
+
+        public Document Doc { get { return doc; } set { doc = value; } }
+        public int ElementId { get { return elementId; } set { elementId = value; } }
+        public string ElementName { get { return elementName; } set { elementName = value; } }
+        public int HostElementId { get { return hostElementId; } set { hostElementId = value; } }
+        public Element ElementObj { get { return m_elem; } set { m_elem = value; } }
+
+        public Element CopiedElement { get { return copiedElement; } set { copiedElement = value; } }
+        public ElementId CopiedElementId { get { return copiedElementId; } set { copiedElementId = value; } }
+        public Transform TransformValue { get { return transformValue; } set { transformValue = value; } }
+
+        public int CategoryId { get { return categoryId; } set { categoryId = value; } }
+        public string CategoryName { get { return categoryName; } set { categoryName = value; } }
+        public Dictionary<int/*massId*/, Solid/*MassSolid*/> MassContainers { get { return massContainers; } set { massContainers = value; } }
+        public Solid ElementSolid { get { return elementSolid; } set { elementSolid = value; } }
+        public Dictionary<int/*massId*/, double/*percentage of intersected*/> OpverappingMaps { get { return overappingMaps; } set { overappingMaps = value; } }
+
+        //use for split options
+        public bool LinkedElement { get { return linkedElement; } set { linkedElement = value; } }
+        public int SelectedMassId { get { return selectedMassId; } set { selectedMassId = value; } }
+        public List<Element> PrimaryElements { get { return primaryElements; } set { primaryElements = value; } } //splited element from selected mass
+        public List<Element> SecondaryElements { get { return secondaryElements; } set { secondaryElements = value; } } //result of the differecne operation of the mass
+
+        public bool SplitSucceed { get { return splitSucceed; } set { splitSucceed = value; } }
+
         public ElementProperties(Element element)
         {
             m_elem = element;
+            doc = m_elem.Document;
+            elementId = m_elem.Id.IntegerValue;
+            elementName=element.Name;
+
+            if (null != m_elem.Category)
+            {
+                categoryId = m_elem.Category.Id.IntegerValue;
+                categoryName = m_elem.Category.Name;
+            }
+           
+            doc = element.Document;
+
         }
 
-        public Document Doc { get; set; }
-        public int ElementId { get { try { return m_elem.Id.IntegerValue; } catch { return 0; } } }
-        public string ElementName { get { try { return m_elem.Name; } catch { return ""; } } }
-        public int HostElementId { get; set; }
-        public Element ElementObj { get { return m_elem; } set { m_elem = value; } }
-
-        public Element CopiedElement { get; set; }
-        public ElementId CopiedElementId { get; set; }
-
-        public int CategoryId { get { try { return m_elem.Category.Id.IntegerValue; } catch { return 0; } } }
-        public string CategoryName { get { try { return m_elem.Category.Name; } catch { return ""; } } }
-        public Dictionary<int/*massId*/, Solid/*MassSolid*/> MassContainers { get; set; }
-        public Solid ElementSolid { get; set; }
-        public Dictionary<int/*massId*/, double/*percentage of intersected*/> OpverappingMaps { get; set; }
         
-        //use for split options
-        public bool LinkedElement { get; set; }
-        public int SelectedMassId { get; set; }
-        public List<Element> PrimaryElements { get; set; } //splited element from selected mass
-        public List<Element> SecondaryElements { get; set; } //result of the differecne operation of the mass
-
-        public bool SplitSucceed { get; set; }
     }
 
     public class FamilyInstanceProperties
