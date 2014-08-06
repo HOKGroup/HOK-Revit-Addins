@@ -155,6 +155,9 @@ namespace HOK.ColorSchemeEditor
                 criteriaInfoList = criteriaInfoList.OrderBy(o => o.DisplayName).ToList();
                 checkBoxLink.IsChecked = includeLinks;
 
+                ClearUIComponents();
+                DisplayParameters();
+
                 if (selectedRules.Count > 0)
                 {
                     filterEnabled = true;
@@ -173,8 +176,7 @@ namespace HOK.ColorSchemeEditor
                     buttonParameter.Content = "Enable Filters";
                 }
 
-                ClearUIComponents();
-                DisplayParameters();
+               
             }
             catch (Exception ex)
             {
@@ -663,7 +665,7 @@ namespace HOK.ColorSchemeEditor
             List<ParameterInfo> resetInfo = new List<ParameterInfo>();
             try
             {
-                Dictionary<string, ParameterInfo> paramInfo = new Dictionary<string, ParameterInfo>();
+                Dictionary<string, ParameterInfo> paramInfo = AddBasicParameterInfo();
                 //Insert Level associated parameter
                 foreach (Parameter parameter in element.Parameters)
                 {
@@ -732,6 +734,27 @@ namespace HOK.ColorSchemeEditor
                 MessageBox.Show("Failed to reset parameter information.\n" + ex.Message, "Reset Parameter Information", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return resetInfo;
+        }
+
+
+        private Dictionary<string, ParameterInfo> AddBasicParameterInfo()
+        {
+            Dictionary<string, ParameterInfo> paramInfo = new Dictionary<string, ParameterInfo>();
+            try
+            {
+                BuiltInParameter[] basicParameters = new BuiltInParameter[] { BuiltInParameter.ALL_MODEL_FAMILY_NAME, BuiltInParameter.ALL_MODEL_TYPE_NAME };
+                foreach (BuiltInParameter bltParam in basicParameters)
+                {
+                    ParameterInfo pi = new ParameterInfo(m_doc, bltParam);
+                    pi.IsInstance = false;
+                    paramInfo.Add(pi.Name, pi);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to add basic parameter information.\n" + ex.Message, "Add Basic Parameter Info", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return paramInfo;
         }
 
         private void comboBoxFilterBy1_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1092,6 +1115,15 @@ namespace HOK.ColorSchemeEditor
             
         }
 
+        public ParameterInfo(Document doc, BuiltInParameter bltParam)
+        {
+            ElementId eId = new ElementId((int)bltParam);
+            paramId = eId;
+            bltParameter = bltParam;
+            storageType = doc.get_TypeOfStorage(bltParam);
+            name = LabelUtils.GetLabelFor(bltParam);
+        }
+
         public ParameterInfo(string paramName)
         {
             name = paramName;
@@ -1099,8 +1131,8 @@ namespace HOK.ColorSchemeEditor
         
         public ParameterInfo(Parameter param)
         {
-            parameterObj = param;
             name = param.Definition.Name;
+            parameterObj = param;
             paramId = param.Id;
             storageType = param.StorageType;
 
@@ -1136,7 +1168,7 @@ namespace HOK.ColorSchemeEditor
         public string ValueAsString { get { return valueAsString; } set { valueAsString = value; } }
         public StorageType ParamStorageType { get { return storageType; } set { storageType = value; } }
         public bool IsEmpty { get { return isEmpty; } set { isEmpty = value; } }
-
+        
         public ParameterValueInfo(Document document, Element element, ParameterInfo parameterInfo)
         {
             doc = document;
@@ -1144,7 +1176,7 @@ namespace HOK.ColorSchemeEditor
             paramInfo = parameterInfo;
             GetParameterValue();
         }
-
+        
         public ParameterValueInfo(Document document, Element element, string parameterName)
         {
             doc = document;

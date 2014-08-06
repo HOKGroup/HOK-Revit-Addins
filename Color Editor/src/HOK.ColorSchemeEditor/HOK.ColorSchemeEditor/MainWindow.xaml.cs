@@ -1400,7 +1400,8 @@ namespace HOK.ColorSchemeEditor
             List<ParameterInfo> resetInfo = new List<ParameterInfo>();
             try
             {
-                Dictionary<string, ParameterInfo> paramInfo = new Dictionary<string, ParameterInfo>();
+                Dictionary<string, ParameterInfo> paramInfo = AddBasicParameterInfo();
+
                 //Insert Level associated parameter
                 foreach (Parameter parameter in element.Parameters)
                 {
@@ -1470,6 +1471,26 @@ namespace HOK.ColorSchemeEditor
                 MessageBox.Show("Failed to reset parameter information.\n" + ex.Message, "Reset Parameter Information", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return resetInfo;
+        }
+
+        private Dictionary<string, ParameterInfo> AddBasicParameterInfo()
+        {
+            Dictionary<string, ParameterInfo> paramInfo = new Dictionary<string, ParameterInfo>();
+            try
+            {
+                BuiltInParameter[] basicParameters = new BuiltInParameter[] { BuiltInParameter.ALL_MODEL_FAMILY_NAME, BuiltInParameter.ALL_MODEL_TYPE_NAME };
+                foreach (BuiltInParameter bltParam in basicParameters)
+                {
+                    ParameterInfo pi = new ParameterInfo(m_doc, bltParam);
+                    pi.IsInstance = false;
+                    paramInfo.Add(pi.Name, pi);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to add basic parameter information.\n"+ex.Message, "Add Basic Parameter Info", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return paramInfo;
         }
 
         private ColorScheme GetFilteredElements(ColorScheme colorScheme)
@@ -1846,10 +1867,11 @@ namespace HOK.ColorSchemeEditor
                     {
                         List<Element> elements = colorScheme.FilteredElements;
                         string paramName = colorScheme.ParameterName;
-                        
+                        ParameterInfo paramInfo = colorScheme.SelectedParamInfo;
+
                         foreach (Element element in elements)
                         {
-                            ParameterValueInfo valueInfo = new ParameterValueInfo(m_doc, element, paramName);
+                            ParameterValueInfo valueInfo = new ParameterValueInfo(m_doc, element, paramInfo);
 
                             List<ColorDefinition> foundDefinitions = new List<ColorDefinition>();
                             if (colorScheme.DefinitionBy == DefinitionType.ByValue)
