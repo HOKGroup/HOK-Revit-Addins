@@ -1269,29 +1269,32 @@ namespace HOK.AddIn_Installer_Internal
                     progressForm.StepForward();
                 }
 
-                if (target == TargetSoftware.Revit_2013)
+                if (null != tp.BetaVersionInfo)
                 {
-                    if (installedVersions2013.ContainsKey(tp.ToolName))
+                    if (target == TargetSoftware.Revit_2013)
                     {
-                        installedVersions2013.Remove(tp.ToolName);
+                        if (installedVersions2013.ContainsKey(tp.ToolName))
+                        {
+                            installedVersions2013.Remove(tp.ToolName);
+                        }
+                        installedVersions2013.Add(tp.ToolName, tp.BetaVersionInfo.FileVersion);
                     }
-                    installedVersions2013.Add(tp.ToolName, tp.BetaVersionInfo.FileVersion);
-                }
-                else if (target == TargetSoftware.Revit_2014)
-                {
-                    if (installedVersions2014.ContainsKey(tp.ToolName))
+                    else if (target == TargetSoftware.Revit_2014)
                     {
-                        installedVersions2014.Remove(tp.ToolName);
+                        if (installedVersions2014.ContainsKey(tp.ToolName))
+                        {
+                            installedVersions2014.Remove(tp.ToolName);
+                        }
+                        installedVersions2014.Add(tp.ToolName, tp.BetaVersionInfo.FileVersion);
                     }
-                    installedVersions2014.Add(tp.ToolName, tp.BetaVersionInfo.FileVersion);
-                }
-                else if (target == TargetSoftware.Revit_2015)
-                {
-                    if (installedVersions2015.ContainsKey(tp.ToolName))
+                    else if (target == TargetSoftware.Revit_2015)
                     {
-                        installedVersions2015.Remove(tp.ToolName);
+                        if (installedVersions2015.ContainsKey(tp.ToolName))
+                        {
+                            installedVersions2015.Remove(tp.ToolName);
+                        }
+                        installedVersions2015.Add(tp.ToolName, tp.BetaVersionInfo.FileVersion);
                     }
-                    installedVersions2015.Add(tp.ToolName, tp.BetaVersionInfo.FileVersion);
                 }
             }
             catch (Exception ex)
