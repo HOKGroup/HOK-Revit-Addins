@@ -1,3 +1,8 @@
+v.0.1.9
+Fix
+- In the drop-dwon list, Color By, "Family Name" and "Type Name" will capture correct values both for family instances and system families
+- When revisiting to the selection of categories and filter rules through the Element Filters button, saved filter rules will be displayed not. 
+
 v.0.1.8
 Fix
 - Save and Save As Buttons will be disabled if the Color Editor UI doesn't contain any of color shcemes components.
