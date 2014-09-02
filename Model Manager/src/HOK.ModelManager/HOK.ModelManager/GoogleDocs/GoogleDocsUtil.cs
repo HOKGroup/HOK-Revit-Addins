@@ -28,22 +28,31 @@ namespace HOK.ModelManager.GoogleDocs
         private List<TreeViewModel> folderTreeViews = new List<TreeViewModel>();
         private Dictionary<string/*folderKey*/, Document> folderDictionary = new Dictionary<string, Document>();
         private Dictionary<string/*folderKey*/, Dictionary<string/*docKey*/, Document>> docDictionary = new Dictionary<string, Dictionary<string, Document>>();
+        private bool googleDocActivated = false;
+
+        public bool GoogleDocActivated { get { return googleDocActivated; } set { googleDocActivated = value; } }
         
         public GoogleDocsUtil()
         {
-            SetCredentialInfo();
-            GetDocumentInfo();
-            projectReplicationFolder = GetFolderByTiltle("Project Replication");
-            modelBuilderFolder = GetFolderByTiltle("Model Builder");
+            if (SetCredentialInfo())
+            {
+                if (GetDocumentInfo())
+                {
+                    projectReplicationFolder = GetFolderByTiltle("Project Replication");
+                    modelBuilderFolder = GetFolderByTiltle("Model Builder");
 
-            prHeader =  new string[] { "ItemType", "SourceName", "SourcePath", "DestinationPath", "ItemSourceID", "ItemSourceName",	
+                    prHeader = new string[] { "ItemType", "SourceName", "SourcePath", "DestinationPath", "ItemSourceID", "ItemSourceName",	
                         "ItemDestinationID",	"ItemDestinationName",	"ItemDestinationImage1", "ItemDestinationImage2", "LinkModified", "LinkModifiedBy" };
-            mbHeader = new string[] { "ItemType", "SourceName", "SourcePath", "DestinationPath", "ItemSourceID", "ItemSourceName",	
-                        "ItemDestinationID",	"ItemDestinationName",	"ItemDestinationImage1", "ItemDestinationImage2", "LinkModified", "LinkModifiedBy" };	
+                    mbHeader = new string[] { "ItemType", "SourceName", "SourcePath", "DestinationPath", "ItemSourceID", "ItemSourceName",	
+                        "ItemDestinationID",	"ItemDestinationName",	"ItemDestinationImage1", "ItemDestinationImage2", "LinkModified", "LinkModifiedBy" };
+                    googleDocActivated = true;
+                }
+            }
         }
          
-        private void SetCredentialInfo()
+        private bool SetCredentialInfo()
         {
+            bool result = false;
             try
             {
                 sheetService = new SpreadsheetsService("Model Manager");
@@ -59,16 +68,20 @@ namespace HOK.ModelManager.GoogleDocs
                 if (null != settings)
                 {
                     docRequest = new DocumentsRequest(settings);
+                    result = true;
                 }
             }
             catch (Exception ex)
             {
-              MessageBox.Show("Failed to get Google Docs info.\n"+ex.Message, "Get Document Info", MessageBoxButton.OK, MessageBoxImage.Warning);
+              MessageBox.Show("Failed to get Google Docs information.\nPlease check Internet connection.\n"+ex.Message, "Set Google Credential", MessageBoxButton.OK, MessageBoxImage.Warning);
+              result = false;
             }
+            return result;
         }
 
-        private void GetDocumentInfo()
+        private bool GetDocumentInfo()
         {
+            bool result = false;
             try
             {
                 Feed<Document> feed = docRequest.GetFolders();
@@ -96,11 +109,14 @@ namespace HOK.ModelManager.GoogleDocs
                         docDictionary.Add(parentFolderKey, dictionary);
                     }
                 }
+                result = true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to get folder information.\n"+ ex.Message, "Get Folder Info", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to get folder information.\nPlease check Internet connection.\n"+ ex.Message, "Get Google Docs Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                result = false;
             }
+            return result;
         }
 
         private Document GetFolderByTiltle(string title)

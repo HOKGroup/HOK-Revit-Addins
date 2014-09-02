@@ -48,8 +48,52 @@ namespace HOK.ModelManager
                             copiedView = preview.RecipientModelInfo.Doc.GetElement(viewId) as ViewDrafting;
                             if (null != copiedView)
                             {
-                                int numOfCopied = DuplicateDetailingAcrossViews(previewMap.SourceViewProperties.ViewDraftingObj, copiedView);
+                                int numOfCopied = DuplicateDetailingAcrossViews(preview.SourceViewProperties.ViewDraftingObj, copiedView);
                             }
+
+                            if (createSheet)
+                            {
+                                
+                                //delete existing viewport
+                                ElementClassFilter filter = new ElementClassFilter(typeof(Viewport));
+                                FilteredElementCollector collector = new FilteredElementCollector(preview.RecipientModelInfo.Doc);
+                                List<Viewport> viewports=collector.WherePasses(filter).Cast<Viewport>().ToList<Viewport>();
+
+                                var query = from element in viewports
+                                            where element.ViewId == viewId
+                                            select element;
+                                if (query.Count() > 0)
+                                {
+                                    Viewport viewport = query.First();
+                                    using (Transaction trans = new Transaction(preview.RecipientModelInfo.Doc, "Delete exisitng viewport"))
+                                    {
+                                        trans.Start();
+                                        try
+                                        {
+                                            preview.RecipientModelInfo.Doc.Delete(viewport.Id);
+                                            trans.Commit();
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            string message = ex.Message;
+                                            trans.RollBack();
+                                        }
+                                    }
+
+                                    if (preview.SourceViewProperties.IsOnSheet && null!=preview.SourceViewProperties.SheetObj)
+                                    {
+                                        ViewSheet copiedSheet = DuplicateSheets(preview);
+                                        if (null != copiedView && null != copiedSheet)
+                                        {
+                                            if (Viewport.CanAddViewToSheet(preview.RecipientModelInfo.Doc, copiedSheet.Id, copiedView.Id))
+                                            {
+                                                Viewport recipientViewport = DuplicateViewPort(preview, copiedSheet, copiedView);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
                         }
                         else
                         {
@@ -253,6 +297,7 @@ namespace HOK.ModelManager
                                 string viewportTypeName = preview.SourceViewProperties.ViewportTypeName;
 
                                 recipientViewport = Viewport.Create(preview.RecipientModelInfo.Doc, copiedSheet.Id, copiedView.Id, viewportLocation);
+                                
                                 ElementId viewportTypeId = ElementId.InvalidElementId;
                                 List<ElementId> elementTypeIds = recipientViewport.GetValidTypes().ToList();
                                 foreach (ElementId typeId in elementTypeIds)

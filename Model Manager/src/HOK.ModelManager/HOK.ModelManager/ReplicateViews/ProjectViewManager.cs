@@ -33,25 +33,27 @@ namespace HOK.ModelManager.ReplicateViews
         {
             m_app = uiapp;
             googleDocsUtil = new GoogleDocsUtil();
-
-            verifiedUser = VerifyUserInfo();
-            if (verifiedUser)
+            if (googleDocsUtil.GoogleDocActivated)
             {
-                GetDraftingViewInfo();
-                viewTypeNames.Sort();
-                sheetNumbers.Sort();
-                sheetNumbers.Add("None");
-
-                if (modelInfoDictionary.Count > 0)
+                verifiedUser = VerifyUserInfo();
+                if (verifiedUser)
                 {
-                    foreach (ModelInfo modelInfo in modelInfoDictionary.Values)
+                    GetDraftingViewInfo();
+                    viewTypeNames.Sort();
+                    sheetNumbers.Sort();
+                    sheetNumbers.Add("None");
+
+                    if (modelInfoDictionary.Count > 0)
                     {
-                        GoogleDocInfo googleDocInfo = googleDocsUtil.GetGoogleDocInfo(modelInfo, ModelManagerMode.ProjectReplication);
-                        if (null != googleDocInfo)
+                        foreach (ModelInfo modelInfo in modelInfoDictionary.Values)
                         {
-                            if (!googleDocDictionary.ContainsKey(googleDocInfo.DocTitle))
+                            GoogleDocInfo googleDocInfo = googleDocsUtil.GetGoogleDocInfo(modelInfo, ModelManagerMode.ProjectReplication);
+                            if (null != googleDocInfo)
                             {
-                                googleDocDictionary.Add(googleDocInfo.DocTitle, googleDocInfo);
+                                if (!googleDocDictionary.ContainsKey(googleDocInfo.DocTitle))
+                                {
+                                    googleDocDictionary.Add(googleDocInfo.DocTitle, googleDocInfo);
+                                }
                             }
                         }
                     }
@@ -371,10 +373,11 @@ namespace HOK.ModelManager.ReplicateViews
                     Dictionary<int, ViewProperties> views = viewDictionary[recipientDoc];
                     foreach (PreviewMap preview in previewMapList)
                     {
-                        if (!views.ContainsKey(preview.RecipientViewProperties.ViewId))
+                        if (views.ContainsKey(preview.RecipientViewProperties.ViewId))
                         {
-                            views.Add(preview.RecipientViewProperties.ViewId, preview.RecipientViewProperties);
+                            views.Remove(preview.RecipientViewProperties.ViewId);
                         }
+                        views.Add(preview.RecipientViewProperties.ViewId, preview.RecipientViewProperties);
                     }
                     viewDictionary.Remove(recipientDoc);
                     viewDictionary.Add(recipientDoc, views);
