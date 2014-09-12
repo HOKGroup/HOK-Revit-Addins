@@ -6,11 +6,13 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
-using System.Threading;
 using Autodesk.Revit.DB.Architecture;
+
+
 
 namespace HOK.Utilities.LevelManager
 {
@@ -228,7 +230,7 @@ namespace HOK.Utilities.LevelManager
                 IList<ElementId> elementIds = collector.OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().WherePasses(levelFilter).ToElementIds().ToList();
 
                 List<Element> systemFamilies = new List<Element>();
-                List<Room> rooms = new List<Room>();
+                List<Autodesk.Revit.DB.Architecture.Room> rooms = new List<Autodesk.Revit.DB.Architecture.Room>();
                 List<Element> familyInstances = new List<Element>();
 #if RELEASE2013
 #else

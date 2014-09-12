@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.Utilities", "HOK.Utilities\HOK.Utilities.csproj", "{547C0617-8592-4A4D-BF2E-E204FAF831ED}"
 EndProject
 Global

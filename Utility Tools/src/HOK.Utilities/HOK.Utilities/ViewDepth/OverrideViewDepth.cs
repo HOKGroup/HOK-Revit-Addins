@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Autodesk.Revit.DB;
+
 using System.Collections;
-using Autodesk.Revit.UI;
 using System.Windows.Forms;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 
 //code source:http://puntorevit.blogspot.com.au/
 
@@ -17,12 +18,56 @@ namespace HOK.Utilities.ViewDepth
     {
         private Autodesk.Revit.UI.UIApplication m_app;
         private Document m_doc;
+        private Autodesk.Revit.DB.View currentView;
 
         public OverrideViewDepth(UIApplication uiapp)
         {
             m_app = uiapp;
             m_doc = m_app.ActiveUIDocument.Document;
+            currentView = m_doc.ActiveView;
+            try
+            {
+                bool viewOverriden = ViewDepthDataStorageUtil.GetOverridenViews(m_doc, currentView.Id);
+                
+                if (viewOverriden)
+                {
+                    TaskDialog mainDialog = new TaskDialog("View Depth - Override Graphics");
+                    mainDialog.MainInstruction = "The current view has already applied graphics overriden by the View Depth tool.\n";
+                    mainDialog.MainContent = "Select an option below.";
 
+                    mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Override Graphics");
+                    mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Clear All Overrides");
+
+                    TaskDialogResult tResult = mainDialog.Show();
+                    if (TaskDialogResult.CommandLink1 == tResult)
+                    {
+                        bool overriden = OverrideGraphics(currentView);
+                        bool updatedStorage = ViewDepthDataStorageUtil.UpdateDataStorage(m_doc, currentView.Id, overriden);
+                    }
+                    else if (TaskDialogResult.CommandLink2 == tResult)
+                    {
+                        bool cleared = ClearAllOverrides(currentView);
+                        if (cleared)
+                        {
+                            bool updatedStorage = ViewDepthDataStorageUtil.UpdateDataStorage(m_doc, currentView.Id, false);
+                        }
+                    }
+                }
+                else
+                {
+                    bool overriden = OverrideGraphics(currentView);
+                    bool updatedStorage = ViewDepthDataStorageUtil.UpdateDataStorage(m_doc, currentView.Id, overriden);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to override the depth of view.\n"+ex.Message, "ViewDepthOverride", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private bool OverrideGraphics(Autodesk.Revit.DB.View activeView)
+        {
+            bool result = false;
             try
             {
                 //known issues: doesn't work with linked files and 3D Views
@@ -34,12 +79,12 @@ namespace HOK.Utilities.ViewDepth
                 List<ElementId> ids1 = new List<ElementId>();
                 List<ElementId> ids2 = new List<ElementId>();
 
-                Autodesk.Revit.DB.View CurrentView = m_doc.ActiveView;
+
                 //It works fine for 2D views, building sections and elevations for example
                 //it should work also with floor plans and even tilted Detail Views
                 //but it wasn't my goal when I started
                 //won't work for a 3D View
-                int clip = CurrentView.get_Parameter(BuiltInParameter.VIEWER_BOUND_FAR_CLIPPING).AsInteger();
+                int clip = activeView.get_Parameter(BuiltInParameter.VIEWER_BOUND_FAR_CLIPPING).AsInteger();
                 //If the far clipping is not active the default depth is 10 feet and won't work correctly
                 if (clip == 0)
                 {
@@ -51,9 +96,9 @@ namespace HOK.Utilities.ViewDepth
                     //foreground (0)
                     //middle (1)
                     //background (2)
-                    ids0 = IntegralCollection(CurrentView, 0);
-                    ids1 = IntegralCollection(CurrentView, 1);
-                    ids2 = IntegralCollection(CurrentView, 2);
+                    ids0 = IntegralCollection(activeView, 0);
+                    ids1 = IntegralCollection(activeView, 1);
+                    ids2 = IntegralCollection(activeView, 2);
                     //Just a check to handle some common errors, for instance not even one
                     //ElementId was found in the foreground view interval
                     if (ids0.Count == 0)
@@ -87,7 +132,7 @@ namespace HOK.Utilities.ViewDepth
                     while (ids0.Count > 0)
                     {
                         //Stores the color for the foreground
-                        OverrideGraphicSettings gSettings = CurrentView.GetElementOverrides(ids0.First());
+                        OverrideGraphicSettings gSettings = activeView.GetElementOverrides(ids0.First());
                         Color Color0 = gSettings.ProjectionLineColor;
 
                         if (ids1.Count != 0)
@@ -97,7 +142,7 @@ namespace HOK.Utilities.ViewDepth
 
                             foreach (ElementId eId in ids1)
                             {
-                                CurrentView.SetElementOverrides(eId, gSettings1);
+                                activeView.SetElementOverrides(eId, gSettings1);
                             }
                         }
                         else
@@ -113,7 +158,7 @@ namespace HOK.Utilities.ViewDepth
 
                             foreach (ElementId eId in ids2)
                             {
-                                CurrentView.SetElementOverrides(eId, gSettings2);
+                                activeView.SetElementOverrides(eId, gSettings2);
                             }
                         }
                         else
@@ -127,7 +172,7 @@ namespace HOK.Utilities.ViewDepth
                         gSettings.SetProjectionLineColor(Color0);
                         foreach (ElementId eId in ids0)
                         {
-                            CurrentView.SetElementOverrides(eId, gSettings);
+                            activeView.SetElementOverrides(eId, gSettings);
                         }
                         break;
                     }
@@ -135,11 +180,49 @@ namespace HOK.Utilities.ViewDepth
                     m_app.ActiveUIDocument.RefreshActiveView();
                     t.Commit();
                 }
+                result = true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to override the depth of view.\n"+ex.Message, "ViewDepthOverride", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to override graphics.\n" + ex.Message, "Override Graphics - " + activeView.Name, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+            return result;
+        }
+
+        private bool ClearAllOverrides(Autodesk.Revit.DB.View activeView)
+        {
+            bool cleared = false;
+            try
+            {
+                FilteredElementCollector collector = new FilteredElementCollector(m_doc, activeView.Id);
+                List<ElementId> elementIds = collector.ToElementIds().ToList();
+
+                OverrideGraphicSettings settings = new OverrideGraphicSettings();
+                settings.SetProjectionLineColor(Autodesk.Revit.DB.Color.InvalidColorValue);
+                using (Transaction trans = new Transaction(m_doc))
+                {
+                    try
+                    {
+                        trans.Start("Clear overrides");
+                        foreach (ElementId eId in elementIds)
+                        {
+                            activeView.SetElementOverrides(eId, settings);
+                        }
+                        trans.Commit();
+                        cleared = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.RollBack();
+                        string message = ex.Message;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to clear all overrides.\n"+ex.Message, "Clear All Overrides", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return cleared;
         }
 
         private List<ElementId> IntegralCollection(Autodesk.Revit.DB.View view, int i)

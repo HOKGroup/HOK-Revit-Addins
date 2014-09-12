@@ -13,6 +13,7 @@ namespace HOK.Utilities
 {
     public class AppCommand:IExternalApplication
     {
+
         public Result OnShutdown(UIControlledApplication application)
         {
             return Result.Succeeded;
@@ -51,7 +52,7 @@ namespace HOK.Utilities
             pushButton4.ToolTip = "Override the graphics of the element based on the distance";
             pushButton4.SetContextualHelp(contextualHelp);
 #endif
-           
+
             PushButton pushButton5 = splitButton.AddPushButton(new PushButtonData("LeaderArrowhead", "Leader Arrowhead", currentAssembly, "HOK.Utilities.ArrowCommand")) as PushButton;
             pushButton5.LargeImage = LoadBitmapImage(assembly, "arrowhead.png");
             pushButton5.ToolTip = "Assign a leader arrowhead style to all tag types.";
@@ -66,6 +67,11 @@ namespace HOK.Utilities
             pushButton7.LargeImage = LoadBitmapImage(assembly, "door.png");
             pushButton7.ToolTip = "Assign To-Room and From-Room values for all door elements across linked models.";
             pushButton7.SetContextualHelp(contextualHelp);
+
+            PushButton pushButton8 = splitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", currentAssembly, "HOK.Utilities.RoomCommand")) as PushButton;
+            pushButton8.LargeImage = LoadBitmapImage(assembly, "cube.png");
+            pushButton8.ToolTip = "Assign room data into enclosed elements.";
+            pushButton8.SetContextualHelp(contextualHelp);
 
             return Result.Succeeded;
         }
@@ -84,7 +90,7 @@ namespace HOK.Utilities
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to load the embedded resource image.\n"+ex.Message, "Load Bitmap Image", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to load the embedded resource image.\n" + ex.Message, "Load Bitmap Image", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return image;
         }
