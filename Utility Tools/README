@@ -1,0 +1,4 @@
+v.0.4.2
+New
+- Room Updater has been added as a new command under Utility Tools
+- View Depth tool has a new feature that clear all overrides applied by the tool, when running the tool second time on the same view.
