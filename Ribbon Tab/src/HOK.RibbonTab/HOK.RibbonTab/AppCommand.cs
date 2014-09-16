@@ -171,6 +171,16 @@ namespace HOK.RibbonTab
                         AddToolTips(pb21);
                         utilityExist = true;
                     }
+
+                    string roomCommand = "HOK.Utilities.RoomCommand";
+                    if (null != utilAssembly.GetType(roomCommand))
+                    {
+                        PushButton pb22 = splitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", utilAssembly.Location, roomCommand)) as PushButton;
+                        pb22.LargeImage = LoadBitmapImage(assembly, "container.png");
+                        pb22.ToolTip = "Populate room parameters values into enclosed elements.";
+                        AddToolTips(pb22);
+                        utilityExist = true;
+                    }
                 }
                 if (!utilityExist)
                 {
