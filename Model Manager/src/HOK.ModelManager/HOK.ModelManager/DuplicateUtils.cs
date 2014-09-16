@@ -79,16 +79,15 @@ namespace HOK.ModelManager
                                             trans.RollBack();
                                         }
                                     }
-
-                                    if (preview.SourceViewProperties.IsOnSheet && null!=preview.SourceViewProperties.SheetObj)
+                                }
+                                if (preview.SourceViewProperties.IsOnSheet && null != preview.SourceViewProperties.SheetObj)
+                                {
+                                    ViewSheet copiedSheet = DuplicateSheets(preview);
+                                    if (null != copiedView && null != copiedSheet)
                                     {
-                                        ViewSheet copiedSheet = DuplicateSheets(preview);
-                                        if (null != copiedView && null != copiedSheet)
+                                        if (Viewport.CanAddViewToSheet(preview.RecipientModelInfo.Doc, copiedSheet.Id, copiedView.Id))
                                         {
-                                            if (Viewport.CanAddViewToSheet(preview.RecipientModelInfo.Doc, copiedSheet.Id, copiedView.Id))
-                                            {
-                                                Viewport recipientViewport = DuplicateViewPort(preview, copiedSheet, copiedView);
-                                            }
+                                            Viewport recipientViewport = DuplicateViewPort(preview, copiedSheet, copiedView);
                                         }
                                     }
                                 }
@@ -313,6 +312,21 @@ namespace HOK.ModelManager
                                 {
                                     ElementId typeId = recipientViewport.ChangeTypeId(viewportTypeId);
                                 }
+                                else
+                                {
+                                    CopyPasteOptions options = new CopyPasteOptions();
+                                    options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
+
+                                    List<ElementId> typeIds = new List<ElementId>();
+                                    typeIds.Add(sourceViewport.GetTypeId());
+
+                                    ICollection<ElementId> copiedTypeIds = ElementTransformUtils.CopyElements(preview.SourceModelInfo.Doc, typeIds, preview.RecipientModelInfo.Doc, Transform.Identity, options);
+                                    if (copiedTypeIds.Count > 0)
+                                    {
+                                        viewportTypeId = copiedTypeIds.First();
+                                        ElementId typeId = recipientViewport.ChangeTypeId(viewportTypeId);
+                                    }
+                                }
                                 trans.Commit();
 
                                 if (null != recipientViewport)
@@ -330,25 +344,32 @@ namespace HOK.ModelManager
 
                                             if (null != rParam)
                                             {
-                                                if (rParam.StorageType == param.StorageType)
+                                                if (!rParam.IsReadOnly)
                                                 {
-                                                    switch (param.StorageType)
+                                                    if (rParam.StorageType == param.StorageType)
                                                     {
-                                                        case StorageType.Double:
-                                                            rParam.Set(param.AsDouble());
-                                                            break;
-                                                        case StorageType.Integer:
-                                                            rParam.Set(param.AsInteger());
-                                                            break;
-                                                        case StorageType.String:
-                                                            rParam.Set(param.AsString());
-                                                            break;
+                                                        switch (param.StorageType)
+                                                        {
+                                                            case StorageType.Double:
+                                                                rParam.Set(param.AsDouble());
+                                                                break;
+                                                            case StorageType.Integer:
+                                                                rParam.Set(param.AsInteger());
+                                                                break;
+                                                            case StorageType.String:
+                                                                rParam.Set(param.AsString());
+                                                                break;
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                    trans.Commit();
+
+                                    FailureHandlingOptions failureOptions = trans.GetFailureHandlingOptions();
+                                    failureOptions.SetFailuresPreprocessor(new HideSameParameterValuePreprocessor());
+                                    trans.Commit(failureOptions);
+
                                 }
                             }
                             catch (Exception ex)
@@ -532,7 +553,7 @@ namespace HOK.ModelManager
         #endregion
     }
 
-
+    
     /// <summary>
     /// A failure preprocessor to hide the warning about duplicate types being pasted.
     /// </summary>
@@ -568,5 +589,29 @@ namespace HOK.ModelManager
         }
 
         #endregion
+    }
+
+    class HideSameParameterValuePreprocessor : IFailuresPreprocessor
+    {
+
+        public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
+        {
+            foreach (FailureMessageAccessor failure in failuresAccessor.GetFailureMessages())
+            {
+                FailureDefinitionId defId = failure.GetFailureDefinitionId();
+                FailureDefinitionId nameInUse = BuiltInFailures.GeneralFailures.NameNotUnique;//same detail number
+
+                // Delete any "Can't paste duplicate types.  Only non duplicate types will be pasted." warnings
+                if (defId == nameInUse)
+                {
+                    failuresAccessor.DeleteWarning(failure);
+                }
+                else if (failure.GetSeverity() == FailureSeverity.Warning)
+                {
+                    failuresAccessor.DeleteWarning(failure);
+                }
+            }
+            return FailureProcessingResult.Continue;
+        }
     }
 }

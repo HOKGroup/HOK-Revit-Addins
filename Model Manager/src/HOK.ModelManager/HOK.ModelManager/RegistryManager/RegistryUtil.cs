@@ -9,8 +9,12 @@ namespace HOK.ModelManager.RegistryManager
     public static class RegistryUtil
     {
         //KeyNames: CompanyName, ModelBuilderActivated
-
+#if RELEASE2014
         private static string keyAddress = "Software\\Autodesk\\Revit\\Autodesk Revit 2014\\ModelManager";
+#elif RELEASE2015
+        private static string keyAddress = "Software\\Autodesk\\Revit\\Autodesk Revit 2015\\ModelManager";
+#endif
+
         public static void SetRegistryKey(string keyName, object value)
         {
             try

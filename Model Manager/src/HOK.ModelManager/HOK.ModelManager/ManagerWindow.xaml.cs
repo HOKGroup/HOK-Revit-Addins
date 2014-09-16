@@ -144,7 +144,7 @@ namespace HOK.ModelManager
                         {
                             labelWarning.Visibility = System.Windows.Visibility.Hidden;
                             TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
-                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy);
+                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                         }
                     }
                 }
@@ -173,7 +173,7 @@ namespace HOK.ModelManager
                         {
                             labelWarning.Visibility = System.Windows.Visibility.Hidden;
                             TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
-                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy);
+                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                         }
                     }
                 }
@@ -202,7 +202,7 @@ namespace HOK.ModelManager
                         {
                             checkBoxLinked.IsChecked = false;
                             TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
-                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy);
+                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                         }
                     }
                 }
@@ -223,13 +223,13 @@ namespace HOK.ModelManager
                 {
                     if (null == selectedItem._parent && selectedItem.Children.Count > 0) //root
                     {
-                        projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy);
+                        projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                     }
                     else if (null != selectedItem._parent && selectedItem.Children.Count > 0)//sheet name or view type
                     {
                         string selectedHeader = ((TreeViewModel)e.NewValue).Name;
                         string filterString = ((TreeViewModel)e.NewValue).Tag.ToString();
-                        projectView.RefreshTreeViewBySelection(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, filterString);
+                        projectView.RefreshTreeViewBySelection(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, filterString, (bool)checkBoxCreateLinks.IsChecked);
                     }
                 }
             }
@@ -276,7 +276,7 @@ namespace HOK.ModelManager
         {
             try
             {
-               bool duplicated = projectView.UpdateDraftingViews(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, (bool)checkBoxSheet.IsChecked ,statusLable, progressBar);
+                bool duplicated = projectView.UpdateDraftingViews(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, (bool)checkBoxSheet.IsChecked, (bool)checkBoxCreateLinks.IsChecked, statusLable, progressBar);
                if (duplicated)
                {
                    if (comboBoxSource.SelectedIndex > -1 && comboBoxRecipient.SelectedIndex > -1)
@@ -284,10 +284,11 @@ namespace HOK.ModelManager
                        if (m_mode == ModelManagerMode.ProjectReplication)
                        {
                            TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
-                           projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy);
+                           projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                        }
                    }
                }
+                
             }
             catch (Exception ex)
             {
@@ -308,7 +309,7 @@ namespace HOK.ModelManager
                 {
                     if (m_mode == ModelManagerMode.ProjectReplication)
                     {
-                        ViewMapClass viewMapClass = projectView.GetViewMap(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString());
+                        ViewMapClass viewMapClass = projectView.GetViewMap(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), (bool)checkBoxCreateLinks.IsChecked);
                         FixLinkWindow fixLinkWindow = new FixLinkWindow(viewMapClass);
                         Nullable<bool> dlResult = fixLinkWindow.ShowDialog();
                         if (dlResult == true)
@@ -325,7 +326,7 @@ namespace HOK.ModelManager
                             bool updatedViewDictionary = projectView.UpdateViewDictionary(viewMapClass);
 
                             TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
-                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy);
+                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
 
                             progressBar.Visibility = System.Windows.Visibility.Hidden;
                             statusLable.Visibility = System.Windows.Visibility.Hidden;

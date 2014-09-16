@@ -21,79 +21,53 @@ using System.Security.Permissions;
 
 namespace HOK.ModelManager_Installer
 {
+    public enum InstallVersion
+    {
+        None,
+        ModelManager2014,
+        ModelManager2015,
+        ModelManagerBoth
+    }
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
         private string addInPath2014 = "";
+        private string addInPath2015 = "";
         private string dataDirectory = "";
-        private string keyAddress = "Software\\Autodesk\\Revit\\Autodesk Revit 2014\\ModelManager";
+        private string keyAddress2014 = "Software\\Autodesk\\Revit\\Autodesk Revit 2014\\ModelManager";
+        private string keyAddress2015 = "Software\\Autodesk\\Revit\\Autodesk Revit 2015\\ModelManager";
+        private InstallVersion version = InstallVersion.None;
+        private Dictionary<string/*fileName*/, string/*path*/> filesDictionary = new Dictionary<string, string>();
 
         public MainWindow()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             addInPath2014 = appData + @"\Autodesk\Revit\Addins\2014";
-           
+            addInPath2015 = appData + @"\Autodesk\Revit\Addins\2015";
+
             InitializeComponent();
             if (ApplicationDeployment.IsNetworkDeployed)
             {
                 dataDirectory = ApplicationDeployment.CurrentDeployment.DataDirectory;
             }
             this.Title = "HOK Tools Installer - Model Manager v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            labelReleaseNum.Content = GetReleasedFileVersion();
-            labelInstalledNum.Content = GetInstalledFileVersion();
- 
-        }
 
-        private string GetReleasedFileVersion()
-        {
-            string versionNumber = "";
-            try
-            {
-                if (ApplicationDeployment.IsNetworkDeployed)
-                {
-                    System.Diagnostics.FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(dataDirectory + "\\2014\\HOK.ModelManager.dll");
-                    if (null != versionInfo)
-                    {
-                        versionNumber = "v." + versionInfo.FileVersion;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to get the released version number.\n"+ex.Message, "Released Version Number", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return versionNumber;
+            filesDictionary = new Dictionary<string, string>();
+            filesDictionary.Add("\\HOK.ModelManager.addin", "\\HOK.ModelManager.addin");
+            filesDictionary.Add("\\HOK.ModelManager.dll", "\\HOK-Addin.bundle\\Contents_External\\HOK.ModelManager.dll");
+            filesDictionary.Add("\\Google.GData.AccessControl.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.AccessControl.dll");
+            filesDictionary.Add("\\Google.GData.Client.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Client.dll");
+            filesDictionary.Add("\\Google.GData.Documents.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Documents.dll");
+            filesDictionary.Add("\\Google.GData.Extensions.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Extensions.dll");
+            filesDictionary.Add("\\Google.GData.Spreadsheets.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Spreadsheets.dll");
+            filesDictionary.Add("\\Newtonsoft.Json.dll", "\\HOK-Addin.bundle\\Contents_External\\Newtonsoft.Json.dll");
+            filesDictionary.Add("\\System.Runtime.dll", "\\HOK-Addin.bundle\\Contents_External\\System.Runtime.dll");
+            filesDictionary.Add("\\model.png", "\\HOK-Addin.bundle\\Contents_External\\Resources\\model.png");
+            filesDictionary.Add("\\project.png", "\\HOK-Addin.bundle\\Contents_External\\Resources\\project.png");
         }
-
-        private string GetInstalledFileVersion()
-        {
-            string versionNumber = "";
-            try
-            {
-                string dllPath = addInPath2014 + "\\HOK-Addin.bundle\\Contents_External\\HOK.ModelManager.dll";
-                if (File.Exists(dllPath))
-                {
-                    System.Diagnostics.FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(dllPath);
-                    if (null != versionInfo)
-                    {
-                        versionNumber = "v." + versionInfo.FileVersion;
-                        buttonUninstall.IsEnabled = true;
-                    }
-                }
-                else
-                {
-                    versionNumber = "Not Installed";
-                    buttonUninstall.IsEnabled = false;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to get the installed version number.\n" + ex.Message, "Installed Version Number", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return versionNumber;
-        }
+       
 
         private void buttonInstall_Click(object sender, RoutedEventArgs e)
         {
@@ -103,54 +77,70 @@ namespace HOK.ModelManager_Installer
             }
             else
             {
-                if (InstallModelManager())
-                {
-                    SetRegistryKey("CompanyName", textBoxCompany.Text);
-                    SetRegistryKey("ModelBuilderActivated", false);
+                if (radioButton2014.IsChecked == true) { version = InstallVersion.ModelManager2014; }
+                else if (radioButton2015.IsChecked == true) { version = InstallVersion.ModelManager2015; }
+                else if (radioButtonBoth.IsChecked == true) { version = InstallVersion.ModelManagerBoth; }
 
-                    MessageBoxResult msResult = MessageBox.Show("The HOK Model Manager is successfully installed!!\nWould you like to finish the installer?", "Completed Installation", MessageBoxButton.OKCancel, MessageBoxImage.Information);
-                    if (msResult == MessageBoxResult.OK)
-                    {
-                        this.Close();
-                    }
+
+                switch (version)
+                {
+                    case InstallVersion.ModelManager2014:
+                        if (InstallModelManager(version))
+                        {
+                            SetRegistryKey(keyAddress2014, "CompanyName", textBoxCompany.Text);
+                            SetRegistryKey(keyAddress2014, "ModelBuilderActivated", false);
+                        }
+                        break;
+                    case InstallVersion.ModelManager2015:
+                        if (InstallModelManager(version))
+                        {
+                            SetRegistryKey(keyAddress2015, "CompanyName", textBoxCompany.Text);
+                            SetRegistryKey(keyAddress2015, "ModelBuilderActivated", false);
+                        }
+                        break;
+                    case InstallVersion.ModelManagerBoth:
+                        if (InstallModelManager(InstallVersion.ModelManager2014))
+                        {
+                            SetRegistryKey(keyAddress2014, "CompanyName", textBoxCompany.Text);
+                            SetRegistryKey(keyAddress2014, "ModelBuilderActivated", false);
+                        }
+                        if (InstallModelManager(InstallVersion.ModelManager2015))
+                        {
+                            SetRegistryKey(keyAddress2015, "CompanyName", textBoxCompany.Text);
+                            SetRegistryKey(keyAddress2015, "ModelBuilderActivated", false);
+                        }
+                        break;
+                }
+
+                MessageBoxResult msResult = MessageBox.Show("The HOK Model Manager is successfully installed!!\nWould you like to finish the installer?", "Completed Installation", MessageBoxButton.OKCancel, MessageBoxImage.Information);
+                if (msResult == MessageBoxResult.OK)
+                {
+                    this.Close();
                 }
             }
         }
 
-        private bool InstallModelManager()
+        private bool InstallModelManager(InstallVersion installVersion)
         {
             bool result = false;
             try
             {
-                if (CreateDirectories())
-                {
-                    Dictionary<string/*fileName*/, string/*path*/> filesDictionary = new Dictionary<string, string>();
-                    filesDictionary.Add("\\HOK.ModelManager.addin", "\\HOK.ModelManager.addin");
-                    filesDictionary.Add("\\HOK.ModelManager.dll", "\\HOK-Addin.bundle\\Contents_External\\HOK.ModelManager.dll");
-                    filesDictionary.Add("\\Google.GData.AccessControl.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.AccessControl.dll");
-                    filesDictionary.Add("\\Google.GData.Client.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Client.dll");
-                    filesDictionary.Add("\\Google.GData.Documents.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Documents.dll");
-                    filesDictionary.Add("\\Google.GData.Extensions.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Extensions.dll");
-                    filesDictionary.Add("\\Google.GData.Spreadsheets.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Spreadsheets.dll");
-                    filesDictionary.Add("\\Newtonsoft.Json.dll", "\\HOK-Addin.bundle\\Contents_External\\Newtonsoft.Json.dll");
-                    filesDictionary.Add("\\System.Runtime.dll", "\\HOK-Addin.bundle\\Contents_External\\System.Runtime.dll");
-                    filesDictionary.Add("\\model.png", "\\HOK-Addin.bundle\\Contents_External\\Resources\\model.png");
-                    filesDictionary.Add("\\project.png", "\\HOK-Addin.bundle\\Contents_External\\Resources\\project.png");
+                string addInPath="";
+                string versionNumber = "";
+                if (installVersion == InstallVersion.ModelManager2014) { addInPath = addInPath2014; versionNumber = "2014";  }
+                else if (installVersion == InstallVersion.ModelManager2015) { addInPath = addInPath2015; versionNumber="2015"; }
 
-                    string sourceDirectory=dataDirectory+"\\2014";
+                if (CreateDirectories(addInPath))
+                {
+                    string sourceDirectory=dataDirectory+"\\"+versionNumber;
                     if (ApplicationDeployment.IsNetworkDeployed)
                     {
                         foreach (string fileName in filesDictionary.Keys)
                         {
                             string filePath = filesDictionary[fileName];
 
-                            File.Copy(sourceDirectory + fileName, addInPath2014 + filePath, true);
+                            File.Copy(sourceDirectory + fileName, addInPath + filePath, true);
                         }
-                    }
-
-                    if (GetReleasedFileVersion() == GetInstalledFileVersion())
-                    {
-                        result = true;
                     }
                 }
             }
@@ -162,27 +152,27 @@ namespace HOK.ModelManager_Installer
             return result;
         }
 
-        private bool CreateDirectories()
+        private bool CreateDirectories(string addInPath)
         {
             bool result = false;
             try
             {
-                if (Directory.Exists(addInPath2014))
+                if (Directory.Exists(addInPath))
                 {
-                    if (!Directory.Exists(addInPath2014 + "\\HOK-Addin.bundle"))
+                    if (!Directory.Exists(addInPath + "\\HOK-Addin.bundle"))
                     {
-                        Directory.CreateDirectory(addInPath2014 + "\\HOK-Addin.bundle");
+                        Directory.CreateDirectory(addInPath + "\\HOK-Addin.bundle");
                     }
-                    if (!Directory.Exists(addInPath2014 + "\\HOK-Addin.bundle\\Contents_External"))
+                    if (!Directory.Exists(addInPath + "\\HOK-Addin.bundle\\Contents_External"))
                     {
-                        Directory.CreateDirectory(addInPath2014 + "\\HOK-Addin.bundle\\Contents_External");
+                        Directory.CreateDirectory(addInPath + "\\HOK-Addin.bundle\\Contents_External");
                     }
-                    if (!Directory.Exists(addInPath2014 + "\\HOK-Addin.bundle\\Contents_External\\Resources"))
+                    if (!Directory.Exists(addInPath + "\\HOK-Addin.bundle\\Contents_External\\Resources"))
                     {
-                        Directory.CreateDirectory(addInPath2014 + "\\HOK-Addin.bundle\\Contents_External\\Resources");
+                        Directory.CreateDirectory(addInPath + "\\HOK-Addin.bundle\\Contents_External\\Resources");
                     }
 
-                    if (Directory.Exists(addInPath2014 + "\\HOK-Addin.bundle\\Contents_External\\Resources"))
+                    if (Directory.Exists(addInPath + "\\HOK-Addin.bundle\\Contents_External\\Resources"))
                     {
                         result = true;
                     }
@@ -195,10 +185,11 @@ namespace HOK.ModelManager_Installer
             return result;
         }
 
-        private void SetRegistryKey(string keyName, object value)
+        private void SetRegistryKey(string keyAddress, string keyName, object value)
         {
             try
             {
+               
                 RegistryKey registryKey = Registry.CurrentUser.OpenSubKey(keyAddress, true);
                 if (null == registryKey)
                 {
@@ -214,44 +205,65 @@ namespace HOK.ModelManager_Installer
 
         private void buttonUninstall_Click(object sender, RoutedEventArgs e)
         {
-            if (UninstallModelManager())
+            try
             {
-                Registry.CurrentUser.DeleteSubKey(keyAddress, false);
-                MessageBoxResult msResult = MessageBox.Show("The HOK Model Manager is successfully removed!!\nWould you like to finish the installer?", "Completed Uninstallation", MessageBoxButton.OKCancel, MessageBoxImage.Information);
-                if (msResult == MessageBoxResult.OK)
+                if (radioButton2014.IsChecked == true) { version = InstallVersion.ModelManager2014; }
+                else if (radioButton2015.IsChecked == true) { version = InstallVersion.ModelManager2015; }
+                else if (radioButtonBoth.IsChecked == true) { version = InstallVersion.ModelManagerBoth; }
+
+                switch (version)
                 {
-                    this.Close();
+                    case InstallVersion.ModelManager2014:
+                        if (UninstallModelManager(addInPath2014))
+                        {
+                            try { Registry.CurrentUser.DeleteSubKey(keyAddress2014, false); }
+                            catch { }
+                        }
+                        break;
+                    case InstallVersion.ModelManager2015:
+                        if (UninstallModelManager(addInPath2015))
+                        {
+                            try { Registry.CurrentUser.DeleteSubKey(keyAddress2015, false); }
+                            catch { }
+                        }
+                        break;
+                    case InstallVersion.ModelManagerBoth:
+                        if (UninstallModelManager(addInPath2014))
+                        {
+                            try { Registry.CurrentUser.DeleteSubKey(keyAddress2014, false); }
+                            catch { }
+                        }
+                        if (UninstallModelManager(addInPath2015))
+                        {
+                            try { Registry.CurrentUser.DeleteSubKey(keyAddress2015, false); }
+                            catch { }
+                        }
+                        break;
                 }
+            }
+            catch { }
+
+            MessageBoxResult msResult = MessageBox.Show("The HOK Model Manager is successfully removed!!\nWould you like to finish the installer?", "Completed Uninstallation", MessageBoxButton.OKCancel, MessageBoxImage.Information);
+            if (msResult == MessageBoxResult.OK)
+            {
+                this.Close();
             }
         }
 
-        private bool UninstallModelManager()
+        private bool UninstallModelManager(string addInPath)
         {
             bool result = false;
             try
             {
-                Dictionary<string/*fileName*/, string/*path*/> filesDictionary = new Dictionary<string, string>();
-                filesDictionary.Add("\\HOK.ModelManager.addin", "\\HOK.ModelManager.addin");
-                filesDictionary.Add("\\HOK.ModelManager.dll", "\\HOK-Addin.bundle\\Contents_External\\HOK.ModelManager.dll");
-                filesDictionary.Add("\\Google.GData.AccessControl.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.AccessControl.dll");
-                filesDictionary.Add("\\Google.GData.Client.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Client.dll");
-                filesDictionary.Add("\\Google.GData.Documents.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Documents.dll");
-                filesDictionary.Add("\\Google.GData.Extensions.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Extensions.dll");
-                filesDictionary.Add("\\Google.GData.Spreadsheets.dll", "\\HOK-Addin.bundle\\Contents_External\\Google.GData.Spreadsheets.dll");
-                filesDictionary.Add("\\Newtonsoft.Json.dll", "\\HOK-Addin.bundle\\Contents_External\\Newtonsoft.Json.dll");
-                filesDictionary.Add("\\System.Runtime.dll", "\\HOK-Addin.bundle\\Contents_External\\System.Runtime.dll");
-                filesDictionary.Add("\\model.png", "\\HOK-Addin.bundle\\Contents_External\\Resources\\model.png");
-                filesDictionary.Add("\\project.png", "\\HOK-Addin.bundle\\Contents_External\\Resources\\project.png");
-
                 foreach (string fileName in filesDictionary.Keys)
                 {
                     string filePath = filesDictionary[fileName];
-                    if (File.Exists(addInPath2014 + filePath))
+                    if (File.Exists(addInPath + filePath))
                     {
-                        File.Delete(addInPath2014 + filePath);
+                        File.Delete(addInPath + filePath);
                     }
                 }
-                string dllPath = addInPath2014 + "\\HOK-Addin.bundle\\Contents_External\\HOK.ModelManager.dll";
+                string dllPath = addInPath + "\\HOK-Addin.bundle\\Contents_External\\HOK.ModelManager.dll";
                 if (!File.Exists(dllPath))
                 {
                     result = true;

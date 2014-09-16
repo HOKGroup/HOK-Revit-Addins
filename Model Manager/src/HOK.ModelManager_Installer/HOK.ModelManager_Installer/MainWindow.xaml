@@ -26,24 +26,23 @@
             <GroupBox Header="Tools Information"  HorizontalAlignment="Stretch" Margin="10,10,10,10" Name="groupBoxInfo" VerticalAlignment="Stretch">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition Height="50" />
-                        <RowDefinition />
+                        <RowDefinition Height="70"/>
+                        <RowDefinition Height="100" />
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <Label Content="Version Released: " HorizontalAlignment="Left" Margin="88,5,0,0" Name="labelVersionReleased" Width="107" />
-                    <Label Content="Not Installed" Height="28" Margin="200,35,0,0" Name="labelInstalledNum" VerticalAlignment="Top" FontStyle="Italic" HorizontalAlignment="Left" Width="112" Grid.RowSpan="2" />
-                    <Label Content="Please enter a valid company name to install the tool." Grid.Row="4" Height="28" HorizontalAlignment="Left" Margin="25,0,0,0" Name="labelUser" VerticalAlignment="Top" />
-                    <Image Grid.RowSpan="2" Height="45" Margin="25,10,0,0" Name="imageManager" Source="/HOK.ModelManager_Installer;component/Images/manager.png" Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Left" Width="45" />
-                    <TextBox Grid.Row="5" Height="23" HorizontalAlignment="Left" Margin="30,0,0,0" Name="textBoxCompany" VerticalAlignment="Top" Width="285" />
-                    <Label Content="Version Installed:" Height="28" HorizontalAlignment="Left" Margin="88,35,0,0" Name="labelVersionInstalled" VerticalAlignment="Top" Grid.RowSpan="2" />
-                    <Label Content="v.2014.0.1.0" FontStyle="Italic" Height="28" Margin="204,5,0,0" Name="labelReleaseNum" VerticalAlignment="Top" HorizontalAlignment="Left" Width="111" />
-                    <TextBlock Grid.Row="2" Height="42" HorizontalAlignment="Left" Margin="22,8,0,0" Name="textBlockDescription" Text="Model Manager will duplicate views, legends, and schedules across Revit documents storing the links data." VerticalAlignment="Top" Width="338" TextWrapping="Wrap" />
+                    <Image Height="45" Margin="20,10,0,0" Name="imageManager" Source="/HOK.ModelManager_Installer;component/Images/manager.png" Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Left" Width="45" />
+                    <TextBlock Height="36" HorizontalAlignment="Left" Margin="75,15,0,0" Name="textBlockDescription" Text="Model Manager will duplicate views, legends, and schedules across Revit documents storing the links data." VerticalAlignment="Top" Width="305" TextWrapping="Wrap" />
+
+                    <RadioButton x:Name="radioButton2014" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,10,0,0" Content="Model Manager for Revit 2014" IsChecked="True"/>
+                    <RadioButton x:Name="radioButton2015" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,35,0,0" Content="Model Manager for Revit 2015"/>
+                    <RadioButton x:Name="radioButtonBoth" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="25,60,0,0" Content="Both 2014 and 2015"/>
+
+                    <Label Content="Please enter a valid company name. (case sensitive)" Grid.Row="2" Height="28" HorizontalAlignment="Left" Margin="20,0,0,0" Name="labelUser" VerticalAlignment="Top" Grid.RowSpan="2" />
+                    <TextBox Grid.Row="3" Height="23" HorizontalAlignment="Left" Margin="20,0,0,0" Name="textBoxCompany" VerticalAlignment="Top" Width="285" />
                 </Grid>
             </GroupBox>
         </Grid>
-        <Label Content="Model Manager for Revit 2014" Height="28" HorizontalAlignment="Left" Margin="21,12,0,0" Name="labelModelManager" VerticalAlignment="Top" FontStyle="Normal" FontWeight="Bold" />
+        <Label Content="Model Manager for Revit" Height="28" HorizontalAlignment="Left" Margin="21,12,0,0" Name="labelModelManager" VerticalAlignment="Top" FontStyle="Normal" FontWeight="Bold" />
     </Grid>
 </Window>

@@ -129,6 +129,7 @@
                         </StackPanel>
                     </Button>
                     <CheckBox Content="Enforce Sheet Mirroring" Height="16" Margin="185,17,0,0" Name="checkBoxSheet" VerticalAlignment="Top" Grid.Row="2" HorizontalAlignment="Left" Width="153" ToolTip="This option will enable to create associated sheets with same names." />
+                    <CheckBox Content="Auto Create Links by View Names" Height="16" Margin="350,17,0,0" x:Name="checkBoxCreateLinks" VerticalAlignment="Top" Grid.Row="2" HorizontalAlignment="Left" ToolTip="This option will automatically find the same name of views in the recipient document to create links." Grid.ColumnSpan="2" />
                 </Grid>
             </TabItem>
             <TabItem Header="Legends" Name="tabItemLegend" >

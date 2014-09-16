@@ -129,11 +129,11 @@ namespace HOK.ModelManager.ReplicateViews
             }
         }
 
-        public void RefreshTreeView(string sourceDoc, string recipientDoc, TreeView sourceView, TreeView recipientView, TreeViewSortBy sortBy)
+        public void RefreshTreeView(string sourceDoc, string recipientDoc, TreeView sourceView, TreeView recipientView, TreeViewSortBy sortBy, bool createLinks)
         {
             try
             {
-                ViewMapClass viewMap = GetViewMap(sourceDoc, recipientDoc);
+                ViewMapClass viewMap = GetViewMap(sourceDoc, recipientDoc, createLinks);
                 if (null != viewMap)
                 {
                     sourceView.ItemsSource = null;
@@ -157,7 +157,7 @@ namespace HOK.ModelManager.ReplicateViews
             }
         }
 
-        public ViewMapClass GetViewMap(string sourceDoc, string recipientDoc)
+        public ViewMapClass GetViewMap(string sourceDoc, string recipientDoc, bool createLinks)
         {
             ViewMapClass viewMap = null;
             try
@@ -172,6 +172,15 @@ namespace HOK.ModelManager.ReplicateViews
                 ModelInfo sInfo = modelInfoDictionary[sourceDoc];
                 ModelInfo rInfo = modelInfoDictionary[recipientDoc];
 
+                if (createLinks)
+                {
+                    List<LinkInfo> linksCreated = CreateLinksByNames(sourceViews, recipientViews, sInfo, rInfo, linkInfo);
+                    if (linksCreated.Count > 0)
+                    {
+                        linkInfo.AddRange(linksCreated);
+                    }
+                }
+
                 ViewMapClass vmc = new ViewMapClass(sInfo, rInfo, sourceViews, recipientViews, linkInfo);
                 viewMapList.Add(vmc);
                 viewMap = vmc;
@@ -183,11 +192,60 @@ namespace HOK.ModelManager.ReplicateViews
             return viewMap;
         }
 
-        public void RefreshTreeViewBySelection(string sourceDoc, string recipientDoc, TreeView sourceView, TreeView recipientView, TreeViewSortBy sortBy, string filterString)
+        private List<LinkInfo> CreateLinksByNames(Dictionary<int, ViewProperties> sourceViews, Dictionary<int, ViewProperties> recipientViews, ModelInfo sInfo, ModelInfo rInfo, List<LinkInfo> googleLinks)
+        {
+            List<LinkInfo> linkInfoList = new List<LinkInfo>();
+            try
+            {
+                foreach (int sourceItemId in sourceViews.Keys)
+                {
+                    var Ids = from link in googleLinks where link.SourceItemId == sourceItemId select link;
+                    if (Ids.Count() > 0)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        //create links
+                        ViewProperties sView=sourceViews[sourceItemId];
+                        string viewName=sView.ViewName;
+                        var views = from view in recipientViews.Values where view.ViewName == viewName select view;
+                        if (views.Count() > 0)
+                        {
+                            ViewProperties rView=views.First();
+
+                            LinkInfo li = new LinkInfo();
+                            li.ItemType = LinkItemType.DraftingView;
+                            li.SourceModelName = sInfo.DocTitle;
+                            li.SourceModelPath = sInfo.DocCentralPath;
+                            li.DestModelName = rInfo.DocTitle;
+                            li.DestModelPath = rInfo.DocCentralPath;
+
+                            li.SourceItemId = sView.ViewId;
+                            li.SourceItemName = sView.ViewName;
+                            li.DestItemId = rView.ViewId;
+                            li.DestItemName = rView.ViewName;
+
+                            li.LinkModified = DateTime.Now.ToString("G");
+                            li.LinkModifiedBy = Environment.UserName;
+
+                            linkInfoList.Add(li);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create links by view names.\n"+ex.Message, "Create Links By Names", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return linkInfoList;
+        }
+
+        public void RefreshTreeViewBySelection(string sourceDoc, string recipientDoc, TreeView sourceView, TreeView recipientView, TreeViewSortBy sortBy, string filterString, bool createLinks)
         {
             try
             {
-                ViewMapClass viewMap = GetViewMap(sourceDoc, recipientDoc);
+                ViewMapClass viewMap = GetViewMap(sourceDoc, recipientDoc, createLinks);
                 if (null != viewMap)
                 {
                     List<string> strList = new List<string>();
@@ -211,14 +269,14 @@ namespace HOK.ModelManager.ReplicateViews
             }
         }
    
-        public bool UpdateDraftingViews(string sourceDoc, string recipientDoc, TreeView treeViewSource, TreeView treeViewRecipient, bool createSheet ,TextBlock statusLable, ProgressBar progressBar)
+        public bool UpdateDraftingViews(string sourceDoc, string recipientDoc, TreeView treeViewSource, TreeView treeViewRecipient, bool createSheet, bool createLinks,TextBlock statusLable, ProgressBar progressBar)
         {
             bool result = false;
             try
             {
                 previewMapList.Clear();
 
-                ViewMapClass vmc = GetViewMap(sourceDoc, recipientDoc);
+                ViewMapClass vmc = GetViewMap(sourceDoc, recipientDoc, createLinks);
                 Dictionary<int, ViewProperties> sourceViews = vmc.SourceViews;
                 Dictionary<int, ViewProperties> recipientViews = vmc.RecipientViews;
 
