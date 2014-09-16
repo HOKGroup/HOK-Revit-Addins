@@ -1,3 +1,11 @@
+v.0.4.4
+Fix
+-Filter elements by room bounding boxes and deterime whether the point of the location of each Revit elements is placed inside of rooms or not.
+
+v.0.4.3
+Fix
+-Filter elements by room bounding boxes
+
 v.0.4.2
 New
 - Room Updater has been added as a new command under Utility Tools
