@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -495,8 +496,11 @@ namespace HOK.Utilities.RoomUpdater
                                 value++;
 
                                 List<Element> revitElements = FindRevitElements(pmp, sep);
-                                bool written = WriteParameter(pmp, sep, revitElements);
-
+                                if (revitElements.Count > 0)
+                                {
+                                    bool written = WriteParameter(pmp, sep, revitElements);
+                                }
+                                
                                 Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
                             }
                         }
@@ -572,42 +576,93 @@ namespace HOK.Utilities.RoomUpdater
             List<Element> revitElements = new List<Element>();
             try
             {
-                GeometryElement geomElement = null;
+               
+                BoundingBoxXYZ boundingBox = null;
+                Room room = null;
+                Space space = null;
                 if (sep.CategoryId == (int)BuiltInCategory.OST_Rooms)
                 {
-                    Room room = sep.ElementObj as Room;
-                    geomElement = room.ClosedShell;
+                    room = sep.ElementObj as Room;
+                    boundingBox = room.get_BoundingBox(null);
                 }
                 else if (sep.CategoryId == (int)BuiltInCategory.OST_MEPSpaces)
                 {
-                    Space space = sep.ElementObj as Space;
-                    geomElement = space.ClosedShell;
+                    space = sep.ElementObj as Space;
+                    boundingBox = space.get_BoundingBox(null);
                 }
 
-                if (sep.IsLinked && null != sep.LinkProperties)
+                if (null != boundingBox)
                 {
-                    geomElement = geomElement.GetTransformed(sep.LinkProperties.TransformValue);
-                }
-
-                Solid spaceSolid = null;
-                foreach (GeometryObject obj in geomElement)
-                {
-                    Solid solid = obj as Solid;
-                    if (null != solid)
+                    if (sep.IsLinked && null != sep.LinkProperties)
                     {
-                        if (solid.Volume > 0)
+                        boundingBox.Transform = sep.LinkProperties.TransformValue;
+                    }
+                    //bounding box quick filter
+                    Outline outline = new Outline(boundingBox.Min, boundingBox.Max);
+                    BoundingBoxIntersectsFilter intersectFilter = new BoundingBoxIntersectsFilter(outline);
+                    BoundingBoxIsInsideFilter insideFilter = new BoundingBoxIsInsideFilter(outline);
+                    LogicalOrFilter orFilter = new LogicalOrFilter(intersectFilter, insideFilter);
+
+                    FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+                    List<Element> elements = collector.OfCategoryId(pmp.RevitCategory.CategoryObj.Id).WherePasses(orFilter).ToElements().ToList();
+                    
+                    //verify if the location is inside the bounding box.
+                    foreach (Element elem in elements)
+                    {
+                        Location position = elem.Location;
+                        if (null != position)
                         {
-                            spaceSolid = solid;
-                            break;
+                            LocationPoint positionPoint = position as LocationPoint;
+                            if (null != positionPoint)
+                            {
+                                XYZ point = positionPoint.Point;
+                                if (null != room)
+                                {
+                                    if (room.IsPointInRoom(point))
+                                    {
+                                        revitElements.Add(elem);
+                                    }
+                                }
+                                else if (null != space)
+                                {
+                                    if (space.IsPointInSpace(point))
+                                    {
+                                        revitElements.Add(elem);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                LocationCurve positionCurve = position as LocationCurve;
+                                if (null != positionCurve)
+                                {
+                                    Curve curve = positionCurve.Curve;
+#if RELEASE2013||RELEASE2014
+                                    XYZ firstPt = curve.get_EndPoint(0);
+                                    XYZ secondPt = curve.get_EndPoint(1);
+#elif RELEASE2015
+                                    XYZ firstPt = curve.GetEndPoint(0);
+                                    XYZ secondPt = curve.GetEndPoint(1);
+#endif
+
+                                    if (null != room)
+                                    {
+                                        if (room.IsPointInRoom(firstPt) || room.IsPointInRoom(secondPt))
+                                        {
+                                            revitElements.Add(elem);
+                                        }
+                                    }
+                                    else if (null != space)
+                                    {
+                                        if (space.IsPointInSpace(firstPt) || space.IsPointInSpace(secondPt))
+                                        {
+                                            revitElements.Add(elem);
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-
-                if (null != spaceSolid)
-                {
-                    ElementIntersectsSolidFilter solidFiletr = new ElementIntersectsSolidFilter(spaceSolid);
-                    FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                    revitElements = collector.OfCategoryId(pmp.RevitCategory.CategoryObj.Id).WherePasses(solidFiletr).WhereElementIsNotElementType().ToElements().ToList();
                 }
             }
             catch (Exception ex)
