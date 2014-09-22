@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>HOK Utility Tools</Name>
+    <Assembly>HOK-Addin.bundle\Contents_External\HOK.Utilities.dll</Assembly>
+    <AddInId>4F5A2BD1-1241-4D5D-B7CB-6AB6113EF2C7</AddInId>
+    <FullClassName>HOK.Utilities.AppCommand</FullClassName>
+    <VendorId>JKIM</VendorId>
+    <VendorDescription>JKIM</VendorDescription>
+  </AddIn>
+</RevitAddIns>
