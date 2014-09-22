@@ -576,10 +576,10 @@ namespace HOK.Utilities.RoomUpdater
             List<Element> revitElements = new List<Element>();
             try
             {
-               
                 BoundingBoxXYZ boundingBox = null;
                 Room room = null;
                 Space space = null;
+                
                 if (sep.CategoryId == (int)BuiltInCategory.OST_Rooms)
                 {
                     room = sep.ElementObj as Room;
@@ -593,71 +593,83 @@ namespace HOK.Utilities.RoomUpdater
 
                 if (null != boundingBox)
                 {
+                    XYZ minXYZ = boundingBox.Min;
+                    XYZ maxXYZ = boundingBox.Max;
+
                     if (sep.IsLinked && null != sep.LinkProperties)
                     {
-                        boundingBox.Transform = sep.LinkProperties.TransformValue;
+                        minXYZ = sep.LinkProperties.TransformValue.OfPoint(minXYZ);
+                        maxXYZ = sep.LinkProperties.TransformValue.OfPoint(maxXYZ);
                     }
                     //bounding box quick filter
-                    Outline outline = new Outline(boundingBox.Min, boundingBox.Max);
+                    Outline outline = new Outline(minXYZ, maxXYZ);
                     BoundingBoxIntersectsFilter intersectFilter = new BoundingBoxIntersectsFilter(outline);
                     BoundingBoxIsInsideFilter insideFilter = new BoundingBoxIsInsideFilter(outline);
                     LogicalOrFilter orFilter = new LogicalOrFilter(intersectFilter, insideFilter);
 
                     FilteredElementCollector collector = new FilteredElementCollector(m_doc);
                     List<Element> elements = collector.OfCategoryId(pmp.RevitCategory.CategoryObj.Id).WherePasses(orFilter).ToElements().ToList();
-                    
-                    //verify if the location is inside the bounding box.
-                    foreach (Element elem in elements)
+
+                    //slow solid filter
+                    if (elements.Count > 0)
                     {
-                        Location position = elem.Location;
-                        if (null != position)
+                        foreach (Element element in elements)
                         {
-                            LocationPoint positionPoint = position as LocationPoint;
-                            if (null != positionPoint)
+                            LocationPoint locationPt = element.Location as LocationPoint;
+                            if (null != locationPt)
                             {
-                                XYZ point = positionPoint.Point;
+                                XYZ point = locationPt.Point;
+                                if (sep.IsLinked && null != sep.LinkProperties)
+                                {
+                                    point = sep.LinkProperties.TransformValue.Inverse.OfPoint(point);
+                                }
+                                
                                 if (null != room)
                                 {
                                     if (room.IsPointInRoom(point))
                                     {
-                                        revitElements.Add(elem);
+                                        revitElements.Add(element);
                                     }
                                 }
                                 else if (null != space)
                                 {
                                     if (space.IsPointInSpace(point))
                                     {
-                                        revitElements.Add(elem);
+                                        revitElements.Add(element);
                                     }
                                 }
                             }
-                            else
+
+                            LocationCurve locationCurve = element.Location as LocationCurve;
+                            if (null != locationCurve)
                             {
-                                LocationCurve positionCurve = position as LocationCurve;
-                                if (null != positionCurve)
-                                {
-                                    Curve curve = positionCurve.Curve;
-#if RELEASE2013||RELEASE2014
-                                    XYZ firstPt = curve.get_EndPoint(0);
-                                    XYZ secondPt = curve.get_EndPoint(1);
-#elif RELEASE2015
-                                    XYZ firstPt = curve.GetEndPoint(0);
-                                    XYZ secondPt = curve.GetEndPoint(1);
+                                Curve curve = locationCurve.Curve;
+#if RELEASE2013
+                                XYZ firstPt = curve.get_EndPoint(0);
+                                XYZ secondPt = curve.get_EndPoint(1);
+#elif RELEASE2014||RELEASE2015
+                                XYZ firstPt = curve.GetEndPoint(0);
+                                XYZ secondPt = curve.GetEndPoint(1);
 #endif
 
-                                    if (null != room)
+                                if (sep.IsLinked && null != sep.LinkProperties)
+                                {
+                                    firstPt = sep.LinkProperties.TransformValue.Inverse.OfPoint(firstPt);
+                                    secondPt = sep.LinkProperties.TransformValue.Inverse.OfPoint(secondPt);
+                                }
+                                
+                                if (null != room)
+                                {
+                                    if (room.IsPointInRoom(firstPt) || room.IsPointInRoom(secondPt))
                                     {
-                                        if (room.IsPointInRoom(firstPt) || room.IsPointInRoom(secondPt))
-                                        {
-                                            revitElements.Add(elem);
-                                        }
+                                        revitElements.Add(element);
                                     }
-                                    else if (null != space)
+                                }
+                                else if (null != space)
+                                {
+                                    if (space.IsPointInSpace(firstPt) || space.IsPointInSpace(secondPt))
                                     {
-                                        if (space.IsPointInSpace(firstPt) || space.IsPointInSpace(secondPt))
-                                        {
-                                            revitElements.Add(elem);
-                                        }
+                                        revitElements.Add(element);
                                     }
                                 }
                             }
