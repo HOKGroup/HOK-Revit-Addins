@@ -23,6 +23,9 @@ namespace HOK.ModelManager.ReplicateViews
     /// </summary>
     public partial class PreviewWindow : Window
     {
+        private UIApplication m_app = null;
+        private UIDocument uidoc = null;
+        
         private List<PreviewMap> previewMapList = new List<PreviewMap>();
         private string tempFolder = "";
         private int pageNum = 0;
@@ -33,8 +36,11 @@ namespace HOK.ModelManager.ReplicateViews
         public List<PreviewMap> PreviewMapList { get { return previewMapList; } set { previewMapList = value; } }
         public bool CreateSheet { get { return createSheet; } set { createSheet = value; } }
 
-        public PreviewWindow(List<PreviewMap> previewMaps, bool sheetCreation)
+        public PreviewWindow(UIApplication uiapp, List<PreviewMap> previewMaps, bool sheetCreation)
         {
+            m_app = uiapp;
+            uidoc = m_app.ActiveUIDocument;
+
             previewMapList = previewMaps;
             createSheet = sheetCreation;
             InitializeComponent();
@@ -164,16 +170,21 @@ namespace HOK.ModelManager.ReplicateViews
                 double value = 0;
 
                 UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
-
-                for (int i = previewMapList.Count - 1; i > -1; i--)
+                DuplicateUtils.errorMessage = new StringBuilder();
+                List<PreviewMap> updatedList = new List<PreviewMap>();
+                for (int i = 0; i <previewMapList.Count; i++)
                 {
                     value += 1;
                     PreviewMap previewMap = DuplicateUtils.DuplicateView(previewMapList[i],createSheet);
-                    previewMapList.RemoveAt(i);
-                    previewMapList.Add(previewMap);
+                    updatedList.Add(previewMap);
                     Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
                 }
+                MessageBox.Show("Following drafting views contains problems.\n\n" + DuplicateUtils.errorMessage.ToString(), "Errors in Duplicating Views", MessageBoxButton.OK, MessageBoxImage.Information);
 
+                bool closed = CloseAllUIViews(updatedList);
+
+                previewMapList = new List<PreviewMap>();
+                previewMapList = updatedList;
                 //exportView one by one
                 ImageExportOptions option = new ImageExportOptions();
                 option.HLRandWFViewsFileType = ImageFileType.PNG;
@@ -221,6 +232,51 @@ namespace HOK.ModelManager.ReplicateViews
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to update drafting views.\n" + ex.Message, "Update Views", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return result;
+        }
+
+        private bool CloseAllUIViews(List<PreviewMap> previewMaps)
+        {
+            bool result = false;
+            try
+            {
+                if (previewMaps.Count > 0)
+                {
+                    Document recipientDoc = previewMaps.First().RecipientModelInfo.Doc;
+                    if (uidoc.Document.Title == recipientDoc.Title)
+                    {
+                        using (Transaction trans = new Transaction(recipientDoc, "close views"))
+                        {
+                            try
+                            {
+                                trans.Start();
+                                IList<UIView> uiviews = uidoc.GetOpenUIViews();
+                                foreach (PreviewMap viewMap in previewMaps)
+                                {
+                                    int copiedViewId = viewMap.RecipientViewProperties.ViewId;
+                                    var viewFound = from view in uiviews where view.ViewId.IntegerValue == copiedViewId select view;
+                                    if (viewFound.Count() > 0)
+                                    {
+                                        UIView uiview = viewFound.First();
+                                        uiview.Close();
+                                    }
+                                }
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                string message = ex.Message;
+                                trans.RollBack();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+                MessageBox.Show("Cannot close opened view.\n" + ex.Message, "Close all opened UI views", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return result;
         }

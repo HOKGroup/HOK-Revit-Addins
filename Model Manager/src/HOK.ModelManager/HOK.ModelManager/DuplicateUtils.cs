@@ -14,6 +14,7 @@ namespace HOK.ModelManager
 {
     class DuplicateUtils
     {
+        public static StringBuilder errorMessage = new StringBuilder();
 
         public static PreviewMap DuplicateView(PreviewMap previewMap, bool createSheet)
         {
@@ -34,6 +35,9 @@ namespace HOK.ModelManager
                         ViewDrafting copiedView = null;
                         if (null != preview.SourceViewProperties.LinkedView) //already exist in recipient model
                         {
+                            ViewDrafting sourceView = previewMap.SourceViewProperties.ViewDraftingObj;
+                            ICollection<ElementId> referenceCalloutIds = sourceView.GetReferenceCallouts();
+
                             ElementId viewId = new ElementId(preview.SourceViewProperties.LinkedView.ViewId);
                             using (Transaction trans = new Transaction(preview.RecipientModelInfo.Doc, "Delete Existing Contents"))
                             {
@@ -49,6 +53,10 @@ namespace HOK.ModelManager
                             if (null != copiedView)
                             {
                                 int numOfCopied = DuplicateDetailingAcrossViews(preview.SourceViewProperties.ViewDraftingObj, copiedView);
+                            }
+                            if (referenceCalloutIds.Count > 0)
+                            {
+                                bool placedCallout = DuplicateReferenceCallouts(sourceView, copiedView);
                             }
 
                             if (createSheet)
@@ -82,7 +90,7 @@ namespace HOK.ModelManager
                                 }
                                 if (preview.SourceViewProperties.IsOnSheet && null != preview.SourceViewProperties.SheetObj)
                                 {
-                                    ViewSheet copiedSheet = DuplicateSheets(preview);
+                                    ViewSheet copiedSheet = DuplicateSheet(preview);
                                     if (null != copiedView && null != copiedSheet)
                                     {
                                         if (Viewport.CanAddViewToSheet(preview.RecipientModelInfo.Doc, copiedSheet.Id, copiedView.Id))
@@ -98,7 +106,7 @@ namespace HOK.ModelManager
                         {
                             if (preview.SourceViewProperties.IsOnSheet && createSheet)
                             {
-                                ViewSheet copiedSheet = DuplicateSheets(preview);
+                                ViewSheet copiedSheet = DuplicateSheet(preview);
                                 copiedView = DuplicateDraftingViews(preview);
 
                                 if (null != copiedSheet && null != copiedView)
@@ -132,43 +140,53 @@ namespace HOK.ModelManager
             ViewDrafting viewDrafting = null;
             try
             {
+                Document fromDoc=previewMap.SourceModelInfo.Doc;
                 Document toDoc = previewMap.RecipientModelInfo.Doc;
+
+                ViewDrafting sourceView=previewMap.SourceViewProperties.ViewDraftingObj;
+                ICollection<ElementId> referenceCalloutIds = sourceView.GetReferenceCallouts();
+                
                 CopyPasteOptions options = new CopyPasteOptions();
                 options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
-                
-                ICollection<ElementId> copiedIds;
+
+                ICollection<ElementId> copiedIds=null;
                 using (Transaction transaction = new Transaction(toDoc, "Duplicate Draftingviews"))
                 {
                     transaction.Start();
                     List<ElementId> viewIds = new List<ElementId>();
-                    viewIds.Add(new ElementId(previewMap.SourceViewProperties.ViewId));
-
-                    copiedIds = ElementTransformUtils.CopyElements(previewMap.SourceModelInfo.Doc, viewIds, toDoc, Transform.Identity, options);
+                    viewIds.Add(sourceView.Id);
+                    
+                    //view-specific item
+                    copiedIds = ElementTransformUtils.CopyElements(fromDoc, viewIds, toDoc, Transform.Identity, options);
 
                     FailureHandlingOptions failureOptions = transaction.GetFailureHandlingOptions();
                     failureOptions.SetFailuresPreprocessor(new HidePasteDuplicateTypesPreprocessor());
                     transaction.Commit(failureOptions);
                 }
 
-                if (copiedIds.Count > 0)
+                if (null!=copiedIds)
                 {
                     ElementId viewId = copiedIds.First();
                     ViewDrafting copiedView = toDoc.GetElement(viewId) as ViewDrafting;
                     if (null != copiedView)
                     {
-                        int numOfCopied = DuplicateDetailingAcrossViews(previewMap.SourceViewProperties.ViewDraftingObj, copiedView);
+                        int numOfCopied = DuplicateDetailingAcrossViews(sourceView, copiedView);
+                    }
+                    if (referenceCalloutIds.Count > 0)
+                    {
+                        bool placedCallout = DuplicateReferenceCallouts(sourceView, copiedView);
                     }
                     viewDrafting = copiedView;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to duplicate drafintg views.\n"+ex.Message, "Duplicate DraftingViews", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to duplicate drafintg views.\n" + ex.Message, "Duplicate DraftingViews", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return viewDrafting;
         }
 
-        private static ViewSheet DuplicateSheets(PreviewMap previewMap)
+        private static ViewSheet DuplicateSheet(PreviewMap previewMap)
         {
             ViewSheet viewSheet = null;
             try
@@ -184,93 +202,106 @@ namespace HOK.ModelManager
                 }
                 else //create sheet from source model
                 {
-                    ElementId titleBlockTypeId = GetTitleBlockId(previewMap);
-                    if (titleBlockTypeId != ElementId.InvalidElementId)
+                    //ElementId titleBlockTypeId = GetTitleBlockId(previewMap);
+                    using (Transaction transaction = new Transaction(toDoc, "Create Sheet"))
                     {
-                        using (Transaction transaction = new Transaction(toDoc, "Create Sheet"))
+                        transaction.Start();
+                        viewSheet = ViewSheet.Create(toDoc, ElementId.InvalidElementId);
+                        transaction.Commit();
+                    }
+                    if (null != viewSheet)
+                    {
+                        using (Transaction trans = new Transaction(toDoc, "Copy Title Block"))
                         {
-                            transaction.Start();
-                            viewSheet = ViewSheet.Create(toDoc, titleBlockTypeId);
-                            transaction.Commit();
-                        }
-                        if (null != viewSheet)
-                        {
-                            using (Transaction trans = new Transaction(toDoc, "Move Title Block"))
+                            FilteredElementCollector vCollector = new FilteredElementCollector(previewMap.SourceModelInfo.Doc, previewMap.SourceViewProperties.SheetObj.Id);
+                            List<FamilyInstance> instances = vCollector.OfCategory(BuiltInCategory.OST_TitleBlocks).OfClass(typeof(FamilyInstance)).ToElements().Cast<FamilyInstance>().ToList();
+                            if (instances.Count > 0)
                             {
-                                trans.Start();
-                                try 
-                                {
-                                    FilteredElementCollector vCollector = new FilteredElementCollector(previewMap.SourceModelInfo.Doc, previewMap.SourceViewProperties.SheetObj.Id);
-                                    List<FamilyInstance> instances = vCollector.OfCategory(BuiltInCategory.OST_TitleBlocks).OfClass(typeof(FamilyInstance)).ToElements().Cast<FamilyInstance>().ToList();
-                                    if (instances.Count > 0)
-                                    {
-                                        FamilyInstance sourceTitleBlock = instances.First();
-                                        LocationPoint slocation = sourceTitleBlock.Location as LocationPoint;
-                                        XYZ sourcePoint = slocation.Point;
+                                List<ElementId> copiedIds = new List<ElementId>();
+                                CopyPasteOptions options = new CopyPasteOptions();
+                                options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
 
-                                        vCollector = new FilteredElementCollector(toDoc, viewSheet.Id);
-                                        List<FamilyInstance> blocks = vCollector.OfCategory(BuiltInCategory.OST_TitleBlocks).OfClass(typeof(FamilyInstance)).ToElements().Cast<FamilyInstance>().ToList();
-                                        if (blocks.Count > 0)
+                                foreach (FamilyInstance instance in instances)
+                                {
+                                    try
+                                    {
+                                        trans.Start();
+                                        List<ElementId> titleBlock = new List<ElementId>();
+                                        titleBlock.Add(instance.Id);
+
+                                        ICollection<ElementId> copiedId = ElementTransformUtils.CopyElements(previewMap.SourceViewProperties.SheetObj, titleBlock, viewSheet, Transform.Identity, options);
+                                        copiedIds.AddRange(copiedId);
+
+                                        FailureHandlingOptions failureOptions = trans.GetFailureHandlingOptions();
+                                        failureOptions.SetFailuresPreprocessor(new HidePasteDuplicateTypesPreprocessor());
+                                        trans.Commit(failureOptions);
+
+                                        if (null != copiedId)
                                         {
-                                            FamilyInstance targetTitleBlock = blocks.First();
-                                            LocationPoint tlocation = targetTitleBlock.Location as LocationPoint;
+                                            trans.Start();
+                                            LocationPoint slocation = instance.Location as LocationPoint;
+                                            XYZ sourcePoint = slocation.Point;
+
+                                            FamilyInstance copiedTitleBlock = toDoc.GetElement(copiedId.First()) as FamilyInstance;
+                                            LocationPoint tlocation = copiedTitleBlock.Location as LocationPoint;
                                             XYZ targetPoint = tlocation.Point;
 
                                             XYZ moveVector = sourcePoint - targetPoint;
-                                            ElementTransformUtils.MoveElement(toDoc, targetTitleBlock.Id, moveVector);
+                                            ElementTransformUtils.MoveElement(toDoc, copiedTitleBlock.Id, moveVector);
+                                            trans.Commit();
                                         }
                                     }
-                                    trans.Commit();
-                                }
-                                catch
-                                {
-                                    trans.RollBack();
+                                    catch (Exception ex)
+                                    {
+                                        string message = ex.Message;
+                                        trans.RollBack();
+                                    }
                                 }
                             }
+                        }
 
-                            using (Transaction transaction = new Transaction(toDoc, "Write Sheet Parameter"))
+                        using (Transaction transaction = new Transaction(toDoc, "Write Sheet Parameter"))
+                        {
+                            transaction.Start();
+                            foreach (Parameter param in previewMap.SourceViewProperties.SheetObj.Parameters)
                             {
-                                transaction.Start();
-                                foreach (Parameter param in previewMap.SourceViewProperties.SheetObj.Parameters)
+                                if (!param.IsReadOnly)
                                 {
-                                    if (!param.IsReadOnly)
-                                    {
 #if RELEASE2014
-                                        Parameter rParam = viewSheet.get_Parameter(param.Definition.Name);
+                                    Parameter rParam = viewSheet.get_Parameter(param.Definition.Name);
 #elif RELEASE2015
                                         Parameter rParam = viewSheet.LookupParameter(param.Definition.Name);
 #endif
 
-                                        if (null != rParam)
+                                    if (null != rParam)
+                                    {
+                                        if (rParam.StorageType == param.StorageType)
                                         {
-                                            if (rParam.StorageType == param.StorageType)
+                                            switch (param.StorageType)
                                             {
-                                                switch (param.StorageType)
-                                                {
-                                                    case StorageType.Double:
-                                                        rParam.Set(param.AsDouble());
-                                                        break;
-                                                    case StorageType.Integer:
-                                                        rParam.Set(param.AsInteger());
-                                                        break;
-                                                    case StorageType.String:
-                                                        rParam.Set(param.AsString());
-                                                        break;
-                                                }
+                                                case StorageType.Double:
+                                                    rParam.Set(param.AsDouble());
+                                                    break;
+                                                case StorageType.Integer:
+                                                    rParam.Set(param.AsInteger());
+                                                    break;
+                                                case StorageType.String:
+                                                    rParam.Set(param.AsString());
+                                                    break;
                                             }
                                         }
                                     }
                                 }
-                                transaction.Commit();
                             }
-                            return viewSheet;
+                            transaction.Commit();
                         }
+                        return viewSheet;
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(previewMap.SourceViewProperties.SheetName+" Failed to create sheet.\n"+ex.Message, "Duplicate Sheet", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(previewMap.SourceViewProperties.SheetName + " Failed to create sheet.\n" + ex.Message, "Duplicate Sheet", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return viewSheet;
         }
@@ -296,80 +327,82 @@ namespace HOK.ModelManager
                                 string viewportTypeName = preview.SourceViewProperties.ViewportTypeName;
 
                                 recipientViewport = Viewport.Create(preview.RecipientModelInfo.Doc, copiedSheet.Id, copiedView.Id, viewportLocation);
-                                
-                                ElementId viewportTypeId = ElementId.InvalidElementId;
-                                List<ElementId> elementTypeIds = recipientViewport.GetValidTypes().ToList();
-                                foreach (ElementId typeId in elementTypeIds)
-                                {
-                                    ElementType eType = preview.RecipientModelInfo.Doc.GetElement(typeId) as ElementType;
-                                    if (eType.Name == viewportTypeName)
-                                    {
-                                        viewportTypeId = typeId; break;
-                                    }
-                                }
-
-                                if (viewportTypeId != ElementId.InvalidElementId)
-                                {
-                                    ElementId typeId = recipientViewport.ChangeTypeId(viewportTypeId);
-                                }
-                                else
-                                {
-                                    CopyPasteOptions options = new CopyPasteOptions();
-                                    options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
-
-                                    List<ElementId> typeIds = new List<ElementId>();
-                                    typeIds.Add(sourceViewport.GetTypeId());
-
-                                    ICollection<ElementId> copiedTypeIds = ElementTransformUtils.CopyElements(preview.SourceModelInfo.Doc, typeIds, preview.RecipientModelInfo.Doc, Transform.Identity, options);
-                                    if (copiedTypeIds.Count > 0)
-                                    {
-                                        viewportTypeId = copiedTypeIds.First();
-                                        ElementId typeId = recipientViewport.ChangeTypeId(viewportTypeId);
-                                    }
-                                }
-                                trans.Commit();
 
                                 if (null != recipientViewport)
                                 {
-                                    trans.Start("Wirte Parameter Values");
-                                    foreach (Parameter param in sourceViewport.Parameters)
+                                    ElementId viewportTypeId = ElementId.InvalidElementId;
+                                    List<ElementId> elementTypeIds = recipientViewport.GetValidTypes().ToList();
+                                    foreach (ElementId typeId in elementTypeIds)
                                     {
-                                        if (!param.IsReadOnly)
+                                        ElementType eType = preview.RecipientModelInfo.Doc.GetElement(typeId) as ElementType;
+                                        if (eType.Name == viewportTypeName)
                                         {
+                                            viewportTypeId = typeId; break;
+                                        }
+                                    }
+
+                                    if (viewportTypeId != ElementId.InvalidElementId)
+                                    {
+                                        ElementId typeId = recipientViewport.ChangeTypeId(viewportTypeId);
+                                    }
+                                    else
+                                    {
+                                        CopyPasteOptions options = new CopyPasteOptions();
+                                        options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
+
+                                        List<ElementId> typeIds = new List<ElementId>();
+                                        typeIds.Add(sourceViewport.GetTypeId());
+
+                                        ICollection<ElementId> copiedTypeIds = ElementTransformUtils.CopyElements(preview.SourceModelInfo.Doc, typeIds, preview.RecipientModelInfo.Doc, Transform.Identity, options);
+                                        if (copiedTypeIds.Count > 0)
+                                        {
+                                            viewportTypeId = copiedTypeIds.First();
+                                            ElementId typeId = recipientViewport.ChangeTypeId(viewportTypeId);
+                                        }
+                                    }
+                                    trans.Commit();
+
+                                    if (null != recipientViewport)
+                                    {
+                                        trans.Start("Wirte Parameter Values");
+                                        foreach (Parameter param in sourceViewport.Parameters)
+                                        {
+                                            if (!param.IsReadOnly)
+                                            {
 #if RELEASE2014
-                                            Parameter rParam = recipientViewport.get_Parameter(param.Definition.Name);
+                                                Parameter rParam = recipientViewport.get_Parameter(param.Definition.Name);
 #elif RELEASE2015
                                             Parameter rParam = recipientViewport.LookupParameter(param.Definition.Name);
 #endif
 
-                                            if (null != rParam)
-                                            {
-                                                if (!rParam.IsReadOnly)
+                                                if (null != rParam)
                                                 {
-                                                    if (rParam.StorageType == param.StorageType)
+                                                    if (!rParam.IsReadOnly)
                                                     {
-                                                        switch (param.StorageType)
+                                                        if (rParam.StorageType == param.StorageType)
                                                         {
-                                                            case StorageType.Double:
-                                                                rParam.Set(param.AsDouble());
-                                                                break;
-                                                            case StorageType.Integer:
-                                                                rParam.Set(param.AsInteger());
-                                                                break;
-                                                            case StorageType.String:
-                                                                rParam.Set(param.AsString());
-                                                                break;
+                                                            switch (param.StorageType)
+                                                            {
+                                                                case StorageType.Double:
+                                                                    rParam.Set(param.AsDouble());
+                                                                    break;
+                                                                case StorageType.Integer:
+                                                                    rParam.Set(param.AsInteger());
+                                                                    break;
+                                                                case StorageType.String:
+                                                                    rParam.Set(param.AsString());
+                                                                    break;
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
+
+                                        FailureHandlingOptions failureOptions = trans.GetFailureHandlingOptions();
+                                        failureOptions.SetFailuresPreprocessor(new HideSameParameterValuePreprocessor());
+                                        trans.Commit(failureOptions);
                                     }
-
-                                    FailureHandlingOptions failureOptions = trans.GetFailureHandlingOptions();
-                                    failureOptions.SetFailuresPreprocessor(new HideSameParameterValuePreprocessor());
-                                    trans.Commit(failureOptions);
-
                                 }
                             }
                             catch (Exception ex)
@@ -423,68 +456,6 @@ namespace HOK.ModelManager
             return preview;
         }
 
-        private static ElementId GetTitleBlockId(PreviewMap previewMap)
-        {
-            ElementId titleBlockTypeId = ElementId.InvalidElementId;
-            try
-            {
-                 ElementId sourceSheetId = previewMap.SourceViewProperties.SheetObj.Id;
-                 FilteredElementCollector collector = new FilteredElementCollector(previewMap.SourceModelInfo.Doc, sourceSheetId);
-                 ICollection<ElementId> instanceIds = collector.OfCategory(BuiltInCategory.OST_TitleBlocks).ToElementIds().ToList();
-                 if (instanceIds.Count > 0)
-                 {
-                     ElementId instanceId = instanceIds.First();
-                     FamilyInstance instance = previewMap.SourceModelInfo.Doc.GetElement(instanceId) as FamilyInstance;
-                     if (null != instance)
-                     {
-                         ElementId typeId = instance.GetTypeId();
-                         ElementType elementType = previewMap.SourceModelInfo.Doc.GetElement(typeId) as ElementType;
-                         if (null != elementType)
-                         {
-                             //check whether the same type of title block exists in the recipieent document or not
-                             FilteredElementCollector rCollector = new FilteredElementCollector(previewMap.RecipientModelInfo.Doc);
-                             List<Element> elements = rCollector.OfCategory(BuiltInCategory.OST_TitleBlocks).WhereElementIsElementType().ToElements().ToList();
-                             var titleBlockTypes = from elem in elements where elem.Name == elementType.Name select elem;
-                             if (titleBlockTypes.Count() > 0)
-                             {
-                                 titleBlockTypeId = titleBlockTypes.First().Id;
-                                 return titleBlockTypeId;
-                             }
-                             else //duplicate element types
-                             {
-                                 CopyPasteOptions options = new CopyPasteOptions();
-                                 options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
-                                 
-                                 List<ElementId> typeIds = new List<ElementId>();
-                                 typeIds.Add(typeId);
-
-                                 ICollection<ElementId> copiedTypeIds;
-                                 using (Transaction trans = new Transaction(previewMap.RecipientModelInfo.Doc, "Duplicate TitleBlock"))
-                                 {
-                                     trans.Start();
-                                     copiedTypeIds = ElementTransformUtils.CopyElements(previewMap.SourceModelInfo.Doc, typeIds, previewMap.RecipientModelInfo.Doc, Transform.Identity, options);
-
-                                     FailureHandlingOptions failureOptions = trans.GetFailureHandlingOptions();
-                                     failureOptions.SetFailuresPreprocessor(new HidePasteDuplicateTypesPreprocessor());
-                                     trans.Commit(failureOptions);
-                                 }
-                                 if (copiedTypeIds.Count > 0)
-                                 {
-                                     titleBlockTypeId = copiedTypeIds.First();
-                                     return titleBlockTypeId;
-                                 }
-                             }
-                         }
-                     }
-                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to get title block Id.\n"+ex.Message, "GetTitleBockId", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return titleBlockTypeId;
-        }
-
         private static PreviewMap TransferProperties(PreviewMap previewMap, ProgressBar progressBar)
         {
 
@@ -493,44 +464,164 @@ namespace HOK.ModelManager
 
         private static int DuplicateDetailingAcrossViews(View fromView, View toView)
         {
-            // Collect view-specific elements in source view
-            FilteredElementCollector collector = new FilteredElementCollector(fromView.Document, fromView.Id);
-
-            // Skip elements which don't have a category.  In testing, this was
-            // the revision table and the extents element, which should not be copied as they will
-            // be automatically created for the copied view.
-            collector.WherePasses(new ElementCategoryFilter(ElementId.InvalidElementId, true));
-
-            // Get collection of elements to copy for CopyElements()
-            ICollection<ElementId> toCopy = collector.ToElementIds();
-
-            // Return value
             int numberOfCopiedElements = 0;
-
-            if (toCopy.Count > 0)
+            try
             {
-                using (Transaction t2 = new Transaction(toView.Document, "Duplicate view detailing"))
+                List<ElementId> elementIdsToExclude = new List<ElementId>();
+
+                ICollection<ElementId> referenceCalloutIds = fromView.GetReferenceCallouts();
+                elementIdsToExclude.AddRange(referenceCalloutIds);
+                ICollection<ElementId> referenceElevationIds = fromView.GetReferenceElevations();
+                elementIdsToExclude.AddRange(referenceElevationIds);
+                ICollection<ElementId> referenceSectionIds = fromView.GetReferenceSections();
+                elementIdsToExclude.AddRange(referenceSectionIds);
+
+                FilteredElementCollector collector = new FilteredElementCollector(fromView.Document, fromView.Id);
+                if (elementIdsToExclude.Count > 0)
                 {
-                    t2.Start();
-                    // Set handler to skip the duplicate types dialog
-                    CopyPasteOptions options = new CopyPasteOptions();
-                    options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
+                    collector.Excluding(elementIdsToExclude);
+                }
+                collector.WherePasses(new ElementCategoryFilter(ElementId.InvalidElementId, true));
 
-                    // Copy the elements using no transformation
-                    ICollection<ElementId> copiedElements = ElementTransformUtils.CopyElements(fromView, toCopy, toView, Transform.Identity, options);
-                    numberOfCopiedElements = copiedElements.Count;
+                ICollection<ElementId> toCopy = collector.ToElementIds();
 
-                    // Set failure handler to skip any duplicate types warnings that are posted.
-                    FailureHandlingOptions failureOptions = t2.GetFailureHandlingOptions();
-                    failureOptions.SetFailuresPreprocessor(new HidePasteDuplicateTypesPreprocessor());
-                    t2.Commit(failureOptions);
+                CopyPasteOptions options = new CopyPasteOptions();
+                options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
+                if (toCopy.Count > 0)
+                {
+                    using (Transaction t2 = new Transaction(toView.Document, "Duplicate view detailing"))
+                    {
+                        t2.Start();
+                        try
+                        {
+                            ICollection<ElementId> copiedElements = ElementTransformUtils.CopyElements(fromView, toCopy, toView, Transform.Identity, options);
+                            numberOfCopiedElements = copiedElements.Count;
+
+                            FailureHandlingOptions failureOptions = t2.GetFailureHandlingOptions();
+                            failureOptions.SetFailuresPreprocessor(new HidePasteDuplicateTypesPreprocessor());
+                            t2.Commit(failureOptions);
+                        }
+                        catch (Exception ex)
+                        {
+                            string message = ex.Message;
+                            t2.RollBack();
+                        }
+                    }
                 }
             }
-
+            catch (Exception ex)
+            {
+                //MessageBox.Show("Failed to duplicate detialing across views.\n"+ex.Message, "Duplicate Detailing Across Views", MessageBoxButton.OK, MessageBoxImage.Warning); 
+                string message = ex.Message;
+                errorMessage.AppendLine(toView.Name + ": errors in duplicating detailing across views");
+            }
             return numberOfCopiedElements;
         }
+
+        private static bool DuplicateReferenceCallouts(View fromView, View toView)
+        {
+            bool result = false;
+            try
+            {
+                Document fromDoc = fromView.Document;
+                Document toDoc = toView.Document;
+
+                CopyPasteOptions copyPasteOptions = new CopyPasteOptions();
+                copyPasteOptions.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
+
+                ICollection<ElementId> referenceCalloutIds = fromView.GetReferenceCallouts();
+                if (referenceCalloutIds.Count > 0)
+                {
+                    foreach (ElementId eId in referenceCalloutIds)
+                    {
+                        XYZ firstPoint = null;
+                        XYZ secondPoint = null;
+                        bool cornerFound = GetCalloutCornerPoints(fromDoc, eId, out firstPoint, out secondPoint);
+
+                        Element callout = fromDoc.GetElement(eId);
+                        if(null!=callout)
+                        {
+                            using (Transaction trans = new Transaction(toDoc, "Duplicate Reference Callout"))
+                            {
+                                try
+                                {
+                                    trans.Start();
+
+                                    toDoc.Regenerate();
+                                    FilteredElementCollector collector = new FilteredElementCollector(toDoc);
+                                    List<ViewDrafting> views = collector.OfClass(typeof(ViewDrafting)).ToElements().Cast<ViewDrafting>().ToList();
+                                    var viewFound = from view in views where view.Name == callout.Name select view;
+                                    if (viewFound.Count() > 0)
+                                    {
+                                        ViewDrafting referenceView = viewFound.First();
+                                        ViewSection.CreateReferenceCallout(toDoc, toView.Id, referenceView.Id, firstPoint, secondPoint);
+                                    }
+                                    
+                                    trans.Commit();
+                                }
+                                catch (Exception ex)
+                                {
+                                    string message = ex.Message;
+                                    trans.RollBack();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+                //MessageBox.Show("Failed to duplicate reference callouts.\n"+ex.Message, "Duplicate Reference Callouts", MessageBoxButton.OK, MessageBoxImage.Warning);
+                errorMessage.AppendLine(toView.Name + ": errors in duplicating reference callouts");
+            }
+            return result;
+        }
+
+        private static bool GetCalloutCornerPoints(Document doc, ElementId calloutId, out XYZ firstPoint, out XYZ secondPoint)
+        {
+            bool result = false;
+            firstPoint = new XYZ(0, 0, 0);
+            secondPoint = new XYZ(0, 0, 0);
+            try
+            {
+                double minX = double.MaxValue;
+                double minY = double.MaxValue;
+                double minZ = double.MaxValue;
+                double maxX = double.MinValue;
+                double maxY = double.MinValue;
+                double maxZ = double.MinValue;
+               
+                ViewCropRegionShapeManager cropRegion = View.GetCropRegionShapeManagerForReferenceCallout(doc, calloutId);
+                CurveLoop curveLoop = cropRegion.GetCropRegionShape();
+                foreach (Curve curve in curveLoop)
+                {
+                    XYZ point = curve.GetEndPoint(0);
+                    if (point.X < minX) { minX = point.X; }
+                    if (point.Y < minY) { minY = point.Y; }
+                    if (point.Z < minZ) { minZ = point.Z; }
+                    if (point.X > maxX) { maxX = point.X; }
+                    if (point.Y > maxY) { maxY = point.Y; }
+                    if (point.Z > maxZ) { maxZ = point.Z; }
+                }
+
+                if (curveLoop.Count() > 0)
+                {
+                    firstPoint = new XYZ(minX, minY, minZ);
+                    secondPoint = new XYZ(maxX, maxY, maxZ);
+                    result = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get corner points of callout\n" + ex.Message, "Get Corner Points of Callout", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return result;
+        }
+
     }
 
+    
 
     /// <summary>
     /// A handler to accept duplicate types names created by the copy/paste operation.

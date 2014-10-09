@@ -26,6 +26,8 @@ namespace HOK.ModelManager.ReplicateViews
         private Viewport viewport = null;
         private LinkStatus status = LinkStatus.None;
         private ViewProperties linkedView = null;
+        private Dictionary<int, ViewProperties> dependantViews = new Dictionary<int, ViewProperties>();
+        
 
         public ViewDrafting ViewDraftingObj { get { return m_view; } set { m_view = value; } }
         public string UniqueId { get { return uniqueId; } set { uniqueId = value; } }
@@ -43,6 +45,7 @@ namespace HOK.ModelManager.ReplicateViews
         public Viewport ViewportObj { get { return viewport; } set { viewport = value; } }
         public LinkStatus Status { get { return status; } set { status = value; } }
         public ViewProperties LinkedView { get { return linkedView; } set { linkedView = value; } }
+        public Dictionary<int, ViewProperties> DependantViews { get { return dependantViews; } set { dependantViews = value; } }
 
         public ViewProperties(Document doc, ViewDrafting view)
         {
@@ -77,6 +80,58 @@ namespace HOK.ModelManager.ReplicateViews
                         isOnSheet = true;
                         sheetObj = FindSheet(sheetNumber, sheetName);
                         viewLocation = FindViewLocation(sheetObj);
+                    }
+                }
+
+                ICollection<ElementId> referenceCalloutIds = m_view.GetReferenceCallouts();
+                if (referenceCalloutIds.Count > 0)
+                {
+                    foreach (ElementId eId in referenceCalloutIds)
+                    {
+                        Element callout = m_doc.GetElement(eId);
+                        if (null != callout)
+                        {
+                            Parameter param = callout.get_Parameter(BuiltInParameter.ID_PARAM);
+                            if (null != param)
+                            {
+                                ElementId referenceViewId = param.AsElementId();
+                                ViewDrafting referenceView = m_doc.GetElement(referenceViewId) as ViewDrafting;
+                                if (null != referenceView)
+                                {
+                                    ViewProperties vp = new ViewProperties(m_doc, referenceView);
+                                    if (!dependantViews.ContainsKey(vp.ViewId))
+                                    {
+                                        dependantViews.Add(vp.ViewId, vp);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                ICollection<ElementId> referenceSectionIds = m_view.GetReferenceSections();
+                if (referenceSectionIds.Count > 0)
+                {
+                    foreach (ElementId eId in referenceSectionIds)
+                    {
+                        Element marker = m_doc.GetElement(eId);
+                        if (null != marker)
+                        {
+                            Parameter param = marker.get_Parameter(BuiltInParameter.ID_PARAM);
+                            if (null != param)
+                            {
+                                ElementId referenceViewId = param.AsElementId();
+                                ViewDrafting referenceView = m_doc.GetElement(referenceViewId) as ViewDrafting;
+                                if (null != referenceView)
+                                {
+                                    ViewProperties vp = new ViewProperties(m_doc, referenceView);
+                                    if (!dependantViews.ContainsKey(vp.ViewId))
+                                    {
+                                        dependantViews.Add(vp.ViewId, vp);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

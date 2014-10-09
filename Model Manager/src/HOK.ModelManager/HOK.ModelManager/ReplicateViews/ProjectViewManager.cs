@@ -22,7 +22,6 @@ namespace HOK.ModelManager.ReplicateViews
         private List<string> viewTypeNames = new List<string>();
         private List<string> sheetNumbers = new List<string>();
         private List<ViewMapClass> viewMapList = new List<ViewMapClass>();
-        private List<PreviewMap> previewMapList = new List<PreviewMap>();
         private Dictionary<string/*docTitle*/, GoogleDocInfo> googleDocDictionary = new Dictionary<string, GoogleDocInfo>();
 
         public Dictionary<string, ModelInfo> ModelInfoDictionary { get { return modelInfoDictionary; } set { modelInfoDictionary = value; } }
@@ -274,13 +273,13 @@ namespace HOK.ModelManager.ReplicateViews
             bool result = false;
             try
             {
-                previewMapList.Clear();
-
+                List<int> sourceViewIds = new List<int>();
+                List<PreviewMap> previewMapList = new List<PreviewMap>();
+                
                 ViewMapClass vmc = GetViewMap(sourceDoc, recipientDoc, createLinks);
                 Dictionary<int, ViewProperties> sourceViews = vmc.SourceViews;
                 Dictionary<int, ViewProperties> recipientViews = vmc.RecipientViews;
 
-                List<PreviewMap> previewList = new List<PreviewMap>();
                 List<TreeViewModel> treeviewModels = treeViewSource.ItemsSource as List<TreeViewModel>;
                 foreach (TreeViewModel rootNode in treeviewModels) 
                 {
@@ -293,9 +292,42 @@ namespace HOK.ModelManager.ReplicateViews
                                 int viewId = 0;
                                 if (int.TryParse(viewNode.Tag.ToString(), out viewId))
                                 {
-                                    if (sourceViews.ContainsKey(viewId))
+                                    if (sourceViews.ContainsKey(viewId) && !sourceViewIds.Contains(viewId))
                                     {
                                         ViewProperties viewSource = sourceViews[viewId];
+                                        if (viewSource.DependantViews.Count > 0)
+                                        {
+                                            foreach (int dependentId in viewSource.DependantViews.Keys)
+                                            {
+                                                if (!sourceViewIds.Contains(dependentId))
+                                                {
+                                                    ViewProperties dependentSource = viewSource.DependantViews[dependentId];
+                                                    ViewProperties dependentRecipient = null;
+                                                    LinkInfo dependantlinkInfo = new LinkInfo();
+                                                    if (null != dependentSource.LinkedView)
+                                                    {
+                                                        dependentRecipient = dependentSource.LinkedView;
+                                                        var linkInfoList = from info in vmc.LinkInfoList where info.SourceItemId == dependentId && info.DestItemId == dependentRecipient.ViewId select info;
+                                                        if (linkInfoList.Count() > 0)
+                                                        {
+                                                            dependantlinkInfo = linkInfoList.First();
+                                                        }
+                                                    }
+
+                                                    PreviewMap dependantView = new PreviewMap();
+                                                    dependantView.SourceModelInfo = modelInfoDictionary[sourceDoc];
+                                                    dependantView.RecipientModelInfo = modelInfoDictionary[recipientDoc];
+                                                    dependantView.SourceViewProperties = dependentSource;
+                                                    dependantView.RecipientViewProperties = dependentRecipient;
+                                                    dependantView.ViewLinkInfo = dependantlinkInfo;
+                                                    dependantView.IsEnabled = true;
+
+                                                    sourceViewIds.Add(dependentId);
+                                                    previewMapList.Add(dependantView);
+                                                }
+                                            }
+                                        }
+                                        
                                         ViewProperties viewRecipient = null;
                                         LinkInfo linkInfo = new LinkInfo();
                                         if (null != viewSource.LinkedView)
@@ -316,6 +348,7 @@ namespace HOK.ModelManager.ReplicateViews
                                         preview.ViewLinkInfo = linkInfo;
                                         preview.IsEnabled = true;
 
+                                        sourceViewIds.Add(viewId);
                                         previewMapList.Add(preview);
                                     }
                                 }
@@ -326,7 +359,7 @@ namespace HOK.ModelManager.ReplicateViews
 
                 if (previewMapList.Count > 0)
                 {
-                    PreviewWindow pWindow = new PreviewWindow(previewMapList, createSheet);
+                    PreviewWindow pWindow = new PreviewWindow(m_app, previewMapList, createSheet);
                     if (true == pWindow.ShowDialog())
                     {
                         previewMapList = pWindow.PreviewMapList;
