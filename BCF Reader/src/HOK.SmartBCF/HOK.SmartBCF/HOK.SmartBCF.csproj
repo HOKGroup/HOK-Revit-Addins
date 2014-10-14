@@ -173,10 +173,10 @@
   <ItemGroup>
     <Compile Include="AppCommand.cs" />
     <Compile Include="BCFClasses\colorscheme.cs" />
-    <Compile Include="BCFClasses\markup.cs" />
-    <Compile Include="BCFClasses\project.cs" />
-    <Compile Include="BCFClasses\userdata.cs" />
-    <Compile Include="BCFClasses\visinfo.cs" />
+    <Compile Include="BCFClasses\markup.designer.cs" />
+    <Compile Include="BCFClasses\project.designer.cs" />
+    <Compile Include="BCFClasses\version.designer.cs" />
+    <Compile Include="BCFClasses\visinfo.designer.cs" />
     <Compile Include="BCFCommand.cs" />
     <Compile Include="GoogleUtils\BCFParser.cs" />
     <Compile Include="GoogleUtils\FileManager.cs" />
@@ -189,11 +189,24 @@
     <Compile Include="Utils\BCFUtil.cs" />
     <Compile Include="Utils\DataStorageUtil.cs" />
     <Compile Include="Utils\GUIDUtil.cs" />
+    <Compile Include="Utils\ParameterUtil.cs" />
     <Compile Include="Walker\BCFWindow.xaml.cs">
       <DependentUpon>BCFWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Walker\FilterWindow.xaml.cs">
+      <DependentUpon>FilterWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Walker\ImportBCFWindow.xaml.cs">
       <DependentUpon>ImportBCFWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Walker\OnlineBCFWindow.xaml.cs">
+      <DependentUpon>OnlineBCFWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Walker\ProjectWindow.xaml.cs">
+      <DependentUpon>ProjectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Walker\StatusItemWindow.xaml.cs">
+      <DependentUpon>StatusItemWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Walker\StatusWindow.xaml.cs">
       <DependentUpon>StatusWindow.xaml</DependentUpon>
@@ -212,15 +225,28 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="BCFClasses\markup.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="BCFClasses\project.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="BCFClasses\version.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="BCFClasses\visinfo.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="Resources\walker.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\BCFicon16.ico" />
-    <Resource Include="Resources\filter.png" />
+    <EmbeddedResource Include="Resources\filter.png" />
     <Resource Include="Resources\gear.png" />
     <Resource Include="Resources\magnifier.png" />
     <Resource Include="Resources\photo.png" />
@@ -235,7 +261,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Walker\FilterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Walker\ImportBCFWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Walker\OnlineBCFWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Walker\ProjectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Walker\StatusItemWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -249,9 +291,21 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\file_transfer_add.png" />
-    <Resource Include="Resources\file_transfer_close.png" />
-    <Resource Include="Resources\file_transfer_down.png" />
+    <Resource Include="Resources\minus.png" />
+    <Resource Include="Resources\pencil.png" />
+    <Resource Include="Resources\plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\checkbox_no.png" />
+    <EmbeddedResource Include="Resources\checkbox_yes.png" />
+    <Resource Include="Resources\google.png" />
+    <EmbeddedResource Include="Resources\filter_empty.png" />
+    <Resource Include="Resources\arrow_up.png" />
+    <Resource Include="Resources\banned.png" />
+    <Resource Include="Resources\download.png" />
+    <Content Include="Resources\HOK Shared Parameters.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.17-beta\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.17-beta\tools\Microsoft.Bcl.Build.targets')" />

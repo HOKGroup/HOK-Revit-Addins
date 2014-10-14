@@ -17,21 +17,46 @@ namespace HOK.SmartBCF.Walker
     {
         private UIApplication m_app = null;
         private Document m_doc = null;
+        private View3D activeView = null;
         private Request m_request = new Request();
+        private FolderHolders googleFolders = null;
         private Dictionary<string/*spreadsheetId*/, LinkedBcfFileInfo> bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
         private Dictionary<string/*spreadsheetId*/, Dictionary<string/*issueId*/, IssueEntry>> bcfDictionary = new Dictionary<string, Dictionary<string, IssueEntry>>();
-       
-        private ColorSchemeInfo schemeInfo = new ColorSchemeInfo();
+        private Dictionary<int /*categoryId*/, BuiltInCategory> catDictionary = new Dictionary<int, BuiltInCategory>();
+        private List<string> categoryNames = new List<string>();
+        private List<CategoryInfo> categoryInfoList = new List<CategoryInfo>();
+        
+        private ColorSchemeInfo schemeInfo =null;
         private WalkerWindow walkerWindow = null;
         private ElementProperties currentElement = null;
+        private IssueEntry selectedIssue = null;
+        private Comment selectedComment = null;
+        private string bcfProjectId = "";
+        private string bcfColorSchemeId = "";
+        private bool isHighlightOn = false;
+        private bool isIsolateOn = false;
+        private bool isSectionBoxOn = false;
+        private bool isProjectIdChanged = false;
 
         public Document ActiveDoc { get { return m_doc; } set { m_doc = value; } }
         public Request Request { get { return m_request; } }
+        public View3D ActiveView { get { return activeView; } set { activeView = value; } }
+        public FolderHolders GoogleFolders { get { return googleFolders; } set { googleFolders = value; } }
         public Dictionary<string, LinkedBcfFileInfo> BCFFileDictionary { get { return bcfFileDictionary; } set { bcfFileDictionary = value; } }
         public Dictionary<string, Dictionary<string, IssueEntry>> BCFDictionary { get { return bcfDictionary; } set { bcfDictionary = value; } }
+        public List<CategoryInfo> CategoryInfoList { get { return categoryInfoList; } set { categoryInfoList = value; } }
+
         public ColorSchemeInfo SchemeInfo { get { return schemeInfo; } set { schemeInfo = value; } }
         public WalkerWindow WalkerWindow { get { return walkerWindow; } set { walkerWindow = value; } }
         public ElementProperties CurrentElement { get { return currentElement; } set { currentElement = value; } }
+        public IssueEntry SelectedIssue { get { return selectedIssue; } set { selectedIssue = value; } }
+        public Comment SelectedComment { get { return selectedComment; } set { selectedComment = value; } }
+        public string BCFProjectId { get { return bcfProjectId; } set { bcfProjectId = value; } }
+        public string BCFColorSchemeId { get { return bcfColorSchemeId; } set { bcfColorSchemeId = value; } }
+        public bool IsHighlightOn { get { return isHighlightOn; } set { isHighlightOn = value; } }
+        public bool IsIsolateOn { get { return isIsolateOn; } set { isIsolateOn = value; } }
+        public bool IsSectionBoxOn { get { return isSectionBoxOn; } set { isSectionBoxOn = value; } }
+        public bool IsProjectIdChanged { get { return isProjectIdChanged; } set { isProjectIdChanged = value; } }
 
         public WalkerHandler(UIApplication uiapp)
         {
@@ -39,29 +64,62 @@ namespace HOK.SmartBCF.Walker
             {
                 m_app = uiapp;
                 m_doc = uiapp.ActiveUIDocument.Document;
-                bcfFileDictionary = GetLinkedBCFFileInfo(m_doc);
-                bcfDictionary = GetBCFDictionary(m_doc);
-                schemeInfo = GetColorSchemeInfo();
+                View3D view3d = m_doc.ActiveView as View3D;
+                if (null != view3d)
+                {
+                    activeView = view3d;
+                }
+                else
+                {
+                    FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+                    List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
+                    var viewfound = from view in view3ds where view.IsTemplate== false && view.IsPerspective == false && view.ViewName =="{3D}" select view;
+                    if (viewfound.Count() > 0)
+                    {
+                        activeView = viewfound.First();
+                        using (Transaction trans = new Transaction(m_doc, "Open 3D View"))
+                        {
+                            try
+                            {
+                                trans.Start();
+                                uiapp.ActiveUIDocument.ActiveView = activeView;
+                                trans.Commit();
+                            }
+                            catch
+                            {
+                                trans.RollBack();
+                            }
+                        }
+                    }
+                }
 
+                bcfProjectId = ParameterUtil.GetBCFProjectId(m_doc);
+                if (!string.IsNullOrEmpty(bcfProjectId))
+                {
+                    googleFolders = FileManager.CreateDefaultFolders(bcfProjectId);
+                    if (null != googleFolders.ColorSheet)
+                    {
+                        bcfColorSchemeId = googleFolders.ColorSheet.Id;
+                    }
+                }
+                schemeInfo = BCFParser.ReadColorSchemes(bcfColorSchemeId, false);
+
+                bcfFileDictionary = DataStorageUtil.ReadLinkedBCFFileInfo(m_doc);
+                bcfDictionary = GetBCFDictionary(m_doc);
+
+                List<BuiltInCategory> bltCategories = catDictionary.Values.ToList();
+                bool parameterCreated = ParameterUtil.CreateBCFParameters(m_app, bltCategories);
+
+                foreach (string catName in categoryNames)
+                {
+                    CategoryInfo catInfo = new CategoryInfo(catName, true);
+                    categoryInfoList.Add(catInfo);
+                }
             }
             catch(Exception ex)
             {
                 MessageBox.Show("Failed to initialize External Event handler.\n"+ex.Message, "External Event Handler", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-        }
-
-        private Dictionary<string, LinkedBcfFileInfo> GetLinkedBCFFileInfo(Document doc)
-        {
-            Dictionary<string, LinkedBcfFileInfo> fileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
-            try
-            {
-                fileDictionary = DataStorageUtil.ReadDataStorage(doc);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to get linked BCF file Info from data storage.\n"+ex.Message, "Get Linked BCF File Info", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return fileDictionary;
         }
 
         private Dictionary<string/*spreadsheetId*/, Dictionary<string/*issueId*/, IssueEntry>> GetBCFDictionary(Document doc)
@@ -71,40 +129,17 @@ namespace HOK.SmartBCF.Walker
             {
                 foreach (string fileId in bcfFileDictionary.Keys)
                 {
-                    LinkedBcfFileInfo bcfFileInfo = bcfFileDictionary[fileId];
-                    Dictionary<string, IssueEntry> dictionary = BCFParser.ReadIssues(fileId, bcfFileInfo.BCFName);
-                    List<string> categoryNames = new List<string>();//for colorscheme
-                    List<string> issueIds = dictionary.Keys.ToList();
-                    foreach (string issueId in issueIds)
-                    {
-                        IssueEntry issueEntry = dictionary[issueId];
-                        List<int> elementIds = issueEntry.ElementDictionary.Keys.ToList();
-                        foreach (int elementId in elementIds)
-                        {
-                            Element element = m_doc.GetElement(new ElementId(elementId));
-                            if (null != element)
-                            {
-                                if (null != element.Category)
-                                {
-                                    if (!categoryNames.Contains(element.Category.Name))
-                                    {
-                                        categoryNames.Add(element.Category.Name);
-                                    }
-                                }
-
-                                ElementProperties ep = new ElementProperties(element);
-                                dictionary[issueId].ElementDictionary.Remove(elementId);
-                                dictionary[issueId].ElementDictionary.Add(elementId, ep);
-                            }
-                        }
-                    }
+                    Dictionary<string, IssueEntry> issueDictionary = GetBCFIssueInfo(doc, fileId);
 
                     if (!bcfDcitionary.ContainsKey(fileId))
                     {
-                        bcfDcitionary.Add(fileId, dictionary);
+                        bcfDcitionary.Add(fileId, issueDictionary);
                     }
+                }
 
-                    bool updatedCategory = BCFParser.UpdateCategories(fileId, categoryNames);
+                if (!string.IsNullOrEmpty(bcfColorSchemeId))
+                {
+                    bool updatedCategory = BCFParser.UpdateCommonCategorySheet(categoryNames, bcfColorSchemeId);
                 }
             }
             catch (Exception ex)
@@ -114,48 +149,96 @@ namespace HOK.SmartBCF.Walker
             return bcfDcitionary;
         }
 
-        private ColorSchemeInfo GetColorSchemeInfo()
+        private Dictionary<string, IssueEntry> GetBCFIssueInfo(Document doc, string sheetId)
         {
-            ColorSchemeInfo info = new ColorSchemeInfo();
+            Dictionary<string, IssueEntry> issueDictionary = new Dictionary<string, IssueEntry>();
             try
             {
-                //combine color definitions from different color scheme
-                foreach (string fileId in bcfFileDictionary.Keys)
+                if(bcfFileDictionary.ContainsKey(sheetId))
                 {
-                    ColorSchemeInfo csi = BCFParser.ReadColorSchemes(fileId);
-                    foreach (ColorScheme scheme in csi.ColorSchemes)
+                    LinkedBcfFileInfo bcfFileInfo = bcfFileDictionary[sheetId];
+                    issueDictionary = BCFParser.ReadIssues(sheetId, bcfFileInfo.BCFName);
+
+                    List<string> issueIds = issueDictionary.Keys.ToList();
+                    foreach (string issueId in issueIds)
                     {
-                        var schemes = from s in info.ColorSchemes where s.SchemeName == scheme.SchemeName select s;
-                        if (schemes.Count() > 0)
+                        IssueEntry issueEntry = issueDictionary[issueId];
+                        List<int> elementIds = issueEntry.ElementDictionary.Keys.ToList();
+                        foreach (int elementId in elementIds)
                         {
-                            for (int i = 0; i < info.ColorSchemes.Count; i++)
+                            ElementProperties property = issueEntry.ElementDictionary[elementId];
+
+                            Element element = m_doc.GetElement(new ElementId(elementId));
+                            if (null != element)
                             {
-                                if (info.ColorSchemes[i].SchemeName == scheme.SchemeName)
+                                if (null != element.Category)
                                 {
-                                    foreach (ColorDefinition cd in scheme.ColorDefinitions)
+                                    if (!categoryNames.Contains(element.Category.Name))
                                     {
-                                        var definitions = from def in info.ColorSchemes[i].ColorDefinitions where def.ParameterValue == cd.ParameterValue select def;
-                                        if (definitions.Count() == 0)
+                                        categoryNames.Add(element.Category.Name);
+                                    }
+
+                                    if (element.Category.AllowsBoundParameters)
+                                    {
+                                        int categoryId = element.Category.Id.IntegerValue;
+                                        if (!catDictionary.ContainsKey(categoryId))
                                         {
-                                            info.ColorSchemes[i].ColorDefinitions.Add(cd);
+                                            BuiltInCategory bltCategory = (BuiltInCategory)categoryId;
+                                            if (bltCategory != BuiltInCategory.INVALID)
+                                            {
+                                                catDictionary.Add(categoryId, bltCategory);
+                                            }
                                         }
                                     }
                                 }
-                                break;
+
+                                ElementProperties ep = new ElementProperties(element);
+                                ep.IssueId = property.IssueId;
+                                ep.Action = property.Action;
+                                ep.ResponsibleParty = property.ResponsibleParty;
+
+                                issueDictionary[issueId].ElementDictionary.Remove(elementId);
+                                issueDictionary[issueId].ElementDictionary.Add(elementId, ep);
                             }
                         }
-                        else
+                        issueDictionary[issueId].NumElements = issueDictionary[issueId].ElementDictionary.Count;
+                        if (null == issueDictionary[issueId].Snapshot)
                         {
-                            info.ColorSchemes.Add(scheme);
+                            if (bcfFileInfo.SharedLinkId == bcfProjectId && null != googleFolders)
+                            {
+                                issueDictionary[issueId].Snapshot = FileManager.DownloadImage(issueId, googleFolders.ActiveImgFolder.Id);
+                            }
+                            else if (bcfFileInfo.SharedLinkId == bcfProjectId)
+                            {
+                                googleFolders = FileManager.CreateDefaultFolders(bcfProjectId);
+                                if (null != googleFolders)
+                                {
+                                    issueDictionary[issueId].Snapshot = FileManager.DownloadImage(issueId, googleFolders.ActiveImgFolder.Id);
+                                }
+                            }
+                            else
+                            {
+                                FolderHolders tempFolders = FileManager.CreateDefaultFolders(bcfFileInfo.SharedLinkId);
+                                if (null != tempFolders)
+                                {
+                                    issueDictionary[issueId].Snapshot = FileManager.DownloadImage(issueId, tempFolders.ActiveImgFolder.Id);
+                                }
+                            }
                         }
                     }
-                }
+
+                    if (bcfDictionary.ContainsKey(sheetId))
+                    {
+                        bcfDictionary.Remove(sheetId);
+                    }
+                    bcfDictionary.Add(sheetId, issueDictionary);
+                } 
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to get color scheme info.\n"+ex.Message, "Get Color Scheme Info", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to add issue items into BCF dictionary.\n"+ex.Message, "Add BCF to Dictionary", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            return info;
+            return issueDictionary;
         }
 
         public void Execute(UIApplication app)
@@ -171,42 +254,86 @@ namespace HOK.SmartBCF.Walker
                     case RequestId.ReadLinkedFileInfo:
                         break;
                     case RequestId.UpdateLinkedFileInfo:
-                        bool updated = DataStorageUtil.UpdateDataStorage(m_doc, bcfFileDictionary);
-                        bcfDictionary = GetBCFDictionary(m_doc);
-                        schemeInfo = GetColorSchemeInfo();
-
-                        if (null != walkerWindow && bcfDictionary.Count > 0)
+                        bool updated = DataStorageUtil.UpdateLinkedBCFFileInfo(m_doc, bcfFileDictionary);
+                        Dictionary<string, Dictionary<string, IssueEntry>> dictionary = new Dictionary<string, Dictionary<string, IssueEntry>>();
+                        
+                        int numCat = categoryNames.Count;
+                        foreach (string fileId in bcfFileDictionary.Keys)
                         {
+                            if (bcfDictionary.ContainsKey(fileId))
+                            {
+                                dictionary.Add(fileId, bcfDictionary[fileId]);
+                            }
+                            else
+                            {
+                                Dictionary<string, IssueEntry> issueDictionary = GetBCFIssueInfo(m_doc, fileId);
+                                dictionary.Add(fileId, issueDictionary);
+                            }
+                        }
+                        bcfDictionary = dictionary;
+
+                        if (numCat != categoryNames.Count)
+                        {
+                            bool updatedCategory = BCFParser.UpdateCommonCategorySheet(categoryNames, bcfColorSchemeId);
+                            List<BuiltInCategory> bltCategories = catDictionary.Values.ToList();
+                            bool parameterCreated = ParameterUtil.CreateBCFParameters(m_app, bltCategories);
+
+                            foreach (string catName in categoryNames)
+                            {
+                                var catFound = from category in categoryInfoList where category.CategoryName == catName select category;
+                                if (catFound.Count() == 0)
+                                {
+                                    CategoryInfo catInfo = new CategoryInfo(catName, true);
+                                    categoryInfoList.Add(catInfo);
+                                }
+                            }
+                        }
+
+                        if (null != walkerWindow)
+                        {
+                            walkerWindow.BCFFileDictionary = bcfFileDictionary;
                             walkerWindow.BCFDictionary = bcfDictionary;
-                            walkerWindow.SchemeInfo = schemeInfo;
+                            walkerWindow.CategoryInfoList = categoryInfoList;
                             walkerWindow.CurrentIndex = 0;
                             walkerWindow.DisplayLinkedBCF();
+                        }
+
+                        bool updatedId = ParameterUtil.SetBCFProjectId(m_doc, bcfProjectId);
+                        schemeInfo = BCFParser.ReadColorSchemes(bcfColorSchemeId, false);
+                        
+                        if (null != walkerWindow)
+                        {
+                            walkerWindow.SchemeInfo = schemeInfo;
                             walkerWindow.DisplayColorscheme(schemeInfo);
                         }
+
                         break;
-                    case RequestId.ReadParameterInfo:
+                    case RequestId.ReadProjectId:
+                        bcfProjectId = ParameterUtil.GetBCFProjectId(m_doc);
                         break;
-                    case RequestId.UpdateParameterInfo:
+                    case RequestId.UpdateProjectId:
+                        bool updatedProjectId = ParameterUtil.SetBCFProjectId(m_doc, bcfProjectId);
                         break;
-                    case RequestId.HighlightElement:
-                        HighlightElement(true, m_doc);
+                    case RequestId.ReadBCFParameterInfo:
                         break;
-                    case RequestId.CancelHighlight:
-                        HighlightElement(false, m_doc);
+                    case RequestId.UpdateBCFParameterInfo:
+                        bool updatedParameters = ParameterUtil.UpdateBCFParameters(m_doc, currentElement, selectedIssue, selectedComment);
                         break;
-                    case RequestId.IsolateElement:
-                        IsolateElement(true, m_doc);
+                    case RequestId.UpdateAction:
+                        bool actionUpdated = ParameterUtil.UpdateBCFParameter(m_doc, currentElement, BCFParameters.BCF_Action, currentElement.Action);
                         break;
-                    case RequestId.CancelIsolate:
-                        IsolateElement(false, m_doc);
-                        break;
-                    case RequestId.CreateSectionBox:
-                        CreateSectionBox(true, m_doc);
-                        break;
-                    case RequestId.CancelSectionBox:
-                        CreateSectionBox(false, m_doc);
+                    case RequestId.UpdateResponsibility:
+                        bool responsibilityUpdated = ParameterUtil.UpdateBCFParameter(m_doc, currentElement, BCFParameters.BCF_Responsibility, currentElement.ResponsibleParty);
                         break;
                     case RequestId.CreateIssue:
+                        break;
+                    case RequestId.UpdateViews:
+                        IsolateElement(isIsolateOn, m_doc);
+                        CreateSectionBox(isSectionBoxOn, m_doc);
+                        HighlightElement(isHighlightOn, m_doc);
+                        break;
+                    case RequestId.UpdateParameterByComment:
+                        UpdateParameters(m_doc);
                         break;
                 }
 
@@ -224,34 +351,49 @@ namespace HOK.SmartBCF.Walker
             try
             {
                 UIDocument uidoc=new UIDocument(doc);
-                Element element = m_doc.GetElement(new ElementId(currentElement.ElementId));
-                if(null!=element)
+                using (Transaction trans = new Transaction(doc))
                 {
-                    if(execute)
+                    trans.Start("Highlight");
+                    try
                     {
+                        Element element = m_doc.GetElement(new ElementId(currentElement.ElementId));
+                        if (null != element)
+                        {
+                            if (execute)
+                            {
 #if RELEASE2013||RELEASE2014
                             SelElementSet selElements = SelElementSet.Create();
                             selElements.Add(element);
                             uidoc.Selection.Elements = selElements;
                             uidoc.ShowElements(element);
 #elif RELEASE2015
-                            List<ElementId> selectedIds = new List<ElementId>();
-                            selectedIds.Add(element.Id);
-                            uidoc.Selection.SetElementIds(selectedIds);
-                            uidoc.ShowElements(element.Id);
+                                List<ElementId> selectedIds = new List<ElementId>();
+                                selectedIds.Add(element.Id);
+                                uidoc.Selection.SetElementIds(selectedIds);
+                                uidoc.ShowElements(element.Id);
 #endif
-                    }
-                    else
-                    {
+                            }
+                            else
+                            {
 #if RELEASE2013||RELEASE2014
                             SelElementSet selElementSet = SelElementSet.Create();
                             uidoc.Selection.Elements = selElementSet;
 #elif RELEASE2015
-                        
-                            uidoc.Selection.SetElementIds(new List<ElementId>());
+
+                                uidoc.Selection.SetElementIds(new List<ElementId>());
 #endif
+                            }
+                            uidoc.RefreshActiveView();
+                        }
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(currentElement.ElementName+": Failed to highlight elements.\n"+ex.Message, "Highlight Element", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        trans.RollBack();
                     }
                 }
+                
             }
             catch (Exception ex)
             {
@@ -265,7 +407,7 @@ namespace HOK.SmartBCF.Walker
             {
                 UIDocument uidoc = new UIDocument(doc);
                 Element element = m_doc.GetElement(new ElementId(currentElement.ElementId));
-                View activeView = doc.ActiveView;
+                
                 if (null != element && null!=activeView)
                 {
                     if (activeView.IsInTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate))
@@ -276,6 +418,7 @@ namespace HOK.SmartBCF.Walker
                             try
                             {
                                 activeView.DisableTemporaryViewMode(TemporaryViewMode.TemporaryHideIsolate);
+                                uidoc.RefreshActiveView();
                                 trans.Commit();
                             }
                             catch
@@ -294,6 +437,7 @@ namespace HOK.SmartBCF.Walker
                                 List<ElementId> elementIds = new List<ElementId>();
                                 elementIds.Add(element.Id);
                                 activeView.IsolateElementsTemporary(elementIds);
+                                uidoc.RefreshActiveView();
                                 trans.Commit();
                             }
                             catch { trans.RollBack(); }
@@ -311,67 +455,81 @@ namespace HOK.SmartBCF.Walker
         {
             try
             {
-                View3D view3d = doc.ActiveView as View3D;
-                if (null != view3d)
+                Element element = m_doc.GetElement(new ElementId(currentElement.ElementId));
+                if (null != element)
                 {
-                    if (execute)
+                    using (Transaction trans = new Transaction(doc))
                     {
-                        Element element = m_doc.GetElement(new ElementId(currentElement.ElementId));
-                        if (null != element)
+                        trans.Start("Section Box");
+                        try
                         {
-                            BoundingBoxXYZ boundingBox = element.get_BoundingBox(null);
-                            if (null != boundingBox)
+                            if (execute)
                             {
-                                using(Transaction trans=new Transaction(doc))
+                                BoundingBoxXYZ boundingBox = element.get_BoundingBox(null);
+                                if (null != boundingBox)
                                 {
-                                    trans.Start("Create Section Box");
-                                    try
-                                    {
+                                    XYZ minXYZ = new XYZ(boundingBox.Min.X - 3, boundingBox.Min.Y - 3, boundingBox.Min.Z - 3);
+                                    XYZ maxXYZ = new XYZ(boundingBox.Max.X + 3, boundingBox.Max.Y + 3, boundingBox.Max.Z + 3);
+                                    BoundingBoxXYZ offsetBoundingBox = new BoundingBoxXYZ();
+                                    offsetBoundingBox.Min = minXYZ;
+                                    offsetBoundingBox.Max = maxXYZ;
 #if RELEASE2013
-                                        view3d.SectionBox = boundingBox;
+                                        view3d.SectionBox = offsetBoundingBox;
 #else
-                                        view3d.SetSectionBox(boundingBox);
-                                        view3d.GetSectionBox().Enabled = true;
+                                    activeView.SetSectionBox(offsetBoundingBox);
+                                    activeView.GetSectionBox().Enabled = true;
 #endif
-                                        trans.Commit();
-                                    }
-                                    catch
-                                    {
-                                        trans.RollBack();
-                                    }
                                 }
-
                             }
-                        }
-                    }
-                    else
-                    {
-                        using (Transaction trans = new Transaction(doc))
-                        {
-                            try
+                            else
                             {
-                                trans.Start("Disable Section Box");
 #if RELEASE2013
-                                view3d.SectionBox = null;
+                                        view3d.SectionBox = null;                              
 #else
-                                view3d.SetSectionBox(null);
-                                view3d.GetSectionBox().Enabled = false;
+                                Parameter parameter = activeView.get_Parameter(BuiltInParameter.VIEWER_MODEL_CLIP_BOX_ACTIVE);
+                                if (null != parameter)
+                                {
+                                    parameter.Set(0);
+                                }
+                                activeView.GetSectionBox().Enabled = false;
 #endif
-                                trans.Commit();
                             }
-                            catch { trans.RollBack(); }
+                            trans.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            string message = ex.Message;
+                            trans.RollBack();
                         }
                     }
-                    
+
                 }
-                
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to create a section box around the selected element.\n"+ex.Message, "Create Section Box", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-     
+
+        private void UpdateParameters(Document doc)
+        {
+            try
+            {
+                if (null != selectedIssue && null != selectedComment)
+                {
+                    foreach (int elementId in selectedIssue.ElementDictionary.Keys)
+                    {
+                        ElementProperties ep = selectedIssue.ElementDictionary[elementId];
+                        bool parameterUpdated = ParameterUtil.UpdateBCFParameters(m_doc, ep, selectedIssue, selectedComment);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to update parameters by selected issues.\n"+ex.Message, "Update Parameters", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
         public string GetName()
         {
             return "BCF Walker Event Handler";
@@ -386,23 +544,24 @@ namespace HOK.SmartBCF.Walker
 
         UpdateLinkedFileInfo=2, 
 
-        ReadParameterInfo=3,
+        ReadProjectId=3,
 
-        UpdateParameterInfo=4,
+        UpdateProjectId=4,
 
-        HighlightElement=5,
+        ReadBCFParameterInfo=5,
 
-        CancelHighlight=6,
+        UpdateBCFParameterInfo=6,
 
-        IsolateElement=7,
+        UpdateAction=7,
 
-        CancelIsolate=8,
+        UpdateResponsibility=8,
 
-        CreateSectionBox=9,
+        CreateIssue=9,
 
-        CancelSectionBox=10,
+        UpdateViews=10,
 
-        CreateIssue=11,
+        UpdateParameterByComment=11,
+
     }
 
     public class Request

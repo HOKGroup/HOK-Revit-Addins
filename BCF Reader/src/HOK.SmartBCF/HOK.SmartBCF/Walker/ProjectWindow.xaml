@@ -1,0 +1,22 @@
+﻿<Window x:Class="HOK.SmartBCF.Walker.ProjectWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Height="170" Width="400" WindowStartupLocation="CenterScreen" Title="BCF Project Setup" Icon="/HOK.SmartBCF;component/Resources/BCFicon16.ico" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <GroupBox x:Name="groupBox" Header="BCF Projects" Margin="10,10,10,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid>
+                <Label Content="Project Id: " HorizontalAlignment="Left" Margin="23,20,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxProjectId" HorizontalAlignment="Left" Height="23" Margin="94,23,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="250"/>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="buttonCancel" IsCancel="True" Content="Cancel" HorizontalAlignment="Right" Margin="0,8,19,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Click="buttonCancel_Click"/>
+        <Button x:Name="buttonOK" IsDefault="True" Content="OK" HorizontalAlignment="Right" Margin="0,8,105,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Click="buttonOK_Click"/>
+    </Grid>
+</Window>

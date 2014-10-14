@@ -24,33 +24,75 @@ namespace HOK.SmartBCF.Walker
     public partial class BCFWindow : Window
     {
         private Dictionary<string/*fileId*/, LinkedBcfFileInfo> bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
-        private SortableObservableCollection<LinkedBcfFileInfo> linkedBCFs = new SortableObservableCollection<LinkedBcfFileInfo>();
+        private List<LinkedBcfFileInfo> linkedBCFs = new List<LinkedBcfFileInfo>();
+        private string bcfProjectId = "";
+        private string bcfColorSchemeId = "";
+        private string sharedLink = "";
+        private FolderHolders googleFolders = null;
 
         public Dictionary<string, LinkedBcfFileInfo> BCFFileDictionary { get { return bcfFileDictionary; } set { bcfFileDictionary = value; } }
+        public string BCFProjectId { get { return bcfProjectId; } set { bcfProjectId = value; } }
+        public string BCFColorSchemeId { get { return bcfColorSchemeId; } set { bcfColorSchemeId = value; } }
+        public FolderHolders GoogleFolders { get { return googleFolders; } set { googleFolders = value; } }
 
-        public BCFWindow(Dictionary<string, LinkedBcfFileInfo> fileHistory)
+        public BCFWindow(Dictionary<string, LinkedBcfFileInfo> fileHistory, FolderHolders folders)
         {
             bcfFileDictionary = fileHistory;
+            googleFolders = folders;
+            if (null != googleFolders)
+            {
+                bcfProjectId = googleFolders.RootId;
+                bcfColorSchemeId = googleFolders.ColorSheet.Id;
+            }
+
             foreach (LinkedBcfFileInfo info in bcfFileDictionary.Values)
             {
                 linkedBCFs.Add(info);
             }
-            linkedBCFs.Sort();
+            linkedBCFs = linkedBCFs.OrderBy(o => o.BCFName).ToList();
 
             InitializeComponent();
-            dataGridBCFs.DataContext = linkedBCFs;
+            if (!string.IsNullOrEmpty(bcfProjectId))
+            {
+                textBoxId.Text = bcfProjectId;
+                sharedLink = FileManager.GetSharedLinkAddress(bcfProjectId);
+            }
+            dataGridBCFs.ItemsSource = null;
+            dataGridBCFs.ItemsSource = linkedBCFs;
         }
 
         private void buttonImport_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ImportBCFWindow importWindow = new ImportBCFWindow();
+                if (!string.IsNullOrEmpty(textBoxId.Text))
+                {
+                    if (textBoxId.Text != bcfProjectId)
+                    {
+                        bcfProjectId = textBoxId.Text;
+                        sharedLink = FileManager.GetSharedLinkAddress(bcfProjectId);
+                        googleFolders = FileManager.CreateDefaultFolders(textBoxId.Text);
+                    }
+                }
+                ImportBCFWindow importWindow = new ImportBCFWindow(googleFolders);
                 if (importWindow.ShowDialog() == true)
                 {
+                    if (importWindow.RememberProjectId)
+                    {
+                        bcfProjectId = importWindow.BCFProjectId;
+                        bcfColorSchemeId = importWindow.BCFColorSchemeId;
+                        googleFolders = importWindow.GoogleFolders;
+                        if (!string.IsNullOrEmpty(bcfProjectId))
+                        {
+                            textBoxId.Text = bcfProjectId;
+                        }
+                    }
                     LinkedBcfFileInfo fileInfo = importWindow.BCFFileInfo;
+                    
+                    dataGridBCFs.ItemsSource = null;
                     linkedBCFs.Add(fileInfo);
-                    linkedBCFs.Sort();
+                    linkedBCFs = linkedBCFs.OrderBy(o => o.BCFName).ToList();
+                    dataGridBCFs.ItemsSource = linkedBCFs;
                     importWindow.Close();
                 }
             }
@@ -64,6 +106,42 @@ namespace HOK.SmartBCF.Walker
         {
             try
             {
+                bcfProjectId = textBoxId.Text;
+                sharedLink = FileManager.GetSharedLinkAddress(bcfProjectId);
+                if (!string.IsNullOrEmpty(bcfProjectId))
+                {
+                    if (null == googleFolders)
+                    {
+                        googleFolders = FileManager.CreateDefaultFolders(bcfProjectId);
+                    }
+
+                    if (null != googleFolders)
+                    {
+                        //add online BCF
+                        OnlineBCFWindow onlineBCFWindow = new OnlineBCFWindow(googleFolders);
+                        if (onlineBCFWindow.ShowDialog() == true)
+                        {
+                            List<OnlineBCFInfo> onlineBCFs = onlineBCFWindow.OnlineBCFs;
+
+                            foreach (OnlineBCFInfo info in onlineBCFs)
+                            {
+                                if (info.IsSelected)
+                                {
+                                    LinkedBcfFileInfo linkedBCF = new LinkedBcfFileInfo(info.SheetTitle, info.SpreadsheetId, sharedLink, bcfProjectId, googleFolders.RootTitle);
+                                    dataGridBCFs.ItemsSource = null;
+                                    linkedBCFs.Add(linkedBCF);
+                                    linkedBCFs = linkedBCFs.OrderBy(o => o.BCFName).ToList();
+                                    dataGridBCFs.ItemsSource = linkedBCFs;
+                                }
+                            }
+                            onlineBCFWindow.Close();
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a valid BCF project Id.", "Invalid BCF Project Id", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
             catch (Exception ex)
             {
@@ -77,11 +155,10 @@ namespace HOK.SmartBCF.Walker
             {
                 if (dataGridBCFs.SelectedItems.Count > 0)
                 {
-                    foreach (object selItem in dataGridBCFs.SelectedItems)
-                    {
-                        LinkedBcfFileInfo fileInfo = (LinkedBcfFileInfo)selItem;
-                        linkedBCFs.Remove(fileInfo);
-                    }
+                    int index = dataGridBCFs.SelectedIndex;
+                    dataGridBCFs.ItemsSource = null;
+                    linkedBCFs.RemoveAt(index);
+                    dataGridBCFs.ItemsSource = linkedBCFs;
                 }
             }
             catch (Exception ex)
@@ -99,18 +176,15 @@ namespace HOK.SmartBCF.Walker
         {
             try
             {
-                if (linkedBCFs.Count > 0)
+                bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
+                foreach (LinkedBcfFileInfo fileInfo in linkedBCFs)
                 {
-                    bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
-                    foreach (LinkedBcfFileInfo fileInfo in linkedBCFs)
+                    if (!bcfFileDictionary.ContainsKey(fileInfo.BCFFileId))
                     {
-                        if (!bcfFileDictionary.ContainsKey(fileInfo.BCFFileId))
-                        {
-                            bcfFileDictionary.Add(fileInfo.BCFFileId, fileInfo);
-                        }
+                        bcfFileDictionary.Add(fileInfo.BCFFileId, fileInfo);
                     }
-                    this.DialogResult = true;
                 }
+                this.DialogResult = true;
             }
             catch (Exception ex)
             {
@@ -118,9 +192,6 @@ namespace HOK.SmartBCF.Walker
             }
         }
 
-    
-
-     
     }
 
     public class LinkedBCF

@@ -10,7 +10,7 @@
             <RowDefinition Height="40"/>
             <RowDefinition Height="23"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="GroupBox" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
+        <GroupBox Header="BCF File Information" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
@@ -22,7 +22,7 @@
                 <Button x:Name="buttonBrowse" Content="Browse.." HorizontalAlignment="Right" Margin="0,17,10,0" VerticalAlignment="Top" Width="75" Click="buttonBrowse_Click"/>
                 <Label Content="Google Drive Folder: " HorizontalAlignment="Left" Margin="10,14,0,0" VerticalAlignment="Top" Grid.Row="1"/>
                 <TextBox x:Name="textBoxFolder" HorizontalAlignment="Left" Height="50" Margin="140,17,0,0" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Width="400"/>
-                <CheckBox x:Name="checkBoxRemember" Content="Remember Google Drive Path" HorizontalAlignment="Left" Margin="140,10,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+                <CheckBox x:Name="checkBoxRemember" Content="Remember Google Drive Path" HorizontalAlignment="Left" Margin="140,10,0,0" Grid.Row="2" VerticalAlignment="Top" IsChecked="True" Checked="checkBoxRemember_Checked" Unchecked="checkBoxRemember_Unchecked"/>
             </Grid>
         </GroupBox>
         <Button x:Name="buttonCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,15,10" Grid.Row="1" VerticalAlignment="Bottom" Width="75" Click="buttonCancel_Click"/>
@@ -33,13 +33,17 @@
                 <ItemsPanelTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="300"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="150"/>
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
             <StatusBarItem>
                 <TextBlock Text="Ready" Name="statusLable" Visibility="Visible" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="1">
+                <ProgressBar HorizontalAlignment="Stretch" x:Name="progressBar" Width="140" Visibility="Hidden" Height="16"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>

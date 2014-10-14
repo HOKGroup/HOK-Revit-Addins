@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,25 +35,47 @@ namespace HOK.SmartBCF.Walker
         private Dictionary<string/*fileId*/, LinkedBcfFileInfo> bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
         private Dictionary<string/*fileId*/, Dictionary<string, IssueEntry>> bcfDictionary = new Dictionary<string, Dictionary<string, IssueEntry>>();
         private List<ElementProperties> elementList = new List<ElementProperties>();
+        private List<CategoryInfo> categoryInfoList = new List<CategoryInfo>();
         private ColorSchemeInfo schemeInfo = new ColorSchemeInfo();
+        private FolderHolders googleFolders = null;
        
         private List<ColorDefinition> actionDefinitons = new List<ColorDefinition>();
         private List<ColorDefinition> responsibilityDefinitions = new List<ColorDefinition>();
         
         private int currentIndex = 0;
+        private LinkedBcfFileInfo selectedBCF = null;
+        private IssueEntry selectedIssue = null;
         private ElementProperties selElementProperties = null;
+        private string bcfProjectId = "";
+        private string bcfColorSchemeId = "";
+        private bool isHighlightOn = false;
+        private bool isIsolateOn = false;
+        private bool isSectionBoxOn = false;
+        private bool isFilterOn = false;
+        private bool freezeHandler = false;
+
+        private BitmapImage filterOnImage = null;
+        private BitmapImage filterOffImage = null;
 
         public WalkerHandler Handler { get { return m_handler; } set { m_handler = value; } }
         public Dictionary<string, LinkedBcfFileInfo> BCFFileDictionary { get { return bcfFileDictionary; } set { bcfFileDictionary = value; } }
         public Dictionary<string, Dictionary<string, IssueEntry>> BCFDictionary { get { return bcfDictionary; } set { bcfDictionary = value; } }
+        public List<CategoryInfo> CategoryInfoList { get { return categoryInfoList; } set { categoryInfoList = value; } }
         public ColorSchemeInfo SchemeInfo { get { return schemeInfo; } set { schemeInfo = value; } }
+        public FolderHolders GoogleFolders { get { return googleFolders; } set { googleFolders = value; } }
         public int CurrentIndex { get { return currentIndex; } set { currentIndex = value; } }
+        public string BCFProjectId { get { return bcfProjectId; } set { bcfProjectId = value; } }
+        public string BCFColorSchemeId { get { return bcfColorSchemeId; } set { bcfColorSchemeId = value; } }
+        
 
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll")]
         static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        private delegate void UpdateLableDelegate(System.Windows.DependencyProperty dp, Object value);
+        private delegate void UpdateProgressDelegate(System.Windows.DependencyProperty dp, Object value);
 
         public WalkerWindow(ExternalEvent exEvent, WalkerHandler handler)
         {
@@ -65,9 +90,18 @@ namespace HOK.SmartBCF.Walker
             this.Height = 535;
             labelStep.Content = "";
 
+            filterOnImage = LoadBitmapImage("filter.png");
+            filterOffImage = LoadBitmapImage("filter_empty.png");
+
+            buttonFilterImage.Source = filterOffImage;
+
             bcfFileDictionary = m_handler.BCFFileDictionary;
             bcfDictionary = m_handler.BCFDictionary;
+            categoryInfoList = m_handler.CategoryInfoList;
             schemeInfo = m_handler.SchemeInfo;
+            bcfProjectId = m_handler.BCFProjectId;
+            bcfColorSchemeId = m_handler.BCFColorSchemeId;
+            googleFolders = m_handler.GoogleFolders;
 
             if (bcfDictionary.Count > 0)
             {
@@ -79,6 +113,26 @@ namespace HOK.SmartBCF.Walker
             {
                 //MessageBox.Show("Elements cannot be found in the active Revit document.\n", "Elements Not Found", MessageBoxButton.OK, MessageBoxImage.Information);
             }
+        }
+
+        private BitmapImage LoadBitmapImage(string imageName)
+        {
+            BitmapImage image = new BitmapImage();
+            try
+            {
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                string prefix = typeof(AppCommand).Namespace + ".Resources.";
+                Stream stream = assembly.GetManifestResourceStream(prefix + imageName);
+
+                image.BeginInit();
+                image.StreamSource = stream;
+                image.EndInit();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to load check box button image.\n" + ex.Message, "Load Bitmap Image", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return image;
         }
 
         private void SetFocus()
@@ -112,8 +166,8 @@ namespace HOK.SmartBCF.Walker
         {
             try
             {
-
                 InitializeUIComponents();
+                comboBoxBCF.ItemsSource = null;
                 List<LinkedBcfFileInfo> bcfFileInfoList = bcfFileDictionary.Values.ToList();
                 bcfFileInfoList = bcfFileInfoList.OrderBy(o => o.BCFName).ToList();
                 comboBoxBCF.ItemsSource = bcfFileInfoList;
@@ -130,10 +184,52 @@ namespace HOK.SmartBCF.Walker
         {
             try
             {
-                ElementProperties ep = elementList[index];
-                selElementProperties = ep;
-                textBoxRevit.Text = ep.ElementName;
+                if (elementList.Count > 0)
+                {
+                    ElementProperties ep = elementList[index];
+                    selElementProperties = ep;
+                    m_handler.CurrentElement = selElementProperties;
 
+                    if (!string.IsNullOrEmpty(ep.ElementName))
+                    {
+                        textBoxRevit.Text = ep.ElementName;
+                    }
+                    else
+                    {
+                        textBoxRevit.Text = "Element Not Found - " + ep.ElementId.ToString();
+                    }
+
+                    freezeHandler = true;
+                    if (comboBoxAction.HasItems)
+                    {
+                        for (int i = 0; i < comboBoxAction.Items.Count; i++)
+                        {
+                            ColorDefinition definition = (ColorDefinition)comboBoxAction.Items[i];
+                            if (definition.ParameterValue == selElementProperties.Action)
+                            {
+                                comboBoxAction.SelectedIndex = i; break;
+                            }
+                        }
+                    }
+
+                    if (comboBoxResponsible.HasItems)
+                    {
+                        for (int i = 0; i < comboBoxResponsible.Items.Count; i++)
+                        {
+                            ColorDefinition definition = (ColorDefinition)comboBoxResponsible.Items[i];
+                            if (definition.ParameterValue == selElementProperties.ResponsibleParty)
+                            {
+                                comboBoxResponsible.SelectedIndex = i; break;
+                            }
+                        }
+                    }
+                    freezeHandler = false;
+                }
+                else if (elementList.Count == 0)
+                {
+                    textBoxRevit.Text = "";
+                }
+                
             }
             catch (Exception ex)
             {
@@ -141,39 +237,96 @@ namespace HOK.SmartBCF.Walker
             }
         }
 
+        private void UpdateElementParameters()
+        {
+            if (null != selElementProperties)
+            {
+                m_handler.CurrentElement = selElementProperties;
+                m_handler.SelectedIssue = (IssueEntry)comboBoxIssue.SelectedItem;
+                if (null != dataGridComments.SelectedItem)
+                {
+                    m_handler.SelectedComment = (Comment)dataGridComments.SelectedItem;
+                }
+                m_handler.Request.Make(RequestId.UpdateBCFParameterInfo);
+                m_event.Raise();
+                SetFocus();
+            }
+        }
+
+        private void UpdateViews()
+        {
+            if (null != selElementProperties)
+            {
+                m_handler.CurrentElement = selElementProperties;
+                m_handler.IsHighlightOn = isHighlightOn;
+                m_handler.IsIsolateOn = isIsolateOn;
+                m_handler.IsSectionBoxOn = isSectionBoxOn;
+                m_handler.Request.Make(RequestId.UpdateViews);
+                m_event.Raise();
+                SetFocus();
+            }
+        }
+
         public void DisplayColorscheme(ColorSchemeInfo info)
         {
             try
             {
-                foreach (ColorScheme scheme in info.ColorSchemes)
+                if (info.ColorSchemes.Count > 0)
                 {
-                    if (scheme.SchemeName == "BCF Action")
+                    comboBoxAction.ItemsSource = null;
+                    comboBoxResponsible.ItemsSource = null;
+
+                    actionDefinitons = new List<ColorDefinition>();
+                    responsibilityDefinitions = new List<ColorDefinition>();
+
+                    foreach (ColorScheme scheme in info.ColorSchemes)
                     {
-                        foreach (ColorDefinition definition in scheme.ColorDefinitions)
+                        if (scheme.SchemeName == "BCF Action")
                         {
-                            actionDefinitons.Add(definition);
+                            foreach (ColorDefinition definition in scheme.ColorDefinitions)
+                            {
+                                actionDefinitons.Add(definition);
+                            }
+                        }
+                        else if (scheme.SchemeName == "BCF Responsibility")
+                        {
+                            foreach (ColorDefinition definition in scheme.ColorDefinitions)
+                            {
+                                responsibilityDefinitions.Add(definition);
+                            }
                         }
                     }
-                    else if (scheme.SchemeName == "BCF Responsibility")
+
+                    actionDefinitons = actionDefinitons.OrderBy(o => o.ParameterValue).ToList();
+                    responsibilityDefinitions = responsibilityDefinitions.OrderBy(o => o.ParameterValue).ToList();
+
+                    comboBoxAction.ItemsSource = actionDefinitons;
+                    comboBoxResponsible.ItemsSource = responsibilityDefinitions;
+
+                    freezeHandler = true;
+                    if (null != selElementProperties)
                     {
-                        foreach (ColorDefinition definition in scheme.ColorDefinitions)
+                        for (int i = 0; i < comboBoxAction.Items.Count; i++)
                         {
-                            responsibilityDefinitions.Add(definition);
+                            ColorDefinition definition = (ColorDefinition)comboBoxAction.Items[i];
+                            if (definition.ParameterValue == selElementProperties.Action)
+                            {
+                                comboBoxAction.SelectedIndex = i; break;
+                            }
+                        }
+                        for (int i = 0; i < comboBoxResponsible.Items.Count; i++)
+                        {
+                            ColorDefinition definition = (ColorDefinition)comboBoxResponsible.Items[i];
+                            if (definition.ParameterValue == selElementProperties.ResponsibleParty)
+                            {
+                                comboBoxResponsible.SelectedIndex = i; break;
+                            }
                         }
                     }
+
+                    freezeHandler = false;
                 }
-
-                actionDefinitons = actionDefinitons.OrderBy(o => o.ParameterValue).ToList();
-                responsibilityDefinitions = responsibilityDefinitions.OrderBy(o => o.ParameterValue).ToList();
-
-                comboBoxAction.ItemsSource = null;
-                comboBoxResponsible.ItemsSource = null;
-
-                comboBoxAction.ItemsSource = actionDefinitons;
-                comboBoxResponsible.ItemsSource = responsibilityDefinitions;
-
-                comboBoxAction.SelectedIndex = 0;
-                comboBoxResponsible.SelectedIndex = 0;
+                
             }
             catch (Exception ex)
             {
@@ -183,7 +336,35 @@ namespace HOK.SmartBCF.Walker
 
         private void UpdateIndex()
         {
-            labelStep.Content = (currentIndex + 1).ToString() + " / " + elementList.Count.ToString();
+            if (elementList.Count > 0)
+            {
+                labelStep.Content = (currentIndex + 1).ToString() + " / " + elementList.Count.ToString();
+            }
+            else
+            {
+                labelStep.Content = "0 / 0";
+            }
+        }
+
+        private List<ElementProperties> ApplyCategoryFilter(List<ElementProperties> elements)
+        {
+            List<ElementProperties> filteredList = new List<ElementProperties>();
+            try
+            {
+                var catNames = from category in categoryInfoList where category.IsSelected select category.CategoryName;
+                foreach (ElementProperties ep in elements)
+                {
+                    if (catNames.Contains(ep.CategoryName))
+                    {
+                        filteredList.Add(ep);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to apply category filters.\n"+ex.Message, "Apply Category Filters", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return filteredList;
         }
 
         #region UI Component events
@@ -211,31 +392,7 @@ namespace HOK.SmartBCF.Walker
             this.MinHeight = 900;
             this.Height = 900;
         }
-
-        private void buttonManage_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                BCFWindow bcfWindow = new BCFWindow(bcfFileDictionary);
-                if (bcfWindow.ShowDialog() == true)
-                {
-                    bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
-                    bcfFileDictionary = bcfWindow.BCFFileDictionary;
-                    bcfWindow.Close();
-
-                    m_handler.BCFFileDictionary = bcfFileDictionary;
-                    m_handler.Request.Make(RequestId.UpdateLinkedFileInfo);
-                    m_event.Raise();
-                    SetFocus();
-                   
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to open BCF window.\n"+ex.Message, "Open Manage BCF", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
+        
         private void InitializeUIComponents()
         {
             currentIndex = 0;
@@ -250,11 +407,6 @@ namespace HOK.SmartBCF.Walker
             checkBoxSection.IsChecked = false;
         }
 
-        private void buttonClose_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
         private void comboBoxBCF_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
@@ -263,6 +415,7 @@ namespace HOK.SmartBCF.Walker
                 if (null != comboBoxBCF.SelectedItem)
                 {
                     LinkedBcfFileInfo fileInfo = (LinkedBcfFileInfo)comboBoxBCF.SelectedItem;
+                    selectedBCF = fileInfo;
                     if(bcfDictionary.ContainsKey(fileInfo.BCFFileId))
                     {
                         Dictionary<string, IssueEntry> dictionary = bcfDictionary[fileInfo.BCFFileId];
@@ -286,34 +439,162 @@ namespace HOK.SmartBCF.Walker
             {
                 if (null != comboBoxIssue.SelectedItem)
                 {
-                    IssueEntry selectedIssue = comboBoxIssue.SelectedItem as IssueEntry;
+                    IssueEntry issueEntry = comboBoxIssue.SelectedItem as IssueEntry;
+                    string issueId = issueEntry.IssueId;
+                    if (null != selectedBCF)
+                    {
+                        selectedIssue = bcfDictionary[selectedBCF.BCFFileId][issueId];
+                        imageIssue.Source = selectedIssue.Snapshot;
+                        labelIssueTopic.Content = selectedIssue.IssueTopic;
+
+                        List<Comment> comments = selectedIssue.CommentDictionary.Values.ToList();
+                        comments = comments.OrderBy(o => o.Comment1).ToList();
+                        
+                        dataGridComments.ItemsSource = null;
+                        dataGridComments.ItemsSource = comments;
+                        if (comments.Count > 0)
+                        {
+                            dataGridComments.SelectedIndex = 0;
+                        }
+                    }
+
                     elementList = selectedIssue.ElementDictionary.Values.ToList();
+                    if (isFilterOn)
+                    {
+                        elementList = ApplyCategoryFilter(elementList);
+                    }
+                   
                     currentIndex = 0;
+                    UpdateElementParameters();
+                    selElementProperties = null;
                     UpdateIndex();
                     DisplayElement(currentIndex);
+                    UpdateViews();
 
-                    for (int i = 0; i < comboBoxAction.Items.Count; i++)
-                    {
-                        ColorDefinition definition = (ColorDefinition)comboBoxAction.Items[i];
-                        if (definition.ParameterValue == selectedIssue.Action)
-                        {
-                            comboBoxAction.SelectedIndex = i;
-                        }
-                    }
-
-                    for (int i = 0; i < comboBoxResponsible.Items.Count; i++)
-                    {
-                        ColorDefinition definition = (ColorDefinition)comboBoxResponsible.Items[i];
-                        if (definition.ParameterValue == selectedIssue.Responsible)
-                        {
-                            comboBoxResponsible.SelectedIndex = i;
-                        }
-                    }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to trigger the evnet of selection changed for Issue.\n"+ex.Message, "comboBoxIssue SelectionChanged", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void comboBoxAction_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (null != comboBoxAction.SelectedItem && freezeHandler==false)
+                {
+                    ColorDefinition selectedAction = (ColorDefinition)comboBoxAction.SelectedItem;
+
+                    if (null!=selectedBCF && null!=selectedIssue && null!=selElementProperties)
+                    {
+                        selElementProperties.Action = selectedAction.ParameterValue;
+
+                        if (bcfDictionary.ContainsKey(selectedBCF.BCFFileId))
+                        {
+                            if (bcfDictionary[selectedBCF.BCFFileId].ContainsKey(selectedIssue.IssueId))
+                            {
+                                if (bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.ContainsKey(selElementProperties.ElementId))
+                                {
+                                    bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.Remove(selElementProperties.ElementId);
+                                    bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.Add(selElementProperties.ElementId, selElementProperties);
+                                }
+                            }
+                        }
+
+                        bool updatedSheet = BCFParser.UpdateElementProperties(selElementProperties, BCFParameters.BCF_Action, selectedBCF.BCFFileId);
+
+                        m_handler.CurrentElement = selElementProperties;
+                        m_handler.Request.Make(RequestId.UpdateAction);
+                        m_event.Raise();
+                        SetFocus();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to set action item.\n" + ex.Message, "Set Action Items", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void comboBoxResponsible_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (null != comboBoxResponsible.SelectedItem && freezeHandler==false)
+                {
+                    ColorDefinition selectedResponsible = (ColorDefinition)comboBoxResponsible.SelectedItem;
+
+                    if (null != selectedBCF && null != selectedIssue && null != selElementProperties)
+                    {
+                        selElementProperties.ResponsibleParty = selectedResponsible.ParameterValue;
+
+                        if (bcfDictionary.ContainsKey(selectedBCF.BCFFileId))
+                        {
+                            if (bcfDictionary[selectedBCF.BCFFileId].ContainsKey(selectedIssue.IssueId))
+                            {
+                                if (bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.ContainsKey(selElementProperties.ElementId))
+                                {
+                                    bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.Remove(selElementProperties.ElementId);
+                                    bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.Add(selElementProperties.ElementId, selElementProperties);
+                                }
+                            }
+                        }
+
+                        bool updatedSheet = BCFParser.UpdateElementProperties(selElementProperties, BCFParameters.BCF_Responsibility, selectedBCF.BCFFileId);
+
+                        m_handler.CurrentElement = selElementProperties;
+                        m_handler.Request.Make(RequestId.UpdateResponsibility);
+                        m_event.Raise();
+                        SetFocus();
+                    }
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to set responsibility itme.\n" + ex.Message, "Set Responsibility Items", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void buttonManage_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                UpdateLableDelegate updateLabelDelegate = new UpdateLableDelegate(statusLable.SetValue);
+                UpdateProgressDelegate updateProgressDelegate = new UpdateProgressDelegate(progressBar.SetValue);
+
+                BCFWindow bcfWindow = new BCFWindow(bcfFileDictionary, googleFolders);
+                if (bcfWindow.ShowDialog() == true)
+                {
+                    Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Loading BCF Information..." });
+                    
+                    if (bcfWindow.BCFFileDictionary.Count > 0)
+                    {
+                        bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
+                        bcfFileDictionary = bcfWindow.BCFFileDictionary;
+                        bcfProjectId = bcfWindow.BCFProjectId;
+                        googleFolders = bcfWindow.GoogleFolders;
+                        bcfColorSchemeId = googleFolders.ColorSheet.Id;
+                        bcfWindow.Close();
+
+                        m_handler.BCFFileDictionary = bcfFileDictionary;
+                        m_handler.BCFProjectId = bcfProjectId;
+                        m_handler.BCFColorSchemeId = bcfColorSchemeId;
+                        m_handler.GoogleFolders = googleFolders;
+                        m_handler.Request.Make(RequestId.UpdateLinkedFileInfo);
+                        m_event.Raise();
+                        SetFocus();
+                    }
+                    
+                    
+                    Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Ready" });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to open BCF window.\n" + ex.Message, "Open Manage BCF", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -324,8 +605,10 @@ namespace HOK.SmartBCF.Walker
                 if (currentIndex < elementList.Count - 1)
                 {
                     currentIndex++;
+                    UpdateElementParameters();
                     UpdateIndex();
                     DisplayElement(currentIndex);
+                    UpdateViews();
                 }
             }
             catch (Exception ex)
@@ -341,8 +624,10 @@ namespace HOK.SmartBCF.Walker
                 if (currentIndex > 0)
                 {
                     currentIndex--;
+                    UpdateElementParameters();
                     UpdateIndex();
                     DisplayElement(currentIndex);
+                    UpdateViews();
                 }
             }
             catch (Exception ex)
@@ -350,117 +635,159 @@ namespace HOK.SmartBCF.Walker
                 MessageBox.Show("Failed to iterate elements backward.\n" + ex.Message, "Backward Button Clicked", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-        #endregion
 
-        #region CheckBox Changed
-        private void checkBoxHighlight_Checked(object sender, RoutedEventArgs e)
+        private void buttonSettings_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (null != selElementProperties)
+                StatusWindow statusWindow = new StatusWindow(schemeInfo, bcfColorSchemeId);
+                if (statusWindow.ShowDialog() == true)
                 {
-                    m_handler.CurrentElement = selElementProperties;
-                    m_handler.Request.Make(RequestId.HighlightElement);
-                    m_event.Raise();
-                    SetFocus();
+                    schemeInfo = statusWindow.SchemeInfo;
+                    actionDefinitons = statusWindow.ActionDefinitions;
+                    responsibilityDefinitions = statusWindow.ResponsibleDefinitions;
+                    statusWindow.Close();
+
+                    comboBoxAction.ItemsSource = null;
+                    comboBoxResponsible.ItemsSource = null;
+
+                    comboBoxAction.ItemsSource = actionDefinitons;
+                    comboBoxResponsible.ItemsSource = responsibilityDefinitions;
+
+                    freezeHandler = true;
+                    if (null != selElementProperties)
+                    {
+                        for (int i = 0; i < comboBoxAction.Items.Count; i++)
+                        {
+                            ColorDefinition definition = (ColorDefinition)comboBoxAction.Items[i];
+                            if (definition.ParameterValue == selElementProperties.Action)
+                            {
+                                comboBoxAction.SelectedIndex = i;
+                            }
+                        }
+
+                        for (int i = 0; i < comboBoxResponsible.Items.Count; i++)
+                        {
+                            ColorDefinition definition = (ColorDefinition)comboBoxResponsible.Items[i];
+                            if (definition.ParameterValue == selElementProperties.ResponsibleParty)
+                            {
+                                comboBoxResponsible.SelectedIndex = i;
+                            }
+                        }
+                    }
+                    freezeHandler = false;
                 }
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to highlight elements.\n"+ex.Message, "Highlight Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to set color schemes.\n"+ex.Message, "Color Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private void buttonClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+        #endregion
+
+        #region CheckBox Changed
+       
+        private void checkBoxHighlight_Checked(object sender, RoutedEventArgs e)
+        {
+            isHighlightOn = true;
+            UpdateViews();
         }
 
         private void checkBoxHighlight_Unchecked(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (null != selElementProperties)
-                {
-                    m_handler.CurrentElement = selElementProperties;
-                    m_handler.Request.Make(RequestId.CancelHighlight);
-                    m_event.Raise();
-                    SetFocus();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to cancel to highlight elements.\n"+ex.Message, "Cancel Highlight Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            isHighlightOn = false;
+            UpdateViews();
         }
 
         private void checkBoxIsolate_Checked(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (null != selElementProperties)
-                {
-                    m_handler.CurrentElement = selElementProperties;
-                    m_handler.Request.Make(RequestId.IsolateElement);
-                    m_event.Raise();
-                    SetFocus();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to isolate elements.\n"+ex.Message, "Isolate Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            isIsolateOn = true;
+            UpdateViews();
         }
 
         private void checkBoxIsolate_Unchecked(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (null != selElementProperties)
-                {
-                    m_handler.CurrentElement = selElementProperties;
-                    m_handler.Request.Make(RequestId.CancelIsolate);
-                    m_event.Raise();
-                    SetFocus();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to cancel to isolate elements.\n"+ex.Message, "Cancel Isolate Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            isIsolateOn = false;
+            UpdateViews();
         }
 
         private void checkBoxSection_Checked(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (null != selElementProperties)
-                {
-                    m_handler.CurrentElement = selElementProperties;
-                    m_handler.Request.Make(RequestId.CreateSectionBox);
-                    m_event.Raise();
-                    SetFocus();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to create section box.\n"+ex.Message, "Create Section Box", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            isSectionBoxOn = true;
+            UpdateViews();
         }
 
         private void checkBoxSection_Unchecked(object sender, RoutedEventArgs e)
         {
+            isSectionBoxOn = false;
+            UpdateViews();
+        }
+
+        #endregion
+
+        private void buttonSelected_Click(object sender, RoutedEventArgs e)
+        {
+            if (null != dataGridComments.SelectedItem)
+            {
+                Comment selectedComment = (Comment)dataGridComments.SelectedItem;
+
+                m_handler.SelectedComment = selectedComment;
+                m_handler.SelectedIssue = selectedIssue;
+                m_handler.Request.Make(RequestId.UpdateParameterByComment);
+                m_event.Raise();
+                SetFocus();
+            }
+        }
+
+        private void buttonFilter_Click(object sender, RoutedEventArgs e)
+        {
             try
             {
-                if (null != selElementProperties)
+                FilterWindow filterWindow = new FilterWindow(categoryInfoList);
+                if (filterWindow.ShowDialog() == true)
                 {
-                    m_handler.CurrentElement = selElementProperties;
-                    m_handler.Request.Make(RequestId.CancelSectionBox);
-                    m_event.Raise();
-                    SetFocus();
+                    categoryInfoList = filterWindow.CategoryInfoList;
+                    var categoryUnselected = from category in categoryInfoList where category.IsSelected == false select category;
+                    if (null != selectedIssue)
+                    {
+                        elementList = selectedIssue.ElementDictionary.Values.ToList();
+                        if (categoryUnselected.Count() > 0)
+                        {
+                            elementList = ApplyCategoryFilter(elementList);
+                            isFilterOn = true;
+                            buttonFilterImage.Source = filterOnImage;
+                        }
+                        else if (categoryUnselected.Count() == 0)
+                        {
+                            isFilterOn = false;
+                            buttonFilterImage.Source = filterOffImage;
+                        }
+
+                        currentIndex = 0;
+                        UpdateElementParameters();
+                        selElementProperties = null;
+                        UpdateIndex();
+                        DisplayElement(currentIndex);
+                        UpdateViews();
+                    }
                 }
+                else
+                {
+                    categoryInfoList = filterWindow.CategoryInfoList;
+                }
+               
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to cancel to create section box.\n"+ex.Message, "Cancel Create Section Box", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to enable filter.\n"+ex.Message, "Filter On/Off", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-        #endregion
 
     }
 

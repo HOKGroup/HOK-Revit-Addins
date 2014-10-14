@@ -16,6 +16,7 @@ using Google.Apis.Services;
 using Google.Apis.Upload;
 using Google.GData.Spreadsheets;
 using HOK.SmartBCF.Utils;
+using HOK.SmartBCF.Walker;
 
 
 
@@ -56,6 +57,33 @@ namespace HOK.SmartBCF.GoogleUtils
             return driveService;
         }
 
+        public static bool RootFolderExist(string rootFolderId, out File rootFolder)
+        {
+            bool exist = false;
+            rootFolder = null;
+            try
+            {
+                if (null == service)
+                {
+                    service = GetUserCredential();
+                }
+
+                if (null != service)
+                {
+                    rootFolder = service.Files.Get(rootFolderId).Execute();
+                    if (null != rootFolder)
+                    {
+                        exist = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Google Folder cannot be found by Id.\n"+ex.Message, "Google Folder Not Found", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return exist;
+        }
+
         public static FolderHolders CreateDefaultFolders(string rootFolderId)
         {
             FolderHolders holder = new FolderHolders(rootFolderId);
@@ -66,55 +94,75 @@ namespace HOK.SmartBCF.GoogleUtils
                     service = GetUserCredential();
                 }
 
-                if (null != service)
+                if (null != service )
                 {
-                    File activeFolder = FindSubFolder("Active", rootFolderId);
-                    if (null == activeFolder)
+                    File rootFolder = null;
+                    if(RootFolderExist(rootFolderId, out rootFolder))
                     {
-                        activeFolder = CreateSubFolder(rootFolderId, "Active", "Interactive BCF Data will be stored in this folder.");
-                    }
-                    if (null != activeFolder)
-                    {
-                        File bcfFolder = FindSubFolder("BCF_Files", activeFolder.Id);
-                        if (null == bcfFolder)
+                        holder.RootFolder = rootFolder;
+                        holder.RootTitle = rootFolder.Title;
+
+                        File colorSheet = FindSubFolder("Color Schemes", rootFolderId);
+                        if (null == colorSheet)
                         {
-                            bcfFolder = CreateSubFolder(activeFolder.Id, "BCF_Files", "Parsed BCF Data will be stored as Google Spreadsheet.");
+                            colorSheet = CreateColorSheet(rootFolderId);
+                            if (null != colorSheet)
+                            {
+                                ColorSchemeInfo colorSchemeInfo = BCFParser.CreateDefaultSchemeInfo();
+                                bool updatedColors = BCFParser.WriteColorSheet(colorSchemeInfo, colorSheet.Id);
+                            }
+                        }
+                        holder.ColorSheet = colorSheet;
+
+                        File activeFolder = FindSubFolder("Active", rootFolderId);
+                        if (null == activeFolder)
+                        {
+                            activeFolder = CreateSubFolder(rootFolderId, "Active", "Interactive BCF Data will be stored in this folder.");
+                        }
+                        if (null != activeFolder)
+                        {
+                            File bcfFolder = FindSubFolder("BCF_Files", activeFolder.Id);
+                            if (null == bcfFolder)
+                            {
+                                bcfFolder = CreateSubFolder(activeFolder.Id, "BCF_Files", "Parsed BCF Data will be stored as Google Spreadsheet.");
+                            }
+
+                            File imgFolder = FindSubFolder("BCF_Images", activeFolder.Id);
+                            if (null == imgFolder)
+                            {
+                                imgFolder = CreateSubFolder(activeFolder.Id, "BCF_Images", "Screen captured images of each issue will be stored in this folder.");
+                            }
+
+                            holder.ActiveFolder = activeFolder;
+                            holder.ActiveBCFFolder = bcfFolder;
+                            holder.ActiveImgFolder = imgFolder;
                         }
 
-                        File imgFolder = FindSubFolder("BCF_Images", activeFolder.Id);
-                        if (null == imgFolder)
+                        File archiveFolder = FindSubFolder("Archive", rootFolderId);
+                        if (null == archiveFolder)
                         {
-                            imgFolder = CreateSubFolder(activeFolder.Id, "BCF_Images", "Screen captured images of each issue will be stored in this folder.");
+                            archiveFolder = CreateSubFolder(rootFolderId, "Archive", "Archived .bcfzip files will be stored in this folder.");
                         }
-
-                        holder.ActiveFolder = activeFolder;
-                        holder.ActiveBCFFolder = bcfFolder;
-                        holder.ActiveImgFolder = imgFolder;
-                    }
-
-                    File archiveFolder = FindSubFolder("Archive", rootFolderId);
-                    if (null == archiveFolder)
-                    {
-                        archiveFolder = CreateSubFolder(rootFolderId, "Archive", "Archived .bcfzip files will be stored in this folder.");
-                    }
-                    if (null != archiveFolder)
-                    {
-                        File bcfFolder = FindSubFolder("BCF_Files", archiveFolder.Id);
-                        if (null == bcfFolder)
+                        if (null != archiveFolder)
                         {
-                            bcfFolder = CreateSubFolder(archiveFolder.Id, "BCF_Files", "Parsed BCF Data will be stored as Google Spreadsheet.");
-                        }
+                            File bcfFolder = FindSubFolder("BCF_Files", archiveFolder.Id);
+                            if (null == bcfFolder)
+                            {
+                                bcfFolder = CreateSubFolder(archiveFolder.Id, "BCF_Files", "Parsed BCF Data will be stored as Google Spreadsheet.");
+                            }
 
-                        File imgFolder = FindSubFolder("BCF_Images", archiveFolder.Id);
-                        if (null == imgFolder)
-                        {
-                            imgFolder = CreateSubFolder(archiveFolder.Id, "BCF_Images", "Screen captured images of each issue will be stored in this folder.");
-                        }
+                            File imgFolder = FindSubFolder("BCF_Images", archiveFolder.Id);
+                            if (null == imgFolder)
+                            {
+                                imgFolder = CreateSubFolder(archiveFolder.Id, "BCF_Images", "Screen captured images of each issue will be stored in this folder.");
+                            }
 
-                        holder.ArchiveFolder = archiveFolder;
-                        holder.ArchiveBCFFolder = bcfFolder;
-                        holder.ArchiveImgFolder = imgFolder;
+                            holder.ArchiveFolder = archiveFolder;
+                            holder.ArchiveBCFFolder = bcfFolder;
+                            holder.ArchiveImgFolder = imgFolder;
+                        }
                     }
+                    
                 }
 
             }
@@ -151,13 +199,13 @@ namespace HOK.SmartBCF.GoogleUtils
             File subFolder = null;
             try
             {
-                FilesResource.ListRequest request = service.Files.List();
-                request.Q = "title contains \'"+folderTitle+"\' and \'"+parentId+"\' in parents";
-                FileList files = request.Execute();
-
-                if (files.Items.Count > 0)
+                ChildrenResource.ListRequest request = service.Children.List(parentId);
+                request.Q = "title contains \'" + folderTitle + "\'";
+                ChildList childList = request.Execute();
+                if (childList.Items.Count > 0)
                 {
-                    subFolder = files.Items.First();
+                    string fileId = childList.Items.First().Id;
+                    subFolder = service.Files.Get(fileId).Execute();
                 }
             }
             catch (Exception ex)
@@ -277,6 +325,36 @@ namespace HOK.SmartBCF.GoogleUtils
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to create a spreadsheet from BCF.\n"+ex.Message, "Create Spreadsheet", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return spreadsheet;
+        }
+
+        public static File CreateColorSheet(string parentId)
+        {
+            File spreadsheet = null;
+            try
+            {
+                if (null == service)
+                {
+                    service = GetUserCredential();
+                }
+
+                if (null != service)
+                {
+                    File body = new File();
+                    body.Title = "Color Schemes";
+                    body.Description = "List of color coded status.";
+                    body.Parents = new List<ParentReference>() { new ParentReference() { Id = parentId } };
+                    body.MimeType = "application/vnd.google-apps.spreadsheet";
+
+                    FilesResource.InsertRequest request = service.Files.Insert(body);
+                    spreadsheet = request.Execute();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create a common color schemes spreadsheet.\n" + ex.Message, "Create Color Schemes Spreadsheet", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return spreadsheet;
         }
@@ -439,11 +517,324 @@ namespace HOK.SmartBCF.GoogleUtils
                     }
                     updatedFile = service.Files.Update(file, file.Id).Execute();
                 }
-                
-                
             }
             catch (Exception ex) { string message = ex.Message; }
             return updatedFile;
+        }
+
+        public static BitmapImage DownloadImage(string issueId, string parentId)
+        {
+            BitmapImage bitmap = new BitmapImage();
+            try
+            {
+                if (null == service)
+                {
+                    service = GetUserCredential();
+                }
+
+                if (null != service)
+                {
+                    File imgFile = null;
+                    try
+                    {
+                        FilesResource.ListRequest request = service.Files.List();
+                        request.Q = "title contains \'" + issueId + "\' and \'" + parentId + "\' in parents";
+                        FileList files = request.Execute();
+
+                        if (files.Items.Count > 0)
+                        {
+                            imgFile = files.Items.First();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        string message = ex.Message;
+                    }
+                    
+                    if (null != imgFile)
+                    {
+                        if (!string.IsNullOrEmpty(imgFile.DownloadUrl))
+                        {
+                            try
+                            {
+                                bitmap.BeginInit();
+                                System.IO.Stream stream = service.HttpClient.GetStreamAsync(imgFile.DownloadUrl).Result;
+                                bitmap.StreamSource = stream;
+                                bitmap.EndInit();
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show("Failed to download image from Google Drive.\nIssue Id: " + issueId + "\n" + ex.Message, "Download Image", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to download image from Google Drive.\nIssue Id: " + issueId + "\n" + ex.Message, "Download Image", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return bitmap;
+        }
+
+        public static List<OnlineBCFInfo> GetOnlineBCFs(FolderHolders folders)
+        {
+            List<OnlineBCFInfo> onlineBCFs = new List<OnlineBCFInfo>();
+            try
+            {
+                FilesResource.ListRequest request = service.Files.List();
+                request.Q = "mimeType=\'application/vnd.google-apps.spreadsheet\' and \'" + folders.ActiveBCFFolder.Id + "\' in parents";
+                FileList files = request.Execute();
+
+                if (files.Items.Count > 0)
+                {
+                    foreach (File file in files.Items)
+                    {
+                        OnlineBCFInfo info = new OnlineBCFInfo(folders.RootId, file);
+                        info.ImageFiles = FindImageFiles(file.Id, folders.ActiveImgFolder.Id);
+                        info.ArchiveFile = FindArchiveZipFile(file.Id, folders.ArchiveBCFFolder.Id);
+                        onlineBCFs.Add(info);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get online BCFs.\n"+ex.Message, "Get Online BCFs", MessageBoxButton.OK, MessageBoxImage.Warning);
+            } 
+            return onlineBCFs;
+        }
+
+        public static List<File> FindImageFiles(string sheetId, string parentId)
+        {
+            List<File> imageFiles = new List<File>();
+            try
+            {
+                FilesResource.ListRequest request = service.Files.List();
+                request.Q = "mimeType=\'image/png\' and \'" + parentId + "\' in parents and properties has {key=\'SheetId\' and value=\'" + sheetId + "\' and visibility=\'PUBLIC\'}";
+                FileList files = request.Execute();
+                if (files.Items.Count > 0)
+                {
+                    imageFiles = files.Items.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to find image files.\n"+ex.Message, "Find Image Files", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return imageFiles;
+        }
+
+        public static File FindArchiveZipFile(string sheetId, string parentId)
+        {
+            File archiveZip = null;
+            try
+            {
+                FilesResource.ListRequest request = service.Files.List();
+                request.Q = "\'" + parentId + "\' in parents and properties has {key=\'SheetId\' and value=\'" + sheetId + "\' and visibility=\'PUBLIC\'}";
+                FileList files = request.Execute();
+                if (files.Items.Count > 0)
+                {
+                    archiveZip = files.Items.First();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to find archive bcfzip.\n"+ex.Message, "Find Archive Zip", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return archiveZip;
+        }
+
+        public static OnlineBCFInfo UploadOnlineBCF(FolderHolders folders, OnlineBCFInfo onlineBCF)
+        {
+            OnlineBCFInfo copiedBCFInfo = null;
+            try
+            {
+                if (null == service)
+                {
+                    service = GetUserCredential();
+                }
+                if (null != service)
+                {
+                    if (null != folders.ActiveBCFFolder)
+                    {
+                        //copy spreadsheet
+                        File body = new File();
+                        body.Title = onlineBCF.SheetTitle;
+                        body.Description = "Parsed BCF";
+                        body.Parents = new List<ParentReference>() { new ParentReference() { Id = folders.ActiveBCFFolder.Id } };
+                        body.MimeType = "application/vnd.google-apps.spreadsheet";
+                        body.Properties = onlineBCF.SpreadsheetFile.Properties;
+                        File copiedFile = service.Files.Copy(body, onlineBCF.SpreadsheetId).Execute();
+                        if (null != copiedFile)
+                        {
+                            copiedBCFInfo = new OnlineBCFInfo(folders.RootId, copiedFile);
+                        }
+                    }
+
+                    if (null != folders.ArchiveBCFFolder)
+                    {
+                        //upload bcfzip
+                        File body = new File();
+                        body.Title = onlineBCF.ArchiveFile.Title;
+                        body.Description = "Archived BCF";
+                        body.Parents = new List<ParentReference>() { new ParentReference() { Id = folders.ArchiveBCFFolder.Id } };
+                        body.Properties = onlineBCF.ArchiveFile.Properties;
+                        File copiedZip = service.Files.Copy(body, onlineBCF.ArchiveFile.Id).Execute();
+                        if (null != copiedZip && null != copiedBCFInfo)
+                        {
+                            copiedBCFInfo.ArchiveFile = copiedZip;
+                        }
+                    }
+
+                    if (null != folders.ActiveImgFolder)
+                    {
+                        List<File> copiedFiles=new List<File>();
+                        foreach (File imgFile in onlineBCF.ImageFiles)
+                        {
+                            File body = new File();
+                            body.Title = imgFile.Title;
+                            body.Description = imgFile.Description;
+                            body.Parents = new List<ParentReference>() { new ParentReference() { Id = folders.ActiveImgFolder.Id } };
+                            body.MimeType = "image/png";
+                            body.Properties = imgFile.Properties;
+
+                            File copiedImage = service.Files.Copy(body, imgFile.Id).Execute();
+                            if (null != copiedImage)
+                            {
+                                copiedFiles.Add(copiedImage);
+                            }
+                        }
+                        if (null != copiedBCFInfo)
+                        {
+                            copiedBCFInfo.ImageFiles = copiedFiles;
+                        }
+                    }
+
+                    if (null != copiedBCFInfo)
+                    {
+                        //update property for cross referencing
+                        if (null != copiedBCFInfo.SpreadsheetFile && null != copiedBCFInfo.ArchiveFile && copiedBCFInfo.ImageFiles.Count > 0)
+                        {
+                            Dictionary<string/*key*/, string/*value*/> propertyDictionary = new Dictionary<string, string>();
+                            propertyDictionary.Add("SheetId", copiedBCFInfo.SpreadsheetId);
+                            propertyDictionary.Add("ArchiveZipId", copiedBCFInfo.ArchiveFile.Id);
+
+                            copiedBCFInfo.SpreadsheetFile = FileManager.AddProperties(copiedBCFInfo.SpreadsheetFile.Id, propertyDictionary);
+                            copiedBCFInfo.ArchiveFile = FileManager.AddProperties(copiedBCFInfo.ArchiveFile.Id, propertyDictionary);
+
+                            for (int i = 0; i < copiedBCFInfo.ImageFiles.Count; i++)
+                            {
+                                copiedBCFInfo.ImageFiles[i] = FileManager.AddProperties(copiedBCFInfo.ImageFiles[i].Id, propertyDictionary);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to upload online BCF.\n"+ex.Message, "Upload Online BCF", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return copiedBCFInfo;
+        }
+
+        public static File CopyFile(File sourceFile, string parentId)
+        {
+            File copiedFile = null;
+            try
+            {
+                if (null == service)
+                {
+                    service = GetUserCredential();
+                }
+                if (null != service)
+                {
+                    File body = new File();
+                    body.Title = sourceFile.Title;
+                    body.Description = sourceFile.Description;
+                    body.Parents = new List<ParentReference>() { new ParentReference() { Id = parentId } };
+                    body.Properties = sourceFile.Properties;
+
+                    copiedFile = service.Files.Copy(body, sourceFile.Id).Execute();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to copy file from "+sourceFile.Title+"\n"+ex.Message, "", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return copiedFile;
+        }
+
+        public static bool CheckExistingFiles(string fileName, FolderHolders folderHolder)
+        {
+            bool result = false;
+            try
+            {
+                File fileUploaded = FileManager.FindSubFolder(fileName, folderHolder.ActiveBCFFolder.Id);
+                if (null != fileUploaded)
+                {
+                    MessageBoxResult mbr = MessageBox.Show(fileName + " already exists in the shared Google Drive folder.\nWould you like to replace the file in the shared folders?", "File Already Exists", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                    switch (mbr)
+                    {
+                        case MessageBoxResult.Yes:
+                            //delete the existing files first
+                            string bcfFileId = fileUploaded.Id;
+                            List<File> archiveFound = FileManager.FindFilesByProperty(folderHolder.ArchiveBCFFolder.Id, "SheetId", bcfFileId);
+                            if (archiveFound.Count > 0)
+                            {
+                                foreach (File file in archiveFound)
+                                {
+                                    bool deleted = FileManager.DeleteFile(file.Id);
+                                }
+                            }
+                            List<File> imagesFound = FileManager.FindFilesByProperty(folderHolder.ActiveImgFolder.Id, "SheetId", bcfFileId);
+                            if (imagesFound.Count > 0)
+                            {
+                                foreach (File file in imagesFound)
+                                {
+                                    bool deleted = FileManager.DeleteFile(file.Id);
+                                }
+                            }
+
+                            bool bcfDeleted = FileManager.DeleteFile(bcfFileId);
+
+                            result = true;
+                            break;
+                        case MessageBoxResult.No:
+                            result = true;
+                            break;
+                        case MessageBoxResult.Cancel:
+                            result = false;
+                            break;
+                    }
+                }
+                else
+                {
+                    result = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to check whether the bcf file already exists in the shared link or not.\n" + ex.Message, "Check Existing Files", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return result;
+        }
+
+        public static string GetSharedLinkAddress(string folderId)
+        {
+            string sharedLink = "https://drive.google.com/folderview?id=" + folderId + "&usp=sharing";
+            return sharedLink;
+        }
+
+        public static string GetFolderId(string sharedLink)
+        {
+            string folderId = "";
+            string[] seperator = new string[] { "folderview?id=", "&usp=sharing" };
+            string[] matchedStr = sharedLink.Split(seperator, StringSplitOptions.RemoveEmptyEntries);
+            if (matchedStr.Length > 1)
+            {
+                folderId = matchedStr[1];
+            }
+            return folderId;
         }
 
     }
@@ -451,6 +842,9 @@ namespace HOK.SmartBCF.GoogleUtils
     public class FolderHolders
     {
         private string rootId = "";
+        private string rootTitle = "";
+        private File rootFolder = null;
+        private File colorSheet = null;
         private File activeFolder = null;
         private File activeBCFFolder = null;
         private File activeImgFolder = null;
@@ -459,6 +853,10 @@ namespace HOK.SmartBCF.GoogleUtils
         private File archiveImgFolder = null;
 
         public string RootId { get { return rootId; } set { rootId = value; } }
+        public string RootTitle { get { return rootTitle; } set { rootTitle = value; } }
+        public File RootFolder { get { return rootFolder; } set { rootFolder = value; } }
+
+        public File ColorSheet { get { return colorSheet; } set { colorSheet = value; } }
 
         public File ActiveFolder { get { return activeFolder; } set { activeFolder = value; } }
         public File ActiveBCFFolder { get { return activeBCFFolder; } set { activeBCFFolder = value; } }

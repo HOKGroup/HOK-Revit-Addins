@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Autodesk.Revit.DB;
 using Google.GData.Client;
 using Google.GData.Spreadsheets;
@@ -12,21 +14,31 @@ using HOK.SmartBCF.Utils;
 
 namespace HOK.SmartBCF.GoogleUtils
 {
+    public enum ModifyItem
+    {
+        Add=0,
+        Edit=1,
+        Delete=2
+    }
     public static class BCFParser
     {
         public static SpreadsheetsService sheetsService = null;
+        public static string colorSheetId = "";
+        public static WorksheetEntry colorSheet = null;
+        public static string currentSheetId = ""; //fileId of Google Spreadsheet
+        public static WorksheetEntry currentSheet = null; //worksheet of ViewPoint
 
         private static string userName = "bsmart@hokbuildingsmart.com";
         private static string passWord = "HOKb$mart";
 
-        private static string[] markupCols = new string[] { "IssueGuid", "IssueTopic", "Action", "Responsible"};
-        private static string[] viewpointCols = new string[] { "IssueGuid", "ComponentIfcGuid", "AuthoringToolId" };
+        private static string[] markupCols = new string[] { "IssueGuid", "IssueTopic", "CommentGuid", "Comment", "Status", "VerbalStatus", "Author", "Date" };
+        private static string[] viewpointCols = new string[] { "IssueGuid", "ComponentIfcGuid", "AuthoringToolId", "Action", "Responsible" };
         private static string[] colorschemeCols = new string[] { "ColorSchemeId", "SchemeName", "ParameterName", "ParameterValue", "ColorR", "ColorG", "ColorB"};
         private static string[] categoryCols = new string[] { "CategoryName" };
 
         private static Random random = new Random();
 
-        public static bool ConverToGoogleDoc(BCFZIP bcfzip, string fileId)
+        public static bool ConverToGoogleDoc(BCFZIP bcfzip, string fileId, string colorSheetId)
         {
             bool result = false;
             try
@@ -39,9 +51,8 @@ namespace HOK.SmartBCF.GoogleUtils
                 {
                     bool createdMarkup = CreateMarkupSheet(bcfzip, fileId);
                     bool createdVisInfo = CreateViewSheet(bcfzip, fileId);
-                    bool createdColorInfo = CreateColorSheet(bcfzip, fileId);
-                    bool createdCategoryInfo = CreateCategorySheet(bcfzip, fileId);
-                    result = (createdMarkup && createdVisInfo && createdColorInfo && createdCategoryInfo);
+
+                    result = (createdMarkup && createdVisInfo);
                 }
                
             }
@@ -95,17 +106,26 @@ namespace HOK.SmartBCF.GoogleUtils
                     ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
                     ListFeed listFeed = sheetsService.Query(listQuery);
 
-                    // "Issue Guid", "Issue Topic", "Action", "Responsible"
+                    // "Issue Guid", "Issue Topic"
                     foreach (BCFComponent bcf in bcfZip.BCFComponents)
                     {
                         Topic bcfTopic = bcf.Markup.Topic;
-                        ListEntry row = new ListEntry();
-                        row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[0].ToLower(), Value =bcfTopic.Guid});
-                        row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[1].ToLower() , Value = bcfTopic.Title});
-                        row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[2].ToLower() , Value = "Delete" });
-                        row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[3].ToLower(), Value = "Architecture" });
-
-                        sheetsService.Insert(listFeed, row);
+                        if (null != bcf.Markup.Comment)
+                        {
+                            foreach (Comment comment in bcf.Markup.Comment)
+                            {
+                                ListEntry row = new ListEntry();
+                                row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[0].ToLower(), Value = bcfTopic.Guid });
+                                row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[1].ToLower(), Value = bcfTopic.Title });
+                                row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[2].ToLower(), Value = comment.Guid });
+                                row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[3].ToLower(), Value = comment.Comment1 });
+                                row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[4].ToLower(), Value = comment.Status });
+                                row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[5].ToLower(), Value = comment.VerbalStatus });
+                                row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[6].ToLower(), Value = comment.Author});
+                                row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[7].ToLower(), Value = comment.Date.ToString() });
+                                sheetsService.Insert(listFeed, row);
+                            }
+                        }
                     }
 
                     created = true;
@@ -167,6 +187,8 @@ namespace HOK.SmartBCF.GoogleUtils
                             row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[0].ToLower(), Value = bcf.GUID });
                             row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[1].ToLower(), Value = component.IfcGuid });
                             row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[2].ToLower(), Value = component.AuthoringToolId });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[3].ToLower(), Value = "MOVE" });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[4].ToLower(), Value = "ARCHITECTURE" });
 
                             sheetsService.Insert(listFeed, row);
                         }
@@ -181,97 +203,265 @@ namespace HOK.SmartBCF.GoogleUtils
             return created;
         }
 
-        private static bool CreateColorSheet(BCFZIP bcfZip, string fileId)
+        private static WorksheetEntry FindColorSheet(string sheetId)
         {
-            bool created = false;
+            WorksheetEntry wsEntry = null;
             try
             {
-                string title = System.IO.Path.GetFileNameWithoutExtension(bcfZip.FileName);
-                SpreadsheetQuery sheetQuery = new SpreadsheetQuery();
-                sheetQuery.Title = title;
-
-                SpreadsheetFeed feed = sheetsService.Query(sheetQuery);
-                WorksheetEntry worksheet = null;
-                foreach (SpreadsheetEntry sheet in feed.Entries)
+                try
                 {
-                    if (sheet.Id.AbsoluteUri.Contains(fileId))
+                    WorksheetQuery worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + colorSheetId + "/private/full");
+                    WorksheetFeed wsFeed = sheetsService.Query(worksheetquery);
+
+                    if (wsFeed.Entries.Count > 0)
                     {
-                        WorksheetEntry wsEntry = new WorksheetEntry(10000, 10, "ColorScheme");
-                        WorksheetFeed wsFeed = sheet.Worksheets;
-                        worksheet = sheetsService.Insert(wsFeed, wsEntry);
-                        break;
+                        WorksheetEntry worksheet = (WorksheetEntry)wsFeed.Entries[0];
+                        worksheet.Title.Text = "ColorScheme";
+                        wsEntry = (WorksheetEntry)worksheet.Update();
                     }
                 }
-
-                if (null != worksheet)
+                catch (Exception ex)
                 {
-                    CellQuery cellQuery = new CellQuery(worksheet.CellFeedLink);
+                    string message = ex.Message;
+                }
+
+                if (null != wsEntry)
+                {
+                    //create headers
+                    CellQuery cellQuery = new CellQuery(wsEntry.CellFeedLink);
                     CellFeed cellFeed = sheetsService.Query(cellQuery);
 
-                    //write headers
                     for (int i = 0; i < colorschemeCols.Length; i++)
                     {
                         string colText = colorschemeCols[i];
                         CellEntry cell = new CellEntry(1, Convert.ToUInt16(i + 1), colText);
                         cellFeed.Insert(cell);
                     }
-
-                    ColorSchemeInfo schemeInfo = null;
-                    foreach (BCFComponent bcf in bcfZip.BCFComponents)
-                    {
-                        if (bcf.ColorSchemeInfo.ColorSchemes.Count > 0)
-                        {
-                            schemeInfo = bcf.ColorSchemeInfo; break;
-                        }
-                    }
-
-                    if (null == schemeInfo)
-                    {
-                        //create default scheme info
-                        schemeInfo = CreateDefaultSchemeInfo();
-                    }
-
-                    if (null != schemeInfo)
-                    {
-                        //write color scheme data
-                        AtomLink listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                        ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                        ListFeed listFeed = sheetsService.Query(listQuery);
-
-                        // "ColorSchemeId", "SchemeName", "ParameterName", "ParameterValue", "ColorValue"
-                        foreach (ColorScheme scheme in schemeInfo.ColorSchemes)
-                        {
-                            string schemeId = scheme.SchemeId;
-                            string schemeName = scheme.SchemeName;
-                            string paramName=scheme.ParameterName;
-
-                            foreach (ColorDefinition definition in scheme.ColorDefinitions)
-                            {
-                                ListEntry row = new ListEntry();
-                                row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[0].ToLower(), Value = schemeId });
-                                row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[1].ToLower(), Value = schemeName });
-                                row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[2].ToLower(), Value = paramName });
-                                row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[3].ToLower(), Value = definition.ParameterValue });
-                                row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[4].ToLower(), Value = definition.Color[0].ToString() });
-                                row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[5].ToLower(), Value = definition.Color[1].ToString() });
-                                row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[6].ToLower(), Value = definition.Color[2].ToString() });
-                                sheetsService.Insert(listFeed, row);
-                            }
-                        }
-
-                        created = true;
-                    }
-
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create viewpoint sheet.\n" + ex.Message, "Create Viewpoint Sheet", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to fine color shcemes spreadsheet.\n" + ex.Message, "Find Color Sheet", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            return created;
+            return wsEntry;
         }
 
-        private static ColorSchemeInfo CreateDefaultSchemeInfo()
+        public static bool WriteColorSheet(ColorSchemeInfo colorSchemeInfo, string sheetId)
+        {
+            bool result = false;
+            try
+            {
+                if (colorSheetId != sheetId)
+                {
+                    //first time colorsheet access
+                    colorSheetId = sheetId;
+                    colorSheet = FindColorSheet(colorSheetId);
+                }
+                
+                //Update color schemes
+                if (null != colorSheet)
+                {
+                    AtomLink listFeedLink = colorSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                    ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                    ListFeed listFeed = sheetsService.Query(listQuery);
+
+                    for (int i = listFeed.Entries.Count - 1; i > -1; i--)
+                    {
+                        ListEntry row = (ListEntry)listFeed.Entries[i];
+                        row.Delete();
+                    }
+
+                    // "ColorSchemeId", "SchemeName", "ParameterName", "ParameterValue", "ColorValue"
+                    foreach (ColorScheme scheme in colorSchemeInfo.ColorSchemes)
+                    {
+                        string schemeId = scheme.SchemeId;
+                        string schemeName = scheme.SchemeName;
+                        string paramName = scheme.ParameterName;
+
+                        foreach (ColorDefinition definition in scheme.ColorDefinitions)
+                        {
+                            ListEntry row = new ListEntry();
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[0].ToLower(), Value = schemeId });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[1].ToLower(), Value = schemeName });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[2].ToLower(), Value = paramName });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[3].ToLower(), Value = definition.ParameterValue });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[4].ToLower(), Value = definition.Color[0].ToString() });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[5].ToLower(), Value = definition.Color[1].ToString() });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[6].ToLower(), Value = definition.Color[2].ToString() });
+                            sheetsService.Insert(listFeed, row);
+                        }
+                    }
+                }
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to update common color sheet.\n"+ex.Message, "Update Color Sheet", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return result;
+        }
+
+        public static bool UpdateColorSheet(ColorScheme colorScheme, ColorDefinition oldDefinition, ColorDefinition newDefinition, ModifyItem modifyItem, string sheetId)
+        {
+            bool result = false;
+            try
+            {
+                if (null == sheetsService)
+                {
+                    sheetsService = GetUserCrendential();
+                }
+
+                if (null != sheetsService)
+                {
+                    if (colorSheetId != sheetId)
+                    {
+                        colorSheetId = sheetId;
+                        colorSheet = FindColorSheet(colorSheetId);
+                    }
+                    if (null != colorSheet)
+                    {
+                        AtomLink listFeedLink = colorSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                        ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                        ListFeed listFeed = sheetsService.Query(listQuery);
+
+                        if (modifyItem == ModifyItem.Add)
+                        {
+                            ListEntry row = new ListEntry();
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[0].ToLower(), Value = colorScheme.SchemeId });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[1].ToLower(), Value = colorScheme.SchemeName });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[2].ToLower(), Value = colorScheme.ParameterName });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[3].ToLower(), Value = newDefinition.ParameterValue });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[4].ToLower(), Value = newDefinition.Color[0].ToString() });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[5].ToLower(), Value = newDefinition.Color[1].ToString() });
+                            row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[6].ToLower(), Value = newDefinition.Color[2].ToString() });
+                            sheetsService.Insert(listFeed, row);
+                        }
+                        else
+                        {
+                            ListEntry rowFound = null;
+                            for (int i = listFeed.Entries.Count - 1; i > -1; i--)
+                            {
+                                ListEntry row = (ListEntry)listFeed.Entries[i];
+                                if (row.Elements[0].Value == colorScheme.SchemeId && row.Elements[3].Value == oldDefinition.ParameterValue)
+                                {
+                                    rowFound = row;
+                                    break;
+                                }
+                            }
+                            if (null != rowFound)
+                            {
+                                if (modifyItem == ModifyItem.Edit)
+                                {
+                                    rowFound.Elements[3].Value = newDefinition.ParameterValue;
+                                    rowFound.Elements[4].Value = newDefinition.Color[0].ToString();
+                                    rowFound.Elements[5].Value = newDefinition.Color[1].ToString();
+                                    rowFound.Elements[6].Value = newDefinition.Color[2].ToString();
+                                    rowFound.Update();
+                                }
+                                else if (modifyItem == ModifyItem.Delete)
+                                {
+                                    rowFound.Delete();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to update color sheet.\n"+ex.Message, "Update Color Sheet", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return result;
+        }
+
+        public static bool UpdateCommonCategorySheet(List<string> categoryNames, string colorSheetId)
+        {
+            bool result = false;
+            try
+            {
+                SpreadsheetQuery sheetQuery = new SpreadsheetQuery();
+                sheetQuery.Title = "Color Schemes";
+
+                SpreadsheetFeed feed = sheetsService.Query(sheetQuery);
+                WorksheetEntry categorySheet = null;
+                foreach (SpreadsheetEntry sheet in feed.Entries)
+                {
+                    if (sheet.Id.AbsoluteUri.Contains(colorSheetId))
+                    {
+                        WorksheetFeed wsFeed = sheet.Worksheets;
+                        if (wsFeed.Entries.Count > 0)
+                        {
+                            foreach (WorksheetEntry entry in wsFeed.Entries)
+                            {
+                                if (entry.Title.Text == "ElementCategories")
+                                {
+                                    categorySheet = entry;
+                                }
+                            }
+                        }
+
+                        if (null == categorySheet)
+                        {
+                            //crate element categories work sheet
+                            WorksheetEntry wsEntry = new WorksheetEntry(10000, 10, "ElementCategories");
+                            categorySheet = sheetsService.Insert(wsFeed, wsEntry);
+                            if (null != categorySheet)
+                            {
+                                CellQuery cellQuery = new CellQuery(categorySheet.CellFeedLink);
+                                CellFeed cellFeed = sheetsService.Query(cellQuery);
+
+                                //write headers
+                                for (int i = 0; i < categoryCols.Length; i++)
+                                {
+                                    string colText = categoryCols[i];
+                                    CellEntry cell = new CellEntry(1, Convert.ToUInt16(i + 1), colText);
+                                    cellFeed.Insert(cell);
+                                }
+                            }
+                        }
+
+                        //Update color schemes
+                        if (null != categorySheet)
+                        {
+                            AtomLink listFeedLink = categorySheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                            ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                            ListFeed listFeed = sheetsService.Query(listQuery);
+
+                            List<string> existingCategories = new List<string>();
+                            foreach (ListEntry row in listFeed.Entries)
+                            {
+                                string catName = row.Elements[0].Value;
+
+                                if (!existingCategories.Contains(catName))
+                                {
+                                    existingCategories.Add(catName);
+                                }
+                            }
+
+                            foreach (string categoryName in categoryNames)
+                            {
+                                if (existingCategories.Contains(categoryName)) { continue; }
+
+                                ListEntry row = new ListEntry();
+                                row.Elements.Add(new ListEntry.Custom() { LocalName = categoryCols[0].ToLower(), Value = categoryName });
+                                sheetsService.Insert(listFeed, row);
+                            }
+
+                        }
+
+                        break;
+                    }
+                }
+                result = true;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Failed to update common category sheet.\n"+ex.Message, "Update Common Category Sheet", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return result;
+        }
+
+        public static ColorSchemeInfo CreateDefaultSchemeInfo()
         {
             ColorSchemeInfo schemeInfo = new ColorSchemeInfo();
             try
@@ -343,51 +533,6 @@ namespace HOK.SmartBCF.GoogleUtils
             return colorBytes;
         }
 
-        private static bool CreateCategorySheet(BCFZIP bcfZip, string fileId)
-        {
-            bool created = false;
-            try
-            {
-                string title = System.IO.Path.GetFileNameWithoutExtension(bcfZip.FileName);
-                SpreadsheetQuery sheetQuery = new SpreadsheetQuery();
-                sheetQuery.Title = title;
-
-                SpreadsheetFeed feed = sheetsService.Query(sheetQuery);
-                WorksheetEntry worksheet = null;
-                foreach (SpreadsheetEntry sheet in feed.Entries)
-                {
-                    if (sheet.Id.AbsoluteUri.Contains(fileId))
-                    {
-                        WorksheetEntry wsEntry = new WorksheetEntry(10000, 10, "ElementCategories");
-                        WorksheetFeed wsFeed = sheet.Worksheets;
-                        worksheet = sheetsService.Insert(wsFeed, wsEntry);
-                        break;
-                    }
-                }
-
-                if (null != worksheet)
-                {
-                    CellQuery cellQuery = new CellQuery(worksheet.CellFeedLink);
-                    CellFeed cellFeed = sheetsService.Query(cellQuery);
-
-                    //write headers
-                    for (int i = 0; i < categoryCols.Length; i++)
-                    {
-                        string colText = categoryCols[i];
-                        CellEntry cell = new CellEntry(1, Convert.ToUInt16(i + 1), colText);
-                        cellFeed.Insert(cell);
-                    }
-
-                    created = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to create viewpoint sheet.\n" + ex.Message, "Create Viewpoint Sheet", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return created;
-        }
-
         public static Dictionary<string, IssueEntry> ReadIssues(string fileId, string fileName)
         {
             Dictionary<string/*issueId*/, IssueEntry> issueDictionary = new Dictionary<string, IssueEntry>();
@@ -410,65 +555,82 @@ namespace HOK.SmartBCF.GoogleUtils
 
                         foreach (ListEntry row in listFeed.Entries)
                         {
-                            IssueEntry ii = new IssueEntry();
-                            ii.BCFName = fileName;
-                            foreach (ListEntry.Custom element in row.Elements)
+                            IssueEntry issueEntry = new IssueEntry();
+                            issueEntry.BCFName = fileName;
+                            
+                            try
                             {
-                                switch (element.LocalName)
+                                string issueId = row.Elements[0].Value;
+                                string issueTopic = row.Elements[1].Value;
+                                string commentId = row.Elements[2].Value;
+                                string commentStr = row.Elements[3].Value;
+                                string status = row.Elements[4].Value;
+                                string verbalStatus = row.Elements[5].Value;
+                                string author = row.Elements[6].Value;
+                                string date = row.Elements[7].Value;
+
+                                issueEntry.IssueId = issueId;
+                                issueEntry.IssueTopic = issueTopic;
+
+                                Comment comment = new Comment();
+                                comment.Topic.Guid = issueId;
+                                comment.Guid = commentId;
+                                comment.Comment1 = commentStr;
+                                comment.Status = status;
+                                comment.VerbalStatus = verbalStatus;
+                                comment.Author = author;
+                                comment.Date = DateTime.Parse(date);
+                               
+                                if (!issueDictionary.ContainsKey(issueEntry.IssueId))
                                 {
-                                    case "issueguid":
-                                        ii.IssueId = element.Value;
-                                        break;
-                                    case "issuetopic":
-                                        ii.IssueTopic = element.Value;
-                                        break;
-                                    case "action":
-                                        ii.Action = element.Value;
-                                        break;
-                                    case "responsible":
-                                        ii.Responsible = element.Value;
-                                        break;
+                                    issueEntry.CommentDictionary.Add(comment.Guid, comment);
+                                    issueDictionary.Add(issueEntry.IssueId, issueEntry);
+                                }
+                                else
+                                {
+                                    issueDictionary[issueEntry.IssueId].CommentDictionary.Add(comment.Guid, comment);
                                 }
                             }
-                            if (!issueDictionary.ContainsKey(ii.IssueId))
+                            catch (Exception ex)
                             {
-                                issueDictionary.Add(ii.IssueId, ii);
+                                string message = ex.Message;
+                                continue;
                             }
                         }
 
                         if (issueDictionary.Count > 0)
                         {
-                            worksheet = (WorksheetEntry)wsFeed.Entries[1]; //viewInfo sheet
+                            //viewInfo sheet
+                            worksheet = (WorksheetEntry)wsFeed.Entries[1]; 
                             listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
                             listQuery = new ListQuery(listFeedLink.HRef.ToString());
                             listFeed = sheetsService.Query(listQuery);
 
                             foreach (ListEntry row in listFeed.Entries)
                             {
-                                string issueId = "";
-                                int elementId = 0;
-                                foreach (ListEntry.Custom element in row.Elements)
+                                try
                                 {
-                                    if (element.LocalName == "issueguid")
-                                    {
-                                        issueId = element.Value;
-                                    }
-                                    if (element.LocalName == "authoringtoolid")
-                                    {
-                                        int.TryParse(element.Value, out elementId);
-                                    }
+                                    string issueId = row.Elements[0].Value;
+                                    int elementId = int.Parse(row.Elements[2].Value);
+                                    string action = row.Elements[3].Value;
+                                    string responsibleParty = row.Elements[4].Value;
 
-                                    if (elementId != 0)
+                                    ElementProperties ep = new ElementProperties(elementId);
+                                    ep.IssueId = issueId;
+                                    ep.Action = action;
+                                    ep.ResponsibleParty = responsibleParty;
+                                    if (issueDictionary.ContainsKey(issueId))
                                     {
-                                        ElementProperties ep = new ElementProperties(elementId);
-                                        if (issueDictionary.ContainsKey(issueId))
+                                        if (!issueDictionary[issueId].ElementDictionary.ContainsKey(elementId))
                                         {
-                                            if (!issueDictionary[issueId].ElementDictionary.ContainsKey(elementId))
-                                            {
-                                                issueDictionary[issueId].ElementDictionary.Add(ep.ElementId, ep);
-                                            }
+                                            issueDictionary[issueId].ElementDictionary.Add(ep.ElementId, ep);
                                         }
                                     }
+                                }
+                                catch (Exception ex)
+                                {
+                                    string message = ex.Message;
+                                    continue;
                                 }
                             }
                         }
@@ -482,7 +644,7 @@ namespace HOK.SmartBCF.GoogleUtils
             return issueDictionary;
         }
 
-        public static ColorSchemeInfo ReadColorSchemes(string fileId)
+        public static ColorSchemeInfo ReadColorSchemes(string fileId, bool isImported)
         {
             ColorSchemeInfo schemeInfo = new ColorSchemeInfo();
             try
@@ -491,36 +653,45 @@ namespace HOK.SmartBCF.GoogleUtils
                 {
                     sheetsService = GetUserCrendential();
                 }
-                if (null != sheetsService)
+                if (null != sheetsService && !string.IsNullOrEmpty(fileId))
                 {
-                    
+                    if (!isImported) { colorSheetId = fileId; }
+                   
                     WorksheetQuery worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
                     WorksheetFeed wsFeed = sheetsService.Query(worksheetquery);
-                    if (wsFeed.Entries.Count > 3)
+                    if (wsFeed.Entries.Count > 0)
                     {
-                        WorksheetEntry worksheet = (WorksheetEntry)wsFeed.Entries[3]; //ElementCategories sheet
-                        AtomLink listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                        ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                        ListFeed listFeed = sheetsService.Query(listQuery);
-
                         List<string> categoryNames = new List<string>();
-                        foreach (ListEntry row in listFeed.Entries)
+                        WorksheetEntry categorySheet = null;
+                        AtomLink listFeedLink = null;
+                        ListQuery listQuery = null;
+                        ListFeed listFeed = null;
+                        if (wsFeed.Entries.Count > 1)
                         {
-                            foreach (ListEntry.Custom element in row.Elements)
+                            categorySheet = (WorksheetEntry)wsFeed.Entries[1]; //ElementCategories sheet
+                            listFeedLink = categorySheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                            listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                            listFeed = sheetsService.Query(listQuery);
+
+                            foreach (ListEntry row in listFeed.Entries)
                             {
-                                if (element.LocalName == "categoryname")
+                                foreach (ListEntry.Custom element in row.Elements)
                                 {
-                                    string catName = element.Value;
-                                    if (categoryNames.Contains(catName))
+                                    if (element.LocalName == "categoryname")
                                     {
-                                        categoryNames.Add(catName);
+                                        string catName = element.Value;
+                                        if (categoryNames.Contains(catName))
+                                        {
+                                            categoryNames.Add(catName);
+                                        }
                                     }
                                 }
                             }
                         }
 
-                        worksheet = (WorksheetEntry)wsFeed.Entries[2]; //ColorScheme sheet
-                        listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                        WorksheetEntry workSheetEntry = (WorksheetEntry)wsFeed.Entries[0]; //ColorScheme sheet
+                        if (!isImported) { colorSheet = workSheetEntry; }
+                        listFeedLink = workSheetEntry.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
                         listQuery = new ListQuery(listFeedLink.HRef.ToString());
                         listFeed = sheetsService.Query(listQuery);
                         foreach (ListEntry row in listFeed.Entries)
@@ -609,65 +780,124 @@ namespace HOK.SmartBCF.GoogleUtils
             return schemeInfo;
         }
 
-        public static bool UpdateCategories(string fileId, List<string> categoryNames)
+        public static WorksheetEntry FindWorksheet(string fileId, int worksheetIndex)
         {
-            bool result = false;
+            WorksheetEntry worksheetEntry = null;
             try
             {
                 WorksheetQuery worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
                 WorksheetFeed wsFeed = sheetsService.Query(worksheetquery);
-                if (wsFeed.Entries.Count > 3)
-                {
-                    WorksheetEntry worksheet = (WorksheetEntry)wsFeed.Entries[3]; //ElementCategories sheet
-                    AtomLink listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                    ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                    ListFeed listFeed = sheetsService.Query(listQuery);
 
-                    for (int i = listFeed.Entries.Count - 1; i > -1; i--)
-                    {
-                        ListEntry row = (ListEntry)listFeed.Entries[i];
-                        sheetsService.Delete(row, true);
-                    }
-                    
-                    foreach (string catName in categoryNames)
-                    {
-                        ListEntry row = new ListEntry();
-                        row.Elements.Add(new ListEntry.Custom() { LocalName = categoryCols[0].ToLower(), Value = catName });
-                        sheetsService.Insert(listFeed, row);
-                    }
-                    result = true;
+                if (wsFeed.Entries.Count > 0)
+                {
+                    worksheetEntry = (WorksheetEntry)wsFeed.Entries[worksheetIndex];
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to update categories.\n"+ex.Message, "Update Categories", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string message = ex.Message;
             }
-            return result;
+            return worksheetEntry;
         }
 
+        public static bool UpdateElementProperties(ElementProperties ep, BCFParameters bcfParam, string fileId)
+        {
+            bool updated = false;
+            try
+            {
+                if (null == sheetsService)
+                {
+                    sheetsService = GetUserCrendential();
+                }
 
+                if (null != sheetsService)
+                {
+                    if (fileId != currentSheetId)
+                    {
+                        currentSheet = FindWorksheet(fileId, 1);//viewpoint worksheet
+                        currentSheetId = fileId;
+                    }
+                    if (null != currentSheet)
+                    {
+                        AtomLink listFeedLink = currentSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                        ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                        ListFeed listFeed = sheetsService.Query(listQuery);
+
+                        for (int i = listFeed.Entries.Count - 1; i > -1; i--)
+                        {
+                            ListEntry row = (ListEntry)listFeed.Entries[i];
+                            try
+                            {
+                                string issueId = row.Elements[0].Value;
+                                int elementId = int.Parse(row.Elements[2].Value);
+
+                                if (issueId == ep.IssueId && elementId == ep.ElementId)
+                                {
+                                    switch (bcfParam)
+                                    {
+                                        case BCFParameters.BCF_Action:
+                                            row.Elements[3].Value = ep.Action;
+                                            row.Update();
+                                            updated = true;
+                                            break;
+                                        case BCFParameters.BCF_Responsibility:
+                                            row.Elements[4].Value = ep.ResponsibleParty;
+                                            row.Update();
+                                            updated = true;
+                                            break;
+                                    }
+                                    break;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                string message = ex.Message;
+                                continue;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to update issue entry.\n" + ex.Message, "Update Issue Entry", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return updated;
+        }
     }
 
     public class ElementProperties
     {
         private int elementId = -1;
         private Element elementObj = null;
+        private ElementId elementIdObj = Autodesk.Revit.DB.ElementId.InvalidElementId;
         private string elementName = "";
         private string categoryName = "";
+        private int categoryId = -1;
+        private string issueId = "";
+        private string action = "";
+        private string responsibleParty = "";
 
         public int ElementId { get { return elementId; } set { elementId = value; } }
         public Element ElementObj { get { return elementObj; } set { elementObj = value; } }
+        public ElementId ElementIdObj { get { return elementIdObj; } set { elementIdObj = value; } }
         public string ElementName { get { return elementName; } set { elementName = value; } }
         public string CategoryName { get { return categoryName; } set { categoryName = value; } }
+        public int CategoryId { get { return categoryId; } set { categoryId = value; } }
+        public string IssueId { get { return issueId; } set { issueId = value; } }
+        public string Action { get { return action; } set { action = value; } }
+        public string ResponsibleParty { get { return responsibleParty; } set { responsibleParty = value; } }
 
         public ElementProperties(Element element)
         {
             elementId = element.Id.IntegerValue;
             elementObj = element;
+            elementIdObj = element.Id;
             elementName = element.Name;
             if (null != element.Category)
             {
                 categoryName = element.Category.Name;
+                categoryId = element.Category.Id.IntegerValue;
             }
         }
 
@@ -682,20 +912,25 @@ namespace HOK.SmartBCF.GoogleUtils
         private string bcfName = "";
         private string issueId = "";
         private string issueTopic = "";
-        private string action = "";
-        private string responsible = "";
+        private BitmapImage snapshot = null;
+        private int numElements = 0;
+        private bool isSelected = false;
         private Dictionary<int, ElementProperties> elementDictionary = new Dictionary<int, ElementProperties>();
+        private Dictionary<string, Comment> commentDictionary = new Dictionary<string, Comment>();
 
         public string BCFName { get { return bcfName; } set { bcfName = value; } }
         public string IssueId { get { return issueId; } set { issueId = value; } }
         public string IssueTopic { get { return issueTopic; } set { issueTopic = value; } }
-        public string Action { get { return action; } set { action = value; } }
-        public string Responsible { get { return responsible; } set { responsible = value; } }
+        public BitmapImage Snapshot { get { return snapshot; } set { snapshot = value; } }
+        public int NumElements { get { return numElements; } set { numElements = value; } }
+        public bool IsSelected { get { return isSelected; } set { isSelected = value; } }
         public Dictionary<int, ElementProperties> ElementDictionary { get { return elementDictionary; } set { elementDictionary = value; } }
+        public Dictionary<string, Comment> CommentDictionary { get { return commentDictionary; } set { commentDictionary = value; } }
 
         public IssueEntry()
         {
            
         }
     }
+
 }

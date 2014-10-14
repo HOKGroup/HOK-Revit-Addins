@@ -4,12 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             Icon="/HOK.SmartBCF;component/Resources/BCFicon16.ico" Title="smartBCF" Height="900" Width="800" Closed="Window_Closed" WindowStartupLocation="CenterScreen" MinWidth="800">
+             Icon="/HOK.SmartBCF;component/Resources/BCFicon16.ico" Title="smartBCF" Height="900" Width="820" Closed="Window_Closed" WindowStartupLocation="CenterScreen" MinWidth="820">
     <Window.Resources>
         <Style TargetType="{x:Type ComboBox}">
             <Setter Property="Background"  Value="{x:Null}"/>
             <Setter Property="BorderBrush" Value="Gray"/>
-
         </Style>
 
         <Style TargetType="{x:Type TabItem}">
@@ -47,7 +46,17 @@
             <Setter Property="BorderBrush" Value="LightGray"/>
         </Style>
 
-
+        <Style TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -80,9 +89,9 @@
 
             <Label Content="Issue Name: " HorizontalAlignment="Left" Margin="10,25,0,0" VerticalAlignment="Top" Grid.Column="1"/>
             <ComboBox x:Name="comboBoxIssue" HorizontalAlignment="Left" Margin="90,28,0,0" VerticalAlignment="Top" Width="225" SelectionChanged="comboBoxIssue_SelectionChanged" Grid.Column="1"  />
-            <Button Grid.Column="1" x:Name="buttonFilter" HorizontalAlignment="Left" Height="27" Margin="325,25,0,0" VerticalAlignment="Top" Width="27" BorderBrush="{x:Null}" Background="{x:Null}"  ToolTip="Filter Elements ">
+            <Button Grid.Column="1" x:Name="buttonFilter" HorizontalAlignment="Left" Height="27" Margin="325,25,0,0" VerticalAlignment="Top" Width="27" BorderBrush="{x:Null}" Background="{x:Null}"  ToolTip="Filter Elements " Click="buttonFilter_Click">
                 <Button.Content>
-                    <Image Source="/HOK.SmartBCF;component/Resources/filter.png" Stretch="UniformToFill" />
+                    <Image x:Name="buttonFilterImage" Source="/HOK.SmartBCF;component/Resources/filter_empty.png" Stretch="UniformToFill" />
                 </Button.Content>
             </Button>
 
@@ -93,8 +102,8 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Label Grid.Row="1" Content="Action: " HorizontalAlignment="Left" Margin="48,0,0,0" VerticalAlignment="Top"  RenderTransformOrigin="0.54,-0.038"/>
-                    <ComboBox Grid.Row="1" x:Name="comboBoxAction" HorizontalAlignment="Left" Margin="103,4,0,0"  VerticalAlignment="Top" Width="200" >
+                    <Label Grid.Row="1" Content="Action: " HorizontalAlignment="Left" Margin="68,0,0,0" VerticalAlignment="Top"  RenderTransformOrigin="0.54,-0.038"/>
+                    <ComboBox Grid.Row="1" x:Name="comboBoxAction" HorizontalAlignment="Left" Margin="127,4,0,0"  VerticalAlignment="Top" Width="176" SelectionChanged="comboBoxAction_SelectionChanged" >
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -109,8 +118,8 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <Label Grid.Row="2" Content="Responsibility: " HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.337,0.423" Width="88" />
-                    <ComboBox Grid.Row="2" x:Name="comboBoxResponsible" HorizontalAlignment="Left" Margin="103,4,0,0" VerticalAlignment="Top" Width="200">
+                    <Label Grid.Row="2" Content="Responsible Party:" HorizontalAlignment="Left" Margin="10,0,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.337,0.423" Width="112" />
+                    <ComboBox Grid.Row="2" x:Name="comboBoxResponsible" HorizontalAlignment="Left" Margin="127,4,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="comboBoxResponsible_SelectionChanged">
                         <ComboBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid>
@@ -125,7 +134,7 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
 
-                    <Button HorizontalAlignment="Right" Height="27" Margin="0,7,18,0" VerticalAlignment="Top" Width="27"  ToolTip="Set Status Options" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <Button x:Name="buttonSettings" HorizontalAlignment="Right" Height="27" Margin="0,7,18,0" VerticalAlignment="Top" Width="27"  ToolTip="Set Status Options" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonSettings_Click">
                         <Image Source="/HOK.SmartBCF;component/Resources/gear.png" Stretch="UniformToFill" />
                     </Button>
                 </Grid>
@@ -168,13 +177,13 @@
                 <ItemsPanelTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
-            <StatusBarItem>
+            <StatusBarItem Margin="0,0,5,0">
                 <TextBlock Text="Ready" Name="statusLable" Visibility="Visible" />
             </StatusBarItem>
             <StatusBarItem  Grid.Column="1" Margin="0">
@@ -182,9 +191,7 @@
             </StatusBarItem>
         </StatusBar>
 
-
-
-        <Expander x:Name="expanderBCF" Header="Show BCF Info" HorizontalAlignment="Stretch" Margin="5" Grid.Row="1" VerticalAlignment="Stretch" Collapsed="expanderBCF_Collapsed" Expanded="expanderBCF_Expanded" >
+        <Expander x:Name="expanderBCF" Header="Show BCF Info" HorizontalAlignment="Stretch" Margin="10,0,0,10" Grid.Row="1" VerticalAlignment="Stretch" Collapsed="expanderBCF_Collapsed" Expanded="expanderBCF_Expanded" >
             <Expander.Background>
                 <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
             </Expander.Background>
@@ -196,29 +203,37 @@
                 </Grid.RowDefinitions>
 
                 <TabControl HorizontalAlignment="Stretch" Margin="5,10,5,0" Grid.RowSpan="2" VerticalAlignment="Stretch" Grid.ColumnSpan="2">
-                    <TabItem Header="Issues">
+                    <TabItem Header="Comments">
                         <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition Height="35"/>
                             </Grid.RowDefinitions>
-                            <DataGrid Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <DataGrid x:Name="dataGridComments" Grid.Column="1" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" CanUserAddRows="False">
                                 <DataGrid.Columns>
-                                    <DataGridTemplateColumn Header="Thumbnail" Width="100"/>
-                                    <DataGridTextColumn Header="Issue" Width="130"/>
-                                    <DataGridTextColumn Header="Topic" Width="130"/>
-                                    <DataGridTextColumn Header="Author" Width="130"/>
+                                    <DataGridTextColumn Header="Comment" Binding="{Binding Comment1}" Width="1*"/>
+                                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                                    <DataGridTextColumn Header="VerbalStatus" Binding="{Binding VerbalStatus}" Width="100"/>
+                                    <DataGridTextColumn Header="Author" Binding="{Binding Author}" Width="100"/>
+                                    <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="100"/>
                                 </DataGrid.Columns>
                             </DataGrid>
-                            <Button Content="Read Status from Revit" HorizontalAlignment="Left" Margin="10,3,0,0" Grid.Row="1" VerticalAlignment="Top" Width="142"/>
-                            <Button Content="Write Selected to Revit" HorizontalAlignment="Right" Margin="0,3,10,0" Grid.Row="1" VerticalAlignment="Top" Width="152"/>
-                            <Button Content="Write All to Revit" HorizontalAlignment="Right" Margin="0,3,167,0" Grid.Row="1" VerticalAlignment="Top" Width="133"/>
+                            <Button x:Name="buttonRead" Grid.Column="1" Grid.Row="1" Content="Read Status from Revit" HorizontalAlignment="Left" Margin="10,3,0,0" VerticalAlignment="Top" Width="142" IsEnabled="False"/>
+                            <Button x:Name="buttonSelected" Grid.Column="1" Grid.Row="1" Content="Write Selected to Revit" HorizontalAlignment="Right" Margin="0,3,10,0" VerticalAlignment="Top" Width="152" Click="buttonSelected_Click"/>
+
+                            <Image x:Name="imageIssue" HorizontalAlignment="Stretch" Margin="10,40,10,40" VerticalAlignment="Stretch"/>
+                            <Label x:Name="labelIssueTopic" Content="Issue Topic" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                         </Grid>
                     </TabItem>
 
                 </TabControl>
             </Grid>
         </Expander>
+        <Button x:Name="buttonBake" Content="Bake BCF Files" HorizontalAlignment="Right" Margin="0,0,105,10" Grid.Row="2" VerticalAlignment="Bottom" Width="100" Click="buttonClose_Click"/>
 
 
     </Grid>
