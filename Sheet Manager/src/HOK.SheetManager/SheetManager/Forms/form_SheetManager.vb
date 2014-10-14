@@ -659,7 +659,7 @@ Public Class form_SheetManager
                         placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
 
                     End If
-#ElseIf RELEASE2014 Or RELEAS2015 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Then
                      pointInsert = XYZ.Zero
 
                     If Viewport.CanAddViewToSheet(m_Settings.Document, m_ViewSheet.Id, m_View.Id) Then
