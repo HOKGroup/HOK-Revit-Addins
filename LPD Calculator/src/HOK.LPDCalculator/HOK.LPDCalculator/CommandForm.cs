@@ -32,6 +32,7 @@ namespace HOK.LPDCalculator
             m_doc = m_app.ActiveUIDocument.Document;
            
             InitializeComponent();
+            this.Text = "LPD Analysis - v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             progressBar.Visible = false;
             statusLabel.Text = "Ready";
         }

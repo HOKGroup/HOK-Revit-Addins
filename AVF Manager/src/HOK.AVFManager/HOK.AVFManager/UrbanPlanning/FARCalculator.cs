@@ -149,7 +149,7 @@ namespace HOK.AVFManager.UrbanPlanning
 #if RELEASE2015
                     Parameter parameter = element.LookupParameter("Building Function");
 #else 
-                    Parameter parameter = element.get_Parameter("Building Function")
+                    Parameter parameter = element.get_Parameter("Building Function");
 #endif
 
                     if (null != parameter)

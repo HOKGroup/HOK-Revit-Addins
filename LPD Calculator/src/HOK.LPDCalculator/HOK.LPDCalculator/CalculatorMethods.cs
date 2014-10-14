@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using HOK.LPDCalculator.Schedule;
 using System.Windows.Forms;
+using Autodesk.Revit.DB.Architecture;
 
 
 namespace HOK.LPDCalculator
@@ -99,87 +100,104 @@ namespace HOK.LPDCalculator
                     bar.Maximum = selectedAreas.Count;
                     bar.Value = 0;
                 }
-                
-                foreach (Element e in selectedAreas)
+
+                using (TransactionGroup group = new TransactionGroup(m_doc, "Update Areas"))
                 {
-                    if (null != bar)
+                    group.Start();
+
+                    foreach (Element e in selectedAreas)
                     {
-                        bar.PerformStep();
-                    }
-
-                    Area area = e as Area;
-
-                    List<Element> elementList = GetLightingFixtures(area);
-                    if (elementList.Count > 0)
-                    {
-                        AreaProperties ap = new AreaProperties();
-                        ap.AreaId = area.Id.IntegerValue;
-                        ap.AreaName = area.Name;
-                        ap.Area = area.Area;
-
-                        Dictionary<int, LightingProperties> lightingDictionary = new Dictionary<int, LightingProperties>();
-                        double totalAL = 0;
-                        foreach (Element element in elementList)
+                        if (null != bar)
                         {
-                            LightingProperties lp = new LightingProperties();
-                            lp.LightingElement = element;
-                            lp.LightingId = element.Id.IntegerValue;
-                            lp.LightingTypeId = element.GetTypeId().IntegerValue;
+                            bar.PerformStep();
+                        }
 
+                        Area area = e as Area;
+                        if (area.Area == 0) { continue; } //skip empty area elements.
+
+                        Room correlatedRoom = null;
+                        List<Element> elementList = GetLightingFixtures(area, out correlatedRoom);
+                        if (elementList.Count > 0)
+                        {
+                            using (Transaction trans = new Transaction(m_doc, "Set LPD"))
+                            {
+                                trans.Start();
+                                try
+                                {
+                                    AreaProperties ap = new AreaProperties(area);
+                                    if (null != correlatedRoom)
+                                    {
+                                        RoomProperties rp = new RoomProperties(correlatedRoom);
+                                        rp.UpdateAreaParameter(area);
+                                    }
+
+                                    Dictionary<int, LightingProperties> lightingDictionary = new Dictionary<int, LightingProperties>();
+                                    double totalAL = 0;
+                                    foreach (Element element in elementList)
+                                    {
+                                        LightingProperties lp = new LightingProperties(element);
 #if RELEASE2015
                             Parameter calculatedParam = element.LookupParameter("Apparent VA Calculated Load");
 #else
-                            Parameter calculatedParam = element.get_Parameter("Apparent VA Calculated Load");
+                                        Parameter calculatedParam = element.get_Parameter("Apparent VA Calculated Load");
 #endif
 
-                            if (null != calculatedParam)
-                            {
-                                lp.ApparentLoad = calculatedParam.AsDouble();
-                                totalAL += lp.ApparentLoad;
-                            }
-                            else if (lightingTypeDictionary.ContainsKey(lp.LightingTypeId))
-                            {
-                                lp.ApparentLoad = lightingTypeDictionary[lp.LightingTypeId];
-                                totalAL += lp.ApparentLoad;
-                            }
+                                        if (null != calculatedParam)
+                                        {
+                                            lp.ApparentLoad = calculatedParam.AsDouble();
+                                            totalAL += lp.ApparentLoad;
+                                        }
+                                        else if (lightingTypeDictionary.ContainsKey(lp.LightingTypeId))
+                                        {
+                                            lp.ApparentLoad = lightingTypeDictionary[lp.LightingTypeId];
+                                            totalAL += lp.ApparentLoad;
+                                        }
 
-                            if (!lightingDictionary.ContainsKey(lp.LightingId))
-                            {
-                                lightingDictionary.Add(lp.LightingId, lp);
-                            }
-                        }
+                                        if (!lightingDictionary.ContainsKey(lp.LightingId))
+                                        {
+                                            lightingDictionary.Add(lp.LightingId, lp);
+                                        }
+                                    }
 
-                        ap.ActualLightingLoad = totalAL;
-                        ap.LPD = totalAL / ap.Area;
+                                    ap.ActualLightingLoad = totalAL;
+                                    ap.LPD = totalAL / ap.Area;
 
-                        Transaction trans = new Transaction(m_doc);
-                        trans.Start("Set LPD");
 #if RELEASE2015
                         Parameter param = area.LookupParameter("ActualLightingLoad");
 #else
-                        Parameter param = area.get_Parameter("ActualLightingLoad");
+                                    Parameter param = area.get_Parameter("ActualLightingLoad");
 #endif
 
-                        if (null != param)
-                        {
-                            bool setLoad = param.Set(ap.ActualLightingLoad);
-                        }
+                                    if (null != param)
+                                    {
+                                        bool setLoad = param.Set(ap.ActualLightingLoad);
+                                    }
 #if RELEASE2015
                         param = area.LookupParameter("ActualLPD");
 #else
-                        param = area.get_Parameter("ActualLPD");
+                                    param = area.get_Parameter("ActualLPD");
 #endif
 
-                        if (null != param)
-                        {
-                            bool setLPD = param.Set(ap.LPD);
-                        }
-                        trans.Commit();
+                                    if (null != param)
+                                    {
+                                        bool setLPD = param.Set(ap.LPD);
+                                    }
 
-                        ap.LightingFixtures = lightingDictionary;
-                        areaDictionary.Add(ap.AreaId, ap);
+                                    ap.LightingFixtures = lightingDictionary;
+                                    areaDictionary.Add(ap.AreaId, ap);
+                                    trans.Commit();
+                                }
+                                catch (Exception ex)
+                                {
+                                    MessageBox.Show("Failed to set LPD.\n" + ex.Message, "Set LPD Values", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                    trans.RollBack();
+                                }
+                            }
+                        }
+                        else { continue; }
                     }
-                    else { continue; }
+
+                    group.Assimilate();
                 }
                 result = true;
             }
@@ -191,8 +209,9 @@ namespace HOK.LPDCalculator
             return result;
         }
 
-        private List<Element> GetLightingFixtures(Area area)
+        private List<Element> GetLightingFixtures(Area area, out Room correlatedRoom)
         {
+            correlatedRoom = null;
             List<Element> lightingFixtures = new List<Element>();
             try
             {
@@ -210,6 +229,27 @@ namespace HOK.LPDCalculator
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
                 collector.OfCategory(BuiltInCategory.OST_LightingFixtures);
                 List<ElementId> elementIds = collector.WherePasses(orFilter).ToElementIds().ToList();
+
+                FilteredElementCollector roomCollector = new FilteredElementCollector(m_doc);
+                roomCollector.OfCategory(BuiltInCategory.OST_Rooms);
+                List<Room> roomsFound = roomCollector.WherePasses(orFilter).ToElements().Cast<Room>().ToList();
+                foreach (Room room in roomsFound)
+                {
+#if RELEASE2013
+                    if (null != area.Level && null!=room.Level)
+                    {
+                        if (area.Level.Id.IntegerValue == room.Level.Id.IntegerValue)
+                        {
+                            correlatedRoom = room; break;
+                        }
+                    }
+#else
+                    if (area.LevelId.IntegerValue == room.LevelId.IntegerValue)
+                    {
+                        correlatedRoom = room; break;
+                    }
+#endif
+                }
 
                 BuiltInParameter bltParam1 = BuiltInParameter.INSTANCE_SCHEDULE_ONLY_LEVEL_PARAM;
                 ParameterValueProvider pvp1 = new ParameterValueProvider(new ElementId((int)bltParam1));
@@ -245,6 +285,30 @@ namespace HOK.LPDCalculator
                         {
                             if (linkedDocuments.Contains(doc.Title))
                             {
+                                if (null == correlatedRoom)
+                                {
+                                    roomCollector = new FilteredElementCollector(doc);
+                                    roomCollector.OfCategory(BuiltInCategory.OST_Rooms);
+                                    roomsFound = roomCollector.WherePasses(orFilter).ToElements().Cast<Room>().ToList();
+                                    foreach (Room room in roomsFound)
+                                    {
+#if RELEASE2013
+                                        if (null != area.Level && null != room.Level)
+                                        {
+                                            if (area.Level.Id.IntegerValue == room.Level.Id.IntegerValue)
+                                            {
+                                                correlatedRoom = room; break;
+                                            }
+                                        }
+#else
+                                        if (area.LevelId.IntegerValue == room.LevelId.IntegerValue)
+                                        {
+                                            correlatedRoom = room; break;
+                                        }
+#endif
+                                    }
+                                }
+
                                 collector = new FilteredElementCollector(doc);
                                 collector.OfCategory(BuiltInCategory.OST_LightingFixtures);
                                 elementIds = collector.WherePasses(orFilter).ToElementIds().ToList();
@@ -594,19 +658,128 @@ namespace HOK.LPDCalculator
 
     public class AreaProperties
     {
-        public int AreaId { get; set; }
-        public string AreaName { get; set; }
-        public double Area { get; set; }
-        public double ActualLightingLoad { get; set; }
-        public double LPD { get; set; }
-        public Dictionary<int, LightingProperties> LightingFixtures { get; set; }
+        private Area areaElement = null;
+        private int areaId = -1;
+        private string areaName = "";
+        private double area = 0;
+        private double actualLightingLoad = 0;
+        private double lpd = 0;
+        private Dictionary<int, LightingProperties> lightingFixtures = new Dictionary<int, LightingProperties>();
+        private RoomProperties correlatedRoom = null;
+
+        public Area AreaElement { get { return areaElement; } set { areaElement = value; } }
+        public int AreaId { get { return areaId; } set { areaId = value; } }
+        public string AreaName { get { return areaName; } set { areaName = value; } }
+        public double Area { get { return area; } set { area = value; } }
+        public double ActualLightingLoad { get { return actualLightingLoad; } set { actualLightingLoad = value; } }
+        public double LPD { get { return lpd; } set { lpd = value; } }
+        public Dictionary<int, LightingProperties> LightingFixtures { get { return lightingFixtures; } set { lightingFixtures = value; } }
+        public RoomProperties CorrelatedRoom { get { return correlatedRoom; } set { correlatedRoom = value; } }
+
+        public AreaProperties(Area areaObj)
+        {
+            areaElement = areaObj;
+            areaId = areaElement.Id.IntegerValue;
+            areaName = areaElement.Name;
+            area = areaElement.Area;
+        }
     }
 
     public class LightingProperties
     {
-        public int LightingId { get; set; }
-        public int LightingTypeId { get; set; }
-        public double ApparentLoad { get; set; }
-        public Element LightingElement { get; set; }
+        private Element lightingElement = null;
+        private int lightingId = -1;
+        private int lightingTypeId = -1;
+        private double apparentLoad = 0;
+
+        public Element LightingElement { get { return lightingElement; } set { lightingElement = value; } }
+        public int LightingId { get { return lightingId; } set { lightingId = value; } }
+        public int LightingTypeId { get { return lightingTypeId; } set { lightingTypeId = value; } }
+        public double ApparentLoad { get { return apparentLoad; } set { apparentLoad = value; } }
+
+        public LightingProperties(Element element)
+        {
+            lightingElement = element;
+            lightingId = lightingElement.Id.IntegerValue;
+            lightingTypeId = lightingElement.GetTypeId().IntegerValue;
+        }
+
+    }
+
+    public class RoomProperties
+    {
+        private Room m_room = null;
+        private int roomId = -1;
+        private string roomName = "";
+        private string roomNumber = "";
+
+        public Room RoomObj { get { return m_room; } set { m_room = value; } }
+        public int RoomId { get { return roomId; } set { roomId = value; } }
+        public string RoomName { get { return roomName; } set { roomName = value; } }
+        public string RoomNumber { get { return roomNumber; } set { roomNumber = value; } }
+
+        public RoomProperties(Room roomElement)
+        {
+            m_room = roomElement;
+            roomId = m_room.Id.IntegerValue;
+            GetRoomInfo();
+        }
+
+        private void GetRoomInfo()
+        {
+            if (null != m_room)
+            {
+                Parameter param = m_room.get_Parameter(BuiltInParameter.ROOM_NAME);
+                if (null != param)
+                {
+                    roomName = param.AsString();
+                }
+
+                param = m_room.get_Parameter(BuiltInParameter.ROOM_NUMBER);
+                if (null != param)
+                {
+                    roomNumber = param.AsString();
+                }
+            }
+        }
+
+        public bool UpdateAreaParameter(Area area)
+        {
+            bool result = false;
+            try
+            {
+#if RELEASE2015
+                Parameter param = area.LookupParameter("RoomName");
+#else
+                Parameter param = area.get_Parameter("RoomName");
+#endif
+                
+                if (null != param)
+                {
+                    if (param.StorageType == StorageType.String)
+                    {
+                        param.Set(roomName);
+                    }
+                }
+
+#if RELEASE2015
+                param = area.LookupParameter("RoomNumber");
+#else
+                param = area.get_Parameter("RoomNumber");
+#endif
+                if (null != param)
+                {
+                    if (param.StorageType == StorageType.String)
+                    {
+                        param.Set(roomNumber);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+            return result;
+        }
     }
 }
