@@ -165,7 +165,7 @@
                 </Grid>
             </GroupBox>
 
-            <Button Grid.Column="1" x:Name="buttonNewIssue" Content="Create New Issue from Selected Elements" HorizontalAlignment="Right" Margin="0,15,30,0" Grid.Row="3" VerticalAlignment="Top" Width="238" Height="25"/>
+            <Button Grid.Column="1" x:Name="buttonNewIssue" Content="Create New Issue from Selected Elements" HorizontalAlignment="Right" Margin="0,15,30,0" Grid.Row="3" VerticalAlignment="Top" Width="238" Height="25" IsEnabled="False"/>
 
         </Grid>
 
@@ -233,7 +233,7 @@
                 </TabControl>
             </Grid>
         </Expander>
-        <Button x:Name="buttonBake" Content="Bake BCF Files" HorizontalAlignment="Right" Margin="0,0,105,10" Grid.Row="2" VerticalAlignment="Bottom" Width="100" Click="buttonClose_Click"/>
+        <Button x:Name="buttonBake" Content="Bake BCF Files" HorizontalAlignment="Right" Margin="0,0,105,10" Grid.Row="2" VerticalAlignment="Bottom" Width="100" Click="buttonClose_Click" IsEnabled="False"/>
 
 
     </Grid>

@@ -189,6 +189,7 @@
     <Compile Include="Utils\BCFUtil.cs" />
     <Compile Include="Utils\DataStorageUtil.cs" />
     <Compile Include="Utils\GUIDUtil.cs" />
+    <Compile Include="Utils\ImageUtil.cs" />
     <Compile Include="Utils\ParameterUtil.cs" />
     <Compile Include="Walker\BCFWindow.xaml.cs">
       <DependentUpon>BCFWindow.xaml</DependentUpon>
@@ -242,7 +243,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="Resources\walker.png" />
+    <EmbeddedResource Include="Resources\walker.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\BCFicon16.ico" />

@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Autodesk.Revit.DB;
+using HOK.SmartBCF.Utils;
 
 namespace HOK.SmartBCF.Walker
 {
@@ -44,30 +45,10 @@ namespace HOK.SmartBCF.Walker
             categoryInfoList = categoryInfoList.OrderBy(o => o.CategoryName).ToList();
 
             InitializeComponent();
-            checkAllImage = LoadBitmapImage("checkbox_yes.png");
-            checkNoneImage = LoadBitmapImage("checkbox_no.png");
+            checkAllImage = ImageUtil.LoadBitmapImage("checkbox_yes.png", 16);
+            checkNoneImage = ImageUtil.LoadBitmapImage("checkbox_no.png", 16);
             buttonCheckImage.Source = checkAllImage;
             dataGridCategory.ItemsSource = categoryInfoList;
-        }
-
-        private BitmapImage LoadBitmapImage(string imageName)
-        {
-            BitmapImage image = new BitmapImage();
-            try
-            {
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                string prefix = typeof(AppCommand).Namespace + ".Resources.";
-                Stream stream = assembly.GetManifestResourceStream(prefix + imageName);
-
-                image.BeginInit();
-                image.StreamSource = stream;
-                image.EndInit();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to load check box button image.\n" + ex.Message, "Load Bitmap Image", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return image;
         }
 
         private void buttonCheck_Click(object sender, RoutedEventArgs e)

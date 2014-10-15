@@ -474,7 +474,7 @@ namespace HOK.SmartBCF.Walker
                                     offsetBoundingBox.Min = minXYZ;
                                     offsetBoundingBox.Max = maxXYZ;
 #if RELEASE2013
-                                        view3d.SectionBox = offsetBoundingBox;
+                                    activeView.SectionBox = offsetBoundingBox;
 #else
                                     activeView.SetSectionBox(offsetBoundingBox);
                                     activeView.GetSectionBox().Enabled = true;
@@ -484,7 +484,7 @@ namespace HOK.SmartBCF.Walker
                             else
                             {
 #if RELEASE2013
-                                        view3d.SectionBox = null;                              
+                                activeView.SectionBox = null;                              
 #else
                                 Parameter parameter = activeView.get_Parameter(BuiltInParameter.VIEWER_MODEL_CLIP_BOX_ACTIVE);
                                 if (null != parameter)

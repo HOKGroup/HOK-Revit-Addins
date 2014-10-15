@@ -90,8 +90,8 @@ namespace HOK.SmartBCF.Walker
             this.Height = 535;
             labelStep.Content = "";
 
-            filterOnImage = LoadBitmapImage("filter.png");
-            filterOffImage = LoadBitmapImage("filter_empty.png");
+            filterOnImage = ImageUtil.LoadBitmapImage("filter.png", 24);
+            filterOffImage = ImageUtil.LoadBitmapImage("filter_empty.png", 24);
 
             buttonFilterImage.Source = filterOffImage;
 
@@ -569,13 +569,14 @@ namespace HOK.SmartBCF.Walker
                 if (bcfWindow.ShowDialog() == true)
                 {
                     Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Loading BCF Information..." });
-                    
-                    if (bcfWindow.BCFFileDictionary.Count > 0)
+
+                    bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
+                    bcfFileDictionary = bcfWindow.BCFFileDictionary;
+                    bcfProjectId = bcfWindow.BCFProjectId;
+                    googleFolders = bcfWindow.GoogleFolders;
+
+                    if (!string.IsNullOrEmpty(bcfProjectId) && null != googleFolders)
                     {
-                        bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
-                        bcfFileDictionary = bcfWindow.BCFFileDictionary;
-                        bcfProjectId = bcfWindow.BCFProjectId;
-                        googleFolders = bcfWindow.GoogleFolders;
                         bcfColorSchemeId = googleFolders.ColorSheet.Id;
                         bcfWindow.Close();
 
@@ -587,8 +588,7 @@ namespace HOK.SmartBCF.Walker
                         m_event.Raise();
                         SetFocus();
                     }
-                    
-                    
+                   
                     Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Ready" });
                 }
             }

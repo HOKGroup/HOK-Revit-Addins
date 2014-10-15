@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 using Autodesk.Revit.UI;
+using HOK.SmartBCF.Utils;
 using HOK.SmartBCF.Walker;
 
 namespace HOK.SmartBCF
@@ -13,6 +14,7 @@ namespace HOK.SmartBCF
     {
         internal static AppCommand thisApp = null;
         private WalkerWindow walkerWindow;
+        private string tabName = "";
 
         public Result OnShutdown(UIControlledApplication application)
         {
@@ -29,7 +31,12 @@ namespace HOK.SmartBCF
             thisApp = this;
             walkerWindow = null;
 
-            RibbonPanel rp = application.CreateRibbonPanel("HOK smartBCF");
+            tabName = "   HOK   ";
+            try { application.CreateRibbonTab(tabName); }
+            catch { }
+
+
+            RibbonPanel rp = application.CreateRibbonPanel(tabName, "BCF");
             string currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
 
             BitmapSource walkerImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(Properties.Resources.walker.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
