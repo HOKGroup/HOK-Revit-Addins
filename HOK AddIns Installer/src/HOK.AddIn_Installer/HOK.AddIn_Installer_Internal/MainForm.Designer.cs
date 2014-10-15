@@ -107,9 +107,9 @@
             // 
             // groupBoxTools
             // 
-            this.groupBoxTools.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxTools.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBoxTools.Controls.Add(this.splitContainerMain);
             this.groupBoxTools.Location = new System.Drawing.Point(19, 76);
             this.groupBoxTools.Margin = new System.Windows.Forms.Padding(10);
@@ -185,9 +185,9 @@
             // 
             // listViewTools
             // 
-            this.listViewTools.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.listViewTools.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.listViewTools.CheckBoxes = true;
             this.listViewTools.FullRowSelect = true;
             this.listViewTools.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
@@ -216,6 +216,7 @@
             this.imageListIcons.Images.SetKeyName(7, "height.png");
             this.imageListIcons.Images.SetKeyName(8, "copy.png");
             this.imageListIcons.Images.SetKeyName(9, "color32.png");
+            this.imageListIcons.Images.SetKeyName(10, "walker.png");
             // 
             // label2
             // 

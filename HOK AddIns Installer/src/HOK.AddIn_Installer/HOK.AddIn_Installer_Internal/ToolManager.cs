@@ -26,6 +26,7 @@ namespace HOK.AddIn_Installer_Internal
         CreateFinishes=13,
         ModelReporting=14,
         HOKNavigator=15,
+        SmartBCF=16
     }
 
     public enum Tool2014
@@ -46,7 +47,8 @@ namespace HOK.AddIn_Installer_Internal
         ModelReporting=14,
         HOKNavigator=15,
         ModelManager=16,
-        ColorEditor=17
+        ColorEditor=17,
+        SmartBCF=18
     }
 
     public enum Tool2015
@@ -67,7 +69,8 @@ namespace HOK.AddIn_Installer_Internal
         ModelReporting = 14,
         HOKNavigator = 15,
         ModelManager = 16,
-        ColorEditor = 17
+        ColorEditor = 17,
+        SmartBCF
     }
 
     public enum TargetSoftware
@@ -256,6 +259,36 @@ namespace HOK.AddIn_Installer_Internal
                             tp.DLLName = "HOK.Utilities.dll";
                             tp.ImageIndex = 7;
                             tp.BetaOnly = false;
+                            break;
+                        case Tool2013.SmartBCF:
+                            fileNames.Add("\\HOK.SmartBCF.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Core.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Drive.v2.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Client.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Spreadsheets.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\log4net.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.Desktop.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Newtonsoft.Json.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
+
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\walker.png");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Shared Parameters.txt");
+                            
+                            tp.ToolName = "Smart BCF";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll";
+                            tp.DLLName = "HOK.SmartBCF.dll";
+                            tp.ImageIndex = 10;
+                            tp.BetaOnly = true;
                             break;
                     }
                     tp.TargetSoftWareEnum = TargetSoftware.Revit_2013;
@@ -479,6 +512,36 @@ namespace HOK.AddIn_Installer_Internal
                             tp.ImageIndex = 9;
                             tp.BetaOnly = false;
                             break;
+                        case Tool2014.SmartBCF:
+                            fileNames.Add("\\HOK.SmartBCF.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Core.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Drive.v2.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Client.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Spreadsheets.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\log4net.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.Desktop.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Newtonsoft.Json.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
+
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\walker.png");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Shared Parameters.txt");
+                            
+                            tp.ToolName = "Smart BCF";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll";
+                            tp.DLLName = "HOK.SmartBCF.dll";
+                            tp.ImageIndex = 10;
+                            tp.BetaOnly = true;
+                            break;
 
                     }
                     tp.TargetSoftWareEnum = TargetSoftware.Revit_2014;
@@ -701,6 +764,36 @@ namespace HOK.AddIn_Installer_Internal
                             tp.DLLName = "HOK.ColorSchemeEditor.dll";
                             tp.ImageIndex = 9;
                             tp.BetaOnly = false;
+                            break;
+                        case Tool2015.SmartBCF:
+                            fileNames.Add("\\HOK.SmartBCF.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Core.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Drive.v2.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Client.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Spreadsheets.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\log4net.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.Desktop.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Newtonsoft.Json.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
+
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\walker.png");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Shared Parameters.txt");
+                            
+                            tp.ToolName = "Smart BCF";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll";
+                            tp.DLLName = "HOK.SmartBCF.dll";
+                            tp.ImageIndex = 10;
+                            tp.BetaOnly = true;
                             break;
 
                     }
