@@ -37,6 +37,9 @@ Partial Class form_ElemViewsFromRooms
         Me.checkBoxReplaceExisting = New System.Windows.Forms.CheckBox()
         Me.radioButtonGroupMultiple = New System.Windows.Forms.RadioButton()
         Me.groupBoxViewType = New System.Windows.Forms.GroupBox()
+        Me.ComboBoxViewTemplate = New System.Windows.Forms.ComboBox()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.RadioButtonTypeElevation = New System.Windows.Forms.RadioButton()
         Me.radioButtonType3dBoxCrop = New System.Windows.Forms.RadioButton()
         Me.textBoxVectorZ = New System.Windows.Forms.TextBox()
         Me.textBoxVectorY = New System.Windows.Forms.TextBox()
@@ -148,7 +151,7 @@ Partial Class form_ElemViewsFromRooms
         '
         'buttonClose
         '
-        Me.buttonClose.Location = New System.Drawing.Point(482, 616)
+        Me.buttonClose.Location = New System.Drawing.Point(502, 671)
         Me.buttonClose.Name = "buttonClose"
         Me.buttonClose.Size = New System.Drawing.Size(178, 29)
         Me.buttonClose.TabIndex = 37
@@ -175,7 +178,7 @@ Partial Class form_ElemViewsFromRooms
         Me.groupBoxSizeCrop.Controls.Add(Me.label10)
         Me.groupBoxSizeCrop.Controls.Add(Me.label11)
         Me.groupBoxSizeCrop.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.groupBoxSizeCrop.Location = New System.Drawing.Point(326, 496)
+        Me.groupBoxSizeCrop.Location = New System.Drawing.Point(346, 547)
         Me.groupBoxSizeCrop.Name = "groupBoxSizeCrop"
         Me.groupBoxSizeCrop.Size = New System.Drawing.Size(334, 107)
         Me.groupBoxSizeCrop.TabIndex = 44
@@ -205,7 +208,7 @@ Partial Class form_ElemViewsFromRooms
         'checkBoxReplaceExisting
         '
         Me.checkBoxReplaceExisting.AutoSize = True
-        Me.checkBoxReplaceExisting.Location = New System.Drawing.Point(11, 71)
+        Me.checkBoxReplaceExisting.Location = New System.Drawing.Point(10, 127)
         Me.checkBoxReplaceExisting.Name = "checkBoxReplaceExisting"
         Me.checkBoxReplaceExisting.Size = New System.Drawing.Size(105, 17)
         Me.checkBoxReplaceExisting.TabIndex = 38
@@ -225,6 +228,9 @@ Partial Class form_ElemViewsFromRooms
         '
         'groupBoxViewType
         '
+        Me.groupBoxViewType.Controls.Add(Me.ComboBoxViewTemplate)
+        Me.groupBoxViewType.Controls.Add(Me.Label2)
+        Me.groupBoxViewType.Controls.Add(Me.RadioButtonTypeElevation)
         Me.groupBoxViewType.Controls.Add(Me.checkBoxReplaceExisting)
         Me.groupBoxViewType.Controls.Add(Me.radioButtonType3dBoxCrop)
         Me.groupBoxViewType.Controls.Add(Me.textBoxVectorZ)
@@ -238,17 +244,45 @@ Partial Class form_ElemViewsFromRooms
         Me.groupBoxViewType.Controls.Add(Me.label15)
         Me.groupBoxViewType.Controls.Add(Me.label16)
         Me.groupBoxViewType.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.groupBoxViewType.Location = New System.Drawing.Point(326, 283)
+        Me.groupBoxViewType.Location = New System.Drawing.Point(346, 283)
         Me.groupBoxViewType.Name = "groupBoxViewType"
-        Me.groupBoxViewType.Size = New System.Drawing.Size(334, 99)
+        Me.groupBoxViewType.Size = New System.Drawing.Size(334, 150)
         Me.groupBoxViewType.TabIndex = 43
         Me.groupBoxViewType.TabStop = False
         Me.groupBoxViewType.Text = "View Type"
         '
+        'ComboBoxViewTemplate
+        '
+        Me.ComboBoxViewTemplate.FormattingEnabled = True
+        Me.ComboBoxViewTemplate.Location = New System.Drawing.Point(130, 68)
+        Me.ComboBoxViewTemplate.Name = "ComboBoxViewTemplate"
+        Me.ComboBoxViewTemplate.Size = New System.Drawing.Size(189, 21)
+        Me.ComboBoxViewTemplate.TabIndex = 61
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(26, 71)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(83, 13)
+        Me.Label2.TabIndex = 60
+        Me.Label2.Text = "View Template: "
+        '
+        'RadioButtonTypeElevation
+        '
+        Me.RadioButtonTypeElevation.AutoSize = True
+        Me.RadioButtonTypeElevation.Location = New System.Drawing.Point(87, 15)
+        Me.RadioButtonTypeElevation.Name = "RadioButtonTypeElevation"
+        Me.RadioButtonTypeElevation.Size = New System.Drawing.Size(69, 17)
+        Me.RadioButtonTypeElevation.TabIndex = 59
+        Me.RadioButtonTypeElevation.TabStop = True
+        Me.RadioButtonTypeElevation.Text = "Elevation"
+        Me.RadioButtonTypeElevation.UseVisualStyleBackColor = True
+        '
         'radioButtonType3dBoxCrop
         '
         Me.radioButtonType3dBoxCrop.AutoSize = True
-        Me.radioButtonType3dBoxCrop.Location = New System.Drawing.Point(243, 16)
+        Me.radioButtonType3dBoxCrop.Location = New System.Drawing.Point(167, 38)
         Me.radioButtonType3dBoxCrop.Name = "radioButtonType3dBoxCrop"
         Me.radioButtonType3dBoxCrop.Size = New System.Drawing.Size(85, 17)
         Me.radioButtonType3dBoxCrop.TabIndex = 58
@@ -258,21 +292,21 @@ Partial Class form_ElemViewsFromRooms
         '
         'textBoxVectorZ
         '
-        Me.textBoxVectorZ.Location = New System.Drawing.Point(278, 41)
+        Me.textBoxVectorZ.Location = New System.Drawing.Point(279, 98)
         Me.textBoxVectorZ.Name = "textBoxVectorZ"
         Me.textBoxVectorZ.Size = New System.Drawing.Size(40, 20)
         Me.textBoxVectorZ.TabIndex = 56
         '
         'textBoxVectorY
         '
-        Me.textBoxVectorY.Location = New System.Drawing.Point(215, 42)
+        Me.textBoxVectorY.Location = New System.Drawing.Point(216, 99)
         Me.textBoxVectorY.Name = "textBoxVectorY"
         Me.textBoxVectorY.Size = New System.Drawing.Size(40, 20)
         Me.textBoxVectorY.TabIndex = 54
         '
         'textBoxVectorX
         '
-        Me.textBoxVectorX.Location = New System.Drawing.Point(144, 42)
+        Me.textBoxVectorX.Location = New System.Drawing.Point(145, 99)
         Me.textBoxVectorX.Name = "textBoxVectorX"
         Me.textBoxVectorX.Size = New System.Drawing.Size(40, 20)
         Me.textBoxVectorX.TabIndex = 52
@@ -280,7 +314,7 @@ Partial Class form_ElemViewsFromRooms
         'label4
         '
         Me.label4.AutoSize = True
-        Me.label4.Location = New System.Drawing.Point(8, 45)
+        Me.label4.Location = New System.Drawing.Point(7, 101)
         Me.label4.Name = "label4"
         Me.label4.Size = New System.Drawing.Size(100, 13)
         Me.label4.TabIndex = 47
@@ -289,7 +323,7 @@ Partial Class form_ElemViewsFromRooms
         'radioButtonType3dCrop
         '
         Me.radioButtonType3dCrop.AutoSize = True
-        Me.radioButtonType3dCrop.Location = New System.Drawing.Point(164, 16)
+        Me.radioButtonType3dCrop.Location = New System.Drawing.Point(88, 38)
         Me.radioButtonType3dCrop.Name = "radioButtonType3dCrop"
         Me.radioButtonType3dCrop.Size = New System.Drawing.Size(64, 17)
         Me.radioButtonType3dCrop.TabIndex = 46
@@ -311,7 +345,7 @@ Partial Class form_ElemViewsFromRooms
         'radioButtonType3dBox
         '
         Me.radioButtonType3dBox.AutoSize = True
-        Me.radioButtonType3dBox.Location = New System.Drawing.Point(86, 16)
+        Me.radioButtonType3dBox.Location = New System.Drawing.Point(10, 38)
         Me.radioButtonType3dBox.Name = "radioButtonType3dBox"
         Me.radioButtonType3dBox.Size = New System.Drawing.Size(60, 17)
         Me.radioButtonType3dBox.TabIndex = 45
@@ -322,7 +356,7 @@ Partial Class form_ElemViewsFromRooms
         'label14
         '
         Me.label14.AutoSize = True
-        Me.label14.Location = New System.Drawing.Point(260, 45)
+        Me.label14.Location = New System.Drawing.Point(261, 102)
         Me.label14.Name = "label14"
         Me.label14.Size = New System.Drawing.Size(17, 13)
         Me.label14.TabIndex = 57
@@ -331,7 +365,7 @@ Partial Class form_ElemViewsFromRooms
         'label15
         '
         Me.label15.AutoSize = True
-        Me.label15.Location = New System.Drawing.Point(196, 45)
+        Me.label15.Location = New System.Drawing.Point(197, 102)
         Me.label15.Name = "label15"
         Me.label15.Size = New System.Drawing.Size(17, 13)
         Me.label15.TabIndex = 55
@@ -340,7 +374,7 @@ Partial Class form_ElemViewsFromRooms
         'label16
         '
         Me.label16.AutoSize = True
-        Me.label16.Location = New System.Drawing.Point(126, 45)
+        Me.label16.Location = New System.Drawing.Point(127, 102)
         Me.label16.Name = "label16"
         Me.label16.Size = New System.Drawing.Size(17, 13)
         Me.label16.TabIndex = 53
@@ -400,7 +434,7 @@ Partial Class form_ElemViewsFromRooms
         Me.groupBoxSizeBox.Controls.Add(Me.label18)
         Me.groupBoxSizeBox.Controls.Add(Me.label19)
         Me.groupBoxSizeBox.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.groupBoxSizeBox.Location = New System.Drawing.Point(326, 388)
+        Me.groupBoxSizeBox.Location = New System.Drawing.Point(346, 439)
         Me.groupBoxSizeBox.Name = "groupBoxSizeBox"
         Me.groupBoxSizeBox.Size = New System.Drawing.Size(334, 102)
         Me.groupBoxSizeBox.TabIndex = 45
@@ -486,7 +520,7 @@ Partial Class form_ElemViewsFromRooms
         Me.groupBoxSelection.Controls.Add(Me.textBoxParameterList1)
         Me.groupBoxSelection.Controls.Add(Me.label8)
         Me.groupBoxSelection.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.groupBoxSelection.Location = New System.Drawing.Point(326, 19)
+        Me.groupBoxSelection.Location = New System.Drawing.Point(346, 19)
         Me.groupBoxSelection.Name = "groupBoxSelection"
         Me.groupBoxSelection.Size = New System.Drawing.Size(334, 161)
         Me.groupBoxSelection.TabIndex = 41
@@ -632,7 +666,7 @@ Partial Class form_ElemViewsFromRooms
         Me.groupBox2.Controls.Add(Me.label3)
         Me.groupBox2.Controls.Add(Me.label9)
         Me.groupBox2.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.groupBox2.Location = New System.Drawing.Point(326, 186)
+        Me.groupBox2.Location = New System.Drawing.Point(346, 186)
         Me.groupBox2.Name = "groupBox2"
         Me.groupBox2.Size = New System.Drawing.Size(334, 91)
         Me.groupBox2.TabIndex = 42
@@ -673,7 +707,7 @@ Partial Class form_ElemViewsFromRooms
         '
         'buttonCreate
         '
-        Me.buttonCreate.Location = New System.Drawing.Point(13, 616)
+        Me.buttonCreate.Location = New System.Drawing.Point(13, 671)
         Me.buttonCreate.Name = "buttonCreate"
         Me.buttonCreate.Size = New System.Drawing.Size(178, 29)
         Me.buttonCreate.TabIndex = 40
@@ -695,21 +729,21 @@ Partial Class form_ElemViewsFromRooms
         Me.listBoxRooms.Location = New System.Drawing.Point(13, 26)
         Me.listBoxRooms.Name = "listBoxRooms"
         Me.listBoxRooms.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.listBoxRooms.Size = New System.Drawing.Size(300, 576)
+        Me.listBoxRooms.Size = New System.Drawing.Size(320, 628)
         Me.listBoxRooms.TabIndex = 38
         '
         'ProgressBar1
         '
-        Me.ProgressBar1.Location = New System.Drawing.Point(13, 616)
+        Me.ProgressBar1.Location = New System.Drawing.Point(13, 671)
         Me.ProgressBar1.Name = "ProgressBar1"
-        Me.ProgressBar1.Size = New System.Drawing.Size(647, 29)
+        Me.ProgressBar1.Size = New System.Drawing.Size(667, 29)
         Me.ProgressBar1.TabIndex = 46
         '
         'form_ElemViewsFromRooms
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(676, 654)
+        Me.ClientSize = New System.Drawing.Size(694, 722)
         Me.Controls.Add(Me.buttonClose)
         Me.Controls.Add(Me.groupBoxSizeCrop)
         Me.Controls.Add(Me.groupBoxViewType)
@@ -722,9 +756,9 @@ Partial Class form_ElemViewsFromRooms
         Me.Controls.Add(Me.ProgressBar1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
-        Me.MaximumSize = New System.Drawing.Size(692, 692)
+        Me.MaximumSize = New System.Drawing.Size(710, 760)
         Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(692, 692)
+        Me.MinimumSize = New System.Drawing.Size(710, 760)
         Me.Name = "form_ElemViewsFromRooms"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "Views From Rooms"
@@ -806,4 +840,7 @@ Partial Class form_ElemViewsFromRooms
     Private WithEvents labelListTitle As System.Windows.Forms.Label
     Private WithEvents listBoxRooms As System.Windows.Forms.ListBox
     Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
+    Friend WithEvents ComboBoxViewTemplate As System.Windows.Forms.ComboBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents RadioButtonTypeElevation As System.Windows.Forms.RadioButton
 End Class
