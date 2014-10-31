@@ -653,11 +653,19 @@ Public Class form_SheetManager
 
                     If Viewport.CanAddViewToSheet(m_Settings.Document, m_ViewSheet.Id, m_View.Id) Then
                         Dim createdViewport As Viewport = Viewport.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
-                        Dim outline As Outline = createdViewport.GetBoxOutline()
 
                         placed = True
                         placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
+                    ElseIf TypeOf m_View Is ViewSchedule Then
+                        pointInsert = XYZ.Zero
+                        Dim createdScheduleInstance As ScheduleSheetInstance = ScheduleSheetInstance.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
+                        Dim centerPoint As XYZ = createdScheduleInstance.Point
+                        Dim bbBox As BoundingBoxXYZ = createdScheduleInstance.BoundingBox(m_ViewSheet)
+                        Dim diffToMove As XYZ = New XYZ(offsetU - bbBox.Min.X, offsetV - bbBox.Min.Y, 0)
+                        ElementTransformUtils.MoveElement(m_Settings.Document, createdScheduleInstance.Id, diffToMove)
 
+                        placed = True
+                        placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
                     End If
 #ElseIf RELEASE2014 Or RELEASE2015 Then
                      pointInsert = XYZ.Zero
@@ -665,12 +673,22 @@ Public Class form_SheetManager
                     If Viewport.CanAddViewToSheet(m_Settings.Document, m_ViewSheet.Id, m_View.Id) Then
                         Dim createdViewport As Viewport = Viewport.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
                         Dim centerPoint As XYZ = createdViewport.GetBoxCenter()
-                    Dim outline As Outline = createdViewport.GetBoxOutline()
+                        Dim outline As Outline = createdViewport.GetBoxOutline()
                         Dim diffToMove As XYZ = New XYZ(offsetU + outline.MaximumPoint.X, offsetV + outline.MaximumPoint.Y, 0)
                         ElementTransformUtils.MoveElement(m_Settings.Document, createdViewport.Id, diffToMove)
 
                         placed = True
                         placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
+                    ElseIf TypeOf m_View Is ViewSchedule Then
+                        Dim createdScheduleInstance As ScheduleSheetInstance = ScheduleSheetInstance.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
+                        Dim centerPoint As XYZ = createdScheduleInstance.Point
+                        Dim bbBox As BoundingBoxXYZ = createdScheduleInstance.BoundingBox(m_ViewSheet)
+                        Dim diffToMove As XYZ = New XYZ(offsetU - bbBox.Min.X, offsetV - bbBox.min.Y, 0)
+                        ElementTransformUtils.MoveElement(m_Settings.Document, createdScheduleInstance.Id, diffToMove)
+
+                        placed = True
+                        placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
+
                     End If
 #End If
 

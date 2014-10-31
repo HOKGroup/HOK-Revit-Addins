@@ -120,6 +120,18 @@ Public Class clsSettings
             End If
         Next
 
+        Dim collectorSchedule As New FilteredElementCollector(m_Doc)
+        collectorSchedule.OfClass(GetType(ViewSchedule))
+        Dim m_dSchedules As IList(Of Element)
+        m_dSchedules = collectorSchedule.ToElements()
+
+        For Each element As Element In m_dSchedules
+            Dim schedule As ViewSchedule = TryCast(element, ViewSchedule)
+            If Not m_Views.ContainsKey(schedule.ViewName) Then
+                m_Views.Add(schedule.ViewName, schedule)
+            End If
+        Next
+
         'Reading ini overrides defaults
         ReadIniFile()
 
