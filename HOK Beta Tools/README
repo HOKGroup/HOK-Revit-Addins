@@ -1,0 +1,4 @@
+v.0.1.0
+New
+-Install beta files to the user profile while running Revit session.
+ It will dynamically create Ribbon items based on users' selection of tools.
