@@ -145,6 +145,7 @@ namespace HOK.Utilities.RoomUpdater
                 ElementType firstTypeElement = null;
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
                 List<Element> elements = collector.OfCategoryId(category.Id).WhereElementIsNotElementType().ToElements().ToList();
+               
                 if (elements.Count > 0)
                 {
                     firstElement = elements.First();
@@ -166,6 +167,8 @@ namespace HOK.Utilities.RoomUpdater
                     {
                         BuiltInParameter bltParam = (BuiltInParameter)eId.IntegerValue;
                         string paramName = LabelUtils.GetLabelFor(bltParam);
+
+                        if (paramName.Contains("Extensions.")) { continue; }
 
                         ParameterProperties pp = null;
 #if RELEASE2013 ||RELEASE2014
@@ -199,12 +202,13 @@ namespace HOK.Utilities.RoomUpdater
                         }                      
                     }
                 }
-
+                //add project parameter
                 if (projectParameters.ContainsKey(category.Name))
                 {
                     Dictionary<string, ParameterProperties> dictionary = projectParameters[category.Name];
                     foreach (string paramName in dictionary.Keys)
                     {
+                        if (paramName.Contains("Extensions.")) { continue; }
 
                         ParameterProperties property = dictionary[paramName];
                         if (property.IsInstance && null != firstTypeElement)
@@ -219,6 +223,7 @@ namespace HOK.Utilities.RoomUpdater
                             {
                                 ParameterProperties pp = new ParameterProperties(param);
                                 pp.IsInstance = true;
+                                
                                 if (!paramDictionary.ContainsKey(pp.ParameterName)) { paramDictionary.Add(pp.ParameterName, pp); }
                             }
                         }
@@ -235,6 +240,56 @@ namespace HOK.Utilities.RoomUpdater
                                 ParameterProperties pp = new ParameterProperties(param);
                                 pp.IsInstance = false;
                                 if (!paramDictionary.ContainsKey(pp.ParameterName)) { paramDictionary.Add(pp.ParameterName, pp); }
+                            }
+                        }
+                    }
+                }
+
+                //add family parameter
+                //sorting
+                collector=new FilteredElementCollector(m_doc);
+                ICollection<ElementId> familyInstanceIds = collector.OfCategoryId(category.Id).OfClass(typeof(FamilyInstance)).ToElementIds();
+                collector=new FilteredElementCollector(m_doc);
+                List<FamilySymbol> familySymbols = collector.OfCategoryId(category.Id).OfClass(typeof(FamilySymbol)).ToElements().Cast<FamilySymbol>().ToList();
+                List<string> familyNames = new List<string>();
+
+                if (familyInstanceIds.Count > 0)
+                {
+                    foreach (FamilySymbol symbol in familySymbols)
+                    {
+                        string familyName = symbol.Family.Name;
+                        if (!string.IsNullOrEmpty(familyName))
+                        {
+                            if (!familyNames.Contains(familyName))
+                            {
+                                FamilyInstanceFilter instanceFilter = new FamilyInstanceFilter(m_doc, symbol.Id);
+                                collector = new FilteredElementCollector(m_doc, familyInstanceIds);
+                                ICollection<Element> familyInstances = collector.WherePasses(instanceFilter).ToElements();
+                                if (familyInstances.Count > 0)
+                                {
+                                    FamilyInstance firstFamilyInstance = familyInstances.First() as FamilyInstance;
+                                    foreach (Parameter param in firstFamilyInstance.Parameters)
+                                    {
+                                        if (param.Id.IntegerValue > 0)
+                                        {
+                                            ParameterProperties pp = new ParameterProperties(param);
+                                            pp.IsInstance = true;
+                                            if (!paramDictionary.ContainsKey(pp.ParameterName) && !pp.ParameterName.Contains("Extensions.")) { paramDictionary.Add(pp.ParameterName, pp); }
+                                        }
+                                    }
+
+                                    FamilySymbol firstFamilySymbol = firstFamilyInstance.Symbol;
+                                    foreach (Parameter param in firstFamilySymbol.Parameters)
+                                    {
+                                        if (param.Id.IntegerValue > 0)
+                                        {
+                                            ParameterProperties pp = new ParameterProperties(param);
+                                            pp.IsInstance = false;
+                                            if (!paramDictionary.ContainsKey(pp.ParameterName) && !pp.ParameterName.Contains("Extensions.")) { paramDictionary.Add(pp.ParameterName, pp); }
+                                        }
+                                    }
+                                }
+                                familyNames.Add(familyName);
                             }
                         }
                     }

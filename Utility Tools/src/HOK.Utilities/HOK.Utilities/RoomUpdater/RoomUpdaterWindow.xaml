@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Title="Room Updater" Icon="/HOK.Utilities;component/Images/hoklogo.ico" Height="700" Width="550" MinWidth="550" MinHeight="700" WindowStartupLocation="CenterScreen">
+             mc:Ignorable="d" Title="Room Updater" Icon="/HOK.Utilities;component/Images/hoklogo.ico" Height="750" Width="550" MinWidth="550" MinHeight="700" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Style TargetType="{x:Type DataGrid}">
             <Setter Property="Background" Value="White"/>
@@ -37,10 +37,11 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
                     <RowDefinition/>
+                    
                 </Grid.RowDefinitions>
                 <Label Content="Category:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="comboBoxSpace" HorizontalAlignment="Left" Margin="76,13,0,0" VerticalAlignment="Top" Width="150" SelectionChanged="comboBoxSpace_SelectionChanged"/>
-                <DataGrid x:Name="dataGridSpatial" HorizontalAlignment="Stretch" Margin="10" Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="dataGridSpatial_SelectionChanged" HorizontalGridLinesBrush="{x:Null}">
+                <DataGrid x:Name="dataGridSpatial" HorizontalAlignment="Stretch" Margin="10,10,10,5" Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="dataGridSpatial_SelectionChanged" HorizontalGridLinesBrush="{x:Null}">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Parameter Name" Width="1*" Binding="{Binding ParameterName}" />
                     </DataGrid.Columns>
@@ -53,10 +54,11 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
                     <RowDefinition/>
+                    
                 </Grid.RowDefinitions>
                 <Label Content="Category:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="comboBoxRevit" HorizontalAlignment="Left" Margin="76,13,0,0" VerticalAlignment="Top" Width="150" SelectionChanged="comboBoxRevit_SelectionChanged"/>
-                <DataGrid x:Name="dataGridRevit" HorizontalAlignment="Stretch" Margin="10" Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="dataGridRevit_SelectionChanged" HorizontalGridLinesBrush="{x:Null}">
+                <DataGrid x:Name="dataGridRevit" HorizontalAlignment="Stretch" Margin="10,10,10,5" Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="dataGridRevit_SelectionChanged" HorizontalGridLinesBrush="{x:Null}">
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Setter Property="TextElement.Foreground" Value="{Binding TextColor}"/>
