@@ -1,3 +1,10 @@
+v.0.4.6
+Room Updater
+New
+- In addition to built-in and project parameters, the Room Updater will now display the family specific parameters in the list.
+Fix
+- Parameter names starting with "Extensions." will no loger be displayed in the list.
+
 v.0.4.5
 Fix
 -In case of linked rooms or spaces, either IsPointInRoom or IsPointInSpace should be executed with a point location transformed inversely. 
