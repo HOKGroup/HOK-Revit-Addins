@@ -34,6 +34,10 @@ Partial Class form_SheetManager
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
         Me.TreeViewSheets = New System.Windows.Forms.TreeView()
         Me.GroupBoxSheets = New System.Windows.Forms.GroupBox()
+        Me.ComboBoxFilter = New System.Windows.Forms.ComboBox()
+        Me.LabelDisplay = New System.Windows.Forms.Label()
+        Me.ButtonUncheck = New System.Windows.Forms.Button()
+        Me.ButtonCheckAll = New System.Windows.Forms.Button()
         Me.ButtonConnectAccess = New System.Windows.Forms.Button()
         Me.buttonExportData = New System.Windows.Forms.Button()
         Me.buttonRenumberSheets = New System.Windows.Forms.Button()
@@ -54,18 +58,20 @@ Partial Class form_SheetManager
         '
         'ListBoxTableSet
         '
+        Me.ListBoxTableSet.Dock = System.Windows.Forms.DockStyle.Fill
         Me.ListBoxTableSet.FormattingEnabled = True
-        Me.ListBoxTableSet.Location = New System.Drawing.Point(6, 19)
+        Me.ListBoxTableSet.Location = New System.Drawing.Point(7, 20)
         Me.ListBoxTableSet.Name = "ListBoxTableSet"
-        Me.ListBoxTableSet.Size = New System.Drawing.Size(320, 147)
+        Me.ListBoxTableSet.Size = New System.Drawing.Size(252, 175)
         Me.ListBoxTableSet.TabIndex = 13
         '
         'TreeViewTitleBlocks
         '
+        Me.TreeViewTitleBlocks.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TreeViewTitleBlocks.HideSelection = False
-        Me.TreeViewTitleBlocks.Location = New System.Drawing.Point(6, 15)
+        Me.TreeViewTitleBlocks.Location = New System.Drawing.Point(7, 20)
         Me.TreeViewTitleBlocks.Name = "TreeViewTitleBlocks"
-        Me.TreeViewTitleBlocks.Size = New System.Drawing.Size(320, 151)
+        Me.TreeViewTitleBlocks.Size = New System.Drawing.Size(252, 172)
         Me.TreeViewTitleBlocks.TabIndex = 27
         '
         'openFileDialog1
@@ -74,6 +80,8 @@ Partial Class form_SheetManager
         '
         'checkBoxUpdateExisting
         '
+        Me.checkBoxUpdateExisting.Checked = True
+        Me.checkBoxUpdateExisting.CheckState = System.Windows.Forms.CheckState.Checked
         Me.checkBoxUpdateExisting.Location = New System.Drawing.Point(691, 273)
         Me.checkBoxUpdateExisting.Name = "checkBoxUpdateExisting"
         Me.checkBoxUpdateExisting.Size = New System.Drawing.Size(142, 43)
@@ -84,9 +92,10 @@ Partial Class form_SheetManager
         'GroupBoxTitleblocks
         '
         Me.GroupBoxTitleblocks.Controls.Add(Me.TreeViewTitleBlocks)
-        Me.GroupBoxTitleblocks.Location = New System.Drawing.Point(344, 258)
+        Me.GroupBoxTitleblocks.Location = New System.Drawing.Point(410, 283)
         Me.GroupBoxTitleblocks.Name = "GroupBoxTitleblocks"
-        Me.GroupBoxTitleblocks.Size = New System.Drawing.Size(332, 177)
+        Me.GroupBoxTitleblocks.Padding = New System.Windows.Forms.Padding(7)
+        Me.GroupBoxTitleblocks.Size = New System.Drawing.Size(266, 199)
         Me.GroupBoxTitleblocks.TabIndex = 37
         Me.GroupBoxTitleblocks.TabStop = False
         Me.GroupBoxTitleblocks.Text = "Select a Titleblock for New Sheets"
@@ -113,7 +122,7 @@ Partial Class form_SheetManager
         '
         'ProgressBar1
         '
-        Me.ProgressBar1.Location = New System.Drawing.Point(12, 440)
+        Me.ProgressBar1.Location = New System.Drawing.Point(13, 488)
         Me.ProgressBar1.Name = "ProgressBar1"
         Me.ProgressBar1.Size = New System.Drawing.Size(830, 60)
         Me.ProgressBar1.TabIndex = 46
@@ -121,30 +130,76 @@ Partial Class form_SheetManager
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.ListBoxTableSet)
-        Me.GroupBox1.Location = New System.Drawing.Point(344, 75)
+        Me.GroupBox1.Location = New System.Drawing.Point(410, 75)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(332, 177)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(7)
+        Me.GroupBox1.Size = New System.Drawing.Size(266, 202)
         Me.GroupBox1.TabIndex = 47
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Select Sheet Data Source Table or Worksheet"
         '
         'TreeViewSheets
         '
+        Me.TreeViewSheets.CheckBoxes = True
+        Me.TreeViewSheets.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TreeViewSheets.HideSelection = False
-        Me.TreeViewSheets.Location = New System.Drawing.Point(6, 19)
+        Me.TreeViewSheets.Location = New System.Drawing.Point(7, 48)
         Me.TreeViewSheets.Name = "TreeViewSheets"
-        Me.TreeViewSheets.Size = New System.Drawing.Size(314, 330)
+        Me.TreeViewSheets.Size = New System.Drawing.Size(378, 352)
         Me.TreeViewSheets.TabIndex = 28
         '
         'GroupBoxSheets
         '
+        Me.GroupBoxSheets.Controls.Add(Me.ComboBoxFilter)
+        Me.GroupBoxSheets.Controls.Add(Me.LabelDisplay)
+        Me.GroupBoxSheets.Controls.Add(Me.ButtonUncheck)
+        Me.GroupBoxSheets.Controls.Add(Me.ButtonCheckAll)
         Me.GroupBoxSheets.Controls.Add(Me.TreeViewSheets)
         Me.GroupBoxSheets.Location = New System.Drawing.Point(12, 75)
         Me.GroupBoxSheets.Name = "GroupBoxSheets"
-        Me.GroupBoxSheets.Size = New System.Drawing.Size(326, 360)
+        Me.GroupBoxSheets.Padding = New System.Windows.Forms.Padding(7, 35, 7, 7)
+        Me.GroupBoxSheets.Size = New System.Drawing.Size(392, 407)
         Me.GroupBoxSheets.TabIndex = 48
         Me.GroupBoxSheets.TabStop = False
         Me.GroupBoxSheets.Text = "Sheet Elements"
+        '
+        'ComboBoxFilter
+        '
+        Me.ComboBoxFilter.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ComboBoxFilter.FormattingEnabled = True
+        Me.ComboBoxFilter.Items.AddRange(New Object() {"Select All Sheets", "New Sheets Only", "Existing Sheets Only"})
+        Me.ComboBoxFilter.Location = New System.Drawing.Point(264, 22)
+        Me.ComboBoxFilter.Name = "ComboBoxFilter"
+        Me.ComboBoxFilter.Size = New System.Drawing.Size(121, 21)
+        Me.ComboBoxFilter.TabIndex = 32
+        '
+        'LabelDisplay
+        '
+        Me.LabelDisplay.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.LabelDisplay.AutoSize = True
+        Me.LabelDisplay.Location = New System.Drawing.Point(162, 25)
+        Me.LabelDisplay.Name = "LabelDisplay"
+        Me.LabelDisplay.Size = New System.Drawing.Size(96, 13)
+        Me.LabelDisplay.TabIndex = 31
+        Me.LabelDisplay.Text = "Selection Options: "
+        '
+        'ButtonUncheck
+        '
+        Me.ButtonUncheck.Image = CType(resources.GetObject("ButtonUncheck.Image"), System.Drawing.Image)
+        Me.ButtonUncheck.Location = New System.Drawing.Point(39, 20)
+        Me.ButtonUncheck.Name = "ButtonUncheck"
+        Me.ButtonUncheck.Size = New System.Drawing.Size(22, 22)
+        Me.ButtonUncheck.TabIndex = 30
+        Me.ButtonUncheck.UseVisualStyleBackColor = True
+        '
+        'ButtonCheckAll
+        '
+        Me.ButtonCheckAll.Image = CType(resources.GetObject("ButtonCheckAll.Image"), System.Drawing.Image)
+        Me.ButtonCheckAll.Location = New System.Drawing.Point(13, 20)
+        Me.ButtonCheckAll.Name = "ButtonCheckAll"
+        Me.ButtonCheckAll.Size = New System.Drawing.Size(22, 22)
+        Me.ButtonCheckAll.TabIndex = 29
+        Me.ButtonCheckAll.UseVisualStyleBackColor = True
         '
         'ButtonConnectAccess
         '
@@ -162,7 +217,7 @@ Partial Class form_SheetManager
         '
         Me.buttonExportData.Image = Global.HOK.SheetManager.My.Resources.Resources._002
         Me.buttonExportData.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.buttonExportData.Location = New System.Drawing.Point(350, 441)
+        Me.buttonExportData.Location = New System.Drawing.Point(350, 488)
         Me.buttonExportData.Name = "buttonExportData"
         Me.buttonExportData.Size = New System.Drawing.Size(160, 60)
         Me.buttonExportData.TabIndex = 35
@@ -174,7 +229,7 @@ Partial Class form_SheetManager
         '
         Me.buttonRenumberSheets.Image = Global.HOK.SheetManager.My.Resources.Resources.Quantity
         Me.buttonRenumberSheets.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.buttonRenumberSheets.Location = New System.Drawing.Point(12, 441)
+        Me.buttonRenumberSheets.Location = New System.Drawing.Point(12, 488)
         Me.buttonRenumberSheets.Name = "buttonRenumberSheets"
         Me.buttonRenumberSheets.Size = New System.Drawing.Size(160, 60)
         Me.buttonRenumberSheets.TabIndex = 34
@@ -186,7 +241,7 @@ Partial Class form_SheetManager
         '
         Me.buttonAddViewsToSheets.Image = Global.HOK.SheetManager.My.Resources.Resources.ExportOrOpenAs
         Me.buttonAddViewsToSheets.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.buttonAddViewsToSheets.Location = New System.Drawing.Point(178, 441)
+        Me.buttonAddViewsToSheets.Location = New System.Drawing.Point(178, 488)
         Me.buttonAddViewsToSheets.Name = "buttonAddViewsToSheets"
         Me.buttonAddViewsToSheets.Size = New System.Drawing.Size(160, 60)
         Me.buttonAddViewsToSheets.TabIndex = 36
@@ -198,7 +253,7 @@ Partial Class form_SheetManager
         '
         Me.buttonUpdateCreate.Image = Global.HOK.SheetManager.My.Resources.Resources.Copy_of_AdmTmpl_dll_I0004_04095
         Me.buttonUpdateCreate.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.buttonUpdateCreate.Location = New System.Drawing.Point(516, 441)
+        Me.buttonUpdateCreate.Location = New System.Drawing.Point(516, 488)
         Me.buttonUpdateCreate.Name = "buttonUpdateCreate"
         Me.buttonUpdateCreate.Size = New System.Drawing.Size(160, 60)
         Me.buttonUpdateCreate.TabIndex = 31
@@ -210,7 +265,7 @@ Partial Class form_SheetManager
         '
         Me.buttonClose.Image = Global.HOK.SheetManager.My.Resources.Resources.Close
         Me.buttonClose.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.buttonClose.Location = New System.Drawing.Point(682, 441)
+        Me.buttonClose.Location = New System.Drawing.Point(682, 488)
         Me.buttonClose.Name = "buttonClose"
         Me.buttonClose.Size = New System.Drawing.Size(160, 60)
         Me.buttonClose.TabIndex = 30
@@ -234,7 +289,7 @@ Partial Class form_SheetManager
         '
         Me.linkAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.linkAbout.AutoSize = True
-        Me.linkAbout.Location = New System.Drawing.Point(63, 516)
+        Me.linkAbout.Location = New System.Drawing.Point(63, 566)
         Me.linkAbout.Name = "linkAbout"
         Me.linkAbout.Size = New System.Drawing.Size(35, 13)
         Me.linkAbout.TabIndex = 50
@@ -245,7 +300,7 @@ Partial Class form_SheetManager
         '
         Me.linkHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.linkHelp.AutoSize = True
-        Me.linkHelp.Location = New System.Drawing.Point(18, 516)
+        Me.linkHelp.Location = New System.Drawing.Point(18, 566)
         Me.linkHelp.Name = "linkHelp"
         Me.linkHelp.Size = New System.Drawing.Size(29, 13)
         Me.linkHelp.TabIndex = 49
@@ -255,7 +310,7 @@ Partial Class form_SheetManager
         'StatusStrip1
         '
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.iniPathLabel})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 540)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 590)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Size = New System.Drawing.Size(854, 22)
         Me.StatusStrip1.TabIndex = 51
@@ -270,7 +325,7 @@ Partial Class form_SheetManager
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(854, 562)
+        Me.ClientSize = New System.Drawing.Size(854, 612)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.linkAbout)
         Me.Controls.Add(Me.linkHelp)
@@ -289,15 +344,16 @@ Partial Class form_SheetManager
         Me.Controls.Add(Me.ProgressBar1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
-        Me.MaximumSize = New System.Drawing.Size(870, 600)
+        Me.MaximumSize = New System.Drawing.Size(870, 650)
         Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(870, 600)
+        Me.MinimumSize = New System.Drawing.Size(870, 650)
         Me.Name = "form_SheetManager"
         Me.Text = "Sheet Management"
         Me.GroupBoxTitleblocks.ResumeLayout(False)
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBoxSheets.ResumeLayout(False)
+        Me.GroupBoxSheets.PerformLayout()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
@@ -326,4 +382,8 @@ Partial Class form_SheetManager
     Private WithEvents linkHelp As System.Windows.Forms.LinkLabel
     Friend WithEvents StatusStrip1 As System.Windows.Forms.StatusStrip
     Friend WithEvents iniPathLabel As System.Windows.Forms.ToolStripStatusLabel
+    Friend WithEvents ButtonUncheck As System.Windows.Forms.Button
+    Friend WithEvents ButtonCheckAll As System.Windows.Forms.Button
+    Friend WithEvents ComboBoxFilter As System.Windows.Forms.ComboBox
+    Friend WithEvents LabelDisplay As System.Windows.Forms.Label
 End Class

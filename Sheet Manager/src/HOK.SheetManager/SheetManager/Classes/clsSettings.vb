@@ -35,15 +35,18 @@ Public Class clsSettings
         m_Doc = m_CommandData.Application.ActiveUIDocument.Document
         ' Calculate the location for which to save the ini file
         Dim directoryName As String = String.Empty
+        Dim masterFilePath As String = m_Doc.PathName
         If m_Doc.IsWorkshared = True Then
             ' Save workshared ini's at location of model
-            If (String.IsNullOrEmpty(m_Doc.GetWorksharingCentralModelPath().ToString())) Then
-                directoryName = Path.GetDirectoryName(m_Doc.GetWorksharingCentralModelPath().ToString())
-            ElseIf String.IsNullOrEmpty(m_Doc.PathName) = False Then
-                directoryName = Path.GetDirectoryName(m_Doc.PathName)
+            Dim modelPath As ModelPath = m_Doc.GetWorksharingCentralModelPath()
+            If modelPath IsNot Nothing Then
+                masterFilePath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath)
+                If (String.IsNullOrEmpty(masterFilePath)) Then
+                    masterFilePath = m_Doc.PathName
+                End If
+                directoryName = Path.GetDirectoryName(masterFilePath)
             End If
-
-        ElseIf String.IsNullOrEmpty(m_Doc.PathName) = False Then
+        ElseIf Not String.IsNullOrEmpty(m_Doc.PathName) Then
             ' Save non workshared ini's at local model
             directoryName = Path.GetDirectoryName(m_Doc.PathName)
         End If
@@ -135,15 +138,13 @@ Public Class clsSettings
         'Reading ini overrides defaults
         ReadIniFile()
 
-
-
     End Sub
 
     ''' <summary>
     ''' Acquire a list of all sheets and titleblock instances
     ''' </summary>
     ''' <remarks></remarks>
-    Private Sub GetSheetsAndTitleblockInstances()
+    Public Sub GetSheetsAndTitleblockInstances()
 
         ' Get all Sheets as Titleblocks
         Dim m_ColTblk As New FilteredElementCollector(m_Doc)
@@ -173,7 +174,9 @@ Public Class clsSettings
             Dim m_clsTblkItem As New clsTblk(m_ParaList, x)
 
             Try
-                m_clsTblks.Add(m_SheetNumber, m_clsTblkItem)
+                If Not m_clsTblks.ContainsKey(m_SheetNumber) Then
+                    m_clsTblks.Add(m_SheetNumber, m_clsTblkItem)
+                End If
             Catch ex As Exception
                 ' Dictionary Failure
             End Try
@@ -193,10 +196,13 @@ Public Class clsSettings
                 Dim m_Sht As ViewSheet = TryCast(x, ViewSheet)
 
                 Dim m_SheetNumber As String = ""
+                If Not String.IsNullOrEmpty(m_Sht.SheetNumber) Then
+                    m_SheetNumber = m_Sht.SheetNumber
+                End If
 
                 ' Add to the source dictionary object
-                If Not m_Sheets.ContainsKey(m_Sht.SheetNumber) Then
-                    m_Sheets.Add(m_Sht.SheetNumber, m_Sht)
+                If Not m_Sheets.ContainsKey(m_SheetNumber) Then
+                    m_Sheets.Add(m_SheetNumber, m_Sht)
                 End If
 
                 Dim m_ParaList As New List(Of clsPara)
@@ -205,9 +211,9 @@ Public Class clsSettings
                     If p IsNot Nothing Then
                         Dim m_para As New clsPara(p)
 
-                        If m_para.Name = "Sheet Number" Then
-                            m_SheetNumber = m_para.Value
-                        End If
+                        'If m_para.Name = "Sheet Number" Then
+                        'm_SheetNumber = m_para.Value
+                        'End If
 
                         m_ParaList.Add(m_para)
                     End If
@@ -216,13 +222,15 @@ Public Class clsSettings
                 Dim m_clsSheetItem As New clsSheet(m_ParaList, m_Sht)
 
                 Try
-                    m_clsSheets.Add(m_SheetNumber, m_clsSheetItem)
+                    If Not m_clsSheets.ContainsKey(m_SheetNumber) Then
+                        m_clsSheets.Add(m_SheetNumber, m_clsSheetItem)
+                    End If
                 Catch ex As Exception
                     ' Dictionary Failure
                 End Try
 
             Catch ex As Exception
-
+                Dim message As String = ex.Message
             End Try
 
         Next

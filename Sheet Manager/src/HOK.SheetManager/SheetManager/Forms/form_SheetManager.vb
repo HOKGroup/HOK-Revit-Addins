@@ -59,6 +59,8 @@ Public Class form_SheetManager
         buttonRenumberSheets.Enabled = False
         buttonAddViewsToSheets.Enabled = False
         ProgressBar1.Visible = False
+        ComboBoxFilter.SelectedIndex = 0
+
 
         ' General settings and class constructors
         m_Settings = settings
@@ -240,6 +242,7 @@ Public Class form_SheetManager
             For Each row As DataRow In m_DataTable.Rows
 
                 Dim sheetNumber As String = row("Sheet Number").ToString
+                Dim sheetName As String = row("Sheet Name").ToString
 
                 'Check for empty sheet number, which can arise with Excel case
                 If sheetNumber = "" Then
@@ -248,9 +251,28 @@ Public Class form_SheetManager
                 Else
                     ' Create the parent node
                     Dim tn1 As New System.Windows.Forms.TreeNode
-                    tn1.Text = sheetNumber
+                    tn1.Text = sheetNumber & ": " & sheetName
                     tn1.Tag = sheetNumber
                     tn1.Name = sheetNumber
+                    tn1.ForeColor = Drawing.Color.Black
+                    tn1.Checked = False
+
+                    Select Case ComboBoxFilter.SelectedIndex
+                        Case 0
+                            'Select all sheets
+                            tn1.Checked = True
+                        Case 1
+                            'New sheets only
+                            If Not m_Settings.Sheets.ContainsKey(sheetNumber) Then
+                                tn1.Checked = True
+                            End If
+                        Case 2
+                            'Existing sheets only
+                            If m_Settings.Sheets.ContainsKey(sheetNumber) Then
+                                tn1.Checked = True
+                            End If
+                    End Select
+
                     Me.TreeViewSheets.Nodes.Add(tn1)
 
                     ' Is it an existing sheet?
@@ -259,6 +281,7 @@ Public Class form_SheetManager
                         ' Find discrepancies
                         tn1.ImageIndex = 0
                         tn1.SelectedImageIndex = 0
+                        tn1.ForeColor = Drawing.Color.Gray
 
                         ' The Titleblock Element Instance
                         Dim m_TblkItem As Element = m_Settings.clsTblksList(sheetNumber).Element
@@ -309,10 +332,10 @@ Public Class form_SheetManager
                                         If isDiscrepancy = True Then
                                             ' This is a discrepancy
                                             Dim tn2 As New System.Windows.Forms.TreeNode
-                                            tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
-                                            tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                            tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                            Me.TreeViewSheets.Nodes(row("Sheet Number").ToString).Nodes.Add(tn2)
+                                            tn2.Text = m_para.Name & vbTab & ": " & vbTab & m_para.Value & vbTab & " (XL=" & row(m_para.Name).ToString & ")"
+                                            tn2.Tag = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                            tn2.Name = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                            Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
                                             tn2.ImageIndex = 1
                                             tn2.SelectedImageIndex = 1
                                         End If
@@ -321,9 +344,9 @@ Public Class form_SheetManager
                                         If m_para.Value <> row(m_para.Name).ToString Then
                                             ' This is a discrepancy
                                             Dim tn2 As New System.Windows.Forms.TreeNode
-                                            tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
-                                            tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                            tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
+                                            tn2.Text = m_para.Name & vbTab & ": " & vbTab & m_para.Value & vbTab & " (XL=" & row(m_para.Name).ToString & ")"
+                                            tn2.Tag = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                            tn2.Name = m_para.Name & vbTab & ": " & vbTab & m_para.Value
                                             Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
                                             tn2.ImageIndex = 1
                                             tn2.SelectedImageIndex = 1
@@ -371,10 +394,10 @@ Public Class form_SheetManager
                                         If isDiscrepancy = True Then
                                             ' This is a discrepancy
                                             Dim tn2 As New System.Windows.Forms.TreeNode
-                                            tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
-                                            tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                            tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                            Me.TreeViewSheets.Nodes(row("Sheet Number").ToString).Nodes.Add(tn2)
+                                            tn2.Text = m_para.Name & vbTab & ": " & vbTab & m_para.Value & vbTab & " (XL=" & row(m_para.Name).ToString & ")"
+                                            tn2.Tag = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                            tn2.Name = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                            Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
                                             tn2.ImageIndex = 1
                                             tn2.SelectedImageIndex = 1
                                         End If
@@ -383,10 +406,10 @@ Public Class form_SheetManager
                                         If m_para.Value <> row(m_para.Name).ToString Then
                                             ' This is a discrepancy
                                             Dim tn2 As New System.Windows.Forms.TreeNode
-                                            tn2.Text = m_para.Name & vbTab & "_" & vbTab & m_para.Value & vbTab & "(" & row(m_para.Name).ToString & ")"
-                                            tn2.Tag = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                            tn2.Name = m_para.Name & vbTab & "_" & vbTab & m_para.Value
-                                            Me.TreeViewSheets.Nodes(row("Sheet Number").ToString).Nodes.Add(tn2)
+                                            tn2.Text = m_para.Name & vbTab & ": " & vbTab & m_para.Value & vbTab & " (XL=" & row(m_para.Name).ToString & ")"
+                                            tn2.Tag = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                            tn2.Name = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                            Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
                                             tn2.ImageIndex = 1
                                             tn2.SelectedImageIndex = 1
 
@@ -482,6 +505,9 @@ Public Class form_SheetManager
         Dim m_Dlg As New TaskDialog(p_Title)
         m_Dlg.MainInstruction = p_Inst
         m_Dlg.MainContent = p_Content
+        m_Dlg.CommonButtons = TaskDialogCommonButtons.Ok
+        m_Dlg.DefaultButton = TaskDialogResult.Ok
+
         Dim result As TaskDialogResult = m_Dlg.Show
         Select Case result
             Case TaskDialogResult.Ok
@@ -534,7 +560,7 @@ Public Class form_SheetManager
         m_Trans.Start()
 
         Dim dataTableLocal As System.Data.DataTable
-        Dim pointInsert As XYZ
+        Dim pointInsert As XYZ = Nothing
         Dim parameterViewSheetInfo As Parameter
         Dim offsetU As Double = 0
         Dim offsetV As Double = 0
@@ -603,8 +629,10 @@ Public Class form_SheetManager
             'Increment the progress bar
             Me.ProgressBar1.Increment(1)
 
+            Dim sheetNumber As String = row("Sheet Number").ToString
+
             'Check for missing values and ignore them
-            If row("Sheet Number").ToString = "" Then
+            If String.IsNullOrEmpty(sheetNumber) Then
                 Continue For
             End If
             If row("View Name").ToString = "" Then
@@ -618,36 +646,39 @@ Public Class form_SheetManager
             End If
 
             'See if sheet and view exist; if not ignore step
-            If Not m_Settings.Sheets.ContainsKey(row("Sheet Number").ToString) Then
+            If Not m_Settings.Sheets.ContainsKey(sheetNumber) Then
                 Continue For
             End If
             If Not m_Settings.Views.ContainsKey(row("View Name").ToString) Then
                 Continue For
             End If
 
-            'Get the sheet and view and place view
-            m_ViewSheet = m_Settings.Sheets(row("Sheet Number").ToString)
-            m_View = m_Settings.Views(row("View Name").ToString)
+            If TreeViewSheets.Nodes.ContainsKey(sheetNumber) Then
+                If TreeViewSheets.Nodes(sheetNumber).Checked = True Then
 
-            'Confirm that UV values are good numbers and get the values
-            Try
-                offsetU = Convert.ToDouble(row("U").ToString)
-                offsetV = Convert.ToDouble(row("V").ToString)
-            Catch exception As Exception
-                ShowRevitTaskDialog("Sheet Manager", _
-                                    m_Settings.ProgramName, _
-                                    "Error in 'Start.buttonAddViews_Click' while converting U or V value to number. Processing stopped." & vbLf & vbLf & _
-                                    "System message: " & exception.Message)
-                Me.ProgressBar1.Visible = False
-                Return
-            End Try
+                    'Get the sheet and view and place view
+                    m_ViewSheet = m_Settings.Sheets(sheetNumber)
+                    m_View = m_Settings.Views(row("View Name").ToString)
 
-            'place the view
-            Try
-                parameterViewSheetInfo = m_View.Parameter(BuiltInParameter.VIEW_SHEET_VIEWPORT_INFO)
-                If parameterViewSheetInfo.AsString.ToUpper = "NOT IN A SHEET" Then
-                    Dim boundingBox As BoundingBoxXYZ = m_View.BoundingBox(m_View)
-                   
+                    'Confirm that UV values are good numbers and get the values
+                    Try
+                        offsetU = Convert.ToDouble(row("U").ToString)
+                        offsetV = Convert.ToDouble(row("V").ToString)
+                    Catch exception As Exception
+                        ShowRevitTaskDialog("Sheet Manager", _
+                                            m_Settings.ProgramName, _
+                                            "Error in 'Start.buttonAddViews_Click' while converting U or V value to number. Processing stopped." & vbLf & vbLf & _
+                                            "System message: " & exception.Message)
+                        Me.ProgressBar1.Visible = False
+                        Return
+                    End Try
+
+                    'place the view
+                    Try
+                        parameterViewSheetInfo = m_View.Parameter(BuiltInParameter.VIEW_SHEET_VIEWPORT_INFO)
+                        If parameterViewSheetInfo.AsString.ToUpper = "NOT IN A SHEET" Then
+                            Dim boundingBox As BoundingBoxXYZ = m_View.BoundingBox(m_View)
+
 #If RELEASE2013 Then
                     pointInsert = New XYZ(offsetU - m_View.Outline.Min.U, offsetV - m_View.Outline.Min.V, 0)
 
@@ -668,50 +699,52 @@ Public Class form_SheetManager
                         placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
                     End If
 #ElseIf RELEASE2014 Or RELEASE2015 Then
-                     pointInsert = XYZ.Zero
+                            pointInsert = XYZ.Zero
 
-                    If Viewport.CanAddViewToSheet(m_Settings.Document, m_ViewSheet.Id, m_View.Id) Then
-                        Dim createdViewport As Viewport = Viewport.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
-                        Dim centerPoint As XYZ = createdViewport.GetBoxCenter()
-                        Dim outline As Outline = createdViewport.GetBoxOutline()
-                        Dim diffToMove As XYZ = New XYZ(offsetU + outline.MaximumPoint.X, offsetV + outline.MaximumPoint.Y, 0)
-                        ElementTransformUtils.MoveElement(m_Settings.Document, createdViewport.Id, diffToMove)
+                            If Viewport.CanAddViewToSheet(m_Settings.Document, m_ViewSheet.Id, m_View.Id) Then
+                                Dim createdViewport As Viewport = Viewport.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
+                                Dim centerPoint As XYZ = createdViewport.GetBoxCenter()
+                                Dim outline As Outline = createdViewport.GetBoxOutline()
+                                Dim diffToMove As XYZ = New XYZ(offsetU + outline.MaximumPoint.X, offsetV + outline.MaximumPoint.Y, 0)
+                                ElementTransformUtils.MoveElement(m_Settings.Document, createdViewport.Id, diffToMove)
 
-                        placed = True
-                        placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
-                    ElseIf TypeOf m_View Is ViewSchedule Then
-                        Dim createdScheduleInstance As ScheduleSheetInstance = ScheduleSheetInstance.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
-                        Dim centerPoint As XYZ = createdScheduleInstance.Point
-                        Dim bbBox As BoundingBoxXYZ = createdScheduleInstance.BoundingBox(m_ViewSheet)
-                        Dim diffToMove As XYZ = New XYZ(offsetU - bbBox.Min.X, offsetV - bbBox.min.Y, 0)
-                        ElementTransformUtils.MoveElement(m_Settings.Document, createdScheduleInstance.Id, diffToMove)
+                                placed = True
+                                placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
+                            ElseIf TypeOf m_View Is ViewSchedule Then
+                                Dim createdScheduleInstance As ScheduleSheetInstance = ScheduleSheetInstance.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
+                                Dim centerPoint As XYZ = createdScheduleInstance.Point
+                                Dim bbBox As BoundingBoxXYZ = createdScheduleInstance.BoundingBox(m_ViewSheet)
+                                Dim diffToMove As XYZ = New XYZ(offsetU - bbBox.Min.X, offsetV - bbBox.Min.Y, 0)
+                                ElementTransformUtils.MoveElement(m_Settings.Document, createdScheduleInstance.Id, diffToMove)
 
-                        placed = True
-                        placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
+                                placed = True
+                                placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
 
-                    End If
+                            End If
 #End If
+                        Else
+                            upPlacedViews.AppendLine(parameterViewSheetInfo.AsString() & " : " & m_View.Name)
+                        End If
+                        'catch {
+                        '    //For now we are ignoring this error since it occurs when the view has already been placed
+                        '    continue;
 
+                    Catch exception As Exception
+                        If pointInsert IsNot Nothing Then
+                            ShowRevitTaskDialog("Sheet Manager", "Processing Stopped", "Error in 'Start.buttonAddViews_Click' while placing view." _
+                                           & vbLf & "Sheet Number: """ & row("Sheet Number").ToString & """" & vbLf & "View Name: """ & row("View Name").ToString & """" & vbLf & _
+                                           "U: """ & row("U").ToString & """" & vbLf & "V: """ & row("V").ToString & """" & vbLf & _
+                                           "pointInsert.X: """ & pointInsert.X.ToString & """" & vbLf & "pointInsert.Y: """ & pointInsert.Y.ToString & """" & vbLf & vbLf & _
+                                           "System message: " & exception.Message)
 
-                Else
-                    upPlacedViews.AppendLine(parameterViewSheetInfo.AsString() & " : " & m_View.Name)
+                            Me.ProgressBar1.Visible = False
+                        End If
+                        Return
+                    End Try
                 End If
-                'catch {
-                '    //For now we are ignoring this error since it occurs when the view has already been placed
-                '    continue;
+            End If
 
-            Catch exception As Exception
-                If pointInsert IsNot Nothing Then
-                    ShowRevitTaskDialog("Sheet Manager", "Processing Stopped", "Error in 'Start.buttonAddViews_Click' while placing view." _
-                                   & vbLf & "Sheet Number: """ & row("Sheet Number").ToString & """" & vbLf & "View Name: """ & row("View Name").ToString & """" & vbLf & _
-                                   "U: """ & row("U").ToString & """" & vbLf & "V: """ & row("V").ToString & """" & vbLf & _
-                                   "pointInsert.X: """ & pointInsert.X.ToString & """" & vbLf & "pointInsert.Y: """ & pointInsert.Y.ToString & """" & vbLf & vbLf & _
-                                   "System message: " & exception.Message)
-
-                    Me.ProgressBar1.Visible = False
-                End If
-                Return
-            End Try
+            
         Next
 
         ' Commit the transaction
@@ -798,87 +831,99 @@ Public Class form_SheetManager
 
         'Check for logic errors in rename
         For Each sheetNumber As String In m_Settings.Sheets.Keys
-            listTestRenumber.Add(sheetNumber)
-        Next
-
-        ' The Transaction
-        Dim m_Trans As New Transaction(m_Settings.Document, "HOK Sheet Renumber")
-        m_Trans.Start()
-
-
-        For Each row As DataRow In m_DataTable.Rows
-
-            'Increment the progress bar
-            Me.ProgressBar1.Increment(1)
-
-            'Check for missing values and ignore them
-            If row("OldNumber").ToString = "" Then
-                Continue For
-            End If
-            If row("NewNumber").ToString = "" Then
-                Continue For
-            End If
-
-            'See if sheet exists, otherwise ignore it.  If found, check that new number doesn't exist.
-            If listTestRenumber.Contains(row("OldNumber").ToString) Then
-                If listTestRenumber.Contains(row("NewNumber").ToString) Then
-
-                    ShowRevitTaskDialog("Sheet Manager", "Logical error at Old Number:", row("OldNumber").ToString & " New Number: " & Convert.ToString(row("NewNumber")))
-
-                    m_DataTable.Clear()
-                    If m_UtilityInterop.DataTable IsNot Nothing Then
-                        m_UtilityInterop.DataTable.Clear()
-                    End If
-                    Me.ProgressBar1.Visible = False
-                    Return
+            If TreeViewSheets.Nodes.ContainsKey(sheetNumber) Then
+                If TreeViewSheets.Nodes(sheetNumber).Checked = True Then
+                    listTestRenumber.Add(sheetNumber)
                 End If
-                listTestRenumber.Remove(row("OldNumber").ToString)
-                listTestRenumber.Add(row("NewNumber").ToString)
             End If
         Next
 
-        'Restart the progress bar
-        With Me.ProgressBar1
-            .Minimum = 0
-            .Maximum = m_DataTable.Rows.Count + 2
-            .Value = 0
-            .Visible = True
-        End With
-        Me.ProgressBar1.Increment(1)
+        Using m_Trans As New Transaction(m_Settings.Document, "HOK Sheet Renumber")
+            m_Trans.Start()
+            Try
+                For Each row As DataRow In m_DataTable.Rows
+
+                    'Increment the progress bar
+                    Me.ProgressBar1.Increment(1)
+
+                    'Check for missing values and ignore them
+                    If row("OldNumber").ToString = "" Then
+                        Continue For
+                    End If
+                    If row("NewNumber").ToString = "" Then
+                        Continue For
+                    End If
+
+                    'See if sheet exists, otherwise ignore it.  If found, check that new number doesn't exist.
+                    If listTestRenumber.Contains(row("OldNumber").ToString) Then
+                        If listTestRenumber.Contains(row("NewNumber").ToString) Then
+
+                            ShowRevitTaskDialog("Sheet Manager", "Logical error at Old Number:", row("OldNumber").ToString & " New Number: " & Convert.ToString(row("NewNumber")))
+
+                            m_DataTable.Clear()
+                            If m_UtilityInterop.DataTable IsNot Nothing Then
+                                m_UtilityInterop.DataTable.Clear()
+                            End If
+                            Me.ProgressBar1.Visible = False
+                            Return
+                        End If
+                        listTestRenumber.Remove(row("OldNumber").ToString)
+                        listTestRenumber.Add(row("NewNumber").ToString)
+                    End If
+                Next
+
+                'Restart the progress bar
+                With Me.ProgressBar1
+                    .Minimum = 0
+                    .Maximum = m_DataTable.Rows.Count + 2
+                    .Value = 0
+                    .Visible = True
+                End With
+                Me.ProgressBar1.Increment(1)
 
 
+                'To avoid transparent look while waiting
+                'Process each row in rename table
+                For Each row As DataRow In m_DataTable.Rows
 
-        'To avoid transparent look while waiting
-        'Process each row in rename table
-        For Each row As DataRow In m_DataTable.Rows
+                    'Increment the progress bar
+                    Me.ProgressBar1.Increment(1)
 
-            'Increment the progress bar
-            Me.ProgressBar1.Increment(1)
+                    Dim oldNumber As String = row("OldNumber").ToString
+                    Dim newNumber As String = row("NewNumber").ToString
 
-            Dim oldNumber As String = row("OldNumber").ToString
-            Dim newNumber As String = row("NewNumber").ToString
+                    'Check for missing values and ignore them
+                    If oldNumber = "" Then
+                        Continue For
+                    End If
+                    If newNumber = "" Then
+                        Continue For
+                    End If
 
-            'Check for missing values and ignore them
-            If oldNumber = "" Then
-                Continue For
-            End If
-            If newNumber = "" Then
-                Continue For
-            End If
+                    'See if sheet exists, otherwise ignore it.  If found renumber and update dictionary
+                    If m_Settings.Sheets.ContainsKey(oldNumber) And TreeViewSheets.Nodes.ContainsKey(oldNumber) And Not m_Settings.Sheets.ContainsKey(newNumber) Then
+                        If TreeViewSheets.Nodes.ContainsKey(oldNumber) Then
+                            If TreeViewSheets.Nodes(oldNumber).Checked = True Then
 
-            'See if sheet exists, otherwise ignore it.  If found renumber and update dictionary
-            If m_Settings.Sheets.ContainsKey(oldNumber) And TreeViewSheets.Nodes.ContainsKey(oldNumber) Then
-                m_ViewSheet = m_Settings.Sheets(oldNumber)
-                m_ViewSheet.SheetNumber = newNumber
-                m_Settings.Sheets.Add(newNumber, m_Settings.Sheets(oldNumber))
-                m_Settings.Sheets.Remove(oldNumber)
-                ' This was missing, pretty important 11-06-13, Don Rudder
-                m_ViewSheet.SheetNumber = newNumber
-            End If
-        Next
+                                m_ViewSheet = m_Settings.Sheets(oldNumber)
+                                m_ViewSheet.SheetNumber = newNumber
+                                m_Settings.Sheets.Add(newNumber, m_Settings.Sheets(oldNumber))
+                                m_Settings.Sheets.Remove(oldNumber)
+                                ' This was missing, pretty important 11-06-13, Don Rudder
+                                m_ViewSheet.SheetNumber = newNumber
+                            End If
+                        End If
+                    End If
+                Next
 
-        ' Commit the transaction
-        m_Trans.Commit()
+                ' Commit the transaction
+                m_Trans.Commit()
+            Catch ex As Exception
+                m_Trans.RollBack()
+                Dim message As String = ex.Message
+            End Try
+        End Using
+
 
         'Empty the data table since it seems to fill up with repeated use of the command
         m_DataTable.Clear()
@@ -1198,233 +1243,229 @@ Public Class form_SheetManager
             GoTo UpdateExistingElement
 
         Else
+            Using m_SheetTrans As New Transaction(m_Settings.Document, "HOK Sheet Manager, Created: " & sheetNumber)
+                m_SheetTrans.Start()
+                Try
+                    ' Create it
+                    Dim m_DocCreate As Autodesk.Revit.Creation.Document = m_Settings.Application.ActiveUIDocument.Document.Create
+                    m_SheetView = ViewSheet.Create(m_Settings.Application.ActiveUIDocument.Document, m_TitleBlock.Id)
 
-            ' Sheet Creation Transaction
-            Dim m_SheetTrans As New Transaction(m_Settings.Document, "HOK Sheet Manager, Created: " & sheetNumber)
-            m_SheetTrans.Start()
+                    ' Update the Sheet Number and Name
+                    m_SheetView.SheetNumber = sheetNumber
+                    m_SheetView.Name = sheetName
 
-            ' Create it
-            Dim m_DocCreate As Autodesk.Revit.Creation.Document = m_Settings.Application.ActiveUIDocument.Document.Create
-            m_SheetView = ViewSheet.Create(m_Settings.Application.ActiveUIDocument.Document, m_TitleBlock.Id)
-
-            ' Update the Sheet Number and Name
-            m_SheetView.SheetNumber = sheetNumber
-            m_SheetView.Name = sheetName
-
-            Try ' Commit the New Sheet
-                m_SheetTrans.Commit()
-            Catch ex As Exception
-                m_SheetTrans.RollBack()
-                CreateFailCount += 1
-                m_ErrorMessage.AppendLine("Sheet Number: " & sheetNumber & ", Sheet Name: " & sheetName & vbCr & ex.Message)
-                Return False
-            End Try
-
-            ' Increment the New Sheet Integer
-            NewSheetCount += 1
+                    m_SheetTrans.Commit()
+                    ' Increment the New Sheet Integer
+                    NewSheetCount += 1
+                Catch ex As Exception
+                    m_SheetTrans.RollBack()
+                    CreateFailCount += 1
+                    m_ErrorMessage.AppendLine("Sheet Number: " & sheetNumber & ", Sheet Name: " & sheetName & vbCr & ex.Message)
+                    Return False
+                End Try
+            End Using
 
         End If
+
 UpdateExistingElement:
+        Using m_SheetUpdateTrans As New Transaction(m_Settings.Document)
+            If m_SheetUpdateTrans.Start("HOK Sheet Manager, Updated: " & infoRow("Sheet Number").ToString) = TransactionStatus.Started Then
+                Try
+                    ' Update all Discrepancies
+                    Dim isDiscrepancy As Boolean = False
+                    ' Iterate all Parameter names
+                    For Each x As String In ParamNames
 
-        ' Sheet Creation Transaction
-        Dim m_SheetUpdateTrans As New Transaction(m_Settings.Document, "HOK Sheet Manager, Updated: " & infoRow("Sheet Number").ToString)
-        m_SheetUpdateTrans.Start()
+                        ' Skip Sheet Number and Sheet Name
+                        If x.ToUpper = "SHEET NUMBER" Or x.ToUpper = "NAME" Then Continue For
 
-        ' Update all Discrepancies
-        Dim isDiscrepancy As Boolean = False
+                        ' Avoid Double Searching in Titleblock Family Later
+                        Dim m_ParamFoundInSheet As Boolean = False
 
-        ' Iterate all Parameter names
-        For Each x As String In ParamNames
+                        ' If the param is in the sheet, update it and continue for
+                        If m_SheetView IsNot Nothing Then
 
-            ' Skip Sheet Number and Sheet Name
-            If x.ToUpper = "SHEET NUMBER" Or x.ToUpper = "NAME" Then Continue For
-
-            ' Avoid Double Searching in Titleblock Family Later
-            Dim m_ParamFoundInSheet As Boolean = False
-
-            ' If the param is in the sheet, update it and continue for
-            If m_SheetView IsNot Nothing Then
-
-                ' Does the param exist in here?
+                            ' Does the param exist in here?
 #If RELEASE2013 Or RELEASE2014 Then
                 Dim m_P As Parameter = m_SheetView.Parameter(x)
 #ElseIf RELEASE2015 Then
-                Dim m_P As Parameter = m_SheetView.LookupParameter(x)
+                            Dim m_P As Parameter = m_SheetView.LookupParameter(x)
 #End If
 
-                If m_P IsNot Nothing Then
+                            If m_P IsNot Nothing Then
 
-                    ' No Need to search TB element
-                    m_ParamFoundInSheet = True
+                                ' No Need to search TB element
+                                m_ParamFoundInSheet = True
 
-                    Dim m_Para As New clsPara(m_P)
-                    If m_Para IsNot Nothing Then
+                                Dim m_Para As New clsPara(m_P)
+                                If m_Para IsNot Nothing Then
 
-                        ' Special Handling for YesNo
-                        If m_Para.DisplayUnitType.ToUpper = "YESNO" Then
+                                    ' Special Handling for YesNo
+                                    If m_Para.DisplayUnitType.ToUpper = "YESNO" Then
 
-                            Select Case infoRow(m_Para.Name).ToString.ToUpper
-                                Case "1"
-                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
-                                Case "Y"
-                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
-                                Case "YES"
-                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
-                                Case "X"
-                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
-                                Case "0"
-                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
-                                Case "N"
-                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
-                                Case "NO"
-                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
-                                Case ""
-                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
-                            End Select
+                                        Select Case infoRow(m_Para.Name).ToString.ToUpper
+                                            Case "1"
+                                                If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "Y"
+                                                If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "YES"
+                                                If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "X"
+                                                If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
+                                            Case "0"
+                                                If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
+                                            Case "N"
+                                                If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
+                                            Case "NO"
+                                                If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
+                                            Case ""
+                                                If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
+                                        End Select
 
-                            If isDiscrepancy = True Then
+                                        If isDiscrepancy = True Then
 
-                                m_Para.Value = infoRow(m_Para.Name).ToString
+                                            m_Para.Value = infoRow(m_Para.Name).ToString
 
-                                ' Increment the Update Count
-                                UpdatedParameterCount += 1
+                                            ' Increment the Update Count
+                                            UpdatedParameterCount += 1
 
-                            End If
+                                        End If
 
-                        Else
-                            If m_Para.Value <> infoRow(m_Para.Name).ToString Then
-                                isDiscrepancy = True
-                                m_Para.Value = infoRow(m_Para.Name).ToString
+                                    Else
+                                        If m_Para.Value <> infoRow(m_Para.Name).ToString Then
+                                            isDiscrepancy = True
+                                            m_Para.Value = infoRow(m_Para.Name).ToString
 
-                                ' Increment the Update Count
-                                UpdatedParameterCount += 1
+                                            ' Increment the Update Count
+                                            UpdatedParameterCount += 1
 
-                            End If
-                        End If
-                    End If
-                End If
-            End If
-
-            ' Not in sheet, check the Titleblock
-            If m_ParamFoundInSheet = False Then
-
-                ' Do we have a valid Titleblock Element
-                If m_SheetTitleblock Is Nothing Then
-
-                    ' Is it already collected?
-                    If m_Settings.clsTblksList.ContainsKey(infoRow("Sheet Number").ToString) Then
-                        m_SheetTitleblock = m_Settings.clsTblksList(infoRow("Sheet Number").ToString).Element
-                    Else
-
-                        ' Find the Titleblock Family
-                        Dim m_TBeleCol As New FilteredElementCollector(m_Settings.Document)
-                        Dim m_ListTBs As IList(Of Element)
-                        m_ListTBs = m_TBeleCol.OfCategory(BuiltInCategory.OST_TitleBlocks).ToElements
-
-                        ' Find the Right one...
-                        For Each y As Element In m_ListTBs
-
-                            ' Itentify the element by Sheet Number
-#If RELEASE2013 Or RELEASE2014 Then
-                            Dim m_SheetNumberP As Parameter = y.Parameter("Sheet Number")
-#ElseIf RELEASE2015 Then
-                            Dim m_SheetNumberP As Parameter = y.LookupParameter("Sheet Number")
-#End If
-
-                            If m_SheetNumberP IsNot Nothing Then
-
-                                ' Try and get the Sheet Number parameter
-                                Dim m_SheetNumberPara As New clsPara(m_SheetNumberP)
-                                If m_SheetNumberPara IsNot Nothing Then
-
-                                    ' Does the Sheet Number Match what We're after?
-                                    If m_SheetNumberPara.Value.ToUpper = infoRow("Sheet Number").ToString.ToUpper Then
-
-                                        ' This is the element we need
-                                        m_SheetTitleblock = y
-
-                                        Exit For
+                                        End If
                                     End If
                                 End If
                             End If
-                        Next
-                    End If
-                End If
+                        End If
 
-                ' Do the Updates to the Titleblock Family
-                If m_SheetTitleblock IsNot Nothing Then
+                        ' Not in sheet, check the Titleblock
+                        If m_ParamFoundInSheet = False Then
 
-                    ' Does the param exist in here?
+                            ' Do we have a valid Titleblock Element
+                            If m_SheetTitleblock Is Nothing Then
+
+                                ' Is it already collected?
+                                If m_Settings.clsTblksList.ContainsKey(infoRow("Sheet Number").ToString) Then
+                                    m_SheetTitleblock = m_Settings.clsTblksList(infoRow("Sheet Number").ToString).Element
+                                Else
+
+                                    ' Find the Titleblock Family
+                                    Dim m_TBeleCol As New FilteredElementCollector(m_Settings.Document)
+                                    Dim m_ListTBs As IList(Of Element)
+                                    m_ListTBs = m_TBeleCol.OfCategory(BuiltInCategory.OST_TitleBlocks).ToElements
+
+                                    ' Find the Right one...
+                                    For Each y As Element In m_ListTBs
+
+                                        ' Itentify the element by Sheet Number
+#If RELEASE2013 Or RELEASE2014 Then
+                            Dim m_SheetNumberP As Parameter = y.Parameter("Sheet Number")
+#ElseIf RELEASE2015 Then
+                                        Dim m_SheetNumberP As Parameter = y.LookupParameter("Sheet Number")
+#End If
+
+                                        If m_SheetNumberP IsNot Nothing Then
+
+                                            ' Try and get the Sheet Number parameter
+                                            Dim m_SheetNumberPara As New clsPara(m_SheetNumberP)
+                                            If m_SheetNumberPara IsNot Nothing Then
+
+                                                ' Does the Sheet Number Match what We're after?
+                                                If m_SheetNumberPara.Value.ToUpper = infoRow("Sheet Number").ToString.ToUpper Then
+
+                                                    ' This is the element we need
+                                                    m_SheetTitleblock = y
+
+                                                    Exit For
+                                                End If
+                                            End If
+                                        End If
+                                    Next
+                                End If
+                            End If
+
+                            ' Do the Updates to the Titleblock Family
+                            If m_SheetTitleblock IsNot Nothing Then
+
+                                ' Does the param exist in here?
 #If RELEASE2013 Or RELEASE2014 Then
                     Dim m_P As Parameter = m_SheetTitleblock.Parameter(x)
 #ElseIf RELEASE2015 Then
-                    Dim m_P As Parameter = m_SheetTitleblock.LookupParameter(x)
+                                Dim m_P As Parameter = m_SheetTitleblock.LookupParameter(x)
 #End If
 
-                    If m_P IsNot Nothing Then
+                                If m_P IsNot Nothing Then
 
-                        Dim m_Para As New clsPara(m_P)
-                        If m_Para IsNot Nothing Then
+                                    Dim m_Para As New clsPara(m_P)
+                                    If m_Para IsNot Nothing Then
 
-                            ' Special Handling for YesNo
-                            If m_Para.DisplayUnitType.ToUpper = "YESNO" Then
+                                        ' Special Handling for YesNo
+                                        If m_Para.DisplayUnitType.ToUpper = "YESNO" Then
 
-                                Select Case infoRow(m_Para.Name).ToString.ToUpper
-                                    Case "1"
-                                        If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
-                                    Case "Y"
-                                        If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
-                                    Case "YES"
-                                        If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
-                                    Case "X"
-                                        If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
-                                    Case "0"
-                                        If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
-                                    Case "N"
-                                        If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
-                                    Case "NO"
-                                        If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
-                                    Case ""
-                                        If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
-                                End Select
+                                            Select Case infoRow(m_Para.Name).ToString.ToUpper
+                                                Case "1"
+                                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
+                                                Case "Y"
+                                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
+                                                Case "YES"
+                                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
+                                                Case "X"
+                                                    If Double.Parse(m_Para.Value) <> 1 Then isDiscrepancy = True
+                                                Case "0"
+                                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
+                                                Case "N"
+                                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
+                                                Case "NO"
+                                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
+                                                Case ""
+                                                    If Double.Parse(m_Para.Value) <> 0 Then isDiscrepancy = True
+                                            End Select
 
-                                If isDiscrepancy = True Then
+                                            If isDiscrepancy = True Then
 
-                                    m_Para.Value = infoRow(m_Para.Name).ToString
+                                                m_Para.Value = infoRow(m_Para.Name).ToString
 
-                                    ' Increment the Update Count
-                                    UpdatedParameterCount += 1
+                                                ' Increment the Update Count
+                                                UpdatedParameterCount += 1
 
-                                End If
+                                            End If
 
-                            Else
+                                        Else
 
-                                If m_Para.Value <> infoRow(m_Para.Name).ToString Then
-                                    isDiscrepancy = True
-                                    m_Para.Value = infoRow(m_Para.Name).ToString
+                                            If m_Para.Value <> infoRow(m_Para.Name).ToString Then
+                                                isDiscrepancy = True
+                                                m_Para.Value = infoRow(m_Para.Name).ToString
 
-                                    ' Increment the Update Count
-                                    UpdatedParameterCount += 1
+                                                ' Increment the Update Count
+                                                UpdatedParameterCount += 1
 
+                                            End If
+                                        End If
+                                    End If
                                 End If
                             End If
                         End If
+                    Next
+
+                    m_SheetUpdateTrans.Commit()
+                    If m_SheetExists = True Then
+                        UpdatedSheetCount += 1
                     End If
-                End If
+
+                Catch ex As Exception
+                    Dim message As String = ex.Message
+                    UpdatedFailCount += 1
+                    m_SheetUpdateTrans.RollBack()
+                End Try
             End If
-        Next
-
-TransactionFinalization:
-
-        ' If not a new sheet and discrepancies, update count
-        If isDiscrepancy = True And m_SheetExists = True Then UpdatedSheetCount += 1
-
-        Try ' Commit the Updated Sheet
-            m_SheetUpdateTrans.Commit()
-        Catch ex As Exception
-            UpdatedFailCount += 1
-            m_SheetUpdateTrans.RollBack()
-        End Try
+        End Using
 
         Return True
 
@@ -1509,18 +1550,25 @@ TransactionFinalization:
             m_ParamNameList.Add(dataColumn.ColumnName)
         Next
 
+       
+
         'Process each row in template table
         For Each row As DataRow In m_DataTable.Rows
 
             ' Progress Bar
             Me.ProgressBar1.Increment(1)
 
+            Dim sheetNumber As String = row("Sheet Number").ToString()
+
             ' Avoid Blank Sheet Numbers
-            If String.IsNullOrEmpty(row("Sheet Number").ToString()) Then Continue For
+            If String.IsNullOrEmpty(sheetNumber) Then Continue For
 
-            ' Process the Sheet
-            DoSheet(row, m_ParamNameList)
-
+            If TreeViewSheets.Nodes.ContainsKey(sheetNumber) Then
+                If TreeViewSheets.Nodes(sheetNumber).Checked = True Then
+                    ' Process the Sheet
+                    DoSheet(row, m_ParamNameList)
+                End If
+            End If
         Next
 
         'Empty the data table
@@ -1563,8 +1611,10 @@ TransactionFinalization:
                                 UpdatedFailCount.ToString & " " & " Sheets Skipped due to Elements Locked by Users")
         End If
 
+        m_Settings.GetSheetsAndTitleblockInstances()
+        ScanSheets()
 
-        Me.Close()
+        'Me.Close()
     End Sub
 
 #Region "Access and Excel Selection Buttons"
@@ -1673,9 +1723,7 @@ TransactionFinalization:
 
 #End Region
 
-    Private Sub form_SheetManager_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-
-    End Sub
+   
 
     Private Sub linkHelp_LinkClicked(ByVal sender As System.Object, ByVal e As System.Windows.Forms.LinkLabelLinkClickedEventArgs) Handles linkHelp.LinkClicked
         Dim htmPath As String = "V:\RVT-Data\HOK Program\Documentation\Sheet Manager_Instruction.pdf"
@@ -1686,5 +1734,60 @@ TransactionFinalization:
         Dim aboutBox As AboutBox = New AboutBox
         aboutBox.ShowDialog()
 
+    End Sub
+
+    Private Sub form_SheetManager_FormClosing(sender As Object, e As Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
+        m_UtilityInterop.ShutDownAccess()
+        m_UtilityInterop.ShutDownExcel()
+    End Sub
+
+    Private Sub ButtonCheckAll_Click(sender As Object, e As EventArgs) Handles ButtonCheckAll.Click
+        Try
+            Dim i As Integer
+            For i = 0 To TreeViewSheets.Nodes.Count - 1
+                TreeViewSheets.Nodes(i).Checked = True
+            Next
+        Catch ex As Exception
+            Dim message As String = ex.Message
+        End Try
+    End Sub
+
+    Private Sub ButtonUncheck_Click(sender As Object, e As EventArgs) Handles ButtonUncheck.Click
+        Try
+            Dim i As Integer
+            For i = 0 To TreeViewSheets.Nodes.Count - 1
+                TreeViewSheets.Nodes(i).Checked = False
+            Next
+        Catch ex As Exception
+            Dim message As String = ex.Message
+        End Try
+    End Sub
+
+    Private Sub ComboBoxFilter_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBoxFilter.SelectedIndexChanged
+        Try
+            If ListBoxTableSet.SelectedItem IsNot Nothing Then
+                If ComboBoxFilter.SelectedItem IsNot Nothing Then
+                    Dim i As Integer
+                    For i = 0 To TreeViewSheets.Nodes.Count - 1
+                        TreeViewSheets.Nodes(i).Checked = False
+                        Dim sheetNumber As String = TreeViewSheets.Nodes(i).Name
+                        Select Case ComboBoxFilter.SelectedIndex
+                            Case 0
+                                TreeViewSheets.Nodes(i).Checked = True
+                            Case 1
+                                If Not m_Settings.Sheets.ContainsKey(sheetNumber) Then
+                                    TreeViewSheets.Nodes(i).Checked = True
+                                End If
+                            Case 2
+                                If m_Settings.Sheets.ContainsKey(sheetNumber) Then
+                                    TreeViewSheets.Nodes(i).Checked = True
+                                End If
+                        End Select
+                    Next
+                End If
+            End If
+        Catch ex As Exception
+            Dim message As String = ex.Message
+        End Try
     End Sub
 End Class
