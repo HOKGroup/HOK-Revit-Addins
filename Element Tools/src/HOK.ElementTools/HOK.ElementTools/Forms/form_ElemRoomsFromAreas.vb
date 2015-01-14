@@ -416,7 +416,7 @@ Public Class form_ElemRoomsFromAreas
 
     Private Sub buttonClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonClose.Click
         SaveSettings()
-        Me.Close()
+        Me.DialogResult = Windows.Forms.DialogResult.OK
     End Sub
 
     Private Sub radioButtonPlaced_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles radioButtonPlaced.CheckedChanged

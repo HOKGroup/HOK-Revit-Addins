@@ -370,7 +370,7 @@ Public Class form_ElemTagViewsArea
 
     Private Sub buttonClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonClose.Click
         SaveSettings()
-        Me.Close()
+        Me.DialogResult = Windows.Forms.DialogResult.OK
     End Sub
 
     Private Sub buttonSelect_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonSelect.Click

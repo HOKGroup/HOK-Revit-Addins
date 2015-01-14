@@ -13,6 +13,9 @@ Public Class form_ElemViewsFromRooms
     Private mViewTemplates As New Dictionary(Of ViewType, Dictionary(Of String, ElementId))
     Private mElevationMaps As New Dictionary(Of Integer, Integer) 'viewid, markerid
     Private initializing As Boolean = True
+    Private view2dFamilyType As ViewFamilyType = Nothing
+    Private view3dFamilyType As ViewFamilyType = Nothing
+    Private viewElevationFamilyType As ViewFamilyType = Nothing
 
 #Region "Constructor"
     Public Sub New(ByVal settings As clsSettings)
@@ -117,6 +120,26 @@ Public Class form_ElemViewsFromRooms
         Else
             FillRoomsList(False)
         End If
+
+        Dim collector As New FilteredElementCollector(m_Settings.Document)
+        collector.OfClass(GetType(ViewFamilyType))
+
+        Dim viewTypeList As List(Of Element)
+        viewTypeList = collector.ToElements().ToList()
+
+        For Each viewType As Element In viewTypeList
+            Dim viewfamilytype As ViewFamilyType
+            viewfamilytype = CType(viewType, ViewFamilyType)
+            If viewfamilytype.ViewFamily = ViewFamily.FloorPlan Then
+                view2dFamilyType = viewfamilytype
+            End If
+            If viewfamilytype.ViewFamily = ViewFamily.ThreeDimensional Then
+                view3dFamilyType = viewfamilytype
+            End If
+            If viewfamilytype.ViewFamily = ViewFamily.Elevation Then
+                viewElevationFamilyType = viewfamilytype
+            End If
+        Next
 
     End Sub
 
@@ -248,6 +271,23 @@ Public Class form_ElemViewsFromRooms
                         .Value = 0
                         .Visible = True
                     End With
+                End If
+
+                If radioButtonType2d.Checked And IsNothing(view2dFamilyType) Then
+                    MessageBox.Show("Please load at least one view family to create 2D plan view.", "View Family Missing", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    Return
+                End If
+
+                If radioButtonType3dBox.Checked Or radioButtonType3dBoxCrop.Checked Or radioButtonType3dCrop.Checked Then
+                    If IsNothing(view3dFamilyType) Then
+                        MessageBox.Show("Please load at least one view family to create 3D view.", "View Family Missing", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                        Return
+                    End If
+                End If
+
+                If RadioButtonTypeElevation.Checked And IsNothing(viewElevationFamilyType) Then
+                    MessageBox.Show("Please load at least one view family to create Elevation view.", "View Family Missing", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    Return
                 End If
 
                 Dim categorySectionBox As DB.Category
@@ -515,29 +555,7 @@ Public Class form_ElemViewsFromRooms
 
                     'Create the view
                     Try
-                        Dim collector As New FilteredElementCollector(m_Settings.Document)
-                        collector.OfClass(GetType(ViewFamilyType))
-
-                        Dim viewTypeList As List(Of Element)
-                        viewTypeList = collector.ToElements().ToList()
-
-                        Dim view2dFamilyType As ViewFamilyType = Nothing
-                        Dim view3dFamilyType As ViewFamilyType = Nothing
-                        Dim viewElevationFamilyType As ViewFamilyType = Nothing
-
-                        For Each viewType As Element In viewTypeList
-                            Dim viewfamilytype As ViewFamilyType
-                            viewfamilytype = CType(viewType, ViewFamilyType)
-                            If viewfamilytype.ViewFamily = ViewFamily.FloorPlan Then
-                                view2dFamilyType = viewfamilytype
-                            End If
-                            If viewfamilytype.ViewFamily = ViewFamily.ThreeDimensional Then
-                                view3dFamilyType = viewfamilytype
-                            End If
-                            If viewfamilytype.ViewFamily = ViewFamily.Elevation Then
-                                viewElevationFamilyType = viewfamilytype
-                            End If
-                        Next
+                        
 
                         If radioButtonType2d.Checked Then
 
@@ -595,7 +613,7 @@ Public Class form_ElemViewsFromRooms
                                     view2d.Scale = scale
 
 #If RELEASE2013 Or RELEASE2014 Then
-                    parameter = view2d.Parameter("Title on Sheet")
+                                    parameter = view2d.Parameter("Title on Sheet")
 #ElseIf RELEASE2015 Then
                                     parameter = view2d.LookupParameter("Title on Sheet")
 #End If
@@ -611,6 +629,8 @@ Public Class form_ElemViewsFromRooms
                            
 
                         ElseIf RadioButtonTypeElevation.Checked Then
+                            Dim createdElevations As List(Of ViewSection) = New List(Of ViewSection)
+
                             Using trans As New Transaction(m_Settings.Document, "Create Elevation View")
                                 Dim rbb As BoundingBoxXYZ = roomToUse.BoundingBox(Nothing)
                                 Dim midPt As XYZ = 0.5 * (rbb.Max + rbb.Min)
@@ -622,10 +642,15 @@ Public Class form_ElemViewsFromRooms
                                     'create elevation view
                                     viewNameComposite = viewName & "-Elevation"
                                     Dim surfix() As String = {"-D", "-A", "-B", "-C"}
-                                    Dim createdElevations As List(Of ViewSection) = New List(Of ViewSection)
+
 
                                     If viewElementIdElevation_A = "*" And viewElementIdElevation_B = "*" And viewElementIdElevation_C = "*" And viewElementIdElevation_D = "*" Then
                                         Dim marker As ElevationMarker = ElevationMarker.CreateElevationMarker(m_Settings.Document, viewElevationFamilyType.Id, markerLocation, scale)
+                                        Dim viewCount As Integer = 3
+                                        If (marker.MaximumViewCount < 4) Then
+                                            viewCount = marker.MaximumViewCount - 1
+                                        End If
+
                                         For index As Integer = 0 To 3
                                             Dim viewElevation As ViewSection = marker.CreateElevation(m_Settings.Document, m_Settings.ActiveViewPlan.Id, index)
                                             viewElevation.Name = viewNameComposite & surfix(index)
@@ -762,7 +787,7 @@ Public Class form_ElemViewsFromRooms
                                             Next
                                         End If
                                     End If
-
+                                   
                                     'set view template
                                     If ComboBoxViewTemplate.SelectedItem IsNot Nothing Then
                                         Dim selectedTemplateName As String = ComboBoxViewTemplate.SelectedItem.ToString
@@ -793,6 +818,89 @@ Public Class form_ElemViewsFromRooms
                                 End Try
                             End Using
 
+
+                            Dim vertices As List(Of XYZ) = New List(Of XYZ)
+                            Dim geomElement As GeometryElement = roomToUse.ClosedShell
+                            If (geomElement IsNot Nothing) Then
+                                For Each geomObj As GeometryObject In geomElement
+                                    Dim solid As Solid = TryCast(geomObj, Solid)
+                                    If (solid IsNot Nothing) Then
+                                        For Each edge As Edge In solid.Edges
+                                            Dim curve As Curve = edge.AsCurve()
+#If RELEASE2013 Then
+                                            vertices.Add(curve.EndPoint(0))
+                                            vertices.Add(curve.EndPoint(1))
+#Else
+                                            vertices.Add(curve.GetEndPoint(0))
+                                            vertices.Add(curve.GetEndPoint(1))
+#End If
+
+                                        Next
+                                    End If
+                                Next
+                            End If
+
+                            If (vertices.Count > 0) Then
+                                For Each elevation As ViewSection In createdElevations
+                                    Dim verticesInView As List(Of XYZ) = New List(Of XYZ)
+                                    Dim bb As BoundingBoxXYZ = elevation.CropBox
+                                    If (bb IsNot Nothing) Then
+                                        Dim transform As Transform = bb.Transform
+                                        For Each vertex As XYZ In vertices
+                                            verticesInView.Add(transform.Inverse.OfPoint(vertex))
+                                        Next
+                                        Dim xMin As Double = 0, yMin As Double = 0, zMin As Double = 0, xMax As Double = 0, yMax As Double = 0, zMax As Double = 0
+                                        Dim first As Boolean = False
+                                        For Each p As XYZ In verticesInView
+                                            If (first) Then
+                                                xMin = p.X
+                                                yMin = p.Y
+                                                zMin = p.Z
+                                                xMax = p.X
+                                                yMax = p.Y
+                                                zMax = p.Z
+                                            Else
+                                                If (xMin > p.X) Then
+                                                    xMin = p.X
+                                                End If
+                                                If (yMin > p.Y) Then
+                                                    yMin = p.Y
+                                                End If
+                                                If (zMin > p.Z) Then
+                                                    zMin = p.Z
+                                                End If
+                                                If (xMax < p.X) Then
+                                                    xMax = p.X
+                                                End If
+                                                If (yMax < p.Y) Then
+                                                    yMax = p.Y
+                                                End If
+                                                If (zMax < p.Z) Then
+                                                    zMax = p.Z
+                                                End If
+                                            End If
+                                        Next
+
+                                        Using trans As New Transaction(m_Settings.Document, "Modify CropBox")
+                                            Try
+                                                trans.Start()
+                                                'Modify CropBox
+                                                elevation.CropBoxActive = False
+                                                bb.Max = New XYZ(xMax, yMax, -zMin)
+                                                bb.Min = New XYZ(xMin, yMin, 0)
+                                                elevation.CropBox = bb
+                                                elevation.CropBoxActive = True
+                                                elevation.CropBoxVisible = True
+
+                                                trans.Commit()
+                                            Catch ex As Exception
+                                                trans.RollBack()
+                                                Dim message As String = ex.Message
+                                            End Try
+                                        End Using
+                                    End If
+                                Next
+                            End If
                         Else
                             Using trans As New Transaction(m_Settings.Document, "Create 3D Views")
                                 Try
@@ -1793,7 +1901,7 @@ Public Class form_ElemViewsFromRooms
     End Sub
     Private Sub buttonClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonClose.Click
         SaveSettings()
-        Me.Close()
+        Me.DialogResult = Windows.Forms.DialogResult.OK
     End Sub
     Private Sub checkBoxIncludeExisting_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles checkBoxListExisting.CheckedChanged
         If Not initializing Then

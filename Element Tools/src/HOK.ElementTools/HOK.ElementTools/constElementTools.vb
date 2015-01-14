@@ -6,12 +6,10 @@ Imports Autodesk.Revit.UI
 ''' </summary>
 Public Class constElementTools
 
-    Public Sub New(ByVal cmdData As ExternalCommandData, _
-                   ByVal Msg As String, _
-                   ByVal eSet As ElementSet, _
+    Public Sub New(ByVal settings As clsSettings,
                    ByVal myAppVer As String)
 
-        Dim dlg As New form_ElemMenu(cmdData, Msg, eSet, "v" & System.Reflection.Assembly.GetExecutingAssembly.GetName.Version.ToString)
+        Dim dlg As New form_ElemMenu(settings, "v" & System.Reflection.Assembly.GetExecutingAssembly.GetName.Version.ToString)
         dlg.ShowDialog()
 
     End Sub

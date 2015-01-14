@@ -179,7 +179,7 @@ Public Class form_ElemSheetsFromViews
 
     Private Sub buttonClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonClose.Click
         SaveSettings()
-        Me.Close()
+        Me.DialogResult = Windows.Forms.DialogResult.OK
     End Sub
 
     Private Sub buttonCreate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonCreate.Click

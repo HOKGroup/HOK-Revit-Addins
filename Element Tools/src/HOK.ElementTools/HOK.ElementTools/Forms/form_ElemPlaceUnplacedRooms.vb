@@ -565,15 +565,21 @@ Public Class form_ElemPlaceUnplacedRooms
     ''' <param name="e"></param>
     ''' <remarks></remarks>
     Private Sub ButtonPickPoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonPickPoint.Click
-        Me.Hide()
-        Dim point As XYZ = m_Settings.UIdoc.Selection.PickPoint("Please pick a point to place component.")
-        If point IsNot Nothing Then
-            Me.textBoxStartX.Text = point.X.ToString
-            Me.textBoxStartY.Text = point.Y.ToString
-        Else
-            Dim test1 As String = ""
-        End If
-        Me.ShowDialog()
+        Me.DialogResult = Windows.Forms.DialogResult.Retry
+
+        'Me.Hide()
+        'Try
+        '    Dim point As XYZ = m_Settings.UIdoc.Selection.PickPoint("Please pick a point to place component.")
+        '    If point IsNot Nothing Then
+        '        Me.textBoxStartX.Text = point.X.ToString
+        '        Me.textBoxStartY.Text = point.Y.ToString
+        '    Else
+        '        Dim test1 As String = ""
+        '    End If
+        'Catch ex As Exception
+        '    Dim message As String = ex.Message
+        'End Try
+        'Me.ShowDialog()
     End Sub
 
     ''' <summary>
@@ -584,7 +590,7 @@ Public Class form_ElemPlaceUnplacedRooms
     ''' <remarks></remarks>
     Private Sub buttonClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonClose.Click
         SaveSettings()
-        Me.Close()
+        Me.DialogResult = Windows.Forms.DialogResult.OK
     End Sub
 
     ''' <summary>

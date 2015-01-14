@@ -7,11 +7,28 @@ Public Class form_ElemMenu
 
     Private m_wndToolTip As System.Windows.Forms.ToolTip
     Private m_Settings As clsSettings
+    Private m_command As cmdElementTools.ToolType = cmdElementTools.ToolType.None
 
-    Public Sub New(ByRef commandData As ExternalCommandData, ByRef message As String, ByRef elementSet As ElementSet, ByVal appV As String)
+    Property CommandToolType() As cmdElementTools.ToolType
+        Get
+            Return m_command
+        End Get
+        Set(value As cmdElementTools.ToolType)
+            m_command = value
+        End Set
+    End Property
+
+    Public Sub New(ByRef settings As clsSettings, ByVal appV As String)
         InitializeComponent()
-        m_Settings = New clsSettings(commandData, message, elementSet)
+        m_Settings = settings
         Me.Text = "Element Tools - " & appV
+    End Sub
+
+    Public Sub New(ByRef settings As clsSettings, ByVal appV As String, ByVal command As cmdElementTools.ToolType)
+        InitializeComponent()
+        m_Settings = settings
+        Me.Text = "Element Tools - " & appV
+        m_command = command
     End Sub
 
     Private Sub Menu_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
@@ -65,6 +82,36 @@ Public Class form_ElemMenu
                                "by their element ID." & vbCr & _
                                "Creates a text file of the list and provides an option" & vbCr & _
                                "to select attachment(s) to be modified on return to Revit. ")
+        If (m_command <> cmdElementTools.ToolType.None) Then
+            RunCommand(m_command)
+        End If
+    End Sub
+
+    Public Sub RunCommand(ByVal toolToRun As cmdElementTools.ToolType)
+        Try
+            Select Case toolToRun
+                Case cmdElementTools.ToolType.CreateRoomsFromAreas
+                    RunCreateRoomsFromAres()
+                Case cmdElementTools.ToolType.CreateSheetsFromViews
+                    RunCreateSheetsFromViews()
+                Case cmdElementTools.ToolType.CreateTaggedViewsFromAreas
+                    RunCreateTaggedViewsFromAreas()
+                Case cmdElementTools.ToolType.CreateTaggedViewsFromRooms
+                    RunCreateTaggedViewsFromRooms()
+                Case cmdElementTools.ToolType.CreateViewsFromAreas
+                    RunCreateViewsFromArea()
+                Case cmdElementTools.ToolType.CreateViewsFromRooms
+                    RunCreateViewsFromRooms()
+                Case cmdElementTools.ToolType.ManageAttachmentLinks
+                    RunManageAttachmentLinks()
+                Case cmdElementTools.ToolType.PlaceUnplacedAreas
+                    RunPlaceUnplacedAreas()
+                Case cmdElementTools.ToolType.PlaceUnplacedRooms
+                    RunPlaceUnplacedRooms()
+            End Select
+        Catch ex As Exception
+            Dim message As String = ex.Message
+        End Try
     End Sub
 
     Private Sub ButtonCancel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
@@ -75,69 +122,133 @@ Public Class form_ElemMenu
         m_Settings.ReloadDefaults()
     End Sub
 
-    Private Sub ButtonPlaceUnplacedAreas_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonPlaceUnplacedAreas.Click
+    Private Sub RunPlaceUnplacedAreas()
         Dim dialog As New form_ElemPlaceUnplacedAreas(m_Settings)
         Me.WindowState = FormWindowState.Minimized
-        dialog.ShowDialog()
-        Me.Close()
+        Dim dResult As DialogResult = dialog.ShowDialog()
+        If (DialogResult.OK = dResult Or DialogResult.Retry = dResult) Then
+            m_command = cmdElementTools.ToolType.PlaceUnplacedAreas
+            Me.DialogResult = dResult
+        End If
+    End Sub
+
+    Private Sub ButtonPlaceUnplacedAreas_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonPlaceUnplacedAreas.Click
+        RunPlaceUnplacedAreas()
+    End Sub
+
+    Private Sub RunPlaceUnplacedRooms()
+        Dim dialog As New form_ElemPlaceUnplacedRooms(m_Settings)
+        Me.WindowState = FormWindowState.Minimized
+        Dim dResult As DialogResult = dialog.ShowDialog()
+        If (DialogResult.OK = dResult Or DialogResult.Retry = dResult) Then
+            m_command = cmdElementTools.ToolType.PlaceUnplacedRooms
+            dialog.Close()
+            Me.DialogResult = dResult
+        End If
     End Sub
 
     Private Sub ButtonPlaceUnplacedRooms_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonPlaceUnplacedRooms.Click
-        Dim dialog As New form_ElemPlaceUnplacedRooms(m_Settings)
+        RunPlaceUnplacedRooms()
+    End Sub
+
+    Private Sub RunCreateRoomsFromAres()
+        Dim dialog As New form_ElemRoomsFromAreas(m_Settings)
         Me.WindowState = FormWindowState.Minimized
-        dialog.ShowDialog()
-        Me.Close()
+        Dim dResult As DialogResult = dialog.ShowDialog()
+        If (DialogResult.OK = dResult Or DialogResult.Retry = dResult) Then
+            m_command = cmdElementTools.ToolType.CreateRoomsFromAreas
+            Me.DialogResult = dResult
+        End If
     End Sub
 
     Private Sub ButtonCreateRoomsFromAreas_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCreateRoomsFromAreas.Click
-        Dim dialog As New form_ElemRoomsFromAreas(m_Settings)
+        RunCreateRoomsFromAres()
+    End Sub
+
+    Private Sub RunCreateViewsFromRooms()
+        Dim dialog As New form_ElemViewsFromRooms(m_Settings)
         Me.WindowState = FormWindowState.Minimized
-        dialog.ShowDialog()
-        Me.Close()
+        Dim dResult As DialogResult = dialog.ShowDialog()
+        If (DialogResult.OK = dResult Or DialogResult.Retry = dResult) Then
+            m_command = cmdElementTools.ToolType.CreateViewsFromRooms
+            Me.DialogResult = dResult
+        End If
     End Sub
 
     Private Sub ButtonCreateViewsFromRooms_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCreateViewsFromRooms.Click
-        Dim dialog As New form_ElemViewsFromRooms(m_Settings)
+        RunCreateViewsFromRooms()
+    End Sub
+
+    Private Sub RunCreateTaggedViewsFromRooms()
+        Dim dialog As New form_ElemTagViews(m_Settings)
         Me.WindowState = FormWindowState.Minimized
-        dialog.ShowDialog()
-        Me.Close()
+        Dim dResult As DialogResult = dialog.ShowDialog()
+        If (DialogResult.OK = dResult Or DialogResult.Retry = dResult) Then
+            m_command = cmdElementTools.ToolType.CreateTaggedViewsFromRooms
+            Me.DialogResult = dResult
+        End If
     End Sub
 
     Private Sub ButtonCreateTaggedViewsFromRooms_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCreateTaggedViewsFromRooms.Click
-        Dim dialog As New form_ElemTagViews(m_Settings)
+        RunCreateTaggedViewsFromRooms()
+    End Sub
+
+    Private Sub RunCreateViewsFromArea()
+        Dim dialog As New form_ElemViewsFromAreas(m_Settings)
         Me.WindowState = FormWindowState.Minimized
-        dialog.ShowDialog()
-        Me.Close()
+        Dim dResult As DialogResult = dialog.ShowDialog()
+        If (DialogResult.OK = dResult Or DialogResult.Retry = dResult) Then
+            m_command = cmdElementTools.ToolType.CreateViewsFromAreas
+            Me.DialogResult = dResult
+        End If
     End Sub
 
     Private Sub ButtonCreateViewsFromAreas_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCreateViewsFromAreas.Click
-        Dim dialog As New form_ElemViewsFromAreas(m_Settings)
+        RunCreateViewsFromArea()
+    End Sub
+
+    Private Sub RunCreateTaggedViewsFromAreas()
+        Dim dialog As New form_ElemTagViewsArea(m_Settings)
         Me.WindowState = FormWindowState.Minimized
-        dialog.ShowDialog()
-        Me.Close()
+        Dim dResult As DialogResult = dialog.ShowDialog()
+        If (DialogResult.OK = dResult Or DialogResult.Retry = dResult) Then
+            m_command = cmdElementTools.ToolType.CreateTaggedViewsFromAreas
+            Me.DialogResult = dResult
+        End If
     End Sub
 
     Private Sub ButtonCreateTaggedViewsFromAreas_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCreateTaggedViewsFromAreas.Click
-        Dim dialog As New form_ElemTagViewsArea(m_Settings)
+        RunCreateTaggedViewsFromAreas()
+    End Sub
+
+    Private Sub RunCreateSheetsFromViews()
+        Dim dialog As New form_ElemSheetsFromViews(m_Settings)
         Me.WindowState = FormWindowState.Minimized
-        dialog.ShowDialog()
-        Me.Close()
+        Dim dResult As DialogResult = dialog.ShowDialog()
+        If (DialogResult.OK = dResult Or DialogResult.Retry = dResult) Then
+            m_command = cmdElementTools.ToolType.CreateSheetsFromViews
+            Me.DialogResult = dResult
+        End If
     End Sub
 
     Private Sub ButtonCreateSheetsFromViews_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCreateSheetsFromViews.Click
-        Dim dialog As New form_ElemSheetsFromViews(m_Settings)
+        RunCreateSheetsFromViews()
+    End Sub
+
+    Private Sub RunManageAttachmentLinks()
+        Dim dialog As New form_ElemAttachmentManager(m_Settings)
         Me.WindowState = FormWindowState.Minimized
-        dialog.ShowDialog()
-        Me.Close()
+        Dim dResult As DialogResult = dialog.ShowDialog()
+        If (DialogResult.OK = dResult Or DialogResult.Retry = dResult) Then
+            m_command = cmdElementTools.ToolType.ManageAttachmentLinks
+            Me.DialogResult = dResult
+        End If
     End Sub
 
     Private Sub ButtonManageAttachmentLinks_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonManageAttachmentLinks.Click
-        Dim dialog As New form_ElemAttachmentManager(m_Settings)
-        Me.WindowState = FormWindowState.Minimized
-        dialog.ShowDialog()
-        Me.Close()
+        RunManageAttachmentLinks()
     End Sub
 
-    
-    
+
+
 End Class
