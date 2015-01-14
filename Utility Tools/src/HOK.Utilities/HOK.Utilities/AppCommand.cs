@@ -73,6 +73,11 @@ namespace HOK.Utilities
             pushButton8.ToolTip = "Assign room data into enclosed elements.";
             pushButton8.SetContextualHelp(contextualHelp);
 
+            PushButton pushButton9 = splitButton.AddPushButton(new PushButtonData("Elevation Creator", "Elevation Creator", currentAssembly, "HOK.Utilities.ElevationCommand")) as PushButton;
+            pushButton9.LargeImage = LoadBitmapImage(assembly, "elevation.png");
+            pushButton9.ToolTip = "Place an elevation marker within a room and rotate the marker to be perpendicular to a selected wall.";
+            pushButton9.SetContextualHelp(contextualHelp);
+
             return Result.Succeeded;
         }
 

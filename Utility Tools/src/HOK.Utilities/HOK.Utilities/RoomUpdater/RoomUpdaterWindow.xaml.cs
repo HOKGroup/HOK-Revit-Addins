@@ -665,66 +665,73 @@ namespace HOK.Utilities.RoomUpdater
                     FilteredElementCollector collector = new FilteredElementCollector(m_doc);
                     List<Element> elements = collector.OfCategoryId(pmp.RevitCategory.CategoryObj.Id).WherePasses(orFilter).ToElements().ToList();
 
-                    //slow solid filter
-                    if (elements.Count > 0)
+                    if (checkBoxIntersect.IsChecked == true)
                     {
-                        foreach (Element element in elements)
+                        revitElements.AddRange(elements);
+                    }
+                    else
+                    {
+                        //slow solid filter
+                        if (elements.Count > 0)
                         {
-                            LocationPoint locationPt = element.Location as LocationPoint;
-                            if (null != locationPt)
+                            foreach (Element element in elements)
                             {
-                                XYZ point = locationPt.Point;
-                                if (sep.IsLinked && null != sep.LinkProperties)
+                                LocationPoint locationPt = element.Location as LocationPoint;
+                                if (null != locationPt)
                                 {
-                                    point = sep.LinkProperties.TransformValue.Inverse.OfPoint(point);
-                                }
-                                
-                                if (null != room)
-                                {
-                                    if (room.IsPointInRoom(point))
+                                    XYZ point = locationPt.Point;
+                                    if (sep.IsLinked && null != sep.LinkProperties)
                                     {
-                                        revitElements.Add(element);
+                                        point = sep.LinkProperties.TransformValue.Inverse.OfPoint(point);
                                     }
-                                }
-                                else if (null != space)
-                                {
-                                    if (space.IsPointInSpace(point))
-                                    {
-                                        revitElements.Add(element);
-                                    }
-                                }
-                            }
 
-                            LocationCurve locationCurve = element.Location as LocationCurve;
-                            if (null != locationCurve)
-                            {
-                                Curve curve = locationCurve.Curve;
+                                    if (null != room)
+                                    {
+                                        if (room.IsPointInRoom(point))
+                                        {
+                                            revitElements.Add(element);
+                                        }
+                                    }
+                                    else if (null != space)
+                                    {
+                                        if (space.IsPointInSpace(point))
+                                        {
+                                            revitElements.Add(element);
+                                        }
+                                    }
+                                }
+
+                                LocationCurve locationCurve = element.Location as LocationCurve;
+                                if (null != locationCurve)
+                                {
+                                    Curve curve = locationCurve.Curve;
 #if RELEASE2013
                                 XYZ firstPt = curve.get_EndPoint(0);
                                 XYZ secondPt = curve.get_EndPoint(1);
 #elif RELEASE2014||RELEASE2015
-                                XYZ firstPt = curve.GetEndPoint(0);
-                                XYZ secondPt = curve.GetEndPoint(1);
+                                    XYZ firstPt = curve.GetEndPoint(0);
+                                    XYZ secondPt = curve.GetEndPoint(1);
 #endif
 
-                                if (sep.IsLinked && null != sep.LinkProperties)
-                                {
-                                    firstPt = sep.LinkProperties.TransformValue.Inverse.OfPoint(firstPt);
-                                    secondPt = sep.LinkProperties.TransformValue.Inverse.OfPoint(secondPt);
-                                }
-                                
-                                if (null != room)
-                                {
-                                    if (room.IsPointInRoom(firstPt) || room.IsPointInRoom(secondPt))
+                                    if (sep.IsLinked && null != sep.LinkProperties)
                                     {
-                                        revitElements.Add(element);
+                                        firstPt = sep.LinkProperties.TransformValue.Inverse.OfPoint(firstPt);
+                                        secondPt = sep.LinkProperties.TransformValue.Inverse.OfPoint(secondPt);
                                     }
-                                }
-                                else if (null != space)
-                                {
-                                    if (space.IsPointInSpace(firstPt) || space.IsPointInSpace(secondPt))
+
+                                    if (null != room)
                                     {
-                                        revitElements.Add(element);
+                                        if (room.IsPointInRoom(firstPt) || room.IsPointInRoom(secondPt))
+                                        {
+                                            revitElements.Add(element);
+                                        }
+                                    }
+                                    else if (null != space)
+                                    {
+                                        if (space.IsPointInSpace(firstPt) || space.IsPointInSpace(secondPt))
+                                        {
+                                            revitElements.Add(element);
+                                        }
                                     }
                                 }
                             }
@@ -991,11 +998,13 @@ namespace HOK.Utilities.RoomUpdater
         private RevitLinkInstance m_instance = null;
         private int instanceId = -1;
         private Document linkedDocument = null;
+        private string documentTitle = "";
         private Autodesk.Revit.DB.Transform transformValue = null;
 
         public RevitLinkInstance Instance { get { return m_instance; } set { m_instance = value; } }
         public int InstanceId { get { return instanceId; } set { instanceId = value; } }
         public Document LinkedDocument { get { return linkedDocument; } set { linkedDocument = value; } }
+        public string DocumentTitle { get { return documentTitle; } set { documentTitle = value; } }
         public Autodesk.Revit.DB.Transform TransformValue { get { return transformValue; } set { transformValue = value; } }
 
         public LinkedInstanceProperties(RevitLinkInstance instance)
@@ -1007,6 +1016,7 @@ namespace HOK.Utilities.RoomUpdater
 #elif RELEASE2014 || RELEASE2015
             linkedDocument = instance.GetLinkDocument();
 #endif
+            documentTitle = linkedDocument.Title;
             transformValue = instance.GetTotalTransform();
         }
     }

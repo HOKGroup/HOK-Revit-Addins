@@ -112,6 +112,7 @@
     <Compile Include="CeilingHeight\CeilingHeightUtil.cs" />
     <Compile Include="DoorCommand.cs" />
     <Compile Include="DoorRoom\DoorLinkManager.cs" />
+    <Compile Include="ElevationCommand.cs" />
     <Compile Include="FinishCommand.cs" />
     <Compile Include="FinishCreator\FloorCreator.cs" />
     <Compile Include="LevelCommand.cs" />
@@ -143,6 +144,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RoomCommand.cs" />
+    <Compile Include="RoomElevation\ElevationCreator.cs" />
     <Compile Include="RoomUpdater\RoomUpdaterDataStorageUtil.cs" />
     <Compile Include="RoomUpdater\RoomUpdaterWindow.xaml.cs">
       <DependentUpon>RoomUpdaterWindow.xaml</DependentUpon>
@@ -229,6 +231,11 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\cube.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\elevation.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>

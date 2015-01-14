@@ -37,7 +37,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
                     <RowDefinition/>
-                    
+                    <RowDefinition Height="20"/>
                 </Grid.RowDefinitions>
                 <Label Content="Category:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="comboBoxSpace" HorizontalAlignment="Left" Margin="76,13,0,0" VerticalAlignment="Top" Width="150" SelectionChanged="comboBoxSpace_SelectionChanged"/>
@@ -54,7 +54,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
                     <RowDefinition/>
-                    
+                    <RowDefinition Height="20"/>
                 </Grid.RowDefinitions>
                 <Label Content="Category:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="comboBoxRevit" HorizontalAlignment="Left" Margin="76,13,0,0" VerticalAlignment="Top" Width="150" SelectionChanged="comboBoxRevit_SelectionChanged"/>
@@ -68,6 +68,7 @@
                         <DataGridTextColumn Header="Parameter Name" Width="1*" Binding="{Binding ParameterName}"/>
                     </DataGrid.Columns>
                 </DataGrid>
+                <CheckBox x:Name="checkBoxIntersect" Content="Include intersecting elements" HorizontalAlignment="Left" Margin="19,0,0,0" Grid.Row="2" VerticalAlignment="Top" ToolTip="Select this option only if the point location of the family is not neccessary placed insdie the room."/>
             </Grid>
         </GroupBox>
 
