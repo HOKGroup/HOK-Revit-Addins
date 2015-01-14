@@ -92,11 +92,11 @@ namespace HOK.RibbonTab
                         utilityExist = true;
                     }
 
-                    Assembly utilAssembly = System.Reflection.Assembly.LoadFrom(currentDirectory + "/HOK.Utilities.dll");
+                    Assembly utilAssembly = System.Reflection.Assembly.LoadFile(currentDirectory + "/HOK.Utilities.dll");
                     string finishCommand = "HOK.Utilities.FinishCommand";
                     if (null != utilAssembly.GetType(finishCommand))
                     {
-                        PushButton pb3 = splitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", utilAssembly.Location, finishCommand)) as PushButton;
+                        PushButton pb3 = splitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", currentDirectory + "/HOK.Utilities.dll", finishCommand)) as PushButton;
                         pb3.LargeImage = LoadBitmapImage(assembly, "finish.png");
                         pb3.ToolTip = "Create floor finishes from the selected rooms.";
                         AddToolTips(pb3);
@@ -105,7 +105,7 @@ namespace HOK.RibbonTab
                     string ceilingCommand = "HOK.Utilities.CeilingCommand";
                     if (null != utilAssembly.GetType(ceilingCommand))
                     {
-                        PushButton pb4 = splitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", utilAssembly.Location, ceilingCommand)) as PushButton;
+                        PushButton pb4 = splitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", currentDirectory + "/HOK.Utilities.dll", ceilingCommand)) as PushButton;
                         pb4.LargeImage = LoadBitmapImage(assembly, "height.png");
                         pb4.ToolTip = "Select rooms to measure the height from floors to ceilings.";
                         AddToolTips(pb4);
@@ -114,7 +114,7 @@ namespace HOK.RibbonTab
                     string levelCommand = "HOK.Utilities.LevelCommand";
                     if (null != utilAssembly.GetType(levelCommand))
                     {
-                        PushButton pb5 = splitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", utilAssembly.Location, levelCommand)) as PushButton;
+                        PushButton pb5 = splitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", currentDirectory + "/HOK.Utilities.dll", levelCommand)) as PushButton;
                         pb5.LargeImage = LoadBitmapImage(assembly, "level.png");
                         pb5.ToolTip = "Rehost elements from one level to anather. ";
                         AddToolTips(pb5);
@@ -122,9 +122,9 @@ namespace HOK.RibbonTab
                     }
 
                     string viewCommand = "HOK.Utilities.ViewCommand";
-                    if (null!=utilAssembly.GetType(viewCommand))
+                    if (null != utilAssembly.GetType(viewCommand))
                     {
-                        PushButton pb18 = splitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", utilAssembly.Location, viewCommand)) as PushButton;
+                        PushButton pb18 = splitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", currentDirectory + "/HOK.Utilities.dll", viewCommand)) as PushButton;
                         pb18.LargeImage = LoadBitmapImage(assembly, "camera.ico");
                         pb18.ToolTip = "Override the graphics of the element based on the distance";
                         pb18.ToolTipImage = LoadBitmapImage(assembly, "viewTooltip.png");
@@ -133,9 +133,9 @@ namespace HOK.RibbonTab
                     }
 
                     string leaderCommand = "HOK.Utilities.ArrowCommand";
-                    if (null!=utilAssembly.GetType(leaderCommand))
+                    if (null != utilAssembly.GetType(leaderCommand))
                     {
-                        PushButton pb19 = splitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", utilAssembly.Location, leaderCommand)) as PushButton;
+                        PushButton pb19 = splitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", currentDirectory + "/HOK.Utilities.dll", leaderCommand)) as PushButton;
                         pb19.LargeImage = LoadBitmapImage(assembly, "arrowhead.png");
                         pb19.ToolTip = "Assign a leader arrowhead style to all tag types.";
                         AddToolTips(pb19);
@@ -145,7 +145,7 @@ namespace HOK.RibbonTab
                     string worksetCommand = "HOK.Utilities.WorksetCommand";
                     if (null != utilAssembly.GetType(worksetCommand))
                     {
-                        PushButton pb19 = splitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", utilAssembly.Location, worksetCommand)) as PushButton;
+                        PushButton pb19 = splitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", currentDirectory + "/HOK.Utilities.dll", worksetCommand)) as PushButton;
                         pb19.LargeImage = LoadBitmapImage(assembly, "workset.png");
                         pb19.ToolTip = "Create 3D Views for each workset.";
                         AddToolTips(pb19);
@@ -165,7 +165,7 @@ namespace HOK.RibbonTab
                     string doorCommand = "HOK.Utilities.DoorCommand";
                     if (null != utilAssembly.GetType(doorCommand))
                     {
-                        PushButton pb21 = splitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", utilAssembly.Location, doorCommand)) as PushButton;
+                        PushButton pb21 = splitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", currentDirectory + "/HOK.Utilities.dll", doorCommand)) as PushButton;
                         pb21.LargeImage = LoadBitmapImage(assembly, "door.png");
                         pb21.ToolTip = "Set shared parameters with To and From room data.";
                         AddToolTips(pb21);
@@ -175,10 +175,20 @@ namespace HOK.RibbonTab
                     string roomCommand = "HOK.Utilities.RoomCommand";
                     if (null != utilAssembly.GetType(roomCommand))
                     {
-                        PushButton pb22 = splitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", utilAssembly.Location, roomCommand)) as PushButton;
+                        PushButton pb22 = splitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", currentDirectory + "/HOK.Utilities.dll", roomCommand)) as PushButton;
                         pb22.LargeImage = LoadBitmapImage(assembly, "container.png");
                         pb22.ToolTip = "Populate room parameters values into enclosed elements.";
                         AddToolTips(pb22);
+                        utilityExist = true;
+                    }
+
+                    string elevationCommand = "HOK.Utilities.ElevationCommand";
+                    if (null != utilAssembly.GetType(elevationCommand))
+                    {
+                        PushButton pb23 = splitButton.AddPushButton(new PushButtonData("Room Elevation", "Room Elevation", currentDirectory + "/HOK.Utilities.dll", elevationCommand)) as PushButton;
+                        pb23.LargeImage = LoadBitmapImage(assembly, "elevation.png");
+                        pb23.ToolTip = "Create elevation views by selecting rooms and walls to be faced.";
+                        AddToolTips(pb23);
                         utilityExist = true;
                     }
                 }

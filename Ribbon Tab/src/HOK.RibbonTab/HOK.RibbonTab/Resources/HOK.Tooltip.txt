@@ -30,6 +30,14 @@ View Creator
 The View Creator tool will create 3D views for each workset with the workset visibility settings.
 V:\RVT-Data\HOK Program\Documentation\HOK Utilities_Instruction.pdf
 ---------------------------------------------------------------------------------
+Room Updater
+The Room Updater will populate parameter values of elements within a room by creating linkages between room parameters and element parameters.
+V:\RVT-Data\HOK Program\Documentation\HOK Utilities_Instruction.pdf
+---------------------------------------------------------------------------------
+Room Elevation
+The Room Elevation tool will create elevation views by selecting a room and a specific wall to be faced toward. Then, the elevation marker will be rotated perpendicular to the selected wall.
+V:\RVT-Data\HOK Program\Documentation\HOK Utilities_Instruction.pdf
+---------------------------------------------------------------------------------
 Color Editor
 The Color Scheme Editor will create or edit color schemes by the selection of categories and parameter values to ovveride graphics to the filtered elements.
 V:\RVT-Data\HOK Program\Documentation\ColorEditor_Instruction.pdf
