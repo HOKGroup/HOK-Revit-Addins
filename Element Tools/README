@@ -1,0 +1,8 @@
+v.0.8.7
+ New - Create Views From Rooms
+ -Elevation Option: this option should be selected with a plan view opened in the background so then it will list out all rooms visible in the acitive view.
+                   elevation views will have adjusted siz of crop box to fit to the bounding box of the selected room.
+
+Fix - Place Unplaced Rooms
+-In order to get users' interaction by letting them pick a point in the workspace, all window forms should be closed.
+This version will close the opened windows, allow users to pick a point and reopen the command windows with the saved settings.
