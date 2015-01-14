@@ -222,11 +222,11 @@ namespace HOK.BetaToolsManager
 
                         if (utilitiesTP.InstallExist)
                         {
-                            Assembly utilAssembly = System.Reflection.Assembly.LoadFrom(utilitiesTP.InstallPath);
+                            Assembly utilAssembly = System.Reflection.Assembly.LoadFile(utilitiesTP.InstallPath);
                             string finishCommand = "HOK.Utilities.FinishCommand";
                             if (null != utilAssembly.GetType(finishCommand) && !utilityButtons.ContainsKey("Finish Creator"))
                             {
-                                PushButton finishButton = utilitySplitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", utilAssembly.Location, finishCommand)) as PushButton;
+                                PushButton finishButton = utilitySplitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", utilitiesTP.InstallPath, finishCommand)) as PushButton;
                                 finishButton.LargeImage = ImageUtil.LoadBitmapImage("finish.png");
                                 finishButton.ToolTip = "Create floor finishes from the selected rooms.";
                                 AddToolTips(finishButton);
@@ -234,7 +234,7 @@ namespace HOK.BetaToolsManager
                             string ceilingCommand = "HOK.Utilities.CeilingCommand";
                             if (null != utilAssembly.GetType(ceilingCommand) && !utilityButtons.ContainsKey("Ceiling Height"))
                             {
-                                PushButton ceilingButton = utilitySplitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", utilAssembly.Location, ceilingCommand)) as PushButton;
+                                PushButton ceilingButton = utilitySplitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", utilitiesTP.InstallPath, ceilingCommand)) as PushButton;
                                 ceilingButton.LargeImage = ImageUtil.LoadBitmapImage("height.png");
                                 ceilingButton.ToolTip = "Select rooms to measure the height from floors to ceilings.";
                                 AddToolTips(ceilingButton);
@@ -242,7 +242,7 @@ namespace HOK.BetaToolsManager
                             string levelCommand = "HOK.Utilities.LevelCommand";
                             if (null != utilAssembly.GetType(levelCommand) && !utilityButtons.ContainsKey("Level Manager"))
                             {
-                                PushButton levelButton = utilitySplitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", utilAssembly.Location, levelCommand)) as PushButton;
+                                PushButton levelButton = utilitySplitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", utilitiesTP.InstallPath, levelCommand)) as PushButton;
                                 levelButton.LargeImage = ImageUtil.LoadBitmapImage("level.png");
                                 levelButton.ToolTip = "Rehost elements from one level to anather. ";
                                 AddToolTips(levelButton);
@@ -251,7 +251,7 @@ namespace HOK.BetaToolsManager
                             string viewCommand = "HOK.Utilities.ViewCommand";
                             if (null != utilAssembly.GetType(viewCommand) && !utilityButtons.ContainsKey("View Depth"))
                             {
-                                PushButton viewButton = utilitySplitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", utilAssembly.Location, viewCommand)) as PushButton;
+                                PushButton viewButton = utilitySplitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", utilitiesTP.InstallPath, viewCommand)) as PushButton;
                                 viewButton.LargeImage = ImageUtil.LoadBitmapImage("camera.ico");
                                 viewButton.ToolTip = "Override the graphics of the element based on the distance";
                                 viewButton.ToolTipImage = ImageUtil.LoadBitmapImage("viewTooltip.png");
@@ -261,7 +261,7 @@ namespace HOK.BetaToolsManager
                             string leaderCommand = "HOK.Utilities.ArrowCommand";
                             if (null != utilAssembly.GetType(leaderCommand) && !utilityButtons.ContainsKey("Leader Arrowhead"))
                             {
-                                PushButton leaderButton = utilitySplitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", utilAssembly.Location, leaderCommand)) as PushButton;
+                                PushButton leaderButton = utilitySplitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", utilitiesTP.InstallPath, leaderCommand)) as PushButton;
                                 leaderButton.LargeImage = ImageUtil.LoadBitmapImage("arrowhead.png");
                                 leaderButton.ToolTip = "Assign a leader arrowhead style to all tag types.";
                                 AddToolTips(leaderButton);
@@ -270,7 +270,7 @@ namespace HOK.BetaToolsManager
                             string worksetCommand = "HOK.Utilities.WorksetCommand";
                             if (null != utilAssembly.GetType(worksetCommand) && !utilityButtons.ContainsKey("View Creator"))
                             {
-                                PushButton worksetButton = utilitySplitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", utilAssembly.Location, worksetCommand)) as PushButton;
+                                PushButton worksetButton = utilitySplitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", utilitiesTP.InstallPath, worksetCommand)) as PushButton;
                                 worksetButton.LargeImage = ImageUtil.LoadBitmapImage("workset.png");
                                 worksetButton.ToolTip = "Create 3D Views for each workset.";
                                 AddToolTips(worksetButton);
@@ -278,7 +278,7 @@ namespace HOK.BetaToolsManager
                             string doorCommand = "HOK.Utilities.DoorCommand";
                             if (null != utilAssembly.GetType(doorCommand) && !utilityButtons.ContainsKey("Door Link"))
                             {
-                                PushButton doorButton = utilitySplitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", utilAssembly.Location, doorCommand)) as PushButton;
+                                PushButton doorButton = utilitySplitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", utilitiesTP.InstallPath, doorCommand)) as PushButton;
                                 doorButton.LargeImage = ImageUtil.LoadBitmapImage("door.png");
                                 doorButton.ToolTip = "Set shared parameters with To and From room data.";
                                 AddToolTips(doorButton);
@@ -287,10 +287,18 @@ namespace HOK.BetaToolsManager
                             string roomCommand = "HOK.Utilities.RoomCommand";
                             if (null != utilAssembly.GetType(roomCommand) && !utilityButtons.ContainsKey("Room Updater"))
                             {
-                                PushButton roomButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", utilAssembly.Location, roomCommand)) as PushButton;
+                                PushButton roomButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", utilitiesTP.InstallPath, roomCommand)) as PushButton;
                                 roomButton.LargeImage = ImageUtil.LoadBitmapImage("container.png");
                                 roomButton.ToolTip = "Populate room parameters values into enclosed elements.";
                                 AddToolTips(roomButton);
+                            }
+                            string elevationCommand = "HOK.Utilities.ElevationCommand";
+                            if (null != utilAssembly.GetType(elevationCommand) && !utilityButtons.ContainsKey("Room Elevation"))
+                            {
+                                PushButton elevationButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Elevation", "Room Elevation", utilitiesTP.InstallPath, elevationCommand)) as PushButton;
+                                elevationButton.LargeImage = ImageUtil.LoadBitmapImage("elevation.png");
+                                elevationButton.ToolTip = "Create elevation views by selecting rooms and walls to be faced.";
+                                AddToolTips(elevationButton);
                             }
                         }
                         else
@@ -334,6 +342,11 @@ namespace HOK.BetaToolsManager
                             {
                                 PushButton roomButton = utilityButtons["Room Updater"];
                                 roomButton.Enabled = false;
+                            }
+                            if (utilityButtons.ContainsKey("Room Elevation"))
+                            {
+                                PushButton elevationButton = utilityButtons["Room Elevation"];
+                                elevationButton.Enabled = false;
                             }
                         }
 
