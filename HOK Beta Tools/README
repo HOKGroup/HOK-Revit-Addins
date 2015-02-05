@@ -1,3 +1,8 @@
+v.0.1.4
+New
+- Copy all separate dll files for the Utility Tools. 
+- Create Temp directory in the user profile to avoid being locked dll files. This Temp directory will be refreshed everytime Revit starts up.
+
 v.0.1.0
 New
 -Install beta files to the user profile while running Revit session.
