@@ -16,13 +16,11 @@ namespace HOK.BetaToolsManager
         private string versionNumber = "";
         private string betaDirectory = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
         private string installDirectory = "";
-        private string tempInstallDirectory = "";
         private Dictionary<ToolEnum, ToolProperties> toolInfoDictionary = new Dictionary<ToolEnum, ToolProperties>();
 
         public string VersionNumber { get { return versionNumber; } set { versionNumber = value; } }
         public string BetaDirectroy { get { return betaDirectory; } set { betaDirectory = value; } }
         public string InstallDirectory { get { return installDirectory; } set { installDirectory = value; } }
-        public string TempInstallDirectory { get { return tempInstallDirectory; } set { tempInstallDirectory = value; } }
         public Dictionary<ToolEnum, ToolProperties> ToolInfoDictionary { get { return toolInfoDictionary; } set { toolInfoDictionary = value; } }
 
         public ToolManager(string version)
@@ -30,72 +28,31 @@ namespace HOK.BetaToolsManager
             versionNumber = version;
             betaDirectory = betaDirectory + versionNumber+@"\HOK-Addin.bundle\Contents\";
             installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\" + versionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
-            tempInstallDirectory = Path.Combine(installDirectory, "Temp");
 
-            if (ExistBetaContentFolder())
+            if (ExistBetaContentFolder(installDirectory))
             {
                 toolInfoDictionary = GetToolInfo();
             }
         }
 
-        private bool ExistBetaContentFolder()
+        private bool ExistBetaContentFolder(string addinFolder)
         {
             bool exist = false;
             try
             {
-                if (!Directory.Exists(installDirectory))
+                if (!Directory.Exists(addinFolder))
                 {
-                    Directory.CreateDirectory(installDirectory);
+                    Directory.CreateDirectory(addinFolder);
                 }
-                if (Directory.Exists(tempInstallDirectory))
-                {
-                    //delete temp directory first
-                    Directory.Delete(tempInstallDirectory, true);
-                }
-
-                string resourceFolder = Path.Combine(installDirectory, "Resources");
-                if (Directory.Exists(installDirectory) && !Directory.Exists(resourceFolder))
+                string resourceFolder = Path.Combine(addinFolder, "Resources");
+                if (Directory.Exists(addinFolder) && !Directory.Exists(resourceFolder))
                 {
                     Directory.CreateDirectory(resourceFolder);
                 }
-                if (Directory.Exists(installDirectory) && !Directory.Exists(tempInstallDirectory))
-                {
-                    //copy files from install directory to temp directory.
-                    string[] installedFiles = Directory.GetFiles(installDirectory);
-
-                    Directory.CreateDirectory(tempInstallDirectory);
-                    if (Directory.Exists(tempInstallDirectory))
-                    {
-                        foreach (string filePath in installedFiles)
-                        {
-                            string fileName = Path.GetFileName(filePath);
-                            string tempFile = Path.Combine(tempInstallDirectory, fileName);
-                            File.Copy(filePath, tempFile);
-                        }
-                    }
-
-                    string tempResourceFolder = Path.Combine(tempInstallDirectory, "Resources");
-                    if (!Directory.Exists(tempResourceFolder))
-                    {
-                        Directory.CreateDirectory(tempResourceFolder);
-                    }
-                    if (Directory.Exists(tempResourceFolder))
-                    {
-                        string[] installedResources = Directory.GetFiles(resourceFolder);
-                        foreach (string filePath in installedResources)
-                        {
-                            string fileName = Path.GetFileName(filePath);
-                            string tempFile = Path.Combine(tempResourceFolder, fileName);
-                            File.Copy(filePath, tempFile);
-                        }
-                    }
-                }
-                
                 if (Directory.Exists(resourceFolder))
                 {
-                    exist = true;  
+                    exist = true;
                 }
-               
             }
             catch (Exception ex)
             {
@@ -122,124 +79,112 @@ namespace HOK.BetaToolsManager
                     {
                         case ToolEnum.ElementTools:
                             tp.ToolName = "Element Tools";
-                            tp.DllName = "HOK.ElementTools.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.ElementTools.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.ElementTools.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.ElementTools.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("element.ico");
                             
                             dictionary.Add(tool, tp);
                             break;
                         case ToolEnum.ParameterTools:
                             tp.ToolName = "Parameter Tools";
-                            tp.DllName = "HOK.ParameterTools.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.ParameterTools.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.ParameterTools.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.ParameterTools.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("parameter.ico");
 
                             dictionary.Add(tool, tp);
                             break;
                         case ToolEnum.SheetManager:
                             tp.ToolName = "Sheet Manager";
-                            tp.DllName = "HOK.SheetManager.dll";
-                            tp.BetaPath =  betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.SheetManager.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.SheetManager.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.SheetManager.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("sheet.ico");
 
                             dictionary.Add(tool, tp);
                             break;
                         case ToolEnum.BCFReader:
                             tp.ToolName = "BCF Reader";
-                            tp.DllName = "HOK.BCFReader.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.BCFReader.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.BCFReader.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.BCFReader.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("comment.ico");
 
                             dictionary.Add(tool, tp);
                             break;
                         case ToolEnum.MassTool:
                             tp.ToolName = "Mass Tools";
-                            tp.DllName = "HOK.RoomsToMass.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.RoomsToMass.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.RoomsToMass.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.RoomsToMass.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("cube.png");
 
                             dictionary.Add(tool, tp);
                             break;
                         case ToolEnum.RevitData:
                             tp.ToolName = "Data Manager";
-                            tp.DllName = "HOK.RevitDBManager.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.RevitDBManager.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.RevitDBManager.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.RevitDBManager.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("editor.ico");
 
                             dictionary.Add(tool, tp);
                             break;
                         case ToolEnum.Analysis:
                             tp.ToolName = "Analysis Tools";
-                            tp.DllName = "HOK.AVFManager.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.AVFManager.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.BetaPath1 = betaDirectory + "HOK.LPDCalculator.dll";
-                            tp.BetaExist1 = File.Exists(tp.BetaPath1);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.AVFManager.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
                             tp.InstallPath1 = installDirectory + "HOK.LPDCalculator.dll";
                             tp.InstallExist1 = File.Exists(tp.InstallPath1);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.AVFManager.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("chart.ico");
 
                             dictionary.Add(tool, tp);
                             break;
                         case ToolEnum.Utility:
                             tp.ToolName = "Utility Tools";
-                            tp.DllName = "HOK.Utilities.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.Utilities.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.Utilities.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.Utilities.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("height.png");
 
                             dictionary.Add(tool, tp);
                             break;
                         case ToolEnum.ModelManager:
                             tp.ToolName = "Model Manager";
-                            tp.DllName = "HOK.ModelManager.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.ModelManager.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.ModelManager.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.ModelManager.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("project.png");
 
                             dictionary.Add(tool, tp);
                             break;
                         case ToolEnum.ColorEditor:
                             tp.ToolName = "Color Editor";
-                            tp.DllName = "HOK.ColorSchemeEditor.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaPath = betaDirectory + "HOK.ColorSchemeEditor.dll";
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallPath = installDirectory + "HOK.ColorSchemeEditor.dll";
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.DllName = "HOK.ColorSchemeEditor.dll";
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("color32.png");
                             dictionary.Add(tool, tp);
                             break;
@@ -255,68 +200,6 @@ namespace HOK.BetaToolsManager
                 MessageBox.Show("Failed to get information about beta tools.\n" + ex.Message, "Get Tool Information", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return dictionary;
-        }
-
-        /*
-        private string GetDllName(string directoryName, string assemblyName, bool pathName)
-        {
-            string dllName = "";
-            try
-            {
-                string latestFile = "";
-                Version latestVersion = null;
-                string[] files = Directory.GetFiles(directoryName, assemblyName + "*");
-                foreach (string fileName in files)
-                {
-                    if (Path.GetExtension(fileName) == ".dll")
-                    {
-                        FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(fileName);
-                        Version version = new Version(versionInfo.FileVersion);
-
-                        if (string.IsNullOrEmpty(latestFile))
-                        {
-                            latestFile = fileName;
-                            latestVersion = version;
-                        }
-                        else if (!string.IsNullOrEmpty(latestFile) && null != latestVersion)
-                        {
-                            if (latestVersion.CompareTo(version) < 0)
-                            {
-                                latestFile = fileName;
-                                latestVersion = version;
-                            }
-                        }
-
-                    }
-                }
-
-                dllName = pathName ? latestFile : Path.GetFileName(latestFile);
-
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-            return dllName;
-        }
-        */
-        private string GetTempInstallPath(string installPath)
-        {
-            string tempPath="";
-            try
-            {
-                string fileName = Path.GetFileName(installPath);
-                tempPath = Path.Combine(tempInstallDirectory, fileName);
-                if (!File.Exists(tempPath))
-                {
-                    tempPath = installPath;
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-            return tempPath;
         }
 
         private List<string> GetFiles(ToolEnum toolName)
@@ -366,15 +249,6 @@ namespace HOK.BetaToolsManager
 
                     case ToolEnum.Utility:
                         fileNames.Add("HOK.Utilities.dll");
-                        fileNames.Add("HOK.Arrowhead.dll");
-                        fileNames.Add("HOK.CeilingHeight.dll");
-                        fileNames.Add("HOK.DoorRoom.dll");
-                        fileNames.Add("HOK.FinishCreator.dll");
-                        fileNames.Add("HOK.LevelManager.dll");
-                        fileNames.Add("HOK.RoomElevation.dll");
-                        fileNames.Add("HOK.RoomUpdater.dll");
-                        fileNames.Add("HOK.ViewDepth.dll");
-                        fileNames.Add("HOK.WorksetView.dll");
                         break;
                     case ToolEnum.ModelManager:
                         fileNames.Add("HOK.ModelManager.dll");
@@ -409,19 +283,15 @@ namespace HOK.BetaToolsManager
         private ToolEnum toolEnumVal = ToolEnum.None;
         private string toolName = "";
         private string dllName = "";
-        //private string assemblyName = "";
         private string installPath = "";
         private string installPath1 = "";
         private string betaPath = "";
-        private string betaPath1 = "";
-        private string tempAssemblyPath = "";
         private FileVersionInfo betaVersionInfo = null;
         private FileVersionInfo installedVersionInfo = null;
         private string betaVersionNumber = "Not Exist";
         private string betaReleasedDate = "";
         private string installVersionNumber = "Not Installed";
         private bool betaExist = false;
-        private bool betaExist1 = false;
         private bool installExist = false;
         private bool installExist1 = false;
         private bool isEnabled = false;
@@ -431,20 +301,16 @@ namespace HOK.BetaToolsManager
 
         public ToolEnum ToolEnumVal { get { return toolEnumVal; } set { toolEnumVal = value; } }
         public string ToolName { get { return toolName; } set { toolName = value; } }
-        public string DllName { get { return dllName; } set { dllName = value; } }
-        //public string AssemblyName { get { return assemblyName; } set { assemblyName = value; } }
+        public string DllName { get { return toolName; } set { dllName = value; } }
         public string InstallPath { get { return installPath; } set { installPath = value; } }
         public string InstallPath1 { get { return installPath1; } set { installPath1 = value; } }
         public string BetaPath { get { return betaPath; } set { betaPath = value; } }
-        public string BetaPath1 { get { return betaPath1; } set { betaPath1 = value; } }
-        public string TempAssemblyPath { get { return tempAssemblyPath; } set { tempAssemblyPath = value; } }
         public FileVersionInfo BetaVersionInfo { get { return betaVersionInfo; } set { betaVersionInfo = value; } }
         public FileVersionInfo InstalledVersionInfo { get { return installedVersionInfo; } set { installedVersionInfo = value; } }
         public string BetaVersionNumber { get { return betaVersionNumber; } set { betaVersionNumber = value; } }
         public string BetaReleasedDate { get { return betaReleasedDate; } set { betaReleasedDate = value; } }
         public string InstallVersionNumber { get { return installVersionNumber; } set { installVersionNumber = value; } }
         public bool BetaExist { get { return betaExist; } set { betaExist = value; } }
-        public bool BetaExist1 { get { return betaExist1; } set { betaExist1 = value; } }
         public bool InstallExist { get { return installExist; } set { installExist = value; } }
         public bool InstallExist1 { get { return installExist1; } set { installExist1 = value; } }
         public bool IsEnabled { get { return isEnabled; } set { isEnabled = value; } }

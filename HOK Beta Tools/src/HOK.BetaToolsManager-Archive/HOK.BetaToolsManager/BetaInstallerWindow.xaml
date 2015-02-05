@@ -1,0 +1,98 @@
+﻿<Window x:Class="HOK.BetaToolsManager.BetaInstallerWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Title="HOK Beta Tools Installer" Icon="Resources/hoklogo.ico" Height="400" Width="600" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+        </Style>
+
+    </Window.Resources>
+    
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Beta Tools" HorizontalAlignment="Stretch" Margin="10" VerticalAlignment="Stretch">
+            <Grid>
+                <DataGrid x:Name="dataGridTools" Margin="5" CanUserAddRows="False">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Binding="{Binding IsSelected}">
+                            
+                        </DataGridCheckBoxColumn>
+                        <DataGridTemplateColumn Header="Icon" IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding ToolIcon}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Binding="{Binding ToolName}" Header="Tool Name" Width="1*" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" >
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Binding="{Binding BetaVersionNumber}" Header="Released Version" Width="100" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" >
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Binding="{Binding BetaReleasedDate}" Header="Released Date" Width="100" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" >
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Binding="{Binding InstallVersionNumber}" Header="Installed Version" Width="100" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock" >
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </GroupBox>
+        
+        <Button x:Name="buttonCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,10,10,0" Grid.Row="1" VerticalAlignment="Top" Width="84" Height="27" Click="buttonCancel_Click"/>
+        
+        <Button x:Name="buttonRemove" HorizontalAlignment="Right" Margin="0,10,99,0" Grid.Row="1" VerticalAlignment="Top" Width="90" Height="27" Click="buttonRemove_Click">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Uninstall" Margin="0,3,5,0"/>
+                    <Image Source="Resources/remove.png" Stretch="None"/>
+                </StackPanel>
+            </Button.Content>
+        </Button>
+        
+        <Button x:Name="buttonInstall" HorizontalAlignment="Right" Margin="0,10,194,0" Grid.Row="1" VerticalAlignment="Top" Width="130" Height="27" Click="buttonInstall_Click">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Install / Update" Margin="0,3,5,0"/>
+                    <Image Source="Resources/install.png" Stretch="None"/>
+                </StackPanel>
+            </Button.Content>
+        </Button>
+        
+    </Grid>
+</Window>

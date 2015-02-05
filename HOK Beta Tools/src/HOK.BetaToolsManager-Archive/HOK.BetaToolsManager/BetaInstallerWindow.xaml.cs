@@ -25,7 +25,6 @@ namespace HOK.BetaToolsManager
         private string versionNumber = "";
         private string betaDirectory = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
         private string installDirectory = "";
-        private string tempInstallDirectory = "";
         
         private Dictionary<ToolEnum, ToolProperties> toolInfoDictionary = new Dictionary<ToolEnum, ToolProperties>();
         private List<ToolProperties> betaToolList = new List<ToolProperties>();
@@ -37,11 +36,9 @@ namespace HOK.BetaToolsManager
             versionNumber = version;
             betaDirectory = betaDirectory + versionNumber + @"\HOK-Addin.bundle\Contents\";
             installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\" + versionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
-            tempInstallDirectory = System.IO.Path.Combine(installDirectory, "Temp")+"\\";
 
             toolInfoDictionary = dictionary;
             InitializeComponent();
-            this.Title = "HOK Beta Tools Installer v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             foreach (ToolProperties tp in toolInfoDictionary.Values)
             {
@@ -81,6 +78,7 @@ namespace HOK.BetaToolsManager
             return tp;
         }
 
+
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
@@ -104,39 +102,25 @@ namespace HOK.BetaToolsManager
                             {
                                 try
                                 {
-                                    string[] installedFiles = Directory.GetFiles(installDirectory, fileName + "*");
-                                    if (installedFiles.Length > 0)
-                                    {
-                                        foreach (string installedFile in installedFiles)
-                                        {
-                                            File.Delete(installedFile);
-                                        }
-                                    }
                                     File.Copy(betaDirectory + fileName, installDirectory + fileName, true);
-                                    //make copies of the files for the push button data
-                                    File.Copy(betaDirectory + fileName, tempInstallDirectory + fileName, true);
                                 }
                                 catch (Exception ex)
                                 {
                                     string message = ex.Message;
                                 }
                             }
-                            string installPath = System.IO.Path.Combine(installDirectory, System.IO.Path.GetFileName(tool.BetaPath));
+
                             //update tool info dictionary
-                            if (File.Exists(installPath))
+                            if (File.Exists(tool.InstallPath))
                             {
-                                tool.InstallPath = installPath;
-                                tool.TempAssemblyPath = GetTempInstallPath(tool.InstallPath);
                                 tool.InstallExist = true;
                                 tool.InstalledVersionInfo = FileVersionInfo.GetVersionInfo(tool.InstallPath);
                                 tool.InstallVersionNumber = "v." + tool.InstalledVersionInfo.FileVersion;
                                 tool.IsSelected = false;
                             }
                             
-                            if (!string.IsNullOrEmpty(tool.BetaPath1))
+                            if (!string.IsNullOrEmpty(tool.InstallPath1))
                             {
-                                string installPath1 = System.IO.Path.Combine(installDirectory, System.IO.Path.GetFileName(tool.BetaPath1));
-                                tool.InstallPath1 = installPath1;
                                 tool.InstallExist1 = File.Exists(tool.InstallPath1);
                             }
                             toolInfoDictionary.Remove(tool.ToolEnumVal);
@@ -157,25 +141,6 @@ namespace HOK.BetaToolsManager
             {
                 MessageBox.Show("Failed to install beta tools.\n"+ex.Message, "Install Beta Tools", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-        }
-
-        private string GetTempInstallPath(string installPath)
-        {
-            string tempPath = "";
-            try
-            {
-                string fileName = System.IO.Path.GetFileName(installPath);
-                tempPath = tempInstallDirectory + fileName;
-                if (!File.Exists(tempPath))
-                {
-                    tempPath = installPath;
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-            return tempPath;
         }
 
 

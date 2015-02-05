@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -65,7 +64,7 @@ namespace HOK.BetaToolsManager
 
             try { m_app.CreateRibbonTab(tabName); }
             catch { }
-          
+
             currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
             currentDirectory = Path.GetDirectoryName(currentAssembly);
             string tooltipTxt = currentDirectory + "/Resources/" + tooltipFileName;
@@ -194,24 +193,12 @@ namespace HOK.BetaToolsManager
                     {
                         Dictionary<string, PushButton> utilityButtons = CheckExistingButtons(utilitySplitButton);
 
-                        if (elementTP.InstallExist)
+                        if (elementTP.InstallExist && !utilityButtons.ContainsKey("Element Tools"))
                         {
-                            
-                            if (!utilityButtons.ContainsKey("Element Tools"))
-                            {
-                                //install
-                                PushButton elementButton = utilitySplitButton.AddPushButton(new PushButtonData("Element Tools", "Element Tools", elementTP.TempAssemblyPath, "HOK.ElementTools.cmdElementTools")) as PushButton;
-                                elementButton.LargeImage = ImageUtil.LoadBitmapImage("element.ico");
-                                elementButton.ToolTip = "Room and Area Elements Tools";
-                                AddToolTips(elementButton);
-                            }
-                            else
-                            {
-                                //update
-                                PushButton elementButton = utilityButtons["Element Tools"];
-                                elementButton.AssemblyName = elementTP.TempAssemblyPath;
-                            }
-                            
+                            PushButton elementButton = utilitySplitButton.AddPushButton(new PushButtonData("Element Tools", "Element Tools", elementTP.InstallPath, "HOK.ElementTools.cmdElementTools")) as PushButton;
+                            elementButton.LargeImage = ImageUtil.LoadBitmapImage("element.ico");
+                            elementButton.ToolTip = "Room and Area Elements Tools";
+                            AddToolTips(elementButton);
                         }
                         else if (!elementTP.InstallExist && utilityButtons.ContainsKey("Element Tools"))
                         {
@@ -220,23 +207,12 @@ namespace HOK.BetaToolsManager
                             elementButton.Enabled = false;
                         }
 
-                        if (parameterTP.InstallExist)
+                        if (parameterTP.InstallExist && !utilityButtons.ContainsKey("Parameter Tools"))
                         {
-                            if (!utilityButtons.ContainsKey("Parameter Tools"))
-                            {
-                                //install
-                                PushButton parameterButton = utilitySplitButton.AddPushButton(new PushButtonData("Parameter Tools", "Parameter Tools", parameterTP.TempAssemblyPath, "HOK.ParameterTools.cmdParameterTools")) as PushButton;
-                                parameterButton.LargeImage = ImageUtil.LoadBitmapImage("parameter.ico");
-                                parameterButton.ToolTip = "Parameter Tools";
-                                AddToolTips(parameterButton);
-                            }
-                            else
-                            {
-                                //update
-                                PushButton parameterButton = utilityButtons["Parameter Tools"];
-                                parameterButton.AssemblyName = parameterTP.TempAssemblyPath;
-                            }
-                            
+                            PushButton parameterButton = utilitySplitButton.AddPushButton(new PushButtonData("Parameter Tools", "Parameter Tools", parameterTP.InstallPath, "HOK.ParameterTools.cmdParameterTools")) as PushButton;
+                            parameterButton.LargeImage = ImageUtil.LoadBitmapImage("parameter.ico");
+                            parameterButton.ToolTip = "Parameter Tools";
+                            AddToolTips(parameterButton);
                         }
                         else if (!parameterTP.InstallExist && utilityButtons.ContainsKey("Parameter Tools"))
                         {
@@ -246,184 +222,83 @@ namespace HOK.BetaToolsManager
 
                         if (utilitiesTP.InstallExist)
                         {
-                            string directoryName = Path.GetDirectoryName(utilitiesTP.InstallPath);
-                            string finishPath = Path.Combine(directoryName, "HOK.FinishCreator.dll");
-                            finishPath = GetTempInstallPath(finishPath);
-                            if (File.Exists(finishPath))
+                            Assembly utilAssembly = System.Reflection.Assembly.LoadFile(utilitiesTP.InstallPath);
+                            string finishCommand = "HOK.Utilities.FinishCommand";
+                            if (null != utilAssembly.GetType(finishCommand) && !utilityButtons.ContainsKey("Finish Creator"))
                             {
-                                if (!utilityButtons.ContainsKey("Finish Creator"))
-                                {
-                                    //install
-                                    PushButton finishButton = utilitySplitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", finishPath, "HOK.FinishCreator.FinishCommand")) as PushButton;
-                                    finishButton.LargeImage = ImageUtil.LoadBitmapImage("finish.png");
-                                    finishButton.ToolTip = "Create floor finishes from the selected rooms.";
-                                    AddToolTips(finishButton);
-                                }
-                                else
-                                {
-                                    //update
-                                    PushButton finishButton = utilityButtons["Finish Creator"];
-                                    finishButton.AssemblyName = finishPath;
-                                }
+                                PushButton finishButton = utilitySplitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", utilitiesTP.InstallPath, finishCommand)) as PushButton;
+                                finishButton.LargeImage = ImageUtil.LoadBitmapImage("finish.png");
+                                finishButton.ToolTip = "Create floor finishes from the selected rooms.";
+                                AddToolTips(finishButton);
+                            }
+                            string ceilingCommand = "HOK.Utilities.CeilingCommand";
+                            if (null != utilAssembly.GetType(ceilingCommand) && !utilityButtons.ContainsKey("Ceiling Height"))
+                            {
+                                PushButton ceilingButton = utilitySplitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", utilitiesTP.InstallPath, ceilingCommand)) as PushButton;
+                                ceilingButton.LargeImage = ImageUtil.LoadBitmapImage("height.png");
+                                ceilingButton.ToolTip = "Select rooms to measure the height from floors to ceilings.";
+                                AddToolTips(ceilingButton);
+                            }
+                            string levelCommand = "HOK.Utilities.LevelCommand";
+                            if (null != utilAssembly.GetType(levelCommand) && !utilityButtons.ContainsKey("Level Manager"))
+                            {
+                                PushButton levelButton = utilitySplitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", utilitiesTP.InstallPath, levelCommand)) as PushButton;
+                                levelButton.LargeImage = ImageUtil.LoadBitmapImage("level.png");
+                                levelButton.ToolTip = "Rehost elements from one level to anather. ";
+                                AddToolTips(levelButton);
                             }
 
-                            string ceilingPath =Path.Combine(directoryName, "HOK.CeilingHeight.dll");
-                            ceilingPath = GetTempInstallPath(ceilingPath);
-                            if (File.Exists(ceilingPath))
+                            string viewCommand = "HOK.Utilities.ViewCommand";
+                            if (null != utilAssembly.GetType(viewCommand) && !utilityButtons.ContainsKey("View Depth"))
                             {
-                                if (!utilityButtons.ContainsKey("Ceiling Height"))
-                                {
-                                    PushButton ceilingButton = utilitySplitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", ceilingPath, "HOK.CeilingHeight.CeilingCommand")) as PushButton;
-                                    ceilingButton.LargeImage = ImageUtil.LoadBitmapImage("height.png");
-                                    ceilingButton.ToolTip = "Select rooms to measure the height from floors to ceilings.";
-                                    AddToolTips(ceilingButton);
-                                    //install
-                                }
-                                else
-                                {
-                                    //update
-                                    PushButton ceilingButton = utilityButtons["Ceiling Height"];
-                                    ceilingButton.AssemblyName = ceilingPath;
-                                }
+                                PushButton viewButton = utilitySplitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", utilitiesTP.InstallPath, viewCommand)) as PushButton;
+                                viewButton.LargeImage = ImageUtil.LoadBitmapImage("camera.ico");
+                                viewButton.ToolTip = "Override the graphics of the element based on the distance";
+                                viewButton.ToolTipImage = ImageUtil.LoadBitmapImage("viewTooltip.png");
+                                AddToolTips(viewButton);
                             }
 
-                            string levelPath = Path.Combine(directoryName, "HOK.LevelManager.dll");
-                            levelPath = GetTempInstallPath(levelPath);
-                            if (File.Exists(levelPath))
+                            string leaderCommand = "HOK.Utilities.ArrowCommand";
+                            if (null != utilAssembly.GetType(leaderCommand) && !utilityButtons.ContainsKey("Leader Arrowhead"))
                             {
-                                if (!utilityButtons.ContainsKey("Level Manager"))
-                                {
-                                    PushButton levelButton = utilitySplitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", levelPath, "HOK.LevelManager.LevelCommand")) as PushButton;
-                                    levelButton.LargeImage = ImageUtil.LoadBitmapImage("level.png");
-                                    levelButton.ToolTip = "Rehost elements from one level to anather. ";
-                                    AddToolTips(levelButton);
-                                }
-                                else
-                                {
-                                    PushButton levelButton = utilityButtons["Level Manager"];
-                                    levelButton.AssemblyName = levelPath;
-                                }
-                            }
-#if RELEASE2013
-#else
-                            string viewPath = Path.Combine(directoryName, "HOK.ViewDepth.dll");
-                            viewPath = GetTempInstallPath(viewPath);
-                            if (File.Exists(viewPath))
-                            {
-                                if (!utilityButtons.ContainsKey("View Depth"))
-                                {
-                                    //install
-                                    PushButton viewButton = utilitySplitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", viewPath, "HOK.ViewDepth.ViewCommand")) as PushButton;
-                                    viewButton.LargeImage = ImageUtil.LoadBitmapImage("camera.ico");
-                                    viewButton.ToolTip = "Override the graphics of the element based on the distance";
-                                    viewButton.ToolTipImage = ImageUtil.LoadBitmapImage("viewTooltip.png");
-                                    AddToolTips(viewButton);
-                                }
-                                else
-                                {
-                                    //update
-                                    PushButton viewButton = utilityButtons["View Depth"];
-                                    viewButton.AssemblyName = viewPath;
-                                }
-                            }
-#endif
-
-                            string arrowPath = Path.Combine( directoryName, "HOK.Arrowhead.dll"); 
-                            arrowPath = GetTempInstallPath(arrowPath);
-                            if (File.Exists(arrowPath))
-                            {
-                                if (!utilityButtons.ContainsKey("Leader Arrowhead"))
-                                {
-                                    //install
-                                    PushButton leaderButton = utilitySplitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", arrowPath, "HOK.Arrowhead.ArrowCommand")) as PushButton;
-                                    leaderButton.LargeImage = ImageUtil.LoadBitmapImage("arrowhead.png");
-                                    leaderButton.ToolTip = "Assign a leader arrowhead style to all tag types.";
-                                    AddToolTips(leaderButton);
-                                }
-                                else
-                                {
-                                    //update
-                                    PushButton leaderButton = utilityButtons["Leader Arrowhead"];
-                                    leaderButton.AssemblyName = arrowPath;
-                                }
+                                PushButton leaderButton = utilitySplitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", utilitiesTP.InstallPath, leaderCommand)) as PushButton;
+                                leaderButton.LargeImage = ImageUtil.LoadBitmapImage("arrowhead.png");
+                                leaderButton.ToolTip = "Assign a leader arrowhead style to all tag types.";
+                                AddToolTips(leaderButton);
                             }
 
-                            string worksetPath = Path.Combine(directoryName, "HOK.WorksetView.dll"); 
-                            worksetPath = GetTempInstallPath(worksetPath);
-                            if (File.Exists(worksetPath))
+                            string worksetCommand = "HOK.Utilities.WorksetCommand";
+                            if (null != utilAssembly.GetType(worksetCommand) && !utilityButtons.ContainsKey("View Creator"))
                             {
-                                if (!utilityButtons.ContainsKey("View Creator"))
-                                {
-                                    //install
-                                    PushButton worksetButton = utilitySplitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", worksetPath, "HOK.WorksetView.WorksetCommand")) as PushButton;
-                                    worksetButton.LargeImage = ImageUtil.LoadBitmapImage("workset.png");
-                                    worksetButton.ToolTip = "Create 3D Views for each workset.";
-                                    AddToolTips(worksetButton);
-                                }
-                                else
-                                {
-                                    //update
-                                    PushButton worksetButton = utilityButtons["View Creator"];
-                                    worksetButton.AssemblyName = worksetPath;
-                                }
+                                PushButton worksetButton = utilitySplitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", utilitiesTP.InstallPath, worksetCommand)) as PushButton;
+                                worksetButton.LargeImage = ImageUtil.LoadBitmapImage("workset.png");
+                                worksetButton.ToolTip = "Create 3D Views for each workset.";
+                                AddToolTips(worksetButton);
+                            }
+                            string doorCommand = "HOK.Utilities.DoorCommand";
+                            if (null != utilAssembly.GetType(doorCommand) && !utilityButtons.ContainsKey("Door Link"))
+                            {
+                                PushButton doorButton = utilitySplitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", utilitiesTP.InstallPath, doorCommand)) as PushButton;
+                                doorButton.LargeImage = ImageUtil.LoadBitmapImage("door.png");
+                                doorButton.ToolTip = "Set shared parameters with To and From room data.";
+                                AddToolTips(doorButton);
                             }
 
-                            string doorPath = Path.Combine(directoryName, "HOK.DoorRoom.dll"); 
-                            doorPath = GetTempInstallPath(doorPath);
-                            if (File.Exists(doorPath))
+                            string roomCommand = "HOK.Utilities.RoomCommand";
+                            if (null != utilAssembly.GetType(roomCommand) && !utilityButtons.ContainsKey("Room Updater"))
                             {
-                                if (!utilityButtons.ContainsKey("Door Link"))
-                                {
-                                    //install
-                                    PushButton doorButton = utilitySplitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", doorPath, "HOK.DoorRoom.DoorCommand")) as PushButton;
-                                    doorButton.LargeImage = ImageUtil.LoadBitmapImage("door.png");
-                                    doorButton.ToolTip = "Set shared parameters with To and From room data.";
-                                    AddToolTips(doorButton);
-                                }
-                                else
-                                {
-                                    //update
-                                    PushButton doorButton = utilityButtons["Door Link"];
-                                    doorButton.AssemblyName = doorPath;
-                                }
+                                PushButton roomButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", utilitiesTP.InstallPath, roomCommand)) as PushButton;
+                                roomButton.LargeImage = ImageUtil.LoadBitmapImage("container.png");
+                                roomButton.ToolTip = "Populate room parameters values into enclosed elements.";
+                                AddToolTips(roomButton);
                             }
-
-                            string roomPath = Path.Combine(directoryName, "HOK.RoomUpdater.dll");
-                            roomPath = GetTempInstallPath(roomPath);
-                            if (File.Exists(roomPath))
+                            string elevationCommand = "HOK.Utilities.ElevationCommand";
+                            if (null != utilAssembly.GetType(elevationCommand) && !utilityButtons.ContainsKey("Room Elevation"))
                             {
-                                if (!utilityButtons.ContainsKey("Room Updater"))
-                                {
-                                    //install
-                                    PushButton roomButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", roomPath, "HOK.RoomUpdater.RoomCommand")) as PushButton;
-                                    roomButton.LargeImage = ImageUtil.LoadBitmapImage("container.png");
-                                    roomButton.ToolTip = "Populate room parameters values into enclosed elements.";
-                                    AddToolTips(roomButton);
-                                }
-                                else
-                                {
-                                    //update
-                                    PushButton roomButton = utilityButtons["Room Updater"];
-                                    roomButton.AssemblyName = roomPath;
-                                }
-                            }
-
-                            string elevationPath =Path.Combine (directoryName , "HOK.RoomElevation.dll"); 
-                            elevationPath = GetTempInstallPath(elevationPath);
-                            if (File.Exists(elevationPath))
-                            {
-                                if (!utilityButtons.ContainsKey("Room Elevation"))
-                                {
-                                    PushButton elevationButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Elevation", "Room Elevation", elevationPath, "HOK.RoomElevation.ElevationCommand")) as PushButton;
-                                    elevationButton.LargeImage = ImageUtil.LoadBitmapImage("elevation.png");
-                                    elevationButton.ToolTip = "Create elevation views by selecting rooms and walls to be faced.";
-                                    AddToolTips(elevationButton);
-                                }
-                                else
-                                {
-                                    PushButton elevationButton = utilityButtons["Room Elevation"];
-                                    elevationButton.AssemblyName = elevationPath;
-                                }
+                                PushButton elevationButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Elevation", "Room Elevation", utilitiesTP.InstallPath, elevationCommand)) as PushButton;
+                                elevationButton.LargeImage = ImageUtil.LoadBitmapImage("elevation.png");
+                                elevationButton.ToolTip = "Create elevation views by selecting rooms and walls to be faced.";
+                                AddToolTips(elevationButton);
                             }
                         }
                         else
@@ -476,21 +351,12 @@ namespace HOK.BetaToolsManager
                         }
 
 #if RELEASE2014||RELEASE2015
-                        if (colorTP.InstallExist)
+                        if (colorTP.InstallExist && !utilityButtons.ContainsKey("Color Editor"))
                         {
-                            if (!utilityButtons.ContainsKey("Color Editor"))
-                            {
-                                PushButton colorButton = utilitySplitButton.AddPushButton(new PushButtonData("Color Editor", "Color Editor", colorTP.TempAssemblyPath, "HOK.ColorSchemeEditor.Command")) as PushButton;
-                                colorButton.LargeImage = ImageUtil.LoadBitmapImage("color32.png");
-                                colorButton.ToolTip = "Create color schemes by categories and parameter values.";
-                                AddToolTips(colorButton);
-                            }
-                            else
-                            {
-                                PushButton colorButton = utilityButtons["Color Editor"];
-                                colorButton.AssemblyName = colorTP.TempAssemblyPath;
-                            }
-                            
+                            PushButton colorButton = utilitySplitButton.AddPushButton(new PushButtonData("Color Editor", "Color Editor", colorTP.InstallPath, "HOK.ColorSchemeEditor.Command")) as PushButton;
+                            colorButton.LargeImage = ImageUtil.LoadBitmapImage("color32.png");
+                            colorButton.ToolTip = "Create color schemes by categories and parameter values.";
+                            AddToolTips(colorButton);
                         }
                         else if (!colorTP.InstallExist && utilityButtons.ContainsKey("Color Editor"))
                         {
@@ -536,21 +402,13 @@ namespace HOK.BetaToolsManager
                     {
                         Dictionary<string, PushButton> customButtons = CheckExistingButtons(customizePanel);
 
-                        if (sheetTP.InstallExist)
+                        if (sheetTP.InstallExist && !customButtons.ContainsKey("Sheet Manager"))
                         {
-                            if (!customButtons.ContainsKey("Sheet Manager"))
-                            {
-                                PushButton sheetButton = customizePanel.AddItem(new PushButtonData("Sheet Manager", "Sheet Manager", sheetTP.TempAssemblyPath, "HOK.SheetManager.cmdSheetManager")) as PushButton;
-                                sheetButton.LargeImage = ImageUtil.LoadBitmapImage("sheet.ico");
-                                sheetButton.ToolTip = "Sheet Manager";
-                                AddToolTips(sheetButton);
-                                customizePanel.AddSeparator();
-                            }
-                            else
-                            {
-                                PushButton sheetButton = customButtons["Sheet Manager"];
-                                sheetButton.AssemblyName = sheetTP.TempAssemblyPath;
-                            }
+                            PushButton sheetButton = customizePanel.AddItem(new PushButtonData("Sheet Manager", "Sheet Manager", sheetTP.InstallPath, "HOK.SheetManager.cmdSheetManager")) as PushButton;
+                            sheetButton.LargeImage = ImageUtil.LoadBitmapImage("sheet.ico");
+                            sheetButton.ToolTip = "Sheet Manager";
+                            AddToolTips(sheetButton);
+                            customizePanel.AddSeparator();
                         }
                         else if (!sheetTP.InstallExist && customButtons.ContainsKey("Sheet Manager"))
                         {
@@ -559,21 +417,13 @@ namespace HOK.BetaToolsManager
                         }
 
 #if RELEASE2014 ||RELEASE2015
-                        if (modelTP.InstallExist)
+                        if (modelTP.InstallExist && !customButtons.ContainsKey("Project Replication"))
                         {
-                            if (!customButtons.ContainsKey("Project Replication"))
-                            {
-                                PushButton modelButton = customizePanel.AddItem(new PushButtonData("Project Replication", "Project Replication", modelTP.TempAssemblyPath, "HOK.ModelManager.ProjectCommand")) as PushButton;
-                                modelButton.LargeImage = ImageUtil.LoadBitmapImage("project.png");
-                                modelButton.ToolTip = "Model Manager - Project Replication";
-                                AddToolTips(modelButton);
-                                customizePanel.AddSeparator();
-                            }
-                            else
-                            {
-                                PushButton modelButton = customButtons["Project Replication"];
-                                modelButton.AssemblyName = modelTP.TempAssemblyPath;
-                            }
+                            PushButton modelButton = customizePanel.AddItem(new PushButtonData("Project Replication", "Project Replication", modelTP.InstallPath, "HOK.ModelManager.ProjectCommand")) as PushButton;
+                            modelButton.LargeImage = ImageUtil.LoadBitmapImage("project.png");
+                            modelButton.ToolTip = "Model Manager - Project Replication";
+                            AddToolTips(modelButton);
+                            customizePanel.AddSeparator();
                         }
                         else if (!modelTP.InstallExist && customButtons.ContainsKey("Project Replication"))
                         {
@@ -582,21 +432,13 @@ namespace HOK.BetaToolsManager
                         }
 #endif
 
-                        if (bcfTP.InstallExist)
+                        if (bcfTP.InstallExist && !customButtons.ContainsKey("BCF Reader"))
                         {
-                            if (!customButtons.ContainsKey("BCF Reader"))
-                            {
-                                PushButton bcfButton = customizePanel.AddItem(new PushButtonData("BCF Reader", "BCF Reader", bcfTP.TempAssemblyPath, "HOK.BCFReader.Command")) as PushButton;
-                                bcfButton.LargeImage = ImageUtil.LoadBitmapImage("comment.ico");
-                                bcfButton.ToolTip = "BIM Collaboration Format (BCF) Reader";
-                                AddToolTips(bcfButton);
-                                customizePanel.AddSeparator();
-                            }
-                            else
-                            {
-                                PushButton bcfButton = customButtons["BCF Reader"];
-                                bcfButton.AssemblyName = bcfTP.TempAssemblyPath;
-                            }
+                            PushButton bcfButton = customizePanel.AddItem(new PushButtonData("BCF Reader", "BCF Reader", bcfTP.InstallPath, "HOK.BCFReader.Command")) as PushButton;
+                            bcfButton.LargeImage = ImageUtil.LoadBitmapImage("comment.ico");
+                            bcfButton.ToolTip = "BIM Collaboration Format (BCF) Reader";
+                            AddToolTips(bcfButton);
+                            customizePanel.AddSeparator();
                         }
                         else if (!bcfTP.InstallExist && customButtons.ContainsKey("BCF Reader"))
                         {
@@ -620,40 +462,25 @@ namespace HOK.BetaToolsManager
 
                                 if (!massButtons.ContainsKey("Create Mass"))
                                 {
-                                    PushButton createButton = massSplitButton.AddPushButton(new PushButtonData("Create Mass", "Create Mass", massTP.TempAssemblyPath, "HOK.RoomsToMass.Command"));
+                                    PushButton createButton = massSplitButton.AddPushButton(new PushButtonData("Create Mass", "Create Mass", massTP.InstallPath, "HOK.RoomsToMass.Command"));
                                     createButton.LargeImage = ImageUtil.LoadBitmapImage("cube.png");
                                     createButton.ToolTip = "Creates 3D Mass from rooms, areas and floors.";
                                     createButton.ToolTipImage = ImageUtil.LoadBitmapImage("tooltip.png");
                                     AddToolTips(createButton);
                                 }
-                                else
-                                {
-                                    PushButton createButton = massButtons["Create Mass"];
-                                    createButton.AssemblyName = massTP.TempAssemblyPath;
-                                }
                                 if (!massButtons.ContainsKey("Update Data"))
                                 {
-                                    PushButton updateButton = massSplitButton.AddPushButton(new PushButtonData("Update Data", "Update Data", massTP.TempAssemblyPath, "HOK.RoomsToMass.DataCommand"));
+                                    PushButton updateButton = massSplitButton.AddPushButton(new PushButtonData("Update Data", "Update Data", massTP.InstallPath, "HOK.RoomsToMass.DataCommand"));
                                     updateButton.LargeImage = ImageUtil.LoadBitmapImage("refresh.png");
                                     updateButton.ToolTip = "Transfer parameters values between Rooms, Areas, Floors and Masses";
                                     AddToolTips(updateButton);
                                 }
-                                else
-                                {
-                                    PushButton updateButton = massButtons["Update Data"];
-                                    updateButton.AssemblyName = massTP.TempAssemblyPath;
-                                }
                                 if (!massButtons.ContainsKey("Mass Commands"))
                                 {
-                                    PushButton commandButton = massSplitButton.AddPushButton(new PushButtonData("Mass Commands", "Mass Commands", massTP.TempAssemblyPath, "HOK.RoomsToMass.AssignerCommand"));
+                                    PushButton commandButton = massSplitButton.AddPushButton(new PushButtonData("Mass Commands", "Mass Commands", massTP.InstallPath, "HOK.RoomsToMass.AssignerCommand"));
                                     commandButton.LargeImage = ImageUtil.LoadBitmapImage("shape.png");
                                     commandButton.ToolTip = "Assign parameters or split elements";
                                     AddToolTips(commandButton);
-                                }
-                                else
-                                {
-                                    PushButton commandButton = massButtons["Mass Commands"];
-                                    commandButton.AssemblyName = massTP.TempAssemblyPath;
                                 }
                             }
                         }
@@ -709,45 +536,30 @@ namespace HOK.BetaToolsManager
 
                             if (!dataButtons.ContainsKey("Data Sync"))
                             {
-                                PushButton syncButton = dataPanel.AddItem(new PushButtonData("Data Sync", "Data Sync", dataTP.TempAssemblyPath, "RevitDBManager.Command")) as PushButton;
+                                PushButton syncButton = dataPanel.AddItem(new PushButtonData("Data Sync", "Data Sync", dataTP.InstallPath, "RevitDBManager.Command")) as PushButton;
                                 syncButton.LargeImage = ImageUtil.LoadBitmapImage("sync.ico");
                                 syncButton.ToolTip = "Data Sync";
                                 AddToolTips(syncButton);
-                            }
-                            else
-                            {
-                                PushButton syncButton = dataButtons["Data Sync"];
-                                syncButton.AssemblyName = dataTP.TempAssemblyPath;
+
                             }
 
                             if (!dataButtons.ContainsKey("Setup"))
                             {
                                 //DBManager_Setup
-                                PushButton setupButton = dataPanel.AddItem(new PushButtonData("Setup", "  Setup  ", dataTP.TempAssemblyPath, "RevitDBManager.EditorCommand")) as PushButton;
+                                PushButton setupButton = dataPanel.AddItem(new PushButtonData("Setup", "  Setup  ", dataTP.InstallPath, "RevitDBManager.EditorCommand")) as PushButton;
                                 setupButton.LargeImage = ImageUtil.LoadBitmapImage("editor.ico");
                                 setupButton.ToolTip = "Setup";
                                 AddToolTips(setupButton);
-                            }
-                            else
-                            {
-                                PushButton setupButton = dataButtons["Setup"];
-                                setupButton.AssemblyName = dataTP.TempAssemblyPath;
                             }
 
                             if (!dataButtons.ContainsKey("Data Editor"))
                             {
                                 //DBManager_Data Editor
-                                PushButton editorButton = dataPanel.AddItem(new PushButtonData("Data Editor", "Data Editor", dataTP.TempAssemblyPath, "RevitDBManager.ViewerCommand")) as PushButton;
+                                PushButton editorButton = dataPanel.AddItem(new PushButtonData("Data Editor", "Data Editor", dataTP.InstallPath, "RevitDBManager.ViewerCommand")) as PushButton;
                                 editorButton.LargeImage = ImageUtil.LoadBitmapImage("view.ico");
                                 editorButton.ToolTip = "Data Editor";
                                 AddToolTips(editorButton);
                             }
-                            else
-                            {
-                                PushButton editorButton = dataButtons["Data Editor"];
-                                editorButton.AssemblyName = dataTP.TempAssemblyPath;
-                            }
-
                         }
                     }
                     else if(!dataTP.InstallExist && null != dataPanel)
@@ -805,35 +617,18 @@ namespace HOK.BetaToolsManager
                             Dictionary<string, PushButton> analysisButtons = CheckExistingButtons(analysisSplitButton);
                             if (analysisTP.InstallExist && !analysisButtons.ContainsKey("AVF"))
                             {
-                                if (!analysisButtons.ContainsKey("AVF"))
-                                {
-                                    PushButton avfButton = analysisSplitButton.AddPushButton(new PushButtonData("AVF", "  AVF  ", analysisTP.TempAssemblyPath, "HOK.AVFManager.Command")) as PushButton;
-                                    avfButton.LargeImage = ImageUtil.LoadBitmapImage("chart.ico");
-                                    avfButton.ToolTip = "Analysis Visualization Framework";
-                                    AddToolTips(avfButton);
-                                }
-                                else
-                                {
-                                    PushButton avfButton = analysisButtons["AVF"];
-                                    avfButton.AssemblyName = analysisTP.TempAssemblyPath;
-                                }
+                                PushButton avfButton = analysisSplitButton.AddPushButton(new PushButtonData("AVF", "  AVF  ", analysisTP.InstallPath, "HOK.AVFManager.Command")) as PushButton;
+                                avfButton.LargeImage = ImageUtil.LoadBitmapImage("chart.ico");
+                                avfButton.ToolTip = "Analysis Visualization Framework";
+                                AddToolTips(avfButton);
                             }
 
                             if (analysisTP.InstallExist1 && !analysisButtons.ContainsKey("LPD Analysis"))
                             {
-                                string tempPath = GetTempInstallPath(analysisTP.InstallPath1);
-                                if (!analysisButtons.ContainsKey("LPD Analysis"))
-                                {
-                                    PushButton lpdButton = analysisSplitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", tempPath, "HOK.LPDCalculator.Command")) as PushButton;
-                                    lpdButton.LargeImage = ImageUtil.LoadBitmapImage("bulb.png");
-                                    lpdButton.ToolTip = "Calculating Lighting Power Density";
-                                    AddToolTips(lpdButton);
-                                }
-                                else
-                                {
-                                    PushButton lpdButton = analysisButtons["LPD Analysis"];
-                                    lpdButton.AssemblyName = tempPath;
-                                }
+                                PushButton lpdButton = analysisSplitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", analysisTP.InstallPath1, "HOK.LPDCalculator.Command")) as PushButton;
+                                lpdButton.LargeImage = ImageUtil.LoadBitmapImage("bulb.png");
+                                lpdButton.ToolTip = "Calculating Lighting Power Density";
+                                AddToolTips(lpdButton);
                             }
                         }
                     }
@@ -858,66 +653,6 @@ namespace HOK.BetaToolsManager
             {
                 MessageBox.Show("Failed to create Analysis panel.\n"+ex.Message, "Create Analysis Panel", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-        }
-        /*
-        private string GetDllName(string directoryName, string assemblyName, bool pathName)
-        {
-            string dllName = "";
-            try
-            {
-                string latestFile = "";
-                Version latestVersion = null;
-                string[] files = Directory.GetFiles(directoryName, assemblyName + "*");
-                foreach (string fileName in files)
-                {
-                    if (Path.GetExtension(fileName) == ".dll")
-                    {
-                        FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(fileName);
-                        Version version = new Version(versionInfo.FileVersion);
-
-                        if (string.IsNullOrEmpty(latestFile))
-                        {
-                            latestFile = fileName;
-                            latestVersion = version;
-                        }
-                        else if(!string.IsNullOrEmpty(latestFile) && null!=latestVersion)
-                        {
-                            if (latestVersion.CompareTo(version) < 0)
-                            {
-                                latestFile = fileName;
-                                latestVersion = version;
-                            }
-                        }
-                    }
-                }
-
-                dllName = pathName ? latestFile : Path.GetFileName(latestFile);
-
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-            return dllName;
-        }
-        */
-        private string GetTempInstallPath(string installPath)
-        {
-            string tempPath = "";
-            try
-            {
-                string fileName = Path.GetFileName(installPath);
-                tempPath = Path.Combine(toolManager.TempInstallDirectory, fileName);
-                if (!File.Exists(tempPath))
-                {
-                    tempPath = installPath;
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-            return tempPath;
         }
 
         private void ReadToolTips(string txtfile)
