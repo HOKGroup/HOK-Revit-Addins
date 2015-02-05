@@ -49,11 +49,15 @@ Partial Class form_SheetManager
         Me.linkHelp = New System.Windows.Forms.LinkLabel()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.iniPathLabel = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.RadioButtonPlaceholder = New System.Windows.Forms.RadioButton()
+        Me.RadioButtonViewSheet = New System.Windows.Forms.RadioButton()
         Me.GroupBoxTitleblocks.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBoxSheets.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
         '
         'ListBoxTableSet
@@ -82,7 +86,7 @@ Partial Class form_SheetManager
         '
         Me.checkBoxUpdateExisting.Checked = True
         Me.checkBoxUpdateExisting.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.checkBoxUpdateExisting.Location = New System.Drawing.Point(691, 273)
+        Me.checkBoxUpdateExisting.Location = New System.Drawing.Point(691, 255)
         Me.checkBoxUpdateExisting.Name = "checkBoxUpdateExisting"
         Me.checkBoxUpdateExisting.Size = New System.Drawing.Size(142, 43)
         Me.checkBoxUpdateExisting.TabIndex = 32
@@ -105,7 +109,7 @@ Partial Class form_SheetManager
         Me.GroupBox2.Controls.Add(Me.LabelFilePath)
         Me.GroupBox2.Location = New System.Drawing.Point(12, 12)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(830, 57)
+        Me.GroupBox2.Size = New System.Drawing.Size(850, 57)
         Me.GroupBox2.TabIndex = 38
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Sheet Manager Input/Output File Path"
@@ -205,9 +209,9 @@ Partial Class form_SheetManager
         '
         Me.ButtonConnectAccess.Image = Global.HOK.SheetManager.My.Resources.Resources.MsAccess_Med
         Me.ButtonConnectAccess.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.ButtonConnectAccess.Location = New System.Drawing.Point(682, 181)
+        Me.ButtonConnectAccess.Location = New System.Drawing.Point(691, 165)
         Me.ButtonConnectAccess.Name = "ButtonConnectAccess"
-        Me.ButtonConnectAccess.Size = New System.Drawing.Size(160, 60)
+        Me.ButtonConnectAccess.Size = New System.Drawing.Size(171, 60)
         Me.ButtonConnectAccess.TabIndex = 43
         Me.ButtonConnectAccess.Text = "Connect Access"
         Me.ButtonConnectAccess.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -277,9 +281,9 @@ Partial Class form_SheetManager
         '
         Me.ButtonConnectExcel.Image = Global.HOK.SheetManager.My.Resources.Resources.Excel2007Logo_Med
         Me.ButtonConnectExcel.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.ButtonConnectExcel.Location = New System.Drawing.Point(682, 94)
+        Me.ButtonConnectExcel.Location = New System.Drawing.Point(691, 86)
         Me.ButtonConnectExcel.Name = "ButtonConnectExcel"
-        Me.ButtonConnectExcel.Size = New System.Drawing.Size(160, 60)
+        Me.ButtonConnectExcel.Size = New System.Drawing.Size(171, 60)
         Me.ButtonConnectExcel.TabIndex = 42
         Me.ButtonConnectExcel.Text = "Connect Excel"
         Me.ButtonConnectExcel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -289,7 +293,7 @@ Partial Class form_SheetManager
         '
         Me.linkAbout.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.linkAbout.AutoSize = True
-        Me.linkAbout.Location = New System.Drawing.Point(63, 566)
+        Me.linkAbout.Location = New System.Drawing.Point(63, 576)
         Me.linkAbout.Name = "linkAbout"
         Me.linkAbout.Size = New System.Drawing.Size(35, 13)
         Me.linkAbout.TabIndex = 50
@@ -300,7 +304,7 @@ Partial Class form_SheetManager
         '
         Me.linkHelp.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.linkHelp.AutoSize = True
-        Me.linkHelp.Location = New System.Drawing.Point(18, 566)
+        Me.linkHelp.Location = New System.Drawing.Point(18, 576)
         Me.linkHelp.Name = "linkHelp"
         Me.linkHelp.Size = New System.Drawing.Size(29, 13)
         Me.linkHelp.TabIndex = 49
@@ -310,9 +314,9 @@ Partial Class form_SheetManager
         'StatusStrip1
         '
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.iniPathLabel})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 590)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 600)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(854, 22)
+        Me.StatusStrip1.Size = New System.Drawing.Size(874, 22)
         Me.StatusStrip1.TabIndex = 51
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -321,11 +325,45 @@ Partial Class form_SheetManager
         Me.iniPathLabel.Name = "iniPathLabel"
         Me.iniPathLabel.Size = New System.Drawing.Size(0, 17)
         '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.RadioButtonPlaceholder)
+        Me.GroupBox3.Controls.Add(Me.RadioButtonViewSheet)
+        Me.GroupBox3.Location = New System.Drawing.Point(691, 322)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(171, 75)
+        Me.GroupBox3.TabIndex = 52
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Sheet Type"
+        '
+        'RadioButtonPlaceholder
+        '
+        Me.RadioButtonPlaceholder.AutoSize = True
+        Me.RadioButtonPlaceholder.Location = New System.Drawing.Point(6, 42)
+        Me.RadioButtonPlaceholder.Name = "RadioButtonPlaceholder"
+        Me.RadioButtonPlaceholder.Size = New System.Drawing.Size(151, 17)
+        Me.RadioButtonPlaceholder.TabIndex = 1
+        Me.RadioButtonPlaceholder.Text = "Create Placeholder Sheets"
+        Me.RadioButtonPlaceholder.UseVisualStyleBackColor = True
+        '
+        'RadioButtonViewSheet
+        '
+        Me.RadioButtonViewSheet.AutoSize = True
+        Me.RadioButtonViewSheet.Checked = True
+        Me.RadioButtonViewSheet.Location = New System.Drawing.Point(6, 19)
+        Me.RadioButtonViewSheet.Name = "RadioButtonViewSheet"
+        Me.RadioButtonViewSheet.Size = New System.Drawing.Size(118, 17)
+        Me.RadioButtonViewSheet.TabIndex = 0
+        Me.RadioButtonViewSheet.TabStop = True
+        Me.RadioButtonViewSheet.Text = "Create View Sheets"
+        Me.RadioButtonViewSheet.UseVisualStyleBackColor = True
+        '
         'form_SheetManager
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(854, 612)
+        Me.ClientSize = New System.Drawing.Size(874, 622)
+        Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.linkAbout)
         Me.Controls.Add(Me.linkHelp)
@@ -344,9 +382,9 @@ Partial Class form_SheetManager
         Me.Controls.Add(Me.ProgressBar1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.MaximizeBox = False
-        Me.MaximumSize = New System.Drawing.Size(870, 650)
+        Me.MaximumSize = New System.Drawing.Size(890, 660)
         Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(870, 650)
+        Me.MinimumSize = New System.Drawing.Size(890, 660)
         Me.Name = "form_SheetManager"
         Me.Text = "Sheet Management"
         Me.GroupBoxTitleblocks.ResumeLayout(False)
@@ -356,6 +394,8 @@ Partial Class form_SheetManager
         Me.GroupBoxSheets.PerformLayout()
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -386,4 +426,7 @@ Partial Class form_SheetManager
     Friend WithEvents ButtonCheckAll As System.Windows.Forms.Button
     Friend WithEvents ComboBoxFilter As System.Windows.Forms.ComboBox
     Friend WithEvents LabelDisplay As System.Windows.Forms.Label
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents RadioButtonPlaceholder As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButtonViewSheet As System.Windows.Forms.RadioButton
 End Class

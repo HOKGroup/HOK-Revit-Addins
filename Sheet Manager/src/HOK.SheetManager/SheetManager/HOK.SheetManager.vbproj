@@ -10,7 +10,7 @@
     <ProjectGuid>{04F9F82F-782D-48B7-89D1-34F21D329352}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>HOK.SheetManager</RootNamespace>
-    <AssemblyName>HOK.SheetManager</AssemblyName>
+    <AssemblyName>HOK.SheetManager_v.2013.0.1.11</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -22,7 +22,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
+    <DocumentationFile>HOK.SheetManager_v.2013.0.1.11.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files\Autodesk\Revit Architecture 2011\Program\Revit.exe</StartProgram>
@@ -34,7 +34,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
+    <DocumentationFile>HOK.SheetManager_v.2013.0.1.11.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>

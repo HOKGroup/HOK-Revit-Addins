@@ -276,91 +276,35 @@ Public Class form_SheetManager
                     Me.TreeViewSheets.Nodes.Add(tn1)
 
                     ' Is it an existing sheet?
-                    If m_Settings.Sheets.ContainsKey(sheetNumber) And m_Settings.clsTblksList.ContainsKey(sheetNumber) And m_Settings.clsSheetsList.ContainsKey(sheetNumber) Then
+                    If m_Settings.Sheets.ContainsKey(sheetNumber) And m_Settings.clsSheetsList.ContainsKey(sheetNumber) Then
 
                         ' Find discrepancies
                         tn1.ImageIndex = 0
                         tn1.SelectedImageIndex = 0
                         tn1.ForeColor = Drawing.Color.Gray
 
-                        ' The Titleblock Element Instance
-                        Dim m_TblkItem As Element = m_Settings.clsTblksList(sheetNumber).Element
                         ' The Sheet Element
                         Dim m_SheetItem As ViewSheet = m_Settings.clsSheetsList(sheetNumber).Sheet
+                        Dim isPlaceholderSheet As Boolean = False
+
+                        If m_SheetItem.IsPlaceholder Then
+                            isPlaceholderSheet = True
+                            tn1.Text = sheetNumber & ": " & sheetName & " (Placeholder)"
+                        End If
+
+                        ' The Titleblock Element Instance
+                        Dim m_TblkItem As Element = Nothing
+                        If m_Settings.clsTblksList.ContainsKey(sheetNumber) Then
+                            m_TblkItem = m_Settings.clsTblksList(sheetNumber).Element
+                        End If
 
                         ' Iterate the columns in the datarow
                         For Each dc As DataColumn In m_DataTable.Columns
-
 #If RELEASE2013 Or RELEASE2014 Then
-                            Dim m_pTblk As Parameter = m_TblkItem.Parameter(dc.ColumnName)
                             Dim m_pSht As Parameter = m_SheetItem.Parameter(dc.ColumnName)
 #ElseIf RELEASE2015 Then
-                        Dim m_pTblk As Parameter = m_TblkItem.LookupParameter(dc.ColumnName)
-                        Dim m_pSht As Parameter = m_SheetItem.LookupParameter(dc.ColumnName)
+                            Dim m_pSht As Parameter = m_SheetItem.LookupParameter(dc.ColumnName)
 #End If
-
-                            If m_pTblk IsNot Nothing Then
-
-                                Dim m_para As New clsPara(m_pTblk)
-
-                                Try
-
-                                    ' Is this a Y/N parameter
-                                    If m_para.DisplayUnitType.ToUpper = "YESNO" Then
-
-                                        Dim isDiscrepancy As Boolean = False
-
-                                        Select Case row(m_para.Name).ToString.ToUpper
-                                            Case "1"
-                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
-                                            Case "Y"
-                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
-                                            Case "YES"
-                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
-                                            Case "X"
-                                                If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
-                                            Case "0"
-                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
-                                            Case "N"
-                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
-                                            Case "NO"
-                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
-                                            Case ""
-                                                If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
-                                        End Select
-
-                                        If isDiscrepancy = True Then
-                                            ' This is a discrepancy
-                                            Dim tn2 As New System.Windows.Forms.TreeNode
-                                            tn2.Text = m_para.Name & vbTab & ": " & vbTab & m_para.Value & vbTab & " (XL=" & row(m_para.Name).ToString & ")"
-                                            tn2.Tag = m_para.Name & vbTab & ": " & vbTab & m_para.Value
-                                            tn2.Name = m_para.Name & vbTab & ": " & vbTab & m_para.Value
-                                            Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
-                                            tn2.ImageIndex = 1
-                                            tn2.SelectedImageIndex = 1
-                                        End If
-                                    Else
-                                        ' These are not YesNo Parameters
-                                        If m_para.Value <> row(m_para.Name).ToString Then
-                                            ' This is a discrepancy
-                                            Dim tn2 As New System.Windows.Forms.TreeNode
-                                            tn2.Text = m_para.Name & vbTab & ": " & vbTab & m_para.Value & vbTab & " (XL=" & row(m_para.Name).ToString & ")"
-                                            tn2.Tag = m_para.Name & vbTab & ": " & vbTab & m_para.Value
-                                            tn2.Name = m_para.Name & vbTab & ": " & vbTab & m_para.Value
-                                            Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
-                                            tn2.ImageIndex = 1
-                                            tn2.SelectedImageIndex = 1
-
-                                        End If
-                                    End If
-
-                                Catch ex As Exception
-
-                                End Try
-
-                            End If
-
-
                             If m_pSht IsNot Nothing Then
 
                                 Dim m_para As New clsPara(m_pSht)
@@ -423,6 +367,73 @@ Public Class form_SheetManager
                             End If
 
 
+                            If isPlaceholderSheet = False And m_TblkItem IsNot Nothing Then
+#If RELEASE2013 Or RELEASE2014 Then
+                            Dim m_pTblk As Parameter = m_TblkItem.Parameter(dc.ColumnName)
+#ElseIf RELEASE2015 Then
+                                Dim m_pTblk As Parameter = m_TblkItem.LookupParameter(dc.ColumnName)
+#End If
+
+                                If m_pTblk IsNot Nothing Then
+
+                                    Dim m_para As New clsPara(m_pTblk)
+
+                                    Try
+
+                                        ' Is this a Y/N parameter
+                                        If m_para.DisplayUnitType.ToUpper = "YESNO" Then
+
+                                            Dim isDiscrepancy As Boolean = False
+
+                                            Select Case row(m_para.Name).ToString.ToUpper
+                                                Case "1"
+                                                    If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                                Case "Y"
+                                                    If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                                Case "YES"
+                                                    If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                                Case "X"
+                                                    If Double.Parse(m_para.Value) <> 1 Then isDiscrepancy = True
+                                                Case "0"
+                                                    If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                                Case "N"
+                                                    If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                                Case "NO"
+                                                    If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                                Case ""
+                                                    If Double.Parse(m_para.Value) <> 0 Then isDiscrepancy = True
+                                            End Select
+
+                                            If isDiscrepancy = True Then
+                                                ' This is a discrepancy
+                                                Dim tn2 As New System.Windows.Forms.TreeNode
+                                                tn2.Text = m_para.Name & vbTab & ": " & vbTab & m_para.Value & vbTab & " (XL=" & row(m_para.Name).ToString & ")"
+                                                tn2.Tag = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                                tn2.Name = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                                Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
+                                                tn2.ImageIndex = 1
+                                                tn2.SelectedImageIndex = 1
+                                            End If
+                                        Else
+                                            ' These are not YesNo Parameters
+                                            If m_para.Value <> row(m_para.Name).ToString Then
+                                                ' This is a discrepancy
+                                                Dim tn2 As New System.Windows.Forms.TreeNode
+                                                tn2.Text = m_para.Name & vbTab & ": " & vbTab & m_para.Value & vbTab & " (XL=" & row(m_para.Name).ToString & ")"
+                                                tn2.Tag = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                                tn2.Name = m_para.Name & vbTab & ": " & vbTab & m_para.Value
+                                                Me.TreeViewSheets.Nodes(sheetNumber).Nodes.Add(tn2)
+                                                tn2.ImageIndex = 1
+                                                tn2.SelectedImageIndex = 1
+
+                                            End If
+                                        End If
+
+                                    Catch ex As Exception
+                                        Dim message As String = ex.Message
+                                    End Try
+                                End If
+                            End If
                         Next
 
                         ' If no discrepancies, then remove the parent node
@@ -1248,7 +1259,11 @@ Public Class form_SheetManager
                 Try
                     ' Create it
                     Dim m_DocCreate As Autodesk.Revit.Creation.Document = m_Settings.Application.ActiveUIDocument.Document.Create
-                    m_SheetView = ViewSheet.Create(m_Settings.Application.ActiveUIDocument.Document, m_TitleBlock.Id)
+                    If RadioButtonViewSheet.Checked Then
+                        m_SheetView = ViewSheet.Create(m_Settings.Application.ActiveUIDocument.Document, m_TitleBlock.Id)
+                    ElseIf RadioButtonPlaceholder.Checked Then
+                        m_SheetView = ViewSheet.CreatePlaceholder(m_Settings.Application.ActiveUIDocument.Document)
+                    End If
 
                     ' Update the Sheet Number and Name
                     m_SheetView.SheetNumber = sheetNumber
@@ -1346,7 +1361,7 @@ UpdateExistingElement:
                         End If
 
                         ' Not in sheet, check the Titleblock
-                        If m_ParamFoundInSheet = False Then
+                        If m_SheetView.IsPlaceholder = False And m_ParamFoundInSheet = False Then
 
                             ' Do we have a valid Titleblock Element
                             If m_SheetTitleblock Is Nothing Then
@@ -1790,4 +1805,6 @@ UpdateExistingElement:
             Dim message As String = ex.Message
         End Try
     End Sub
+
+   
 End Class
