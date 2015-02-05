@@ -18,8 +18,32 @@ namespace HOK.RoomsToMass.ToMass
         }
 
         public Area AreaObject { get { return m_area; } }
-        public string Name { get { try { return m_area.Name; } catch { return ""; } } }
-        public string Number { get { try { return m_area.Number; } catch { return ""; } } }
+        public string Name 
+        { 
+            get 
+            {
+                string areaName = "";
+                Parameter parameter = m_area.get_Parameter(BuiltInParameter.ROOM_NAME);
+                if (null != parameter)
+                {
+                    areaName = parameter.AsString();
+                }
+                return areaName; 
+            }
+        }
+        public string Number 
+        { 
+            get 
+            {
+                string areaNumber = "";
+                Parameter parameter = m_area.get_Parameter(BuiltInParameter.ROOM_NUMBER);
+                if (null != parameter)
+                {
+                    areaNumber = parameter.AsString();
+                }
+                return areaNumber; 
+            } 
+        }
         public int ID { get { try { return m_area.Id.IntegerValue; } catch { return 0; } } }
 
         public double Height { get; set; }

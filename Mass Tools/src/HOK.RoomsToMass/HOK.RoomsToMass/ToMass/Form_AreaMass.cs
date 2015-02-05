@@ -160,10 +160,10 @@ namespace HOK.RoomsToMass.ToMass
             {
                 foreach (DataGridViewRow row in dataGridViewArea.Rows)
                 {
-                    if (null != row.Tag && null!=row.Cells[8].Value)
+                    if (null != row.Tag && null!=row.Cells[6].Value)
                     {
                         AreaProperties ap = row.Tag as AreaProperties;
-                        ap.Height = Convert.ToDouble(row.Cells[8].Value);
+                        ap.Height = Convert.ToDouble(row.Cells[6].Value);
                     }
                 }
             }
@@ -359,7 +359,7 @@ namespace HOK.RoomsToMass.ToMass
                     {
                         if (!row.ReadOnly)
                         {
-                            row.Cells[7].Value = height;
+                            row.Cells[6].Value = height;
                         }
                     }
                 }
