@@ -18,11 +18,11 @@ using Autodesk.Revit.UI;
 namespace HOK.RibbonTab
 {
 
-    public class AppCommand:IExternalApplication
+    public class AppCommand : IExternalApplication
     {
         private UIControlledApplication m_app;
-        private string tabName="";
-        private string currentDirectory="";
+        private string tabName = "";
+        private string currentDirectory = "";
         private string currentAssembly = "";
         private Assembly assembly = null;
         private string tooltipFileName = "HOK.Tooltip.txt";
@@ -54,7 +54,7 @@ namespace HOK.RibbonTab
             CreateCustomPushButtons();
             CreateDataPushButtons();
             CreateAVFPushButtons();
-            
+
             return Result.Succeeded;
         }
 
@@ -65,7 +65,7 @@ namespace HOK.RibbonTab
                 bool utilityExist = false;
                 RibbonPanel utilPanel = m_app.CreateRibbonPanel(tabName, "Utilities");
                 //HOK Utilities
-                if (File.Exists(currentDirectory + "/HOK.Utilities.dll"))
+                if (File.Exists(currentDirectory + "/HOK.Utilities.dll") || File.Exists(currentDirectory + "/HOK.ElementTools.dll") || File.Exists(currentDirectory + "/HOK.ParameterTools.dll") || File.Exists(currentDirectory + "/HOK.ColorSchemeEditor.dll"))
                 {
                     SplitButtonData splitButtonData = new SplitButtonData("HOKUtilities", "HOK Utilities");
                     SplitButton splitButton = utilPanel.AddItem(splitButtonData) as SplitButton;
@@ -92,39 +92,36 @@ namespace HOK.RibbonTab
                         utilityExist = true;
                     }
 
-                    Assembly utilAssembly = System.Reflection.Assembly.LoadFile(currentDirectory + "/HOK.Utilities.dll");
-                    string finishCommand = "HOK.Utilities.FinishCommand";
-                    if (null != utilAssembly.GetType(finishCommand))
+                    if (File.Exists(currentDirectory + "/HOK.FinishCreator.dll"))
                     {
-                        PushButton pb3 = splitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", currentDirectory + "/HOK.Utilities.dll", finishCommand)) as PushButton;
+                        PushButton pb3 = splitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", currentDirectory + "/HOK.FinishCreator.dll", "HOK.FinishCreator.FinishCommand")) as PushButton;
                         pb3.LargeImage = LoadBitmapImage(assembly, "finish.png");
                         pb3.ToolTip = "Create floor finishes from the selected rooms.";
                         AddToolTips(pb3);
                         utilityExist = true;
                     }
-                    string ceilingCommand = "HOK.Utilities.CeilingCommand";
-                    if (null != utilAssembly.GetType(ceilingCommand))
+
+                    if (File.Exists(currentDirectory + "/HOK.CeilingHeight.dll"))
                     {
-                        PushButton pb4 = splitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", currentDirectory + "/HOK.Utilities.dll", ceilingCommand)) as PushButton;
+                        PushButton pb4 = splitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", currentDirectory + "/HOK.CeilingHeight.dll", "HOK.CeilingHeight.CeilingCommand")) as PushButton;
                         pb4.LargeImage = LoadBitmapImage(assembly, "height.png");
                         pb4.ToolTip = "Select rooms to measure the height from floors to ceilings.";
                         AddToolTips(pb4);
                         utilityExist = true;
                     }
-                    string levelCommand = "HOK.Utilities.LevelCommand";
-                    if (null != utilAssembly.GetType(levelCommand))
+
+                    if (File.Exists(currentDirectory + "/HOK.LevelManager.dll"))
                     {
-                        PushButton pb5 = splitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", currentDirectory + "/HOK.Utilities.dll", levelCommand)) as PushButton;
+                        PushButton pb5 = splitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", currentDirectory + "/HOK.LevelManager.dll", "HOK.LevelManager.LevelCommand")) as PushButton;
                         pb5.LargeImage = LoadBitmapImage(assembly, "level.png");
                         pb5.ToolTip = "Rehost elements from one level to anather. ";
                         AddToolTips(pb5);
                         utilityExist = true;
                     }
 
-                    string viewCommand = "HOK.Utilities.ViewCommand";
-                    if (null != utilAssembly.GetType(viewCommand))
+                    if (File.Exists(currentDirectory + "/HOK.ViewDepth.dll"))
                     {
-                        PushButton pb18 = splitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", currentDirectory + "/HOK.Utilities.dll", viewCommand)) as PushButton;
+                        PushButton pb18 = splitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", currentDirectory + "/HOK.ViewDepth.dll", "HOK.ViewDepth.ViewCommand")) as PushButton;
                         pb18.LargeImage = LoadBitmapImage(assembly, "camera.ico");
                         pb18.ToolTip = "Override the graphics of the element based on the distance";
                         pb18.ToolTipImage = LoadBitmapImage(assembly, "viewTooltip.png");
@@ -132,27 +129,24 @@ namespace HOK.RibbonTab
                         utilityExist = true;
                     }
 
-                    string leaderCommand = "HOK.Utilities.ArrowCommand";
-                    if (null != utilAssembly.GetType(leaderCommand))
+                    if (File.Exists(currentDirectory + "/HOK.Arrowhead.dll"))
                     {
-                        PushButton pb19 = splitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", currentDirectory + "/HOK.Utilities.dll", leaderCommand)) as PushButton;
+                        PushButton pb19 = splitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", currentDirectory + "/HOK.Arrowhead.dll", "HOK.Arrowhead.ArrowCommand")) as PushButton;
                         pb19.LargeImage = LoadBitmapImage(assembly, "arrowhead.png");
                         pb19.ToolTip = "Assign a leader arrowhead style to all tag types.";
                         AddToolTips(pb19);
                         utilityExist = true;
                     }
 
-                    string worksetCommand = "HOK.Utilities.WorksetCommand";
-                    if (null != utilAssembly.GetType(worksetCommand))
+                    if (File.Exists(currentDirectory + "/HOK.WorksetView.dll"))
                     {
-                        PushButton pb19 = splitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", currentDirectory + "/HOK.Utilities.dll", worksetCommand)) as PushButton;
+                        PushButton pb19 = splitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", currentDirectory + "/HOK.WorksetView.dll", "HOK.WorksetView.WorksetCommand")) as PushButton;
                         pb19.LargeImage = LoadBitmapImage(assembly, "workset.png");
                         pb19.ToolTip = "Create 3D Views for each workset.";
                         AddToolTips(pb19);
                         utilityExist = true;
                     }
 
-                    //Color Scheme Editor
                     if (File.Exists(currentDirectory + "/HOK.ColorSchemeEditor.dll"))
                     {
                         PushButton pb20 = splitButton.AddPushButton(new PushButtonData("Color Editor", "Color Editor", currentDirectory + "/HOK.ColorSchemeEditor.dll", "HOK.ColorSchemeEditor.Command")) as PushButton;
@@ -162,30 +156,27 @@ namespace HOK.RibbonTab
                         utilityExist = true;
                     }
 
-                    string doorCommand = "HOK.Utilities.DoorCommand";
-                    if (null != utilAssembly.GetType(doorCommand))
+                    if (File.Exists(currentDirectory + "/HOK.DoorRoom.dll"))
                     {
-                        PushButton pb21 = splitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", currentDirectory + "/HOK.Utilities.dll", doorCommand)) as PushButton;
+                        PushButton pb21 = splitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", currentDirectory + "/HOK.DoorRoom.dll", "HOK.DoorRoom.DoorCommand")) as PushButton;
                         pb21.LargeImage = LoadBitmapImage(assembly, "door.png");
                         pb21.ToolTip = "Set shared parameters with To and From room data.";
                         AddToolTips(pb21);
                         utilityExist = true;
                     }
 
-                    string roomCommand = "HOK.Utilities.RoomCommand";
-                    if (null != utilAssembly.GetType(roomCommand))
+                    if (File.Exists(currentDirectory + "/HOK.RoomUpdater.dll"))
                     {
-                        PushButton pb22 = splitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", currentDirectory + "/HOK.Utilities.dll", roomCommand)) as PushButton;
+                        PushButton pb22 = splitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", currentDirectory + "/HOK.RoomUpdater.dll", "HOK.RoomUpdater.RoomCommand")) as PushButton;
                         pb22.LargeImage = LoadBitmapImage(assembly, "container.png");
                         pb22.ToolTip = "Populate room parameters values into enclosed elements.";
                         AddToolTips(pb22);
                         utilityExist = true;
                     }
 
-                    string elevationCommand = "HOK.Utilities.ElevationCommand";
-                    if (null != utilAssembly.GetType(elevationCommand))
+                    if (File.Exists(currentDirectory + "/HOK.RoomElevation.dll"))
                     {
-                        PushButton pb23 = splitButton.AddPushButton(new PushButtonData("Room Elevation", "Room Elevation", currentDirectory + "/HOK.Utilities.dll", elevationCommand)) as PushButton;
+                        PushButton pb23 = splitButton.AddPushButton(new PushButtonData("Room Elevation", "Room Elevation", currentDirectory + "/HOK.RoomElevation.dll", "HOK.RoomElevation.ElevationCommand")) as PushButton;
                         pb23.LargeImage = LoadBitmapImage(assembly, "elevation.png");
                         pb23.ToolTip = "Create elevation views by selecting rooms and walls to be faced.";
                         AddToolTips(pb23);
@@ -199,7 +190,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create the Utilities Panel.\n"+ex.Message, "Create Utilites Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to create the Utilities Panel.\n" + ex.Message, "Create Utilites Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -283,7 +274,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create the Customizations panel.\n"+ex.Message, "Create Customizations Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to create the Customizations panel.\n" + ex.Message, "Create Customizations Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -314,7 +305,7 @@ namespace HOK.RibbonTab
                     AddToolTips(pb13);
 
                     exist = true;
-                   
+
                     if (!exist)
                     {
                         dataPanel.Visible = false;
@@ -360,9 +351,9 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create Analysis panel.\n"+ex.Message, "Create Analysis Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to create Analysis panel.\n" + ex.Message, "Create Analysis Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            
+
         }
 
         private void ReadToolTips(string txtfile)
@@ -399,7 +390,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to read the information of tool tips.\n"+ex.Message, "Read Tool Tips", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to read the information of tool tips.\n" + ex.Message, "Read Tool Tips", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
