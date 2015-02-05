@@ -552,12 +552,6 @@ namespace HOK.AddIn_Installer_Internal
                     ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
                     DeleteOldDirectories(progressForm, target);
 
-                    //make copies of the default files first
-                    RevitToolProperties tp = tool2013Dictionary[Tool2013.Default];
-
-                    if (checkBoxBeta.Checked) { CopyFromBeta(tp, progressForm, target); }
-                    else { CopyFromStandard(tp, progressForm, target); }
-
                     int count = 0;
                     
                     for (int i = 0; i < listViewTools.CheckedItems.Count; i++)
@@ -568,7 +562,7 @@ namespace HOK.AddIn_Installer_Internal
                             Tool2013 tool = (Tool2013)item.Tag;
                             if (tool2013Dictionary.ContainsKey(tool))
                             {
-                                tp = tool2013Dictionary[tool];
+                                RevitToolProperties tp = tool2013Dictionary[tool];
                                 CopyFromStandard(tp, progressForm, target);
 
                                 tp.InstallVersionInfo = tp.ReleaseVersionInfo;
@@ -579,7 +573,7 @@ namespace HOK.AddIn_Installer_Internal
                         }
                         count++;
                     }
-
+                    bool utilitySelected = false;
                     if (checkBoxBeta.Checked)
                     {
                         for (int i = 0; i < listViewBeta.CheckedItems.Count; i++)
@@ -592,7 +586,8 @@ namespace HOK.AddIn_Installer_Internal
                                 {
                                     if (tool2013Dictionary.ContainsKey(tool))
                                     {
-                                        tp = tool2013Dictionary[tool];
+                                        RevitToolProperties tp = tool2013Dictionary[tool];
+                                        if (tp.ToolEnum2013 == Tool2013.Utility) { utilitySelected = true; }
                                         CopyFromBeta(tp, progressForm, target);
 
                                         tp.InstallVersionInfo = tp.BetaVersionInfo;
@@ -605,7 +600,12 @@ namespace HOK.AddIn_Installer_Internal
                             count++;
                         }
                     }
-                    
+
+                    //make copies of the default files first
+                    RevitToolProperties defaultTP = tool2013Dictionary[Tool2013.Default];
+                    if (checkBoxBeta.Checked && utilitySelected) { CopyFromBeta(defaultTP, progressForm, target); }
+                    else { CopyFromStandard(defaultTP, progressForm, target); }
+
                     progressForm.Close();
 
                     DialogResult dr = MessageBox.Show(count + " tools were successfully installed.\nThe new Addins will be available when Revit is restarted.\nWould you like to exit the installer?"
@@ -637,11 +637,6 @@ namespace HOK.AddIn_Installer_Internal
                     ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
                     DeleteOldDirectories(progressForm, traget);
 
-                    //make copies of the default files first
-                    RevitToolProperties tp = tool2014Dictionary[Tool2014.Default];
-                    if (checkBoxBeta.Checked) { CopyFromBeta(tp, progressForm, traget); }
-                    else { CopyFromStandard(tp, progressForm, traget); }
-
                     int count = 0;
 
                     for (int i = 0; i < listViewTools.CheckedItems.Count; i++)
@@ -652,7 +647,7 @@ namespace HOK.AddIn_Installer_Internal
                             Tool2014 tool = (Tool2014)item.Tag;
                             if (tool2014Dictionary.ContainsKey(tool))
                             {
-                                tp = tool2014Dictionary[tool];
+                                RevitToolProperties tp = tool2014Dictionary[tool];
                                 CopyFromStandard(tp, progressForm, traget);
                                 
                                 tp.InstallVersionInfo = tp.ReleaseVersionInfo;
@@ -664,6 +659,7 @@ namespace HOK.AddIn_Installer_Internal
                         count++;
                     }
 
+                    bool utilitySelected = false;
                     if (checkBoxBeta.Checked)
                     {
                         for (int i = 0; i < listViewBeta.CheckedItems.Count; i++)
@@ -676,7 +672,8 @@ namespace HOK.AddIn_Installer_Internal
                                 {
                                     if (tool2014Dictionary.ContainsKey(tool))
                                     {
-                                        tp = tool2014Dictionary[tool];
+                                        RevitToolProperties tp = tool2014Dictionary[tool];
+                                        if (tp.ToolEnum2014 == Tool2014.Utility) { utilitySelected = true; }
                                         CopyFromBeta(tp, progressForm, traget);
 
                                         tp.InstallVersionInfo = tp.BetaVersionInfo;
@@ -689,6 +686,11 @@ namespace HOK.AddIn_Installer_Internal
                             count++;
                         }
                     }
+
+                    //make copies of the default files first
+                    RevitToolProperties defaultTP = tool2014Dictionary[Tool2014.Default];
+                    if (checkBoxBeta.Checked && utilitySelected ) { CopyFromBeta(defaultTP, progressForm, traget); }
+                    else { CopyFromStandard(defaultTP, progressForm, traget); }
                     
                     progressForm.Close();
 
@@ -721,11 +723,6 @@ namespace HOK.AddIn_Installer_Internal
                     ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
                     DeleteOldDirectories(progressForm, traget);
 
-                    //make copies of the default files first
-                    RevitToolProperties tp = tool2015Dictionary[Tool2015.Default];
-                    if (checkBoxBeta.Checked) { CopyFromBeta(tp, progressForm, traget); }
-                    else { CopyFromStandard(tp, progressForm, traget); }
-
                     int count = 0;
 
                     for (int i = 0; i < listViewTools.CheckedItems.Count; i++)
@@ -736,7 +733,7 @@ namespace HOK.AddIn_Installer_Internal
                             Tool2015 tool = (Tool2015)item.Tag;
                             if (tool2015Dictionary.ContainsKey(tool))
                             {
-                                tp = tool2015Dictionary[tool];
+                                RevitToolProperties tp = tool2015Dictionary[tool];
                                 CopyFromStandard(tp, progressForm, traget);
 
                                 tp.InstallVersionInfo = tp.ReleaseVersionInfo;
@@ -748,6 +745,7 @@ namespace HOK.AddIn_Installer_Internal
                         count++;
                     }
 
+                    bool utilitySelected = false;
                     if (checkBoxBeta.Checked)
                     {
                         for (int i = 0; i < listViewBeta.CheckedItems.Count; i++)
@@ -760,7 +758,8 @@ namespace HOK.AddIn_Installer_Internal
                                 {
                                     if (tool2015Dictionary.ContainsKey(tool))
                                     {
-                                        tp = tool2015Dictionary[tool];
+                                        RevitToolProperties tp = tool2015Dictionary[tool];
+                                        if (tp.ToolEnum2015 == Tool2015.Utility) { utilitySelected = true; }
                                         CopyFromBeta(tp, progressForm, traget);
 
                                         tp.InstallVersionInfo = tp.BetaVersionInfo;
@@ -773,6 +772,11 @@ namespace HOK.AddIn_Installer_Internal
                             count++;
                         }
                     }
+
+                    //make copies of the default files first
+                    RevitToolProperties defaultTP = tool2015Dictionary[Tool2015.Default];
+                    if (checkBoxBeta.Checked && utilitySelected ) { CopyFromBeta(defaultTP, progressForm, traget); }
+                    else { CopyFromStandard(defaultTP, progressForm, traget); }
 
                     progressForm.Close();
 
@@ -1256,14 +1260,18 @@ namespace HOK.AddIn_Installer_Internal
 
                 foreach (string path in fileNames)
                 {
-                    if (File.Exists(betaDirectory + path))
+                    string betaPath = betaDirectory + path;
+                    string standardPath = masterDirectory + path;
+                    string installPath = installDirectory + path;
+
+                    if (File.Exists(betaPath))
                     {
-                        try { File.Copy(betaDirectory + path, installDirectory + path, true); }
+                        try { File.Copy(betaPath, installPath, true); }
                         catch { continue; }
                     }
-                    else if (File.Exists(masterDirectory + path))
+                    else if (File.Exists(standardPath))
                     {
-                        try { File.Copy(masterDirectory + path, installDirectory + path, true); }
+                        try { File.Copy(standardPath, installPath, true); }
                         catch{continue;}
                     }
                     progressForm.StepForward();

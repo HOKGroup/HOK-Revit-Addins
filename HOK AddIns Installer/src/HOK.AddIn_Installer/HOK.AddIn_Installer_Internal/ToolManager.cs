@@ -246,6 +246,16 @@ namespace HOK.AddIn_Installer_Internal
 
                         case Tool2013.Utility:
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.Utilities.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.Arrowhead.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.CeilingHeight.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.DoorRoom.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FinishCreator.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.LevelManager.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.RoomElevation.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.RoomUpdater.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ViewDepth.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.WorksetView.dll");
+
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\height.png");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\level.png");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\finish.png");
@@ -302,8 +312,10 @@ namespace HOK.AddIn_Installer_Internal
                     }
 
                     tp.InstallVersionInfo = GetInstalledVersion(tp);
-                    tp.BetaVersionInfo = GetBetaReleaseVersion(tp.DllPath);
-                    tp.BetaDate = GetBetaReleaseDate(tp.DllPath);
+
+                    string betaPath = betaDirectory + tp.DllPath;
+                    tp.BetaVersionInfo = GetBetaReleaseVersion(betaPath);
+                    tp.BetaDate = GetBetaReleaseDate(betaPath);
                     dictionary.Add(tool, tp);
                 }
                 catch (Exception ex)
@@ -469,6 +481,16 @@ namespace HOK.AddIn_Installer_Internal
                             break;
                         case Tool2014.Utility:
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.Utilities.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.Arrowhead.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.CeilingHeight.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.DoorRoom.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FinishCreator.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.LevelManager.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.RoomElevation.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.RoomUpdater.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ViewDepth.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.WorksetView.dll");
+
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\height.png");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\level.png");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\finish.png");
@@ -555,8 +577,10 @@ namespace HOK.AddIn_Installer_Internal
                     }
 
                     tp.InstallVersionInfo = GetInstalledVersion(tp);
-                    tp.BetaVersionInfo = GetBetaReleaseVersion(tp.DllPath);
-                    tp.BetaDate = GetBetaReleaseDate(tp.DllPath);
+
+                    string betaPath = betaDirectory + tp.DllPath;
+                    tp.BetaVersionInfo = GetBetaReleaseVersion(betaPath);
+                    tp.BetaDate = GetBetaReleaseDate(betaPath);
                     dictionary.Add(tool, tp);
                 }
                 catch (Exception ex)
@@ -722,6 +746,16 @@ namespace HOK.AddIn_Installer_Internal
                             break;
                         case Tool2015.Utility:
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.Utilities.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.Arrowhead.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.CeilingHeight.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.DoorRoom.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FinishCreator.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.LevelManager.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.RoomElevation.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.RoomUpdater.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ViewDepth.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.WorksetView.dll");
+
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\height.png");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\level.png");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\finish.png");
@@ -808,8 +842,10 @@ namespace HOK.AddIn_Installer_Internal
                     }
 
                     tp.InstallVersionInfo = GetInstalledVersion(tp);
-                    tp.BetaVersionInfo = GetBetaReleaseVersion(tp.DllPath);
-                    tp.BetaDate = GetBetaReleaseDate(tp.DllPath);
+
+                    string betaPath = betaDirectory + tp.DllPath;
+                    tp.BetaVersionInfo = GetBetaReleaseVersion(betaPath);
+                    tp.BetaDate = GetBetaReleaseDate(betaPath);
                     dictionary.Add(tool, tp);
                 }
                 catch (Exception ex)
@@ -1007,12 +1043,11 @@ namespace HOK.AddIn_Installer_Internal
             return versionInfo;
         }
 
-        private FileVersionInfo GetBetaReleaseVersion(string filePath)
+        private FileVersionInfo GetBetaReleaseVersion(string dllPath)
         {
             FileVersionInfo versionInfo = null;
             try
             {
-                string dllPath = betaDirectory + filePath;
                 if (File.Exists(dllPath))
                 {
                     versionInfo = FileVersionInfo.GetVersionInfo(dllPath);
@@ -1020,17 +1055,16 @@ namespace HOK.AddIn_Installer_Internal
             }
             catch (Exception ex)
             {
-                strBuilder.AppendLine("File Not Found: " + filePath + "\n" + ex.Message);
+                strBuilder.AppendLine("File Not Found: " + dllPath + "\n" + ex.Message);
             }
             return versionInfo;
         }
 
-        private string GetBetaReleaseDate(string filePath)
+        private string GetBetaReleaseDate(string dllPath)
         {
             string date = "";
             try
             {
-                string dllPath = betaDirectory + filePath;
                 if (File.Exists(dllPath))
                 {
                     FileInfo fileInfo = new FileInfo(dllPath);
@@ -1039,11 +1073,59 @@ namespace HOK.AddIn_Installer_Internal
             }
             catch (Exception ex)
             {
-                strBuilder.AppendLine("File Not Found: " + filePath + "\n" + ex.Message);
+                strBuilder.AppendLine("File Not Found: " + dllPath + "\n" + ex.Message);
                 //MessageBox.Show("Failed to get the date of a released dll.\n" + filePath + "\n" + ex.Message, "MainForm:GetReleaseDate", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             return date;
         }
+        /*
+        public string GetBetaDllName(string dllPath)
+        {
+            string betaDll = dllPath;
+            try
+            {
+                string fileName = Path.GetFileNameWithoutExtension(dllPath);
+                string directoryName = Path.GetDirectoryName(dllPath);
+
+                string latestFile = "";
+                Version latestVersion = null;
+                string[] files = Directory.GetFiles(directoryName, fileName + "*");
+                foreach (string file in files)
+                {
+                    if (Path.GetExtension(file) == ".dll")
+                    {
+                        FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(file);
+                        Version version = new Version(versionInfo.FileVersion);
+
+                        if (string.IsNullOrEmpty(latestFile))
+                        {
+                            latestFile = file;
+                            latestVersion = version;
+                        }
+                        else if (!string.IsNullOrEmpty(latestFile) && null != latestVersion)
+                        {
+                            if (latestVersion.CompareTo(version) < 0)
+                            {
+                                latestFile = file;
+                                latestVersion = version;
+                            }
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(latestFile))
+                {
+                    betaDll = latestFile;
+                }
+            }
+            catch (Exception ex)
+            {
+                strBuilder.AppendLine("Beta File Not Found: "+ex.Message);
+            }
+            return betaDll;
+        }
+        */
+
     }
 
     public class RevitToolProperties
