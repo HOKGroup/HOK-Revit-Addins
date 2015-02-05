@@ -1,3 +1,8 @@
+v.0.1.11
+New
+- Options for create viewsheets and create placeholder sheets
+- Existing placeholder sheets will be marekd with gray text with a suffix "(Placeholder)"
+
 v.0.1.10
 New
 - Tree View with sheet number and sheet name

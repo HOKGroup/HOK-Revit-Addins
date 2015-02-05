@@ -1,3 +1,7 @@
+v.0.2.11
+Fix
+- Area name and number will be obtained by parameter value, not by properties of Area class
+
 v.0.2.9 (beta)
 Changes
 -Split Elements option will be only available from linked files. 
