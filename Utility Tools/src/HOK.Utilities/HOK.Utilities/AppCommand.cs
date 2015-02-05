@@ -14,7 +14,7 @@ namespace HOK.Utilities
     public class AppCommand:IExternalApplication
     {
 
-        public Result OnShutdown(UIControlledApplication application)
+        public Result OnShutdown(UIControlledApplication application)        
         {
             return Result.Succeeded;
         }
@@ -24,59 +24,70 @@ namespace HOK.Utilities
             RibbonPanel rp = application.CreateRibbonPanel("HOK Utilities");
             Assembly assembly = Assembly.GetExecutingAssembly();
             string currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
+            string directoryName = Path.GetDirectoryName(currentAssembly);
+
 
             ContextualHelp contextualHelp = new ContextualHelp(ContextualHelpType.Url, @"V:\RVT-Data\HOK Program\Documentation\HOK Utilities_Instruction.pdf");
 
             SplitButtonData splitButtonData = new SplitButtonData("HOKUtilities", "HOK Utilities");
             SplitButton splitButton = rp.AddItem(splitButtonData) as SplitButton;
 
-            PushButton pushButton1 = splitButton.AddPushButton(new PushButtonData("FinishCreator", "Finish Creator", currentAssembly, "HOK.Utilities.FinishCommand")) as PushButton;
-            pushButton1.LargeImage = LoadBitmapImage(assembly, "finish.png");
-            pushButton1.ToolTip = "Create floor finishes from the selected rooms.";
-            pushButton1.SetContextualHelp(contextualHelp);
+            string finishPath = Path.Combine(directoryName, "HOK.FinishCreator.dll");
+            PushButton finishButton = splitButton.AddPushButton(new PushButtonData("FinishCreator", "Finish Creator", finishPath, "HOK.FinishCreator.FinishCommand")) as PushButton;
+            finishButton.LargeImage = LoadBitmapImage(assembly, "finish.png");
+            finishButton.ToolTip = "Create floor finishes from the selected rooms.";
+            finishButton.SetContextualHelp(contextualHelp);
 
-            PushButton pushButton2 = splitButton.AddPushButton(new PushButtonData("CeilingHeight", "Ceiling Heights", currentAssembly, "HOK.Utilities.CeilingCommand")) as PushButton;
-            pushButton2.LargeImage = LoadBitmapImage(assembly, "height.png");
-            pushButton2.ToolTip = "Select rooms to measure the height from floors to ceilings.";
-            pushButton2.SetContextualHelp(contextualHelp);
+            string ceilingPath = Path.Combine(directoryName, "HOK.CeilingHeight.dll");
+            PushButton ceilingButton = splitButton.AddPushButton(new PushButtonData("CeilingHeight", "Ceiling Heights", ceilingPath, "HOK.CeilingHeight.CeilingCommand")) as PushButton;
+            ceilingButton.LargeImage = LoadBitmapImage(assembly, "height.png");
+            ceilingButton.ToolTip = "Select rooms to measure the height from floors to ceilings.";
+            ceilingButton.SetContextualHelp(contextualHelp);
 
-            PushButton pushButton3 = splitButton.AddPushButton(new PushButtonData("LevelManager", "Level Manager", currentAssembly, "HOK.Utilities.LevelCommand")) as PushButton;
-            pushButton3.LargeImage = LoadBitmapImage(assembly, "level.png");
-            pushButton3.ToolTip = "Rehost elements from one level to anather. ";
-            pushButton3.SetContextualHelp(contextualHelp);
+            string levelPath = Path.Combine(directoryName, "HOK.LevelManager.dll");
+            PushButton levelButton = splitButton.AddPushButton(new PushButtonData("LevelManager", "Level Manager", levelPath, "HOK.LevelManager.LevelCommand")) as PushButton;
+            levelButton.LargeImage = LoadBitmapImage(assembly, "level.png");
+            levelButton.ToolTip = "Rehost elements from one level to anather. ";
+            levelButton.SetContextualHelp(contextualHelp);
 
 #if RELEASE2013
 #else
-            PushButton pushButton4 = splitButton.AddPushButton(new PushButtonData("ViewDepth", "View Depth", currentAssembly, "HOK.Utilities.ViewCommand")) as PushButton;
-            pushButton4.LargeImage = LoadBitmapImage(assembly, "camera.ico");
-            pushButton4.ToolTip = "Override the graphics of the element based on the distance";
-            pushButton4.SetContextualHelp(contextualHelp);
+            string viewPath = Path.Combine(directoryName, "HOK.ViewDepth.dll");
+            PushButton viewButton = splitButton.AddPushButton(new PushButtonData("ViewDepth", "View Depth", viewPath, "HOK.ViewDepth.ViewCommand")) as PushButton;
+            viewButton.LargeImage = LoadBitmapImage(assembly, "camera.ico");
+            viewButton.ToolTip = "Override the graphics of the element based on the distance";
+            viewButton.SetContextualHelp(contextualHelp);
 #endif
 
-            PushButton pushButton5 = splitButton.AddPushButton(new PushButtonData("LeaderArrowhead", "Leader Arrowhead", currentAssembly, "HOK.Utilities.ArrowCommand")) as PushButton;
-            pushButton5.LargeImage = LoadBitmapImage(assembly, "arrowhead.png");
-            pushButton5.ToolTip = "Assign a leader arrowhead style to all tag types.";
-            pushButton5.SetContextualHelp(contextualHelp);
+            string arrowPath = Path.Combine(directoryName, "HOK.Arrowhead.dll");
+            PushButton arrowButton = splitButton.AddPushButton(new PushButtonData("LeaderArrowhead", "Leader Arrowhead", arrowPath, "HOK.Arrowhead.ArrowCommand")) as PushButton;
+            arrowButton.LargeImage = LoadBitmapImage(assembly, "arrowhead.png");
+            arrowButton.ToolTip = "Assign a leader arrowhead style to all tag types.";
+            arrowButton.SetContextualHelp(contextualHelp);
 
-            PushButton pushButton6 = splitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", currentAssembly, "HOK.Utilities.WorksetCommand")) as PushButton;
-            pushButton6.LargeImage = LoadBitmapImage(assembly, "workset.png");
-            pushButton6.ToolTip = "Create 3D Views for each workset.";
-            pushButton6.SetContextualHelp(contextualHelp);
+            string worksetPath = Path.Combine(directoryName, "HOK.WorksetView.dll");
+            PushButton worksetButton = splitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", worksetPath, "HOK.WorksetView.WorksetCommand")) as PushButton;
+            worksetButton.LargeImage = LoadBitmapImage(assembly, "workset.png");
+            worksetButton.ToolTip = "Create 3D Views for each workset.";
+            worksetButton.SetContextualHelp(contextualHelp);
 
-            PushButton pushButton7 = splitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", currentAssembly, "HOK.Utilities.DoorCommand")) as PushButton;
-            pushButton7.LargeImage = LoadBitmapImage(assembly, "door.png");
-            pushButton7.ToolTip = "Assign To-Room and From-Room values for all door elements across linked models.";
-            pushButton7.SetContextualHelp(contextualHelp);
+            string doorPath = Path.Combine(directoryName, "HOK.DoorRoom.dll");
+            PushButton doorButton = splitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", doorPath, "HOK.DoorRoom.DoorCommand")) as PushButton;
+            doorButton.LargeImage = LoadBitmapImage(assembly, "door.png");
+            doorButton.ToolTip = "Assign To-Room and From-Room values for all door elements across linked models.";
+            doorButton.SetContextualHelp(contextualHelp);
 
-            PushButton pushButton8 = splitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", currentAssembly, "HOK.Utilities.RoomCommand")) as PushButton;
-            pushButton8.LargeImage = LoadBitmapImage(assembly, "cube.png");
-            pushButton8.ToolTip = "Assign room data into enclosed elements.";
-            pushButton8.SetContextualHelp(contextualHelp);
+            string roomPath = Path.Combine(directoryName, "HOK.RoomUpdater.dll");
+            PushButton roomButton = splitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", roomPath, "HOK.RoomUpdater.RoomCommand")) as PushButton;
+            roomButton.LargeImage = LoadBitmapImage(assembly, "cube.png");
+            roomButton.ToolTip = "Assign room data into enclosed elements.";
+            roomButton.SetContextualHelp(contextualHelp);
 
-            PushButton pushButton9 = splitButton.AddPushButton(new PushButtonData("Elevation Creator", "Elevation Creator", currentAssembly, "HOK.Utilities.ElevationCommand")) as PushButton;
-            pushButton9.LargeImage = LoadBitmapImage(assembly, "elevation.png");
-            pushButton9.ToolTip = "Place an elevation marker within a room and rotate the marker to be perpendicular to a selected wall.";
-            pushButton9.SetContextualHelp(contextualHelp);
+            string elevationPath = Path.Combine(directoryName, "HOK.RoomElevation.dll");
+            PushButton elevationButton = splitButton.AddPushButton(new PushButtonData("Elevation Creator", "Elevation Creator", elevationPath, "HOK.RoomElevation.ElevationCommand")) as PushButton;
+            elevationButton.LargeImage = LoadBitmapImage(assembly, "elevation.png");
+            elevationButton.ToolTip = "Place an elevation marker within a room and rotate the marker to be perpendicular to a selected wall.";
+            elevationButton.SetContextualHelp(contextualHelp);
 
             return Result.Succeeded;
         }
