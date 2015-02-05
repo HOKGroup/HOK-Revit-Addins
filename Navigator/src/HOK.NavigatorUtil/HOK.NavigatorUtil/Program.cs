@@ -45,7 +45,7 @@ namespace HOK.NavigatorUtil
 
                 if (args.Length > 0)
                 {
-                    versionNumber = FindVersion(args[0]);
+                    versionNumber = FindVersion(arguments[0]);
                     if (VerifyFolderStructure(versionNumber))
                     {
                         foreach (string arg in arguments)
@@ -318,6 +318,16 @@ namespace HOK.NavigatorUtil
 
                     case ToolEnum.Utility:
                         fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.Utilities.dll");
+                        fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.Arrowhead.dll");
+                        fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.CeilingHeight.dll");
+                        fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.DoorRoom.dll");
+                        fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FinishCreator.dll");
+                        fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.LevelManager.dll");
+                        fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.RoomElevation.dll");
+                        fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.RoomUpdater.dll");
+                        fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ViewDepth.dll");
+                        fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.WorksetView.dll");
+
                         fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\height.png");
                         fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\level.png");
                         fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\finish.png");
