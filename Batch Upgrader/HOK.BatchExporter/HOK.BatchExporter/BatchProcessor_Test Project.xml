@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BatchProcessor ProjectName="Test Project">
+  <Files>
+    <File>
+      <RevitFile>C:\Revit Projects\ChevronMidland-HOK_AR-PRK_2014.rvt</RevitFile>
+      <OutputFolder>C:\Revit Projects\IFC</OutputFolder>
+    </File>
+    <File>
+      <RevitFile>C:\Revit Projects\IFCTest.rvt</RevitFile>
+      <OutputFolder>C:\Revit Projects\IFC</OutputFolder>
+    </File>
+  </Files>
+  <IFCOptions>
+    <ExportBaseQuantities>False</ExportBaseQuantities>
+    <FamilyMappingFile></FamilyMappingFile>
+    <FileVersion>IFC2X3</FileVersion>
+    <SpaceBoundaryLevel>1</SpaceBoundaryLevel>
+    <WallAndColumnSplitting>False</WallAndColumnSplitting>
+  </IFCOptions>
+  <DWGOptions>
+    <ExportLayersAndProperties>ByEntity</ExportLayersAndProperties>
+    <ExportLayerMapping></ExportLayerMapping>
+    <ExportLineScaling>ViewScale</ExportLineScaling>
+    <ExportCoordinateSystem>false</ExportCoordinateSystem>
+    <Exportunit>Default</Exportunit>
+    <ExportSolid>Polymesh</ExportSolid>
+    <ExportAreas>false</ExportAreas>
+    <ExportMergeFiles>false</ExportMergeFiles>
+  </DWGOptions>
+  <PDFOptions>
+    
+  </PDFOptions>
+</BatchProcessor>

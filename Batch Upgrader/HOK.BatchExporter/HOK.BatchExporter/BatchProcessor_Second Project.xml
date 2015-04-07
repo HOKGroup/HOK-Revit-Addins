@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BatchProcessor ProjectName="Test Project">
+  <Files>
+    <File>
+      <RevitFile>C:\Users\Jinsol.Kim\Documents\01. RevitAPI\SampleFiles\2014\rac_advanced_sample.rvt</RevitFile>
+      <OutputFolder>C:\Users\Jinsol.Kim\Documents\01. RevitAPI\SampleFiles\2014\IFC</OutputFolder>
+    </File>
+    <File>
+      <RevitFile>C:\Users\Jinsol.Kim\Documents\01. RevitAPI\SampleFiles\2014\rac_basic_sample_project.rvt</RevitFile>
+      <OutputFolder>C:\Users\Jinsol.Kim\Documents\01. RevitAPI\SampleFiles\2014\IFC</OutputFolder>
+    </File>
+  </Files>
+  <IFCOptions>
+    <ExportBaseQuantities>False</ExportBaseQuantities>
+    <FamilyMappingFile></FamilyMappingFile>
+    <FileVersion>IFC2X3</FileVersion>
+    <SpaceBoundaryLevel>1</SpaceBoundaryLevel>
+    <WallAndColumnSplitting>False</WallAndColumnSplitting>
+  </IFCOptions>
+  <DWGOptions>
+    <ExportLayersAndProperties>ByEntity</ExportLayersAndProperties>
+    <ExportLayerMapping></ExportLayerMapping>
+    <ExportLineScaling>ViewScale</ExportLineScaling>
+    <ExportCoordinateSystem>false</ExportCoordinateSystem>
+    <Exportunit>Default</Exportunit>
+    <ExportSolid>Polymesh</ExportSolid>
+    <ExportAreas>false</ExportAreas>
+    <ExportMergeFiles>false</ExportMergeFiles>
+  </DWGOptions>
+  <PDFOptions>
+    
+  </PDFOptions>
+</BatchProcessor>
