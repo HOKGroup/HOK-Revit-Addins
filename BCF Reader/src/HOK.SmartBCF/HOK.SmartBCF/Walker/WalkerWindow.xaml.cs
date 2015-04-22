@@ -88,6 +88,7 @@ namespace HOK.SmartBCF.Walker
             //expanderRowDefinition.Height = new GridLength(40);
             this.MinHeight = 535;
             this.Height = 535;
+            this.Title = "smartBCF v." +System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             labelStep.Content = "";
 
             filterOnImage = ImageUtil.LoadBitmapImage("filter.png", 24);

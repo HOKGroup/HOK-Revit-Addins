@@ -31,17 +31,21 @@ namespace HOK.SmartBCF.GoogleUtils
             DriveService driveService = null;
             try
             {
-               
-                UserCredential credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-               new ClientSecrets
-               {
-                   ClientId = "756603983986-ht1lgljr5m3tn8b429fen871lfutet7d.apps.googleusercontent.com",
-                   ClientSecret = "TTtpuUjaJg7SQ6Wuew3G6YH7",
-               },
-               new[] { DriveService.Scope.Drive, SpreadsheetsService.GSpreadsheetsService },
-              "user",
-               CancellationToken.None).Result;
+                UserCredential credential;
+                string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
+                string jsonPath = System.IO.Path.Combine(currentDirectory, "client_secrets_samrtBCF.json");
 
+                using (var filestream = new System.IO.FileStream(jsonPath,
+                    System.IO.FileMode.Open, System.IO.FileAccess.Read))
+                {
+                    credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
+                        GoogleClientSecrets.Load(filestream).Secrets,
+                        new[] { DriveService.Scope.Drive, },
+                        "user",
+                        CancellationToken.None).Result;
+
+                }
 
                 // Create the service.
                 driveService = new DriveService(new BaseClientService.Initializer()
@@ -56,6 +60,8 @@ namespace HOK.SmartBCF.GoogleUtils
             }
             return driveService;
         }
+
+        
 
         public static bool RootFolderExist(string rootFolderId, out File rootFolder)
         {
@@ -852,6 +858,7 @@ namespace HOK.SmartBCF.GoogleUtils
         private File archiveBCFFolder = null;
         private File archiveImgFolder = null;
 
+
         public string RootId { get { return rootId; } set { rootId = value; } }
         public string RootTitle { get { return rootTitle; } set { rootTitle = value; } }
         public File RootFolder { get { return rootFolder; } set { rootFolder = value; } }
@@ -861,6 +868,7 @@ namespace HOK.SmartBCF.GoogleUtils
         public File ActiveFolder { get { return activeFolder; } set { activeFolder = value; } }
         public File ActiveBCFFolder { get { return activeBCFFolder; } set { activeBCFFolder = value; } }
         public File ActiveImgFolder { get { return activeImgFolder; } set { activeImgFolder = value; } }
+       
 
         public File ArchiveFolder { get { return archiveFolder; } set { archiveFolder = value; } }
         public File ArchiveBCFFolder { get { return archiveBCFFolder; } set { archiveBCFFolder = value; } }
