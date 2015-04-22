@@ -217,6 +217,8 @@
             this.imageListIcons.Images.SetKeyName(8, "copy.png");
             this.imageListIcons.Images.SetKeyName(9, "color32.png");
             this.imageListIcons.Images.SetKeyName(10, "walker.png");
+            this.imageListIcons.Images.SetKeyName(11, "stop_32.png");
+            this.imageListIcons.Images.SetKeyName(12, "monitor.png");
             // 
             // label2
             // 

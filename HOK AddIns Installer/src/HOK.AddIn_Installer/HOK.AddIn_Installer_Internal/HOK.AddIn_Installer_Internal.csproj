@@ -27,8 +27,8 @@
     <SupportUrl>http://www.knowledgenet.hok.com/BIM%2520Resources/SiteMap.htm</SupportUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>2015.0.1.0</ApplicationVersion>
+    <ApplicationRevision>4</ApplicationRevision>
+    <ApplicationVersion>2015.0.1.4</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -56,16 +56,19 @@
     <ApplicationIcon>hoklogo.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>250D49072A87ECF43A18FD96D69AA8BBB40CDB2F</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>A54814E02ABC92F4BA4A3256BDA3DCF3F229F774</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>HOK.AddIn_Installer_Internal_1_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>HOK.AddIn_Installer_Internal_2_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -112,6 +115,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="HOK.AddIn_Installer_Internal_1_TemporaryKey.pfx" />
+    <None Include="HOK.AddIn_Installer_Internal_2_TemporaryKey.pfx" />
     <None Include="HOK.AddIn_Installer_Internal_TemporaryKey.pfx" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

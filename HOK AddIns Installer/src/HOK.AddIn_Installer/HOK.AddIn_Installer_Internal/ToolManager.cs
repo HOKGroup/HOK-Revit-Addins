@@ -26,7 +26,9 @@ namespace HOK.AddIn_Installer_Internal
         CreateFinishes=13,
         ModelReporting=14,
         HOKNavigator=15,
-        SmartBCF=16
+        SmartBCF=16,
+        FileMonitor=17,
+        ProjectMonitor=18,
     }
 
     public enum Tool2014
@@ -48,7 +50,9 @@ namespace HOK.AddIn_Installer_Internal
         HOKNavigator=15,
         ModelManager=16,
         ColorEditor=17,
-        SmartBCF=18
+        SmartBCF=18,
+        FileMonitor=19,
+        ProjectMonitor= 20
     }
 
     public enum Tool2015
@@ -70,7 +74,9 @@ namespace HOK.AddIn_Installer_Internal
         HOKNavigator = 15,
         ModelManager = 16,
         ColorEditor = 17,
-        SmartBCF
+        SmartBCF=18,
+        FileMonitor=19,
+        ProjectMonitor= 20
     }
 
     public enum TargetSoftware
@@ -290,6 +296,7 @@ namespace HOK.AddIn_Installer_Internal
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets_samrtBCF.json");
 
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\walker.png");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Shared Parameters.txt");
@@ -298,6 +305,27 @@ namespace HOK.AddIn_Installer_Internal
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll";
                             tp.DLLName = "HOK.SmartBCF.dll";
                             tp.ImageIndex = 10;
+                            tp.BetaOnly = true;
+                            break;
+
+                        case Tool2013.FileMonitor:
+                            fileNames.Add("\\HOK.FileOpeningMonitor.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll");
+
+                            tp.ToolName = "Central File Monitor";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll";
+                            tp.DLLName = "HOK.FileOnpeningMonitor.dll";
+                            tp.ImageIndex = 11;
+                            tp.BetaOnly = true;
+                            break;
+                        case Tool2013.ProjectMonitor:
+                            fileNames.Add("\\HOK.ProjectMonitor.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ProjectMonitor.dll");
+
+                            tp.ToolName = "Project Monitor";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.ProjectMonitor.dll";
+                            tp.DLLName = "HOK.ProjectMonitor.dll";
+                            tp.ImageIndex = 12;
                             tp.BetaOnly = true;
                             break;
                     }
@@ -507,15 +535,24 @@ namespace HOK.AddIn_Installer_Internal
                             break;
                         case Tool2014.ModelManager:
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ModelManager.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.AccessControl.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Core.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Drive.v2.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.PlatformServices.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Client.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Documents.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Spreadsheets.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\log4net.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.Desktop.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Newtonsoft.Json.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Runtime.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\model.png");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\project.png");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets.json");
 
                             tp.ToolName = "Model Manager";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.ModelManager.dll";
@@ -554,6 +591,7 @@ namespace HOK.AddIn_Installer_Internal
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets_samrtBCF.json");
 
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\walker.png");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Shared Parameters.txt");
@@ -562,6 +600,27 @@ namespace HOK.AddIn_Installer_Internal
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll";
                             tp.DLLName = "HOK.SmartBCF.dll";
                             tp.ImageIndex = 10;
+                            tp.BetaOnly = true;
+                            break;
+
+                        case Tool2014.FileMonitor:
+                            fileNames.Add("\\HOK.FileOpeningMonitor.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll");
+
+                            tp.ToolName = "Central File Monitor";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll";
+                            tp.DLLName = "HOK.FileOnpeningMonitor.dll";
+                            tp.ImageIndex = 11;
+                            tp.BetaOnly = true;
+                            break;
+                        case Tool2014.ProjectMonitor:
+                            fileNames.Add("\\HOK.ProjectMonitor.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ProjectMonitor.dll");
+
+                            tp.ToolName = "Project Monitor";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.ProjectMonitor.dll";
+                            tp.DLLName = "HOK.ProjectMonitor.dll";
+                            tp.ImageIndex = 12;
                             tp.BetaOnly = true;
                             break;
 
@@ -772,15 +831,24 @@ namespace HOK.AddIn_Installer_Internal
                             break;
                         case Tool2015.ModelManager:
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ModelManager.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.AccessControl.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Auth.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Core.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.Drive.v2.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.Apis.PlatformServices.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Client.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Documents.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Google.GData.Spreadsheets.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\log4net.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.Desktop.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Microsoft.Threading.Tasks.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Newtonsoft.Json.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Runtime.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\model.png");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\project.png");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets.json");
 
                             tp.ToolName = "Model Manager";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.ModelManager.dll";
@@ -819,6 +887,7 @@ namespace HOK.AddIn_Installer_Internal
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets_samrtBCF.json");
 
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\walker.png");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Shared Parameters.txt");
@@ -827,6 +896,28 @@ namespace HOK.AddIn_Installer_Internal
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll";
                             tp.DLLName = "HOK.SmartBCF.dll";
                             tp.ImageIndex = 10;
+                            tp.BetaOnly = true;
+                            break;
+                            
+                        case Tool2015.FileMonitor:
+                            fileNames.Add("\\HOK.FileOpeningMonitor.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll");
+
+                            tp.ToolName = "Central File Monitor";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll";
+                            tp.DLLName = "HOK.FileOnpeningMonitor.dll";
+                            tp.ImageIndex = 11;
+                            tp.BetaOnly = true;
+                            break;
+
+                        case Tool2015.ProjectMonitor:
+                            fileNames.Add("\\HOK.ProjectMonitor.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ProjectMonitor.dll");
+
+                            tp.ToolName = "Project Monitor";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.ProjectMonitor.dll";
+                            tp.DLLName = "HOK.ProjectMonitor.dll";
+                            tp.ImageIndex = 12;
                             tp.BetaOnly = true;
                             break;
 
