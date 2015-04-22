@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="HOK.ModelManager" Label="HOK.ModelManager" Category="Project" />
+    <Node Id="Google.Apis 1.9.1" Label="Google.Apis 1.9.1" Category="Package" />
+    <Node Id="Google.Apis.Auth 1.9.1" Label="Google.Apis.Auth 1.9.1" Category="Package" />
+    <Node Id="Google.Apis.Core 1.9.1" Label="Google.Apis.Core 1.9.1" Category="Package" />
+    <Node Id="Google.Apis.Drive.v2 1.9.0.1670" Label="Google.Apis.Drive.v2 1.9.0.1670" Category="Package" />
+    <Node Id="log4net 2.0.3" Label="log4net 2.0.3" Category="Package" />
+    <Node Id="Microsoft.Bcl 1.1.10" Label="Microsoft.Bcl 1.1.10" Category="Package" />
+    <Node Id="Microsoft.Bcl.Async 1.0.168" Label="Microsoft.Bcl.Async 1.0.168" Category="Package" />
+    <Node Id="Microsoft.Bcl.Build 1.0.21" Label="Microsoft.Bcl.Build 1.0.21" Category="Package" />
+    <Node Id="Microsoft.Net.Http 2.2.29" Label="Microsoft.Net.Http 2.2.29" Category="Package" />
+    <Node Id="Newtonsoft.Json 7.0.1-beta2" Label="Newtonsoft.Json 7.0.1-beta2" Category="Package" />
+    <Node Id="Zlib.Portable 1.10.0" Label="Zlib.Portable 1.10.0" Category="Package" />
+  </Nodes>
+  <Links>
+    <Link Source="Google.Apis 1.9.1" Target="Google.Apis.Core 1.9.1" Category="Package Dependency" />
+    <Link Source="Google.Apis 1.9.1" Target="Zlib.Portable 1.10.0" Category="Package Dependency" />
+    <Link Source="Google.Apis 1.9.1" Target="Google.Apis.Core 1.9.1" Category="Package Dependency" />
+    <Link Source="Google.Apis 1.9.1" Target="log4net 2.0.3" Category="Package Dependency" />
+    <Link Source="Google.Apis 1.9.1" Target="Zlib.Portable 1.10.0" Category="Package Dependency" />
+    <Link Source="Google.Apis.Auth 1.9.1" Target="Google.Apis.Core 1.9.1" Category="Package Dependency" />
+    <Link Source="Google.Apis.Core 1.9.1" Target="Microsoft.Bcl 1.1.10" Category="Package Dependency" />
+    <Link Source="Google.Apis.Core 1.9.1" Target="Microsoft.Bcl.Async 1.0.168" Category="Package Dependency" />
+    <Link Source="Google.Apis.Core 1.9.1" Target="Microsoft.Bcl.Build 1.0.21" Category="Package Dependency" />
+    <Link Source="Google.Apis.Core 1.9.1" Target="Microsoft.Net.Http 2.2.29" Category="Package Dependency" />
+    <Link Source="Google.Apis.Core 1.9.1" Target="Newtonsoft.Json 7.0.1-beta2" Category="Package Dependency" />
+    <Link Source="Google.Apis.Drive.v2 1.9.0.1670" Target="Google.Apis 1.9.1" Category="Package Dependency" />
+    <Link Source="Google.Apis.Drive.v2 1.9.0.1670" Target="Google.Apis.Auth 1.9.1" Category="Package Dependency" />
+    <Link Source="Microsoft.Bcl 1.1.10" Target="Microsoft.Bcl.Build 1.0.21" Category="Package Dependency" />
+    <Link Source="Microsoft.Bcl.Async 1.0.168" Target="Microsoft.Bcl 1.1.10" Category="Package Dependency" />
+    <Link Source="Microsoft.Net.Http 2.2.29" Target="Microsoft.Bcl 1.1.10" Category="Package Dependency" />
+    <Link Source="Microsoft.Net.Http 2.2.29" Target="Microsoft.Bcl.Build 1.0.21" Category="Package Dependency" />
+    <Link Source="HOK.ModelManager" Target="Google.Apis.Drive.v2 1.9.0.1670" Category="Installed Package" />
+  </Links>
+  <Categories>
+    <Category Id="Project" />
+    <Category Id="Package" />
+  </Categories>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Project" ValueLabel="True">
+      <Condition Expression="HasCategory('Project')" />
+      <Setter Property="Background" Value="Blue" />
+    </Style>
+    <Style TargetType="Link" GroupLabel="Package Dependency" ValueLabel="True">
+      <Condition Expression="HasCategory('Package Dependency')" />
+      <Setter Property="Background" Value="Yellow" />
+    </Style>
+  </Styles>
+</DirectedGraph>

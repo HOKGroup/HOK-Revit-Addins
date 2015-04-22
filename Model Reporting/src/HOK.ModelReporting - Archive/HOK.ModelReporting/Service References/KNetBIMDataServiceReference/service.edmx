@@ -1,0 +1,203 @@
+﻿<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx">
+  <edmx:DataServices xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" m:DataServiceVersion="1.0">
+    <Schema Namespace="KNetBIMDataCollectionModel" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+      <EntityType Name="ProjectStartupInfo">
+        <Key>
+          <PropertyRef Name="Office" />
+          <PropertyRef Name="ProjectNumber" />
+        </Key>
+        <Property Name="Office" Type="Edm.String" Nullable="false" MaxLength="50" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectNumber" Type="Edm.String" Nullable="false" MaxLength="12" Unicode="false" FixedLength="false" />
+        <Property Name="DeltekProjectName" Type="Edm.String" Nullable="true" MaxLength="256" Unicode="false" FixedLength="false" />
+        <Property Name="NewFormaProjectName" Type="Edm.String" Nullable="true" MaxLength="256" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectPath" Type="Edm.String" Nullable="true" MaxLength="256" Unicode="false" FixedLength="false" />
+        <Property Name="Timestamp" Type="Edm.DateTime" Nullable="false" />
+        <Property Name="IsDeltekLookup" Type="Edm.String" Nullable="true" MaxLength="1" Unicode="false" FixedLength="true" />
+      </EntityType>
+      <EntityType Name="RevitSyncToCentralEvent">
+        <Key>
+          <PropertyRef Name="ID" />
+        </Key>
+        <Property Name="ID" Type="Edm.Guid" Nullable="false" />
+        <Property Name="ProjectNumber" Type="Edm.String" Nullable="false" MaxLength="12" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectName" Type="Edm.String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+        <Property Name="FileName" Type="Edm.String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+        <Property Name="PreSyncFileSize" Type="Edm.Int32" Nullable="false" />
+        <Property Name="PostSyncFileSize" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncStart" Type="Edm.DateTime" Nullable="false" />
+        <Property Name="SyncFinish" Type="Edm.DateTime" Nullable="false" />
+        <Property Name="UserName" Type="Edm.String" Nullable="false" MaxLength="128" Unicode="false" FixedLength="false" />
+        <Property Name="UserLocation" Type="Edm.String" Nullable="true" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="UserIPAddress" Type="Edm.String" Nullable="true" MaxLength="24" Unicode="false" FixedLength="false" />
+      </EntityType>
+      <EntityType Name="ViewOfficeProjectUserDailySyncTime">
+        <Key>
+          <PropertyRef Name="UserLocation" />
+          <PropertyRef Name="ProjectNumber" />
+          <PropertyRef Name="UserName" />
+          <PropertyRef Name="SyncYear" />
+          <PropertyRef Name="SyncMonth" />
+          <PropertyRef Name="SyncDay" />
+        </Key>
+        <Property Name="UserLocation" Type="Edm.String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectNumber" Type="Edm.String" Nullable="false" MaxLength="12" Unicode="false" FixedLength="false" />
+        <Property Name="UserName" Type="Edm.String" Nullable="false" MaxLength="128" Unicode="false" FixedLength="false" />
+        <Property Name="SyncYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncDay" Type="Edm.Int32" Nullable="false" />
+        <Property Name="NumberOfSaves" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+      </EntityType>
+      <EntityType Name="ViewOfficeProjectUserHourlySyncTime">
+        <Key>
+          <PropertyRef Name="UserLocation" />
+          <PropertyRef Name="ProjectNumber" />
+          <PropertyRef Name="UserName" />
+          <PropertyRef Name="SyncYear" />
+          <PropertyRef Name="SyncMonth" />
+          <PropertyRef Name="SyncDay" />
+          <PropertyRef Name="SyncHour" />
+        </Key>
+        <Property Name="UserLocation" Type="Edm.String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectNumber" Type="Edm.String" Nullable="false" MaxLength="12" Unicode="false" FixedLength="false" />
+        <Property Name="UserName" Type="Edm.String" Nullable="false" MaxLength="128" Unicode="false" FixedLength="false" />
+        <Property Name="SyncYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncDay" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncHour" Type="Edm.Int32" Nullable="false" />
+        <Property Name="NumberOfSaves" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+      </EntityType>
+      <EntityType Name="ViewOfficeProjectUserMonthlySyncTime">
+        <Key>
+          <PropertyRef Name="UserLocation" />
+          <PropertyRef Name="ProjectNumber" />
+          <PropertyRef Name="UserName" />
+          <PropertyRef Name="SyncYear" />
+          <PropertyRef Name="SyncMonth" />
+        </Key>
+        <Property Name="UserLocation" Type="Edm.String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectNumber" Type="Edm.String" Nullable="false" MaxLength="12" Unicode="false" FixedLength="false" />
+        <Property Name="UserName" Type="Edm.String" Nullable="false" MaxLength="128" Unicode="false" FixedLength="false" />
+        <Property Name="SyncYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="NumberOfSaves" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+      </EntityType>
+      <EntityType Name="ViewProjectUserOfficeHourlySyncData">
+        <Key>
+          <PropertyRef Name="ProjectNumber" />
+          <PropertyRef Name="UserName" />
+          <PropertyRef Name="UserLocation" />
+          <PropertyRef Name="SyncYear" />
+          <PropertyRef Name="SyncMonth" />
+          <PropertyRef Name="SyncDay" />
+          <PropertyRef Name="SyncHour" />
+        </Key>
+        <Property Name="ProjectNumber" Type="Edm.String" Nullable="false" MaxLength="12" Unicode="false" FixedLength="false" />
+        <Property Name="UserName" Type="Edm.String" Nullable="false" MaxLength="128" Unicode="false" FixedLength="false" />
+        <Property Name="UserLocation" Type="Edm.String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="SyncYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncDay" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncHour" Type="Edm.Int32" Nullable="false" />
+        <Property Name="NumberOfSaves" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+      </EntityType>
+      <EntityType Name="ViewRevitSyncToCentralData">
+        <Key>
+          <PropertyRef Name="ID" />
+        </Key>
+        <Property Name="ID" Type="Edm.Guid" Nullable="false" />
+        <Property Name="ProjectNumber" Type="Edm.String" Nullable="false" MaxLength="12" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectName" Type="Edm.String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+        <Property Name="FileName" Type="Edm.String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+        <Property Name="PreSyncFileSize" Type="Edm.Int32" Nullable="false" />
+        <Property Name="PostSyncFileSize" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+        <Property Name="SyncStart" Type="Edm.DateTime" Nullable="false" />
+        <Property Name="SyncFinish" Type="Edm.DateTime" Nullable="false" />
+        <Property Name="SyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="SyncYear" Type="Edm.Int32" Nullable="true" />
+        <Property Name="SyncMonth" Type="Edm.Int32" Nullable="true" />
+        <Property Name="SyncDay" Type="Edm.Int32" Nullable="true" />
+        <Property Name="SyncHour" Type="Edm.Int32" Nullable="true" />
+        <Property Name="UserName" Type="Edm.String" Nullable="false" MaxLength="128" Unicode="false" FixedLength="false" />
+        <Property Name="UserLocation" Type="Edm.String" Nullable="true" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="UserIPAddress" Type="Edm.String" Nullable="true" MaxLength="64" Unicode="false" FixedLength="false" />
+      </EntityType>
+      <EntityType Name="ViewUserProjectOfficeHourlySyncData">
+        <Key>
+          <PropertyRef Name="UserName" />
+          <PropertyRef Name="ProjectNumber" />
+          <PropertyRef Name="UserLocation" />
+          <PropertyRef Name="SyncYear" />
+          <PropertyRef Name="SyncMonth" />
+          <PropertyRef Name="SyncDay" />
+          <PropertyRef Name="SyncHour" />
+        </Key>
+        <Property Name="UserName" Type="Edm.String" Nullable="false" MaxLength="128" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectNumber" Type="Edm.String" Nullable="false" MaxLength="12" Unicode="false" FixedLength="false" />
+        <Property Name="UserLocation" Type="Edm.String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="SyncYear" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncMonth" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncDay" Type="Edm.Int32" Nullable="false" />
+        <Property Name="SyncHour" Type="Edm.Int32" Nullable="false" />
+        <Property Name="NumberOfSaves" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgSyncTime" Type="Edm.Int32" Nullable="true" />
+        <Property Name="TotalFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+        <Property Name="AvgFileSizeDiff" Type="Edm.Int32" Nullable="true" />
+      </EntityType>
+      <EntityType Name="RevitEvent">
+        <Key>
+          <PropertyRef Name="ID" />
+        </Key>
+        <Property Name="ID" Type="Edm.Guid" Nullable="false" />
+        <Property Name="EventType" Type="Edm.String" Nullable="false" MaxLength="64" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectNumber" Type="Edm.String" Nullable="false" MaxLength="12" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectName" Type="Edm.String" Nullable="false" MaxLength="256" Unicode="false" FixedLength="false" />
+        <Property Name="ProjectLatitude" Type="Edm.Double" Nullable="false" />
+        <Property Name="ProjectLongitude" Type="Edm.Double" Nullable="false" />
+        <Property Name="FileName" Type="Edm.String" Nullable="false" MaxLength="512" Unicode="false" FixedLength="false" />
+        <Property Name="FileLocation" Type="Edm.String" Nullable="false" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="PreEventFileSize" Type="Edm.Int32" Nullable="false" />
+        <Property Name="PostEventFileSize" Type="Edm.Int32" Nullable="false" />
+        <Property Name="EventStart" Type="Edm.DateTime" Nullable="false" />
+        <Property Name="EventFinish" Type="Edm.DateTime" Nullable="false" />
+        <Property Name="UserName" Type="Edm.String" Nullable="false" MaxLength="128" Unicode="false" FixedLength="false" />
+        <Property Name="UserLocation" Type="Edm.String" Nullable="true" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="UserIPAddress" Type="Edm.String" Nullable="true" MaxLength="64" Unicode="false" FixedLength="false" />
+        <Property Name="ComputerName" Type="Edm.String" Nullable="true" MaxLength="24" Unicode="false" FixedLength="false" />
+        <Property Name="SoftwareVersion" Type="Edm.String" Nullable="true" MaxLength="24" Unicode="false" FixedLength="false" />
+        <Property Name="LocalFileLocation" Type="Edm.String" Nullable="true" MaxLength="20" Unicode="false" FixedLength="false" />
+        <Property Name="LocalFileName" Type="Edm.String" Nullable="true" MaxLength="512" Unicode="false" FixedLength="false" />
+      </EntityType>
+    </Schema>
+    <Schema Namespace="HOK.BIM.DAL.Models" xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+      <EntityContainer Name="KNetBIMDataCollectionEntities" p7:LazyLoadingEnabled="true" m:IsDefaultEntityContainer="true" xmlns:p7="http://schemas.microsoft.com/ado/2009/02/edm/annotation">
+        <EntitySet Name="ProjectStartupInfos" EntityType="KNetBIMDataCollectionModel.ProjectStartupInfo" />
+        <EntitySet Name="RevitSyncToCentralEvents" EntityType="KNetBIMDataCollectionModel.RevitSyncToCentralEvent" />
+        <EntitySet Name="ViewOfficeProjectUserDailySyncTimes" EntityType="KNetBIMDataCollectionModel.ViewOfficeProjectUserDailySyncTime" />
+        <EntitySet Name="ViewOfficeProjectUserHourlySyncTimes" EntityType="KNetBIMDataCollectionModel.ViewOfficeProjectUserHourlySyncTime" />
+        <EntitySet Name="ViewOfficeProjectUserMonthlySyncTimes" EntityType="KNetBIMDataCollectionModel.ViewOfficeProjectUserMonthlySyncTime" />
+        <EntitySet Name="ViewProjectUserOfficeHourlySyncDatas" EntityType="KNetBIMDataCollectionModel.ViewProjectUserOfficeHourlySyncData" />
+        <EntitySet Name="ViewRevitSyncToCentralDatas" EntityType="KNetBIMDataCollectionModel.ViewRevitSyncToCentralData" />
+        <EntitySet Name="ViewUserProjectOfficeHourlySyncDatas" EntityType="KNetBIMDataCollectionModel.ViewUserProjectOfficeHourlySyncData" />
+        <EntitySet Name="RevitEvents" EntityType="KNetBIMDataCollectionModel.RevitEvent" />
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>

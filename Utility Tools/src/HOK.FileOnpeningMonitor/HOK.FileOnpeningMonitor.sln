@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.FileOnpeningMonitor", "HOK.FileOnpeningMonitor\HOK.FileOnpeningMonitor.csproj", "{97100534-BD15-43FB-B05E-0B42FDCBA3A5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		2013|Any CPU = 2013|Any CPU
+		2014|Any CPU = 2014|Any CPU
+		2015|Any CPU = 2015|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.2013|Any CPU.ActiveCfg = 2013|Any CPU
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.2013|Any CPU.Build.0 = 2013|Any CPU
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.2014|Any CPU.ActiveCfg = 2014|Any CPU
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.2014|Any CPU.Build.0 = 2014|Any CPU
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.2015|Any CPU.ActiveCfg = 2015|Any CPU
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.2015|Any CPU.Build.0 = 2015|Any CPU
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97100534-BD15-43FB-B05E-0B42FDCBA3A5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

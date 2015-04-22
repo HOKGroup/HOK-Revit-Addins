@@ -1,0 +1,61 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="HOK.DoorMonitor.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="StateNames" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;string&gt;AL&lt;/string&gt;
+  &lt;string&gt;AK&lt;/string&gt;
+  &lt;string&gt;AZ&lt;/string&gt;
+  &lt;string&gt;AR&lt;/string&gt;
+  &lt;string&gt;CA&lt;/string&gt;
+  &lt;string&gt;CO&lt;/string&gt;
+  &lt;string&gt;CT&lt;/string&gt;
+  &lt;string&gt;DE&lt;/string&gt;
+  &lt;string&gt;FL&lt;/string&gt;
+  &lt;string&gt;GA&lt;/string&gt;
+  &lt;string&gt;HI&lt;/string&gt;
+  &lt;string&gt;ID&lt;/string&gt;
+  &lt;string&gt;IL&lt;/string&gt;
+  &lt;string&gt;IN&lt;/string&gt;
+  &lt;string&gt;IA&lt;/string&gt;
+  &lt;string&gt;KS&lt;/string&gt;
+  &lt;string&gt;KY&lt;/string&gt;
+  &lt;string&gt;LA&lt;/string&gt;
+  &lt;string&gt;ME&lt;/string&gt;
+  &lt;string&gt;MD&lt;/string&gt;
+  &lt;string&gt;MA&lt;/string&gt;
+  &lt;string&gt;MI&lt;/string&gt;
+  &lt;string&gt;MN&lt;/string&gt;
+  &lt;string&gt;MS&lt;/string&gt;
+  &lt;string&gt;MO&lt;/string&gt;
+  &lt;string&gt;MT&lt;/string&gt;
+  &lt;string&gt;NE&lt;/string&gt;
+  &lt;string&gt;NV&lt;/string&gt;
+  &lt;string&gt;NH&lt;/string&gt;
+  &lt;string&gt;NJ&lt;/string&gt;
+  &lt;string&gt;NM&lt;/string&gt;
+  &lt;string&gt;NY&lt;/string&gt;
+  &lt;string&gt;NC&lt;/string&gt;
+  &lt;string&gt;ND&lt;/string&gt;
+  &lt;string&gt;OH&lt;/string&gt;
+  &lt;string&gt;OK&lt;/string&gt;
+  &lt;string&gt;OR&lt;/string&gt;
+  &lt;string&gt;PA&lt;/string&gt;
+  &lt;string&gt;RI&lt;/string&gt;
+  &lt;string&gt;SC&lt;/string&gt;
+  &lt;string&gt;SD&lt;/string&gt;
+  &lt;string&gt;TN&lt;/string&gt;
+  &lt;string&gt;TX&lt;/string&gt;
+  &lt;string&gt;UT&lt;/string&gt;
+  &lt;string&gt;VT&lt;/string&gt;
+  &lt;string&gt;VA&lt;/string&gt;
+  &lt;string&gt;WA&lt;/string&gt;
+  &lt;string&gt;WV&lt;/string&gt;
+  &lt;string&gt;WI&lt;/string&gt;
+  &lt;string&gt;WY&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
