@@ -378,13 +378,24 @@ namespace HOK.BetaToolsManager
                         break;
                     case ToolEnum.ModelManager:
                         fileNames.Add("HOK.ModelManager.dll");
-                        fileNames.Add("Google.GData.AccessControl.dll");
+                        fileNames.Add("Google.Apis.Auth.dll");
+                        fileNames.Add("Google.Apis.Auth.PlatformServices.dll");
+                        fileNames.Add("Google.Apis.Core.dll");
+                        fileNames.Add("Google.Apis.dll");
+                        fileNames.Add("Google.Apis.Drive.v2.dll");
+                        fileNames.Add("Google.Apis.PlatformServices.dll");
                         fileNames.Add("Google.GData.Client.dll");
-                        fileNames.Add("Google.GData.Documents.dll");
                         fileNames.Add("Google.GData.Extensions.dll");
                         fileNames.Add("Google.GData.Spreadsheets.dll");
+                        fileNames.Add("log4net.dll");
+                        fileNames.Add("Microsoft.Threading.Tasks.dll");
+                        fileNames.Add("Microsoft.Threading.Tasks.Extensions.Desktop.dll");
+                        fileNames.Add("Microsoft.Threading.Tasks.Extensions.dll");
                         fileNames.Add("Newtonsoft.Json.dll");
-                        fileNames.Add("System.Runtime.dll");
+                        fileNames.Add("System.Net.Http.Extensions.dll");
+                        fileNames.Add("System.Net.Http.Primitives.dll");
+                        fileNames.Add("Zlib.Portable.dll");
+                        fileNames.Add("client_secrets.json");
                         break;
                     case ToolEnum.ColorEditor:
                         fileNames.Add("HOK.ColorSchemeEditor.dll");
