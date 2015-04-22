@@ -17,8 +17,9 @@ namespace HOK.WorksetView
             try
             {
                 string viewName = "WS - 3D - " + worksetInfo.WorksetName;
-                using (Transaction trans = new Transaction(doc))
+                using (TransactionGroup tg = new TransactionGroup(doc))
                 {
+                    tg.Start("Create 3D View");
                     try
                     {
                         FilteredElementCollector collector = new FilteredElementCollector(doc);
@@ -35,55 +36,95 @@ namespace HOK.WorksetView
                                 return view3D;
                             }
                         }
-
                         if (null == view3D)
                         {
-                            trans.Start("Create 3D View");
-                            view3D = View3D.CreateIsometric(doc, view3dFamilyType.Id);
-                            view3D.Name = viewName;
-                            view3D.Discipline = ViewDiscipline.Coordination;
-                            trans.Commit();
-                        }
-
-                        trans.Start("Set Visibility");
-                        FilteredWorksetCollector worksetCollector = new FilteredWorksetCollector(doc);
-                        IList<Workset> worksetList = worksetCollector.ToWorksets();
-                        var worksets = from workset in worksetList where workset.Kind == WorksetKind.UserWorkset select workset;
-                        foreach (Workset ws in worksets)
-                        {
-                            if (ws.Kind == WorksetKind.UserWorkset)
+                            using (Transaction trans = new Transaction(doc))
                             {
-                                if (ws.Id.IntegerValue == worksetInfo.WorksetId.IntegerValue)
+                                trans.Start("Create Isometric");
+                                try
                                 {
-                                    view3D.SetWorksetVisibility(ws.Id, WorksetVisibility.Visible);
+                                    view3D = View3D.CreateIsometric(doc, view3dFamilyType.Id);
+                                    view3D.Name = viewName;
+                                    if(view3D.CanModifyViewDiscipline())
+                                    {
+                                        view3D.Discipline = ViewDiscipline.Coordination;
+                                    }
+                                    trans.Commit();
                                 }
-                                else
+                                catch (Exception ex)
                                 {
-                                    view3D.SetWorksetVisibility(ws.Id, WorksetVisibility.Hidden);
+                                    trans.RollBack();
+                                    MessageBox.Show("Failed to create Isometric.\n"+ex.Message, "Create Isometric", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                                 }
                             }
                         }
-                        trans.Commit();
 
+                        using (Transaction trans = new Transaction(doc))
+                        {
+                            trans.Start("Set Visibility");
+                            try
+                            {
+                                FilteredWorksetCollector worksetCollector = new FilteredWorksetCollector(doc);
+                                IList<Workset> worksetList = worksetCollector.ToWorksets();
+                                var worksets = from workset in worksetList where workset.Kind == WorksetKind.UserWorkset select workset;
+                                foreach (Workset ws in worksets)
+                                {
+                                    if (ws.Kind == WorksetKind.UserWorkset)
+                                    {
+                                        if (ws.Id.IntegerValue == worksetInfo.WorksetId.IntegerValue)
+                                        {
+                                            view3D.SetWorksetVisibility(ws.Id, WorksetVisibility.Visible);
+                                        }
+                                        else
+                                        {
+                                            view3D.SetWorksetVisibility(ws.Id, WorksetVisibility.Hidden);
+                                        }
+                                    }
+                                }
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.RollBack();
+                                MessageBox.Show("Failed to set visibility.\n"+ex.Message, "Set Visibility", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                        }
 
-                        trans.Start("Get Bounding Box");
-                        collector = new FilteredElementCollector(doc, view3D.Id);
-                        List<Element> elements = collector.ToElements().ToList();
-
-                        BoundingBoxXYZ boundingBox = GetBoundingBox(elements);
+                        using (Transaction trans = new Transaction(doc))
+                        {
+                            trans.Start("Set SectionBox");
+                            try
+                            {
+                                collector = new FilteredElementCollector(doc, view3D.Id);
+                                List<Element> elements = collector.ToElements().ToList();
+                                if (elements.Count > 0)
+                                {
+                                    BoundingBoxXYZ boundingBox = GetBoundingBox(elements);
+                                    if (null != boundingBox)
+                                    {
 #if RELEASE2013
-                        view3D.SectionBox = boundingBox;
+                                        view3D.SectionBox = boundingBox;
 #else
-                        view3D.SetSectionBox(boundingBox);
+                                        view3D.SetSectionBox(boundingBox);
 #endif
-                        //view3d.GetSectionBox().Enabled = true;
-                        trans.Commit();
+                                        //view3d.GetSectionBox().Enabled = true;
+                                    }
+                                }
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.RollBack();
+                                MessageBox.Show("Failed to set sectionbox.\n"+ex.Message, "Set Sectionbox", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
-                        trans.RollBack();
-                        MessageBox.Show("Failed to create a 3d view for the workset, " + worksetInfo.WorksetName + "\n" + ex.Message, "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Failed to create 3d views by worksets.\n" + ex.Message, "Create 3D Views by Worksets", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        tg.RollBack();
                     }
+                    tg.Assimilate();
                 }
             }
             catch (Exception ex)
@@ -166,70 +207,78 @@ namespace HOK.WorksetView
                 string viewName = "PH - 3D - " + phaseInfo.PhaseName;
                 using (Transaction trans = new Transaction(doc))
                 {
-                    try
+                    FilteredElementCollector collector = new FilteredElementCollector(doc);
+                    List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
+                    var views = from view in view3ds where view.Name == viewName select view;
+                    if (views.Count() > 0)
                     {
-                        FilteredElementCollector collector = new FilteredElementCollector(doc);
-                        List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
-                        var views = from view in view3ds where view.Name == viewName select view;
-                        if (views.Count() > 0)
+                        if (overwrite)
                         {
-                            if (overwrite)
-                            {
-                                view3D = views.First();
-                            }
-                            else
-                            {
-                                return view3D;
-                            }
+                            view3D = views.First();
                         }
-
-                        if (null == view3D)
+                        else
                         {
-                            trans.Start("Create 3D View");
+                            return view3D;
+                        }
+                    }
+
+                    if (null == view3D)
+                    {
+                        trans.Start("Create 3D View");
+                        try
+                        {
                             view3D = View3D.CreateIsometric(doc, view3dFamilyType.Id);
                             view3D.Name = viewName;
-                            view3D.Discipline = ViewDiscipline.Coordination;
+                            if (view3D.CanModifyViewDiscipline())
+                            {
+                                view3D.Discipline = ViewDiscipline.Coordination;
+                            }
+                            
                             Parameter param = view3D.get_Parameter(BuiltInParameter.VIEW_PHASE);
                             if (null != param)
                             {
-                                param.Set(phaseInfo.PhaseId);
+                                if (!param.IsReadOnly)
+                                {
+                                    param.Set(phaseInfo.PhaseId);
+                                }
                             }
                             trans.Commit();
                         }
-                        
-                        /*
-                        trans.Start("Set Phase");
-                        BuiltInParameter bip = BuiltInParameter.PHASE_CREATED;
-                        FilterRule filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(new ElementId(bip), phaseInfo.PhaseId);
-                        ElementParameterFilter filter = new ElementParameterFilter(filterRule);
-                        FilteredElementCollector viewCollector = new FilteredElementCollector(doc, view3D.Id);
-                        List<Element> elements = viewCollector.WherePasses(filter).ToElements().ToList();
-                        if (elements.Count > 0)
+                        catch (Exception ex)
                         {
-                            progressBar.Value = 0;
-                            progressBar.Maximum = elements.Count;
+                            trans.RollBack();
+                            MessageBox.Show("Failed to create 3d view by phases.\n" + ex.Message, "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        
+                    }
 
-                            foreach (Element element in elements)
+                    /*
+                    trans.Start("Set Phase");
+                    BuiltInParameter bip = BuiltInParameter.PHASE_CREATED;
+                    FilterRule filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(new ElementId(bip), phaseInfo.PhaseId);
+                    ElementParameterFilter filter = new ElementParameterFilter(filterRule);
+                    FilteredElementCollector viewCollector = new FilteredElementCollector(doc, view3D.Id);
+                    List<Element> elements = viewCollector.WherePasses(filter).ToElements().ToList();
+                    if (elements.Count > 0)
+                    {
+                        progressBar.Value = 0;
+                        progressBar.Maximum = elements.Count;
+
+                        foreach (Element element in elements)
+                        {
+                            progressBar.PerformStep();
+                            Parameter param = element.get_Parameter(bip);
+                            if (null != param)
                             {
-                                progressBar.PerformStep();
-                                Parameter param = element.get_Parameter(bip);
-                                if (null != param)
+                                if (!param.IsReadOnly)
                                 {
-                                    if (!param.IsReadOnly)
-                                    {
-                                        param.Set(phaseInfo.PhaseId);
-                                    }
+                                    param.Set(phaseInfo.PhaseId);
                                 }
                             }
                         }
-                        trans.Commit();
-                        */
                     }
-                    catch (Exception ex)
-                    {
-                        trans.RollBack();
-                        MessageBox.Show("Failed to create a 3d view for the phase, " + phaseInfo.PhaseName + "\n" + ex.Message, "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    trans.Commit();
+                    */
                 }
             }
             catch (Exception ex)
@@ -247,6 +296,7 @@ namespace HOK.WorksetView
                 string viewName = "OP - 3D - " + designOptionInfo.DesignOptionName;
                 using (Transaction trans = new Transaction(doc))
                 {
+                    trans.Start("Create 3D View");
                     try
                     {
                         FilteredElementCollector collector = new FilteredElementCollector(doc);
@@ -266,10 +316,13 @@ namespace HOK.WorksetView
 
                         if (view3D == null)
                         {
-                            trans.Start("Create 3D View");
                             view3D = View3D.CreateIsometric(doc, view3dFamilyType.Id);
                             view3D.Name = viewName;
-                            view3D.Discipline = ViewDiscipline.Coordination;
+                            if (view3D.CanModifyViewDiscipline())
+                            {
+                                view3D.Discipline = ViewDiscipline.Coordination;
+                            }
+                            
                             trans.Commit();
                         }
                     }
@@ -290,65 +343,84 @@ namespace HOK.WorksetView
         public static ViewPlan CreateFloorPlan(Document doc, WorksetInfo worksetInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite)
         {
             ViewPlan viewPlan = null;
-            try
+            string viewName = planLevel.Name + " - " + worksetInfo.WorksetName;
+            using (TransactionGroup tg = new TransactionGroup(doc))
             {
-                string viewName = planLevel.Name + " - " + worksetInfo.WorksetName;
-                using (Transaction trans = new Transaction(doc))
+                tg.Start("Create Floor Plan");
+                try
                 {
-                    try
+                    FilteredElementCollector collector = new FilteredElementCollector(doc);
+                    List<ViewPlan> viewPlans = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
+                    var views = from view in viewPlans where view.Name == viewName select view;
+                    if (views.Count() > 0)
                     {
-                        FilteredElementCollector collector = new FilteredElementCollector(doc);
-                        List<ViewPlan> viewPlans = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
-                        var views = from view in viewPlans where view.Name == viewName select view;
-                        if (views.Count() > 0)
+                        if (overwrite)
                         {
-                            if (overwrite)
-                            {
-                                viewPlan = views.First();
-                            }
-                            else
-                            {
-                                return viewPlan;
-                            }
+                            viewPlan = views.First();
                         }
-                        if (null == viewPlan)
+                        else
+                        {
+                            return viewPlan;
+                        }
+                    }
+
+                    if (null == viewPlan)
+                    {
+                        using (Transaction trans = new Transaction(doc))
                         {
                             trans.Start("Create Plan View");
-                            viewPlan = ViewPlan.Create(doc, viewPlanFamilyType.Id, planLevel.Id);
-                            viewPlan.Name = viewName;
-                            trans.Commit();
-                        }
-
-                        trans.Start("Set Visibility");
-                        FilteredWorksetCollector worksetCollector = new FilteredWorksetCollector(doc);
-                        IList<Workset> worksetList = worksetCollector.ToWorksets();
-                        var worksets = from workset in worksetList where workset.Kind == WorksetKind.UserWorkset select workset;
-                        foreach (Workset ws in worksets)
-                        {
-                            if (ws.Kind == WorksetKind.UserWorkset)
+                            try
                             {
-                                if (ws.Id.IntegerValue == worksetInfo.WorksetId.IntegerValue)
-                                {
-                                    viewPlan.SetWorksetVisibility(ws.Id, WorksetVisibility.Visible);
-                                }
-                                else
-                                {
-                                    viewPlan.SetWorksetVisibility(ws.Id, WorksetVisibility.Hidden);
-                                }
+                                viewPlan = ViewPlan.Create(doc, viewPlanFamilyType.Id, planLevel.Id);
+                                viewPlan.Name = viewName;
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.RollBack();
+                                MessageBox.Show("Failed to create plan view.\n" + ex.Message, "Create Plan View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }
                         }
-                        trans.Commit();
                     }
-                    catch (Exception ex)
+
+
+                    using (Transaction trans = new Transaction(doc))
                     {
-                        trans.RollBack();
-                        MessageBox.Show("Failed to create a plan view for the workset, " + worksetInfo.WorksetName + "\n" + ex.Message, "Create Plan View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        trans.Start("Set Visibility");
+                        try
+                        {
+                            FilteredWorksetCollector worksetCollector = new FilteredWorksetCollector(doc);
+                            IList<Workset> worksetList = worksetCollector.ToWorksets();
+                            var worksets = from workset in worksetList where workset.Kind == WorksetKind.UserWorkset select workset;
+                            foreach (Workset ws in worksets)
+                            {
+                                if (ws.Kind == WorksetKind.UserWorkset)
+                                {
+                                    if (ws.Id.IntegerValue == worksetInfo.WorksetId.IntegerValue)
+                                    {
+                                        viewPlan.SetWorksetVisibility(ws.Id, WorksetVisibility.Visible);
+                                    }
+                                    else
+                                    {
+                                        viewPlan.SetWorksetVisibility(ws.Id, WorksetVisibility.Hidden);
+                                    }
+                                }
+                            }
+                            trans.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            trans.RollBack();
+                            MessageBox.Show("Failed to set visibility.\n" + ex.Message, "Set Visibility", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to create floor plans by worksets.\n"+ex.Message, "Create Floor Plans by Worksets", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                catch (Exception ex)
+                {
+                    tg.RollBack();
+                    MessageBox.Show("Failed to create floor plans by worksets.\n" + ex.Message, "Create Floor Plans by Worksets", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                tg.Assimilate();
             }
             return viewPlan;
         }
@@ -386,7 +458,10 @@ namespace HOK.WorksetView
                             Parameter param = viewPlan.get_Parameter(BuiltInParameter.VIEW_PHASE);
                             if (null != param)
                             {
-                                param.Set(phaseInfo.PhaseId);
+                                if (!param.IsReadOnly)
+                                {
+                                    param.Set(phaseInfo.PhaseId);
+                                }
                             }
                             trans.Commit();
                         }

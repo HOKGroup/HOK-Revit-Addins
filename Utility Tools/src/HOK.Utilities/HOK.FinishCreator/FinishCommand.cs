@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 
@@ -27,9 +28,19 @@ namespace HOK.FinishCreator
                 m_doc = m_app.ActiveUIDocument.Document;
 
                 UIDocument uidoc = m_app.ActiveUIDocument;
-                DialogResult dr = MessageBox.Show("Start selecting rooms to create floors and click Finish on the options bar. The windowed area will filter out Room category only.", "Select Rooms", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                if (dr == DialogResult.OK)
+                string title = "Finish Creator v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+                TaskDialog mainDialog = new TaskDialog(title);
+                mainDialog.MainInstruction = "Select a Finish Type";
+                mainDialog.MainContent = "Start selecting rooms to create floors or ceilings and click Finish on the options bar.\n The windowed area will filter out Room category only.";
+                
+                mainDialog.AllowCancellation = true;
+                mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Floors");
+                mainDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Ceilings");
+                
+                TaskDialogResult tResult = mainDialog.Show();
+                if (TaskDialogResult.CommandLink1 == tResult)
                 {
+                    //floor
                     IList<Reference> selectedElement = uidoc.Selection.PickObjects(ObjectType.Element, new RoomElementFilter(), "Select rooms to create floors which follow their area boundary. Click Finish on the options bar when you're done selecting rooms.");
                     List<Element> selectedRooms = new List<Element>();
                     foreach (Reference reference in selectedElement)
@@ -47,6 +58,37 @@ namespace HOK.FinishCreator
                         floorCreator.CreateFloor();
                     }
                 }
+                else if (TaskDialogResult.CommandLink2 == tResult)
+                {
+                    //ceiling
+                    IList<Reference> selectedElement = uidoc.Selection.PickObjects(ObjectType.Element, new RoomElementFilter(), "Select rooms to create floors which follow their area boundary. Click Finish on the options bar when you're done selecting rooms.");
+                    List<Room> selectedRooms = new List<Room>();
+                    foreach (Reference reference in selectedElement)
+                    {
+                        Room room = m_doc.GetElement(reference.ElementId) as Room;
+                        if (null != room)
+                        {
+                            selectedRooms.Add(room);
+                        }
+                    }
+
+                    if (selectedRooms.Count > 0)
+                    {
+                        CeilingCreator ceilingCreator = new CeilingCreator(m_app, selectedRooms);
+                        if (ceilingCreator.CreateCeiling())
+                        {
+                            int ceilingCount = 0;
+                            foreach (int roomid in ceilingCreator.CreatedCeilings.Keys)
+                            {
+                                ceilingCount += ceilingCreator.CreatedCeilings[roomid].Count;
+                            }
+
+                            MessageBox.Show(ceilingCount.ToString() + " ceiling finishes are created in " + ceilingCreator.CreatedCeilings.Count + " rooms.", "Ceiling Finishes Created", MessageBoxButtons.OK, MessageBoxIcon.Information); 
+                        }
+                    }
+                }
+
+                
 
                 return Result.Succeeded;
             }

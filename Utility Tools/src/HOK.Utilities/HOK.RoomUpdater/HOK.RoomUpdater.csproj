@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.RoomUpdater</RootNamespace>
-    <AssemblyName>HOK.RoomUpdater_v.2013.0.4.11</AssemblyName>
+    <AssemblyName>HOK.RoomUpdater_v.2013.0.4.12</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -91,11 +91,18 @@
     <Compile Include="RoomCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoomUpdaterDataStorageUtil.cs" />
+    <Compile Include="RoomUpdaterErrorWindow.xaml.cs">
+      <DependentUpon>RoomUpdaterErrorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="RoomUpdaterWindow.xaml.cs">
       <DependentUpon>RoomUpdaterWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="RoomUpdaterErrorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RoomUpdaterWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

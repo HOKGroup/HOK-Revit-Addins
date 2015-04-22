@@ -89,7 +89,7 @@ namespace HOK.FinishCreator
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot create floors from the selected room.\n" + ex.Message, "Create Floor", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Cannot create floors from the selected room.\n" + ex.Message, "Create Floors", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

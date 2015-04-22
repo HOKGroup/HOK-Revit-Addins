@@ -29,6 +29,7 @@ namespace HOK.RoomUpdater
         private Document m_doc;
         private Dictionary<string/*categoryName*/, Dictionary<string/*paramName*/, ParameterProperties>> projectParameters = new Dictionary<string,Dictionary<string,ParameterProperties>>();
         private List<ParameterMapProperties> parameterMapList = new List<ParameterMapProperties>();
+        private StringBuilder errorMessages = new StringBuilder();
         private bool groupExist = false;
 
         public RoomUpdaterWindow(UIApplication app)
@@ -530,6 +531,7 @@ namespace HOK.RoomUpdater
             {
                 if (parameterMapList.Count > 0)
                 {
+                    errorMessages = new StringBuilder();
                     statusLable.Text = "Writing parameters values...";
 
                     progressBar.Visibility = System.Windows.Visibility.Visible;
@@ -571,6 +573,15 @@ namespace HOK.RoomUpdater
 
                     statusLable.Text = "Completed.";
                     progressBar.Visibility = System.Windows.Visibility.Hidden;
+
+                    if(!string.IsNullOrEmpty(errorMessages.ToString()))
+                    {
+                        RoomUpdaterErrorWindow errorWindow = new RoomUpdaterErrorWindow(errorMessages.ToString());
+                        if(errorWindow.ShowDialog() == true)
+                        {
+                            errorMessages = new StringBuilder();
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -624,7 +635,8 @@ namespace HOK.RoomUpdater
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to find spatial elements.\n"+ex.Message, "Find Spatial Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
+                errorMessages.AppendLine("Cannot find spatial elements from "+pmp.SpatialCategory.CategoryName);
+                errorMessages.AppendLine(ex.Message);
             }
             return sepList;
         }
@@ -744,7 +756,8 @@ namespace HOK.RoomUpdater
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to find Revit elements by a solid filter.\n"+ex.Message, "Find Revit Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
+                errorMessages.AppendLine("Cannot find model elements from - " +sep.ElementObj.Number+" : "+ sep.ElementObj.Name );
+                errorMessages.AppendLine(ex.Message);
             }
             return revitElements;
         }
@@ -842,7 +855,8 @@ namespace HOK.RoomUpdater
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to write parameters.\n"+ex.Message, "Write Parameters", MessageBoxButton.OK, MessageBoxImage.Warning);
+                errorMessages.AppendLine("Cannot write parameter values of family instances inside - " + sep.ElementObj.Number + " : " + sep.ElementObj.Name);
+                errorMessages.AppendLine(ex.Message);
             }
             return result;
         }
@@ -992,6 +1006,7 @@ namespace HOK.RoomUpdater
 
         public SpatialElementProperties(SpatialElement element)
         {
+         
             elementObj = element;
             if (!string.IsNullOrEmpty(element.Name))
             {
