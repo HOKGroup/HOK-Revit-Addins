@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" Title="Fix Links" MinHeight="600" MinWidth="800" Height="600" Width="900" WindowStartupLocation="CenterScreen" Icon="/HOK.ModelManager_v.2015.0.2.0;component/Images/hok.png" >
+             mc:Ignorable="d" Icon="/HOK.ModelManager;component/Images/hok.png" Title="Fix Links" MinHeight="600" MinWidth="800" Height="600" Width="900" WindowStartupLocation="CenterScreen">
     
     <Grid>
         <Grid.RowDefinitions>
@@ -58,10 +58,10 @@
         </GroupBox>
         
         <Button Grid.Column="2" Grid.ColumnSpan="2" Height="30" HorizontalAlignment="Left" Margin="0,142,0,0" Name="buttonAdd" VerticalAlignment="Top" Width="51" Click="buttonAdd_Click" ToolTip="Add Links">
-            <Image Margin="1" Source="/HOK.ModelManager_v.2015.0.2.0;component/Images/forward.png" />
+            <Image Margin="1" Source="/HOK.ModelManager;component/Images/forward.png" />
         </Button>
         <Button Height="30" HorizontalAlignment="Left" Margin="0,299,0,0" Name="buttonDelete" VerticalAlignment="Top" Width="51" Grid.Column="2" Grid.ColumnSpan="2" Click="buttonDelete_Click" ToolTip="Remove Links">
-            <Image Margin="1" Source="/HOK.ModelManager_v.2015.0.2.0;component/Images/backward.png" />
+            <Image Margin="1" Source="/HOK.ModelManager;component/Images/backward.png" />
         </Button>
 
         <Button Content="Cancel" Grid.Column="3" Grid.Row="2" Height="23" Margin="0,14,13,0" Name="buttonCancel" VerticalAlignment="Top" HorizontalAlignment="Right" Width="75" Click="buttonCancel_Click" />

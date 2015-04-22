@@ -170,11 +170,8 @@ namespace HOK.ModelManager.ReplicateViews
                 for (int i = 0; i <previewMapList.Count; i++)
                 {
                     value += 1;
-                    if (previewMapList[i].IsEnabled)
-                    {
-                        PreviewMap previewMap = DuplicateUtils.DuplicateView(previewMapList[i], createSheet);
-                        updatedList.Add(previewMap);
-                    }
+                    PreviewMap previewMap = DuplicateUtils.DuplicateView(previewMapList[i],createSheet);
+                    updatedList.Add(previewMap);
                     Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
                 }
 

@@ -13,7 +13,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using HOK.ModelManager.GoogleDocs;
-using System.Collections.ObjectModel;
 
 namespace HOK.ModelManager.ReplicateViews
 {
@@ -23,30 +22,27 @@ namespace HOK.ModelManager.ReplicateViews
     public partial class FixLinkWindow : Window
     {
         private ViewMapClass fixedViewMap = null;
-
-        private ModelInfo sourceInfo = null;
-        private ModelInfo recipientInfo = null;
-
         private Dictionary<int, ViewProperties> sourceViews = new Dictionary<int, ViewProperties>();
         private Dictionary<int, ViewProperties> recipientViews = new Dictionary<int, ViewProperties>();
         private List<LinkInfo> listLinkInfo = new List<LinkInfo>();
-
+        private List<LinkInfo> deletingLinks = new List<LinkInfo>();
+        private Dictionary<int, ViewProperties> recordsToRemove = new Dictionary<int, ViewProperties>(); //missing recipient
+        
         public ViewMapClass FixedViewMap { get { return fixedViewMap; } set { fixedViewMap = value; } }
+        public List<LinkInfo> DeletingLinks { get { return deletingLinks; } set { deletingLinks = value; } }
+        public Dictionary<int, ViewProperties> RecordsToRemove { get { return recordsToRemove; } set { recordsToRemove = value; } }
 
         public FixLinkWindow(ViewMapClass viewMapClass)
         {
             fixedViewMap = viewMapClass;
-            sourceInfo = fixedViewMap.SourceInfo;
-            recipientInfo = fixedViewMap.RecipientInfo;
-
             sourceViews = viewMapClass.SourceViews;
             recipientViews = viewMapClass.RecipientViews;
-            listLinkInfo = viewMapClass.LinkInfoList; //from recepient model only related to the source model
+            listLinkInfo = viewMapClass.LinkInfoList;
 
             InitializeComponent();
 
-            textSourceTitle.Text = sourceInfo.DocTitle;
-            textRecipientTitle.Text = recipientInfo.DocTitle;
+            textSourceTitle.Text = fixedViewMap.SourceInfo.DocTitle;
+            textRecipientTitle.Text = fixedViewMap.RecipientInfo.DocTitle;
            
             DisplayViews();
         }
@@ -96,7 +92,6 @@ namespace HOK.ModelManager.ReplicateViews
                 List<LinkInfo> linkedItems = new List<LinkInfo>();
                 foreach (LinkInfo info in listLinkInfo)
                 {
-                    if (info.ItemStatus == LinkItemStatus.Deleted) { continue; }
                     int sourceId = info.SourceItemId;
                     int destId = info.DestItemId;
                     if (sourceViews.ContainsKey(sourceId) && recipientViews.ContainsKey(destId))
@@ -146,17 +141,31 @@ namespace HOK.ModelManager.ReplicateViews
 
                     LinkInfo linkInfo = new LinkInfo();
                     linkInfo.ItemType = LinkItemType.DraftingView;
-                    linkInfo.SourceModelName = sourceInfo.DocTitle;
-                    linkInfo.SourceModelPath = sourceInfo.DocCentralPath;
-                    linkInfo.SourceModelId = sourceInfo.RevitDocumentID;
+                    linkInfo.SourceModelName = fixedViewMap.SourceInfo.DocTitle;
+                    linkInfo.SourceModelPath = fixedViewMap.SourceInfo.DocCentralPath;
                     linkInfo.SourceItemId = sView.ViewId;
                     linkInfo.SourceItemName = sView.ViewName;
-                    linkInfo.DestModelName = recipientInfo.DocTitle;
-                    linkInfo.DestModelPath = recipientInfo.DocCentralPath;
+                    linkInfo.DestModelName = fixedViewMap.RecipientInfo.DocTitle;
+                    linkInfo.DestModelPath = fixedViewMap.RecipientInfo.DocCentralPath;
                     linkInfo.DestItemId = rview.ViewId;
                     linkInfo.DestItemName = rview.ViewName;
 
-                    linkInfo.ItemStatus = LinkItemStatus.Added;
+                    for (int i = listLinkInfo.Count-1; i >-1; i--)
+                    {
+                        if (listLinkInfo[i].SourceItemId == linkInfo.SourceItemId)
+                        {
+                            deletingLinks.Add(listLinkInfo[i]);
+                            listLinkInfo.RemoveAt(i);
+                        }
+                        if (listLinkInfo[i].DestItemId == linkInfo.DestItemId)
+                        {
+                            deletingLinks.Add(listLinkInfo[i]);
+                            linkInfo.DestImagePath1 = listLinkInfo[i].DestImagePath1;
+                            linkInfo.DestImagePath2 = listLinkInfo[i].DestImagePath2;
+                            listLinkInfo.RemoveAt(i);
+                        }
+                    }
+
                     listLinkInfo.Add(linkInfo);
 
                     DisplayViews();
@@ -177,10 +186,8 @@ namespace HOK.ModelManager.ReplicateViews
                     for (int i = listViewMap.SelectedItems.Count - 1; i > -1; i--)
                     {
                         LinkInfo link = (LinkInfo)listViewMap.SelectedItems[i];
-                        int index = listLinkInfo.IndexOf(link);
-                        listLinkInfo.RemoveAt(index);
-                        link.ItemStatus = LinkItemStatus.Deleted;
-                        listLinkInfo.Add(link);
+                        listLinkInfo.Remove(link);
+                        deletingLinks.Add(link);
 
                         if (sourceViews.ContainsKey(link.SourceItemId))
                         {
@@ -243,17 +250,16 @@ namespace HOK.ModelManager.ReplicateViews
                             vp.Status = LinkStatus.None;
                             sourceViews.Remove(vp.ViewId);
                             sourceViews.Add(vp.ViewId, vp);
+                            if (!recordsToRemove.ContainsKey(vp.ViewId))
+                            {
+                                recordsToRemove.Add(vp.ViewId, vp);
+                            }
                         }
-
 
                         var linkItems = from litem in listLinkInfo where litem.SourceItemId == vp.ViewId select litem;
                         if (linkItems.Count() > 0)
                         {
-                            LinkInfo linkInfo = linkItems.First();
-                            int index = listLinkInfo.IndexOf(linkInfo);
-                            listLinkInfo.RemoveAt(index);
-                            linkInfo.ItemStatus = LinkItemStatus.Deleted;
-                            listLinkInfo.Add(linkInfo);
+                            listLinkInfo.Remove(linkItems.First());
                         }
                     }
                     DisplayViews();

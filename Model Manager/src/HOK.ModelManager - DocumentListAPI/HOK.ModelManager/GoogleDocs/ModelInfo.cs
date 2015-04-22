@@ -5,8 +5,6 @@ using System.Text;
 using Autodesk.Revit.DB;
 using System.Text.RegularExpressions;
 using HOK.ModelManager.RegistryManager;
-using System.Collections.ObjectModel;
-using HOK.ModelManager.ReplicateViews;
 
 namespace HOK.ModelManager.GoogleDocs
 {
@@ -23,10 +21,7 @@ namespace HOK.ModelManager.GoogleDocs
         private string userLocation = "";
         private bool hokStandard = false;
         private string companyName = "Unknown";
-        private string revitDocumentId = "";
-        private string googleSheetId = "";
-        private ObservableCollection<LinkInfo> linkInfoCollection = new ObservableCollection<LinkInfo>();
-        private Dictionary<int, ViewProperties> viewDictionary = new Dictionary<int, ViewProperties>();
+        private string fileIdentifier = "";
 
         public Document Doc { get { return m_doc; } set { m_doc = value; } }
         public string DocCentralPath { get { return docCentralPath; } set { docCentralPath = value; } }
@@ -38,10 +33,7 @@ namespace HOK.ModelManager.GoogleDocs
         public string UserLocation { get { return userLocation; } set { userLocation = value; } }
         public bool HOKStandard { get { return hokStandard; } set { hokStandard = value; } }
         public string CompanyName { get { return companyName; } set { companyName = value; } }
-        public string RevitDocumentID { get { return revitDocumentId; } set { revitDocumentId = value; } }
-        public string GoogleSheetID { get { return googleSheetId; } set { googleSheetId = value; } }
-        public ObservableCollection<LinkInfo> LinkInfoCollection { get { return linkInfoCollection; } set { linkInfoCollection = value; } }
-        public Dictionary<int, ViewProperties> ViewDictionary { get { return viewDictionary; } set { viewDictionary = value; } }
+        public string FileIdentifier { get { return fileIdentifier; } set { fileIdentifier = value; } }
 
         public ModelInfo(Document doc)
         {
@@ -61,19 +53,11 @@ namespace HOK.ModelManager.GoogleDocs
                 hokStandard = false;
                 string regValue = RegistryUtil.GetRegistryKey("CompanyName");
                 if (!string.IsNullOrEmpty(regValue)) { companyName = regValue; }
+                fileIdentifier = FileIdentifierUtil.GetIdentifier(docCentralPath);
             }
             else
             {
                 hokStandard = true;
-            }
-
-            ProjectReplicatorSettings settings = DataStorageUtil.ReadSettings(doc);
-            revitDocumentId = settings.RevitDocumentId;
-            if (string.IsNullOrEmpty(revitDocumentId))
-            {
-                revitDocumentId = Guid.NewGuid().ToString();
-                settings.RevitDocumentId = revitDocumentId;
-                DataStorageUtil.UpdateSettings(doc, settings);
             }
         }
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Windows;
 using Autodesk.Revit.DB;
 using HOK.ModelManager.GoogleDocs;
 
@@ -189,6 +188,8 @@ namespace HOK.ModelManager.ReplicateViews
 
     public class PreviewMap
     {
+        //public Document SourceDocument { get; set; }
+        //public Document RecipientDocument { get; set; }
         public ModelInfo SourceModelInfo { get; set; }
         public ModelInfo RecipientModelInfo { get; set; }
         public ViewProperties SourceViewProperties { get; set; }
@@ -206,49 +207,43 @@ namespace HOK.ModelManager.ReplicateViews
         private Dictionary<int, ViewProperties> recipientViews = new Dictionary<int, ViewProperties>();
         private List<LinkInfo> linkInfoList = new List<LinkInfo>();
 
+
         public ModelInfo SourceInfo { get { return sourceInfo; } set { sourceInfo = value; } }
         public ModelInfo RecipientInfo { get { return recipientInfo; } set { recipientInfo = value; } }
         public Dictionary<int, ViewProperties> SourceViews { get { return sourceViews; } set { sourceViews = value; } }
         public Dictionary<int, ViewProperties> RecipientViews { get { return recipientViews; } set { recipientViews = value; } }
         public List<LinkInfo> LinkInfoList { get { return linkInfoList; } set { linkInfoList = value; } }
 
-        public ViewMapClass(ModelInfo sInfo, ModelInfo rInfo, bool createLinks)
+        public ViewMapClass(ModelInfo sInfo, ModelInfo rInfo, Dictionary<int, ViewProperties> sDictionary, Dictionary<int, ViewProperties> rDictionary, List<LinkInfo> linkInfo)
         {
             sourceInfo = sInfo;
             recipientInfo = rInfo;
 
-            foreach (ViewProperties vp in sourceInfo.ViewDictionary.Values)
+            foreach (ViewProperties vp in sDictionary.Values)
             {
                 vp.Status = LinkStatus.None;
                 sourceViews.Add(vp.ViewId, vp);
             }
 
-            foreach (ViewProperties vp in recipientInfo.ViewDictionary.Values)
+            foreach (ViewProperties vp in rDictionary.Values)
             {
                 vp.Status = LinkStatus.None;
                 recipientViews.Add(vp.ViewId, vp);
             }
 
-            
-            //find links only related to the source model from the list exsiting in the recipient model
-            var links = from link in rInfo.LinkInfoCollection where link.SourceModelId == sInfo.RevitDocumentID select link;
+            var links = from link in linkInfo where link.SourceModelName == sInfo.DocTitle select link;
             linkInfoList = links.ToList();
-            
-            if (createLinks)
-            {
-                bool createdLinks = CreateLinksByNames();
-            }
+
             SetLinkStatus();
-            
         }
 
         private void SetLinkStatus()
         {
             try
             {
+                
                 foreach (LinkInfo info in linkInfoList)
                 {
-                    if (info.ItemStatus == LinkItemStatus.Deleted) { continue; }
                     int sourceId = info.SourceItemId;
                     int destId = info.DestItemId;
                     if (sourceViews.ContainsKey(sourceId) && recipientViews.ContainsKey(destId))
@@ -290,58 +285,5 @@ namespace HOK.ModelManager.ReplicateViews
             }
         }
 
-        private bool CreateLinksByNames()
-        {
-            bool createdLinks = false;
-            try
-            {
-                foreach (ViewProperties sView in sourceViews.Values)
-                {
-                    //create links
-                    string viewName = sView.ViewName;
-                    var views = from view in recipientViews.Values where view.ViewName == viewName select view;
-                    if (views.Count() > 0)
-                    {
-                        ViewProperties rView = views.First();
-
-                        LinkInfo li = new LinkInfo();
-                        li.ItemType = LinkItemType.DraftingView;
-                        li.SourceModelName = sourceInfo.DocTitle;
-                        li.SourceModelPath = sourceInfo.DocCentralPath;
-                        li.SourceModelId = sourceInfo.RevitDocumentID;
-                        li.DestModelName = recipientInfo.DocTitle;
-                        li.DestModelPath = recipientInfo.DocCentralPath;
-
-                        li.SourceItemId = sView.ViewId;
-                        li.SourceItemName = sView.ViewName;
-                        li.DestItemId = rView.ViewId;
-                        li.DestItemName = rView.ViewName;
-
-                        li.LinkModified = DateTime.Now.ToString("G");
-                        li.LinkModifiedBy = Environment.UserName;
-
-                        li.ItemStatus = LinkItemStatus.Added;
-                        int index = linkInfoList.FindIndex(info => info.SourceItemId ==sView.ViewId);
-                        if (index > -1)
-                        {
-                            li.ItemStatus = LinkItemStatus.Updated;
-                            //duplicate list
-                            linkInfoList.RemoveAt(index);
-                        }
-
-                        linkInfoList.Add(li);
-                    }
-                }
-                createdLinks = true;
-
-                //update model info
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to create links by view names.\n" + ex.Message, "Create Links By Names", MessageBoxButton.OK, MessageBoxImage.Warning);
-                createdLinks = false;
-            }
-            return createdLinks;
-        }
     }
 }

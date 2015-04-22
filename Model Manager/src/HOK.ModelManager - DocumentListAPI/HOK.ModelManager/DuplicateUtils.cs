@@ -20,8 +20,7 @@ namespace HOK.ModelManager
         {
             PreviewMap preview = previewMap;
             try
-            {
-
+            {    
                 CopyPasteOptions options = new CopyPasteOptions();
                 options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
 
@@ -36,7 +35,6 @@ namespace HOK.ModelManager
                         ViewDrafting copiedView = null;
                         if (null != preview.SourceViewProperties.LinkedView) //already exist in recipient model
                         {
-
                             ViewDrafting sourceView = previewMap.SourceViewProperties.ViewDraftingObj;
                             ICollection<ElementId> referenceCalloutIds = sourceView.GetReferenceCallouts();
 
@@ -44,23 +42,11 @@ namespace HOK.ModelManager
                             using (Transaction trans = new Transaction(preview.RecipientModelInfo.Doc, "Delete Existing Contents"))
                             {
                                 trans.Start();
-                                try
-                                {
-                                    FailureHandlingOptions failOpt = trans.GetFailureHandlingOptions();
-                                    failOpt.SetFailuresPreprocessor(new WarningMessagePreprocessor());
-                                    trans.SetFailureHandlingOptions(failOpt);
-
-                                    FilteredElementCollector collector = new FilteredElementCollector(preview.RecipientModelInfo.Doc, viewId);
-                                    collector.WherePasses(new ElementCategoryFilter(ElementId.InvalidElementId, true));
-                                    ICollection<ElementId> toDelete = collector.ToElementIds();
-                                    ICollection<ElementId> deletedIds = preview.RecipientModelInfo.Doc.Delete(toDelete);
-                                    trans.Commit();
-                                }
-                                catch (Exception ex)
-                                {
-                                    string message = ex.Message;
-                                    trans.RollBack();
-                                }
+                                FilteredElementCollector collector = new FilteredElementCollector(preview.RecipientModelInfo.Doc, viewId);
+                                collector.WherePasses(new ElementCategoryFilter(ElementId.InvalidElementId, true));
+                                ICollection<ElementId> toDelete = collector.ToElementIds();
+                                ICollection<ElementId> deletedIds = preview.RecipientModelInfo.Doc.Delete(toDelete);
+                                trans.Commit();
                             }
 
                             copiedView = preview.RecipientModelInfo.Doc.GetElement(viewId) as ViewDrafting;
@@ -92,10 +78,6 @@ namespace HOK.ModelManager
                                         trans.Start();
                                         try
                                         {
-                                            FailureHandlingOptions failOpt = trans.GetFailureHandlingOptions();
-                                            failOpt.SetFailuresPreprocessor(new WarningMessagePreprocessor());
-                                            trans.SetFailureHandlingOptions(failOpt);
-
                                             preview.RecipientModelInfo.Doc.Delete(viewport.Id);
                                             trans.Commit();
                                         }
@@ -139,7 +121,6 @@ namespace HOK.ModelManager
                             {
                                 copiedView = DuplicateDraftingViews(preview);
                             }
-                            
                         }
                         preview = UpdatePreviewMap(preview, copiedView);
                     }
@@ -173,23 +154,15 @@ namespace HOK.ModelManager
                 using (Transaction transaction = new Transaction(toDoc, "Duplicate Draftingviews"))
                 {
                     transaction.Start();
-                    try
-                    {
-                        List<ElementId> viewIds = new List<ElementId>();
-                        viewIds.Add(sourceView.Id);
+                    List<ElementId> viewIds = new List<ElementId>();
+                    viewIds.Add(sourceView.Id);
+                    
+                    //view-specific item
+                    copiedIds = ElementTransformUtils.CopyElements(fromDoc, viewIds, toDoc, Transform.Identity, options);
 
-                        //view-specific item
-                        copiedIds = ElementTransformUtils.CopyElements(fromDoc, viewIds, toDoc, Transform.Identity, options);
-
-                        FailureHandlingOptions failureOptions = transaction.GetFailureHandlingOptions();
-                        failureOptions.SetFailuresPreprocessor(new HidePasteDuplicateTypesPreprocessor());
-                        transaction.Commit(failureOptions);
-                    }
-                    catch (Exception ex)
-                    {
-                        string message = ex.Message;
-                        transaction.RollBack();
-                    }
+                    FailureHandlingOptions failureOptions = transaction.GetFailureHandlingOptions();
+                    failureOptions.SetFailuresPreprocessor(new HidePasteDuplicateTypesPreprocessor());
+                    transaction.Commit(failureOptions);
                 }
 
                 if (null!=copiedIds)
@@ -235,20 +208,8 @@ namespace HOK.ModelManager
                     using (Transaction transaction = new Transaction(toDoc, "Create Sheet"))
                     {
                         transaction.Start();
-                        try
-                        {
-                            FailureHandlingOptions failOpt = transaction.GetFailureHandlingOptions();
-                            failOpt.SetFailuresPreprocessor(new WarningMessagePreprocessor());
-                            transaction.SetFailureHandlingOptions(failOpt);
-
-                            viewSheet = ViewSheet.Create(toDoc, ElementId.InvalidElementId);
-                            transaction.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            string message = ex.Message;
-                            transaction.RollBack();
-                        }
+                        viewSheet = ViewSheet.Create(toDoc, ElementId.InvalidElementId);
+                        transaction.Commit();
                     }
                     if (null != viewSheet)
                     {
@@ -289,7 +250,7 @@ namespace HOK.ModelManager
 
                                             XYZ moveVector = sourcePoint - targetPoint;
                                             ElementTransformUtils.MoveElement(toDoc, copiedTitleBlock.Id, moveVector);
-                                            trans.Commit(failureOptions);
+                                            trans.Commit();
                                         }
                                     }
                                     catch (Exception ex)
@@ -304,49 +265,37 @@ namespace HOK.ModelManager
                         using (Transaction transaction = new Transaction(toDoc, "Write Sheet Parameter"))
                         {
                             transaction.Start();
-                            FailureHandlingOptions failOpt = transaction.GetFailureHandlingOptions();
-                            failOpt.SetFailuresPreprocessor(new WarningMessagePreprocessor());
-                            transaction.SetFailureHandlingOptions(failOpt);
-
-                            try
+                            foreach (Parameter param in previewMap.SourceViewProperties.SheetObj.Parameters)
                             {
-                                foreach (Parameter param in previewMap.SourceViewProperties.SheetObj.Parameters)
+                                if (!param.IsReadOnly)
                                 {
-                                    if (!param.IsReadOnly)
-                                    {
 #if RELEASE2014
                                     Parameter rParam = viewSheet.get_Parameter(param.Definition.Name);
 #elif RELEASE2015
                                         Parameter rParam = viewSheet.LookupParameter(param.Definition.Name);
 #endif
 
-                                        if (null != rParam)
+                                    if (null != rParam)
+                                    {
+                                        if (rParam.StorageType == param.StorageType)
                                         {
-                                            if (rParam.StorageType == param.StorageType)
+                                            switch (param.StorageType)
                                             {
-                                                switch (param.StorageType)
-                                                {
-                                                    case StorageType.Double:
-                                                        rParam.Set(param.AsDouble());
-                                                        break;
-                                                    case StorageType.Integer:
-                                                        rParam.Set(param.AsInteger());
-                                                        break;
-                                                    case StorageType.String:
-                                                        rParam.Set(param.AsString());
-                                                        break;
-                                                }
+                                                case StorageType.Double:
+                                                    rParam.Set(param.AsDouble());
+                                                    break;
+                                                case StorageType.Integer:
+                                                    rParam.Set(param.AsInteger());
+                                                    break;
+                                                case StorageType.String:
+                                                    rParam.Set(param.AsString());
+                                                    break;
                                             }
                                         }
                                     }
                                 }
-                                transaction.Commit();
                             }
-                            catch (Exception ex)
-                            {
-                                string message = ex.Message;
-                                transaction.RollBack();
-                            }
+                            transaction.Commit();
                         }
                         return viewSheet;
                     }
@@ -377,8 +326,6 @@ namespace HOK.ModelManager
                             try
                             {
                                 trans.Start("Create Viewport");
-                               
-                                
                                 XYZ viewportLocation = preview.SourceViewProperties.ViewLocation;
                                 string viewportTypeName = preview.SourceViewProperties.ViewportTypeName;
 
@@ -416,9 +363,7 @@ namespace HOK.ModelManager
                                             ElementId typeId = recipientViewport.ChangeTypeId(viewportTypeId);
                                         }
                                     }
-                                    FailureHandlingOptions failOpt = trans.GetFailureHandlingOptions();
-                                    failOpt.SetFailuresPreprocessor(new WarningMessagePreprocessor());
-                                    trans.Commit(failOpt);
+                                    trans.Commit();
 
                                     if (null != recipientViewport)
                                     {
@@ -500,15 +445,12 @@ namespace HOK.ModelManager
                     linkInfo.ItemType = LinkItemType.DraftingView;
                     linkInfo.SourceModelName = preview.SourceModelInfo.DocTitle;
                     linkInfo.SourceModelPath = preview.SourceModelInfo.DocCentralPath;
-                    linkInfo.SourceModelId = preview.SourceModelInfo.RevitDocumentID;
                     linkInfo.SourceItemId = preview.SourceViewProperties.ViewId;
                     linkInfo.SourceItemName = preview.SourceViewProperties.ViewName;
                     linkInfo.DestModelName = preview.RecipientModelInfo.DocTitle;
                     linkInfo.DestModelPath = preview.RecipientModelInfo.DocCentralPath;
                     linkInfo.DestItemId = preview.RecipientViewProperties.ViewId;
                     linkInfo.DestItemName = preview.RecipientViewProperties.ViewName;
-                    linkInfo.LinkModified = DateTime.Now.ToString("G");
-                    linkInfo.LinkModifiedBy = Environment.UserName;
                     preview.ViewLinkInfo = linkInfo;
 
                 }
@@ -759,34 +701,6 @@ namespace HOK.ModelManager
                 }
                 else if (failure.GetSeverity() == FailureSeverity.Warning)
                 {
-                    failuresAccessor.DeleteWarning(failure);
-                }
-            }
-            return FailureProcessingResult.Continue;
-        }
-    }
-
-    class WarningMessagePreprocessor : IFailuresPreprocessor
-    {
-        public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
-        {
-            foreach (FailureMessageAccessor failure in failuresAccessor.GetFailureMessages())
-            {
-                if (failure.GetSeverity() == FailureSeverity.Warning)
-                {
-                    string elementIds = "";
-                    if(null != failure.GetFailingElementIds())
-                    {
-                        foreach (ElementId eId in failure.GetFailingElementIds())
-                        {
-                            elementIds += " [" + eId + "] ";
-                        }
-                    }
-
-                    string description = failure.GetDescriptionText();
-
-                    DuplicateUtils.errorMessage.AppendLine("Warnings - Element Ids:" + elementIds);
-                    DuplicateUtils.errorMessage.AppendLine(description);
                     failuresAccessor.DeleteWarning(failure);
                 }
             }

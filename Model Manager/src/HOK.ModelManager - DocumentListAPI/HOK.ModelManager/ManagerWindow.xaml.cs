@@ -41,9 +41,9 @@ namespace HOK.ModelManager
         private Document m_doc;
         private ProjectViewManager projectView = null;
         private ModelViewManager modelView = null;
+        private bool verifiedUser = false;
 
-        private Dictionary<string, ModelInfo> modelInfoDictionary = new Dictionary<string, ModelInfo>();
-
+        public bool VerifiedUser { get { return verifiedUser; } set { verifiedUser = value; } }
         public ManagerWindow(UIApplication uiapp, ModelManagerMode mode)
         {
             try
@@ -63,16 +63,7 @@ namespace HOK.ModelManager
                 if (m_mode == ModelManagerMode.ProjectReplication)
                 {
                     projectView = new ProjectViewManager(m_app); //get drafting views info
-                    modelInfoDictionary = projectView.ModelInfoDictionary;
-                    if (projectView.VerifiedUser)
-                    {
-                        DisplayDocuments();
-                    }
-                    else
-                    {
-                        MessageBox.Show("The Model Manager provided by HOK will be no longer available.\nPlease contact the software provider to exetend the license.", "Account Not Verified", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-                    
+                    verifiedUser = projectView.VerifiedUser;
                     this.Title = "HOK Model Manager - Project Replication v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
                 }
                 else if (m_mode == ModelManagerMode.ModelBuilder)
@@ -81,7 +72,10 @@ namespace HOK.ModelManager
                     this.Title = "HOK Model Manager - Model Builder v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
                 }
 
-                
+                if (verifiedUser)
+                {
+                    DisplayDocuments();
+                }
                 
             }
             catch (Exception ex)
@@ -106,21 +100,22 @@ namespace HOK.ModelManager
             {
                 if (m_mode == ModelManagerMode.ProjectReplication)
                 {
-                    comboBoxSource.ItemsSource = modelInfoDictionary.Values;
-                    comboBoxSource.DisplayMemberPath = "DocTitle";
+                    List<string> sources = projectView.ModelInfoDictionary.Keys.ToList();
+                    comboBoxSource.ItemsSource = sources;
                     comboBoxSource.SelectedIndex = 0;
 
-                    comboBoxRecipient.ItemsSource = modelInfoDictionary.Values;
-                    comboBoxRecipient.DisplayMemberPath = "DocTitle";
-
-                    string docId = DataStorageUtil.ReadSettings(m_doc).RevitDocumentId;
-                    if (!string.IsNullOrEmpty(docId))
+                    comboBoxRecipient.ItemsSource = sources;
+                    if (!string.IsNullOrEmpty(m_doc.Title))
                     {
-                        comboBoxRecipient.SelectedItem = modelInfoDictionary[docId];
-                        
-                        if (comboBoxRecipient.SelectedIndex == comboBoxSource.SelectedIndex && comboBoxSource.Items.Count > 1)
+                        int rSelected = sources.IndexOf(m_doc.Title);
+                        if (rSelected == 0)
                         {
                             comboBoxSource.SelectedIndex = 1;
+                            comboBoxRecipient.SelectedIndex = 0;
+                        }
+                        else
+                        {
+                            comboBoxRecipient.SelectedIndex = rSelected;
                         }
                     }
                 }
@@ -128,31 +123,6 @@ namespace HOK.ModelManager
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to display the lists of documents.\n"+ex.Message, "Display Documents", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private void RefreshModelInfo(int sIndex, int rIndex)
-        {
-            try
-            {
-                modelInfoDictionary = projectView.ModelInfoDictionary;
-                if (m_mode == ModelManagerMode.ProjectReplication)
-                {
-                    comboBoxSource.ItemsSource = null;
-                    comboBoxSource.ItemsSource = modelInfoDictionary.Values;
-                    comboBoxSource.DisplayMemberPath = "DocTitle";
-                    comboBoxSource.SelectedIndex = sIndex;
-
-                    comboBoxRecipient.ItemsSource = null;
-                    comboBoxRecipient.ItemsSource = modelInfoDictionary.Values;
-                    comboBoxRecipient.DisplayMemberPath = "DocTitle";
-                    comboBoxRecipient.SelectedIndex = rIndex;
-                }
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to display the list of documents.\n" + ex.Message, "Display Documents", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -174,7 +144,7 @@ namespace HOK.ModelManager
                         {
                             labelWarning.Visibility = System.Windows.Visibility.Hidden;
                             TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
-                            projectView.RefreshTreeView((ModelInfo)comboBoxSource.SelectedItem, (ModelInfo)comboBoxRecipient.SelectedItem, treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
+                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                         }
                     }
                 }
@@ -203,7 +173,7 @@ namespace HOK.ModelManager
                         {
                             labelWarning.Visibility = System.Windows.Visibility.Hidden;
                             TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
-                            projectView.RefreshTreeView((ModelInfo)comboBoxSource.SelectedItem, (ModelInfo)comboBoxRecipient.SelectedItem, treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
+                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                         }
                     }
                 }
@@ -232,7 +202,7 @@ namespace HOK.ModelManager
                         {
                             checkBoxLinked.IsChecked = false;
                             TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
-                            projectView.RefreshTreeView((ModelInfo)comboBoxSource.SelectedItem, (ModelInfo)comboBoxRecipient.SelectedItem, treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
+                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                         }
                     }
                 }
@@ -253,13 +223,13 @@ namespace HOK.ModelManager
                 {
                     if (null == selectedItem._parent && selectedItem.Children.Count > 0) //root
                     {
-                        projectView.RefreshTreeView((ModelInfo)comboBoxSource.SelectedItem, (ModelInfo)comboBoxRecipient.SelectedItem, treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
+                        projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                     }
                     else if (null != selectedItem._parent && selectedItem.Children.Count > 0)//sheet name or view type
                     {
                         string selectedHeader = ((TreeViewModel)e.NewValue).Name;
                         string filterString = ((TreeViewModel)e.NewValue).Tag.ToString();
-                        projectView.RefreshTreeViewBySelection((ModelInfo)comboBoxSource.SelectedItem, (ModelInfo)comboBoxRecipient.SelectedItem, treeViewSource, treeViewRecipient, sortBy, filterString, (bool)checkBoxCreateLinks.IsChecked);
+                        projectView.RefreshTreeViewBySelection(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, filterString, (bool)checkBoxCreateLinks.IsChecked);
                     }
                 }
             }
@@ -306,7 +276,7 @@ namespace HOK.ModelManager
         {
             try
             {
-                bool duplicated = projectView.UpdateDraftingViews((ModelInfo)comboBoxSource.SelectedItem, (ModelInfo)comboBoxRecipient.SelectedItem, treeViewSource, treeViewRecipient, (bool)checkBoxSheet.IsChecked, (bool)checkBoxCreateLinks.IsChecked, statusLable, progressBar);
+                bool duplicated = projectView.UpdateDraftingViews(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, (bool)checkBoxSheet.IsChecked, (bool)checkBoxCreateLinks.IsChecked, statusLable, progressBar);
                if (duplicated)
                {
                    if (comboBoxSource.SelectedIndex > -1 && comboBoxRecipient.SelectedIndex > -1)
@@ -314,8 +284,9 @@ namespace HOK.ModelManager
                        if (m_mode == ModelManagerMode.ProjectReplication)
                        {
                            TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
-                           RefreshModelInfo(comboBoxSource.SelectedIndex, comboBoxRecipient.SelectedIndex);
+                           projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
                            //update viewmapclass
+
                        }
                    }
                }
@@ -340,24 +311,25 @@ namespace HOK.ModelManager
                 {
                     if (m_mode == ModelManagerMode.ProjectReplication)
                     {
-                        ViewMapClass viewMapClass = new ViewMapClass((ModelInfo)comboBoxSource.SelectedItem, (ModelInfo)comboBoxRecipient.SelectedItem, (bool)checkBoxCreateLinks.IsChecked);
+                        ViewMapClass viewMapClass = projectView.GetViewMap(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), (bool)checkBoxCreateLinks.IsChecked);
                         FixLinkWindow fixLinkWindow = new FixLinkWindow(viewMapClass);
                         Nullable<bool> dlResult = fixLinkWindow.ShowDialog();
                         if (dlResult == true)
                         {
                             progressBar.Visibility = System.Windows.Visibility.Visible;
                             statusLable.Visibility = System.Windows.Visibility.Visible;
-                            
-                            viewMapClass = fixLinkWindow.FixedViewMap;
+                            Action emptyDelegate = delegate() { };
+                            statusLable.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Render, emptyDelegate);
+                            progressBar.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Render, emptyDelegate);
 
-                            bool updatedViewDictionary = projectView.FixViewDictionary(viewMapClass);
-                            modelInfoDictionary = projectView.ModelInfoDictionary;
-                            ModelInfo recipientInfo = modelInfoDictionary[viewMapClass.RecipientInfo.RevitDocumentID];
-                            bool updatedGoogleSheet = GoogleSheetUtil.WriteLinkIfo(recipientInfo.GoogleSheetID, recipientInfo.LinkInfoCollection);
-                            bool updatedLinkStatus = projectView.UpdateLinkStatus(recipientInfo);
-                            //update google spreadsheet
-                            RefreshModelInfo(comboBoxSource.SelectedIndex, comboBoxRecipient.SelectedIndex);
-                          
+                            viewMapClass = fixLinkWindow.FixedViewMap;
+                            List<LinkInfo> deletingLinks = fixLinkWindow.DeletingLinks; //to clean up broken links
+                            Dictionary<int, ViewProperties> removeMissingItems = fixLinkWindow.RecordsToRemove; //to remove records of missing items.
+                            bool updatedGoogleDoc = projectView.UpdateGoogleDoc(viewMapClass.RecipientInfo.DocTitle, viewMapClass.LinkInfoList, deletingLinks, removeMissingItems);
+                            bool updatedViewDictionary = projectView.UpdateViewDictionary(viewMapClass);
+
+                            TreeViewSortBy sortBy = (TreeViewSortBy)comboBoxViewBy.SelectedIndex;
+                            projectView.RefreshTreeView(comboBoxSource.SelectedItem.ToString(), comboBoxRecipient.SelectedItem.ToString(), treeViewSource, treeViewRecipient, sortBy, (bool)checkBoxCreateLinks.IsChecked);
 
                             progressBar.Visibility = System.Windows.Visibility.Hidden;
                             statusLable.Visibility = System.Windows.Visibility.Hidden;
@@ -418,8 +390,6 @@ namespace HOK.ModelManager
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
-
-        private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
     }
 
     public static class UIElementUtil

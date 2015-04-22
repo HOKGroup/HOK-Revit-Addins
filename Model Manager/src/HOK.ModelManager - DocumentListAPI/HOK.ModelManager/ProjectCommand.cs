@@ -25,8 +25,15 @@ namespace HOK.ModelManager
                 m_doc = m_app.ActiveUIDocument.Document;
 
                 ManagerWindow managerWindow = new ManagerWindow(m_app, ModelManagerMode.ProjectReplication);
-                Nullable<bool> dlgResult = managerWindow.ShowDialog();
-              
+                if (managerWindow.VerifiedUser)
+                {
+                    Nullable<bool> dlgResult = managerWindow.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show("The Model Manager provided by HOK will be no longer available.\nPlease contact the software provider to exetend the license.", "Account Not Verified", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                
                 
                 return Result.Succeeded;
             }
