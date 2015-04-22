@@ -1,3 +1,15 @@
+v.0.4.14
+Room Elevation 
+New 
+- "Create by Room List" and "Create by Pick Elements" commands with elevation views settings.
+- Extensible storage for the created elevation views and the settings 
+- Multiple elevation views for "Create by Pick Elements"
+
+Room Updater
+Fix
+- skip linked isntance if it cannot get the title of the linked document.
+- skip unplaced rooms of which area is less than zero.
+
 v.o.4.9
 Room Elevation - New Tool
 - This will create elevation views from a room and a wall to determine the direction of elevation marker.
