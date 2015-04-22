@@ -1,7 +1,7 @@
 ﻿<Window x:Class="HOK.BatcUpgrader.MultiFilesWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Add Files from Folder" Height="250" Width="650" Icon="hoklogo.ico">
+        Title="Add Files from Folder" Height="200" Width="650" Icon="hoklogo.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -12,17 +12,9 @@
             <Grid>
                 <Label Content="Select a Folder for Revit Files:" Height="28" HorizontalAlignment="Left" Margin="6,6,0,0" Name="RevitFile" VerticalAlignment="Top" />
                 <TextBox Height="23" Margin="6,40,138,0" Name="textBoxRevitFile" VerticalAlignment="Top" IsReadOnly="True" />
-                <Label Content="Select an Output Folder:" Height="28" HorizontalAlignment="Left" Margin="6,78,0,0" Name="label1" VerticalAlignment="Top" Width="274" />
-                <TextBox Height="23" IsReadOnly="True" Margin="6,110,138,0" Name="textBoxFolder" VerticalAlignment="Top" />
                 <Button Height="23" HorizontalAlignment="Right" Margin="0,40,14,0" Name="buttonOpenRVT" VerticalAlignment="Top" Width="118" Click="buttonOpenRVT_Click" >
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Images/revit.png" Margin="0,1,5,0"/>
-                        <TextBlock>Browse</TextBlock>
-                    </StackPanel>
-                </Button>
-                <Button Height="23" Margin="0,109,14,0" Name="buttonFolder" VerticalAlignment="Top"  HorizontalAlignment="Right" Width="118" Click="buttonFolder_Click">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="Images/open.png" Margin="0,1,5,0"/>
                         <TextBlock>Browse</TextBlock>
                     </StackPanel>
                 </Button>
@@ -30,7 +22,7 @@
         </GroupBox>
         <Button Content="OK" HorizontalAlignment="Right" Margin="0,0,12,12" Name="buttonOK" Width="75" Grid.Row="1" Height="27" VerticalAlignment="Bottom" Click="buttonOK_Click" />
         <Button Content="Cancel" HorizontalAlignment="Right" Margin="0,0,93,12" Name="buttonCancel" Width="75" Grid.Row="1" Height="27" VerticalAlignment="Bottom" Click="buttonCancel_Click" />
-        <CheckBox x:Name="checkBoxInclude" Content="Include files from all subdirectories" HorizontalAlignment="Left" Margin="23,7,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+        <CheckBox x:Name="checkBoxInclude" Content="Include files from all subdirectories" HorizontalAlignment="Left" Margin="25,95,0,0" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>

@@ -87,8 +87,7 @@
                     <ListView Grid.Column="1" HorizontalAlignment="Stretch" Margin="5,5,5,5" Name="listViewRevitFile" VerticalAlignment="Stretch" ContextMenu="{StaticResource MyContextMenu}" >
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="Revit File" Width="300" DisplayMemberBinding="{Binding RevitFile}"/>
-                                <GridViewColumn Header="Export Path" Width="300" DisplayMemberBinding="{Binding OutputFolder}" />
+                                <GridViewColumn Header="Revit File"  DisplayMemberBinding="{Binding RevitFile}" Width="750"/>
                             </GridView>
                         </ListView.View>
                     </ListView>

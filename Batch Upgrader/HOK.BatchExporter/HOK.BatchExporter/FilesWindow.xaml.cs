@@ -22,10 +22,8 @@ namespace HOK.BatchExporter
     public partial class FilesWindow : Window
     {
         private string rvtFileName = "";
-        private string outputFolder = "";
 
         public string RvtFileName { get { return rvtFileName; } set { rvtFileName = value; } }
-        public string OutputFolder { get { return outputFolder; } set { outputFolder = value; } }
 
         public FilesWindow()
         {
@@ -37,7 +35,6 @@ namespace HOK.BatchExporter
             try
             {
                 textBoxRevitFile.Text = rvtFileName;
-                textBoxFolder.Text = outputFolder;
             }
             catch (Exception ex)
             {
@@ -60,8 +57,6 @@ namespace HOK.BatchExporter
                 {
                     rvtFileName = openFileDialog.FileName;
                     textBoxRevitFile.Text = rvtFileName;
-                    outputFolder = FindDefaultSoftWarePath(rvtFileName);
-                    textBoxFolder.Text = outputFolder;
                 }
             }
             catch (Exception ex)
@@ -119,30 +114,13 @@ namespace HOK.BatchExporter
             return softwareDirectoryPath;
         }
 
-        private void buttonFolder_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                FileFolderDialog fileFolderDialog = new FileFolderDialog();
-                fileFolderDialog.Dialog.Title = "Select the directory that you want to store files.";
-                WinForms.DialogResult result = fileFolderDialog.ShowDialog();
-                if (result == WinForms.DialogResult.OK)
-                {
-                    outputFolder = fileFolderDialog.SelectedPath;
-                    textBoxFolder.Text = outputFolder;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show("Cannot open the selected Revit file.\n" + ex.Message, "Open Revit File", MessageBoxButton.OK);
-            }
-        }
+       
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (File.Exists(rvtFileName) && Directory.Exists(outputFolder))
+                if (File.Exists(rvtFileName))
                 {
                     this.DialogResult = true;
                 }
@@ -150,10 +128,7 @@ namespace HOK.BatchExporter
                 {
                     MessageBox.Show("The selected file doesn't exist.\n" + rvtFileName, "File Not Exist", MessageBoxButton.OK);
                 }
-                else if (!Directory.Exists(outputFolder))
-                {
-                    MessageBox.Show("The selected path doesn't exist.\n" + outputFolder, "Folder Not Exist", MessageBoxButton.OK);
-                }
+                
             }
             catch(Exception ex)
             {

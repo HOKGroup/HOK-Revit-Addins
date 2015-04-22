@@ -531,7 +531,7 @@ namespace HOK.BatchExporter
                 Nullable<bool> result = filesWindow.ShowDialog();
                 if (result == true)
                 {
-                    AddFileToList(filesWindow.RvtFileName, filesWindow.OutputFolder);
+                    AddFileToList(filesWindow.RvtFileName);
                     if (string.IsNullOrEmpty(selectedProject.UpgradeOptions.UpgradeVersionSaveAsOptions.ReviewLocation))
                     {
                         selectedProject.UpgradeOptions.UpgradeVersionSaveAsOptions.ReviewLocation = FindReviewDirectory();
@@ -558,7 +558,7 @@ namespace HOK.BatchExporter
                     {
                         foreach (string rvtFileName in filesWindow.RevitFileNames)
                         {
-                            AddFileToList(rvtFileName, filesWindow.OutputFolder);
+                            AddFileToList(rvtFileName);
                         }
 
                         if (string.IsNullOrEmpty(selectedProject.UpgradeOptions.UpgradeVersionSaveAsOptions.ReviewLocation))
@@ -588,7 +588,7 @@ namespace HOK.BatchExporter
                     Nullable<bool> result = filesWindow.ShowDialog();
                     if (result == true)
                     {
-                        AddFileToList(filesWindow.RvtFileName, filesWindow.OutputFolder);
+                        AddFileToList(filesWindow.RvtFileName);
                     }
                 }
                 else
@@ -602,13 +602,12 @@ namespace HOK.BatchExporter
             }
         }
 
-        private void AddFileToList(string revitFile, string outputFolder)
+        private void AddFileToList(string revitFile)
         {
             try
             {
                 FileItem fileItem = new FileItem();
                 fileItem.RevitFile = revitFile;
-                fileItem.OutputFolder = outputFolder;
                 selectedProject.FileItems.Add(fileItem);
 
                 List<string> configFiles = projectSettings.Keys.ToList();
@@ -749,7 +748,7 @@ namespace HOK.BatchExporter
                     RevitFileHeader selectedItem = listViewRevitFile.SelectedItem as RevitFileHeader;
                     FilesWindow filesWindow = new FilesWindow();
                     filesWindow.RvtFileName = selectedItem.RevitFile;
-                    filesWindow.OutputFolder = selectedItem.OutputFolder;
+                    
                     filesWindow.DisplayPredefined();
 
                     Nullable<bool> result = filesWindow.ShowDialog();
@@ -762,7 +761,7 @@ namespace HOK.BatchExporter
                                 selectedProject.FileItems.RemoveAt(i);
                             }
                         }
-                        AddFileToList(filesWindow.RvtFileName, filesWindow.OutputFolder);
+                        AddFileToList(filesWindow.RvtFileName);
                     }
                 }
             }
@@ -781,7 +780,7 @@ namespace HOK.BatchExporter
                     RevitFileHeader selectedItem = listViewRevitFile.SelectedItem as RevitFileHeader;
                     FilesWindow filesWindow = new FilesWindow();
                     filesWindow.RvtFileName = selectedItem.RevitFile;
-                    filesWindow.OutputFolder = selectedItem.OutputFolder;
+                    
                     filesWindow.DisplayPredefined();
 
                     Nullable<bool> result = filesWindow.ShowDialog();
@@ -794,7 +793,7 @@ namespace HOK.BatchExporter
                                 selectedProject.FileItems.RemoveAt(i);
                             }
                         }
-                        AddFileToList(filesWindow.RvtFileName, filesWindow.OutputFolder);
+                        AddFileToList(filesWindow.RvtFileName);
                     }
                 }
             }
@@ -813,13 +812,12 @@ namespace HOK.BatchExporter
                     RevitFileHeader selectedItem = listViewRevitFile.SelectedItem as RevitFileHeader;
                     FilesWindow filesWindow = new FilesWindow();
                     filesWindow.RvtFileName = selectedItem.RevitFile.Replace(".rvt", "-Copy.rvt");
-                    filesWindow.OutputFolder = selectedItem.OutputFolder;
                     filesWindow.DisplayPredefined();
 
                     Nullable<bool> result = filesWindow.ShowDialog();
                     if (result == true)
                     {
-                        AddFileToList(filesWindow.RvtFileName, filesWindow.OutputFolder);
+                        AddFileToList(filesWindow.RvtFileName);
                     }
                 }
             }
@@ -838,13 +836,13 @@ namespace HOK.BatchExporter
                     RevitFileHeader selectedItem = listViewRevitFile.SelectedItem as RevitFileHeader;
                     FilesWindow filesWindow = new FilesWindow();
                     filesWindow.RvtFileName = selectedItem.RevitFile.Replace(".rvt", "-Copy.rvt");
-                    filesWindow.OutputFolder = selectedItem.OutputFolder;
+                    
                     filesWindow.DisplayPredefined();
 
                     Nullable<bool> result = filesWindow.ShowDialog();
                     if (result == true)
                     {
-                        AddFileToList(filesWindow.RvtFileName, filesWindow.OutputFolder);
+                        AddFileToList(filesWindow.RvtFileName);
                     }
                 }
             }

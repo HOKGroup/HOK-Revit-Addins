@@ -22,11 +22,9 @@ namespace HOK.BatcUpgrader
     public partial class MultiFilesWindow : Window
     {
         private string rvtFolderName = "";
-        private string outputFolder = "";
         private string[] revitFileNames;
 
         public string RvtFolderName { get { return rvtFolderName; } set { rvtFolderName = value; } }
-        public string OutputFolder { get { return outputFolder; } set { outputFolder = value; } }
         public string[] RevitFileNames { get { return revitFileNames; } set { revitFileNames = value; } }
 
         public MultiFilesWindow()
@@ -53,30 +51,12 @@ namespace HOK.BatcUpgrader
             }
         }
 
-        private void buttonFolder_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                FileFolderDialog fileFolderDialog = new FileFolderDialog();
-                fileFolderDialog.Dialog.Title = "Select the directory that you want to store files.";
-                WinForms.DialogResult result = fileFolderDialog.ShowDialog();
-                if (result == WinForms.DialogResult.OK)
-                {
-                    outputFolder = fileFolderDialog.SelectedPath;
-                    textBoxFolder.Text = outputFolder;
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show("Cannot open the selected folder.\n" + ex.Message, "Select Folder", MessageBoxButton.OK);
-            }
-        }
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                if (Directory.Exists(rvtFolderName) && Directory.Exists(outputFolder))
+                if (Directory.Exists(rvtFolderName))
                 {
                     
                     DirectoryInfo di = new DirectoryInfo(rvtFolderName);
@@ -89,8 +69,6 @@ namespace HOK.BatcUpgrader
                             FileInfo fi = fileInfoArray[i];
                             revitFileNames[i] = fi.FullName;
                         }
-                       
-                        
                     }
                     else
                     {
@@ -117,7 +95,7 @@ namespace HOK.BatcUpgrader
                 }
                 else
                 {
-                    MessageBox.Show("Please select valid paths for input and output folder.", "Invalid Path", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Please select valid paths for input folder.", "Invalid Path", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             catch (Exception ex)
