@@ -790,6 +790,7 @@ namespace HOK.BetaToolsManager
                 }
                 if (null != analysisTP)
                 {
+                    string directoryName = Path.GetDirectoryName(analysisTP.InstallPath);
                     if (analysisTP.InstallExist || analysisTP.InstallExist1)
                     {
                         if (null == analysisPanel)
@@ -819,12 +820,13 @@ namespace HOK.BetaToolsManager
                                 }
                             }
 
-                            if (analysisTP.InstallExist1 && !analysisButtons.ContainsKey("LPD Analysis"))
+                            string lpdPath = Path.Combine(directoryName, "HOK.LPDCalculator.dll");
+                            lpdPath = GetTempInstallPath(lpdPath);
+                            if (File.Exists(lpdPath))
                             {
-                                string tempPath = GetTempInstallPath(analysisTP.InstallPath1);
                                 if (!analysisButtons.ContainsKey("LPD Analysis"))
                                 {
-                                    PushButton lpdButton = analysisSplitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", tempPath, "HOK.LPDCalculator.Command")) as PushButton;
+                                    PushButton lpdButton = analysisSplitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", lpdPath, "HOK.LPDCalculator.Command")) as PushButton;
                                     lpdButton.LargeImage = ImageUtil.LoadBitmapImage("bulb.png");
                                     lpdButton.ToolTip = "Calculating Lighting Power Density";
                                     AddToolTips(lpdButton);
@@ -832,9 +834,29 @@ namespace HOK.BetaToolsManager
                                 else
                                 {
                                     PushButton lpdButton = analysisButtons["LPD Analysis"];
-                                    lpdButton.AssemblyName = tempPath;
+                                    lpdButton.AssemblyName = lpdPath;
                                 }
                             }
+                            
+#if RELEASE2015
+                            string leedPath = Path.Combine(directoryName, "HOK.ViewAnalysis.dll");
+                            leedPath = GetTempInstallPath(leedPath);
+                            if (File.Exists(leedPath))
+                            {
+                                if (!analysisButtons.ContainsKey("LEED View Analysis"))
+                                {
+                                    PushButton analysisButton = analysisSplitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", leedPath, "HOK.ViewAnalysis.Command")) as PushButton;
+                                    analysisButton.LargeImage = ImageUtil.LoadBitmapImage("eq.ico");
+                                    analysisButton.ToolTip = "Calculating Area with Views for LEED EQc 8.2";
+                                    AddToolTips(analysisButton);
+                                }
+                                else
+                                {
+                                    PushButton analysisButton = analysisButtons["LEED View Analysis"];
+                                    analysisButton.AssemblyName = leedPath;
+                                }
+                            }
+#endif
                         }
                     }
                     else if(null != analysisSplitButton)
@@ -851,6 +873,13 @@ namespace HOK.BetaToolsManager
                             PushButton lpdButton = analysisButtons["LPD Analysis"];
                             lpdButton.Enabled = false;
                         }
+#if RELEASE2015
+                        if (analysisButtons.ContainsKey("LEED View Analysis"))
+                        {
+                            PushButton leedButton = analysisButtons["LEED View Analysis"];
+                            leedButton.Enabled = false;
+                        }
+#endif
                     }
                 }
             }

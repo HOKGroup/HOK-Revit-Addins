@@ -197,12 +197,8 @@ namespace HOK.BetaToolsManager
                             tp.DllName = "HOK.AVFManager.dll";
                             tp.BetaPath = betaDirectory + tp.DllName;
                             tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.BetaPath1 = betaDirectory + "HOK.LPDCalculator.dll";
-                            tp.BetaExist1 = File.Exists(tp.BetaPath1);
                             tp.InstallPath = installDirectory + tp.DllName;
                             tp.InstallExist = File.Exists(tp.InstallPath);
-                            tp.InstallPath1 = installDirectory + "HOK.LPDCalculator.dll";
-                            tp.InstallExist1 = File.Exists(tp.InstallPath1);
                             if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("chart.ico");
 
@@ -362,6 +358,10 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("Resources\\DefaultSettings.xml");
                         fileNames.Add("Resources\\PointOfView.rfa");
                         fileNames.Add("HOK.LPDCalculator.dll");
+#if RELEASE2015
+                        fileNames.Add("HOK.ViewAnalysis.dll");
+                        fileNames.Add("Resources\\Addins Shared Parameters.txt");
+#endif
                         break;
 
                     case ToolEnum.Utility:
@@ -422,9 +422,7 @@ namespace HOK.BetaToolsManager
         private string dllName = "";
         //private string assemblyName = "";
         private string installPath = "";
-        private string installPath1 = "";
         private string betaPath = "";
-        private string betaPath1 = "";
         private string tempAssemblyPath = "";
         private FileVersionInfo betaVersionInfo = null;
         private FileVersionInfo installedVersionInfo = null;
@@ -445,9 +443,7 @@ namespace HOK.BetaToolsManager
         public string DllName { get { return dllName; } set { dllName = value; } }
         //public string AssemblyName { get { return assemblyName; } set { assemblyName = value; } }
         public string InstallPath { get { return installPath; } set { installPath = value; } }
-        public string InstallPath1 { get { return installPath1; } set { installPath1 = value; } }
         public string BetaPath { get { return betaPath; } set { betaPath = value; } }
-        public string BetaPath1 { get { return betaPath1; } set { betaPath1 = value; } }
         public string TempAssemblyPath { get { return tempAssemblyPath; } set { tempAssemblyPath = value; } }
         public FileVersionInfo BetaVersionInfo { get { return betaVersionInfo; } set { betaVersionInfo = value; } }
         public FileVersionInfo InstalledVersionInfo { get { return installedVersionInfo; } set { installedVersionInfo = value; } }
@@ -473,7 +469,6 @@ namespace HOK.BetaToolsManager
             this.ToolName = tp.ToolName;
             this.DllName = tp.DllName;
             this.InstallPath = tp.InstallPath;
-            this.InstallPath1 = tp.InstallPath1;
             this.BetaPath = tp.BetaPath;
             this.BetaVersionInfo = tp.BetaVersionInfo;
             this.InstalledVersionInfo = tp.InstalledVersionInfo;

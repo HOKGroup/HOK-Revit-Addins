@@ -82,3 +82,7 @@ LPD Analysis
 This method will claculate the Lighting Load and Actual Lighting Power Density (LPD) from Revit Areas and Rooms. Actual LPD = Lighting Load / Area
 V:\RVT-Data\HOK Program\Documentation\LPD Calculator_Instruction.pdf
 ---------------------------------------------------------------------------------
+LEED View Analysis
+This method will determine whether regularly occupied area has access to views or not using ray-tracing from uv points on rooms to the points on windows elements.
+V:\RVT-Data\HOK Program\Documentation\LEED_ViewAnalysis_Instruction.pdf
+---------------------------------------------------------------------------------

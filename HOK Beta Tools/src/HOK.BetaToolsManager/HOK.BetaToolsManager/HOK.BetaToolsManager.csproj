@@ -158,6 +158,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\elevation.png" />
+    <EmbeddedResource Include="Resources\eq.ico" />
     <Content Include="Resources\HOK.Tooltip.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

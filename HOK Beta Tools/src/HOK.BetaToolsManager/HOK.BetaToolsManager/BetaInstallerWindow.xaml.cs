@@ -132,13 +132,7 @@ namespace HOK.BetaToolsManager
                                 tool.InstallVersionNumber = "v." + tool.InstalledVersionInfo.FileVersion;
                                 tool.IsSelected = false;
                             }
-                            
-                            if (!string.IsNullOrEmpty(tool.BetaPath1))
-                            {
-                                string installPath1 = System.IO.Path.Combine(installDirectory, System.IO.Path.GetFileName(tool.BetaPath1));
-                                tool.InstallPath1 = installPath1;
-                                tool.InstallExist1 = File.Exists(tool.InstallPath1);
-                            }
+                          
                             toolInfoDictionary.Remove(tool.ToolEnumVal);
                             toolInfoDictionary.Add(tool.ToolEnumVal, tool);
                             numOfTools++;
@@ -212,11 +206,6 @@ namespace HOK.BetaToolsManager
                                 tool.InstalledVersionInfo = null;
                                 tool.InstallVersionNumber = "Not Installed";
                                 tool.IsSelected = false;
-
-                                if (!string.IsNullOrEmpty(tool.InstallPath1))
-                                {
-                                    tool.InstallExist1 = File.Exists(tool.InstallPath1);
-                                }
                             }
 
                             toolInfoDictionary.Remove(tool.ToolEnumVal);
