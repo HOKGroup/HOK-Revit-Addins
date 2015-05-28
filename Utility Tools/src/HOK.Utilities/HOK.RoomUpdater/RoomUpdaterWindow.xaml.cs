@@ -265,7 +265,7 @@ namespace HOK.RoomUpdater
                             {
                                 FamilyInstanceFilter instanceFilter = new FamilyInstanceFilter(m_doc, symbol.Id);
                                 collector = new FilteredElementCollector(m_doc, familyInstanceIds);
-                                ICollection<Element> familyInstances = collector.WherePasses(instanceFilter).ToElements();
+                                List<Element> familyInstances = collector.WherePasses(instanceFilter).ToElements().ToList();
                                 if (familyInstances.Count > 0)
                                 {
                                     FamilyInstance firstFamilyInstance = familyInstances.First() as FamilyInstance;
@@ -386,13 +386,18 @@ namespace HOK.RoomUpdater
                 if (null != comboBoxRevit.SelectedItem)
                 {
                     CategoryProperties cp = (CategoryProperties)comboBoxRevit.SelectedItem;
+                    List<ParameterProperties> paramList = cp.ParamDictionary.Values.ToList();
+                    paramList = paramList.OrderBy(o => o.ParameterName).ToList();
+                    dataGridRevit.ItemsSource = null;
+                    dataGridRevit.ItemsSource = paramList;
+                    /*
                     var parameters = from param in cp.ParamDictionary.Values where param.IsReadOnly == false select param;
                     if (parameters.Count() > 0)
                     {
                         List<ParameterProperties> paramList = parameters.OrderBy(o => o.ParameterName).ToList();
                         dataGridRevit.ItemsSource = null;
                         dataGridRevit.ItemsSource = paramList;
-                    }
+                    }*/
                 }
             }
             catch (Exception ex)
