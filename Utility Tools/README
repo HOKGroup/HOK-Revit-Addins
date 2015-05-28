@@ -1,3 +1,7 @@
+Room Updater v.0.4.13
+Fix
+- Read-only family parameters will be found in the parameter list to support familis existed in groups.
+
 Finish Creator v.0.4.11
 New 
 -Create Ceiling Finish
