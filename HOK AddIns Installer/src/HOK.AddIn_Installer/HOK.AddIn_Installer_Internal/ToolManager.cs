@@ -796,6 +796,8 @@ namespace HOK.AddIn_Installer_Internal
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\PointOfView.rfa");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.LPDCalculator.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\bulb.png");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.ViewAnalysis.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\Addins Shared Parameters.txt");
 
                             tp.ToolName = "Analysis Tool";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.AVFManager.dll";

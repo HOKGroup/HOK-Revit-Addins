@@ -573,7 +573,7 @@ namespace HOK.AddIn_Installer_Internal
                         }
                         count++;
                     }
-                    bool utilitySelected = false;
+
                     if (checkBoxBeta.Checked)
                     {
                         for (int i = 0; i < listViewBeta.CheckedItems.Count; i++)
@@ -587,7 +587,6 @@ namespace HOK.AddIn_Installer_Internal
                                     if (tool2013Dictionary.ContainsKey(tool))
                                     {
                                         RevitToolProperties tp = tool2013Dictionary[tool];
-                                        if (tp.ToolEnum2013 == Tool2013.Utility) { utilitySelected = true; }
                                         CopyFromBeta(tp, progressForm, target);
 
                                         tp.InstallVersionInfo = tp.BetaVersionInfo;
@@ -603,7 +602,7 @@ namespace HOK.AddIn_Installer_Internal
 
                     //make copies of the default files first
                     RevitToolProperties defaultTP = tool2013Dictionary[Tool2013.Default];
-                    if (checkBoxBeta.Checked && utilitySelected) { CopyFromBeta(defaultTP, progressForm, target); }
+                    if (checkBoxBeta.Checked) { CopyFromBeta(defaultTP, progressForm, target); }
                     else { CopyFromStandard(defaultTP, progressForm, target); }
 
                     progressForm.Close();
@@ -659,7 +658,6 @@ namespace HOK.AddIn_Installer_Internal
                         count++;
                     }
 
-                    bool utilitySelected = false;
                     if (checkBoxBeta.Checked)
                     {
                         for (int i = 0; i < listViewBeta.CheckedItems.Count; i++)
@@ -673,7 +671,6 @@ namespace HOK.AddIn_Installer_Internal
                                     if (tool2014Dictionary.ContainsKey(tool))
                                     {
                                         RevitToolProperties tp = tool2014Dictionary[tool];
-                                        if (tp.ToolEnum2014 == Tool2014.Utility) { utilitySelected = true; }
                                         CopyFromBeta(tp, progressForm, traget);
 
                                         tp.InstallVersionInfo = tp.BetaVersionInfo;
@@ -689,7 +686,7 @@ namespace HOK.AddIn_Installer_Internal
 
                     //make copies of the default files first
                     RevitToolProperties defaultTP = tool2014Dictionary[Tool2014.Default];
-                    if (checkBoxBeta.Checked && utilitySelected ) { CopyFromBeta(defaultTP, progressForm, traget); }
+                    if (checkBoxBeta.Checked ) { CopyFromBeta(defaultTP, progressForm, traget); }
                     else { CopyFromStandard(defaultTP, progressForm, traget); }
                     
                     progressForm.Close();
@@ -745,7 +742,6 @@ namespace HOK.AddIn_Installer_Internal
                         count++;
                     }
 
-                    bool utilitySelected = false;
                     if (checkBoxBeta.Checked)
                     {
                         for (int i = 0; i < listViewBeta.CheckedItems.Count; i++)
@@ -759,9 +755,8 @@ namespace HOK.AddIn_Installer_Internal
                                     if (tool2015Dictionary.ContainsKey(tool))
                                     {
                                         RevitToolProperties tp = tool2015Dictionary[tool];
-                                        if (tp.ToolEnum2015 == Tool2015.Utility) { utilitySelected = true; }
+                                       
                                         CopyFromBeta(tp, progressForm, traget);
-
                                         tp.InstallVersionInfo = tp.BetaVersionInfo;
                                         tool2015Dictionary.Remove(tool);
                                         tool2015Dictionary.Add(tool, tp);
@@ -775,7 +770,7 @@ namespace HOK.AddIn_Installer_Internal
 
                     //make copies of the default files first
                     RevitToolProperties defaultTP = tool2015Dictionary[Tool2015.Default];
-                    if (checkBoxBeta.Checked && utilitySelected ) { CopyFromBeta(defaultTP, progressForm, traget); }
+                    if (checkBoxBeta.Checked) { CopyFromBeta(defaultTP, progressForm, traget); }
                     else { CopyFromStandard(defaultTP, progressForm, traget); }
 
                     progressForm.Close();
