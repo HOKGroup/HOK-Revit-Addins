@@ -323,7 +323,7 @@ namespace HOK.RibbonTab
         {
             try
             {
-                if (File.Exists(currentDirectory + "/HOK.AVFManager.dll") || File.Exists(currentDirectory + "/HOK.LPDCalculator.dll"))
+                if (File.Exists(currentDirectory + "/HOK.AVFManager.dll") || File.Exists(currentDirectory + "/HOK.LPDCalculator.dll") || File.Exists(currentDirectory + "/HOK.ViewAnalysis.dll"))
                 {
                     RibbonPanel avfPanel = m_app.CreateRibbonPanel(tabName, "Analysis");
 
@@ -347,6 +347,15 @@ namespace HOK.RibbonTab
                         pb15.ToolTip = "Calculating Lighting Power Density";
                         AddToolTips(pb15);
                     }
+#if RELEASE2015
+                    if (File.Exists(currentDirectory + "/HOK.ViewAnalysis.dll"))
+                    {
+                        PushButton pb24 = splitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", currentDirectory + "/HOK.ViewAnalysis.dll", "HOK.ViewAnalysis.Command")) as PushButton;
+                        pb24.LargeImage = LoadBitmapImage(assembly, "eq.ico");
+                        pb24.ToolTip = "Calculating Area with Views for LEED EQc 8.2";
+                        AddToolTips(pb24);
+                    }
+#endif
                 }
             }
             catch (Exception ex)
