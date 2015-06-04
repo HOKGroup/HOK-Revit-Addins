@@ -80,7 +80,7 @@ namespace HOK.SmartBCF.Utils
                 if (string.IsNullOrEmpty(sharedParameterTxt))
                 {
                     string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                    sharedParameterTxt = Path.GetDirectoryName(currentAssembly) + "/Resources/HOK Shared Parameters.txt";
+                    sharedParameterTxt = Path.GetDirectoryName(currentAssembly) + "/Resources/Addins Shared Parameters.txt";
                 }
 
                 string originalDefinitionFile = uiapp.Application.SharedParametersFilename;

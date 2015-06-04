@@ -34,7 +34,7 @@ namespace HOK.SmartBCF.GoogleUtils
                 UserCredential credential;
                 string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
-                string jsonPath = System.IO.Path.Combine(currentDirectory, "client_secrets_samrtBCF.json");
+                string jsonPath = System.IO.Path.Combine(currentDirectory, "Resources\\client_secrets_samrtBCF.json");
 
                 using (var filestream = new System.IO.FileStream(jsonPath,
                     System.IO.FileMode.Open, System.IO.FileAccess.Read))

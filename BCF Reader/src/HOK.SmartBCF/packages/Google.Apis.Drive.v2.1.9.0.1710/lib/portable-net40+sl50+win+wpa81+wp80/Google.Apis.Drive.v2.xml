@@ -12,7 +12,8 @@
             precedence.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.Data.About.DomainSharingPolicy">
-            <summary>The domain sharing policy for the current user.</summary>
+            <summary>The domain sharing policy for the current user. Possible values are: - ALLOWED -
+            ALLOWED_WITH_WARNING - INCOMING_ONLY - DISALLOWED</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.Data.About.ETag">
             <summary>The ETag of the item.</summary>
@@ -694,6 +695,10 @@
         </member>
         <member name="P:Google.Apis.Drive.v2.Data.File.SharingUser">
             <summary>User that shared the item with the current user, if available.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.Data.File.Spaces">
+            <summary>The list of spaces which contain the file. Supported values are 'drive' and
+            'appDataFolder'.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.Data.File.Thumbnail">
             <summary>Thumbnail for the file. Only accepted on upload and for files that are not already thumbnailed by
@@ -1448,9 +1453,6 @@
             they own.</summary>
             [default: true]
         </member>
-        <member name="P:Google.Apis.Drive.v2.ChangesResource.ListRequest.StartChangeId">
-            <summary>Change ID to start listing changes from.</summary>
-        </member>
         <member name="P:Google.Apis.Drive.v2.ChangesResource.ListRequest.IncludeDeleted">
             <summary>Whether to include deleted items.</summary>
             [default: true]
@@ -1462,6 +1464,13 @@
         </member>
         <member name="P:Google.Apis.Drive.v2.ChangesResource.ListRequest.PageToken">
             <summary>Page token for changes.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.ChangesResource.ListRequest.Spaces">
+            <summary>A comma-separated list of spaces to query. Supported values are 'drive' and
+            'appDataFolder'.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.ChangesResource.ListRequest.StartChangeId">
+            <summary>Change ID to start listing changes from.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.ChangesResource.ListRequest.MethodName">
             <summary>Gets the method name.</summary>
@@ -1490,9 +1499,6 @@
             they own.</summary>
             [default: true]
         </member>
-        <member name="P:Google.Apis.Drive.v2.ChangesResource.WatchRequest.StartChangeId">
-            <summary>Change ID to start listing changes from.</summary>
-        </member>
         <member name="P:Google.Apis.Drive.v2.ChangesResource.WatchRequest.IncludeDeleted">
             <summary>Whether to include deleted items.</summary>
             [default: true]
@@ -1504,6 +1510,13 @@
         </member>
         <member name="P:Google.Apis.Drive.v2.ChangesResource.WatchRequest.PageToken">
             <summary>Page token for changes.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.ChangesResource.WatchRequest.Spaces">
+            <summary>A comma-separated list of spaces to query. Supported values are 'drive' and
+            'appDataFolder'.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.ChangesResource.WatchRequest.StartChangeId">
+            <summary>Change ID to start listing changes from.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.ChangesResource.WatchRequest.Body">
             <summary>Gets or sets the body of this request.</summary>
@@ -2000,7 +2013,7 @@
             [default: false]
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.CopyRequest.OcrLanguage">
-            <summary>If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.</summary>
+            <summary>If ocr is true, hints at the language to use. Valid values are BCP 47 codes.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.CopyRequest.Visibility">
             <summary>The visibility of the new file. This parameter is only relevant when the source is not a native
@@ -2106,21 +2119,21 @@
         <member name="P:Google.Apis.Drive.v2.FilesResource.GetRequest.FileId">
             <summary>The ID for the file in question.</summary>
         </member>
-        <member name="P:Google.Apis.Drive.v2.FilesResource.GetRequest.Projection">
-            <summary>This parameter is deprecated and has no function.</summary>
-        </member>
-        <member name="P:Google.Apis.Drive.v2.FilesResource.GetRequest.RevisionId">
-            <summary>Specifies the Revision ID that should be downloaded. Ignored unless alt=media is
-            specified.</summary>
-        </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.GetRequest.AcknowledgeAbuse">
-            <summary>Whether the user is acknowledging the risk of downloading known malware or other abusive files.
-            Ignored unless alt=media is specified.</summary>
+            <summary>Whether the user is acknowledging the risk of downloading known malware or other abusive
+            files.</summary>
             [default: false]
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.GetRequest.UpdateViewedDate">
             <summary>Whether to update the view date after successfully retrieving the file.</summary>
             [default: false]
+        </member>
+        <member name="P:Google.Apis.Drive.v2.FilesResource.GetRequest.RevisionId">
+            <summary>Specifies the Revision ID that should be downloaded. Ignored unless alt=media is
+            specified.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.FilesResource.GetRequest.Projection">
+            <summary>This parameter is deprecated and has no function.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.GetRequest.MethodName">
             <summary>Gets the method name.</summary>
@@ -2164,7 +2177,7 @@
             [default: false]
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.InsertRequest.OcrLanguage">
-            <summary>If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.</summary>
+            <summary>If ocr is true, hints at the language to use. Valid values are BCP 47 codes.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.InsertRequest.Visibility">
             <summary>The visibility of the new file. This parameter is only relevant when convert=false.</summary>
@@ -2249,7 +2262,7 @@
             [default: false]
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.InsertMediaUpload.OcrLanguage">
-            <summary>If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.</summary>
+            <summary>If ocr is true, hints at the language to use. Valid values are BCP 47 codes.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.InsertMediaUpload.Visibility">
             <summary>The visibility of the new file. This parameter is only relevant when convert=false.</summary>
@@ -2295,15 +2308,6 @@
         <member name="M:Google.Apis.Drive.v2.FilesResource.ListRequest.InitParameters">
             <summary>Initializes List parameter list.</summary>
         </member>
-        <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.Q">
-            <summary>Query string for searching files.</summary>
-        </member>
-        <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.PageToken">
-            <summary>Page token for files.</summary>
-        </member>
-        <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.Corpus">
-            <summary>The body of items (files/documents) to which the query applies.</summary>
-        </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.Projection">
             <summary>This parameter is deprecated and has no function.</summary>
         </member>
@@ -2311,6 +2315,19 @@
             <summary>Maximum number of files to return.</summary>
             [default: 100]
             [minimum: 0]
+        </member>
+        <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.Q">
+            <summary>Query string for searching files.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.PageToken">
+            <summary>Page token for files.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.Spaces">
+            <summary>A comma-separated list of spaces to query. Supported values are 'drive' and
+            'appDataFolder'.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.Corpus">
+            <summary>The body of items (files/documents) to which the query applies.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.MethodName">
             <summary>Gets the method name.</summary>
@@ -2321,15 +2338,6 @@
         <member name="P:Google.Apis.Drive.v2.FilesResource.ListRequest.RestPath">
             <summary>Gets the REST path.</summary>
         </member>
-        <member name="T:Google.Apis.Drive.v2.FilesResource.ListRequest.CorpusEnum">
-            <summary>The body of items (files/documents) to which the query applies.</summary>
-        </member>
-        <member name="F:Google.Apis.Drive.v2.FilesResource.ListRequest.CorpusEnum.DEFAULT">
-            <summary>The items that the user has accessed.</summary>
-        </member>
-        <member name="F:Google.Apis.Drive.v2.FilesResource.ListRequest.CorpusEnum.DOMAIN">
-            <summary>Items shared to the user's domain.</summary>
-        </member>
         <member name="T:Google.Apis.Drive.v2.FilesResource.ListRequest.ProjectionEnum">
             <summary>This parameter is deprecated and has no function.</summary>
         </member>
@@ -2338,6 +2346,15 @@
         </member>
         <member name="F:Google.Apis.Drive.v2.FilesResource.ListRequest.ProjectionEnum.FULL">
             <summary>Deprecated</summary>
+        </member>
+        <member name="T:Google.Apis.Drive.v2.FilesResource.ListRequest.CorpusEnum">
+            <summary>The body of items (files/documents) to which the query applies.</summary>
+        </member>
+        <member name="F:Google.Apis.Drive.v2.FilesResource.ListRequest.CorpusEnum.DEFAULT">
+            <summary>The items that the user has accessed.</summary>
+        </member>
+        <member name="F:Google.Apis.Drive.v2.FilesResource.ListRequest.CorpusEnum.DOMAIN">
+            <summary>Items shared to the user's domain.</summary>
         </member>
         <member name="T:Google.Apis.Drive.v2.FilesResource.PatchRequest">
             <summary>Updates file metadata and/or content. This method supports patch semantics.</summary>
@@ -2377,7 +2394,7 @@
             [default: false]
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.PatchRequest.OcrLanguage">
-            <summary>If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.</summary>
+            <summary>If ocr is true, hints at the language to use. Valid values are BCP 47 codes.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.PatchRequest.Pinned">
             <summary>Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.</summary>
@@ -2512,7 +2529,7 @@
             [default: false]
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.UpdateRequest.OcrLanguage">
-            <summary>If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.</summary>
+            <summary>If ocr is true, hints at the language to use. Valid values are BCP 47 codes.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.UpdateRequest.Pinned">
             <summary>Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.</summary>
@@ -2605,7 +2622,7 @@
             [default: false]
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.UpdateMediaUpload.OcrLanguage">
-            <summary>If ocr is true, hints at the language to use. Valid values are ISO 639-1 codes.</summary>
+            <summary>If ocr is true, hints at the language to use. Valid values are BCP 47 codes.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.UpdateMediaUpload.Pinned">
             <summary>Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.</summary>
@@ -2657,21 +2674,21 @@
         <member name="P:Google.Apis.Drive.v2.FilesResource.WatchRequest.FileId">
             <summary>The ID for the file in question.</summary>
         </member>
-        <member name="P:Google.Apis.Drive.v2.FilesResource.WatchRequest.Projection">
-            <summary>This parameter is deprecated and has no function.</summary>
-        </member>
-        <member name="P:Google.Apis.Drive.v2.FilesResource.WatchRequest.RevisionId">
-            <summary>Specifies the Revision ID that should be downloaded. Ignored unless alt=media is
-            specified.</summary>
-        </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.WatchRequest.AcknowledgeAbuse">
-            <summary>Whether the user is acknowledging the risk of downloading known malware or other abusive files.
-            Ignored unless alt=media is specified.</summary>
+            <summary>Whether the user is acknowledging the risk of downloading known malware or other abusive
+            files.</summary>
             [default: false]
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.WatchRequest.UpdateViewedDate">
             <summary>Whether to update the view date after successfully retrieving the file.</summary>
             [default: false]
+        </member>
+        <member name="P:Google.Apis.Drive.v2.FilesResource.WatchRequest.RevisionId">
+            <summary>Specifies the Revision ID that should be downloaded. Ignored unless alt=media is
+            specified.</summary>
+        </member>
+        <member name="P:Google.Apis.Drive.v2.FilesResource.WatchRequest.Projection">
+            <summary>This parameter is deprecated and has no function.</summary>
         </member>
         <member name="P:Google.Apis.Drive.v2.FilesResource.WatchRequest.Body">
             <summary>Gets or sets the body of this request.</summary>

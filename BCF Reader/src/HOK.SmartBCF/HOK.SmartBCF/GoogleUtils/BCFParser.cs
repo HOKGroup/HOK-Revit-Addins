@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Autodesk.Revit.DB;
+using Google.Apis.Auth.OAuth2;
 using Google.GData.Client;
 using Google.GData.Spreadsheets;
 using HOK.SmartBCF.Utils;
@@ -28,8 +30,11 @@ namespace HOK.SmartBCF.GoogleUtils
         public static string currentSheetId = ""; //fileId of Google Spreadsheet
         public static WorksheetEntry currentSheet = null; //worksheet of ViewPoint
 
-        private static string userName = "bsmart@hokbuildingsmart.com";
-        private static string passWord = "HOKb$mart";
+        //private static string userName = "bsmart@hokbuildingsmart.com";
+        //private static string passWord = "HOKb$mart";
+
+        private static string keyFile = "HOK smartBCF.p12";
+        private static string serviceAccountEmail = "756603983986-lrc8dm2b0nl381cepd60q2o7fo8df3bg@developer.gserviceaccount.com";
 
         private static string[] markupCols = new string[] { "IssueGuid", "IssueTopic", "CommentGuid", "Comment", "Status", "VerbalStatus", "Author", "Date" };
         private static string[] viewpointCols = new string[] { "IssueGuid", "ComponentIfcGuid", "AuthoringToolId", "Action", "Responsible" };
@@ -49,8 +54,9 @@ namespace HOK.SmartBCF.GoogleUtils
                 }
                 if (null != sheetsService)
                 {
-                    bool createdMarkup = CreateMarkupSheet(bcfzip, fileId);
-                    bool createdVisInfo = CreateViewSheet(bcfzip, fileId);
+                    WorksheetFeed wsFeed = null;
+                    bool createdMarkup = CreateMarkupSheet(bcfzip, fileId, out wsFeed);
+                    bool createdVisInfo = CreateViewSheet(bcfzip, wsFeed);
 
                     result = (createdMarkup && createdVisInfo);
                 }
@@ -68,8 +74,25 @@ namespace HOK.SmartBCF.GoogleUtils
             SpreadsheetsService service = null;
             try
             {
+                string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
+                string keyFilePath = System.IO.Path.Combine(currentDirectory, "Resources\\" + keyFile);
+
+                var certificate = new X509Certificate2(keyFilePath, "notasecret", X509KeyStorageFlags.Exportable);
+
+                ServiceAccountCredential credential = new ServiceAccountCredential(new
+                ServiceAccountCredential.Initializer(serviceAccountEmail)
+                {
+                    Scopes = new[] { "https://spreadsheets.google.com/feeds/" }
+                }.FromCertificate(certificate));
+
+                credential.RequestAccessTokenAsync(System.Threading.CancellationToken.None).Wait();
+
+                var requestFactory = new GDataRequestFactory("My App User Agent");
+                requestFactory.CustomHeaders.Add(string.Format("Authorization: Bearer {0}", credential.Token.AccessToken));
+
                 service = new SpreadsheetsService("HOK smartBCF");
-                service.setUserCredentials(userName, passWord);
+                service.RequestFactory = requestFactory;
             }
             catch (Exception ex)
             {
@@ -78,13 +101,14 @@ namespace HOK.SmartBCF.GoogleUtils
             return service;
         }
 
-        private static bool CreateMarkupSheet(BCFZIP bcfZip, string fileId)
+        private static bool CreateMarkupSheet(BCFZIP bcfZip, string fileId, out WorksheetFeed wsFeed)
         {
             bool created = false;
+            wsFeed = null;
             try
             {
                 WorksheetQuery worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
-                WorksheetFeed wsFeed = sheetsService.Query(worksheetquery);
+                wsFeed = sheetsService.Query(worksheetquery);
                 if (wsFeed.Entries.Count > 0)
                 {
                     WorksheetEntry worksheet = (WorksheetEntry)wsFeed.Entries[0];
@@ -138,27 +162,13 @@ namespace HOK.SmartBCF.GoogleUtils
             return created;
         }
 
-        private static bool CreateViewSheet(BCFZIP bcfZip, string fileId)
+        private static bool CreateViewSheet(BCFZIP bcfZip, WorksheetFeed wsFeed)
         {
             bool created = false;
             try
             {
-                string title = System.IO.Path.GetFileNameWithoutExtension(bcfZip.FileName);
-                SpreadsheetQuery sheetQuery = new SpreadsheetQuery();
-                sheetQuery.Title = title;
-
-                SpreadsheetFeed feed = sheetsService.Query(sheetQuery);
-                WorksheetEntry worksheet = null;
-                foreach (SpreadsheetEntry sheet in feed.Entries)
-                {
-                    if (sheet.Id.AbsoluteUri.Contains(fileId))
-                    {
-                        WorksheetEntry wsEntry = new WorksheetEntry(10000, 10, "ViewPoint");
-                        WorksheetFeed wsFeed = sheet.Worksheets;
-                        worksheet = sheetsService.Insert(wsFeed, wsEntry);
-                        break;
-                    }
-                }
+                WorksheetEntry wsEntry = new WorksheetEntry(10000, 10, "ViewPoint");
+                WorksheetEntry worksheet = sheetsService.Insert(wsFeed, wsEntry);
 
                 if (null != worksheet)
                 {

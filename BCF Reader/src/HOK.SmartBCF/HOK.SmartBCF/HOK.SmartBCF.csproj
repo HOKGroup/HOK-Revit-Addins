@@ -71,8 +71,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Google.Apis.Core.1.9.1\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Google.Apis.Drive.v2">
-      <HintPath>..\packages\Google.Apis.Drive.v2.1.9.0.1670\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Drive.v2.dll</HintPath>
+    <Reference Include="Google.Apis.Drive.v2, Version=1.9.0.171, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Google.Apis.Drive.v2.1.9.0.1710\lib\portable-net40+sl50+win+wpa81+wp80\Google.Apis.Drive.v2.dll</HintPath>
     </Reference>
     <Reference Include="Google.Apis.PlatformServices, Version=1.9.1.12397, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -107,7 +108,7 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1-beta2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1-beta3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -241,12 +242,15 @@
     <EmbeddedResource Include="Resources\walker.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="client_secrets_samrtBCF.json">
+    <Content Include="Resources\client_secrets_samrtBCF.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Resources\HOK smartBCF.p12">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\BCFicon16.ico" />
@@ -307,7 +311,7 @@
     <Resource Include="Resources\arrow_up.png" />
     <Resource Include="Resources\banned.png" />
     <Resource Include="Resources\download.png" />
-    <Content Include="Resources\HOK Shared Parameters.txt">
+    <Content Include="Resources\Addins Shared Parameters.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
