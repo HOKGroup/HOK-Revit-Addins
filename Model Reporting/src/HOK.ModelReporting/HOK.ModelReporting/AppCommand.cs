@@ -163,8 +163,14 @@ namespace HOK.ModelReporting
                         EventSettings eventSettings = openSettingsDictionary[docPath];
                         eventSettings.SizeEnd = eventSettings.GetFileSize();
                         eventSettings.EndTime = DateTime.Now;
-
-                        WriteRecord(eventSettings, "OPEN-FILE");
+                        if (eventSettings.OpenCentral)
+                        {
+                            WriteRecord(eventSettings, "OPEN-CENTRAL");
+                        }
+                        else
+                        {
+                            WriteRecord(eventSettings, "OPEN-FILE");
+                        }
                     }
                 }
             }

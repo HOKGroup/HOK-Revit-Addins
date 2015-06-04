@@ -27,6 +27,7 @@ namespace HOK.ModelReporting
         private string versionNumber = "";
         private bool validCentral = false;
         private bool openDetached = false;
+        private bool openCentral = false;
         private long sizeStart = 0;
         private long sizeEnd = 0;
         private DateTime startTime = DateTime.Now;
@@ -47,6 +48,7 @@ namespace HOK.ModelReporting
         public string VersionNumber { get { return versionNumber; } set { versionNumber = value; } }
         public bool ValidCentral { get { return validCentral; } set { validCentral = value; } }
         public bool OpenDetached { get { return openDetached; } set { openDetached = value; } }
+        public bool OpenCentral { get { return openCentral; } set { openCentral = value; } }
         public long SizeStart { get { return sizeStart; } set { sizeStart = value; } }
         public long SizeEnd { get { return sizeEnd; } set { sizeEnd = value; } }
         public DateTime StartTime { get { return startTime; } set { startTime = value; } }
@@ -99,6 +101,13 @@ namespace HOK.ModelReporting
                 validCentral = false;
                 docCentralPath = m_doc.PathName;
                 docLocalPath = m_doc.PathName;
+            }
+            finally
+            {
+                if (validCentral && (docCentralPath == docLocalPath))
+                {
+                    openCentral = true;
+                }
             }
         }
 

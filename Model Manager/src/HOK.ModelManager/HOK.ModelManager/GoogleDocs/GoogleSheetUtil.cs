@@ -5,8 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Security.Cryptography.X509Certificates;
+using Google.Apis.Auth.OAuth2;
 using Google.GData.Client;
 using Google.GData.Spreadsheets;
+using Google.GData.Extensions;
 
 namespace HOK.ModelManager.GoogleDocs
 {
@@ -14,8 +17,12 @@ namespace HOK.ModelManager.GoogleDocs
     {
         public static SpreadsheetsService sheetsService = null;
 
-        private static string userName = "bsmart@hokbuildingsmart.com";
-        private static string passWord = "HOKb$mart";
+        private static string keyFile = "HOK Project Replicator.p12";
+
+        private static string serviceAccountEmail = "1008136763933-o7vgka08vtgd6oc4c4i90k1hvbjuvoe5@developer.gserviceaccount.com";
+       
+        //private static string userName = "bsmart@hokbuildingsmart.com";
+        //private static string passWord = "HOKb$mart";
 
         private static string[] headers = new string[]{ "ItemType", "SourceName", "SourcePath", "SourceModelId", "DestinationPath", "ItemSourceID", "ItemSourceName",	
                         "ItemDestinationID",	"ItemDestinationName",	"ItemDestinationImage1", "ItemDestinationImage2", "LinkModified", "LinkModifiedBy" };
@@ -92,8 +99,26 @@ namespace HOK.ModelManager.GoogleDocs
             SpreadsheetsService sheetService = null;
             try
             {
+                string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
+                string keyFilePath = System.IO.Path.Combine(currentDirectory, "Resources\\"+keyFile);
+
+                var certificate = new X509Certificate2(keyFilePath, "notasecret", X509KeyStorageFlags.Exportable);
+
+                ServiceAccountCredential credential = new ServiceAccountCredential(new
+                ServiceAccountCredential.Initializer(serviceAccountEmail)
+                {
+                    Scopes = new[] { "https://spreadsheets.google.com/feeds/" }
+                }.FromCertificate(certificate));
+
+                credential.RequestAccessTokenAsync(System.Threading.CancellationToken.None).Wait();
+
+                var requestFactory = new GDataRequestFactory("My App User Agent");
+                requestFactory.CustomHeaders.Add(string.Format("Authorization: Bearer {0}", credential.Token.AccessToken));
+                
                 sheetService = new SpreadsheetsService("HOK Project Replicator");
-                sheetService.setUserCredentials(userName, passWord);
+                sheetService.RequestFactory = requestFactory;
+
             }
             catch (Exception ex)
             {

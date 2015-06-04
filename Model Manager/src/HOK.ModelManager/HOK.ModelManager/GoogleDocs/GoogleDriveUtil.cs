@@ -17,7 +17,7 @@ namespace HOK.ModelManager.GoogleDocs
     public static class GoogleDriveUtil
     {
         public static DriveService service = null;
-
+        
         private static DriveService GetUserCredential()
         {
             DriveService driveService = null;
@@ -26,7 +26,7 @@ namespace HOK.ModelManager.GoogleDocs
                 UserCredential credential;
                 string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
-                string jsonPath = System.IO.Path.Combine(currentDirectory, "client_secrets.json");
+                string jsonPath = System.IO.Path.Combine(currentDirectory, "Resources\\client_secrets_ProjectReplicator.json");
 
                 using (var filestream = new System.IO.FileStream(jsonPath,
                     System.IO.FileMode.Open, System.IO.FileAccess.Read))
@@ -39,13 +39,13 @@ namespace HOK.ModelManager.GoogleDocs
                         
                 }
 
-
                 // Create the service.
                 driveService = new DriveService(new BaseClientService.Initializer()
                 {
                     HttpClientInitializer = credential,
                     ApplicationName = "HOK Project Replicator",
                 });
+
             }
             catch (Exception ex)
             {
@@ -248,6 +248,7 @@ namespace HOK.ModelManager.GoogleDocs
 
                     FilesResource.InsertRequest request = service.Files.Insert(body);
                     sheetFile = request.Execute();
+
                 }
             }
             catch (Exception ex)

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800" Icon="/HOK.ModelManager_v.2015.0.2.0;component/Images/hok.png" Title="Confirm Views to Sync" MinWidth="800" MinHeight="600" Closed="Window_Closed" WindowStartupLocation="CenterScreen">
+             d:DesignHeight="600" d:DesignWidth="800" Icon="/HOK.ModelManager_v.2015.0.2.1;component/Images/hok.png" Title="Confirm Views to Sync" MinWidth="800" MinHeight="600" Closed="Window_Closed" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="70" />
@@ -25,10 +25,10 @@
         <TextBox Grid.Row="3" Height="30" Name="textBoxPage" VerticalAlignment="Top" Grid.Column="1" Margin="0,7,0,0" IsReadOnly="True" />
         
         <Button  Grid.Row="3" Height="25" Margin="0,7,20,0" Name="buttonBack" VerticalAlignment="Top" HorizontalAlignment="Right" Width="60" Click="buttonBack_Click">
-            <Image Margin="1" Source="/HOK.ModelManager_v.2015.0.2.0;component/Images/backward.png" />
+            <Image Margin="1" Source="/HOK.ModelManager_v.2015.0.2.1;component/Images/backward.png" />
         </Button>
         <Button Height="25" HorizontalAlignment="Left" Margin="20,7,0,0" Name="buttonNext" VerticalAlignment="Top" Width="60" Grid.Column="2" Grid.Row="3" Click="buttonNext_Click">
-            <Image Margin="1" Source="/HOK.ModelManager_v.2015.0.2.0;component/Images/forward.png" />
+            <Image Margin="1" Source="/HOK.ModelManager_v.2015.0.2.1;component/Images/forward.png" />
         </Button>
         <Label Content="Source View Name" Grid.Row="2" Height="28" HorizontalAlignment="Left" Margin="30,0,0,0" Name="SourceView" VerticalAlignment="Top" />
         <Label Content="Recipient View Name" Height="28" HorizontalAlignment="Left" Margin="30,0,0,0" Name="RecipientView" VerticalAlignment="Top" Grid.Column="2" Grid.Row="2" />
@@ -38,7 +38,7 @@
         <Button Content="Update Without Review" Grid.Column="2" Grid.Row="4" Height="25" Margin="0,8,217,0" Name="buttonUpdateAll" VerticalAlignment="Top" HorizontalAlignment="Right" Width="137" Click="buttonUpdateAll_Click" />
         <Button Grid.Column="2" Grid.Row="4" Height="25" Margin="0,8,101,0" Name="buttonUpdateViews" VerticalAlignment="Top" HorizontalAlignment="Right" Width="110" Click="buttonUpdateViews_Click" IsEnabled="False">
             <StackPanel Orientation="Horizontal">
-                <Image Margin="0,1,6,0" Source="/HOK.ModelManager_v.2015.0.2.0;component/Images/view.png" />
+                <Image Margin="0,1,6,0" Source="/HOK.ModelManager_v.2015.0.2.1;component/Images/view.png" />
                 <TextBlock>Update Views</TextBlock>
             </StackPanel>
         </Button>
@@ -49,7 +49,7 @@
         </ContentControl>
         <Button Grid.Column="2" Height="25" Margin="0,13,25,0" Name="buttonRefresh" VerticalAlignment="Top" HorizontalAlignment="Right" Width="25" Click="buttonRefresh_Click">
             <Button.Content>
-                <Image Source="/HOK.ModelManager_v.2015.0.2.0;component/Images/refresh.png" />
+                <Image Source="/HOK.ModelManager_v.2015.0.2.1;component/Images/refresh.png" />
             </Button.Content>
         </Button>
         
