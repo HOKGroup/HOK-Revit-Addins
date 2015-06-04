@@ -1,3 +1,8 @@
+v.0.2.12
+Fix
+-Create a new sketch plane when placing a family instnace 
+-shared parameter dictionary error
+
 v.0.2.11
 Fix
 - Area name and number will be obtained by parameter value, not by properties of Area class
