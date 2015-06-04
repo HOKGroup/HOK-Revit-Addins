@@ -1,3 +1,7 @@
+v.0.1.10
+New
+- Family parameters were added into the list of parameter.
+
 v.0.1.9
 Fix
 - In the drop-dwon list, Color By, "Family Name" and "Type Name" will capture correct values both for family instances and system families
