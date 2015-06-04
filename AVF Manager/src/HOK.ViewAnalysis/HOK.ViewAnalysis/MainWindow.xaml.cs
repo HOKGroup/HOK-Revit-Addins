@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,11 +8,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
+using System.Xml.Serialization;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
@@ -32,8 +36,11 @@ namespace HOK.ViewAnalysis
         private Document m_doc;
         private List<Room> selectedRooms = new List<Room>();
         private AnalysisSettings settings = new AnalysisSettings();
+        private AnalysisDataCollection analysisDataCollection = new AnalysisDataCollection();
 
         public AnalysisSettings Settings { get { return settings; } set { settings = value; } }
+        public AnalysisDataCollection DataCollection { get { return analysisDataCollection; } set { analysisDataCollection = value; } }
+
         public MainWindow(UIApplication uiapp, List<Room> rooms )
         {
             m_app = uiapp;
@@ -42,6 +49,7 @@ namespace HOK.ViewAnalysis
             AbortFlag.SetAbortFlag(false);
 
             InitializeComponent();
+            settings = DataStorageUtil.ReadAnalysisSettings(m_doc);
 
             DisplaySettings();
             this.Title = "LEED EQc 8.2 - View Analysis v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -51,36 +59,100 @@ namespace HOK.ViewAnalysis
         {
             try
             {
-                settings = DataStorageUtil.ReadAnalysisSettings(m_doc);
                 textBoxDataFile.Text = settings.DataFileName;
                 sliderResolution.Value = (int)settings.Resolution;
                 radioButtonParameter.IsChecked = settings.ExteriorWallByParameter;
                 checkBoxLinkedModel.IsChecked = settings.IncludeLinkedModel;
-                checkBoxOverwrite.IsChecked = settings.OverwriteData;
+                chekcBoxRecalculate.IsChecked = settings.OverwriteData;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to display settings for View Analysis.\n"+ex.Message, "Display Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                System.Windows.MessageBox.Show("Failed to display settings for View Analysis.\n"+ex.Message, "Display Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
         private void buttonAnalysis_Click(object sender, RoutedEventArgs e)
         {
             try
             {
                 if (SaveSettings())
                 {
-                    ViewAnalysisManager manager = new ViewAnalysisManager(m_app, selectedRooms, settings);
+                    ViewAnalysisManager manager = new ViewAnalysisManager(m_app, selectedRooms, settings, analysisDataCollection);
                     bool result = manager.RunViewAnalysis(progressBar, statusLable);
                     if (result)
                     {
-                        this.DialogResult = true;
+                        if (SaveResultData(manager.RoomDictionary))
+                        {
+                            this.DialogResult = true;
+                        }
+                        
                     }
                 }  
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to start View Analysis.\n"+ex.Message, "View Analysis - Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                System.Windows.MessageBox.Show("Failed to start View Analysis.\n"+ex.Message, "View Analysis - Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private bool SaveResultData(Dictionary<int,RoomData> roomDictionary)
+        {
+            bool saved = false;
+            try
+            {
+                if (!string.IsNullOrEmpty(settings.DataFileName))
+                {
+                    analysisDataCollection = new AnalysisDataCollection();
+
+                    foreach (int roomId in roomDictionary.Keys)
+                    {
+                        RoomData roomData = roomDictionary[roomId];
+                        int index = analysisDataCollection.AnalysisDataList.FindIndex(o => o.RoomId == roomId);
+                        if (settings.OverwriteData)
+                        {
+                            if (index > -1) { analysisDataCollection.AnalysisDataList.RemoveAt(index); }
+                            AnalysisData aData = new AnalysisData();
+                            aData.RoomId = roomData.RoomId;
+                            aData.RoomArea = roomData.RoomArea;
+                            aData.VisibleArea = roomData.AreaWithViews;
+                            aData.RoomFace = FMEDataUtil.ConvertRevitFaceToFMEArea(roomData.RoomFace);
+                            aData.PointValues = FMEDataUtil.ConvertToFMEPointList(roomData.PointDataList);
+                            analysisDataCollection.AnalysisDataList.Add(aData);
+                        }
+                        else if(index == -1)
+                        {
+                            //add new room data only if it doesn't exist
+                            AnalysisData aData = new AnalysisData();
+                            aData.RoomId = roomData.RoomId;
+                            aData.RoomArea = roomData.RoomArea;
+                            aData.VisibleArea = roomData.AreaWithViews;
+                            aData.RoomFace = FMEDataUtil.ConvertRevitFaceToFMEArea(roomData.RoomFace);
+                            aData.PointValues = FMEDataUtil.ConvertToFMEPointList(roomData.PointDataList);
+                            analysisDataCollection.AnalysisDataList.Add(aData);
+                        }
+                    }
+
+                    if (analysisDataCollection.AnalysisDataList.Count > 0)
+                    {
+                        XmlSerializer serializer = new XmlSerializer(typeof(AnalysisDataCollection));
+                        StreamWriter writer = new StreamWriter(settings.DataFileName);
+                        serializer.Serialize(writer, analysisDataCollection);
+                        writer.Close();
+                        saved = true;
+                    }
+                }
+                else
+                {
+                    saved = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                saved = false;
+                System.Windows.MessageBox.Show("Failed to save analysis data.\n" + ex.Message, "Save Result Data", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return saved;
         }
 
         private bool SaveSettings()
@@ -107,7 +179,7 @@ namespace HOK.ViewAnalysis
 
                 settings.ExteriorWallByParameter = (bool)radioButtonParameter.IsChecked;
                 settings.IncludeLinkedModel = (bool)checkBoxLinkedModel.IsChecked;
-                settings.OverwriteData = (bool)checkBoxOverwrite.IsChecked;
+                settings.OverwriteData = (bool)chekcBoxRecalculate.IsChecked;
 
                 if (DataStorageUtil.UpdateAnalysisSettings(m_doc, settings))
                 {
@@ -117,17 +189,64 @@ namespace HOK.ViewAnalysis
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to save analysis settings.\n" + ex.Message, "Save Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                System.Windows.MessageBox.Show("Failed to save analysis settings.\n" + ex.Message, "Save Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return saved;
         }
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show("Would you like to stop processing the View Analysis?", "Cancellation - View Analysis", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            MessageBoxResult result = System.Windows.MessageBox.Show("Would you like to stop processing the View Analysis?", "Cancellation - View Analysis", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
                 AbortFlag.SetAbortFlag(true);
+            }
+        }
+
+        private void buttonBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "xml files (*.xml)|*.xml";
+                saveFileDialog.RestoreDirectory = true;
+                saveFileDialog.Title = "Save Analysis Data";
+
+                if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    settings.DataFileName = saveFileDialog.FileName;
+                    textBoxDataFile.Text = settings.DataFileName;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("A data file cannot be saved in the file path.\n" + ex.Message, "Save Data File", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void textBoxDataFile_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(textBoxDataFile.Text))
+                {
+                    if (File.Exists(textBoxDataFile.Text))
+                    {
+                        XmlSerializer serializer = new XmlSerializer(typeof(AnalysisDataCollection));
+                        FileStream fs = new FileStream(textBoxDataFile.Text, FileMode.Open);
+                        XmlReader reader = XmlReader.Create(fs);
+                        if (serializer.CanDeserialize(reader))
+                        {
+                            analysisDataCollection = (AnalysisDataCollection)serializer.Deserialize(reader);
+                        }
+                        reader.Close();
+                        fs.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("Failed to read point data from the xml file.\n"+ex.Message, "Read Result Data File", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

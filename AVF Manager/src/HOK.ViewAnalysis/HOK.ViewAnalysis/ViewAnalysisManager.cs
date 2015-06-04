@@ -20,11 +20,13 @@ namespace HOK.ViewAnalysis
         private Document m_doc;
         private View3D m_view;
         private List<Room> selectedRooms = new List<Room>();
+        private AnalysisSettings analysisSettings = new AnalysisSettings();
+        private AnalysisDataCollection dataCollection = new AnalysisDataCollection();
         private List<LinkElementId> exteriorElementIds = new List<LinkElementId>();
         private SpatialFieldManager m_sfm = null;
         private int resultIndex = -1;
-        private AnalysisSettings analysisSettings = new AnalysisSettings();
         private bool includeLinkedModel = false;
+        private bool overwriteData = false;
        
         private ElementId occupiedParamId = ElementId.InvalidElementId;
         private Dictionary<int/*roomId*/, RoomData> roomDictionary = new Dictionary<int, RoomData>();
@@ -39,7 +41,7 @@ namespace HOK.ViewAnalysis
         private delegate void UpdateLableDelegate(System.Windows.DependencyProperty dp, Object value);
         private delegate void UpdateProgressDelegate(System.Windows.DependencyProperty dp, Object value);
 
-        public ViewAnalysisManager(UIApplication uiapp, List<Room> rooms, AnalysisSettings settings)
+        public ViewAnalysisManager(UIApplication uiapp, List<Room> rooms, AnalysisSettings settings, AnalysisDataCollection analysisDataCollection)
         {
             try
             {
@@ -47,6 +49,8 @@ namespace HOK.ViewAnalysis
                 m_doc = m_app.ActiveUIDocument.Document;
                 selectedRooms = rooms;
                 analysisSettings = settings;
+                overwriteData = analysisSettings.OverwriteData;
+                dataCollection = analysisDataCollection;
                 epsilon = m_app.Application.ShortCurveTolerance ;
 
                 categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_Walls)); //intercepting elements.
@@ -211,7 +215,13 @@ namespace HOK.ViewAnalysis
                     if (room.Area > 0)
                     {
                         RoomData roomData = new RoomData(room, m_doc);
-                        roomData.BoundarySegments = roomData.CollectSegmentData(exteriorElementIds, includeLinkedModel);
+                        int index = dataCollection.AnalysisDataList.FindIndex(o => o.RoomId == roomData.RoomId);
+                        if (index == -1 || overwriteData)
+                        {
+                            roomData.RoomFace = roomData.GetRoomFace();
+                            roomData.BoundarySegments = roomData.CollectSegmentData(exteriorElementIds, includeLinkedModel);
+                        }
+                       
                         if (!dictionary.ContainsKey(roomData.RoomId))
                         {
                             dictionary.Add(roomData.RoomId, roomData);
@@ -252,10 +262,24 @@ namespace HOK.ViewAnalysis
                                 Dispatcher.CurrentDispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, roomInfo });
                                 progressBar.Visibility = System.Windows.Visibility.Visible;
 
-                                RoomData updatedData = FindVisibility(rData, progressBar);
+                                RoomData updatedData = null;
+                                int index = dataCollection.AnalysisDataList.FindIndex(o => o.RoomId == rData.RoomId);
+                                if (index == -1 || overwriteData)
+                                {
+                                    updatedData = FindVisibility(rData, progressBar);
+                                }
+                                else
+                                {
+                                    AnalysisData aData = dataCollection.AnalysisDataList[index];
+                                    updatedData = FindVisibilityByPointData(rData, aData, progressBar);
+                                }
+
+                                if (null != updatedData)
+                                {
+                                    roomDictionary.Remove(roomId);
+                                    roomDictionary.Add(roomId, updatedData);
+                                }
                                 
-                                roomDictionary.Remove(roomId);
-                                roomDictionary.Add(roomId, updatedData);
                                 finishedRoom++;
                                 trans.Commit();
                             }
@@ -278,6 +302,62 @@ namespace HOK.ViewAnalysis
                 }
             }
             return result; 
+        }
+
+        private RoomData FindVisibilityByPointData(RoomData rd, AnalysisData aData, ProgressBar progressBar)
+        {
+            RoomData updatedData = new RoomData(rd);
+            try
+            {
+                updatedData.RoomFace = FMEDataUtil.CreateFacebyFMEData(aData.RoomFace);
+                if(null!=updatedData.RoomFace)
+                {
+                    updatedData.PointDataList = FMEDataUtil.ConvertToPointDataList(updatedData.RoomFace, aData.PointValues);
+
+                    IList<UV> uvPoints = new List<UV>();
+                    IList<ValueAtPoint> valList = new List<ValueAtPoint>();
+
+                    progressBar.Value = 0;
+                    progressBar.Minimum = 0;
+                    progressBar.Maximum = updatedData.PointDataList.Count;
+                    UpdateProgressDelegate updateProgressDelegate = new UpdateProgressDelegate(progressBar.SetValue);
+
+                    int visibleCount = 0;
+                    double progressValue = 0;
+                    foreach (PointData ptData in updatedData.PointDataList)
+                    {
+                        if (AbortFlag.GetAbortFlag()) { return updatedData; }
+                        Dispatcher.CurrentDispatcher.Invoke(updateProgressDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, progressValue });
+
+                        if (null != ptData.UVPoint && null != ptData.ValueAtPoint)
+                        {
+                            uvPoints.Add(ptData.UVPoint);
+                            valList.Add(ptData.ValueAtPoint);
+                            if (ptData.PointValue > 0) { visibleCount++; }
+                        }
+                        progressValue++;
+                    }
+
+                    double ratio = (double)visibleCount / (double)uvPoints.Count;
+                    updatedData.VisiblityRatio = ratio;
+                    updatedData.AreaWithViews = rd.RoomArea * ratio;
+                    updatedData.SetResultParameterValue(LEEDParameters.LEED_AreaWithViews.ToString(), rd.AreaWithViews);
+
+                    //visualize
+                    Transform transform = Transform.CreateTranslation(new XYZ(0, 0, offsetHeight));
+                    int index = m_sfm.AddSpatialFieldPrimitive(updatedData.RoomFace, transform);
+                
+                    FieldDomainPointsByUV domainPoints = new FieldDomainPointsByUV(uvPoints);
+                    FieldValues values = new FieldValues(valList);
+
+                    m_sfm.UpdateSpatialFieldPrimitive(index, domainPoints, values, resultIndex);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to find visibility.\n" + ex.Message, "Find Visibility", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return updatedData;
         }
 
         private RoomData FindVisibility(RoomData rd, ProgressBar progressBar)
@@ -359,21 +439,19 @@ namespace HOK.ViewAnalysis
                     }
                 }
 
-                rd.PointDataList = pointDataList;
+                updatedData.PointDataList = pointDataList;
                 double ratio = (double)visibleCount / (double)uvPoints.Count;
-                rd.VisiblityRatio = ratio;
-                rd.AreaWithViews = rd.RoomArea * ratio;
-                rd.SetResultParameterValue(LEEDParameters.LEED_AreaWithViews.ToString(), rd.AreaWithViews);
+                updatedData.VisiblityRatio = ratio;
+                updatedData.AreaWithViews = rd.RoomArea * ratio;
+                updatedData.SetResultParameterValue(LEEDParameters.LEED_AreaWithViews.ToString(), rd.AreaWithViews);
 
                 //visualize
                 Transform transform = Transform.CreateTranslation(new XYZ(0, 0, offsetHeight));
-
                 int index = m_sfm.AddSpatialFieldPrimitive(face, transform);
                 FieldDomainPointsByUV domainPoints = new FieldDomainPointsByUV(uvPoints);
                 FieldValues values = new FieldValues(valList);
 
                 m_sfm.UpdateSpatialFieldPrimitive(index, domainPoints, values, resultIndex);
-
             }
             catch (Exception ex)
             {
@@ -583,4 +661,5 @@ namespace HOK.ViewAnalysis
         }
 
     }
+
 }

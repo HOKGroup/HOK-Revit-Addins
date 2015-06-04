@@ -26,8 +26,8 @@
                 <Label Content="High" HorizontalAlignment="Left" Margin="393,55,0,0" Grid.Row="1" VerticalAlignment="Top" Foreground="#FF0558AA" ToolTip="Grid Interval: 0.5 feet - Slow Analysis" RenderTransformOrigin="0.486,-0.423" />
 
                 <Label Content="Result Data:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                <TextBox x:Name="textBoxDataFile" HorizontalAlignment="Stretch" Height="23" Margin="88,15,100,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" IsReadOnly="True" IsEnabled="False" />
-                <Button x:Name="buttonBrowse"  HorizontalAlignment="Right" Margin="0,15,10,0" VerticalAlignment="Top" Width="80" Height="25" IsEnabled="False">
+                <TextBox x:Name="textBoxDataFile" HorizontalAlignment="Stretch" Height="23" Margin="88,15,100,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" IsReadOnly="True" TextChanged="textBoxDataFile_TextChanged"/>
+                <Button x:Name="buttonBrowse"  HorizontalAlignment="Right" Margin="0,15,10,0" VerticalAlignment="Top" Width="80" Height="25" Click="buttonBrowse_Click">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="Resources/open.png"/>
                         <TextBlock Margin="5,0,0,0">Browse</TextBlock>
@@ -47,7 +47,7 @@
 
             </Grid>
         </GroupBox>
-        <CheckBox x:Name="checkBoxOverwrite" Content="Overwrite Data Results" HorizontalAlignment="Left" Margin="20,15,0,0" Grid.Row="1" VerticalAlignment="Top" Width="200" IsEnabled="False"/>
+        <CheckBox x:Name="chekcBoxRecalculate" Content="Recalculate and overwrite result data" HorizontalAlignment="Left" Margin="40,13,0,0" Grid.Row="1" VerticalAlignment="Top"/>
         <Button x:Name="buttonAnalysis"  HorizontalAlignment="Right" Margin="0,10,15,0" Grid.Row="1" VerticalAlignment="Top" Width="110" Height="27" Click="buttonAnalysis_Click">
             <StackPanel Orientation="Horizontal">
                 <Image Margin="2" Source="Resources/color.png"/>
@@ -79,6 +79,7 @@
                 <ProgressBar Value="0" Width="150" Height="16" Name="progressBar" Visibility="Hidden"/>
             </StatusBarItem>
         </StatusBar>
+        
 
 
     </Grid>

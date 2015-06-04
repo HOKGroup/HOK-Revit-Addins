@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<xfMap>
+  <feature-map multi-feature-construction="true">
+    <note> construct an FME feature when we read the 'Feature' element. </note>
+    <mapping match="AnalysisData">
+      <feature-type>
+        <literal expr="AnalysisData"/>
+      </feature-type>
+      <geometry activate="xml-aggregate"/>
+    </mapping>
+    <mapping match="RoomInfo">
+      <feature-type>
+        <literal expr="RoomInfo"/>
+      </feature-type>
+      <geometry activate="xml-face"/>
+    </mapping>
+  </feature-map>
+  <feature-content-map>
+    <mapping match="RoomId RoomArea VisibleArea RoomName RoomNumber">
+      <attributes>
+        <attribute>
+          <name>
+            <matched expr="local-name"/>
+          </name>
+          <value>
+            <extract expr="."/>
+          </value>
+        </attribute>
+      </attributes>
+    </mapping>
+    <mapping match="RoomFace">
+      <geometry activate="xml-face"/>
+    </mapping>
+    <mapping match="FMEArea">
+      <geometry activate="xml-area">
+        <data name="data-string">
+          <extract expr="./Coordinates" />
+        </data>
+      </geometry>
+    </mapping>
+    <mapping match ="PointValues">
+      <geometry activate="xml-multi-point"/>
+    </mapping>
+    <mapping match="FMEPoint">
+      <trait>
+        <name>
+          <literal expr="PointValue"/>
+        </name>
+        <value>
+          <extract expr="@PointValue"/>
+        </value>
+      </trait>
+      <geometry activate="xml-point">
+        <data name="data-string">
+          <extract expr="./Coordinate" />
+        </data>
+      </geometry>
+    </mapping>
+  </feature-content-map>
+</xfMap>

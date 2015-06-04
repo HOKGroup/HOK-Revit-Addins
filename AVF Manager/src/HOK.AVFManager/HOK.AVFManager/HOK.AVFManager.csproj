@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.AVFManager</RootNamespace>
-    <AssemblyName>HOK.AVFManager_v.2013.0.1.18</AssemblyName>
+    <AssemblyName>HOK.AVFManager_v.2015.0.1.19</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

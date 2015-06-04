@@ -47,9 +47,6 @@ namespace HOK.ViewAnalysis
             roomArea = m_room.Area;
 
             tolerance = Double.Epsilon;
-            
-            roomFace = GetRoomFace();
-            
         }
 
         public RoomData(RoomData rd)
@@ -65,7 +62,7 @@ namespace HOK.ViewAnalysis
             this.RoomArea = rd.RoomArea;
         }
 
-        private Face GetRoomFace()
+        public Face GetRoomFace()
         {
             Face bottomFace = null;
             try
