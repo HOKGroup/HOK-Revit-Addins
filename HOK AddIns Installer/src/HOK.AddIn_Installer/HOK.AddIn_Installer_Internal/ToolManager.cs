@@ -296,10 +296,11 @@ namespace HOK.AddIn_Installer_Internal
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets_samrtBCF.json");
-
+                            
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\walker.png");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Shared Parameters.txt");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\Addins Shared Parameters.txt");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\client_secrets_samrtBCF.json");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK smartBCF.p12");
                             
                             tp.ToolName = "Smart BCF";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll";
@@ -552,7 +553,8 @@ namespace HOK.AddIn_Installer_Internal
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets.json");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\client_secrets_ProjectReplicator.json");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Project Replicator.p12");
 
                             tp.ToolName = "Model Manager";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.ModelManager.dll";
@@ -591,10 +593,11 @@ namespace HOK.AddIn_Installer_Internal
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets_samrtBCF.json");
 
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\walker.png");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Shared Parameters.txt");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\Addins Shared Parameters.txt");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\client_secrets_samrtBCF.json");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK smartBCF.p12");
                             
                             tp.ToolName = "Smart BCF";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll";
@@ -850,7 +853,8 @@ namespace HOK.AddIn_Installer_Internal
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets.json");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\client_secrets_ProjectReplicator.json");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Project Replicator.p12");
 
                             tp.ToolName = "Model Manager";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.ModelManager.dll";
@@ -889,10 +893,11 @@ namespace HOK.AddIn_Installer_Internal
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Extensions.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\System.Net.Http.Primitives.dll");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Zlib.Portable.dll");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\client_secrets_samrtBCF.json");
 
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\walker.png");
-                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK Shared Parameters.txt");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\Addins Shared Parameters.txt");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\client_secrets_samrtBCF.json");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\Resources\\HOK smartBCF.p12");
                             
                             tp.ToolName = "Smart BCF";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.SmartBCF.dll";
