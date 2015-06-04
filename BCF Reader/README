@@ -1,3 +1,6 @@
+v.0.0.12
+-Client Login has been replaced to a service account with p12 key file using OAuth 2.0
+
 v.0.0.11
 -Updated with Google Drive API v.1.9.0.167
 -Updated with Google Sheet API v2.2
