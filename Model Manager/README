@@ -1,3 +1,6 @@
+v.0.2.1
+- Client Login has been reaplaced with a service account key file using OAuth 2.0
+
 v.0.2.0
 -Updated Google Drive API and Sheet API
 
