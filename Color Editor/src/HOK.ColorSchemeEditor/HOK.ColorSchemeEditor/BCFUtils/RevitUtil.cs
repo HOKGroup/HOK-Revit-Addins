@@ -442,5 +442,135 @@ namespace HOK.ColorSchemeEditor.BCFUtils
             return paramNames;
         }
 
+        public static Dictionary<int/*paramId*/, ParameterInfo> GetParameterInfoList(Document doc, Category category)
+        {
+            Dictionary<int, ParameterInfo> paramDictionary = new Dictionary<int, ParameterInfo>();
+            try
+            {
+                FilteredElementCollector collector = new FilteredElementCollector(doc);
+                List<ElementId> instanceIds = collector.OfCategoryId(category.Id).WhereElementIsNotElementType().ToElementIds().ToList();
+
+                if (instanceIds.Count > 0)
+                {
+                    collector = new FilteredElementCollector(doc, instanceIds);
+                    List<ElementId> familyInstanceIds = collector.OfClass(typeof(FamilyInstance)).ToElementIds().ToList();
+                    if (familyInstanceIds.Count > 0)
+                    {
+                        //family instance
+                        paramDictionary = GetComponentFamilyParameters(doc, category, familyInstanceIds);
+                    }
+                    else
+                    {
+                        //system family
+                        paramDictionary = GetSystemFamilyParameters(doc, category);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get parameter info list.\n"+ex.Message, "Get Parameter Info List", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return paramDictionary;
+        }
+
+        private static Dictionary<int/*paramId*/, ParameterInfo> GetComponentFamilyParameters(Document doc, Category category, List<ElementId> instanceIds)
+        {
+            Dictionary<int, ParameterInfo> paramDictionary = new Dictionary<int, ParameterInfo>();
+            try
+            {
+                FilteredElementCollector collector = new FilteredElementCollector(doc);
+                List<FamilySymbol> familySymbols = collector.OfCategoryId(category.Id).OfClass(typeof(FamilySymbol)).ToElements().Cast<FamilySymbol>().ToList();
+                List<string> familyNames = new List<string>();
+
+                foreach (FamilySymbol symbol in familySymbols)
+                {
+                    string familyName = symbol.Family.Name;
+                    if (string.IsNullOrEmpty(familyName)) { continue; }
+                    if (familyNames.Contains(familyName)) { continue; }
+                    
+                    FamilyInstanceFilter instanceFilter = new FamilyInstanceFilter(doc, symbol.Id);
+                    collector = new FilteredElementCollector(doc, instanceIds);
+                    List<FamilyInstance> instances = collector.WherePasses(instanceFilter).ToElements().Cast<FamilyInstance>().ToList();
+                    if (instances.Count > 0)
+                    {
+                        FamilyInstance instance = instances.First();
+                        foreach (Parameter param in instance.Parameters)
+                        {
+                            string paramName = param.Definition.Name;
+                            if (!paramDictionary.ContainsKey(param.Id.IntegerValue) && !paramName.Contains("Extensions."))
+                            {
+                                ParameterInfo paramInfo = new ParameterInfo(param, true);
+                                paramDictionary.Add(paramInfo.ParamId.IntegerValue, paramInfo);
+                            }
+                        }
+
+                        foreach (Parameter param in symbol.Parameters)
+                        {
+                            string paramName = param.Definition.Name;
+                            if (!paramDictionary.ContainsKey(param.Id.IntegerValue) && !paramName.Contains("Extensions."))
+                            {
+                                ParameterInfo paramInfo = new ParameterInfo(param, false);
+                                paramDictionary.Add(paramInfo.ParamId.IntegerValue, paramInfo);
+                            }
+                        }
+
+                        familyNames.Add(familyName);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get family parameters.\n"+ex.Message, "Get Family Parameters", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return paramDictionary;
+        }
+
+        private static Dictionary<int/*paramId*/, ParameterInfo> GetSystemFamilyParameters(Document doc, Category category)
+        {
+            Dictionary<int, ParameterInfo> paramDictionary = new Dictionary<int, ParameterInfo>();
+            try
+            {
+                FilteredElementCollector collector = new FilteredElementCollector(doc);
+                List<ElementType> elementTypes = collector.OfCategoryId(category.Id).OfClass(typeof(ElementType)).ToElements().Cast<ElementType>().ToList();
+
+                collector = new FilteredElementCollector(doc);
+                List<Element> instances = collector.OfCategoryId(category.Id).ToElements().ToList();
+
+                foreach (ElementType elemType in elementTypes)
+                {
+                    var elements = from instance in instances where instance.GetTypeId() == elemType.Id select instance;
+                    if (elements.Count() > 0)
+                    {
+                        Element firstElement = elements.First();
+                        foreach (Parameter param in firstElement.Parameters)
+                        {
+                            string paramName = param.Definition.Name;
+                            if (!paramDictionary.ContainsKey(param.Id.IntegerValue) && !paramName.Contains("Extensions."))
+                            {
+                                ParameterInfo paramInfo = new ParameterInfo(param, true);
+                                paramDictionary.Add(paramInfo.ParamId.IntegerValue, paramInfo);
+                            }
+                        }
+
+                        foreach (Parameter param in elemType.Parameters)
+                        {
+                            string paramName = param.Definition.Name;
+                            if (!paramDictionary.ContainsKey(param.Id.IntegerValue) && !paramName.Contains("Extensions."))
+                            {
+                                ParameterInfo paramInfo = new ParameterInfo(param, false);
+                                paramDictionary.Add(paramInfo.ParamId.IntegerValue, paramInfo);
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get family parameters.\n" + ex.Message, "Get Family Parameters", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return paramDictionary;
+        }
     }
 }

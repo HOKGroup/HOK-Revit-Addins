@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300" Width="660" Height="500" Title="Select Elements" WindowStartupLocation="CenterOwner" Icon="/HOK.ColorSchemeEditor;component/Images/hoklogo.ico">
+             d:DesignHeight="300" d:DesignWidth="300" Width="660" Height="500" Title="Select Elements" WindowStartupLocation="CenterOwner" Icon="Images/hoklogo.ico">
     <Window.Resources>
         <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
             <Setter Property="IsExpanded" Value="False" />
@@ -38,12 +38,12 @@
                     <CheckBox Content="Hide un-checked categories" Height="16" HorizontalAlignment="Left" Margin="7,38,0,0" Name="checkBoxHide" VerticalAlignment="Top" Checked="checkBoxHide_Checked" Unchecked="checkBoxHide_Unchecked" />
                     <Button HorizontalAlignment="Left" Margin="7,0,0,7" Name="buttonCheckAll" Width="23" Height="23" VerticalAlignment="Bottom" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonCheckAll_Click">
                         <Button.Content>
-                            <Image Source="/HOK.ColorSchemeEditor;component/Images/checkAll.png" />
+                            <Image Source="Images/checkAll.png" />
                         </Button.Content>
                     </Button>
                     <Button HorizontalAlignment="Left" Margin="30,0,0,7" Name="buttonCheckNone" Width="23" Height="23" VerticalAlignment="Bottom" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonCheckNone_Click">
                         <Button.Content>
-                            <Image Source="/HOK.ColorSchemeEditor;component/Images/uncheck.png" />
+                            <Image Source="Images/uncheck.png" />
                         </Button.Content>
                     </Button>
                     <TreeView x:Name="treeViewCategory" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneTime}" ItemTemplate="{StaticResource CheckBoxItemTemplate}" HorizontalAlignment="Stretch" Margin="6,57,6,36" VerticalAlignment="Stretch" IsTextSearchEnabled="True" KeyDown="treeViewCategory_KeyDown" />

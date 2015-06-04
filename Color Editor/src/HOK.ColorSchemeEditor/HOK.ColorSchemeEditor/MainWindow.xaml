@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="850" Name="mainWindow" SizeToContent="WidthAndHeight" Title="Color Scheme Editor" MinHeight="800" MaxHeight="800" MinWidth="900" MaxWidth="900" Icon="/HOK.ColorSchemeEditor;component/Images/hoklogo.ico" WindowStartupLocation="CenterScreen" Closing="mainWindow_Closing">
+             d:DesignHeight="800" d:DesignWidth="850" Name="mainWindow" SizeToContent="WidthAndHeight" Title="Color Scheme Editor" MinHeight="800" MaxHeight="800" MinWidth="900" MaxWidth="900" Icon="Images/hoklogo.ico" WindowStartupLocation="CenterScreen" Closing="mainWindow_Closing">
     <Window.Resources>
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
@@ -128,37 +128,37 @@
             <ToolBar Band="1" BandIndex="1" VerticalContentAlignment="Stretch">
                 <Button Name="buttonNewBCF" Click="buttonNewBCF_Click">
                     <StackPanel Orientation="Horizontal" Margin="5,0">
-                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/asterisk.png" />
+                        <Image Margin="0,1,5,0" Source="Images/asterisk.png" />
                         <TextBlock>Create New</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Name="buttonOpenBCF" Margin="5,0" Click="buttonOpenBCF_Click">
                     <StackPanel Orientation="Horizontal">
-                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/open.ico" />
+                        <Image Margin="0,1,5,0" Source="Images/open.ico" />
                         <TextBlock>Open Color Scheme</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Name="buttonSaveBCF" Margin="5,0" Click="buttonSaveBCF_Click" IsEnabled="False">
                     <StackPanel Orientation="Horizontal">
-                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/save.ico" Stretch="None" />
+                        <Image Margin="0,1,5,0" Source="Images/save.ico" Stretch="None" />
                         <TextBlock>Save BCF</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Name="buttonSaveAsBCF" Margin="5,0" Click="buttonSaveAsBCF_Click" IsEnabled="False">
                     <StackPanel Orientation="Horizontal">
-                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/saveas.ico" Stretch="None" />
+                        <Image Margin="0,1,5,0" Source="Images/saveas.ico" Stretch="None" />
                         <TextBlock>Save As</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Name="buttonSettings" Margin="5,0" IsEnabled="False">
                     <StackPanel Orientation="Horizontal">
-                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/setting.ico" Stretch="None" />
+                        <Image Margin="0,1,5,0" Source="Images/setting.ico" Stretch="None" />
                         <TextBlock>Settings</TextBlock>
                     </StackPanel>
                 </Button>
                 <Button Name="buttonHelp" Margin="5,0" IsEnabled="False">
                     <StackPanel Orientation="Horizontal">
-                        <Image Margin="0,1,5,0" Source="/HOK.ColorSchemeEditor;component/Images/help.png" Stretch="None" />
+                        <Image Margin="0,1,5,0" Source="Images/help.png" Stretch="None" />
                         <TextBlock>Help</TextBlock>
                     </StackPanel>
                 </Button>

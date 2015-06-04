@@ -43,7 +43,8 @@ namespace HOK.ColorSchemeEditor
         private List<ViewInfo> viewInfoList = new List<ViewInfo>();
         private Dictionary<int, ElementProperties> filteredElements = new Dictionary<int, ElementProperties>();
         private SortableObservableCollection<ListViewModel> sortableSchemeViews = new SortableObservableCollection<ListViewModel>();
-       
+        private Dictionary<int, ParameterInfo> paramInfoDictionary = new Dictionary<int, ParameterInfo>();
+        
         public MainWindow(UIApplication uiapp)
         {
             m_app = uiapp;
@@ -105,6 +106,7 @@ namespace HOK.ColorSchemeEditor
                         List<FilterRule> selectedFilterRules = new List<FilterRule>();
                         selectedFilterRules = categoryWindow.SelectedRules;
                         bool includeLinks = categoryWindow.IncludeLinks;
+                        paramInfoDictionary = categoryWindow.ParamInfoDictionary;
                         categoryWindow.Close();
 
                         ICollection<ElementId> filterCatIds = new List<ElementId>();
@@ -120,7 +122,7 @@ namespace HOK.ColorSchemeEditor
                         selectedColorScheme.FilterRules = selectedFilterRules;
                         selectedColorScheme.IncludeLinks = includeLinks;
 
-                        SelectParameter(selectedColorScheme);
+                        SelectParameterByColorScheme(selectedColorScheme);
                     }
                 }
             }
@@ -609,7 +611,7 @@ namespace HOK.ColorSchemeEditor
                     {
                         selectedColorScheme = selectedItem.ItemContent as ColorScheme;
                     }
-                    SelectParameter(selectedColorScheme);
+                    SelectParameterByColorScheme(selectedColorScheme);
                     SelectView(selectedColorScheme);
 
                 }
@@ -1250,30 +1252,60 @@ namespace HOK.ColorSchemeEditor
             }
         }
 
-        private void SelectParameter(ColorScheme colorScheme)
+        private void SelectParameterByColorScheme(ColorScheme colorScheme)
         {
             try
             {
                 Categories categories = m_doc.Settings.Categories;
-                ICollection<ElementId> filterCatIds = new List<ElementId>();
                 List<Category> categoryList = new List<Category>();
                 foreach (string catName in colorScheme.Categories)
                 {
-                    Category category = categories.get_Item(catName);
-                    if (null != category)
+                    if (!string.IsNullOrEmpty(catName))
                     {
-                        filterCatIds.Add(category.Id);
-                        categoryList.Add(category);
+                        Category category = categories.get_Item(catName);
+                        if (null != category)
+                        {
+                            categoryList.Add(category);
+                        }
                     }
                 }
 
-                ICollection<ElementId> supportedParams = ParameterFilterUtilities.GetFilterableParametersInCommon(m_doc, filterCatIds);
-                List<string> projectParamNames = RevitUtil.FindProjectParameters(m_doc, categoryList);
-                if (colorScheme.FilteredElements.Count > 0)
+                if (colorScheme.FilteredElements.Count > 0 && categoryList.Count > 0)
                 {
-                    Element element = colorScheme.FilteredElements.First();
-                    ResetParameterComboBox(comboBoxColor, element, supportedParams, projectParamNames);
+                    paramInfoDictionary = new Dictionary<int, ParameterInfo>(); //accumulated dictionary
+                    paramInfoDictionary = RevitUtil.GetParameterInfoList(m_doc, categoryList[0]);
+                    if (categoryList.Count > 1)
+                    {
+                        List<int> intersectedIds = paramInfoDictionary.Keys.ToList(); //intersected id list
+                        for (int i = 1; i < categoryList.Count; i++)
+                        {
+                            Dictionary<int, ParameterInfo> dictionary = RevitUtil.GetParameterInfoList(m_doc, categoryList[i]);
+                            List<int> paramIds = dictionary.Keys.ToList();
+                            foreach (int paramId in paramIds)
+                            {
+                                if (!paramInfoDictionary.ContainsKey(paramId))
+                                {
+                                    paramInfoDictionary.Add(paramId, dictionary[paramId]);
+                                }
+                            }
+                            intersectedIds = intersectedIds.Intersect(paramIds).ToList();
+                        }
+
+                        if (intersectedIds.Count > 0 && paramInfoDictionary.Count > 0)
+                        {
+                            List<int> paramIds = paramInfoDictionary.Keys.ToList();
+                            foreach (int paramId in paramIds)
+                            {
+                                if (!intersectedIds.Contains(paramId))
+                                {
+                                    paramInfoDictionary.Remove(paramId);
+                                }
+                            }
+                        }
+                    }
                 }
+
+                ResetParameterComboBox(comboBoxColor, paramInfoDictionary);
 
                 if (!string.IsNullOrEmpty(colorScheme.ParameterName))
                 {
@@ -1367,130 +1399,21 @@ namespace HOK.ColorSchemeEditor
             }
         }
 
-        private void ResetParameterComboBox(System.Windows.Controls.ComboBox comboBox, Element element, ICollection<ElementId> paramSet, List<string> projectParamNames)
+        private void ResetParameterComboBox(System.Windows.Controls.ComboBox comboBox, Dictionary<int, ParameterInfo> dictionary)
         {
             try
             {
-                List<string> paramNames = projectParamNames;
-                foreach (ElementId paramId in paramSet)
-                {
-                    if (paramId.IntegerValue < 0)
-                    {
-                        BuiltInParameter bltParameter = (BuiltInParameter)paramId.IntegerValue;
-                        string paramName = LabelUtils.GetLabelFor(bltParameter);
-                        paramNames.Add(paramName);
-                    }
-                }
+                List<ParameterInfo> paramInfoList = dictionary.Values.ToList();
+                paramInfoList = paramInfoList.OrderBy(o => o.Name).ToList();
 
-                paramNames = paramNames.Distinct().ToList();
-
-                List<ParameterInfo> paramInfoList = ResetParameterInfo(element, paramNames);
                 comboBox.ItemsSource = null;
                 comboBox.ItemsSource = paramInfoList;
                 comboBox.DisplayMemberPath = "Name";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to reset parameter combobox.\n" + ex.Message, "Reset Parameter ComboBox", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to reset parameter combobox.\n"+ex.Message, "Reset Parameter Combobox", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-        }
-
-        private List<ParameterInfo> ResetParameterInfo(Element element, List<string> paramNames)
-        {
-            List<ParameterInfo> resetInfo = new List<ParameterInfo>();
-            try
-            {
-                Dictionary<string, ParameterInfo> paramInfo = AddBasicParameterInfo();
-
-                //Insert Level associated parameter
-                foreach (Parameter parameter in element.Parameters)
-                {
-                    string parameterName = parameter.Definition.Name;
-                    if (parameterName.Contains("Level") && parameter.StorageType == StorageType.ElementId)
-                    {
-                        if (!paramNames.Contains(parameterName))
-                        {
-                            ParameterInfo pi = new ParameterInfo(parameter);
-                            pi.IsInstance = true;
-                            if (!paramInfo.ContainsKey(parameterName))
-                            {
-                                paramInfo.Add(parameterName, pi);
-                            }
-                        }
-                    }
-                }
-
-                foreach (string paramName in paramNames)
-                {
-                    if (paramName.Contains("Extensions.")) { continue; }
-#if RELEASE2014
-                    Parameter param = element.get_Parameter(paramName);
-#else
-                    Parameter param = element.LookupParameter(paramName);
-#endif
-
-                    if (null != param)
-                    {
-                        ParameterInfo pi = new ParameterInfo(param);
-                        pi.IsInstance = true;
-                        if (!paramInfo.ContainsKey(paramName))
-                        {
-                            paramInfo.Add(paramName, pi);
-                        }
-                    }
-                    else
-                    {
-                        ElementId typeId = element.GetTypeId();
-                        ElementType eType = m_doc.GetElement(typeId) as ElementType;
-                        if (null != eType)
-                        {
-#if RELEASE2014
-                            param = eType.get_Parameter(paramName);
-#else
-                            param = eType.LookupParameter(paramName);
-#endif
-
-                            if (null != param)
-                            {
-                                ParameterInfo pi = new ParameterInfo(param);
-                                pi.IsInstance = false;
-                                if (!paramInfo.ContainsKey(paramName))
-                                {
-                                    paramInfo.Add(paramName, pi);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                resetInfo = paramInfo.Values.ToList();
-                resetInfo = resetInfo.OrderBy(o => o.Name).ToList();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to reset parameter information.\n" + ex.Message, "Reset Parameter Information", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return resetInfo;
-        }
-
-        private Dictionary<string, ParameterInfo> AddBasicParameterInfo()
-        {
-            Dictionary<string, ParameterInfo> paramInfo = new Dictionary<string, ParameterInfo>();
-            try
-            {
-                BuiltInParameter[] basicParameters = new BuiltInParameter[] { BuiltInParameter.ALL_MODEL_FAMILY_NAME, BuiltInParameter.ALL_MODEL_TYPE_NAME };
-                foreach (BuiltInParameter bltParam in basicParameters)
-                {
-                    ParameterInfo pi = new ParameterInfo(m_doc, bltParam);
-                    pi.IsInstance = false;
-                    paramInfo.Add(pi.Name, pi);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to add basic parameter information.\n"+ex.Message, "Add Basic Parameter Info", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return paramInfo;
         }
 
         private ColorScheme GetFilteredElements(ColorScheme colorScheme)

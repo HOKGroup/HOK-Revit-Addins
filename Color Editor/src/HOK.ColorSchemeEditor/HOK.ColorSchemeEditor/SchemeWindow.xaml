@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             SizeToContent="WidthAndHeight" Width="300" Height="450" Icon="/HOK.ColorSchemeEditor;component/Images/hoklogo.ico" Title="Import Color Schemes" MinWidth="300" MinHeight="450" WindowStartupLocation="CenterOwner">
+             SizeToContent="WidthAndHeight" Width="300" Height="450" Icon="Images/hoklogo.ico" Title="Import Color Schemes" MinWidth="300" MinHeight="450" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <DataTemplate x:Key="CheckBoxItemTemplate">
             <StackPanel Orientation="Horizontal">
@@ -39,12 +39,12 @@
                 </ListView>
                 <Button Grid.Row="2" HorizontalAlignment="Left" Margin="7,0,0,7" Name="buttonCheckAll" Width="23" Height="23" VerticalAlignment="Bottom" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonCheckAll_Click">
                     <Button.Content>
-                        <Image Source="/HOK.ColorSchemeEditor;component/Images/checkAll.png" />
+                        <Image Source="Images/checkAll.png" />
                     </Button.Content>
                 </Button>
                 <Button Grid.Row="2" HorizontalAlignment="Left" Margin="30,0,0,7" Name="buttonCheckNone" Width="23" Height="23" VerticalAlignment="Bottom" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonCheckNone_Click">
                     <Button.Content>
-                        <Image Source="/HOK.ColorSchemeEditor;component/Images/uncheck.png" />
+                        <Image Source="Images/uncheck.png" />
                     </Button.Content>
                 </Button>
                 <Label Content="Select color schemes to be imported" Height="28" HorizontalAlignment="Left" Margin="6,2,0,0" Name="labelSelect" VerticalAlignment="Top" Foreground="Gray" />
