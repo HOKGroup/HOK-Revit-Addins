@@ -94,7 +94,7 @@ namespace HOK.RoomsToMass.ToMass
                         string fileName = Path.Combine(massFolder, rp.ID + ".rfa");
                         familyDoc.SaveAs(fileName, opt);
                         familyDoc.Close(true);
-                        familyInstance = LoadMassFamily(fileName, rp.Level);
+                        familyInstance = LoadMassFamily(fileName, rp.LevelObj);
                     }
                 }
             }
@@ -160,7 +160,7 @@ namespace HOK.RoomsToMass.ToMass
                         familyDoc.SaveAs(fileName, opt);
                         familyDoc.Close(true);
 
-                        familyInstance = LoadMassFamily(fileName, ap.Level);
+                        familyInstance = LoadMassFamily(fileName, ap.LevelObj);
                     }
                 }
             }
@@ -226,7 +226,7 @@ namespace HOK.RoomsToMass.ToMass
                         string fileName = Path.Combine(massFolder, fp.ID + ".rfa");
                         familyDoc.SaveAs(fileName, opt);
                         familyDoc.Close(true);
-                        familyInstance = LoadMassFamily(fileName, fp.Level);
+                        familyInstance = LoadMassFamily(fileName, fp.LevelObj);
                     }
                 }
             }
@@ -723,7 +723,7 @@ namespace HOK.RoomsToMass.ToMass
             }
         }
 
-        private FamilyInstance LoadMassFamily(string fileName, string levelName)
+        private FamilyInstance LoadMassFamily(string fileName, Level level)
         {
             FamilyInstance familyInstance = null;
             using (Transaction trans = new Transaction(doc))
@@ -738,12 +738,13 @@ namespace HOK.RoomsToMass.ToMass
                     FamilySymbolSetIterator symbolIterator = newFamily.Symbols.ForwardIterator();
                     symbolIterator.MoveNext();
                     FamilySymbol symbol = symbolIterator.Current as FamilySymbol;
-                    FilteredElementCollector collector = new FilteredElementCollector(doc);
-                    SketchPlane skPlane = collector.OfClass(typeof(SketchPlane)).First<Element>(e => e.Name.Equals(levelName)) as SketchPlane;
 
 #if RELEASE2013
+                    FilteredElementCollector collector = new FilteredElementCollector(doc);
+                    SketchPlane skPlane = collector.OfClass(typeof(SketchPlane)).First<Element>(e => e.Name.Equals(level.Name)) as SketchPlane;
                     familyInstance = doc.Create.NewFamilyInstance(new XYZ(0, 0, skPlane.Plane.Origin.Z), symbol, skPlane, StructuralType.NonStructural);
 #elif RELEASE2014
+                    SketchPlane skPlane = SketchPlane.Create(doc, level.Id);
                     familyInstance = doc.Create.NewFamilyInstance(new XYZ(0, 0, skPlane.GetPlane().Origin.Z), symbol, skPlane, StructuralType.NonStructural);
 #endif
 
@@ -755,9 +756,12 @@ namespace HOK.RoomsToMass.ToMass
                         FamilySymbol fSymbol = doc.GetElement(symbolId) as FamilySymbol;
                         if (null != fSymbol)
                         {
-                            FilteredElementCollector collector = new FilteredElementCollector(doc);
-                            SketchPlane skPlane = collector.OfClass(typeof(SketchPlane)).First<Element>(e => e.Name.Equals(levelName)) as SketchPlane;
-                            familyInstance = doc.Create.NewFamilyInstance(new XYZ(0, 0, skPlane.GetPlane().Origin.Z), fSymbol, skPlane, StructuralType.NonStructural);
+                            SketchPlane skPlane = SketchPlane.Create(doc, level.Id);
+                            if (null != skPlane)
+                            {
+                                familyInstance = doc.Create.NewFamilyInstance(new XYZ(0, 0, skPlane.GetPlane().Origin.Z), fSymbol, skPlane, StructuralType.NonStructural);
+                            }
+
                         }
                     }
 #endif

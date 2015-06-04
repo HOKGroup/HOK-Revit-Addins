@@ -34,6 +34,24 @@ namespace HOK.RoomsToMass.ToMass
 
         public double UnboundedHeight { get { try { return m_room.UnboundedHeight; } catch { return 0; } } }
         public double DefaultHeight { get { return defaultHeight; } set { defaultHeight = value; } }
+        public Level LevelObj
+        {
+            get
+            {
+                try
+                {
+#if RELEASE2013
+                    ElementId levelId = m_room.Level.Id;
+#elif RELEASE2014||RELEASE2015
+                    ElementId levelId = m_room.LevelId;
+#endif
+                    Level level = m_doc.GetElement(levelId) as Level;
+                    return level;
+                }
+                catch { return null; }
+            } 
+        }
+
         public string Level 
         { 
             get 
@@ -157,12 +175,16 @@ namespace HOK.RoomsToMass.ToMass
                     foreach (Parameter param in m_room.Parameters)
                     {
                         if (param.Definition.Name.Contains("Extensions.")) { continue; }
-                        parameters.Add(param.Definition.Name, param);
+                        if (!parameters.ContainsKey(param.Definition.Name))
+                        {
+                            parameters.Add(param.Definition.Name, param);
+                        }
                     }
                     return parameters;
                 }
-                catch
+                catch(Exception ex)
                 {
+                    string message = ex.Message;
                     return parameters;
                 }
             }

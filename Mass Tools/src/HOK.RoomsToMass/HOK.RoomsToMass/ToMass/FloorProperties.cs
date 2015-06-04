@@ -21,6 +21,23 @@ namespace HOK.RoomsToMass.ToMass
         public string TypeName { get { try { return m_floor.FloorType.Name; } catch { return ""; } } }
         public int ID { get { try { return m_floor.Id.IntegerValue; } catch { return 0; } } }
         public double Height { get; set; }
+        public Level LevelObj
+        {
+            get
+            {
+                try
+                {
+#if RELEASE2013
+                    ElementId levelId = m_floor.Level.Id;
+#elif RELEASE2014||RELEASE2015
+                    ElementId levelId = m_floor.LevelId;
+#endif
+                    Level level = m_doc.GetElement(levelId) as Level;
+                    return level;
+                }
+                catch { return null; }
+            }
+        }
         public string Level 
         { 
             get 

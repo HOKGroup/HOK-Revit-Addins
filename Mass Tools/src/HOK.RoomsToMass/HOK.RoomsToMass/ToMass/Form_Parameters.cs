@@ -82,6 +82,7 @@ namespace HOK.RoomsToMass.ToMass
 
             foreach (Parameter param in element.Parameters)
             {
+                if (param.Definition.Name.Contains("Extensions.")) { continue; }
                 if (param.StorageType != StorageType.ElementId)
                 {
                     ListViewItem item = new ListViewItem();
