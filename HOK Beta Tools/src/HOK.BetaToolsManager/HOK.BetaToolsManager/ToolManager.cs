@@ -395,7 +395,8 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("System.Net.Http.Extensions.dll");
                         fileNames.Add("System.Net.Http.Primitives.dll");
                         fileNames.Add("Zlib.Portable.dll");
-                        fileNames.Add("client_secrets.json");
+                        fileNames.Add("Resources\\client_secrets_ProjectReplicator.json");
+                        fileNames.Add("Resources\\HOK Project Replicator.p12");
                         break;
                     case ToolEnum.ColorEditor:
                         fileNames.Add("HOK.ColorSchemeEditor.dll");
