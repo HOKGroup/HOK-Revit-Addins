@@ -104,7 +104,7 @@ namespace HOK.SmartBCF.Walker
                 }
                 schemeInfo = BCFParser.ReadColorSchemes(bcfColorSchemeId, false);
 
-                bcfFileDictionary = DataStorageUtil.ReadLinkedBCFFileInfo(m_doc);
+                bcfFileDictionary = DataStorageUtil.ReadLinkedBCFFileInfo(m_doc, bcfProjectId);
                 bcfDictionary = GetBCFDictionary(m_doc);
 
                 List<BuiltInCategory> bltCategories = catDictionary.Values.ToList();
@@ -127,13 +127,22 @@ namespace HOK.SmartBCF.Walker
             Dictionary<string, Dictionary<string, IssueEntry>> bcfDcitionary = new Dictionary<string, Dictionary<string, IssueEntry>>();
             try
             {
-                foreach (string fileId in bcfFileDictionary.Keys)
-                {
-                    Dictionary<string, IssueEntry> issueDictionary = GetBCFIssueInfo(doc, fileId);
+                List<string> fileIds = bcfFileDictionary.Keys.ToList();
 
-                    if (!bcfDcitionary.ContainsKey(fileId))
+                foreach (string fileId in fileIds)
+                {
+                    if (null != FileManager.FindFileById(fileId))
                     {
-                        bcfDcitionary.Add(fileId, issueDictionary);
+                        Dictionary<string, IssueEntry> issueDictionary = GetBCFIssueInfo(doc, fileId);
+
+                        if (!bcfDcitionary.ContainsKey(fileId))
+                        {
+                            bcfDcitionary.Add(fileId, issueDictionary);
+                        }
+                    }
+                    else
+                    {
+                        bcfFileDictionary.Remove(fileId);
                     }
                 }
 

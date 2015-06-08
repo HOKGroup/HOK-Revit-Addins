@@ -193,7 +193,7 @@ namespace HOK.SmartBCF.Walker
                                 fileHolders.ActiveBCF = createdSheet;
                                 fileHolders.BCFImages = uploadedImages;
 
-                                bcfFileInfo = new LinkedBcfFileInfo(createdSheet.Title, createdSheet.Id, sharedLink, bcfProjectId, googleFolders.RootTitle);
+                                bcfFileInfo = new LinkedBcfFileInfo(createdSheet.Title, createdSheet.Id, sharedLink, bcfProjectId, googleFolders.RootTitle, bcfProjectId);
 
                                 this.DialogResult = true;
                             }

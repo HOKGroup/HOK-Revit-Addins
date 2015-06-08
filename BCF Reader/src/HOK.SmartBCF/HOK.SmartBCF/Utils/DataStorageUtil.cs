@@ -8,12 +8,13 @@ using System.Windows;
 using System.Windows.Media;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
+using HOK.SmartBCF.GoogleUtils;
 
 namespace HOK.SmartBCF.Utils
 {
     public static class DataStorageUtil
     {
-        public static Guid bcfSchemaId = new Guid("7DB00972-B525-4C37-AC97-BCF1E52C1E49");
+        public static Guid bcfSchemaId = new Guid("FB6DC6BC-AF50-4848-A1E3-AA4CAC98D96A");
         public static Guid colorSchemaId = new Guid("83E4C48C-83B5-4696-86D7-653C2BBF277D");
         public static Guid categorySchemaId = new Guid("5106EC42-8A60-4508-BD8D-87C8562FD40C");
         public static Schema bcf_Schema = Schema.Lookup(bcfSchemaId);
@@ -26,6 +27,7 @@ namespace HOK.SmartBCF.Utils
         private static string s_sharedLinkId = "SahredLinkId"; //bcf project Id
         private static string s_sharedLinkAddress = "SharedLinkAddress"; //full address of the shared folder link
         private static string s_sharedFolderTitle = "SharedFolderTitle"; //shared folder name
+        private static string s_projectFolderId = "ProjectFolderId";//Project folder Id
 
         //BCF Color Schemes
         private static string s_colorSchemeId = "ColorSchemeId";
@@ -39,7 +41,7 @@ namespace HOK.SmartBCF.Utils
         //BCF Categories
         private static string s_categoryNames = "CategoryNames";
 
-        public static Dictionary<string/*fileId*/, LinkedBcfFileInfo> ReadLinkedBCFFileInfo(Document doc)
+        public static Dictionary<string/*fileId*/, LinkedBcfFileInfo> ReadLinkedBCFFileInfo( Document doc, string bcfProjectFolderId)
         {
             Dictionary<string, LinkedBcfFileInfo> linkedBcfFiles = new Dictionary<string, LinkedBcfFileInfo>();
             try
@@ -62,11 +64,15 @@ namespace HOK.SmartBCF.Utils
                             string folderId = entity.Get<string>(bcf_Schema.GetField(s_sharedLinkId));
                             string folderAddress = entity.Get<string>(bcf_Schema.GetField(s_sharedLinkAddress));
                             string folderTitle = entity.Get<string>(bcf_Schema.GetField(s_sharedFolderTitle));
+                            string projectFolderId = entity.Get<string>(bcf_Schema.GetField(s_projectFolderId));
 
-                            LinkedBcfFileInfo fileInfo = new LinkedBcfFileInfo(fileName, fileId, folderAddress, folderId, folderTitle);
-                            if (!linkedBcfFiles.ContainsKey(fileId))
+                            if (bcfProjectFolderId == projectFolderId)
                             {
-                                linkedBcfFiles.Add(fileId, fileInfo);
+                                LinkedBcfFileInfo fileInfo = new LinkedBcfFileInfo(fileName, fileId, folderAddress, folderId, folderTitle, projectFolderId);
+                                if (!linkedBcfFiles.ContainsKey(fileId))
+                                {
+                                    linkedBcfFiles.Add(fileId, fileInfo);
+                                }
                             }
                         }
                     }
@@ -241,6 +247,7 @@ namespace HOK.SmartBCF.Utils
                                 entity.Set<string>(s_sharedLinkId, info.SharedLinkId);
                                 entity.Set<string>(s_sharedLinkAddress, info.SharedLinkAddress);
                                 entity.Set<string>(s_sharedFolderTitle, info.SharedFolderName);
+                                entity.Set<string>(s_projectFolderId, info.ProjectFolderId);
                                 storage.SetEntity(entity);
                             }
 
@@ -410,6 +417,7 @@ namespace HOK.SmartBCF.Utils
                 schemaBuilder.AddSimpleField(s_sharedLinkId, typeof(string));
                 schemaBuilder.AddSimpleField(s_sharedLinkAddress, typeof(string));
                 schemaBuilder.AddSimpleField(s_sharedFolderTitle, typeof(string));
+                schemaBuilder.AddSimpleField(s_projectFolderId, typeof(string));
                 schema = schemaBuilder.Finish();
             }
             catch (Exception ex)
@@ -476,20 +484,23 @@ namespace HOK.SmartBCF.Utils
         private string sharedLinkId = "";
         private string sharedLinkAddress = "";
         private string sharedFolderName = "";
+        private string projectFolderId = "";
 
         public string BCFName { get { return bcfName; } set { bcfName = value; } }
         public string BCFFileId { get { return bcfFileId; } set { bcfFileId = value; } }
         public string SharedLinkId { get { return sharedLinkId; } set { sharedLinkId = value; } }
         public string SharedLinkAddress { get { return sharedLinkAddress; } set { sharedLinkAddress = value; } }
         public string SharedFolderName { get { return sharedFolderName; } set { sharedFolderName = value; } }
+        public string ProjectFolderId { get { return projectFolderId; } set { projectFolderId = value; } }
 
-        public LinkedBcfFileInfo(string name, string fileId, string folderAddress, string folderId, string folderName)
+        public LinkedBcfFileInfo(string name, string fileId, string folderAddress, string folderId, string folderName, string rootFolderId)
         {
             bcfName = name;
             bcfFileId = fileId;
             sharedLinkAddress = folderAddress;
             sharedLinkId = folderId;
             sharedFolderName = folderName;
+            projectFolderId = rootFolderId;
         }
 
         public LinkedBcfFileInfo() { }

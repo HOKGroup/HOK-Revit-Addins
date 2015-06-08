@@ -147,7 +147,12 @@ namespace HOK.SmartBCF.GoogleUtils
                                 row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[5].ToLower(), Value = comment.VerbalStatus });
                                 row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[6].ToLower(), Value = comment.Author});
                                 row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[7].ToLower(), Value = comment.Date.ToString() });
-                                sheetsService.Insert(listFeed, row);
+                                
+                                try
+                                {
+                                    ListEntry insertedRow = sheetsService.Insert(listFeed, row);
+                                }
+                                catch { System.Threading.Thread.Sleep(500); }
                             }
                         }
                     }
@@ -200,7 +205,11 @@ namespace HOK.SmartBCF.GoogleUtils
                             row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[3].ToLower(), Value = "MOVE" });
                             row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[4].ToLower(), Value = "ARCHITECTURE" });
 
-                            sheetsService.Insert(listFeed, row);
+                            try
+                            {
+                                ListEntry insertedRow = sheetsService.Insert(listFeed, row);
+                            }
+                            catch { System.Threading.Thread.Sleep(500); }
                         }
                     }
                     created = true;

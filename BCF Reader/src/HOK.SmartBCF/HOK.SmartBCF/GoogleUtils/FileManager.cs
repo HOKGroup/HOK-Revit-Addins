@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,9 @@ namespace HOK.SmartBCF.GoogleUtils
 {
     public static class FileManager
     {
+        private static string keyFile = "HOK smartBCF.p12";
+        private static string serviceAccountEmail = "756603983986-lrc8dm2b0nl381cepd60q2o7fo8df3bg@developer.gserviceaccount.com";
+
         public static DriveService service = null;
 
         private static DriveService GetUserCredential()
@@ -31,6 +35,7 @@ namespace HOK.SmartBCF.GoogleUtils
             DriveService driveService = null;
             try
             {
+                /*
                 UserCredential credential;
                 string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
@@ -53,6 +58,27 @@ namespace HOK.SmartBCF.GoogleUtils
                     HttpClientInitializer = credential,
                     ApplicationName = "HOK smartBCF",
                 });
+                */
+
+                string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
+                string keyFilePath = System.IO.Path.Combine(currentDirectory, "Resources\\" + keyFile);
+
+                X509Certificate2 certificate = new X509Certificate2(keyFilePath, "notasecret", X509KeyStorageFlags.Exportable);
+
+                ServiceAccountCredential credential = new ServiceAccountCredential(
+                    new ServiceAccountCredential.Initializer(serviceAccountEmail)
+                    {
+                        Scopes = new[] { DriveService.Scope.Drive }
+                    }.FromCertificate(certificate));
+
+                // Create the service.
+                driveService = new DriveService(new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = credential,
+                    ApplicationName = "smartBCF",
+                });
+
             }
             catch (Exception ex)
             {
@@ -60,8 +86,6 @@ namespace HOK.SmartBCF.GoogleUtils
             }
             return driveService;
         }
-
-        
 
         public static bool RootFolderExist(string rootFolderId, out File rootFolder)
         {
@@ -79,7 +103,21 @@ namespace HOK.SmartBCF.GoogleUtils
                     rootFolder = service.Files.Get(rootFolderId).Execute();
                     if (null != rootFolder)
                     {
-                        exist = true;
+                        PermissionId permissionId = service.Permissions.GetIdForEmail(serviceAccountEmail).Execute();
+                        Permission permission = null;
+                        try { permission = service.Permissions.Get(rootFolderId, permissionId.Id).Execute();  }
+                        catch { }
+
+                        if (null == permission)
+                        {
+                            Permission newPermission = new Permission();
+                            newPermission.Value = serviceAccountEmail;
+                            newPermission.Type = "user";
+                            newPermission.Role = "writer";
+                            permission = service.Permissions.Insert(newPermission, rootFolderId).Execute();
+                        }
+
+                        if (null != permission) { exist = true; }
                     }
                 }
             }
@@ -108,7 +146,7 @@ namespace HOK.SmartBCF.GoogleUtils
                         holder.RootFolder = rootFolder;
                         holder.RootTitle = rootFolder.Title;
 
-                        File colorSheet = FindSubFolder("Color Schemes", rootFolderId);
+                        File colorSheet = FindSubItemByFolderId("Color Schemes", rootFolderId);
                         if (null == colorSheet)
                         {
                             colorSheet = CreateColorSheet(rootFolderId);
@@ -120,20 +158,20 @@ namespace HOK.SmartBCF.GoogleUtils
                         }
                         holder.ColorSheet = colorSheet;
 
-                        File activeFolder = FindSubFolder("Active", rootFolderId);
+                        File activeFolder = FindSubItemByFolderId("Active", rootFolderId);
                         if (null == activeFolder)
                         {
                             activeFolder = CreateSubFolder(rootFolderId, "Active", "Interactive BCF Data will be stored in this folder.");
                         }
                         if (null != activeFolder)
                         {
-                            File bcfFolder = FindSubFolder("BCF_Files", activeFolder.Id);
+                            File bcfFolder = FindSubItemByFolderId("BCF_Files", activeFolder.Id);
                             if (null == bcfFolder)
                             {
                                 bcfFolder = CreateSubFolder(activeFolder.Id, "BCF_Files", "Parsed BCF Data will be stored as Google Spreadsheet.");
                             }
 
-                            File imgFolder = FindSubFolder("BCF_Images", activeFolder.Id);
+                            File imgFolder = FindSubItemByFolderId("BCF_Images", activeFolder.Id);
                             if (null == imgFolder)
                             {
                                 imgFolder = CreateSubFolder(activeFolder.Id, "BCF_Images", "Screen captured images of each issue will be stored in this folder.");
@@ -144,20 +182,20 @@ namespace HOK.SmartBCF.GoogleUtils
                             holder.ActiveImgFolder = imgFolder;
                         }
 
-                        File archiveFolder = FindSubFolder("Archive", rootFolderId);
+                        File archiveFolder = FindSubItemByFolderId("Archive", rootFolderId);
                         if (null == archiveFolder)
                         {
                             archiveFolder = CreateSubFolder(rootFolderId, "Archive", "Archived .bcfzip files will be stored in this folder.");
                         }
                         if (null != archiveFolder)
                         {
-                            File bcfFolder = FindSubFolder("BCF_Files", archiveFolder.Id);
+                            File bcfFolder = FindSubItemByFolderId("BCF_Files", archiveFolder.Id);
                             if (null == bcfFolder)
                             {
                                 bcfFolder = CreateSubFolder(archiveFolder.Id, "BCF_Files", "Parsed BCF Data will be stored as Google Spreadsheet.");
                             }
 
-                            File imgFolder = FindSubFolder("BCF_Images", archiveFolder.Id);
+                            File imgFolder = FindSubItemByFolderId("BCF_Images", archiveFolder.Id);
                             if (null == imgFolder)
                             {
                                 imgFolder = CreateSubFolder(archiveFolder.Id, "BCF_Images", "Screen captured images of each issue will be stored in this folder.");
@@ -200,26 +238,48 @@ namespace HOK.SmartBCF.GoogleUtils
             return subFolder;
         }
 
-        public static File FindSubFolder(string folderTitle, string parentId)
+        public static File FindSubItemByFolderId(string itemTitle, string parentId)
         {
-            File subFolder = null;
+            File subItem = null;
             try
             {
-                ChildrenResource.ListRequest request = service.Children.List(parentId);
-                request.Q = "title contains \'" + folderTitle + "\'";
-                ChildList childList = request.Execute();
-                if (childList.Items.Count > 0)
+                FilesResource.ListRequest request = service.Files.List();
+                request.Q = "title = \'" + itemTitle + "\' and \'" + parentId + "\' in parents";
+                FileList files = request.Execute();
+
+                if (files.Items.Count > 0)
                 {
-                    string fileId = childList.Items.First().Id;
-                    subFolder = service.Files.Get(fileId).Execute();
+                    foreach (File file in files.Items)
+                    {
+                        if (null == file.ExplicitlyTrashed)
+                        {
+                            subItem = file; break;
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Folder Title: " + folderTitle + "  Parent Id: " + parentId + "\nFailed to find a sub folder.\n" + ex.Message, "Find Sub Folder", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Item Title: " + itemTitle + "  Parent Id: " + parentId + "\nFailed to find a sub item.\n" + ex.Message, "Find Sub Item", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            return subFolder;
+            return subItem;
         }
+
+        public static File FindFileById(string fileId)
+        {
+            File file = null;
+            try
+            {
+                file = service.Files.Get(fileId).Execute();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to find a file by fileId: "+fileId+"\n"+ex.Message, "FindSubFile", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return file;
+        }
+
+
 
         public static List<File> FindFilesByProperty(string parentId, string propertyKey, string propertyValue)
         {
@@ -775,7 +835,7 @@ namespace HOK.SmartBCF.GoogleUtils
             bool result = false;
             try
             {
-                File fileUploaded = FileManager.FindSubFolder(fileName, folderHolder.ActiveBCFFolder.Id);
+                File fileUploaded = FileManager.FindSubItemByFolderId(fileName, folderHolder.ActiveBCFFolder.Id);
                 if (null != fileUploaded)
                 {
                     MessageBoxResult mbr = MessageBox.Show(fileName + " already exists in the shared Google Drive folder.\nWould you like to replace the file in the shared folders?", "File Already Exists", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);

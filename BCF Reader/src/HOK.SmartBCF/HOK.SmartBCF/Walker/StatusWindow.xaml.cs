@@ -431,7 +431,7 @@ namespace HOK.SmartBCF.Walker
                 Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, labelText });
 
                 string projectId = projectWindow.ProjectId;
-                File colorSheet = FileManager.FindSubFolder("Color Schemes", projectId);
+                File colorSheet = FileManager.FindSubItemByFolderId("Color Schemes", projectId);
                 ColorSchemeInfo colorInfo = BCFParser.ReadColorSchemes(colorSheet.Id, true);
 
                 List<ColorDefinition> actionColors = new List<ColorDefinition>();

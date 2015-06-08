@@ -36,7 +36,7 @@ namespace HOK.SmartBCF
             catch { }
 
 
-            RibbonPanel rp = application.CreateRibbonPanel("BCF");
+            RibbonPanel rp = application.CreateRibbonPanel(tabName, "BCF");
             string currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
 
             BitmapSource walkerImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(Properties.Resources.walker.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());

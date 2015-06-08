@@ -127,7 +127,7 @@ namespace HOK.SmartBCF.Walker
                             {
                                 if (info.IsSelected)
                                 {
-                                    LinkedBcfFileInfo linkedBCF = new LinkedBcfFileInfo(info.SheetTitle, info.SpreadsheetId, sharedLink, bcfProjectId, googleFolders.RootTitle);
+                                    LinkedBcfFileInfo linkedBCF = new LinkedBcfFileInfo(info.SheetTitle, info.SpreadsheetId, sharedLink, bcfProjectId, googleFolders.RootTitle, bcfProjectId);
                                     dataGridBCFs.ItemsSource = null;
                                     linkedBCFs.Add(linkedBCF);
                                     linkedBCFs = linkedBCFs.OrderBy(o => o.BCFName).ToList();
