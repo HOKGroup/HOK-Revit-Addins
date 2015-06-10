@@ -21,16 +21,16 @@ namespace HOK.FileOnpeningMonitor
     /// </summary>
     public partial class CentralFileWarningWindow : Window
     {
-        private Document openedDocument = null;
+        private CentralFileInfo fileInfo = null;
 
-        public CentralFileWarningWindow(Document doc)
+        public CentralFileWarningWindow(CentralFileInfo info)
         {
-            openedDocument = doc;
+            fileInfo = info;
             
             InitializeComponent();
-            if (!string.IsNullOrEmpty(doc.PathName))
+            if (!string.IsNullOrEmpty(fileInfo.DocCentralPath))
             {
-                textBlockFilePath.Text = "Central File Path:\n" + doc.PathName;
+                textBlockFilePath.Text = "Central File Path:\n" + fileInfo.DocCentralPath;
             }
             else
             {

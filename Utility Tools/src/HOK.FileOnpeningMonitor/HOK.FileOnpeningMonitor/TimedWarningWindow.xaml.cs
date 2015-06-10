@@ -22,9 +22,9 @@ namespace HOK.FileOnpeningMonitor
     public partial class TimedWarningWindow : Window
     {
         private int timerCount = 0;
-        private Dictionary<string, Document> openedCentralFiles = new Dictionary<string, Document>();
+        private Dictionary<string, CentralFileInfo> openedCentralFiles = new Dictionary<string, CentralFileInfo>();
 
-        public TimedWarningWindow(int count, Dictionary<string, Document> centralFiles)
+        public TimedWarningWindow(int count, Dictionary<string, CentralFileInfo> centralFiles)
         {
             timerCount = count;
             openedCentralFiles = centralFiles;

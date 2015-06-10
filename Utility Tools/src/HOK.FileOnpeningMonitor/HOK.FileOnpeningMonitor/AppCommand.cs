@@ -15,7 +15,7 @@ namespace HOK.FileOnpeningMonitor
 {
     public class AppCommand:IExternalApplication
     {
-        private Dictionary<string/*filePath*/, Document> openedCentralFiles = new Dictionary<string, Document>();
+        private Dictionary<string/*filePath*/, CentralFileInfo> openedCentralFiles = new Dictionary<string, CentralFileInfo>();
         private Document openedDocument = null;
         private UIControlledApplication m_app = null;
         private bool isCentral = false;
@@ -62,12 +62,16 @@ namespace HOK.FileOnpeningMonitor
                     isCentral = IsCentralFile(openedDocument);
                     if (isCentral)
                     {
-                        if (!openedCentralFiles.ContainsKey(openedDocument.PathName))
+                        CentralFileInfo fileInfo = new CentralFileInfo(openedDocument);
+                        Dictionary<string, string> properties = new Dictionary<string, string>();
+                        bool submittedJob = FMEServerUtil.RunFMEWorkspace(fileInfo, "buildingSMART Notifications", "OpenCentralFileNotification.fmw", out properties);
+
+                        if (!openedCentralFiles.ContainsKey(fileInfo.DocCentralPath))
                         {
-                            openedCentralFiles.Add(openedDocument.PathName, openedDocument);
+                            openedCentralFiles.Add(openedDocument.PathName, fileInfo);
                         }
 
-                        CentralFileWarningWindow firstWindow = new CentralFileWarningWindow(openedDocument);
+                        CentralFileWarningWindow firstWindow = new CentralFileWarningWindow(fileInfo);
                         if (firstWindow.ShowDialog() == true)
                         {
                             timerCount = 1;

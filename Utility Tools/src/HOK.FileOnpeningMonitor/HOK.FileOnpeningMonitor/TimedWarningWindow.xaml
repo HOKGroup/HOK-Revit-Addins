@@ -4,15 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-              WindowStartupLocation="CenterScreen" Icon="Images/hok.ico" Title="Central File Notification" Height="500" Width="500">
+              WindowStartupLocation="CenterScreen" Icon="Images/hok.ico" Title="Central File Notification" Height="450" Width="500">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="250"/>
             <RowDefinition/>
             <RowDefinition Height="70"/>
-            <RowDefinition Height="50"/>
         </Grid.RowDefinitions>
-        <Button x:Name="buttonClose" Content="Close" HorizontalAlignment="Right" Margin="0,10,15,0" Grid.Row="3" VerticalAlignment="Top" Width="100" Height="30" FontSize="14" Click="buttonClose_Click"/>
         <Label Content="Action Required!!" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" FontSize="20" Foreground="#FFAA0C0C"/>
         <Label Content="You are working on the central file. " HorizontalAlignment="Left" Margin="141,58,0,0" VerticalAlignment="Top" Width="336" FontSize="14"/>
         <Label Content="You will see this warning message peoridically." HorizontalAlignment="Left" Margin="141,93,0,0" VerticalAlignment="Top" Width="336" FontSize="14"/>
