@@ -312,6 +312,7 @@ namespace HOK.AddIn_Installer_Internal
                         case Tool2013.FileMonitor:
                             fileNames.Add("\\HOK.FileOpeningMonitor.addin");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\fmeserverapidotnet.dll");
 
                             tp.ToolName = "Central File Monitor";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll";
@@ -609,6 +610,7 @@ namespace HOK.AddIn_Installer_Internal
                         case Tool2014.FileMonitor:
                             fileNames.Add("\\HOK.FileOpeningMonitor.addin");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\fmeserverapidotnet.dll");
 
                             tp.ToolName = "Central File Monitor";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll";
@@ -909,6 +911,7 @@ namespace HOK.AddIn_Installer_Internal
                         case Tool2015.FileMonitor:
                             fileNames.Add("\\HOK.FileOpeningMonitor.addin");
                             fileNames.Add("\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents\\fmeserverapidotnet.dll");
 
                             tp.ToolName = "Central File Monitor";
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.FileOnpeningMonitor.dll";

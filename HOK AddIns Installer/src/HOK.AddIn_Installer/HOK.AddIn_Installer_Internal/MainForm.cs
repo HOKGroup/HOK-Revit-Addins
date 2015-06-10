@@ -550,7 +550,7 @@ namespace HOK.AddIn_Installer_Internal
                     TargetSoftware target = TargetSoftware.Revit_2013;
 
                     ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
-                    DeleteOldDirectories(progressForm, target);
+                    //DeleteOldDirectories(progressForm, target);
 
                     int count = 0;
                     
@@ -634,7 +634,7 @@ namespace HOK.AddIn_Installer_Internal
                 {
                     TargetSoftware traget = TargetSoftware.Revit_2014;
                     ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
-                    DeleteOldDirectories(progressForm, traget);
+                    //DeleteOldDirectories(progressForm, traget);
 
                     int count = 0;
 
@@ -718,7 +718,7 @@ namespace HOK.AddIn_Installer_Internal
                 {
                     TargetSoftware traget = TargetSoftware.Revit_2015;
                     ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
-                    DeleteOldDirectories(progressForm, traget);
+                    //DeleteOldDirectories(progressForm, traget);
 
                     int count = 0;
 
