@@ -182,6 +182,15 @@ namespace HOK.RibbonTab
                         AddToolTips(pb23);
                         utilityExist = true;
                     }
+
+                    if (File.Exists(currentDirectory + "/HOK.CameraDuplicator.dll"))
+                    {
+                        PushButton pb25 = splitButton.AddPushButton(new PushButtonData("Camera Duplicator", "Camera Duplicator", currentDirectory + "/HOK.CameraDuplicator.dll", "HOK.CameraDuplicator.CameraCommand")) as PushButton;
+                        pb25.LargeImage = LoadBitmapImage(assembly, "cameraview.png");
+                        pb25.ToolTip = "Duplicate camera views from one project to the other.";
+                        AddToolTips(pb25);
+                        utilityExist = true;
+                    }
                 }
                 if (!utilityExist)
                 {
@@ -352,7 +361,7 @@ namespace HOK.RibbonTab
                     {
                         PushButton pb24 = splitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", currentDirectory + "/HOK.ViewAnalysis.dll", "HOK.ViewAnalysis.Command")) as PushButton;
                         pb24.LargeImage = LoadBitmapImage(assembly, "eq.ico");
-                        pb24.ToolTip = "Calculating Area with Views for LEED EQc 8.2";
+                        pb24.ToolTip = "Calculating Area with Views for LEED IEQc 8.2";
                         AddToolTips(pb24);
                     }
 #endif
