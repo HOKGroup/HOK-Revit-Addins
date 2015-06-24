@@ -1,0 +1,119 @@
+﻿<Window x:Class="HOK.CameraDuplicator.CameraWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Icon="Images/hoklogo.ico" Height="700" Width="700" Title="Camera View Duplication" MinWidth="700" MinHeight="700" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Source Model" HorizontalAlignment="Stretch" Margin="7,5,5,5" VerticalAlignment="Stretch">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Content="Source Model Name:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="comboBoxSource" HorizontalAlignment="Left" Margin="136,14,0,0" VerticalAlignment="Top" Width="176" SelectionChanged="comboBoxSource_SelectionChanged"/>
+                    <DataGrid x:Name="dataGridSource" HorizontalAlignment="Stretch" Margin="7" Grid.Row="2" VerticalAlignment="Stretch" GridLinesVisibility="None">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Linked}" Value="true">
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Linked}" Value="false">
+                                        <Setter Property="Foreground" Value="Black"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="ToolTip">
+                                    <Setter.Value>
+                                        <TextBlock Text="{Binding LinkedViewId}"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Binding="{Binding IsSelected}" />
+                            <DataGridTextColumn Header="Source View Name" Binding="{Binding ViewName}" Width="1*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button x:Name="buttonAll" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Top" Height="23" Width="23" Click="buttonAll_Click">
+                        <Button.Content>
+                            <Image Source="Images/checkbox_yes.png"/>
+                        </Button.Content>
+                    </Button>
+                    <Button x:Name="buttonNone" HorizontalAlignment="Left" Margin="40,0,0,0" Grid.Row="1" VerticalAlignment="Top" Height="23" Width="23" Click="buttonNone_Click">
+                        <Button.Content>
+                            <Image Source="Images/checkbox_no.png"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Column="1" Header="Recipient Model" HorizontalAlignment="Stretch" Margin="5,5,7,5" VerticalAlignment="Stretch" >
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="25"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Content="Recipient Model Name:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                    <ComboBox x:Name="comboBoxRecipient" HorizontalAlignment="Left" Margin="150,14,0,0" VerticalAlignment="Top" Width="162" SelectionChanged="comboBoxRecipient_SelectionChanged"/>
+                    <DataGrid x:Name="dataGridRecipient" HorizontalAlignment="Stretch" Margin="7" Grid.Row="2" VerticalAlignment="Stretch" GridLinesVisibility="None">
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Linked}" Value="true">
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Linked}" Value="false">
+                                        <Setter Property="Foreground" Value="Black"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="ToolTip">
+                                    <Setter.Value>
+                                        <TextBlock Text="{Binding LinkedViewId}"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Copied View Name" Binding="{Binding ViewName}" Width="1*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Label x:Name="labelSameModel" Content="(*)Please select a different model." HorizontalAlignment="Right" Margin="0,0,15,0" Grid.Row="1" VerticalAlignment="Top" Foreground="#FFFD0808" Visibility="Hidden" />
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <Button x:Name="buttonClose" Content="Close" HorizontalAlignment="Right" Margin="0,10,15,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Height="27" Click="buttonClose_Click"/>
+        <Button x:Name="buttonCopy" HorizontalAlignment="Right" Margin="0,10,95,0" Grid.Row="2" VerticalAlignment="Top" Width="125" Height="27" Click="buttonCopy_Click">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/edit_copy.png" Width="16" Height="16" IsHitTestVisible="False"/>
+                <TextBlock Margin="7,0,0,0">Duplicate Views</TextBlock>
+            </StackPanel>
+        </Button>
+    </Grid>
+</Window>
