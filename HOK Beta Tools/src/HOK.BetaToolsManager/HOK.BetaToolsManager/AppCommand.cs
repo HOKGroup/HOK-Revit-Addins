@@ -425,6 +425,24 @@ namespace HOK.BetaToolsManager
                                     elevationButton.AssemblyName = elevationPath;
                                 }
                             }
+
+                            string cameraPath = Path.Combine(directoryName, "HOK.CameraDuplicator.dll");
+                            cameraPath = GetTempInstallPath(cameraPath);
+                            if (File.Exists(cameraPath))
+                            {
+                                if (!utilityButtons.ContainsKey("Camera Duplicator"))
+                                {
+                                    PushButton cameraButton = utilitySplitButton.AddPushButton(new PushButtonData("Camera Duplicator", "Camera Duplicator", cameraPath, "HOK.CameraDuplicator.CameraCommand")) as PushButton;
+                                    cameraButton.LargeImage = ImageUtil.LoadBitmapImage("cameraview.png");
+                                    cameraButton.ToolTip = "Duplicate camera views from one project to the other.";
+                                    AddToolTips(cameraButton);
+                                }
+                                else
+                                {
+                                    PushButton cameraButton = utilityButtons["Camera Duplicator"];
+                                    cameraButton.AssemblyName = cameraPath;
+                                }
+                            }
                         }
                         else
                         {
@@ -472,6 +490,11 @@ namespace HOK.BetaToolsManager
                             {
                                 PushButton elevationButton = utilityButtons["Room Elevation"];
                                 elevationButton.Enabled = false;
+                            }
+                            if (utilityButtons.ContainsKey("Camera Duplicator"))
+                            {
+                                PushButton cameraButton = utilityButtons["Camera Duplicator"];
+                                cameraButton.Enabled = false;
                             }
                         }
 
@@ -847,7 +870,7 @@ namespace HOK.BetaToolsManager
                                 {
                                     PushButton analysisButton = analysisSplitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", leedPath, "HOK.ViewAnalysis.Command")) as PushButton;
                                     analysisButton.LargeImage = ImageUtil.LoadBitmapImage("eq.ico");
-                                    analysisButton.ToolTip = "Calculating Area with Views for LEED EQc 8.2";
+                                    analysisButton.ToolTip = "Calculating Area with Views for LEED IEQc 8.2";
                                     AddToolTips(analysisButton);
                                 }
                                 else
@@ -888,48 +911,7 @@ namespace HOK.BetaToolsManager
                 MessageBox.Show("Failed to create Analysis panel.\n"+ex.Message, "Create Analysis Panel", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-        /*
-        private string GetDllName(string directoryName, string assemblyName, bool pathName)
-        {
-            string dllName = "";
-            try
-            {
-                string latestFile = "";
-                Version latestVersion = null;
-                string[] files = Directory.GetFiles(directoryName, assemblyName + "*");
-                foreach (string fileName in files)
-                {
-                    if (Path.GetExtension(fileName) == ".dll")
-                    {
-                        FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(fileName);
-                        Version version = new Version(versionInfo.FileVersion);
 
-                        if (string.IsNullOrEmpty(latestFile))
-                        {
-                            latestFile = fileName;
-                            latestVersion = version;
-                        }
-                        else if(!string.IsNullOrEmpty(latestFile) && null!=latestVersion)
-                        {
-                            if (latestVersion.CompareTo(version) < 0)
-                            {
-                                latestFile = fileName;
-                                latestVersion = version;
-                            }
-                        }
-                    }
-                }
-
-                dllName = pathName ? latestFile : Path.GetFileName(latestFile);
-
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-            return dllName;
-        }
-        */
         private string GetTempInstallPath(string installPath)
         {
             string tempPath = "";

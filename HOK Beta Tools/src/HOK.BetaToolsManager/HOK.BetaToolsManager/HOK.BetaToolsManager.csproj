@@ -157,6 +157,7 @@
     <Resource Include="Resources\install.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\cameraview.png" />
     <EmbeddedResource Include="Resources\elevation.png" />
     <EmbeddedResource Include="Resources\eq.ico" />
     <Content Include="Resources\HOK.Tooltip.txt">

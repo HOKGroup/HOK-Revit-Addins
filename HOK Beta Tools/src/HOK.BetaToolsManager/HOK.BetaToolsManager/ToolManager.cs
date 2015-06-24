@@ -375,6 +375,7 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("HOK.RoomUpdater.dll");
                         fileNames.Add("HOK.ViewDepth.dll");
                         fileNames.Add("HOK.WorksetView.dll");
+                        fileNames.Add("HOK.CameraDuplicator.dll");
                         break;
                     case ToolEnum.ModelManager:
                         fileNames.Add("HOK.ModelManager.dll");

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.BetaToolsManager")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2014")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2013.0.1.7")]
-[assembly: AssemblyFileVersion("2013.0.1.7")]
+[assembly: AssemblyVersion("2015.0.1.8")]
+[assembly: AssemblyFileVersion("2015.0.1.8")]
