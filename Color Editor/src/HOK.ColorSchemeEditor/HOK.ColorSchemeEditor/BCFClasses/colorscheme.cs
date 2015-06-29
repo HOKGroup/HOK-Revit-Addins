@@ -216,7 +216,12 @@ public partial class ColorScheme {
         this.Categories = source.Categories;
         this.SelectedParamInfo = source.SelectedParamInfo;
         this.ParameterName = source.ParameterName;
-        this.ColorDefinitions = source.ColorDefinitions;
+        this.ColorDefinitions = new List<ColorDefinition>();
+        foreach (ColorDefinition colorDefinition in source.ColorDefinitions)
+        {
+            ColorDefinition cd = new ColorDefinition(colorDefinition);
+            this.ColorDefinitions.Add(cd);
+        }
         this.CustomColorDefinitions = source.CustomColorDefinitions;
         this.FilterRules = source.FilterRules;
         this.FilteredElements = source.FilteredElements;
@@ -260,7 +265,9 @@ public partial class ColorDefinition
         this.ParameterValue = definition.ParameterValue;
         this.MinimumValue = definition.MinimumValue;
         this.MaximumValue = definition.MaximumValue;
-        this.Color = definition.Color;
+        this.Color[0] = definition.Color[0];
+        this.Color[1] = definition.Color[1];
+        this.Color[2] = definition.Color[2];
         this.RGB = definition.RGB;
         this.InUse = definition.InUse;
         this.BackgroundColor = definition.BackgroundColor;

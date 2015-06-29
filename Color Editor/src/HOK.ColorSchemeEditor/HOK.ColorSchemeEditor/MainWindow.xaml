@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="850" Name="mainWindow" SizeToContent="WidthAndHeight" Title="Color Scheme Editor" MinHeight="800" MaxHeight="800" MinWidth="900" MaxWidth="900" Icon="Images/hoklogo.ico" WindowStartupLocation="CenterScreen" Closing="mainWindow_Closing">
+              Name="mainWindow" Title="Color Scheme Editor"  Height="800" Width="950" MinHeight="800"  MinWidth="950" Icon="Images/hoklogo.ico" WindowStartupLocation="CenterScreen" Closing="mainWindow_Closing" IsManipulationEnabled="True" SizeToContent="WidthAndHeight" MaxHeight="800" MaxWidth="950">
     <Window.Resources>
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
@@ -54,9 +54,9 @@
 
         <TabControl Grid.Row="2" HorizontalAlignment="Stretch" Margin="5,5,5,5" Name="tabControlSelection" VerticalAlignment="Stretch">
             <TabItem Header="Color Schemes" Name="tabItemScheme">
-                <Grid>
+                <Grid IsManipulationEnabled="True">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="220" />
+                        <ColumnDefinition Width="250" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <GroupBox Header="Schemes" HorizontalAlignment="Stretch" Margin="5,5,5,5" Name="groupBoxSchemes" VerticalAlignment="Stretch" >

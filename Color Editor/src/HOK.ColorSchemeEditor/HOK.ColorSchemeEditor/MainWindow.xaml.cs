@@ -225,8 +225,8 @@ namespace HOK.ColorSchemeEditor
                         ListViewModel viewModel = new ListViewModel(copiedScheme);
                         sortableSchemeViews.Add(viewModel);
                         sortableSchemeViews.Sort();
-                       
-                        dataGridSchemes.SelectedItem = viewModel;
+
+                        dataGridSchemes.SelectedItem = sortableSchemeViews.Select(o => o.ItemContent.SchemeId == copiedScheme.SchemeId);
                     }
                 }
             }
@@ -310,6 +310,7 @@ namespace HOK.ColorSchemeEditor
            
                     comboBoxColor.ItemsSource = null;
                     dataGridDefinition.ItemsSource = null;
+                    selectedColorScheme = null;
 
                     if (colorSchemeInfo.ColorSchemes.Count > 0)
                     {
@@ -600,10 +601,12 @@ namespace HOK.ColorSchemeEditor
                 userInput = false;
                 if (null != dataGridSchemes.SelectedItem)
                 {
-
-                    if (!string.IsNullOrEmpty(selectedColorScheme.SchemeId))
+                    if (null != selectedColorScheme)
                     {
-                        SaveChanges(selectedColorScheme);
+                        if (!string.IsNullOrEmpty(selectedColorScheme.SchemeId))
+                        {
+                            SaveChanges(selectedColorScheme);
+                        }
                     }
 
                     ListViewModel selectedItem = dataGridSchemes.SelectedItem as ListViewModel;
@@ -1720,65 +1723,6 @@ namespace HOK.ColorSchemeEditor
             return colorDefinitions;
         }
 
-        /*
-        private Dictionary<int, ElementProperties> GetElementDictionary(ColorScheme colorScheme)
-        {
-            Dictionary<int, ElementProperties> elementDictionary = new Dictionary<int, ElementProperties>();
-            try
-            {
-                if (null != colorScheme)
-                {
-                    if (null != colorScheme.SelectedParamInfo)
-                    {
-                        List<Element> elements = colorScheme.FilteredElements;
-                        ParameterInfo paramInfo = colorScheme.SelectedParamInfo;
-
-                        foreach (Element element in elements)
-                        {
-                            ParameterValueInfo valueInfo = new ParameterValueInfo(m_doc, element, paramInfo);
-
-                            List<ColorDefinition> foundDefinitions = new List<ColorDefinition>();
-                            if (colorScheme.DefinitionBy == DefinitionType.ByValue)
-                            {
-                                var foundDef = from definition in colorScheme.ColorDefinitions where definition.ParameterValue == valueInfo.ValueAsString select definition;
-                                foundDefinitions = foundDef.ToList();
-                            }
-                            else if (colorScheme.DefinitionBy == DefinitionType.ByRange)
-                            {
-                                if (paramInfo.ParamStorageType == StorageType.Integer)
-                                {
-                                    int paramValue = valueInfo.IntValue;
-                                    var foundDef = from definition in colorScheme.ColorDefinitions where (definition.MinimumValue <= paramValue) && (definition.MaximumValue >= paramValue) select definition;
-                                    foundDefinitions = foundDef.ToList();
-                                }
-                                else if (paramInfo.ParamStorageType == StorageType.Double)
-                                {
-                                    double paramValue = valueInfo.DblValue;
-                                    var foundDef = from definition in colorScheme.ColorDefinitions where (definition.MinimumValue <= paramValue) && (definition.MaximumValue >= paramValue) select definition;
-                                    foundDefinitions = foundDef.ToList();
-                                }
-                            }
-
-                            if (foundDefinitions.Count() > 0)
-                            {
-                                ColorDefinition colorDefinition = foundDefinitions.First();
-                                ElementProperties ep = new ElementProperties(element, colorDefinition);
-                                if (!elementDictionary.ContainsKey(ep.ElementIdInt))
-                                {
-                                    elementDictionary.Add(ep.ElementIdInt, ep);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to get filtered elements.\n"+ex.Message, "Get Filtered Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return elementDictionary;
-        }
-        */
         private Dictionary<int, ElementProperties> GetElementDictionary(ColorScheme colorScheme)
         {
             Dictionary<int, ElementProperties> elementDictionary = new Dictionary<int, ElementProperties>();
