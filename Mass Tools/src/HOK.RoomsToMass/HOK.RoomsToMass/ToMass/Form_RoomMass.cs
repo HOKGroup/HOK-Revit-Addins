@@ -172,127 +172,166 @@ namespace HOK.RoomsToMass.ToMass
 
                 if (checkedRows.Count > 0)
                 {
-                    double height = 0;
-                    if (checkBoxHeight.Checked)
+                    using (TransactionGroup tg = new TransactionGroup(doc))
                     {
-                        if (!ValidateHeight(out height))
+                        tg.Start("Update Masses");
+                        try
                         {
-                            MessageBox.Show("Please enter a valid room height.", "Room Height Required", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return;
-                        }
-                        else if (height == 0)
-                        {
-                            MessageBox.Show("Please enter a valid room height.", "Room Height Required", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            return;
-                        }
-                    }
-
-                    massCreator.DefDictionary = defDictionary;
-
-                    Dictionary<int, RoomProperties> createdRooms = new Dictionary<int, RoomProperties>(); //created rooms at this run
-                    Dictionary<int, MassProperties> placedMasses = new Dictionary<int, MassProperties>();
-
-                    statusLabel.Text = "Updating Masses . . .";
-                    toolStripProgressBar.Maximum = checkedRows.Count;
-                    toolStripProgressBar.Visible = true;
-
-                    StringBuilder resultMessage = new StringBuilder();
-
-                    foreach (int index in checkedRows)
-                    {
-                        toolStripProgressBar.PerformStep();
-                        DataGridViewRow row = dataGridViewRoom.Rows[index];
-                        if (null != row.Tag)
-                        {
-                            RoomProperties rp = row.Tag as RoomProperties;
-                            MassProperties mp = new MassProperties();
-                            mp.HostElementId = rp.ID;
-                            if (placedRooms.Contains(rp.ID))
+                            double height = 0;
+                            if (checkBoxHeight.Checked)
                             {
-                                FamilyInstance instance = MassUtils.FindMassById(doc, rp.ID);
+                                if (!ValidateHeight(out height))
+                                {
+                                    MessageBox.Show("Please enter a valid room height.", "Room Height Required", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    return;
+                                }
+                                else if (height == 0)
+                                {
+                                    MessageBox.Show("Please enter a valid room height.", "Room Height Required", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    return;
+                                }
+                            }
+
+                            massCreator.DefDictionary = defDictionary;
+
+                            Dictionary<int, RoomProperties> createdRooms = new Dictionary<int, RoomProperties>(); //created rooms at this run
+                            Dictionary<int, MassProperties> placedMasses = new Dictionary<int, MassProperties>();
+
+                            statusLabel.Text = "Updating Masses . . .";
+                            toolStripProgressBar.Maximum = checkedRows.Count;
+                            toolStripProgressBar.Visible = true;
+
+                            StringBuilder resultMessage = new StringBuilder();
+
+                            foreach (int index in checkedRows)
+                            {
+                                toolStripProgressBar.PerformStep();
+                                DataGridViewRow row = dataGridViewRoom.Rows[index];
+                                if (null != row.Tag)
+                                {
+                                    RoomProperties rp = row.Tag as RoomProperties;
+                                    MassProperties mp = new MassProperties();
+                                    mp.HostElementId = rp.ID;
+                                    rp.IsDefaultHeight = checkBoxHeight.Checked;
+                                    rp.DefaultHeight = height;
+
+                                    if (placedRooms.Contains(rp.ID))
+                                    {
+                                        FamilyInstance instance = MassUtils.FindMassById(doc, rp.ID);
+                                        if (null != instance)
+                                        {
+                                            mp.MassFamilyInstance = instance;
+                                            double roomHeight = (rp.IsDefaultHeight == true) ? rp.DefaultHeight : rp.UnboundedHeight;
+#if RELEASE2015
+                                            Parameter parameter = instance.LookupParameter("Height");
+#elif RELEASE2013||RELEASE2014
+                                            Parameter parameter = instance.get_Parameter("Height");
+#endif
+
+                                            if (null != parameter)
+                                            {
+                                                using (Transaction trans = new Transaction(doc))
+                                                {
+                                                    trans.Start("Update Height");
+                                                    try
+                                                    {
+                                                        parameter.Set(roomHeight);
+                                                        trans.Commit();
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        string message = ex.Message;
+                                                        trans.RollBack();
+                                                    }
+                                                }
+                                            }
+
+                                            if (!placedMasses.ContainsKey(rp.ID)) { placedMasses.Add(rp.ID, mp); }
+
+                                            resultMessage.AppendLine(rp.ID + "\t" + rp.Number + "\t" + rp.Name);
+                                        }
+                                        continue;
+                                    }
+
+                                    if (roomDiscrepancy.Contains(rp.ID))
+                                    {
+                                        FamilyInstance instance = MassUtils.FindMassById(doc, rp.ID);
+                                        if (null != instance)
+                                        {
+                                            using (Transaction trans = new Transaction(doc))
+                                            {
+                                                trans.Start("Delete Element");
+                                                doc.Delete(instance.Id);
+                                                trans.Commit();
+                                            }
+                                        }
+                                    }
+
+                                    FamilyInstance familyInstance = massCreator.CreateFamily(rp);
+                                    if (null != familyInstance)
+                                    {
+                                        mp.MassFamilyInstance = familyInstance;
+                                        if (!placedMasses.ContainsKey(rp.ID)) { placedMasses.Add(rp.ID, mp); }
+                                    }
+
+                                    createdRooms.Add(rp.ID, rp);
+                                    resultMessage.AppendLine(rp.ID + "\t" + rp.Number + "\t" + rp.Name);
+                                }
+                            }
+                            //to include placed masses from the previous run into the snapshot.png
+                            foreach (int roomId in placedRooms)
+                            {
+                                FamilyInstance instance = MassUtils.FindMassById(doc, roomId);
+                                MassProperties mp = new MassProperties();
                                 if (null != instance)
                                 {
                                     mp.MassFamilyInstance = instance;
-                                    if (!placedMasses.ContainsKey(rp.ID)) { placedMasses.Add(rp.ID, mp); }
-
-                                    resultMessage.AppendLine(rp.ID + "\t" + rp.Number + "\t" + rp.Name);
+                                    if (!placedMasses.ContainsKey(roomId)) { placedMasses.Add(roomId, mp); }
                                 }
-                                continue;
                             }
 
-                            if (roomDiscrepancy.Contains(rp.ID))
+                            statusLabel.Text = "Done";
+                            roomDataManager.CreatedRooms = createdRooms;
+                            roomDataManager.WriteINI();
+                            if (massCreator.FailureMessage.Length > 0)
                             {
-                                FamilyInstance instance = MassUtils.FindMassById(doc, rp.ID);
-                                if (null != instance)
+                                DialogResult dr = MessageBox.Show("Errors occured while creating extrusion forms.\n" + massCreator.FailureMessage.ToString(), "Warning Messages", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                if (dr == DialogResult.OK)
                                 {
                                     using (Transaction trans = new Transaction(doc))
                                     {
-                                        trans.Start("Delete Element");
-                                        doc.Delete(instance.Id);
+                                        trans.Start("Set Shared Parameters");
+                                        m_app.Application.SharedParametersFilename = originalDefFile;
                                         trans.Commit();
+                                    }
+
+                                    this.Close();
+                                }
+                            }
+                            else
+                            {
+                                if (resultMessage.Length > 0)
+                                {
+                                    string header = "Room Masses are sucessfully updated. \n[Room ID], [Room Number], [Room Name]\n";
+                                    MessageBoxForm messageForm = new MessageBoxForm("Completion Messages", header + resultMessage.ToString(), "", false, false);
+                                    if (DialogResult.OK == messageForm.ShowDialog())
+                                    {
+                                        using (Transaction trans = new Transaction(doc))
+                                        {
+                                            trans.Start("Set Shared Parameters");
+                                            m_app.Application.SharedParametersFilename = originalDefFile;
+                                            trans.Commit();
+                                        }
+                                        this.Close();
                                     }
                                 }
                             }
-                            rp.IsDefaultHeight = checkBoxHeight.Checked;
-                            rp.DefaultHeight = height;
-
-                            FamilyInstance familyInstance = massCreator.CreateFamily(rp);
-                            if (null != familyInstance)
-                            {
-                                mp.MassFamilyInstance = familyInstance;
-                                if (!placedMasses.ContainsKey(rp.ID)) { placedMasses.Add(rp.ID, mp); }
-                            }
-
-                            createdRooms.Add(rp.ID, rp);
-                            resultMessage.AppendLine(rp.ID + "\t" + rp.Number + "\t" + rp.Name);
+                            tg.Assimilate();
                         }
-                    }
-                    //to include placed masses from the previous run into the snapshot.png
-                    foreach (int roomId in placedRooms)
-                    {
-                        FamilyInstance instance = MassUtils.FindMassById(doc, roomId);
-                        MassProperties mp = new MassProperties();
-                        if (null != instance)
+                        catch (Exception ex)
                         {
-                            mp.MassFamilyInstance = instance;
-                            if (!placedMasses.ContainsKey(roomId)) { placedMasses.Add(roomId, mp); }
-                        }
-                    }
-
-                    statusLabel.Text = "Done";
-                    roomDataManager.CreatedRooms = createdRooms;
-                    roomDataManager.WriteINI();
-                    if (massCreator.FailureMessage.Length > 0)
-                    {
-                        DialogResult dr = MessageBox.Show("Errors occured while creating extrusion forms.\n" + massCreator.FailureMessage.ToString(), "Warning Messages", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        if (dr == DialogResult.OK)
-                        {
-                            using (Transaction trans = new Transaction(doc))
-                            {
-                                trans.Start("Set Shared Parameters");
-                                m_app.Application.SharedParametersFilename = originalDefFile;
-                                trans.Commit();
-                            }
-                            
-                            this.Close();
-                        }
-                    }
-                    else
-                    {
-                        if (resultMessage.Length > 0)
-                        {
-                            string header = "Room Masses are sucessfully updated. \n[Room ID], [Room Number], [Room Name]\n";
-                            MessageBoxForm messageForm = new MessageBoxForm("Completion Messages", header + resultMessage.ToString(), "", false, false);
-                            if (DialogResult.OK == messageForm.ShowDialog())
-                            {
-                                using (Transaction trans = new Transaction(doc))
-                                {
-                                    trans.Start("Set Shared Parameters");
-                                    m_app.Application.SharedParametersFilename = originalDefFile;
-                                    trans.Commit();
-                                }
-                                this.Close();
-                            }
+                            tg.RollBack();
+                            MessageBox.Show("Failed to update masses from rooms.\n" + ex.Message, "Create Masses from Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
                         }
                     }
                 }

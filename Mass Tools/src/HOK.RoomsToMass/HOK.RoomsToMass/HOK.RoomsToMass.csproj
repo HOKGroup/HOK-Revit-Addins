@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.RoomsToMass</RootNamespace>
-    <AssemblyName>HOK.RoomsToMass_v.2015.0.2.12</AssemblyName>
+    <AssemblyName>HOK.RoomsToMass_v.2013.0.2.13</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
