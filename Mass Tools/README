@@ -1,3 +1,7 @@
+v.0.2.13
+Fix
+-update the height of masses according to the changes on the height of rooms
+
 v.0.2.12
 Fix
 -Create a new sketch plane when placing a family instnace 
