@@ -33,10 +33,13 @@ namespace HOK.SmartBCF.Walker
         private Comment selectedComment = null;
         private string bcfProjectId = "";
         private string bcfColorSchemeId = "";
+        private string categorySheetId = "";
         private bool isHighlightOn = false;
         private bool isIsolateOn = false;
         private bool isSectionBoxOn = false;
         private bool isProjectIdChanged = false;
+
+        private ProgressWindow progressWindow;
 
         public Document ActiveDoc { get { return m_doc; } set { m_doc = value; } }
         public Request Request { get { return m_request; } }
@@ -53,6 +56,7 @@ namespace HOK.SmartBCF.Walker
         public Comment SelectedComment { get { return selectedComment; } set { selectedComment = value; } }
         public string BCFProjectId { get { return bcfProjectId; } set { bcfProjectId = value; } }
         public string BCFColorSchemeId { get { return bcfColorSchemeId; } set { bcfColorSchemeId = value; } }
+        public string CategorySheetId { get { return categorySheetId; } set { categorySheetId = value; } }
         public bool IsHighlightOn { get { return isHighlightOn; } set { isHighlightOn = value; } }
         public bool IsIsolateOn { get { return isIsolateOn; } set { isIsolateOn = value; } }
         public bool IsSectionBoxOn { get { return isSectionBoxOn; } set { isSectionBoxOn = value; } }
@@ -64,6 +68,7 @@ namespace HOK.SmartBCF.Walker
             {
                 m_app = uiapp;
                 m_doc = uiapp.ActiveUIDocument.Document;
+               
                 View3D view3d = m_doc.ActiveView as View3D;
                 if (null != view3d)
                 {
@@ -96,13 +101,19 @@ namespace HOK.SmartBCF.Walker
                 bcfProjectId = ParameterUtil.GetBCFProjectId(m_app);
                 if (!string.IsNullOrEmpty(bcfProjectId))
                 {
-                    googleFolders = FileManager.CreateDefaultFolders(bcfProjectId);
+                    googleFolders = FileManager.FindGoogleFolders(bcfProjectId);
                     if (null != googleFolders.ColorSheet)
                     {
                         bcfColorSchemeId = googleFolders.ColorSheet.Id;
                     }
-
-                    schemeInfo = BCFParser.ReadColorSchemes(bcfColorSchemeId, false);
+                    if (null != googleFolders.CategorySheet)
+                    {
+                        categorySheetId = googleFolders.CategorySheet.Id;
+                    }
+                    if (!string.IsNullOrEmpty(bcfColorSchemeId) && !string.IsNullOrEmpty(categorySheetId))
+                    {
+                        schemeInfo = FileManager.ReadColorSchemes(bcfColorSchemeId, categorySheetId, false);
+                    }
 
                     bcfFileDictionary = DataStorageUtil.ReadLinkedBCFFileInfo(m_doc, bcfProjectId);
                     bcfDictionary = GetBCFDictionary(m_doc);
@@ -130,124 +141,139 @@ namespace HOK.SmartBCF.Walker
 
         private Dictionary<string/*spreadsheetId*/, Dictionary<string/*issueId*/, IssueEntry>> GetBCFDictionary(Document doc)
         {
-            Dictionary<string, Dictionary<string, IssueEntry>> bcfDcitionary = new Dictionary<string, Dictionary<string, IssueEntry>>();
+            Dictionary<string, Dictionary<string, IssueEntry>> dictionary = new Dictionary<string, Dictionary<string, IssueEntry>>();
             try
             {
-                List<string> fileIds = bcfFileDictionary.Keys.ToList();
+                AbortFlag.SetAbortFlag(false);
+                progressWindow = new ProgressWindow("Loading BCF issues and images...");
+                progressWindow.Show();
 
-                foreach (string fileId in fileIds)
+                List<string> markupIds = bcfFileDictionary.Keys.ToList();
+                foreach (string markupId in markupIds)
                 {
-                    if (null != FileManager.FindFileById(fileId))
+                    LinkedBcfFileInfo bcfFileInfo = bcfFileDictionary[markupId];
+                    if (null != FileManager.FindFileById(bcfFileInfo.MarkupFileId) && null != FileManager.FindFileById(bcfFileInfo.ViewpointFileId))
                     {
-                        Dictionary<string, IssueEntry> issueDictionary = GetBCFIssueInfo(doc, fileId);
-
-                        if (!bcfDcitionary.ContainsKey(fileId))
+                        Dictionary<string, IssueEntry> issueDictionary = GetBCFIssueInfo(doc, bcfFileInfo);
+                        if (AbortFlag.GetAbortFlag()) { return new Dictionary<string, Dictionary<string, IssueEntry>>(); }
+                        if (!dictionary.ContainsKey(markupId) && issueDictionary.Count > 0)
                         {
-                            bcfDcitionary.Add(fileId, issueDictionary);
+                            dictionary.Add(markupId, issueDictionary);
                         }
                     }
                     else
                     {
-                        bcfFileDictionary.Remove(fileId);
+                        bcfFileDictionary.Remove(markupId);
                     }
                 }
 
-                if (!string.IsNullOrEmpty(bcfColorSchemeId))
+                if (!string.IsNullOrEmpty(categorySheetId))
                 {
-                    bool updatedCategory = BCFParser.UpdateCommonCategorySheet(categoryNames, bcfColorSchemeId);
+                    System.IO.MemoryStream stream = BCFParser.CreateCategoryStream(categoryNames);
+                    if (null != stream)
+                    {
+                        Google.Apis.Drive.v2.Data.File file = FileManager.UpdateSpreadsheet(stream, categorySheetId, bcfProjectId);
+                    }
                 }
+
+                if (progressWindow.IsActive) { progressWindow.Close(); }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to get BCF dictionary.\n"+ex.Message, "Get BCF Dictionary", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            return bcfDcitionary;
+            return dictionary;
         }
 
-        private Dictionary<string, IssueEntry> GetBCFIssueInfo(Document doc, string sheetId)
+        private Dictionary<string, IssueEntry> GetBCFIssueInfo(Document doc, LinkedBcfFileInfo bcfFileInfo)
         {
             Dictionary<string, IssueEntry> issueDictionary = new Dictionary<string, IssueEntry>();
             try
             {
-                if(bcfFileDictionary.ContainsKey(sheetId))
+                issueDictionary = FileManager.ReadIssues(bcfFileInfo);
+
+                List<string> issueIds = issueDictionary.Keys.ToList();
+                progressWindow.SetMaximum(issueIds.Count);
+
+                double progressValue = 0;
+                foreach (string issueId in issueIds)
                 {
-                    LinkedBcfFileInfo bcfFileInfo = bcfFileDictionary[sheetId];
-                    issueDictionary = BCFParser.ReadIssues(sheetId, bcfFileInfo.BCFName);
+                    if (AbortFlag.GetAbortFlag()) { progressWindow.Close();  return new Dictionary<string, IssueEntry>(); }
 
-                    List<string> issueIds = issueDictionary.Keys.ToList();
-                    foreach (string issueId in issueIds)
+                    progressValue++;
+                    progressWindow.SetProgressValue(progressValue);
+
+                    IssueEntry issueEntry = issueDictionary[issueId];
+                    List<int> elementIds = issueEntry.ElementDictionary.Keys.ToList();
+                    foreach (int elementId in elementIds)
                     {
-                        IssueEntry issueEntry = issueDictionary[issueId];
-                        List<int> elementIds = issueEntry.ElementDictionary.Keys.ToList();
-                        foreach (int elementId in elementIds)
+                        ElementProperties property = issueEntry.ElementDictionary[elementId];
+
+                        Element element = m_doc.GetElement(new ElementId(elementId));
+                        if (null != element)
                         {
-                            ElementProperties property = issueEntry.ElementDictionary[elementId];
-
-                            Element element = m_doc.GetElement(new ElementId(elementId));
-                            if (null != element)
+                            if (null != element.Category)
                             {
-                                if (null != element.Category)
+                                if (!categoryNames.Contains(element.Category.Name))
                                 {
-                                    if (!categoryNames.Contains(element.Category.Name))
-                                    {
-                                        categoryNames.Add(element.Category.Name);
-                                    }
+                                    categoryNames.Add(element.Category.Name);
+                                }
 
-                                    if (element.Category.AllowsBoundParameters)
+                                if (element.Category.AllowsBoundParameters)
+                                {
+                                    int categoryId = element.Category.Id.IntegerValue;
+                                    if (!catDictionary.ContainsKey(categoryId))
                                     {
-                                        int categoryId = element.Category.Id.IntegerValue;
-                                        if (!catDictionary.ContainsKey(categoryId))
+                                        BuiltInCategory bltCategory = (BuiltInCategory)categoryId;
+                                        if (bltCategory != BuiltInCategory.INVALID)
                                         {
-                                            BuiltInCategory bltCategory = (BuiltInCategory)categoryId;
-                                            if (bltCategory != BuiltInCategory.INVALID)
-                                            {
-                                                catDictionary.Add(categoryId, bltCategory);
-                                            }
+                                            catDictionary.Add(categoryId, bltCategory);
                                         }
                                     }
                                 }
-
-                                ElementProperties ep = new ElementProperties(element);
-                                ep.IssueId = property.IssueId;
-                                ep.Action = property.Action;
-                                ep.ResponsibleParty = property.ResponsibleParty;
-
-                                issueDictionary[issueId].ElementDictionary.Remove(elementId);
-                                issueDictionary[issueId].ElementDictionary.Add(elementId, ep);
                             }
+
+                            ElementProperties ep = new ElementProperties(element);
+                            ep.IssueId = property.IssueId;
+                            ep.Action = property.Action;
+                            ep.ResponsibleParty = property.ResponsibleParty;
+                            ep.CellEntries = property.CellEntries;
+
+                            issueDictionary[issueId].ElementDictionary.Remove(elementId);
+                            issueDictionary[issueId].ElementDictionary.Add(elementId, ep);
                         }
-                        issueDictionary[issueId].NumElements = issueDictionary[issueId].ElementDictionary.Count;
-                        if (null == issueDictionary[issueId].Snapshot)
+                    }
+                    issueDictionary[issueId].NumElements = issueDictionary[issueId].ElementDictionary.Count;
+                    if (null == issueDictionary[issueId].Snapshot)
+                    {
+                        if (bcfFileInfo.SharedLinkId == bcfProjectId && null != googleFolders)
                         {
-                            if (bcfFileInfo.SharedLinkId == bcfProjectId && null != googleFolders)
+                            issueDictionary[issueId].Snapshot = FileManager.DownloadImage(issueId, googleFolders.ActiveImgFolder.Id);
+                        }
+                        else if (bcfFileInfo.SharedLinkId == bcfProjectId)
+                        {
+                            googleFolders = FileManager.FindGoogleFolders(bcfProjectId);
+                            if (null != googleFolders)
                             {
                                 issueDictionary[issueId].Snapshot = FileManager.DownloadImage(issueId, googleFolders.ActiveImgFolder.Id);
                             }
-                            else if (bcfFileInfo.SharedLinkId == bcfProjectId)
+                        }
+                        else
+                        {
+                            FolderHolders tempFolders = FileManager.FindGoogleFolders(bcfFileInfo.SharedLinkId);
+                            if (null != tempFolders)
                             {
-                                googleFolders = FileManager.CreateDefaultFolders(bcfProjectId);
-                                if (null != googleFolders)
-                                {
-                                    issueDictionary[issueId].Snapshot = FileManager.DownloadImage(issueId, googleFolders.ActiveImgFolder.Id);
-                                }
-                            }
-                            else
-                            {
-                                FolderHolders tempFolders = FileManager.CreateDefaultFolders(bcfFileInfo.SharedLinkId);
-                                if (null != tempFolders)
-                                {
-                                    issueDictionary[issueId].Snapshot = FileManager.DownloadImage(issueId, tempFolders.ActiveImgFolder.Id);
-                                }
+                                issueDictionary[issueId].Snapshot = FileManager.DownloadImage(issueId, tempFolders.ActiveImgFolder.Id);
                             }
                         }
                     }
+                }
 
-                    if (bcfDictionary.ContainsKey(sheetId))
-                    {
-                        bcfDictionary.Remove(sheetId);
-                    }
-                    bcfDictionary.Add(sheetId, issueDictionary);
-                } 
+                if (bcfDictionary.ContainsKey(bcfFileInfo.MarkupFileId))
+                {
+                    bcfDictionary.Remove(bcfFileInfo.MarkupFileId);
+                }
+                bcfDictionary.Add(bcfFileInfo.MarkupFileId, issueDictionary);
             }
             catch (Exception ex)
             {
@@ -273,23 +299,38 @@ namespace HOK.SmartBCF.Walker
                         Dictionary<string, Dictionary<string, IssueEntry>> dictionary = new Dictionary<string, Dictionary<string, IssueEntry>>();
                         
                         int numCat = categoryNames.Count;
-                        foreach (string fileId in bcfFileDictionary.Keys)
+                        AbortFlag.SetAbortFlag(false);
+                        progressWindow = new ProgressWindow("Loading BCF issues and images...");
+                        progressWindow.Show();
+
+                        foreach (string markupId in bcfFileDictionary.Keys)
                         {
-                            if (bcfDictionary.ContainsKey(fileId))
+                            LinkedBcfFileInfo bcfInfo = bcfFileDictionary[markupId];
+                            if (bcfDictionary.ContainsKey(markupId))
                             {
-                                dictionary.Add(fileId, bcfDictionary[fileId]);
+                                dictionary.Add(markupId, bcfDictionary[markupId]);
                             }
                             else
                             {
-                                Dictionary<string, IssueEntry> issueDictionary = GetBCFIssueInfo(m_doc, fileId);
-                                dictionary.Add(fileId, issueDictionary);
+                                Dictionary<string, IssueEntry> issueDictionary = GetBCFIssueInfo(m_doc, bcfInfo);
+                                if (issueDictionary.Count > 0)
+                                {
+                                    dictionary.Add(markupId, issueDictionary);
+                                }
                             }
                         }
+                        if (progressWindow.IsActive) { progressWindow.Close(); }
+                        
                         bcfDictionary = dictionary;
 
                         if (numCat != categoryNames.Count)
                         {
-                            bool updatedCategory = BCFParser.UpdateCommonCategorySheet(categoryNames, bcfColorSchemeId);
+                            System.IO.MemoryStream stream = BCFParser.CreateCategoryStream(categoryNames);
+                            if (null != stream)
+                            {
+                                Google.Apis.Drive.v2.Data.File file = FileManager.UpdateSpreadsheet(stream, categorySheetId, bcfProjectId);
+                            }
+
                             List<BuiltInCategory> bltCategories = catDictionary.Values.ToList();
                             bool parameterCreated = ParameterUtil.CreateBCFParameters(m_app, bltCategories);
 
@@ -314,7 +355,7 @@ namespace HOK.SmartBCF.Walker
                         }
 
                         bool updatedId = ParameterUtil.SetBCFProjectId(m_doc, bcfProjectId);
-                        schemeInfo = BCFParser.ReadColorSchemes(bcfColorSchemeId, false);
+                        schemeInfo = FileManager.ReadColorSchemes(bcfColorSchemeId, categorySheetId, false);
                         
                         if (null != walkerWindow)
                         {
