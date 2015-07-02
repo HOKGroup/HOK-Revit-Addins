@@ -562,7 +562,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                     ElementProperties ep = new ElementProperties(element);
                                     ep.Doc = linkedDoc;
                                     ep.TransformValue = transformValue;
-#if RELEASE2014||RELEASE2015
+#if RELEASE2014||RELEASE2015 || RELEASE2016
                                     ep.LinkedElement = true;
 #endif
 

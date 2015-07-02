@@ -12,15 +12,18 @@ namespace HOK.AddIn_Installer_Internal
         private string installDirectory2013 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2013";
         private string installDirectory2014 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2014";
         private string installDirectory2015 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2015";
+        private string installDirectory2016 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2016";
         private string installDynamo = @"C:\Autodesk\Dynamo\Core\definitions";
         private Dictionary<Tool2013, RevitToolProperties> deprecated2013 = new Dictionary<Tool2013, RevitToolProperties>();
         private Dictionary<Tool2014, RevitToolProperties> deprecated2014 = new Dictionary<Tool2014, RevitToolProperties>();
         private Dictionary<Tool2015, RevitToolProperties> deprecated2015 = new Dictionary<Tool2015, RevitToolProperties>();
+        private Dictionary<Tool2016, RevitToolProperties> deprecated2016 = new Dictionary<Tool2016, RevitToolProperties>();
         private Dictionary<string, DynamoToolProperties> deprecatedDynamo = new Dictionary<string, DynamoToolProperties>();
 
         public Dictionary<Tool2013, RevitToolProperties> Deprecated2013 { get { return deprecated2013; } set { deprecated2013 = value; } }
         public Dictionary<Tool2014, RevitToolProperties> Deprecated2014 { get { return deprecated2014; } set { deprecated2014 = value; } }
         public Dictionary<Tool2015, RevitToolProperties> Deprecated2015 { get { return deprecated2015; } set { deprecated2015 = value; } }
+        public Dictionary<Tool2016, RevitToolProperties> Deprecated2016 { get { return deprecated2016; } set { deprecated2016 = value; } }
         public Dictionary<string, DynamoToolProperties> DeprecatedDynamo { get { return deprecatedDynamo; } set { deprecatedDynamo = value; } }
 
         public DeprecatedTools()

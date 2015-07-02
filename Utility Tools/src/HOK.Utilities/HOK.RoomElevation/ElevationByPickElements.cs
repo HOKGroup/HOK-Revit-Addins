@@ -61,7 +61,7 @@ namespace HOK.RoomElevation
                         roomElement = m_doc.GetElement(selectedRoom.ElementId) as Room;
                     }
                 }
-#if RELEASE2014||RELEASE2015
+#if RELEASE2014||RELEASE2015 || RELEASE2016
                 else
                 {
                     selectedRoom = uidoc.Selection.PickObject(ObjectType.LinkedElement, "Select a room from linked models to create an elevation view.");
@@ -94,7 +94,7 @@ namespace HOK.RoomElevation
                                 wallElement = m_doc.GetElement(selectedWall.ElementId) as Wall;
                             }
                         }
-#if RELEASE2014||RELEASE2015
+#if RELEASE2014||RELEASE2015 || RELEASE2016
                         else
                         {
                             selectedWall = uidoc.Selection.PickObject(ObjectType.LinkedElement, "Select a wall from linked models to rotate an elevation view perpendicular to the wall.");

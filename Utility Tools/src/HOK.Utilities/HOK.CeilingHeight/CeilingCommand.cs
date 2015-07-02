@@ -112,7 +112,7 @@ namespace HOK.CeilingHeight
             bool result = false;
             try
             {
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                 Parameter param = room.LookupParameter(paramName);
 #else
                 Parameter param = room.get_Parameter(paramName);

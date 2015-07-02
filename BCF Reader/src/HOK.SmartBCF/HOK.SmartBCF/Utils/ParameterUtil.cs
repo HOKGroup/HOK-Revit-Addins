@@ -118,7 +118,7 @@ namespace HOK.SmartBCF.Utils
                 ProjectInfo pInfo = doc.ProjectInformation;
                 if (null != pInfo)
                 {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                     Parameter param = pInfo.LookupParameter(BCFParameters.BCF_ProjectId.ToString());
 #elif RELEASE2013||RELEASE2014
                     Parameter param = pInfo.get_Parameter(BCFParameters.BCF_ProjectId.ToString());
@@ -165,7 +165,7 @@ namespace HOK.SmartBCF.Utils
                 ProjectInfo pInfo = doc.ProjectInformation;
                 if (null != pInfo)
                 {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                     Parameter param = pInfo.LookupParameter(BCFParameters.BCF_ProjectId.ToString());
 #elif RELEASE2013||RELEASE2014
                     Parameter param = pInfo.get_Parameter(BCFParameters.BCF_ProjectId.ToString());
@@ -201,7 +201,7 @@ namespace HOK.SmartBCF.Utils
                 ProjectInfo pInfo = doc.ProjectInformation;
                 if (null != pInfo)
                 {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                     Parameter param = pInfo.LookupParameter(BCFParameters.BCF_ColorSchemeId.ToString());
 #elif RELEASE2013||RELEASE2014
                     Parameter param = pInfo.get_Parameter(BCFParameters.BCF_ColorSchemeId.ToString());
@@ -227,7 +227,7 @@ namespace HOK.SmartBCF.Utils
                 ProjectInfo pInfo = doc.ProjectInformation;
                 if (null != pInfo)
                 {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                     Parameter param = pInfo.LookupParameter(BCFParameters.BCF_ColorSchemeId.ToString());
 #elif RELEASE2013||RELEASE2014
                     Parameter param = pInfo.get_Parameter(BCFParameters.BCF_ColorSchemeId.ToString());
@@ -404,7 +404,7 @@ namespace HOK.SmartBCF.Utils
                 Element element = doc.GetElement(new ElementId(ep.ElementId));
                 if (null != element)
                 {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                     Parameter param = element.LookupParameter(bcfParam.ToString());
                     
 #elif RELEASE2013||RELEASE2014

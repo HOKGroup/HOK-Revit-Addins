@@ -91,7 +91,7 @@ namespace HOK.LPDCalculator.Schedule
             {
                 ViewScheduleExportOptions options = new ViewScheduleExportOptions();
                 options.ColumnHeaders = ExportColumnHeaders.OneRow;
-#if RELEASE2014 || RELEASE2015
+#if RELEASE2014 || RELEASE2015 || RELEASE2016
                 options.Title = false;
 #endif
 

@@ -394,7 +394,7 @@ namespace HOK.CeilingHeight
                 try
                 {
                     string paramName = "Ceiling Height";
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                     Parameter parameter = room.LookupParameter(paramName);
 #else
                     Parameter parameter = room.get_Parameter(paramName);
@@ -408,7 +408,7 @@ namespace HOK.CeilingHeight
                     }
                     else if (CreateSharedParameter(paramName, ParameterType.Length, BuiltInParameterGroup.PG_GEOMETRY))
                     {
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                         parameter = room.LookupParameter(paramName);
 #else
                         parameter = room.get_Parameter(paramName);
@@ -443,7 +443,7 @@ namespace HOK.CeilingHeight
                     string paramName = "Secondary Ceiling Heights";
                     List<double> ceilingHeightList = new List<double>();
 
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                     Parameter tempParam = room.LookupParameter("Ceiling Height");
 #else
                     Parameter tempParam = room.get_Parameter("Ceiling Height");
@@ -465,7 +465,7 @@ namespace HOK.CeilingHeight
                         }
                     }
 
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                     Parameter parameter = room.LookupParameter(paramName);
 #else
                     Parameter parameter = room.get_Parameter(paramName);
@@ -479,7 +479,7 @@ namespace HOK.CeilingHeight
                     }
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.PG_GEOMETRY))
                     {
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                         parameter = room.LookupParameter(paramName);
 #else
                         parameter = room.get_Parameter(paramName);
@@ -513,7 +513,7 @@ namespace HOK.CeilingHeight
                 {
                     string paramName = "Ceiling Plan";
 
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                     Parameter parameter = room.LookupParameter(paramName);
 #else
                     Parameter parameter = room.get_Parameter(paramName);
@@ -533,7 +533,7 @@ namespace HOK.CeilingHeight
                     }
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.INVALID))
                     {
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                         parameter = room.LookupParameter(paramName);
 #else
                         parameter = room.get_Parameter(paramName);
@@ -583,7 +583,7 @@ namespace HOK.CeilingHeight
                         }
                     }
 
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                     Parameter parameter = room.LookupParameter(paramName);
 #else
                     Parameter parameter = room.get_Parameter(paramName);
@@ -603,7 +603,7 @@ namespace HOK.CeilingHeight
                     }
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.INVALID))
                     {
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                         parameter = room.LookupParameter(paramName);
 #else
                         parameter = room.get_Parameter(paramName);
@@ -652,6 +652,9 @@ namespace HOK.CeilingHeight
                         {
 #if RELEASE2015
                             ExternalDefinitonCreationOptions options = new ExternalDefinitonCreationOptions(paramName, paramType);
+                            definition = group.Definitions.Create(options);
+#elif RELEASE2016
+                            ExternalDefinitionCreationOptions options = new ExternalDefinitionCreationOptions(paramName, paramType);
                             definition = group.Definitions.Create(options);
 #else
                             definition = group.Definitions.Create(paramName, paramType);

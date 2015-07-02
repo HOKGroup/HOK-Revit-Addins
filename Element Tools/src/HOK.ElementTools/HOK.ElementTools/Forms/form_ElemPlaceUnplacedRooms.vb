@@ -130,7 +130,7 @@ Public Class form_ElemPlaceUnplacedRooms
             Dim roomToPlace As Architecture.Room = DirectCast(m_Settings.Document.GetElement(elemId), Architecture.Room)
 #If RELEASE2013 Or RELEASE2014 Then
             Dim parameterArea As Parameter = roomToPlace.Parameter(textBoxParameterRequiredArea.Text)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
             Dim parameterArea As Parameter = roomToPlace.LookupParameter(textBoxParameterRequiredArea.Text)
 #End If
 
@@ -157,7 +157,7 @@ Public Class form_ElemPlaceUnplacedRooms
             Dim line2 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox2, ptCurrentBox3, True)
             Dim line3 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox3, ptCurrentBox4, True)
             Dim line4 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox4, ptCurrentBox1, True)
-#ElseIf RELEASE2014 Or RELEASE2015 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
             Dim line1 As Curve = Line.CreateBound(ptCurrentBox1, ptCurrentBox2)
             Dim line2 As Curve = Line.CreateBound(ptCurrentBox2, ptCurrentBox3)
             Dim line3 As Curve = Line.CreateBound(ptCurrentBox3, ptCurrentBox4)
@@ -282,7 +282,7 @@ Public Class form_ElemPlaceUnplacedRooms
             'Tag the new room
 #If RELEASE2013 Then
             Dim roomTag As Architecture.RoomTag = m_Settings.Document.Create.NewRoomTag(roomNew, ptCurrentInsert, m_Settings.ActiveView)
-#ElseIf RELEASE2014 Or RELEASE2015 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
             Dim roomId As LinkElementId = New LinkElementId(roomNew.Id)
             Dim roomTag As Architecture.RoomTag = m_Settings.Document.Create.NewRoomTag(roomId, ptCurrentInsert, m_Settings.ActiveView.Id)
 #End If
@@ -394,7 +394,7 @@ Public Class form_ElemPlaceUnplacedRooms
             ' Then create a sketch plane using the Geometry.Plane
 #If RELEASE2013 Then
             Dim plane As SketchPlane = m_Settings.Document.Create.NewSketchPlane(geometryPlane)
-#ElseIf RELEASE2014 Or RELEASE2015 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
             Dim plane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
 #End If
 
@@ -428,7 +428,7 @@ Public Class form_ElemPlaceUnplacedRooms
             ' Then create a sketch plane using the Geometry.Plane
 #If RELEASE2013 Then
             Dim plane As SketchPlane = m_Settings.Document.Create.NewSketchPlane(geometryPlane)
-#ElseIf RELEASE2014 Or RELEASE2015 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
              Dim plane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
 #End If
 

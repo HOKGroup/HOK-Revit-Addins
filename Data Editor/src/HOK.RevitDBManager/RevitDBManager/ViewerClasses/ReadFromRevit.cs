@@ -1442,7 +1442,7 @@ namespace RevitDBManager.ViewerClasses
                                 {
 #if RELEASE2013 ||RELEASE2014
                                     Autodesk.Revit.DB.Parameter parameter = element.get_Parameter(updateParam);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                                     Autodesk.Revit.DB.Parameter parameter = element.LookupParameter(updateParam);
 #endif
                                     

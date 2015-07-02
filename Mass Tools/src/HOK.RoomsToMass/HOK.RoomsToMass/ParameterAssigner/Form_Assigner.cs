@@ -380,7 +380,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                         string paramName = selectedParameters[param.Definition.Name];
 #if RELEASE2013||RELEASE2014
                                         Parameter elemParam = element.get_Parameter(paramName);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                                         Parameter elemParam = element.LookupParameter(paramName);
 #endif
 
@@ -556,7 +556,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         {
 #if RELEASE2013||RELEASE2014
                             Parameter param = element.get_Parameter(paramName);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                             Parameter param = element.LookupParameter(paramName);
 #endif
 
@@ -979,7 +979,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         }
                         uidoc.ShowElements(newSelection);
                         uidoc.Selection.Elements = newSelection;
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                         Selection selection = uidoc.Selection;
                         List<Element> elementList = new List<Element>();
                         if (checkBoxFilter.Checked) { elementList = mp.FilteredContainer; }

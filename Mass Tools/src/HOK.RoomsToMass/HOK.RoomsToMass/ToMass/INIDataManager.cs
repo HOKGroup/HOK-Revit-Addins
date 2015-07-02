@@ -308,9 +308,13 @@ namespace HOK.RoomsToMass.ToMass
 #if RELEASE2013||RELEASE2014
                                 Parameter param = element.get_Parameter(paramName);
                                 definition = definitions.Create("Mass_" + param.Definition.Name, param.Definition.ParameterType);
-#elif RELEASE2015
+#elif RELEASE2015 
                                 Parameter param = element.LookupParameter(paramName);
                                 ExternalDefinitonCreationOptions options = new ExternalDefinitonCreationOptions("Mass_" + param.Definition.Name, param.Definition.ParameterType);
+                                definition = definitions.Create(options);
+#elif RELEASE2016
+                                Parameter param = element.LookupParameter(paramName);
+                                ExternalDefinitionCreationOptions options = new ExternalDefinitionCreationOptions("Mass_" + param.Definition.Name, param.Definition.ParameterType);
                                 definition = definitions.Create(options);
 #endif
                             }

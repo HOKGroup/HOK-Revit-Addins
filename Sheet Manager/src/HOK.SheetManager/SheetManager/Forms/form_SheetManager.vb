@@ -302,7 +302,7 @@ Public Class form_SheetManager
                         For Each dc As DataColumn In m_DataTable.Columns
 #If RELEASE2013 Or RELEASE2014 Then
                             Dim m_pSht As Parameter = m_SheetItem.Parameter(dc.ColumnName)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
                             Dim m_pSht As Parameter = m_SheetItem.LookupParameter(dc.ColumnName)
 #End If
                             If m_pSht IsNot Nothing Then
@@ -370,7 +370,7 @@ Public Class form_SheetManager
                             If isPlaceholderSheet = False And m_TblkItem IsNot Nothing Then
 #If RELEASE2013 Or RELEASE2014 Then
                             Dim m_pTblk As Parameter = m_TblkItem.Parameter(dc.ColumnName)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
                                 Dim m_pTblk As Parameter = m_TblkItem.LookupParameter(dc.ColumnName)
 #End If
 
@@ -709,7 +709,7 @@ Public Class form_SheetManager
                         placed = True
                         placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
                     End If
-#ElseIf RELEASE2014 Or RELEASE2015 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
                             pointInsert = XYZ.Zero
 
                             If Viewport.CanAddViewToSheet(m_Settings.Document, m_ViewSheet.Id, m_View.Id) Then
@@ -1031,7 +1031,7 @@ Public Class form_SheetManager
 
 #If RELEASE2013 Or RELEASE2014 Then
             m_ParamTblk = m_ViewSheet.Parameter(dataColumn.ColumnName)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
             m_ParamTblk = m_ViewSheet.LookupParameter(dataColumn.ColumnName)
 #End If
 
@@ -1046,7 +1046,7 @@ Public Class form_SheetManager
 
 #If RELEASE2013 Or RELEASE2014 Then
             m_ParamTblk = m_ViewSheet.Parameter("Sheet Number")
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
             m_ParamTblk = m_ViewSheet.LookupParameter("Sheet Number")
 #End If
 
@@ -1064,7 +1064,7 @@ Public Class form_SheetManager
 
 #If RELEASE2013 Or RELEASE2014 Then
                     m_ParamTblk = m_ViewSheet.Parameter(parameterName)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
                     m_ParamTblk = m_ViewSheet.LookupParameter(parameterName)
 #End If
 
@@ -1082,7 +1082,7 @@ Public Class form_SheetManager
 
 #If RELEASE2013 Or RELEASE2014 Then
                     m_ParamTblk = m_ViewSheet.Parameter(parameterName)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
                     m_ParamTblk = m_ViewSheet.LookupParameter(parameterName)
 #End If
 
@@ -1303,7 +1303,7 @@ UpdateExistingElement:
                             ' Does the param exist in here?
 #If RELEASE2013 Or RELEASE2014 Then
                 Dim m_P As Parameter = m_SheetView.Parameter(x)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
                             Dim m_P As Parameter = m_SheetView.LookupParameter(x)
 #End If
 
@@ -1382,7 +1382,7 @@ UpdateExistingElement:
                                         ' Itentify the element by Sheet Number
 #If RELEASE2013 Or RELEASE2014 Then
                             Dim m_SheetNumberP As Parameter = y.Parameter("Sheet Number")
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
                                         Dim m_SheetNumberP As Parameter = y.LookupParameter("Sheet Number")
 #End If
 
@@ -1412,7 +1412,7 @@ UpdateExistingElement:
                                 ' Does the param exist in here?
 #If RELEASE2013 Or RELEASE2014 Then
                     Dim m_P As Parameter = m_SheetTitleblock.Parameter(x)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
                                 Dim m_P As Parameter = m_SheetTitleblock.LookupParameter(x)
 #End If
 

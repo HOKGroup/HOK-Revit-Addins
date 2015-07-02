@@ -122,7 +122,7 @@ Public Class form_ParamStringCalculate
                     valueToAssign = m_Settings.Document.GetElement(element.Level.Id).Name
                     valueToAssign = valueToAssign.Substring(valueToAssign.LastIndexOf(" ") + 1)
                 End If
-#ElseIf RELEASE2014 Or RELEASE2015 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
                 If element.LevelId Is Nothing Then
                 valueToAssign = ""
                 Else

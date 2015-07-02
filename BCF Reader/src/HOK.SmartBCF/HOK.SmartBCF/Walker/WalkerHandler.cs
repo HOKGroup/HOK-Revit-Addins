@@ -381,7 +381,7 @@ namespace HOK.SmartBCF.Walker
                             selElements.Add(element);
                             uidoc.Selection.Elements = selElements;
                             uidoc.ShowElements(element);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                                 List<ElementId> selectedIds = new List<ElementId>();
                                 selectedIds.Add(element.Id);
                                 uidoc.Selection.SetElementIds(selectedIds);
@@ -393,7 +393,7 @@ namespace HOK.SmartBCF.Walker
 #if RELEASE2013||RELEASE2014
                             SelElementSet selElementSet = SelElementSet.Create();
                             uidoc.Selection.Elements = selElementSet;
-#elif RELEASE2015
+#elif RELEASE2015 ||RELEASE2016
 
                                 uidoc.Selection.SetElementIds(new List<ElementId>());
 #endif

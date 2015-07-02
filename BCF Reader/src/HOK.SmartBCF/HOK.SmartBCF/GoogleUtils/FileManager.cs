@@ -35,31 +35,6 @@ namespace HOK.SmartBCF.GoogleUtils
             DriveService driveService = null;
             try
             {
-                /*
-                UserCredential credential;
-                string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
-                string jsonPath = System.IO.Path.Combine(currentDirectory, "Resources\\client_secrets_samrtBCF.json");
-
-                using (var filestream = new System.IO.FileStream(jsonPath,
-                    System.IO.FileMode.Open, System.IO.FileAccess.Read))
-                {
-                    credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                        GoogleClientSecrets.Load(filestream).Secrets,
-                        new[] { DriveService.Scope.Drive, },
-                        "user",
-                        CancellationToken.None).Result;
-
-                }
-
-                // Create the service.
-                driveService = new DriveService(new BaseClientService.Initializer()
-                {
-                    HttpClientInitializer = credential,
-                    ApplicationName = "HOK smartBCF",
-                });
-                */
-
                 string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
                 string keyFilePath = System.IO.Path.Combine(currentDirectory, "Resources\\" + keyFile);

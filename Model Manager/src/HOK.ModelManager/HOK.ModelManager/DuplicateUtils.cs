@@ -316,7 +316,7 @@ namespace HOK.ModelManager
                                     {
 #if RELEASE2014
                                     Parameter rParam = viewSheet.get_Parameter(param.Definition.Name);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                                         Parameter rParam = viewSheet.LookupParameter(param.Definition.Name);
 #endif
 
@@ -429,7 +429,7 @@ namespace HOK.ModelManager
                                             {
 #if RELEASE2014
                                                 Parameter rParam = recipientViewport.get_Parameter(param.Definition.Name);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                                             Parameter rParam = recipientViewport.LookupParameter(param.Definition.Name);
 #endif
 

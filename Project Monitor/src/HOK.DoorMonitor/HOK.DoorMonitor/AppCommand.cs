@@ -20,7 +20,7 @@ namespace HOK.DoorMonitor
     {
         internal static AppCommand appCommand = null;
         private UIControlledApplication m_app;
-        private string tabName = "";
+        private string tabName = "  HOK - Beta";
         private static DoorUpdater doorUpdater = null;
         private AddInId thisAppId;
    
@@ -45,7 +45,6 @@ namespace HOK.DoorMonitor
         {
             appCommand = this;
             m_app = application;
-            tabName = "   HOK   ";
             try
             {
                 m_app.CreateRibbonTab(tabName);
@@ -122,7 +121,7 @@ namespace HOK.DoorMonitor
                     {
                         doorUpdater.Register(doc, projectSetup);
                     }
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                      if (!UpdaterRegistry.IsUpdaterRegistered(doorUpdater.GetUpdaterId(), doc))
                     {
                         doorUpdater.Register(doc, projectSetup);
@@ -143,7 +142,7 @@ namespace HOK.DoorMonitor
                 {
                     UpdaterRegistry.UnregisterUpdater(doorUpdater.GetUpdaterId());
                 }
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                 if (UpdaterRegistry.IsUpdaterRegistered(doorUpdater.GetUpdaterId(), doc))
                 {
                     UpdaterRegistry.UnregisterUpdater(doorUpdater.GetUpdaterId(), doc);
@@ -164,7 +163,7 @@ namespace HOK.DoorMonitor
                         doorUpdater.Register(doc, projectSetup);
                         doc.DocumentClosing += UnregisterDoorUpdaterOnClose;
                     }
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                     if (!UpdaterRegistry.IsUpdaterRegistered(doorUpdater.GetUpdaterId(), doc))
                     {
                         doorUpdater.Register(doc, projectSetup);
@@ -179,7 +178,7 @@ namespace HOK.DoorMonitor
                     {
                         UpdaterRegistry.UnregisterUpdater(doorUpdater.GetUpdaterId());
                     }
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                     if (UpdaterRegistry.IsUpdaterRegistered(doorUpdater.GetUpdaterId(), doc))
                     {
                         UpdaterRegistry.UnregisterUpdater(doorUpdater.GetUpdaterId(), doc);

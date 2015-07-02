@@ -247,7 +247,7 @@ namespace HOK.RoomsToMass.ToMass
                     Plane plane = fdoc.Application.Create.NewPlane(XYZ.BasisZ, new XYZ(0, 0, 0));
 #if RELEASE2013
                     SketchPlane skPlane = fdoc.FamilyCreate.NewSketchPlane(plane);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                     SketchPlane skPlane = SketchPlane.Create(fdoc, plane);
 #endif
 
@@ -281,7 +281,7 @@ namespace HOK.RoomsToMass.ToMass
                                 curve = edge.AsCurve();
 #if RELEASE2013
                                 XYZ point = curve.get_EndPoint(0);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                                 XYZ point = curve.GetEndPoint(0);
 #endif
 
@@ -309,7 +309,7 @@ namespace HOK.RoomsToMass.ToMass
                                 {
 #if RELEASE2013
                                     curve = doc.Application.Create.NewLineBound(pointList[i], pointList[0]);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                                     curve = Autodesk.Revit.DB.Line.CreateBound(pointList[i], pointList[0]);
 #endif
                                 }
@@ -317,7 +317,7 @@ namespace HOK.RoomsToMass.ToMass
                                 {
 #if RELEASE2013
                                     curve = doc.Application.Create.NewLineBound(pointList[i], pointList[i + 1]);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                                     curve = Autodesk.Revit.DB.Line.CreateBound(pointList[i], pointList[i + 1]);
 #endif
                                 }
@@ -377,7 +377,7 @@ namespace HOK.RoomsToMass.ToMass
                     Plane plane = fdoc.Application.Create.NewPlane(XYZ.BasisZ, new XYZ(0, 0, 0));
 #if RELEASE2013
                     SketchPlane skPlane = fdoc.FamilyCreate.NewSketchPlane(plane);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                     SketchPlane skPlane = SketchPlane.Create(fdoc, plane);
 #endif
 
@@ -408,7 +408,7 @@ namespace HOK.RoomsToMass.ToMass
                             {
 #if RELEASE2013
                                 XYZ pt = curve.get_EndPoint(0);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                                 XYZ pt = curve.GetEndPoint(0);
 #endif
                                 XYZ tempPoint = new XYZ(pt.X, pt.Y, 0);
@@ -433,7 +433,7 @@ namespace HOK.RoomsToMass.ToMass
                                 {
 #if RELEASE2013
                                     newCurve = fdoc.Application.Create.NewLineBound(pointList[i], pointList[0]);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                                     newCurve = Autodesk.Revit.DB.Line.CreateBound(pointList[i], pointList[0]);
 #endif
                                 }
@@ -441,7 +441,7 @@ namespace HOK.RoomsToMass.ToMass
                                 {
 #if RELEASE2013
                                     newCurve = fdoc.Application.Create.NewLineBound(pointList[i], pointList[i + 1]);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                                     newCurve = Autodesk.Revit.DB.Line.CreateBound(pointList[i], pointList[i + 1]);
 #endif
                                 }
@@ -525,7 +525,7 @@ namespace HOK.RoomsToMass.ToMass
                                 curve = edge.AsCurve();
 #if RELEASE2013
                                 XYZ point = curve.get_EndPoint(0);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                                 XYZ point = curve.GetEndPoint(0);
 #endif
                                 XYZ tempPoint = new XYZ(point.X, point.Y, 0);
@@ -549,7 +549,7 @@ namespace HOK.RoomsToMass.ToMass
                             Plane plane = fdoc.Application.Create.NewPlane(XYZ.BasisZ, new XYZ(0, 0, 0));
 #if RELEASE2013
                             SketchPlane skPlane = fdoc.FamilyCreate.NewSketchPlane(plane);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                             SketchPlane skPlane = SketchPlane.Create(fdoc, plane);
 #endif
 
@@ -559,7 +559,7 @@ namespace HOK.RoomsToMass.ToMass
                                 {
 #if RELEASE2013
                                     curve = fdoc.Application.Create.NewLineBound(pointList[i], pointList[0]);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                                     curve = Autodesk.Revit.DB.Line.CreateBound(pointList[i], pointList[0]);
 #endif
                                 }
@@ -567,7 +567,7 @@ namespace HOK.RoomsToMass.ToMass
                                 {
 #if RELEASE2013
                                     curve = fdoc.Application.Create.NewLineBound(pointList[i], pointList[i + 1]);
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                                     curve = Autodesk.Revit.DB.Line.CreateBound(pointList[i], pointList[i + 1]);
 #endif
                                 }
@@ -748,7 +748,7 @@ namespace HOK.RoomsToMass.ToMass
                     familyInstance = doc.Create.NewFamilyInstance(new XYZ(0, 0, skPlane.GetPlane().Origin.Z), symbol, skPlane, StructuralType.NonStructural);
 #endif
 
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                     List<ElementId> elementIds = newFamily.GetFamilySymbolIds().ToList();
                     if (elementIds.Count > 0)
                     {

@@ -170,7 +170,7 @@ namespace HOK.AVFManager.GenericClasses
                     List<double> valueLists = new List<double>();
                     foreach (string paramName in settings.Configurations.Keys)
                     {
-#if RELEASE2015
+#if RELEASE2015 ||RELEASE2016
                         Parameter param = element.LookupParameter(paramName);
 #else
                         Parameter param = element.get_Parameter(paramName);
@@ -271,7 +271,7 @@ namespace HOK.AVFManager.GenericClasses
                     List<double> valueLists = new List<double>();
                     foreach (string paramName in settings.Configurations.Keys)
                     {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                         Parameter param = element.LookupParameter(paramName);
 #else
                         Parameter param = element.get_Parameter(paramName);

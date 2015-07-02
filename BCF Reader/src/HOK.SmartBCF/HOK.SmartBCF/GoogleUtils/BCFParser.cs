@@ -30,9 +30,6 @@ namespace HOK.SmartBCF.GoogleUtils
         public static string currentSheetId = ""; //fileId of Google Spreadsheet
         public static WorksheetEntry currentSheet = null; //worksheet of ViewPoint
 
-        //private static string userName = "bsmart@hokbuildingsmart.com";
-        //private static string passWord = "HOKb$mart";
-
         private static string keyFile = "HOK smartBCF.p12";
         private static string serviceAccountEmail = "756603983986-lrc8dm2b0nl381cepd60q2o7fo8df3bg@developer.gserviceaccount.com";
 

@@ -17,7 +17,7 @@ namespace HOK.Navigator
         RevitData,
         Analysis,
         Utility,
-#if RELEASE2014 || RELEASE2015
+#if RELEASE2014 || RELEASE2015 ||RELEASE2016
         ModelManager,
         ColorEditor,
 #endif
@@ -95,7 +95,7 @@ namespace HOK.Navigator
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.Utilities.dll";
                             tp.DllName = "HOK.Utilities.dll";
                             break;
-#if RELEASE2014 || RELEASE2015
+#if RELEASE2014 || RELEASE2015 || RELEASE2016
                         case ToolEnum.ModelManager:
                             tp.DllPath = "\\HOK-Addin.bundle\\Contents\\HOK.ModelManager.dll";
                             tp.DllName = "HOK.ModelManager.dll";

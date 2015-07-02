@@ -26,10 +26,12 @@ namespace HOK.AddIn_Installer_Internal
         private Dictionary<Tool2013, RevitToolProperties> tool2013Dictionary = new Dictionary<Tool2013, RevitToolProperties>();
         private Dictionary<Tool2014, RevitToolProperties> tool2014Dictionary = new Dictionary<Tool2014, RevitToolProperties>();
         private Dictionary<Tool2015, RevitToolProperties> tool2015Dictionary = new Dictionary<Tool2015, RevitToolProperties>();
+        private Dictionary<Tool2016, RevitToolProperties> tool2016Dictionary = new Dictionary<Tool2016, RevitToolProperties>();
         private Dictionary<string, DynamoToolProperties> dynamoDictionary = new Dictionary<string, DynamoToolProperties>();
         private Dictionary<string/*toolName*/, string/*version*/> installedVersions2013 = new Dictionary<string, string>();
         private Dictionary<string/*toolName*/, string/*version*/> installedVersions2014 = new Dictionary<string, string>();
         private Dictionary<string/*toolName*/, string/*version*/> installedVersions2015 = new Dictionary<string, string>();
+        private Dictionary<string/*toolName*/, string/*version*/> installedVersions2016 = new Dictionary<string, string>();
         private Dictionary<string/*toolName*/, DateTime> installedDateDynamo = new Dictionary<string, DateTime>();
         private ToolManager toolManager;
         private DeprecatedTools deprecatedTools;
@@ -40,6 +42,7 @@ namespace HOK.AddIn_Installer_Internal
             CreateDirectories(TargetSoftware.Revit_2013);
             CreateDirectories(TargetSoftware.Revit_2014);
             CreateDirectories(TargetSoftware.Revit_2015);
+            CreateDirectories(TargetSoftware.Revit_2016);
             CreateDirectories(TargetSoftware.Dynamo);
 
             deprecatedTools = new DeprecatedTools();
@@ -48,11 +51,11 @@ namespace HOK.AddIn_Installer_Internal
             if (tool2013Dictionary.Count == 0) { tool2013Dictionary = toolManager.Get2013Dictionary(deprecatedTools.Deprecated2013); }
             if (tool2014Dictionary.Count == 0) { tool2014Dictionary = toolManager.Get2014Dictionary(deprecatedTools.Deprecated2014); }
             if (tool2015Dictionary.Count == 0) { tool2015Dictionary = toolManager.Get2015Dictionary(deprecatedTools.Deprecated2015); }
+            if (tool2016Dictionary.Count == 0) { tool2016Dictionary = toolManager.Get2016Dictionary(deprecatedTools.Deprecated2016); }
             if (dynamoDictionary.Count == 0) { dynamoDictionary = toolManager.GetDynamoDictionary(deprecatedTools.DeprecatedDynamo); }
             
             InitializeComponent();
             this.Text = "HOK AddIns Installer v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            //ReadINI();
 
             comboBoxTarget.DataSource = Enum.GetValues(typeof(TargetSoftware));
             comboBoxTarget.SelectedItem = TargetSoftware.Revit_2013;
@@ -256,6 +259,71 @@ namespace HOK.AddIn_Installer_Internal
             }
         }
 
+        private void Display2016Tools()
+        {
+            try
+            {
+                listViewTools.Items.Clear();
+                listViewBeta.Items.Clear();
+
+                CreateColumnHeaders(listViewTools, TargetSoftware.Revit_2016, false);
+                CreateColumnHeaders(listViewBeta, TargetSoftware.Revit_2016, true);
+
+                listViewTools.LargeImageList = imageListIcons;
+                listViewTools.SmallImageList = imageListIcons;
+                listViewBeta.LargeImageList = imageListIcons;
+                listViewBeta.SmallImageList = imageListIcons;
+
+                int needInstall = 0;
+                foreach (Tool2016 tool in tool2016Dictionary.Keys)
+                {
+                    RevitToolProperties tp = tool2016Dictionary[tool];
+
+                    if (!tp.BetaOnly)
+                    {
+                        ListViewItem item = new ListViewItem(tp.ToolName);
+                        item.Name = tp.ToolName;
+                        item.ImageIndex = tp.ImageIndex;
+                        item.Tag = tool;
+                        item.SubItems.Add("v." + tp.ReleaseVersionInfo.FileVersion);
+                        item.SubItems.Add(tp.ReleaseDate);
+
+                        if (null != tp.InstallVersionInfo)
+                        {
+                            item.SubItems.Add("v." + tp.InstallVersionInfo.FileVersion);
+                            item.Checked = CompareVersions(tp.InstallVersionInfo, tp.ReleaseVersionInfo);
+                        }
+                        else
+                        {
+                            item.SubItems.Add("Not Installed");
+                            item.Checked = true;
+                        }
+                        if (item.Checked) { needInstall++; }
+                        listViewTools.Items.Add(item);
+                    }
+
+                    if (null != tp.BetaVersionInfo)
+                    {
+                        AddBetaToolItem(tp);
+                    }
+                }
+
+                if (needInstall > 0)
+                {
+                    labelStatus.Text = needInstall + " of 3 out of date";
+                }
+                else
+                {
+                    labelStatus.Text = "All files updated.";
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to display tools for Revit 2015.\n" + ex.Message, "Display2015Tools", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
         private void DisplayDynamoTools()
         {
             try
@@ -341,7 +409,7 @@ namespace HOK.AddIn_Installer_Internal
             try
             {
                 List<ColumnHeader> headers = new List<ColumnHeader>();
-                if (target == TargetSoftware.Revit_2013 || target == TargetSoftware.Revit_2014 || target==TargetSoftware.Revit_2015)
+                if (target == TargetSoftware.Revit_2013 || target == TargetSoftware.Revit_2014 || target==TargetSoftware.Revit_2015 || target == TargetSoftware.Revit_2016)
                 {
                     if (revitColumnHeaders.Count == 0)
                     {
@@ -480,6 +548,7 @@ namespace HOK.AddIn_Installer_Internal
                 if (tp.TargetSoftWareEnum == TargetSoftware.Revit_2013) { item.Tag = tp.ToolEnum2013; }
                 else if (tp.TargetSoftWareEnum == TargetSoftware.Revit_2014) { item.Tag = tp.ToolEnum2014; }
                 else if (tp.TargetSoftWareEnum == TargetSoftware.Revit_2015) { item.Tag = tp.ToolEnum2015; }
+                else if (tp.TargetSoftWareEnum == TargetSoftware.Revit_2016) { item.Tag = tp.ToolEnum2016; }
                 item.SubItems.Add("v." + tp.BetaVersionInfo.FileVersion);
                 item.SubItems.Add(tp.BetaDate);
 
@@ -524,6 +593,9 @@ namespace HOK.AddIn_Installer_Internal
                         case TargetSoftware.Revit_2015:
                             Install2015Tool();
                             break;
+                        case TargetSoftware.Revit_2016:
+                            Install2016Tool();
+                            break;
                         case TargetSoftware.Dynamo:
                             InstallDynamo();
                             break;
@@ -551,7 +623,8 @@ namespace HOK.AddIn_Installer_Internal
 
                     ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
                     //DeleteOldDirectories(progressForm, target);
-
+                    progressForm.Show();
+                   
                     int count = 0;
                     
                     for (int i = 0; i < listViewTools.CheckedItems.Count; i++)
@@ -611,7 +684,6 @@ namespace HOK.AddIn_Installer_Internal
                         , "Installation Complete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (dr == DialogResult.Yes)
                     {
-                        //WriteINI(version);
                         this.Close();
                     }
                     else
@@ -635,6 +707,7 @@ namespace HOK.AddIn_Installer_Internal
                     TargetSoftware traget = TargetSoftware.Revit_2014;
                     ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
                     //DeleteOldDirectories(progressForm, traget);
+                    progressForm.Show();
 
                     int count = 0;
 
@@ -695,7 +768,6 @@ namespace HOK.AddIn_Installer_Internal
                         , "Installation Complete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (dr == DialogResult.Yes)
                     {
-                        //WriteINI(version);
                         this.Close();
                     }
                     else
@@ -719,6 +791,7 @@ namespace HOK.AddIn_Installer_Internal
                     TargetSoftware traget = TargetSoftware.Revit_2015;
                     ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
                     //DeleteOldDirectories(progressForm, traget);
+                    progressForm.Show();
 
                     int count = 0;
 
@@ -779,12 +852,90 @@ namespace HOK.AddIn_Installer_Internal
                         , "Installation Complete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (dr == DialogResult.Yes)
                     {
-                        //WriteINI(version);
                         this.Close();
                     }
                     else
                     {
                         Display2015Tools();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Errors occured while installing 2015 tools.\n" + ex.Message, "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void Install2016Tool()
+        {
+            try
+            {
+                if (CheckPrerequisite())
+                {
+                    TargetSoftware traget = TargetSoftware.Revit_2016;
+                    ProgressForm progressForm = new ProgressForm("Installing selected tools . . . ");
+                    //DeleteOldDirectories(progressForm, traget);
+                    progressForm.Show();
+
+                    int count = 0;
+
+                    for (int i = 0; i < listViewTools.CheckedItems.Count; i++)
+                    {
+                        ListViewItem item = listViewTools.CheckedItems[i];
+                        if (null != item.Tag)
+                        {
+                            Tool2016 tool = (Tool2016)item.Tag;
+                            if (tool2016Dictionary.ContainsKey(tool))
+                            {
+                                RevitToolProperties tp = tool2016Dictionary[tool];
+                                CopyFromStandard(tp, progressForm, traget);
+
+                                tp.InstallVersionInfo = tp.ReleaseVersionInfo;
+                                tool2016Dictionary.Remove(tool);
+                                tool2016Dictionary.Add(tool, tp);
+                                item.SubItems[3].Text = "v." + tp.InstallVersionInfo.FileVersion;
+                            }
+                        }
+                        count++;
+                    }
+
+                    if (checkBoxBeta.Checked)
+                    {
+                        for (int i = 0; i < listViewBeta.CheckedItems.Count; i++)
+                        {
+                            ListViewItem item = listViewBeta.CheckedItems[i];
+                            if (null != item.Tag)
+                            {
+                                Tool2016 tool = (Tool2016)item.Tag;
+                                if (tool2016Dictionary.ContainsKey(tool))
+                                {
+                                    if (tool2016Dictionary.ContainsKey(tool))
+                                    {
+                                        RevitToolProperties tp = tool2016Dictionary[tool];
+
+                                        CopyFromBeta(tp, progressForm, traget);
+                                        tp.InstallVersionInfo = tp.BetaVersionInfo;
+                                        tool2016Dictionary.Remove(tool);
+                                        tool2016Dictionary.Add(tool, tp);
+                                        item.SubItems[3].Text = "v." + tp.InstallVersionInfo.FileVersion;
+                                    }
+                                }
+                            }
+                            count++;
+                        }
+                    }
+
+                    progressForm.Close();
+
+                    DialogResult dr = MessageBox.Show(count + " tools were successfully installed.\nThe new Addins will be available when Revit is restarted.\nWould you like to exit the installer?"
+                        , "Installation Complete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (dr == DialogResult.Yes)
+                    {
+                        this.Close();
+                    }
+                    else
+                    {
+                        Display2016Tools();
                     }
                 }
             }
@@ -857,7 +1008,6 @@ namespace HOK.AddIn_Installer_Internal
                         , "Installation Complete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (dr == DialogResult.Yes)
                     {
-                        //WriteINI(version);
                         this.Close();
                     }
                     else
@@ -1067,26 +1217,48 @@ namespace HOK.AddIn_Installer_Internal
                     case TargetSoftware.Revit_2015:
                         appDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2015";
                         break;
+                    case TargetSoftware.Revit_2016:
+                        appDataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2016";
+                        break;
                     case TargetSoftware.Dynamo:
                         appDataDirectory=@"C:\Autodesk\Dynamo\Core\definitions";
                         break;
                 }
                 
-                if (target != TargetSoftware.Dynamo && Directory.Exists(appDataDirectory))
+                if (Directory.Exists(appDataDirectory))
                 {
-                    if (!Directory.Exists(appDataDirectory + "\\HOK-Addin.bundle"))
+                    if (target == TargetSoftware.Revit_2013 || target == TargetSoftware.Revit_2014 || target == TargetSoftware.Revit_2015)
                     {
-                        Directory.CreateDirectory(appDataDirectory + "\\HOK-Addin.bundle");
+                        if (!Directory.Exists(appDataDirectory + "\\HOK-Addin.bundle"))
+                        {
+                            Directory.CreateDirectory(appDataDirectory + "\\HOK-Addin.bundle");
+                        }
+                        if (!Directory.Exists(appDataDirectory + "\\HOK-Addin.bundle\\Contents"))
+                        {
+                            Directory.CreateDirectory(appDataDirectory + "\\HOK-Addin.bundle\\Contents");
+                        }
+                        if (!Directory.Exists(appDataDirectory + "\\HOK-Addin.bundle\\Contents\\Resources"))
+                        {
+                            Directory.CreateDirectory(appDataDirectory + "\\HOK-Addin.bundle\\Contents\\Resources");
+                        }
                     }
-                    if (!Directory.Exists(appDataDirectory + "\\HOK-Addin.bundle\\Contents"))
+                    else if (target == TargetSoftware.Revit_2016)
                     {
-                        Directory.CreateDirectory(appDataDirectory + "\\HOK-Addin.bundle\\Contents");
-                    }
-                    if (!Directory.Exists(appDataDirectory + "\\HOK-Addin.bundle\\Contents\\Resources"))
-                    {
-                        Directory.CreateDirectory(appDataDirectory + "\\HOK-Addin.bundle\\Contents\\Resources");
+                        if (!Directory.Exists(appDataDirectory + "\\HOK-Addin.bundle"))
+                        {
+                            Directory.CreateDirectory(appDataDirectory + "\\HOK-Addin.bundle");
+                        }
+                        if (!Directory.Exists(appDataDirectory + "\\HOK-Addin.bundle\\Contents_Beta"))
+                        {
+                            Directory.CreateDirectory(appDataDirectory + "\\HOK-Addin.bundle\\Contents_Beta");
+                        }
+                        if (!Directory.Exists(appDataDirectory + "\\HOK-Addin.bundle\\Contents_Beta\\Resources"))
+                        {
+                            Directory.CreateDirectory(appDataDirectory + "\\HOK-Addin.bundle\\Contents_Beta\\Resources");
+                        }
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -1160,6 +1332,10 @@ namespace HOK.AddIn_Installer_Internal
                     }
                 }
             }
+            else if (target == TargetSoftware.Revit_2016)
+            {
+                
+            }
             return count;
         }
 
@@ -1169,6 +1345,9 @@ namespace HOK.AddIn_Installer_Internal
             {
                 List<string> fileNames = new List<string>();
                 fileNames = tp.FilePaths;
+                progressForm.SetValue(0);
+                progressForm.SetMaximumValue(fileNames.Count);
+                progressForm.Refresh();
 
                 foreach (string path in fileNames)
                 {
@@ -1203,6 +1382,14 @@ namespace HOK.AddIn_Installer_Internal
                         installedVersions2015.Remove(tp.ToolName);
                     }
                     installedVersions2015.Add(tp.ToolName, tp.ReleaseVersionInfo.FileVersion);
+                }
+                else if (target == TargetSoftware.Revit_2016)
+                {
+                    if (installedVersions2016.ContainsKey(tp.ToolName))
+                    {
+                        installedVersions2016.Remove(tp.ToolName);
+                    }
+                    installedVersions2016.Add(tp.ToolName, tp.ReleaseVersionInfo.FileVersion);
                 }
             }
             catch (Exception ex)
@@ -1252,6 +1439,9 @@ namespace HOK.AddIn_Installer_Internal
             {
                 List<string> fileNames = new List<string>();
                 fileNames = tp.FilePaths;
+                progressForm.SetValue(0);
+                progressForm.SetMaximumValue(fileNames.Count);
+                progressForm.Refresh();
 
                 foreach (string path in fileNames)
                 {
@@ -1263,11 +1453,6 @@ namespace HOK.AddIn_Installer_Internal
                     {
                         try { File.Copy(betaPath, installPath, true); }
                         catch { continue; }
-                    }
-                    else if (File.Exists(standardPath))
-                    {
-                        try { File.Copy(standardPath, installPath, true); }
-                        catch{continue;}
                     }
                     progressForm.StepForward();
                 }
@@ -1297,6 +1482,14 @@ namespace HOK.AddIn_Installer_Internal
                             installedVersions2015.Remove(tp.ToolName);
                         }
                         installedVersions2015.Add(tp.ToolName, tp.BetaVersionInfo.FileVersion);
+                    }
+                    else if (target == TargetSoftware.Revit_2016)
+                    {
+                        if (installedVersions2016.ContainsKey(tp.ToolName))
+                        {
+                            installedVersions2016.Remove(tp.ToolName);
+                        }
+                        installedVersions2016.Add(tp.ToolName, tp.BetaVersionInfo.FileVersion);
                     }
                 }
             }
@@ -1383,6 +1576,14 @@ namespace HOK.AddIn_Installer_Internal
                                             if (RemoveFile(tp, target)) { count++; }
                                         }
                                         break;
+                                    case TargetSoftware.Revit_2016:
+                                        Tool2016 tool2016 = (Tool2016)item.Tag;
+                                        if (tool2016Dictionary.ContainsKey(tool2016))
+                                        {
+                                            RevitToolProperties tp = tool2016Dictionary[tool2016];
+                                            if (RemoveFile(tp, target)) { count++; }
+                                        }
+                                        break;
                                     case TargetSoftware.Dynamo:
                                         DynamoToolProperties dtp = (DynamoToolProperties)item.Tag;
                                         if (dynamoDictionary.ContainsKey(dtp.ToolName))
@@ -1426,6 +1627,14 @@ namespace HOK.AddIn_Installer_Internal
                                                 if (RemoveFile(tp, target)) { count++; }
                                             }
                                             break;
+                                        case TargetSoftware.Revit_2016:
+                                             Tool2016 tool2016 = (Tool2016)item.Tag;
+                                            if (tool2016Dictionary.ContainsKey(tool2016))
+                                            {
+                                                RevitToolProperties tp = tool2016Dictionary[tool2016];
+                                                if (RemoveFile(tp, target)) { count++; }
+                                            }
+                                            break;
                                         case TargetSoftware.Dynamo:
                                             DynamoToolProperties dtp = (DynamoToolProperties)item.Tag;
                                             if (dynamoDictionary.ContainsKey(dtp.ToolName))
@@ -1443,7 +1652,6 @@ namespace HOK.AddIn_Installer_Internal
                             DialogResult dr = MessageBox.Show(count + " tools were successfully uninstalled.", "Uninstallation Complete!", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             if (dr == DialogResult.OK)
                             {
-                                //WriteINI(version);
                                 this.Close();
                             }
                         }
@@ -1493,6 +1701,13 @@ namespace HOK.AddIn_Installer_Internal
                         installedVersions2015.Remove(tp.ToolName);
                     }
                 }
+                else if (target == TargetSoftware.Revit_2016)
+                {
+                    if (installedVersions2016.ContainsKey(tp.ToolName))
+                    {
+                        installedVersions2016.Remove(tp.ToolName);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -1528,141 +1743,6 @@ namespace HOK.AddIn_Installer_Internal
                 result = false;
             }
             return result;
-        }
-
-        private void ReadINI()
-        {
-            try
-            {
-                string iniPath2013 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2013\HOK.Version.ini";
-                if (File.Exists(iniPath2013))
-                {
-                    using (StreamReader sr = new StreamReader(iniPath2013))
-                    {
-                        string line;
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            string[] strVersion = line.Split(splitter, StringSplitOptions.None);
-                            if (strVersion.Length == 2)
-                            {
-                                string toolName = strVersion[0];
-                                string version = strVersion[1];
-                                if (!installedVersions2013.ContainsKey(toolName))
-                                {
-                                    installedVersions2013.Add(toolName, version);
-                                }
-                            }
-                        }
-                        sr.Close();
-                    }
-                }
-
-                string iniPath2014 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2014\HOK.Version.ini";
-                if (File.Exists(iniPath2014))
-                {
-                    using (StreamReader sr = new StreamReader(iniPath2014))
-                    {
-                        string line;
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            string[] strVersion = line.Split(splitter, StringSplitOptions.None);
-                            if (strVersion.Length == 2)
-                            {
-                                string toolName = strVersion[0];
-                                string version = strVersion[1];
-                                if (!installedVersions2014.ContainsKey(toolName))
-                                {
-                                    installedVersions2014.Add(toolName, version);
-                                }
-                            }
-                        }
-                        sr.Close();
-                    }
-                }
-
-                string iniPath2015 = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2015\HOK.Version.ini";
-                if (File.Exists(iniPath2015))
-                {
-                    using (StreamReader sr = new StreamReader(iniPath2015))
-                    {
-                        string line;
-                        while ((line = sr.ReadLine()) != null)
-                        {
-                            string[] strVersion = line.Split(splitter, StringSplitOptions.None);
-                            if (strVersion.Length == 2)
-                            {
-                                string toolName = strVersion[0];
-                                string version = strVersion[1];
-                                if (!installedVersions2015.ContainsKey(toolName))
-                                {
-                                    installedVersions2015.Add(toolName, version);
-                                }
-                            }
-                        }
-                        sr.Close();
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show("Failed to read ini file.\n"+ex.Message, "MainForm:ReadINI", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        private void WriteINI(TargetSoftware target)
-        {
-            try
-            {
-                string iniPath = installDirectory + "\\HOK.Version.ini";
-                if (File.Exists(iniPath))
-                {
-                    string tempFile = Path.GetTempFileName();
-                    using (StreamReader sr = new StreamReader(iniPath))
-                    {
-                        using (StreamWriter sw = new StreamWriter(tempFile))
-                        {
-                            string line;
-
-                            while ((line = sr.ReadLine()) != null)
-                            {
-                                sw.WriteLine("");
-                            }
-                        }
-                    }
-                    File.Delete(iniPath);
-                    File.Move(tempFile, iniPath);
-                }
-
-                FileStream fs = File.Open(iniPath, FileMode.Create);
-                using (StreamWriter sw = new StreamWriter(fs))
-                {
-                    if (target == TargetSoftware.Revit_2013)
-                    {
-                        foreach (string toolName in installedVersions2013.Keys)
-                        {
-                            sw.WriteLine(toolName + splitter[0] + installedVersions2013[toolName]);
-                        }
-                    }
-                    else if (target == TargetSoftware.Revit_2014)
-                    {
-                        foreach (string toolName in installedVersions2014.Keys)
-                        {
-                            sw.WriteLine(toolName + splitter[0] + installedVersions2014[toolName]);
-                        }
-                    }
-                    else if (target == TargetSoftware.Revit_2015)
-                    {
-                        foreach (string toolName in installedVersions2015.Keys)
-                        {
-                            sw.WriteLine(toolName + splitter[0] + installedVersions2015[toolName]);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to write ini file.\n"+ex.Message, "MainForm:WriteINI", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
         }
 
         private void buttonAll_Click(object sender, EventArgs e)
@@ -1777,6 +1857,23 @@ namespace HOK.AddIn_Installer_Internal
             {
                 MessageBox.Show("Cannot access to the master directory for HOK AddIns Installer.\n You may not be in the HOK network connection.", "Directory Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        private void SelectRevit2016()
+        {
+            masterDirectory = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Addin Files\2016";
+            betaDirectory = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2016";
+            installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2016";
+            programDirectory = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\Autodesk\REVIT\Addins\2016";
+
+            if (Directory.Exists(masterDirectory))
+            {
+                Display2016Tools();
+            }
+            else
+            {
+                MessageBox.Show("Cannot access to the master directory for HOK AddIns Installer.\n You may not be in the HOK network connection.", "Directory Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         } 
 
         private void SelectDynamo()
@@ -1825,6 +1922,9 @@ namespace HOK.AddIn_Installer_Internal
                         break;
                     case TargetSoftware.Revit_2015:
                         SelectRevit2015();
+                        break;
+                    case TargetSoftware.Revit_2016:
+                        SelectRevit2016();
                         break;
                     case TargetSoftware.Dynamo:
                         SelectDynamo();

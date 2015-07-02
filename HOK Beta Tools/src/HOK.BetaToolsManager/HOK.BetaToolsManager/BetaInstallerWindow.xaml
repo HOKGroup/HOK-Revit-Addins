@@ -11,6 +11,7 @@
             <Setter Property="AutoGenerateColumns" Value="False"/>
             <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
             <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
             <Setter Property="SelectionMode" Value="Single"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -31,9 +32,7 @@
             <Grid>
                 <DataGrid x:Name="dataGridTools" Margin="5" CanUserAddRows="False">
                     <DataGrid.Columns>
-                        <DataGridCheckBoxColumn Binding="{Binding IsSelected}">
-                            
-                        </DataGridCheckBoxColumn>
+                        <DataGridCheckBoxColumn Binding="{Binding IsSelected}"/>
                         <DataGridTemplateColumn Header="Icon" IsReadOnly="True">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>

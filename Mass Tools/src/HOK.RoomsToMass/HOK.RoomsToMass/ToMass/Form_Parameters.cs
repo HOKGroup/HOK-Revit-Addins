@@ -158,6 +158,9 @@ namespace HOK.RoomsToMass.ToMass
 #elif RELEASE2015
                             ExternalDefinitonCreationOptions options = new ExternalDefinitonCreationOptions("Mass_" + parameter.Definition.Name, paramType);
                             definition = definitions.Create(options);
+#elif RELEASE2016
+                            ExternalDefinitionCreationOptions options = new ExternalDefinitionCreationOptions("Mass_" + parameter.Definition.Name, paramType);
+                            definition = definitions.Create(options);
 #endif
                         }
 

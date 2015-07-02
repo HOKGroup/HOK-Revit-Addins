@@ -55,7 +55,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
 #if RELEASE2013
                     ElementId levelId = m_area.Level.Id;
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                     ElementId levelId = m_area.LevelId;
 #endif
                     Level level = m_doc.GetElement(levelId) as Level;
@@ -72,7 +72,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
 #if RELEASE2013
                     ElementId levelId = m_area.Level.Id;
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                     ElementId levelId = m_area.LevelId;
 #endif
                     Level level = m_doc.GetElement(levelId) as Level;

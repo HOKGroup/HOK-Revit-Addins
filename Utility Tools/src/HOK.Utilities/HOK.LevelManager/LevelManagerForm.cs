@@ -39,7 +39,7 @@ namespace HOK.LevelManager
             CollectLevels();
 
             Selection selection = m_app.ActiveUIDocument.Selection;
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
             IList<ElementId> selectedIds = selection.GetElementIds().ToList();
             foreach (ElementId eId in selectedIds)
             {
@@ -303,7 +303,7 @@ namespace HOK.LevelManager
                         try
                         {
                             trans.Start("Make Selection");
-#if RELEASE2015
+#if RELEASE2015||RELEASE2016
                             List<ElementId> elementsToShow = new List<ElementId>();
                             foreach (Element element in elementList)
                             {
@@ -403,7 +403,7 @@ namespace HOK.LevelManager
                         StringBuilder strBuilder = new StringBuilder();
                         strBuilder.AppendLine("Following model groups are hosted to a new level.\nAll members of the groups should be migrated manually.");
                         strBuilder.AppendLine("");
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                         List<ElementId> elementsToShow = new List<ElementId>();
                         foreach (int eId in modelGroups.Keys)
                         {
@@ -580,7 +580,7 @@ namespace HOK.LevelManager
                         try
                         {
                             trans.Start("Make Selection");
-#if RELEASE2015
+#if RELEASE2015 ||RELEASE2016
                             List<ElementId> elementsToShow = new List<ElementId>();
                             foreach (Element element in elementsToDelete)
                             {
@@ -686,7 +686,7 @@ namespace HOK.LevelManager
                         strBuilder.AppendLine("Following model groups are hosted to a new level.\nAll members of the groups should be migrated manually.");
                         strBuilder.AppendLine("");
 
-#if RELEASE2015
+#if RELEASE2015 ||RELEASE2016
                         List<ElementId> elementsToShow = new List<ElementId>();
                         foreach (int eId in modelGroups.Keys)
                         {
@@ -870,7 +870,7 @@ namespace HOK.LevelManager
                         {
                             trans.Start("Make Selection");
 
-#if RELEASE2015
+#if RELEASE2015 ||RELEASE2016
                             List<ElementId> elementsToShow = new List<ElementId>();
                             foreach (Element element in elementList)
                             {
@@ -967,7 +967,7 @@ namespace HOK.LevelManager
                         strBuilder.AppendLine("Following model groups are hosted to a new level.\nAll members of the groups should be migrated manually.");
                         strBuilder.AppendLine("");
 
-#if RELEASE2015
+#if RELEASE2015 ||RELEASE2016
                         List<ElementId> elementsToShow = new List<ElementId>();
                         foreach (int eId in modelGroups.Keys)
                         {

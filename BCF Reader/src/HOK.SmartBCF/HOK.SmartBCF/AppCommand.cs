@@ -17,7 +17,7 @@ namespace HOK.SmartBCF
     {
         internal static AppCommand thisApp = null;
         private WalkerWindow walkerWindow;
-        private string tabName = "";
+        private string tabName = "  HOK - Beta";
 
         public Result OnShutdown(UIControlledApplication application)
         {
@@ -35,7 +35,6 @@ namespace HOK.SmartBCF
             thisApp = this;
             walkerWindow = null;
 
-            tabName = "   HOK   ";
             try { application.CreateRibbonTab(tabName); }
             catch { }
 

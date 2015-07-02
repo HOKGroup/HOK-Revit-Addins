@@ -55,7 +55,7 @@ namespace HOK.FileOnpeningMonitor
                 if (openedDocument.IsWorkshared)
                 {
                     if (string.IsNullOrEmpty(openedDocument.PathName)) { return; }
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                     if (openedDocument.IsDetached) { return; }
 #endif
 

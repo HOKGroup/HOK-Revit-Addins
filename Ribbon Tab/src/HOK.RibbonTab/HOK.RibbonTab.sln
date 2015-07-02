@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.RibbonTab", "HOK.RibbonTab\HOK.RibbonTab.csproj", "{FB103113-B585-44CE-9AD1-659D95AD4458}"
 EndProject
 Global
@@ -8,6 +8,7 @@ Global
 		2013|Any CPU = 2013|Any CPU
 		2014|Any CPU = 2014|Any CPU
 		2015|Any CPU = 2015|Any CPU
+		2016|Any CPU = 2016|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
@@ -18,6 +19,8 @@ Global
 		{FB103113-B585-44CE-9AD1-659D95AD4458}.2014|Any CPU.Build.0 = 2014|Any CPU
 		{FB103113-B585-44CE-9AD1-659D95AD4458}.2015|Any CPU.ActiveCfg = 2015|Any CPU
 		{FB103113-B585-44CE-9AD1-659D95AD4458}.2015|Any CPU.Build.0 = 2015|Any CPU
+		{FB103113-B585-44CE-9AD1-659D95AD4458}.2016|Any CPU.ActiveCfg = 2016|Any CPU
+		{FB103113-B585-44CE-9AD1-659D95AD4458}.2016|Any CPU.Build.0 = 2016|Any CPU
 		{FB103113-B585-44CE-9AD1-659D95AD4458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FB103113-B585-44CE-9AD1-659D95AD4458}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB103113-B585-44CE-9AD1-659D95AD4458}.Release|Any CPU.ActiveCfg = Release|Any CPU

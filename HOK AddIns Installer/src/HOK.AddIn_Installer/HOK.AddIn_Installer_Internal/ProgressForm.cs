@@ -38,5 +38,10 @@ namespace HOK.AddIn_Installer_Internal
         {
             progressBarTool.PerformStep();
         }
+
+        public void SetValue(int value)
+        {
+            progressBarTool.Value = value;
+        }
     }
 }

@@ -136,7 +136,7 @@ namespace HOK.LPDCalculator
                                     foreach (Element element in elementList)
                                     {
                                         LightingProperties lp = new LightingProperties(element);
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                             Parameter calculatedParam = element.LookupParameter("Apparent VA Calculated Load");
 #else
                                         Parameter calculatedParam = element.get_Parameter("Apparent VA Calculated Load");
@@ -162,7 +162,7 @@ namespace HOK.LPDCalculator
                                     ap.ActualLightingLoad = totalAL;
                                     ap.LPD = totalAL / ap.Area;
 
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                         Parameter param = area.LookupParameter("ActualLightingLoad");
 #else
                                     Parameter param = area.get_Parameter("ActualLightingLoad");
@@ -172,7 +172,7 @@ namespace HOK.LPDCalculator
                                     {
                                         bool setLoad = param.Set(ap.ActualLightingLoad);
                                     }
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                         param = area.LookupParameter("ActualLPD");
 #else
                                     param = area.get_Parameter("ActualLPD");
@@ -748,7 +748,7 @@ namespace HOK.LPDCalculator
             bool result = false;
             try
             {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                 Parameter param = area.LookupParameter("RoomName");
 #else
                 Parameter param = area.get_Parameter("RoomName");
@@ -762,7 +762,7 @@ namespace HOK.LPDCalculator
                     }
                 }
 
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                 param = area.LookupParameter("RoomNumber");
 #else
                 param = area.get_Parameter("RoomNumber");

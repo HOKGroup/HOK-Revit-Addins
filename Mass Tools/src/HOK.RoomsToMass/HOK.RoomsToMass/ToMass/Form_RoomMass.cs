@@ -222,7 +222,7 @@ namespace HOK.RoomsToMass.ToMass
                                         {
                                             mp.MassFamilyInstance = instance;
                                             double roomHeight = (rp.IsDefaultHeight == true) ? rp.DefaultHeight : rp.UnboundedHeight;
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                                             Parameter parameter = instance.LookupParameter("Height");
 #elif RELEASE2013||RELEASE2014
                                             Parameter parameter = instance.get_Parameter("Height");
@@ -396,7 +396,7 @@ namespace HOK.RoomsToMass.ToMass
                     }
                     uidoc.ShowElements(elementIds);
                     uidoc.Selection.Elements = newSelection;
-#elif RELEASE2015
+#elif RELEASE2015|| RELEASE2016
                     Selection selection = uidoc.Selection;
 
                     foreach (DataGridViewRow row in dataGridViewRoom.SelectedRows)

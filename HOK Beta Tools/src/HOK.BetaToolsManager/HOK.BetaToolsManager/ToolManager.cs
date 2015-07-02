@@ -28,7 +28,7 @@ namespace HOK.BetaToolsManager
         public ToolManager(string version)
         {
             versionNumber = version;
-            betaDirectory = betaDirectory + versionNumber+@"\HOK-Addin.bundle\Contents\";
+            betaDirectory = betaDirectory + versionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
             installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\" + versionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
             tempInstallDirectory = Path.Combine(installDirectory, "Temp");
 
@@ -192,7 +192,7 @@ namespace HOK.BetaToolsManager
 
                             dictionary.Add(tool, tp);
                             break;
-                        case ToolEnum.Analysis:
+                        case ToolEnum.AVF:
                             tp.ToolName = "Analysis Tools";
                             tp.DllName = "HOK.AVFManager.dll";
                             tp.BetaPath = betaDirectory + tp.DllName;
@@ -201,6 +201,30 @@ namespace HOK.BetaToolsManager
                             tp.InstallExist = File.Exists(tp.InstallPath);
                             if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("chart.ico");
+
+                            dictionary.Add(tool, tp);
+                            break;
+                        case ToolEnum.LPDAnalysis:
+                            tp.ToolName = "LPD Analysis";
+                            tp.DllName = "HOK.LPDCalculator.dll";
+                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaExist = File.Exists(tp.BetaPath);
+                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallExist = File.Exists(tp.InstallPath);
+                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.ToolIcon = ImageUtil.LoadBitmapImage("bulb.png");
+
+                            dictionary.Add(tool, tp);
+                            break;
+                        case ToolEnum.LEEDView:
+                            tp.ToolName = "LEED View Analysis";
+                            tp.DllName = "HOK.ViewAnalysis.dll";
+                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaExist = File.Exists(tp.BetaPath);
+                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallExist = File.Exists(tp.InstallPath);
+                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.ToolIcon = ImageUtil.LoadBitmapImage("eq.ico");
 
                             dictionary.Add(tool, tp);
                             break;
@@ -253,49 +277,6 @@ namespace HOK.BetaToolsManager
             return dictionary;
         }
 
-        /*
-        private string GetDllName(string directoryName, string assemblyName, bool pathName)
-        {
-            string dllName = "";
-            try
-            {
-                string latestFile = "";
-                Version latestVersion = null;
-                string[] files = Directory.GetFiles(directoryName, assemblyName + "*");
-                foreach (string fileName in files)
-                {
-                    if (Path.GetExtension(fileName) == ".dll")
-                    {
-                        FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(fileName);
-                        Version version = new Version(versionInfo.FileVersion);
-
-                        if (string.IsNullOrEmpty(latestFile))
-                        {
-                            latestFile = fileName;
-                            latestVersion = version;
-                        }
-                        else if (!string.IsNullOrEmpty(latestFile) && null != latestVersion)
-                        {
-                            if (latestVersion.CompareTo(version) < 0)
-                            {
-                                latestFile = fileName;
-                                latestVersion = version;
-                            }
-                        }
-
-                    }
-                }
-
-                dllName = pathName ? latestFile : Path.GetFileName(latestFile);
-
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-            return dllName;
-        }
-        */
         private string GetTempInstallPath(string installPath)
         {
             string tempPath="";
@@ -353,15 +334,19 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("Resources\\eye.ico");
                         break;
 
-                    case ToolEnum.Analysis:
+                    case ToolEnum.AVF:
                         fileNames.Add("HOK.AVFManager.dll");
                         fileNames.Add("Resources\\DefaultSettings.xml");
                         fileNames.Add("Resources\\PointOfView.rfa");
+                        break;
+
+                    case ToolEnum.LPDAnalysis:
                         fileNames.Add("HOK.LPDCalculator.dll");
-#if RELEASE2015
+                        break;
+
+                    case ToolEnum.LEEDView:
                         fileNames.Add("HOK.ViewAnalysis.dll");
                         fileNames.Add("Resources\\Addins Shared Parameters.txt");
-#endif
                         break;
 
                     case ToolEnum.Utility:
@@ -432,9 +417,7 @@ namespace HOK.BetaToolsManager
         private string betaReleasedDate = "";
         private string installVersionNumber = "Not Installed";
         private bool betaExist = false;
-        private bool betaExist1 = false;
         private bool installExist = false;
-        private bool installExist1 = false;
         private bool isEnabled = false;
         private bool isSelected = false;
         private BitmapImage toolIcon = null;
@@ -453,9 +436,7 @@ namespace HOK.BetaToolsManager
         public string BetaReleasedDate { get { return betaReleasedDate; } set { betaReleasedDate = value; } }
         public string InstallVersionNumber { get { return installVersionNumber; } set { installVersionNumber = value; } }
         public bool BetaExist { get { return betaExist; } set { betaExist = value; } }
-        public bool BetaExist1 { get { return betaExist1; } set { betaExist1 = value; } }
         public bool InstallExist { get { return installExist; } set { installExist = value; } }
-        public bool InstallExist1 { get { return installExist1; } set { installExist1 = value; } }
         public bool IsEnabled { get { return isEnabled; } set { isEnabled = value; } }
         public bool IsSelected { get { return isSelected; } set { isSelected = value; } }
         public BitmapImage ToolIcon { get { return toolIcon; } set { toolIcon = value; } }
@@ -479,7 +460,6 @@ namespace HOK.BetaToolsManager
             this.InstallVersionNumber = tp.InstallVersionNumber;
             this.BetaExist = tp.BetaExist;
             this.InstallExist = tp.InstallExist;
-            this.InstallExist1 = tp.InstallExist1;
             this.IsEnabled = tp.IsEnabled;
             this.IsSelected = tp.IsSelected;
             this.ToolIcon = tp.ToolIcon;

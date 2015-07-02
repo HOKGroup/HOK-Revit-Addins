@@ -27,7 +27,7 @@ namespace HOK.RoomsToMass.ToMass
 
 #if RELEASE2013||RELEASE2014
         public string Department { get { try { return m_room.get_Parameter("Department").AsString(); } catch { return ""; } } }
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
         public string Department { get { try { return m_room.LookupParameter("Department").AsString(); } catch { return ""; } } }
 #endif
 
@@ -42,7 +42,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
 #if RELEASE2013
                     ElementId levelId = m_room.Level.Id;
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                     ElementId levelId = m_room.LevelId;
 #endif
                     Level level = m_doc.GetElement(levelId) as Level;
@@ -60,7 +60,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
 #if RELEASE2013
                     ElementId levelId = m_room.Level.Id;
-#elif RELEASE2014||RELEASE2015
+#elif RELEASE2014||RELEASE2015 || RELEASE2016
                     ElementId levelId = m_room.LevelId;
 #endif
                     Level level = m_doc.GetElement(levelId) as Level;
@@ -91,7 +91,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
 #if RELEASE2013||RELEASE2014
                     ElementId elementId = m_room.get_Parameter("Phase").AsElementId();
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                     ElementId elementId = m_room.LookupParameter("Phase").AsElementId();
 #endif
                     return m_doc.GetElement(elementId).Name;

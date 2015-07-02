@@ -314,7 +314,7 @@ namespace HOK.RoomElevation
                 {
 #if RELEASE2013||RELEASE2014
                     Parameter parameter = sampleRoom.get_Parameter(toolSettings.IntermediateText);
-#elif RELEASE2015
+#elif RELEASE2015 ||RELEASE2016
                     Parameter parameter = sampleRoom.LookupParameter(toolSettings.IntermediateText);
 #endif
                     if (null != parameter)
@@ -331,7 +331,7 @@ namespace HOK.RoomElevation
 
 #if RELEASE2013||RELEASE2014
                     parameter = sampleRoom.get_Parameter(toolSettings.SuffixText);
-#elif RELEASE2015
+#elif RELEASE2015 ||RELEASE2016
                     parameter = sampleRoom.LookupParameter(toolSettings.SuffixText);
 #endif
                     if (null != parameter)

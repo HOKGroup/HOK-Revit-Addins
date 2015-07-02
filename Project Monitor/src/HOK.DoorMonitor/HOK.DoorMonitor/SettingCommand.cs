@@ -81,7 +81,7 @@ namespace HOK.DoorMonitor
 
 #if RELEASE2013 || RELEASE2014
                     Parameter pullParam = doorInstance.get_Parameter(pullParamName);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                         Parameter pullParam = doorInstance.LookupParameter(pullParamName);
 #endif
                         if (null != pullParam)
@@ -97,7 +97,7 @@ namespace HOK.DoorMonitor
 
 #if RELEASE2013||RELEASE2014
                     Parameter pushParam = doorInstance.get_Parameter(pushParamName);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                         Parameter pushParam = doorInstance.LookupParameter(pushParamName);
 #endif
                         if (null != pushParam)
@@ -112,7 +112,7 @@ namespace HOK.DoorMonitor
 
 #if RELEASE2013||RELEASE2014
                             Parameter caParam = doorInstance.get_Parameter(stateCAParamName);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                         Parameter caParam = doorInstance.LookupParameter(stateCAParamName);
 #endif
                         if (null != caParam)
@@ -167,7 +167,7 @@ namespace HOK.DoorMonitor
                 }
                 uidoc.Selection.Elements = selElements;
                 uidoc.ShowElements(selectedIds);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                 foreach (MonitorMessage message in selectedMessages)
                 {
                     selectedIds.Add(message.ElementObj.Id);

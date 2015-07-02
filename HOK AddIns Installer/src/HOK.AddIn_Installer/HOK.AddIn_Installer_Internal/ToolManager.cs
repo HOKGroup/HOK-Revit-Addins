@@ -79,12 +79,21 @@ namespace HOK.AddIn_Installer_Internal
         ProjectMonitor= 20
     }
 
+    //External Application Beta Only
+    public enum Tool2016
+    {
+        SmartBCF=1,
+        FileMonitor=2,
+        ProjectMonitor=3
+    }
+
     public enum TargetSoftware
     {
         Revit_2013=0,
         Revit_2014=1,
         Revit_2015=2,
-        Dynamo=3
+        Revit_2016=3,
+        Dynamo=4
     }
 
     public class ToolManager
@@ -965,6 +974,122 @@ namespace HOK.AddIn_Installer_Internal
             return dictionary;
         }
 
+        public Dictionary<Tool2016, RevitToolProperties> Get2016Dictionary(Dictionary<Tool2016, RevitToolProperties> deprecatedTools)
+        {
+            masterDirectory = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Addin Files\2016";
+            betaDirectory = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2016";
+            installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\2016";
+            programDirectory = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"\Autodesk\REVIT\Addins\2016";
+
+            Dictionary<Tool2016, RevitToolProperties> dictionary = new Dictionary<Tool2016, RevitToolProperties>();
+
+            Array arrayTools = Enum.GetValues(typeof(Tool2016));
+            ProgressForm progressForm = new ProgressForm("Gathering information about installed components in 2016. . .");
+            progressForm.SetMaximumValue(arrayTools.Length);
+            progressForm.Show();
+            progressForm.Refresh();
+
+            strBuilder = new StringBuilder();
+            foreach (Tool2016 tool in arrayTools)
+            {
+                try
+                {
+                    progressForm.StepForward();
+                    if (deprecatedTools.ContainsKey(tool)) { continue; }
+                    RevitToolProperties tp = new RevitToolProperties();
+                    List<string> fileNames = new List<string>();
+                    switch (tool)
+                    {
+                        case Tool2016.SmartBCF:
+                            fileNames.Add("\\HOK.SmartBCF.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\HOK.SmartBCF.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Auth.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Auth.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Core.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Drive.v2.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.PlatformServices.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.GData.Client.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.GData.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.GData.Spreadsheets.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\log4net.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Microsoft.Threading.Tasks.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Microsoft.Threading.Tasks.Extensions.Desktop.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Microsoft.Threading.Tasks.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Newtonsoft.Json.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Net.Http.Extensions.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Net.Http.Primitives.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Zlib.Portable.dll");
+
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Resources\\walker.png");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Resources\\Addins Shared Parameters.txt");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\Resources\\HOK smartBCF.p12");
+
+                            tp.ToolName = "Smart BCF";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents_Beta\\HOK.SmartBCF.dll";
+                            tp.DLLName = "HOK.SmartBCF.dll";
+                            tp.ImageIndex = 10;
+                            tp.BetaOnly = true;
+                            break;
+
+                        case Tool2016.FileMonitor:
+                            fileNames.Add("\\HOK.FileOpeningMonitor.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\HOK.FileOnpeningMonitor.dll");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\fmeserverapidotnet.dll");
+
+                            tp.ToolName = "Central File Monitor";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents_Beta\\HOK.FileOnpeningMonitor.dll";
+                            tp.DLLName = "HOK.FileOnpeningMonitor.dll";
+                            tp.ImageIndex = 11;
+                            tp.BetaOnly = true;
+                            break;
+
+                        case Tool2016.ProjectMonitor:
+                            fileNames.Add("\\HOK.ProjectMonitor.addin");
+                            fileNames.Add("\\HOK-Addin.bundle\\Contents_Beta\\HOK.ProjectMonitor.dll");
+
+                            tp.ToolName = "Project Monitor";
+                            tp.DllPath = "\\HOK-Addin.bundle\\Contents_Beta\\HOK.ProjectMonitor.dll";
+                            tp.DLLName = "HOK.ProjectMonitor.dll";
+                            tp.ImageIndex = 12;
+                            tp.BetaOnly = true;
+                            break;
+
+                    }
+                    tp.TargetSoftWareEnum = TargetSoftware.Revit_2016;
+                    tp.ToolEnum2016 = tool;
+                    tp.FilePaths = fileNames;
+
+                    if (!tp.BetaOnly)
+                    {
+                        tp.ReleaseVersionInfo = GetReleaseVersion(tp.DllPath);
+                        tp.ReleaseDate = GetReleaseDate(tp.DllPath);
+                    }
+
+                    tp.InstallVersionInfo = GetInstalledVersion(tp);
+
+                    string betaPath = betaDirectory + tp.DllPath;
+                    tp.BetaVersionInfo = GetBetaReleaseVersion(betaPath);
+                    tp.BetaDate = GetBetaReleaseDate(betaPath);
+                    dictionary.Add(tool, tp);
+                }
+                catch (Exception ex)
+                {
+                    string message = tool.ToString() + ": " + ex.Message;
+                    strBuilder.AppendLine(message);
+                }
+            }
+
+            progressForm.Close();
+
+            if (strBuilder.Length > 0)
+            {
+                MessageBox.Show(strBuilder.ToString(), "Collecting 2016 Tools Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return dictionary;
+        }
+
+
         public Dictionary<string, DynamoToolProperties> GetDynamoDictionary(Dictionary<string, DynamoToolProperties> deprecatedTools)
         {
             Dictionary<string, DynamoToolProperties> dictionary = new Dictionary<string, DynamoToolProperties>();
@@ -1179,53 +1304,6 @@ namespace HOK.AddIn_Installer_Internal
             }
             return date;
         }
-        /*
-        public string GetBetaDllName(string dllPath)
-        {
-            string betaDll = dllPath;
-            try
-            {
-                string fileName = Path.GetFileNameWithoutExtension(dllPath);
-                string directoryName = Path.GetDirectoryName(dllPath);
-
-                string latestFile = "";
-                Version latestVersion = null;
-                string[] files = Directory.GetFiles(directoryName, fileName + "*");
-                foreach (string file in files)
-                {
-                    if (Path.GetExtension(file) == ".dll")
-                    {
-                        FileVersionInfo versionInfo = FileVersionInfo.GetVersionInfo(file);
-                        Version version = new Version(versionInfo.FileVersion);
-
-                        if (string.IsNullOrEmpty(latestFile))
-                        {
-                            latestFile = file;
-                            latestVersion = version;
-                        }
-                        else if (!string.IsNullOrEmpty(latestFile) && null != latestVersion)
-                        {
-                            if (latestVersion.CompareTo(version) < 0)
-                            {
-                                latestFile = file;
-                                latestVersion = version;
-                            }
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(latestFile))
-                {
-                    betaDll = latestFile;
-                }
-            }
-            catch (Exception ex)
-            {
-                strBuilder.AppendLine("Beta File Not Found: "+ex.Message);
-            }
-            return betaDll;
-        }
-        */
 
     }
 
@@ -1234,6 +1312,7 @@ namespace HOK.AddIn_Installer_Internal
         public Tool2013 ToolEnum2013 { get; set; }
         public Tool2014 ToolEnum2014 { get; set; }
         public Tool2015 ToolEnum2015 { get; set; }
+        public Tool2016 ToolEnum2016 { get; set; }
         public string ToolName { get; set; }
         public List<string> FilePaths { get; set; }
         public string DLLName { get; set; }

@@ -150,7 +150,7 @@ namespace HOK.RoomsToMass.DataTransfer
 #if RELEASE2013||RELEASE2014
                         Parameter mainParameter = mainElement.get_Parameter(paramName);
                         Parameter massParameter = massInstance.get_Parameter("Mass_" + paramName);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                         Parameter mainParameter = mainElement.LookupParameter(paramName);
                         Parameter massParameter = massInstance.LookupParameter("Mass_" + paramName);
 #endif
@@ -269,7 +269,7 @@ namespace HOK.RoomsToMass.DataTransfer
 #if RELEASE2013||RELEASE2014
                         Parameter mainParameter = mainElement.get_Parameter(paramName);
                         Parameter massParameter = massInstance.get_Parameter("Mass_" + paramName);
-#elif RELEASE2015
+#elif RELEASE2015 || RELEASE2016
                         Parameter mainParameter = mainElement.LookupParameter(paramName);
                         Parameter massParameter = massInstance.LookupParameter("Mass_" + paramName);
 #endif

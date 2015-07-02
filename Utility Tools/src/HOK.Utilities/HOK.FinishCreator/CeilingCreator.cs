@@ -205,7 +205,7 @@ namespace HOK.FinishCreator
                     ElementId materialId = ElementId.InvalidElementId;
                     foreach (CeilingType cType in ceilingTypes)
                     {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                         if (!cType.CanBeCopied) { continue; }
 #endif
                         if (null != cType.GetCompoundStructure())

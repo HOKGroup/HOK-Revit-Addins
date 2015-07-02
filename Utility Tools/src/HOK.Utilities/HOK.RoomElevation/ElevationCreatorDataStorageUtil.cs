@@ -383,7 +383,7 @@ namespace HOK.RoomElevation
             }
 
             document = m_room.Document;
-#if RELEASE2014 || RELEASE2015
+#if RELEASE2014 || RELEASE2015 || RELEASE2016 
             isLinked = document.IsLinked;
 #endif
             documentTitle = document.Title;
@@ -410,7 +410,7 @@ namespace HOK.RoomElevation
             }
 
             document = m_room.Document;
-#if RELEASE2014 || RELEASE2015
+#if RELEASE2014 || RELEASE2015 || RELEASE2016
             isLinked = document.IsLinked;
 #endif
             documentTitle = document.Title;

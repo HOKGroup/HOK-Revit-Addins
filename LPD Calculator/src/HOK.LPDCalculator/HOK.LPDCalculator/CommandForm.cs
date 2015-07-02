@@ -236,7 +236,7 @@ namespace HOK.LPDCalculator
             bool result = false;
             try
             {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                 Parameter param = area.LookupParameter(paramName);
 #else 
                 Parameter param = area.get_Parameter(paramName);
@@ -270,7 +270,7 @@ namespace HOK.LPDCalculator
             bool result = false;
             try
             {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                 Parameter param = room.LookupParameter(paramName);
 #else 
                 Parameter param = room.get_Parameter(paramName);

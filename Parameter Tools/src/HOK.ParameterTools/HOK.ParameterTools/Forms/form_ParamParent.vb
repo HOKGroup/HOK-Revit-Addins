@@ -118,7 +118,7 @@ Public Class form_ParamParent
                 ' Get the parameter if it exists 
 #If RELEASE2013 Or RELEASE2014 Then
                 Dim m_ParentKeyParam As Parameter = elementParent.Parameter(textBoxParamParentKey.Text)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
                 Dim m_ParentKeyParam As Parameter = elementParent.LookupParameter(textBoxParamParentKey.Text)
 #End If
 
@@ -142,7 +142,7 @@ Public Class form_ParamParent
                             ' Set the parameter if it exists
 #If RELEASE2013 Or RELEASE2014 Then
                             Dim m_ChildKeyParam As Parameter = elementChild.Parameter(textBoxParamChildKey.Text)
-#ElseIf RELEASE2015 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Then
                             Dim m_ChildKeyParam As Parameter = elementChild.LookupParameter(textBoxParamChildKey.Text)
 #End If
 

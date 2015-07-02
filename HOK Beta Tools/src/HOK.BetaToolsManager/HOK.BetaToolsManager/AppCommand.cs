@@ -21,7 +21,9 @@ namespace HOK.BetaToolsManager
         BCFReader,
         MassTool,
         RevitData,
-        Analysis,
+        AVF,
+        LPDAnalysis,
+        LEEDView,
         Utility,
         ModelManager,
         ColorEditor, 
@@ -498,7 +500,7 @@ namespace HOK.BetaToolsManager
                             }
                         }
 
-#if RELEASE2014||RELEASE2015
+#if RELEASE2014||RELEASE2015 || RELEASE2016
                         if (colorTP.InstallExist)
                         {
                             if (!utilityButtons.ContainsKey("Color Editor"))
@@ -581,7 +583,7 @@ namespace HOK.BetaToolsManager
                             sheetButton.Enabled = false;
                         }
 
-#if RELEASE2014 ||RELEASE2015
+#if RELEASE2014 ||RELEASE2015 || RELEASE2016
                         if (modelTP.InstallExist)
                         {
                             if (!customButtons.ContainsKey("Project Replication"))
@@ -804,19 +806,22 @@ namespace HOK.BetaToolsManager
         {
             try
             {
+                ToolProperties avfTP = null; //AVF properties
+                ToolProperties lpdTP = null; //LPD analysis properties
+                ToolProperties leedTP = null; //LEED view analysis properties
 
-                ToolProperties analysisTP = null; //sheet manager properties
-                
-                if (toolInfoDictionary.ContainsKey(ToolEnum.Analysis))
+                if (toolInfoDictionary.ContainsKey(ToolEnum.AVF) && toolInfoDictionary.ContainsKey(ToolEnum.LPDAnalysis) && toolInfoDictionary.ContainsKey(ToolEnum.LEEDView))
                 {
-                    analysisTP = toolInfoDictionary[ToolEnum.Analysis];
+                    avfTP = toolInfoDictionary[ToolEnum.AVF];
+                    lpdTP = toolInfoDictionary[ToolEnum.LPDAnalysis];
+                    leedTP = toolInfoDictionary[ToolEnum.LEEDView];
                 }
-                if (null != analysisTP)
+
+                if (null != avfTP && null != lpdTP && null != leedTP)
                 {
-                    string directoryName = Path.GetDirectoryName(analysisTP.InstallPath);
-                    if (analysisTP.InstallExist || analysisTP.InstallExist1)
+                    if (avfTP.InstallExist || lpdTP.InstallExist || leedTP.InstallExist)
                     {
-                        if (null == analysisPanel)
+                        if (null == analysisPanel && null == analysisSplitButton)
                         {
                             analysisPanel = m_app.CreateRibbonPanel(tabName, "Analysis");
 
@@ -824,85 +829,82 @@ namespace HOK.BetaToolsManager
                             analysisSplitButton = analysisPanel.AddItem(splitButtonData) as SplitButton;
                             analysisSplitButton.IsSynchronizedWithCurrentItem = true;
                         }
-                        if (null != analysisPanel && null != analysisSplitButton)
-                        {
-                            Dictionary<string, PushButton> analysisButtons = CheckExistingButtons(analysisSplitButton);
-                            if (analysisTP.InstallExist && !analysisButtons.ContainsKey("AVF"))
-                            {
-                                if (!analysisButtons.ContainsKey("AVF"))
-                                {
-                                    PushButton avfButton = analysisSplitButton.AddPushButton(new PushButtonData("AVF", "  AVF  ", analysisTP.TempAssemblyPath, "HOK.AVFManager.Command")) as PushButton;
-                                    avfButton.LargeImage = ImageUtil.LoadBitmapImage("chart.ico");
-                                    avfButton.ToolTip = "Analysis Visualization Framework";
-                                    AddToolTips(avfButton);
-                                }
-                                else
-                                {
-                                    PushButton avfButton = analysisButtons["AVF"];
-                                    avfButton.AssemblyName = analysisTP.TempAssemblyPath;
-                                }
-                            }
-
-                            string lpdPath = Path.Combine(directoryName, "HOK.LPDCalculator.dll");
-                            lpdPath = GetTempInstallPath(lpdPath);
-                            if (File.Exists(lpdPath))
-                            {
-                                if (!analysisButtons.ContainsKey("LPD Analysis"))
-                                {
-                                    PushButton lpdButton = analysisSplitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", lpdPath, "HOK.LPDCalculator.Command")) as PushButton;
-                                    lpdButton.LargeImage = ImageUtil.LoadBitmapImage("bulb.png");
-                                    lpdButton.ToolTip = "Calculating Lighting Power Density";
-                                    AddToolTips(lpdButton);
-                                }
-                                else
-                                {
-                                    PushButton lpdButton = analysisButtons["LPD Analysis"];
-                                    lpdButton.AssemblyName = lpdPath;
-                                }
-                            }
-                            
-#if RELEASE2015
-                            string leedPath = Path.Combine(directoryName, "HOK.ViewAnalysis.dll");
-                            leedPath = GetTempInstallPath(leedPath);
-                            if (File.Exists(leedPath))
-                            {
-                                if (!analysisButtons.ContainsKey("LEED View Analysis"))
-                                {
-                                    PushButton analysisButton = analysisSplitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", leedPath, "HOK.ViewAnalysis.Command")) as PushButton;
-                                    analysisButton.LargeImage = ImageUtil.LoadBitmapImage("eq.ico");
-                                    analysisButton.ToolTip = "Calculating Area with Views for LEED IEQc 8.2";
-                                    AddToolTips(analysisButton);
-                                }
-                                else
-                                {
-                                    PushButton analysisButton = analysisButtons["LEED View Analysis"];
-                                    analysisButton.AssemblyName = leedPath;
-                                }
-                            }
-#endif
-                        }
                     }
-                    else if(null != analysisSplitButton)
+                    if (null != analysisPanel && null != analysisSplitButton)
                     {
                         Dictionary<string, PushButton> analysisButtons = CheckExistingButtons(analysisSplitButton);
-                        if (!analysisTP.InstallExist && analysisButtons.ContainsKey("AVF"))
+                        if (avfTP.InstallExist)
                         {
+                            if (!analysisButtons.ContainsKey("AVF"))
+                            {
+                                //install
+                                PushButton avfButton = analysisSplitButton.AddPushButton(new PushButtonData("AVF", "  AVF  ", avfTP.TempAssemblyPath, "HOK.AVFManager.Command")) as PushButton;
+                                avfButton.LargeImage = ImageUtil.LoadBitmapImage("chart.ico");
+                                avfButton.ToolTip = "Analysis Visualization Framework";
+                                AddToolTips(avfButton);
+                            }
+                            else
+                            {
+                                //update
+                                PushButton avfButton = analysisButtons["AVF"];
+                                avfButton.AssemblyName = avfTP.TempAssemblyPath;
+                            }
+
+                        }
+                        else if (!avfTP.InstallExist && analysisButtons.ContainsKey("AVF"))
+                        {
+                            //remove tools by beta installer
                             PushButton avfButton = analysisButtons["AVF"];
                             avfButton.Enabled = false;
                         }
 
-                        if (!analysisTP.InstallExist1 && analysisButtons.ContainsKey("LPD Analysis"))
+                        if (lpdTP.InstallExist)
                         {
+                            if (!analysisButtons.ContainsKey("LPD Analysis"))
+                            {
+                                //install
+                                PushButton lpdButton = analysisSplitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", lpdTP.TempAssemblyPath, "HOK.LPDCalculator.Command")) as PushButton;
+                                lpdButton.LargeImage = ImageUtil.LoadBitmapImage("bulb.png");
+                                lpdButton.ToolTip = "Calculating Lighting Power Density";
+                                AddToolTips(lpdButton);
+                            }
+                            else
+                            {
+                                //update
+                                PushButton lpdButton = analysisButtons["LPD Analysis"];
+                                lpdButton.AssemblyName = lpdTP.TempAssemblyPath;
+                            }
+                        }
+                        else if (!lpdTP.InstallExist && analysisButtons.ContainsKey("LPD Analysis"))
+                        {
+                            //remove tools by beta installer
                             PushButton lpdButton = analysisButtons["LPD Analysis"];
                             lpdButton.Enabled = false;
                         }
-#if RELEASE2015
-                        if (analysisButtons.ContainsKey("LEED View Analysis"))
+
+                        if (leedTP.InstallExist)
                         {
+                            if (!analysisButtons.ContainsKey("LEED View Analysis"))
+                            {
+                                //install
+                                PushButton leedButton = analysisSplitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", leedTP.TempAssemblyPath, "HOK.ViewAnalysis.Command")) as PushButton;
+                                leedButton.LargeImage = ImageUtil.LoadBitmapImage("eq.ico");
+                                leedButton.ToolTip = "Calculating Area with Views for LEED IEQc 8.2";
+                                AddToolTips(leedButton);
+                            }
+                            else
+                            {
+                                //update
+                                PushButton leedButton = analysisButtons["LEED View Analysis"];
+                                leedButton.AssemblyName = leedTP.TempAssemblyPath;
+                            }
+                        }
+                        else if (!leedTP.InstallExist && analysisButtons.ContainsKey("LEED View Analysis"))
+                        {
+                            //remove tools by beta installer
                             PushButton leedButton = analysisButtons["LEED View Analysis"];
                             leedButton.Enabled = false;
                         }
-#endif
                     }
                 }
             }

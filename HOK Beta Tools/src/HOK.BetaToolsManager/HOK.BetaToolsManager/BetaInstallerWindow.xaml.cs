@@ -35,7 +35,7 @@ namespace HOK.BetaToolsManager
         public BetaInstallerWindow(string version, Dictionary<ToolEnum, ToolProperties> dictionary)
         {
             versionNumber = version;
-            betaDirectory = betaDirectory + versionNumber + @"\HOK-Addin.bundle\Contents\";
+            betaDirectory = betaDirectory + versionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
             installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\" + versionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
             tempInstallDirectory = System.IO.Path.Combine(installDirectory, "Temp")+"\\";
 

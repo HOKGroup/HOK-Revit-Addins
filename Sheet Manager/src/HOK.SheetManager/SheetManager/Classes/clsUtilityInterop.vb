@@ -2,6 +2,7 @@
 Imports System.IO
 Imports Microsoft.Office.Interop
 Imports System.Windows.Forms
+Imports Microsoft.Office.Interop.Access
 
 ''' <summary>
 ''' Class to connect Access and Excel via Interop
@@ -49,8 +50,8 @@ Public Class clsUtilityInterop
     ''' <returns>True on Success</returns>
     ''' <remarks></remarks>
     Public Function FillDataTableFromAccessTable(ByVal nameTable As String, ByVal whereClause As String) As Boolean
-        Dim queryDef As DAO.QueryDef
-        Dim recordset As DAO.Recordset
+        Dim queryDef As Dao.QueryDef
+        Dim recordset As Dao.Recordset
         Dim row As System.Data.DataRow
 
         Dim queryString As String
@@ -68,7 +69,7 @@ Public Class clsUtilityInterop
             'Create the data tabl as a copy of the original table
             m_DataTable = New System.Data.DataTable()
             countColumns = 0
-            For Each field As dao.Field In m_AccessApp.CurrentDb().TableDefs(nameTable).Fields
+            For Each field As Dao.Field In m_AccessApp.CurrentDb().TableDefs(nameTable).Fields
                 m_DataTable.Columns.Add(field.Name, GetType(String))
                 countColumns += 1
             Next

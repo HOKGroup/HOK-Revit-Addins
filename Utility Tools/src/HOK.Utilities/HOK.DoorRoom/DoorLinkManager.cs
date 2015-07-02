@@ -92,7 +92,7 @@ namespace HOK.DoorRoom
                         try
                         {
                             trans.Start();
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                             DoorProperties dp = AssignToFromRoom(door);
                             if (null != dp.ToRoom)
                             {
@@ -327,7 +327,7 @@ namespace HOK.DoorRoom
 
                                 if (null != fromRoom)
                                 {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                                     Parameter fParam = door.LookupParameter(fromRoomNumber);
                                     if (null != fParam)
                                     {
@@ -355,7 +355,7 @@ namespace HOK.DoorRoom
 
                                 if (null != toRoom)
                                 {
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                                     Parameter tParam = door.LookupParameter(toRoomNumber);
                                     if (null != tParam)
                                     {
@@ -422,7 +422,7 @@ namespace HOK.DoorRoom
 #if RELEASE2013
                     if (null == instance.Document) { continue; }
             
-#elif RELEASE2014 || RELEASE2015
+#elif RELEASE2014 || RELEASE2015 || RELEASE2016
                     if (null == instance.GetLinkDocument()) { continue; }
 #endif
                     LinkedInstanceProperties lip = new LinkedInstanceProperties(instance);
@@ -553,7 +553,7 @@ namespace HOK.DoorRoom
             instanceId = instance.Id.IntegerValue;
 #if RELEASE2013
             linkedDocument = instance.Document;
-#elif RELEASE2014 || RELEASE2015
+#elif RELEASE2014 || RELEASE2015 || RELEASE2016
             linkedDocument = instance.GetLinkDocument();
 #endif
             documentTitle = linkedDocument.Title;
