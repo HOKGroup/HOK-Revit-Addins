@@ -70,7 +70,7 @@ namespace HOK.ColorSchemeEditor
                         if (null != category)
                         {
                             if (null != category.Parent) { continue; } //skip subcategories
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                             if (category.CategoryType != CategoryType.Model) { continue; }
 #endif
                             CategoryInfo catInfo = new CategoryInfo(category, filterCatIds);
@@ -133,7 +133,7 @@ namespace HOK.ColorSchemeEditor
                         if (null != category)
                         {
                             if (null != category.Parent) { continue; } //skip subcategories
-#if RELEASE2015
+#if RELEASE2015 || RELEASE2016
                             if (category.CategoryType != CategoryType.Model) { continue; }
 #endif
 
@@ -1176,6 +1176,7 @@ namespace HOK.ColorSchemeEditor
                     if (parameter.HasValue)
                     {
                         isEmpty = false;
+                        storageType = parameter.StorageType;
                         switch (parameter.StorageType)
                         {
                             case StorageType.Double:
