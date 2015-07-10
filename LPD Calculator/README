@@ -1,3 +1,7 @@
+v.0.2.9
+Fix
+Annotation family name has been changed with the prefix "Tag_"
+
 V.0.2.8
 New
 Finding rooms geometrically associated with areas and writing parameter values, RoomName and RoomNumber in area elements
