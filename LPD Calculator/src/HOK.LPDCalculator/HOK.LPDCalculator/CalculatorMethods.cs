@@ -364,7 +364,12 @@ namespace HOK.LPDCalculator
                             double length = 0;
                             foreach (Autodesk.Revit.DB.BoundarySegment boundarySegment in boundarySegments)
                             {
+#if RELEASE2016
+                                Curve curve = boundarySegment.GetCurve();
+#else
                                 Curve curve = boundarySegment.Curve;
+#endif
+
                                 profile.Append(curve);
                                 length += curve.Length;
                             }

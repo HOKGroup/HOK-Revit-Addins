@@ -307,7 +307,7 @@ namespace HOK.LPDCalculator
             {
                 FilteredElementCollector collector = new FilteredElementCollector(doc);
                 List<FamilySymbol> annoSymbolTypes = collector.OfClass(typeof(FamilySymbol)).ToElements().Cast<FamilySymbol>().ToList();
-                var symbolTypes = from annoType in annoSymbolTypes where annoType.Name == familyName select annoType;
+                var symbolTypes = from annoType in annoSymbolTypes where annoType.Name.Contains(familyName) select annoType;
                 if (symbolTypes.Count() > 0)
                 {
                     symbolType = symbolTypes.First();
