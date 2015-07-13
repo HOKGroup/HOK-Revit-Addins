@@ -25,7 +25,6 @@ namespace HOK.BetaToolsManager
         LPDAnalysis,
         LEEDView,
         Utility,
-        ModelManager,
         ColorEditor, 
         SmartBCF
     }
@@ -537,20 +536,18 @@ namespace HOK.BetaToolsManager
             try
             {
                 ToolProperties sheetTP = null; //sheet manager properties
-                ToolProperties modelTP = null; //model manager properties
                 ToolProperties bcfTP = null; // BCF Reader Properties
                 ToolProperties massTP = null; //color editor properties
 
-                if (toolInfoDictionary.ContainsKey(ToolEnum.SheetManager) && toolInfoDictionary.ContainsKey(ToolEnum.ModelManager) && toolInfoDictionary.ContainsKey(ToolEnum.BCFReader) && toolInfoDictionary.ContainsKey(ToolEnum.MassTool))
+                if (toolInfoDictionary.ContainsKey(ToolEnum.SheetManager) && toolInfoDictionary.ContainsKey(ToolEnum.BCFReader) && toolInfoDictionary.ContainsKey(ToolEnum.MassTool))
                 {
                     sheetTP = toolInfoDictionary[ToolEnum.SheetManager];
-                    modelTP = toolInfoDictionary[ToolEnum.ModelManager];
                     bcfTP = toolInfoDictionary[ToolEnum.BCFReader];
                     massTP = toolInfoDictionary[ToolEnum.MassTool];
                 }
-                if (null != sheetTP && null != modelTP && null != bcfTP && null != massTP)
+                if (null != sheetTP  && null != bcfTP && null != massTP)
                 {
-                    if (sheetTP.InstallExist || modelTP.InstallExist || bcfTP.InstallExist || massTP.InstallExist)
+                    if (sheetTP.InstallExist ||  bcfTP.InstallExist || massTP.InstallExist)
                     {
                         if (null == customizePanel)
                         {
@@ -583,29 +580,6 @@ namespace HOK.BetaToolsManager
                             sheetButton.Enabled = false;
                         }
 
-#if RELEASE2014 ||RELEASE2015 || RELEASE2016
-                        if (modelTP.InstallExist)
-                        {
-                            if (!customButtons.ContainsKey("Project Replication"))
-                            {
-                                PushButton modelButton = customizePanel.AddItem(new PushButtonData("Project Replication", "Project Replication", modelTP.TempAssemblyPath, "HOK.ModelManager.ProjectCommand")) as PushButton;
-                                modelButton.LargeImage = ImageUtil.LoadBitmapImage("project.png");
-                                modelButton.ToolTip = "Model Manager - Project Replication";
-                                AddToolTips(modelButton);
-                                customizePanel.AddSeparator();
-                            }
-                            else
-                            {
-                                PushButton modelButton = customButtons["Project Replication"];
-                                modelButton.AssemblyName = modelTP.TempAssemblyPath;
-                            }
-                        }
-                        else if (!modelTP.InstallExist && customButtons.ContainsKey("Project Replication"))
-                        {
-                            PushButton modelButton = customButtons["Project Replication"];
-                            modelButton.Enabled = false;
-                        }
-#endif
 
                         if (bcfTP.InstallExist)
                         {

@@ -53,7 +53,7 @@ namespace HOK.ViewAnalysis
                 categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_CurtainWallPanels)); //passing elements
                 categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_Doors)); //passing elements
                 categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_StructuralColumns)); //intercepting elements
-                categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_RvtLinks)); //find elements in link
+                //categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_RvtLinks)); //find elements in link
 
                 m_view = FindDefault3DView();
                 linkedInstances = GetLinkedInstancesInfo();
@@ -470,7 +470,8 @@ namespace HOK.ViewAnalysis
                             {
                                 Reference reference = context.GetReference();
                                 Element element = null;
-                                
+                                Transform transform = Transform.Identity;
+
                                 if (reference.LinkedElementId != ElementId.InvalidElementId)
                                 {
                                     //element from linked models
@@ -478,6 +479,7 @@ namespace HOK.ViewAnalysis
                                     {
                                         LinkedInstanceData lid = linkedInstances[reference.ElementId.IntegerValue];
                                         element = lid.LinkedDocument.GetElement(reference.LinkedElementId);
+                                        transform = lid.TransformValue;
                                     }
                                 }
                                 else
@@ -514,7 +516,6 @@ namespace HOK.ViewAnalysis
                                             //family instance of wall 
                                             visible = false; break;
                                         }
-                                       
                                     }
                                     else if (categoryId == (int)BuiltInCategory.OST_StructuralColumns)
                                     {
@@ -522,30 +523,18 @@ namespace HOK.ViewAnalysis
                                     }
                                     else if (categoryId == (int)BuiltInCategory.OST_Windows || categoryId == (int)BuiltInCategory.OST_Doors || categoryId ==(int)BuiltInCategory.OST_CurtainWallPanels)
                                     {
-                                        if (reference.LinkedElementId == ElementId.InvalidElementId)
+                                        Face face = FindFaceByReference(element, reference, transform);
+                                        if (null != face)
                                         {
-                                            GeometryObject geomObj = element.GetGeometryObjectFromReference(reference);
-                                            if (null != geomObj)
+                                            if (face.MaterialElementId != ElementId.InvalidElementId)
                                             {
-                                                Face face = geomObj as Face;
-                                                if (null != face)
+                                                Material material = element.Document.GetElement(face.MaterialElementId) as Material;
+                                                if (material.Transparency < minTransparency)
                                                 {
-                                                    if (face.MaterialElementId != ElementId.InvalidElementId)
-                                                    {
-                                                        Material material = element.Document.GetElement(face.MaterialElementId) as Material;
-                                                        if (material.Transparency < minTransparency)
-                                                        {
-                                                            visible = false; break;
-                                                        }
-                                                    }
+                                                    visible = false; break;
                                                 }
                                             }
                                         }
-                                        else if(categoryId ==(int)BuiltInCategory.OST_Doors)
-                                        {
-                                            visible = false; break;
-                                        }
-                                        
 
                                         FamilyInstance instance = element as FamilyInstance;
                                         if (null != instance)
@@ -581,5 +570,73 @@ namespace HOK.ViewAnalysis
             return visible;
         }
 
+        private Face FindFaceByReference(Element element, Reference reference, Transform transform)
+        {
+            Face faceFound = null;
+            try
+            {
+                if (reference.LinkedElementId != ElementId.InvalidElementId)
+                {
+                    XYZ globalPoint = reference.GlobalPoint;
+                    UV uvPoint = reference.UVPoint;
+                    XYZ intersectPoint = transform.Inverse.OfPoint(globalPoint);
+                    //element in linked doc
+                    Options opt = new Options();
+                    opt.ComputeReferences = true;
+
+                    GeometryElement geomElement = element.get_Geometry(opt);
+                    foreach (GeometryObject geoObject in geomElement)
+                    {
+                        // Get the geometry instance which contains the geometry information
+                        Autodesk.Revit.DB.GeometryInstance instance = geoObject as Autodesk.Revit.DB.GeometryInstance;
+                        if (null != instance)
+                        {
+                            foreach (GeometryObject instObj in instance.SymbolGeometry)
+                            {
+                                Solid solid = instObj as Solid;
+                                if (null == solid || 0 == solid.Faces.Size || 0 == solid.Edges.Size)
+                                {
+                                    continue;
+                                }
+                                foreach (Face face in solid.Faces)
+                                {
+                                    IntersectionResult result = face.Project(intersectPoint);
+                                    if (null != result)
+                                    {
+                                        if (result.XYZPoint.DistanceTo(intersectPoint) == 0)
+                                        {
+                                            return faceFound;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    /*
+                    Reference linkReference = reference.CreateReferenceInLink();
+                    GeometryObject geomObj = element.GetGeometryObjectFromReference(linkReference);
+                    if (null != geomObj)
+                    {
+                        faceFound = geomObj as Face;
+                    }
+                    */
+                }
+                else
+                {
+                    //element in host doc
+                    GeometryObject geomObj = element.GetGeometryObjectFromReference(reference);
+                    if (null != geomObj)
+                    {
+                        faceFound = geomObj as Face;
+                    }
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+            return faceFound;
+        }
     }
 }

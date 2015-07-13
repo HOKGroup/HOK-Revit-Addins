@@ -1022,7 +1022,7 @@ namespace HOK.RoomUpdater
                 categoryId = element.Category.Id.IntegerValue;
             }
 
-            if (null != element.Area)
+            if (element.Area>0)
             {
                 spaceArea = element.Area;
             }

@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HOK.CeilingHeight")]
-[assembly: AssemblyDescription("HOK Utility Tools")]
+[assembly: AssemblyTitle("Ceiling Height for Utility Tools")]
+[assembly: AssemblyDescription("Measuring height values from a floor to a ceiling")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.CeilingHeight")]
 [assembly: AssemblyCopyright("Copyright © HOK Group 2015")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Jinsol Kim")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2016.0.4.10")]
-[assembly: AssemblyFileVersion("2016.0.4.10")]
+[assembly: AssemblyVersion("2013.0.4.10")]
+[assembly: AssemblyFileVersion("2013.0.4.10")]

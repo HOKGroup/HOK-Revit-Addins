@@ -48,6 +48,7 @@ namespace HOK.SmartBCF.Walker
         private ElementProperties selElementProperties = null;
         private string bcfProjectId = "";
         private string bcfColorSchemeId = "";
+        private string categorySheetId = "";
         private bool isHighlightOn = false;
         private bool isIsolateOn = false;
         private bool isSectionBoxOn = false;
@@ -66,8 +67,8 @@ namespace HOK.SmartBCF.Walker
         public int CurrentIndex { get { return currentIndex; } set { currentIndex = value; } }
         public string BCFProjectId { get { return bcfProjectId; } set { bcfProjectId = value; } }
         public string BCFColorSchemeId { get { return bcfColorSchemeId; } set { bcfColorSchemeId = value; } }
+        public string CategorySheetId { get { return categorySheetId; } set { categorySheetId = value; } }
         
-
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
 
@@ -417,9 +418,9 @@ namespace HOK.SmartBCF.Walker
                 {
                     LinkedBcfFileInfo fileInfo = (LinkedBcfFileInfo)comboBoxBCF.SelectedItem;
                     selectedBCF = fileInfo;
-                    if(bcfDictionary.ContainsKey(fileInfo.BCFFileId))
+                    if(bcfDictionary.ContainsKey(fileInfo.MarkupFileId))
                     {
-                        Dictionary<string, IssueEntry> dictionary = bcfDictionary[fileInfo.BCFFileId];
+                        Dictionary<string, IssueEntry> dictionary = bcfDictionary[fileInfo.MarkupFileId];
                         List<IssueEntry> issueList = dictionary.Values.OrderBy(o => o.IssueTopic).ToList();
                         comboBoxIssue.ItemsSource = null;
                         comboBoxIssue.ItemsSource = issueList;
@@ -444,7 +445,7 @@ namespace HOK.SmartBCF.Walker
                     string issueId = issueEntry.IssueId;
                     if (null != selectedBCF)
                     {
-                        selectedIssue = bcfDictionary[selectedBCF.BCFFileId][issueId];
+                        selectedIssue = bcfDictionary[selectedBCF.MarkupFileId][issueId];
                         imageIssue.Source = selectedIssue.Snapshot;
                         labelIssueTopic.Content = selectedIssue.IssueTopic;
 
@@ -492,19 +493,19 @@ namespace HOK.SmartBCF.Walker
                     {
                         selElementProperties.Action = selectedAction.ParameterValue;
 
-                        if (bcfDictionary.ContainsKey(selectedBCF.BCFFileId))
+                        if (bcfDictionary.ContainsKey(selectedBCF.MarkupFileId))
                         {
-                            if (bcfDictionary[selectedBCF.BCFFileId].ContainsKey(selectedIssue.IssueId))
+                            if (bcfDictionary[selectedBCF.MarkupFileId].ContainsKey(selectedIssue.IssueId))
                             {
-                                if (bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.ContainsKey(selElementProperties.ElementId))
+                                if (bcfDictionary[selectedBCF.MarkupFileId][selectedIssue.IssueId].ElementDictionary.ContainsKey(selElementProperties.ElementId))
                                 {
-                                    bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.Remove(selElementProperties.ElementId);
-                                    bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.Add(selElementProperties.ElementId, selElementProperties);
+                                    bcfDictionary[selectedBCF.MarkupFileId][selectedIssue.IssueId].ElementDictionary.Remove(selElementProperties.ElementId);
+                                    bcfDictionary[selectedBCF.MarkupFileId][selectedIssue.IssueId].ElementDictionary.Add(selElementProperties.ElementId, selElementProperties);
                                 }
                             }
                         }
 
-                        bool updatedSheet = BCFParser.UpdateElementProperties(selElementProperties, BCFParameters.BCF_Action, selectedBCF.BCFFileId);
+                        bool updatedSheet = BCFParser.UpdateElementProperties(selElementProperties, BCFParameters.BCF_Action, selectedBCF.ViewpointFileId);
 
                         m_handler.CurrentElement = selElementProperties;
                         m_handler.Request.Make(RequestId.UpdateAction);
@@ -531,19 +532,19 @@ namespace HOK.SmartBCF.Walker
                     {
                         selElementProperties.ResponsibleParty = selectedResponsible.ParameterValue;
 
-                        if (bcfDictionary.ContainsKey(selectedBCF.BCFFileId))
+                        if (bcfDictionary.ContainsKey(selectedBCF.MarkupFileId))
                         {
-                            if (bcfDictionary[selectedBCF.BCFFileId].ContainsKey(selectedIssue.IssueId))
+                            if (bcfDictionary[selectedBCF.MarkupFileId].ContainsKey(selectedIssue.IssueId))
                             {
-                                if (bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.ContainsKey(selElementProperties.ElementId))
+                                if (bcfDictionary[selectedBCF.MarkupFileId][selectedIssue.IssueId].ElementDictionary.ContainsKey(selElementProperties.ElementId))
                                 {
-                                    bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.Remove(selElementProperties.ElementId);
-                                    bcfDictionary[selectedBCF.BCFFileId][selectedIssue.IssueId].ElementDictionary.Add(selElementProperties.ElementId, selElementProperties);
+                                    bcfDictionary[selectedBCF.MarkupFileId][selectedIssue.IssueId].ElementDictionary.Remove(selElementProperties.ElementId);
+                                    bcfDictionary[selectedBCF.MarkupFileId][selectedIssue.IssueId].ElementDictionary.Add(selElementProperties.ElementId, selElementProperties);
                                 }
                             }
                         }
 
-                        bool updatedSheet = BCFParser.UpdateElementProperties(selElementProperties, BCFParameters.BCF_Responsibility, selectedBCF.BCFFileId);
+                        bool updatedSheet = BCFParser.UpdateElementProperties(selElementProperties, BCFParameters.BCF_Responsibility, selectedBCF.ViewpointFileId);
 
                         m_handler.CurrentElement = selElementProperties;
                         m_handler.Request.Make(RequestId.UpdateResponsibility);
@@ -579,11 +580,13 @@ namespace HOK.SmartBCF.Walker
                     if (!string.IsNullOrEmpty(bcfProjectId) && null != googleFolders)
                     {
                         bcfColorSchemeId = googleFolders.ColorSheet.Id;
+                        categorySheetId = googleFolders.CategorySheet.Id;
                         bcfWindow.Close();
 
                         m_handler.BCFFileDictionary = bcfFileDictionary;
                         m_handler.BCFProjectId = bcfProjectId;
                         m_handler.BCFColorSchemeId = bcfColorSchemeId;
+                        m_handler.CategorySheetId = categorySheetId;
                         m_handler.GoogleFolders = googleFolders;
                         m_handler.Request.Make(RequestId.UpdateLinkedFileInfo);
                         m_event.Raise();

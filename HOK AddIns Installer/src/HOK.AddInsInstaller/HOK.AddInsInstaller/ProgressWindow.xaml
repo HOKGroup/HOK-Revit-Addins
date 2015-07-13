@@ -1,0 +1,23 @@
+﻿<Window x:Class="HOK.AddInsInstaller.ProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="HOK AddIns Installer" Height="250" Width="500" MaxHeight="250" MaxWidth="500" MinHeight="250" MinWidth="500" Icon="Resources/hoklogo.ico" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <GroupBox HorizontalAlignment="Stretch" Margin="7" VerticalAlignment="Stretch" Header="Info">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <ProgressBar x:Name="statusProgressBar" HorizontalAlignment="Stretch" Height="30" Margin="25,10,25,0" Grid.Row="1" VerticalAlignment="Top"/>
+                <Label x:Name="statusLabel" Content="Gathering information about installed components in 2013. . ." HorizontalAlignment="Left" Margin="25,15,0,0" VerticalAlignment="Top"/>
+
+            </Grid>
+        </GroupBox>
+        <Button x:Name="buttonClose" Content="Close" HorizontalAlignment="Right" Margin="0,10,15,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="25" Click="buttonClose_Click"/>
+    </Grid>
+</Window>

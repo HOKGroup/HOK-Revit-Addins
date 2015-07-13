@@ -30,6 +30,9 @@ namespace HOK.SmartBCF.GoogleUtils
         public static string currentSheetId = ""; //fileId of Google Spreadsheet
         public static WorksheetEntry currentSheet = null; //worksheet of ViewPoint
 
+        //private static string userName = "bsmart@hokbuildingsmart.com";
+        //private static string passWord = "HOKb$mart";
+
         private static string keyFile = "HOK smartBCF.p12";
         private static string serviceAccountEmail = "756603983986-lrc8dm2b0nl381cepd60q2o7fo8df3bg@developer.gserviceaccount.com";
 
@@ -40,33 +43,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
         private static Random random = new Random();
 
-        public static bool ConverToGoogleDoc(BCFZIP bcfzip, string fileId, string colorSheetId)
-        {
-            bool result = false;
-            try
-            {
-                if (null == sheetsService)
-                {
-                    sheetsService = GetUserCrendential();
-                }
-                if (null != sheetsService)
-                {
-                    WorksheetFeed wsFeed = null;
-                    bool createdMarkup = CreateMarkupSheet(bcfzip, fileId, out wsFeed);
-                    bool createdVisInfo = CreateViewSheet(bcfzip, wsFeed);
-
-                    result = (createdMarkup && createdVisInfo);
-                }
-               
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to convert bcf data to google spread sheet.\n"+ex.Message, "Convert to Google Doc", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return result;
-        }
-
-        private static SpreadsheetsService GetUserCrendential()
+        private static SpreadsheetsService GetUserCredential()
         {
             SpreadsheetsService service = null;
             try
@@ -96,6 +73,210 @@ namespace HOK.SmartBCF.GoogleUtils
                 MessageBox.Show("Failed to get user credential.\n"+ex.Message, "Get User Credential", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return service;
+        }
+
+        public static System.IO.MemoryStream CreateColorSchemeStream(ColorSchemeInfo colorSchemeInfo)
+        {
+            System.IO.MemoryStream csvStream = null;
+            try
+            {
+                StringBuilder csvBuilder = new StringBuilder();
+                //write columns
+                for (int i = 0; i < colorschemeCols.Length; i++)
+                {
+                    if (i != 0)
+                    {
+                        csvBuilder.Append(',');
+                    }
+
+                    csvBuilder.Append(markupCols[i]);
+                }
+                csvBuilder.Append("\n");
+
+                char[] specialChar = new char[] { '"', ',' };
+                foreach (ColorScheme scheme in colorSchemeInfo.ColorSchemes)
+                {
+                    string schemeId = scheme.SchemeId;
+                    string schemeName = scheme.SchemeName;
+                    string paramName = scheme.ParameterName;
+
+                    foreach (ColorDefinition definition in scheme.ColorDefinitions)
+                    {
+                        string[] strArray = new string[] { schemeId, schemeName, paramName, definition.ParameterValue, 
+                            definition.Color[0].ToString(), definition.Color[1].ToString(), definition.Color[2].ToString() };
+
+                        StringBuilder rowBuilder = new StringBuilder();
+                        for (int i = 0; i < strArray.Length; i++)
+                        {
+                            if (i != 0) { rowBuilder.Append(','); }
+                            if (strArray[i].IndexOfAny(specialChar) != -1)
+                            {
+                                rowBuilder.AppendFormat("\"{0}\"", strArray[i].Replace("\"", "\"\""));
+                            }
+                            else
+                            {
+                                rowBuilder.Append(strArray[i]);
+                            }
+                        }
+                        csvBuilder.AppendLine(rowBuilder.ToString());
+                    }
+                }
+
+                if (csvBuilder.ToString().Length > 0)
+                {
+                    byte[] csvByteArray = System.Text.Encoding.UTF8.GetBytes(csvBuilder.ToString());
+                    csvStream = new System.IO.MemoryStream(csvByteArray);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to write Color Scheme CSV.\n"+ex.Message, "Create Color Scheme Stream", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return csvStream;
+        }
+
+        public static System.IO.MemoryStream CreateCategoryStream(List<string> categoryNames)
+        {
+            System.IO.MemoryStream csvStream = null;
+            try
+            {
+                StringBuilder csvBuilder = new StringBuilder();
+                //write columns
+                csvBuilder.AppendLine(categoryCols[0]);
+
+                char[] specialChar = new char[] { '"', ',' };
+                foreach (string categoryName in categoryNames)
+                {
+                    csvBuilder.AppendLine(categoryName);
+                }
+
+                if (csvBuilder.ToString().Length > 0)
+                {
+                    byte[] csvByteArray = System.Text.Encoding.UTF8.GetBytes(csvBuilder.ToString());
+                    csvStream = new System.IO.MemoryStream(csvByteArray);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to write Element Categories CSV\n" + ex.Message, "Write Element Category CSV", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return csvStream;
+        }
+
+        public static System.IO.MemoryStream CreateMarkupStream(BCFZIP bcfZip)
+        {
+            System.IO.MemoryStream csvStream = null;
+            try
+            {
+                StringBuilder csvBuilder = new StringBuilder();
+                //write columns
+                for (int i = 0; i < markupCols.Length; i++)
+                {
+                    if (i != 0)
+                    {
+                        csvBuilder.Append(',');
+                    }
+
+                    csvBuilder.Append(markupCols[i]);
+                }
+                csvBuilder.Append("\n");
+
+                char[] specialChar = new char[] { '"', ','};
+                foreach (BCFComponent bcf in bcfZip.BCFComponents)
+                {
+                    Topic bcfTopic = bcf.Markup.Topic;
+                    if (null != bcf.Markup.Comment)
+                    {
+                        foreach (Comment comment in bcf.Markup.Comment)
+                        {
+                            string[] strArray = new string[] { bcfTopic.Guid, bcfTopic.Title, 
+                                comment.Guid, comment.Comment1, comment.Status, comment.VerbalStatus, comment.Author, comment.Date.ToString() };
+
+                            StringBuilder rowBuilder = new StringBuilder();
+
+                            for (int i = 0; i < strArray.Length; i++)
+                            {
+                                if (i != 0) { rowBuilder.Append(','); }
+                                if (strArray[i].IndexOfAny(specialChar) != -1)
+                                {
+                                    rowBuilder.AppendFormat("\"{0}\"", strArray[i].Replace("\"", "\"\""));
+                                }
+                                else
+                                {
+                                    rowBuilder.Append(strArray[i]);
+                                }
+                            }
+                            csvBuilder.AppendLine(rowBuilder.ToString());
+                        }
+                    }
+                }
+
+                if (csvBuilder.ToString().Length > 0)
+                {
+                    byte[] csvByteArray = System.Text.Encoding.UTF8.GetBytes(csvBuilder.ToString());
+                    csvStream = new System.IO.MemoryStream(csvByteArray);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to write Markup to CSV\n" + ex.Message, "Write Markup CSV", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return csvStream;
+        }
+
+        public static System.IO.MemoryStream CreateViewpointStream(BCFZIP bcfZip)
+        {
+            System.IO.MemoryStream csvStream = null;
+            try
+            {
+                StringBuilder csvBuilder = new StringBuilder();
+                //write columns
+                for (int i = 0; i < viewpointCols.Length; i++)
+                {
+                    if (i != 0)
+                    {
+                        csvBuilder.Append(',');
+                    }
+                    csvBuilder.Append(viewpointCols[i]);
+                }
+                csvBuilder.Append("\n");
+
+                char[] specialChar = new char[] { '"', ',' };
+                foreach (BCFComponent bcf in bcfZip.BCFComponents)
+                {
+                    foreach (Component component in bcf.VisualizationInfo.Components)
+                    {
+                        string[] strArray = new string[] { bcf.GUID, component.IfcGuid, component.AuthoringToolId, "MOVE", "ARCHITECTURE" };
+
+                        StringBuilder rowBuilder = new StringBuilder();
+                        for (int i = 0; i < strArray.Length; i++)
+                        {
+                            if (i != 0) { rowBuilder.Append(','); }
+                            if (strArray[i].IndexOfAny(specialChar) != -1)
+                            {
+                                rowBuilder.AppendFormat("\"{0}\"", strArray[i].Replace("\"", "\"\""));
+                            }
+                            else
+                            {
+                                rowBuilder.Append(strArray[i]);
+                            }
+                        }
+                        csvBuilder.AppendLine(rowBuilder.ToString());
+                    }
+                }
+
+                if (csvBuilder.ToString().Length > 0)
+                {
+                    byte[] csvByteArray = System.Text.Encoding.UTF8.GetBytes(csvBuilder.ToString());
+                    csvStream = new System.IO.MemoryStream(csvByteArray);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to write ViewPoint to CSV.\n"+ex.Message, "Write Viewpoint CSV", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return csvStream;
         }
 
         private static bool CreateMarkupSheet(BCFZIP bcfZip, string fileId, out WorksheetFeed wsFeed)
@@ -324,7 +505,7 @@ namespace HOK.SmartBCF.GoogleUtils
             {
                 if (null == sheetsService)
                 {
-                    sheetsService = GetUserCrendential();
+                    sheetsService = GetUserCredential();
                 }
 
                 if (null != sheetsService)
@@ -556,7 +737,7 @@ namespace HOK.SmartBCF.GoogleUtils
             {
                 if (null == sheetsService)
                 {
-                    sheetsService = GetUserCrendential();
+                    sheetsService = GetUserCredential();
                 }
                 if (null != sheetsService)
                 {
@@ -667,7 +848,7 @@ namespace HOK.SmartBCF.GoogleUtils
             {
                 if (null == sheetsService)
                 {
-                    sheetsService = GetUserCrendential();
+                    sheetsService = GetUserCredential();
                 }
                 if (null != sheetsService && !string.IsNullOrEmpty(fileId))
                 {
@@ -823,53 +1004,78 @@ namespace HOK.SmartBCF.GoogleUtils
             {
                 if (null == sheetsService)
                 {
-                    sheetsService = GetUserCrendential();
+                    sheetsService = GetUserCredential();
                 }
 
                 if (null != sheetsService)
                 {
                     if (fileId != currentSheetId)
                     {
-                        currentSheet = FindWorksheet(fileId, 1);//viewpoint worksheet
+                        currentSheet = FindWorksheet(fileId, 0);//viewpoint worksheet
                         currentSheetId = fileId;
                     }
                     if (null != currentSheet)
                     {
-                        AtomLink listFeedLink = currentSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                        ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                        ListFeed listFeed = sheetsService.Query(listQuery);
-
-                        for (int i = listFeed.Entries.Count - 1; i > -1; i--)
+                        CellAddress cellAddress = null;
+                        string cellValue = "";
+                        if(bcfParam == BCFParameters.BCF_Action && ep.CellEntries.ContainsKey(viewpointCols[3]))
                         {
-                            ListEntry row = (ListEntry)listFeed.Entries[i];
-                            try
+                            cellAddress = ep.CellEntries[viewpointCols[3]];
+                            cellValue = ep.Action;
+                        }
+                        else if (bcfParam == BCFParameters.BCF_Responsibility && ep.CellEntries.ContainsKey(viewpointCols[4]))
+                        {
+                            cellAddress = ep.CellEntries[viewpointCols[4]];
+                            cellValue = ep.ResponsibleParty;
+                        }
+                        if (null != cellAddress)
+                        {
+                            AtomLink cellFeedLink = currentSheet.Links.FindService(GDataSpreadsheetsNameTable.CellRel, null);
+                            CellQuery cellQuery = new CellQuery(cellFeedLink.HRef.ToString());
+                            cellQuery.MinimumRow = cellQuery.MaximumRow = cellAddress.Row;
+                            cellQuery.MinimumColumn = cellQuery.MaximumColumn = cellAddress.Col;
+                            CellFeed cellFeed = sheetsService.Query(cellQuery);
+                            if (cellFeed.Entries.Count > 0)
                             {
-                                string issueId = row.Elements[0].Value;
-                                int elementId = int.Parse(row.Elements[2].Value);
+                                CellEntry cellEntry = cellFeed.Entries[0] as CellEntry;
+                                cellEntry.Cell.InputValue = cellValue;
+                                AtomEntry updatedCell = cellEntry.Update();
 
-                                if (issueId == ep.IssueId && elementId == ep.ElementId)
+                            }
+
+                            /*
+                            CellFeed cellFeed = sheetsService.Query(cellQuery);
+
+                            CellFeed batchRequest = new CellFeed(new Uri(cellFeed.Self), sheetsService);
+                            CellEntry batchEntry = new CellEntry(cellAddress.Row, cellAddress.Col);
+                            batchEntry.Id = new AtomId(string.Format("{0}/{1}", cellFeed.Self, cellAddress.IdString));
+                            batchEntry.BatchData = new GDataBatchEntryData(cellAddress.IdString, GDataBatchOperationType.query);
+                            batchRequest.Entries.Add(batchEntry);
+
+                            CellFeed queryBatchResponse = (CellFeed)sheetsService.Batch(batchRequest, new Uri(cellFeed.Batch));
+                            CellFeed batchUpdateRequest = new CellFeed(cellQuery.Uri, sheetsService);
+                            foreach (CellEntry entry in queryBatchResponse.Entries)
+                            {
+                                CellEntry batchUpdateEntry = entry;
+                                batchUpdateEntry.InputValue = cellValue;
+                                batchUpdateEntry.BatchData = new GDataBatchEntryData(GDataBatchOperationType.update);
+                                batchUpdateRequest.Entries.Add(batchUpdateEntry);
+                                break;
+                            }
+
+                            CellFeed batchUpdateResponse = (CellFeed)sheetsService.Batch(batchUpdateRequest, new Uri(cellFeed.Batch));
+
+                            updated = true;
+                            foreach (CellEntry entry in batchUpdateResponse.Entries)
+                            {
+                                string batchId = entry.BatchData.Id;
+                                if (entry.BatchData.Status.Code != 200)
                                 {
-                                    switch (bcfParam)
-                                    {
-                                        case BCFParameters.BCF_Action:
-                                            row.Elements[3].Value = ep.Action;
-                                            row.Update();
-                                            updated = true;
-                                            break;
-                                        case BCFParameters.BCF_Responsibility:
-                                            row.Elements[4].Value = ep.ResponsibleParty;
-                                            row.Update();
-                                            updated = true;
-                                            break;
-                                    }
-                                    break;
+                                    updated = false;
+                                    string reason = entry.BatchData.Status.Reason;
                                 }
                             }
-                            catch (Exception ex)
-                            {
-                                string message = ex.Message;
-                                continue;
-                            }
+                            */
                         }
                     }
                 }
@@ -893,6 +1099,7 @@ namespace HOK.SmartBCF.GoogleUtils
         private string issueId = "";
         private string action = "";
         private string responsibleParty = "";
+        private Dictionary<string, CellAddress> cellEntries = new Dictionary<string, CellAddress>();
 
         public int ElementId { get { return elementId; } set { elementId = value; } }
         public Element ElementObj { get { return elementObj; } set { elementObj = value; } }
@@ -903,6 +1110,7 @@ namespace HOK.SmartBCF.GoogleUtils
         public string IssueId { get { return issueId; } set { issueId = value; } }
         public string Action { get { return action; } set { action = value; } }
         public string ResponsibleParty { get { return responsibleParty; } set { responsibleParty = value; } }
+        public Dictionary<string, CellAddress> CellEntries { get { return cellEntries; } set { cellEntries = value; } }
 
         public ElementProperties(Element element)
         {
@@ -946,6 +1154,24 @@ namespace HOK.SmartBCF.GoogleUtils
         public IssueEntry()
         {
            
+        }
+    }
+
+    public class CellAddress
+    {
+        private uint row = 0;
+        private uint col = 0;
+        private string idString = "";
+
+        public uint Row { get { return row; } set { row = value; } }
+        public uint Col { get { return col; } set { col = value; } }
+        public string IdString { get { return idString; } set { idString = value; } }
+
+        public CellAddress(uint rowNum, uint colNum)
+        {
+            row = rowNum;
+            col = colNum;
+            idString = string.Format("R{0}C{1}", row, col);
         }
     }
 

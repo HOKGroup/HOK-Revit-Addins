@@ -126,7 +126,7 @@ namespace HOK.Navigator
             Outlook.Folder folderInbox = (Outlook.Folder)nameSpace.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox);
             Outlook.MailItem mailItem = (Outlook.MailItem)outlookApplication.CreateItem(Outlook.OlItemType.olMailItem);
 
-            mailItem.Subject = "Revit 2013 Problem Report";
+            mailItem.Subject = "Revit Problem Report";
             mailItem.Body = "**** This email will go to the Firmwide [_HOK BIM Support Request] team. ****\n" + "What office are you in? \n" + "What project are you working on? \n" + "Describe the problem:";
 
             mailItem.Recipients.Add("_HOK BIM Support Request");
@@ -140,7 +140,7 @@ namespace HOK.Navigator
             Outlook.Folder folderInbox = (Outlook.Folder)nameSpace.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox);
             Outlook.MailItem mailItem = (Outlook.MailItem)outlookApplication.CreateItem(Outlook.OlItemType.olMailItem);
 
-            mailItem.Subject = "Revit 2013 Problem Report";
+            mailItem.Subject = "Revit Problem Report";
             mailItem.Body = "**** This email will go to the Firmwide [_HOK BIM Support Request] team. ****\n" + "What office are you in? \n" + "What project are you working on? \n" + "Describe the problem:";
 
             mailItem.Recipients.Add("jinsol.kim@hok.com");

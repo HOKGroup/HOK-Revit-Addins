@@ -21,7 +21,6 @@ namespace HOK.Navigator
         private string currentAssembly = "";
         private string versionNumber = "";
         public PushButton helpButton = null;
-        private ToolManager toolManager;
         private bool onCitrix = false;
 
         public Result OnShutdown(UIControlledApplication application)
@@ -37,7 +36,6 @@ namespace HOK.Navigator
             m_app = application;
             tabName = "   HOK   ";
             versionNumber = m_app.ControlledApplication.VersionNumber;
-            toolManager = new ToolManager(versionNumber);
             
             currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
             currentDirectory = Path.GetDirectoryName(currentAssembly);
@@ -56,36 +54,9 @@ namespace HOK.Navigator
         private void EventAppInitialize(object sender, ApplicationInitializedEventArgs arg)
         {
             CreatePushButton();
-            if (CheckNetworkConnection())
-            {
-                toolManager.FindOutDatedTools();
-            }
         }
 
-        private bool CheckNetworkConnection()
-        {
-            bool result = false;
-            try
-            {
-                NetworkInterface[] netIntrfc = NetworkInterface.GetAllNetworkInterfaces();
-                foreach (NetworkInterface networkInterface in netIntrfc)
-                {
-                    if (networkInterface.OperationalStatus == OperationalStatus.Up)
-                    {
-                        if (networkInterface.NetworkInterfaceType == NetworkInterfaceType.Tunnel && networkInterface.Name.Contains("group.hok.com"))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to verify the newtwork connection.\n" + ex.Message, "Check Network Connection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            return result;
-        }
-
+     
         private void CreatePushButton()
         {
             try
@@ -170,12 +141,6 @@ namespace HOK.Navigator
         {
             try
             {
-                if (toolManager.OutDatedTools.Count > 0)
-                {
-                    //install tools without the notification message
-                    toolManager.InstallTools();
-                }
-
                 if (InstallerTrigger.Activated)
                 {
                     Dictionary<string, bool> activatedInstaller = new Dictionary<string, bool>();

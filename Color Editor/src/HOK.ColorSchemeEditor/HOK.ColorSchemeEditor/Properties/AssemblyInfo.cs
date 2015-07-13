@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HOK.ColorSchemeEditor for Revit (multi-versions)")]
+[assembly: AssemblyTitle("Color Scheme Editor for Revit")]
 [assembly: AssemblyDescription("Color Scheme Editor will read or write the colorschme.xml in BCF to update colors of Revit elements.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.ColorSchemeEditor")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2014")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2015")]
+[assembly: AssemblyTrademark("Jinsol Kim")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

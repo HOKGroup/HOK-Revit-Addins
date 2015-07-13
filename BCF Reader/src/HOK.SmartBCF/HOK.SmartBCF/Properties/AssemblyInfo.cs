@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HOK.SmartBCF")]
+[assembly: AssemblyTitle("Smart BCF for Revit")]
 [assembly: AssemblyDescription("smartBCF will naviate elements associated with BCF issues and write BCF info into Revit parameters.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.SmartBCF")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2014")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2015")]
+[assembly: AssemblyTrademark("Jinsol Kim")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2016.0.0.15")]
-[assembly: AssemblyFileVersion("2016.0.0.15")]
+[assembly: AssemblyVersion("2013.0.0.17")]
+[assembly: AssemblyFileVersion("2013.0.0.17")]

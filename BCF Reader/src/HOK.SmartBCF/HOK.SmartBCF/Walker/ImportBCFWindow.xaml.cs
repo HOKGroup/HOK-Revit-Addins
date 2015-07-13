@@ -29,7 +29,6 @@ namespace HOK.SmartBCF.Walker
         private string sharedLink = "";
         private bool rememberPath = false;
         private BCFZIP bcfzip = new BCFZIP();
-        private FileHolders fileHolders = null;
         private FolderHolders googleFolders = null;
         private LinkedBcfFileInfo bcfFileInfo = null;
         private string bcfProjectId = "";
@@ -39,7 +38,6 @@ namespace HOK.SmartBCF.Walker
         public string BCFPath { get { return bcfPath; } set { bcfPath = value; } }
         public string SharedLink { get { return sharedLink; } set { sharedLink = value; } }
         public bool RememberPath { get { return rememberPath; } set { rememberPath = value; } }
-        public FileHolders FilesInfo { get { return fileHolders; } set { fileHolders = value; } }
         public FolderHolders GoogleFolders { get { return googleFolders; } set { googleFolders = value; } }
         public LinkedBcfFileInfo BCFFileInfo { get { return bcfFileInfo; } set { bcfFileInfo = value; } }
         public string BCFProjectId { get { return bcfProjectId; } set { bcfProjectId = value; } }
@@ -60,15 +58,20 @@ namespace HOK.SmartBCF.Walker
                 sharedLink = FileManager.GetSharedLinkAddress(bcfProjectId);
                 textBoxFolder.Text = sharedLink;
             }
+            AbortFlag.SetAbortFlag(false);
         }
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            MessageBoxResult result = System.Windows.MessageBox.Show("Would you like to stop importing the BCF file?", "Cancellation - Import BCF", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                AbortFlag.SetAbortFlag(true);
+            }
         }
 
-        private delegate void UpdateLableDelegate(System.Windows.DependencyProperty dp, Object value);
-        private delegate void UpdateProgressDelegate(System.Windows.DependencyProperty dp, Object value);
+        public delegate void UpdateLableDelegate(System.Windows.DependencyProperty dp, Object value);
+        public delegate void UpdateProgressDelegate(System.Windows.DependencyProperty dp, Object value);
 
         private void buttonImport_Click(object sender, RoutedEventArgs e)
         {
@@ -78,7 +81,7 @@ namespace HOK.SmartBCF.Walker
             try
             {
                 double progressValue =0;
-                progressBar.Maximum = 4;
+                progressBar.Maximum = 3;
                 progressBar.Value = progressValue;
                 progressBar.Visibility = Visibility.Visible;
                 bcfPath = textBoxBCF.Text;
@@ -94,19 +97,21 @@ namespace HOK.SmartBCF.Walker
                     if (folderId != bcfProjectId)
                     {
                         bcfProjectId = folderId;
-                        googleFolders = FileManager.CreateDefaultFolders(bcfProjectId);
+                        googleFolders = FileManager.FindGoogleFolders(bcfProjectId);
                     }
                 }
                 else
                 {
                     bcfProjectId = folderId;
-                    googleFolders = FileManager.CreateDefaultFolders(bcfProjectId);
+                    googleFolders = FileManager.FindGoogleFolders(bcfProjectId);
                 }
-                
-                fileHolders = new FileHolders(bcfPath, sharedLink);
+
+                if (AbortFlag.GetAbortFlag()) { this.DialogResult = false; return; }
+
                 File colorSheet = null;
                 File uploadedBCF = null;
-                File createdSheet = null;
+                File markupSheet = null;
+                File viewpointSheet = null;
                 List<File> uploadedImages = null;
 
                 if (!string.IsNullOrEmpty(bcfPath) && null!=googleFolders)
@@ -119,83 +124,71 @@ namespace HOK.SmartBCF.Walker
 
                         colorSheet = googleFolders.ColorSheet;
                         bcfColorSchemeId = colorSheet.Id;
-                       
+                        
                         string bcfName = System.IO.Path.GetFileNameWithoutExtension(bcfPath);
                         if (FileManager.CheckExistingFiles(bcfName, googleFolders))
                         {
+                            string uploadId = Guid.NewGuid().ToString();
+
                             if (null != googleFolders.ArchiveBCFFolder)
                             {
+                                if (AbortFlag.GetAbortFlag()) { this.DialogResult = false; return; }
+
                                 progressValue += 1;
                                 Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Uploading bcfzip to an archive folder..." });
                                 Dispatcher.Invoke(updateProgressDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, progressValue });
 
                                 string parentId = googleFolders.ArchiveBCFFolder.Id;
-                                uploadedBCF = FileManager.UploadBCF(bcfPath, parentId);
+                                uploadedBCF = FileManager.UploadBCF(bcfPath, parentId , uploadId);
                             }
                             if (null != googleFolders.ActiveBCFFolder && null != googleFolders.ArchiveImgFolder)
                             {
+                                if (AbortFlag.GetAbortFlag()) { this.DialogResult = false; return; }
+
                                 BCFUtil bcfUtil = new BCFUtil();
                                 bcfzip = bcfUtil.ReadBCF(bcfPath);
-                                fileHolders.BcfZip = bcfzip;
 
                                 progressValue += 1;
                                 Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Creating Google spreadsheet..." });
                                 Dispatcher.Invoke(updateProgressDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, progressValue });
 
+                                if (AbortFlag.GetAbortFlag()) { this.DialogResult = false; return; }
+
                                 string parentId = googleFolders.ActiveBCFFolder.Id;
-                                createdSheet = FileManager.CreateSpreadsheet(bcfPath, parentId);
-                                if (null != createdSheet && null != colorSheet)
+                                System.IO.MemoryStream markupStream = BCFParser.CreateMarkupStream(bcfzip);
+                                if (null != markupStream)
                                 {
-                                    bool sheetCreated = BCFParser.ConverToGoogleDoc(bcfzip, createdSheet.Id, colorSheet.Id);
+                                    string title = bcfName + "_Markup.csv";
+                                    markupSheet = FileManager.UploadSpreadsheet(markupStream, title, parentId, uploadId);
                                 }
+
+                                System.IO.MemoryStream viewpointStream = BCFParser.CreateViewpointStream(bcfzip);
+                                if (null != viewpointStream)
+                                {
+                                    string title = bcfName + "_Viewpoint.csv";
+                                    viewpointSheet = FileManager.UploadSpreadsheet(viewpointStream, title, parentId, uploadId);
+                                }
+
+                                if (AbortFlag.GetAbortFlag()) { this.DialogResult = false; return; }
 
                                 if (null != bcfzip)
                                 {
                                     Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Uploading BCF images..." });
                                     Dispatcher.Invoke(updateProgressDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, progressValue });
                                     parentId = googleFolders.ActiveImgFolder.Id;
-                                    uploadedImages = FileManager.UploadBCFImages(bcfzip, parentId);
+                                    uploadedImages = FileManager.UploadBCFImages(bcfzip, parentId, uploadId, progressBar);
                                 }
 
-                            }
+                                if (AbortFlag.GetAbortFlag()) { this.DialogResult = false; return; }
 
-                            if (null != uploadedBCF && null != createdSheet && null != uploadedImages)
-                            {
-                                progressValue =0;
-                                progressBar.Value = progressValue;
-                                progressBar.Maximum = uploadedImages.Count + 2;
-                                Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Updating properties of files..." });
-                               
-                                Dictionary<string/*key*/, string/*value*/> propertyDictionary = new Dictionary<string, string>();
-                                propertyDictionary.Add("SheetId", createdSheet.Id);
-                                propertyDictionary.Add("BcfPath", bcfPath);
-                                propertyDictionary.Add("ArchiveZipId", uploadedBCF.Id);
-
-                                progressValue += 1;
-                                uploadedBCF = FileManager.AddProperties(uploadedBCF.Id, propertyDictionary);
-                                Dispatcher.Invoke(updateProgressDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, progressValue });
-
-                                progressValue += 1;
-                                createdSheet = FileManager.AddProperties(createdSheet.Id, propertyDictionary);
-                                Dispatcher.Invoke(updateProgressDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, progressValue });
-
-                                for (int i = 0; i < uploadedImages.Count; i++)
+                                if (null != uploadedBCF && null != markupSheet && null != viewpointSheet && null != uploadedImages)
                                 {
-                                    progressValue += 1;
-                                    uploadedImages[i] = FileManager.AddProperties(uploadedImages[i].Id, propertyDictionary);
-                                    Dispatcher.Invoke(updateProgressDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, progressValue });
+                                    Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Completed." });
+                                    progressBar.Visibility = Visibility.Hidden;
+
+                                    bcfFileInfo = new LinkedBcfFileInfo(bcfName, markupSheet.Id, viewpointSheet.Id, sharedLink, googleFolders.RootTitle, bcfProjectId);
+                                    this.DialogResult = true;
                                 }
-
-                                Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Completed." });
-                                progressBar.Visibility = Visibility.Hidden;
-
-                                fileHolders.ArchivedBCF = uploadedBCF;
-                                fileHolders.ActiveBCF = createdSheet;
-                                fileHolders.BCFImages = uploadedImages;
-
-                                bcfFileInfo = new LinkedBcfFileInfo(createdSheet.Title, createdSheet.Id, sharedLink, bcfProjectId, googleFolders.RootTitle, bcfProjectId);
-
-                                this.DialogResult = true;
                             }
                         }
                     }

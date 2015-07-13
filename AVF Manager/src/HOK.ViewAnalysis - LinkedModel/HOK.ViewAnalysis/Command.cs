@@ -19,6 +19,7 @@ namespace HOK.ViewAnalysis
     }
 
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
+    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
     public class Command:IExternalCommand
     {
         private UIApplication m_app;

@@ -13,6 +13,7 @@ namespace HOK.SmartBCF
     using System.Xml.Schema;
     using System.ComponentModel;
     using System.Collections.Generic;
+    using HOK.SmartBCF.GoogleUtils;
 
 
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.0.30319.34234")]
@@ -296,6 +297,8 @@ namespace HOK.SmartBCF
 
         private string guidField;
 
+        private Dictionary<string, CellAddress> cellEntries = new Dictionary<string, CellAddress>();
+
         public Comment()
         {
             this.replyToCommentField = new CommentReplyToComment();
@@ -458,6 +461,13 @@ namespace HOK.SmartBCF
             {
                 this.guidField = value;
             }
+        }
+
+        [System.Xml.Serialization.XmlIgnore]
+        public Dictionary<string, CellAddress> CellEntries
+        {
+            get { return this.cellEntries; }
+            set { this.cellEntries = value; }
         }
     }
 

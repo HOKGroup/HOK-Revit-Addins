@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.ColorSchemeEditor</RootNamespace>
-    <AssemblyName>HOK.ColorSchemeEditor_v.2014.0.1.12</AssemblyName>
+    <AssemblyName>HOK.ColorSchemeEditor</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

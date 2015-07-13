@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Revit Database Manager for Multi-versions of Revit")]
+[assembly: AssemblyTitle("Revit Database Manager")]
 [assembly: AssemblyDescription("The RevitDBManager tool can be used to synchronize data between a Microsoft Access.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("RevitDBManager")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2013")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2015")]
 [assembly: AssemblyTrademark("Jinsol Kim")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2016.0.1.1")]
-[assembly: AssemblyFileVersion("2016.0.1.1")]
+[assembly: AssemblyVersion("2013.0.1.1")]
+[assembly: AssemblyFileVersion("2013.0.1.1")]

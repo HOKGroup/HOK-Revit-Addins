@@ -1,11 +1,17 @@
-HOK KnowledgeNet BIM Resources (Must be inside HOK firewall)
-http://www.knowledgenet.hok.com/BIM%20Resources/SiteMap.htm
-HOK KnowledgeNet BIM Standards (Must be inside HOK firewall)
-http://www.knowledgenet.hok.com/BIM%20Resources/BIMStandards/HOK%20BIM%20Standards.pdf
+Email Help and Support
+mailto:helpdesk@hok.com
+-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
+HOK buildingSMART Home (Must be inside HOK firewall)
+https://hub.hok.com/buildingsmart/Pages/default.aspx
+HOK BIM Standards (Must be inside HOK firewall)
+https://hub.hok.com/buildingsmart/Standards/Home.aspx
 HOK BIM Solutions
 http://hokbimsolutions.blogspot.com/
-HOK Training Videos
-http://www.knowledgenet.hok.com/BIM%20Resources/Videos/TrainingVideos.asp
+HOK Training 
+https://hub.hok.com/buildingsmart/Education/Home.aspx
+HOK Global eTraining
+https://www.globaletraining.net/#/login
 HOK rGuide Library
 http://hok.rguidelibrary.com/LoginForm.spr
 --------------------------------------------------------------------------------------------------------------------------------------
@@ -13,11 +19,13 @@ http://hok.rguidelibrary.com/LoginForm.spr
 Autodesk User Group International (AUGI)
 http://www.augi.com/
 Autodesk Revit Site
-http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=3781831
-Autodesk Discussion Groups
-http://discussion.autodesk.com/index.jspa
+http://www.autodesk.com/products/autodesk-revit-family/overview
+Autodesk 360
+https://360.autodesk.com/Login
+Autodesk Community
+http://forums.autodesk.com/
 Autodesk Labs
-http://labs.autodesk.com/
+https://beta.autodesk.com/callout/?callid=73A1E2A95B1848FC8E4FE48D12A4D95A
 --------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------
 dRofus Install Instructions:
@@ -28,5 +36,5 @@ Email Help
 Email Help
 --------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------
-Version 2013-02-26
+Version 2015-07-09
 ------------------

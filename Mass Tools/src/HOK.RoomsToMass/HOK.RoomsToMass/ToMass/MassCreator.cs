@@ -646,7 +646,11 @@ namespace HOK.RoomsToMass.ToMass
 
                 if (null != topFace)
                 {
+#if RELEASE2016
+                    Dimension dimension = fdoc.FamilyCreate.NewAlignment(FindView(fdoc, "South"), FindLevel(fdoc, "Level 2").GetPlaneReference(), topFace.Reference);
+#else
                     Dimension dimension = fdoc.FamilyCreate.NewAlignment(FindView(fdoc, "South"), FindLevel(fdoc, "Level 2").PlaneReference, topFace.Reference);
+#endif
                     dimension.IsLocked = true;
                 }
             }

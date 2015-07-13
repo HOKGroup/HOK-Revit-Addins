@@ -125,22 +125,14 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\hoklogo.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Images\hoklogo.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\checkbox_no.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Images\checkbox_yes.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Images\checkbox_no.png" />
+    <Resource Include="Images\checkbox_yes.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\edit_copy.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Images\edit_copy.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

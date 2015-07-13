@@ -27,7 +27,7 @@ namespace HOK.ViewAnalysis
             instanceId = instance.Id.IntegerValue;
 #if RELEASE2013
             linkedDocument = instance.Document;
-#elif RELEASE2014 || RELEASE2015
+#elif RELEASE2014 || RELEASE2015 ||RELEASE2016
             linkedDocument = instance.GetLinkDocument();
 #endif
             documentTitle = linkedDocument.Title;

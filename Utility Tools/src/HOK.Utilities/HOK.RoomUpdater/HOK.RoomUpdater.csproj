@@ -129,14 +129,10 @@
     <Resource Include="Images\hoklogo.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\arrow_down.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Images\arrow_down.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\arrow_up.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    <Resource Include="Images\arrow_up.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

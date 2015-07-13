@@ -216,6 +216,7 @@ namespace HOK.BetaToolsManager
 
                             dictionary.Add(tool, tp);
                             break;
+#if RELEASE2015||RELEASE2016
                         case ToolEnum.LEEDView:
                             tp.ToolName = "LEED View Analysis";
                             tp.DllName = "HOK.ViewAnalysis.dll";
@@ -228,6 +229,7 @@ namespace HOK.BetaToolsManager
 
                             dictionary.Add(tool, tp);
                             break;
+#endif
                         case ToolEnum.Utility:
                             tp.ToolName = "Utility Tools";
                             tp.DllName = "HOK.Utilities.dll";
@@ -237,18 +239,6 @@ namespace HOK.BetaToolsManager
                             tp.InstallExist = File.Exists(tp.InstallPath);
                             if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("height.png");
-
-                            dictionary.Add(tool, tp);
-                            break;
-                        case ToolEnum.ModelManager:
-                            tp.ToolName = "Model Manager";
-                            tp.DllName = "HOK.ModelManager.dll";
-                            tp.BetaPath = betaDirectory + tp.DllName;
-                            tp.BetaExist = File.Exists(tp.BetaPath);
-                            tp.InstallPath = installDirectory + tp.DllName;
-                            tp.InstallExist = File.Exists(tp.InstallPath);
-                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
-                            tp.ToolIcon = ImageUtil.LoadBitmapImage("project.png");
 
                             dictionary.Add(tool, tp);
                             break;
@@ -263,10 +253,7 @@ namespace HOK.BetaToolsManager
                             tp.ToolIcon = ImageUtil.LoadBitmapImage("color32.png");
                             dictionary.Add(tool, tp);
                             break;
-                        case ToolEnum.SmartBCF:
-                            
-                            break;
-
+                       
                     }
                 }
             }
@@ -361,28 +348,6 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("HOK.ViewDepth.dll");
                         fileNames.Add("HOK.WorksetView.dll");
                         fileNames.Add("HOK.CameraDuplicator.dll");
-                        break;
-                    case ToolEnum.ModelManager:
-                        fileNames.Add("HOK.ModelManager.dll");
-                        fileNames.Add("Google.Apis.Auth.dll");
-                        fileNames.Add("Google.Apis.Auth.PlatformServices.dll");
-                        fileNames.Add("Google.Apis.Core.dll");
-                        fileNames.Add("Google.Apis.dll");
-                        fileNames.Add("Google.Apis.Drive.v2.dll");
-                        fileNames.Add("Google.Apis.PlatformServices.dll");
-                        fileNames.Add("Google.GData.Client.dll");
-                        fileNames.Add("Google.GData.Extensions.dll");
-                        fileNames.Add("Google.GData.Spreadsheets.dll");
-                        fileNames.Add("log4net.dll");
-                        fileNames.Add("Microsoft.Threading.Tasks.dll");
-                        fileNames.Add("Microsoft.Threading.Tasks.Extensions.Desktop.dll");
-                        fileNames.Add("Microsoft.Threading.Tasks.Extensions.dll");
-                        fileNames.Add("Newtonsoft.Json.dll");
-                        fileNames.Add("System.Net.Http.Extensions.dll");
-                        fileNames.Add("System.Net.Http.Primitives.dll");
-                        fileNames.Add("Zlib.Portable.dll");
-                        fileNames.Add("Resources\\client_secrets_ProjectReplicator.json");
-                        fileNames.Add("Resources\\HOK Project Replicator.p12");
                         break;
                     case ToolEnum.ColorEditor:
                         fileNames.Add("HOK.ColorSchemeEditor.dll");

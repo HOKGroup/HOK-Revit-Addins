@@ -99,4 +99,20 @@ namespace HOK.SmartBCF
         }
 
     }
+
+
+    public static class AbortFlag
+    {
+        private static bool abortFlag = false;
+
+        public static bool GetAbortFlag()
+        {
+            return abortFlag;
+        }
+
+        public static void SetAbortFlag(bool abort)
+        {
+            abortFlag = abort;
+        }
+    }
 }

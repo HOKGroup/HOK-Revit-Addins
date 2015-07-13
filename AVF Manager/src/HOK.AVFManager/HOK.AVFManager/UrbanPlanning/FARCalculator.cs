@@ -224,7 +224,11 @@ namespace HOK.AVFManager.UrbanPlanning
                             CurveArray curveArray = new CurveArray();
                             foreach (Autodesk.Revit.DB.BoundarySegment boundarySegment in boundarySegments)
                             {
-                                Curve curve = boundarySegment.Curve;
+#if RELEASE2016
+                                Curve curve = boundarySegment.GetCurve();
+#else
+                                 Curve curve = boundarySegment.Curve;
+#endif
                                 curveArray.Append(curve);
                             }
                             curveArrArray.Append(curveArray);

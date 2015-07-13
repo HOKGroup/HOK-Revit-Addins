@@ -71,7 +71,7 @@ namespace HOK.SmartBCF.Walker
                     {
                         bcfProjectId = textBoxId.Text;
                         sharedLink = FileManager.GetSharedLinkAddress(bcfProjectId);
-                        googleFolders = FileManager.CreateDefaultFolders(textBoxId.Text);
+                        googleFolders = FileManager.FindGoogleFolders(textBoxId.Text);
                     }
                 }
                 ImportBCFWindow importWindow = new ImportBCFWindow(googleFolders);
@@ -88,11 +88,15 @@ namespace HOK.SmartBCF.Walker
                         }
                     }
                     LinkedBcfFileInfo fileInfo = importWindow.BCFFileInfo;
-                    
+
                     dataGridBCFs.ItemsSource = null;
                     linkedBCFs.Add(fileInfo);
                     linkedBCFs = linkedBCFs.OrderBy(o => o.BCFName).ToList();
                     dataGridBCFs.ItemsSource = linkedBCFs;
+                    importWindow.Close();
+                }
+                else
+                {
                     importWindow.Close();
                 }
             }
@@ -112,7 +116,7 @@ namespace HOK.SmartBCF.Walker
                 {
                     if (null == googleFolders)
                     {
-                        googleFolders = FileManager.CreateDefaultFolders(bcfProjectId);
+                        googleFolders = FileManager.FindGoogleFolders(bcfProjectId);
                     }
 
                     if (null != googleFolders)
@@ -127,7 +131,10 @@ namespace HOK.SmartBCF.Walker
                             {
                                 if (info.IsSelected)
                                 {
-                                    LinkedBcfFileInfo linkedBCF = new LinkedBcfFileInfo(info.SheetTitle, info.SpreadsheetId, sharedLink, bcfProjectId, googleFolders.RootTitle, bcfProjectId);
+                                    OnlineBCFInfo uploadedBCF = FileManager.UploadOnlineBCF(googleFolders, info);
+                                    string bcfName = uploadedBCF.SheetTitle.Replace("_Markup.csv", "");
+
+                                    LinkedBcfFileInfo linkedBCF = new LinkedBcfFileInfo(bcfName, uploadedBCF.MarkupSheetId, uploadedBCF.ViewpointSheetId, sharedLink, googleFolders.RootTitle, bcfProjectId);
                                     dataGridBCFs.ItemsSource = null;
                                     linkedBCFs.Add(linkedBCF);
                                     linkedBCFs = linkedBCFs.OrderBy(o => o.BCFName).ToList();
@@ -179,9 +186,9 @@ namespace HOK.SmartBCF.Walker
                 bcfFileDictionary = new Dictionary<string, LinkedBcfFileInfo>();
                 foreach (LinkedBcfFileInfo fileInfo in linkedBCFs)
                 {
-                    if (!bcfFileDictionary.ContainsKey(fileInfo.BCFFileId))
+                    if (!bcfFileDictionary.ContainsKey(fileInfo.MarkupFileId))
                     {
-                        bcfFileDictionary.Add(fileInfo.BCFFileId, fileInfo);
+                        bcfFileDictionary.Add(fileInfo.MarkupFileId, fileInfo);
                     }
                 }
                 this.DialogResult = true;
@@ -194,21 +201,7 @@ namespace HOK.SmartBCF.Walker
 
     }
 
-    public class LinkedBCF
-    {
-        private string bcfTitle = "";
-        private string sharedLink = "";
-        private FileHolders fileHolders = null;
-
-        public string BCFTitle { get { return bcfTitle; } set { bcfTitle = value; } }
-        public string SharedLink { get { return sharedLink; } set { sharedLink = value; } }
-        public FileHolders FilesInfo { get { return fileHolders; } set { fileHolders = value; } }
-        
-        public LinkedBCF()
-        {
-
-        }
-    }
+    
 
     public class SortableObservableCollection<T> : ObservableCollection<T>
     {
