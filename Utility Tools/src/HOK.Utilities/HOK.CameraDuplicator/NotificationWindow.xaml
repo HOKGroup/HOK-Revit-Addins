@@ -1,0 +1,46 @@
+﻿<Window x:Class="HOK.CameraDuplicator.NotificationWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Height="400" Width="500" MinHeight="400" MinWidth="500" Title="Missing Information" Icon="Images/hoklogo.ico" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        
+        <Button x:Name="buttonClose" Content="Close" HorizontalAlignment="Right" Margin="0,15,15,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Click="buttonClose_Click"/>
+        <GroupBox Header="Skipped Views" HorizontalAlignment="Stretch" Margin="7,0,7,0" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition  Height="40"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Content="Mapping items cannot be found in the recipient model." HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top"/>
+                <DataGrid x:Name="dataGridMissing" HorizontalAlignment="Stretch" Margin="10" Grid.Row="1" VerticalAlignment="Stretch" GridLinesVisibility="None" HeadersVisibility="All">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="View Name" Width="1*" Binding="{Binding ViewName}"/>
+                        <DataGridTextColumn Header="Mapping Type" Width="1*" Binding="{Binding MissingType}"/>
+                        <DataGridTextColumn Header="Item Name" Width="1*" Binding="{Binding ItemName}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>

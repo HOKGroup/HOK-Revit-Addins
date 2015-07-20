@@ -9,112 +9,141 @@ using Autodesk.Revit.DB.ExtensibleStorage;
 
 namespace HOK.CameraDuplicator
 {
-    public static class CameraDataStorageUtil
+    public static class ViewConfigDataStorageUtil
     {
-        private static Guid schemaId = new Guid("D39F4422-82B2-478A-A658-16C68B66C822");
-        private static Schema m_Schema = Schema.Lookup(schemaId);
+        private static Guid schemaId = new Guid("0EC8C23E-A71F-4DD8-9834-FB284CB4D969");
+        private static Guid subSchemaId = new Guid("15BCCA65-4C98-4E12-9408-395AF0D8A91E");
+        private static Schema m_schema = null;
+        private static Schema subSchema = null;
 
+        private static string s_WorksetVisibility = "WorksetVisibility"; //apply workset visibility
+        private static string s_MapItems = "MapItems"; //sub entity name
         private static string s_SourceModelId = "SourceModelId";
-        private static string s_SourceViewId = "SourceViewId";
         private static string s_RecipientModelId = "RecipientModelId";
-        private static string s_RecipientViewId = "RecipientViewId";
+        private static string s_MapItemType = "MapItemType";
+        private static string s_SourceItemId = "SourceItemId";
+        private static string s_RecipientItemId = "RecipientItemId";
+        private static string s_SourceItemName = "SourceItemName";
+        private static string s_RecipientItemName = "RecipientItemName";
 
-        public static List<CameraViewMap> GetCameraViewMap(Document doc)
+        public static ViewConfiguration GetViewConfiguration(Document doc)
         {
-            List<CameraViewMap> viewMapList = new List<CameraViewMap>();
+            ViewConfiguration viewConfig = new ViewConfiguration();
             try
             {
-                if (null == m_Schema)
+                if (null == m_schema)
                 {
-                    m_Schema = CreateSchema();
+                    m_schema = CreateSchema();
                 }
 
-                if (null != m_Schema)
+                if (null != m_schema)
                 {
-                    IList<DataStorage> savedStorage = GetCameraViewMapStorage(doc, m_Schema);
+                    IList<DataStorage> savedStorage = GetViewConfigurationStorage(doc, m_schema);
                     if (savedStorage.Count > 0)
                     {
-                        foreach (DataStorage ds in savedStorage)
+                        DataStorage storage = savedStorage.First();
+                        Entity entity = storage.GetEntity(m_schema);
+                        viewConfig.ApplyWorksetVisibility = entity.Get<bool>(m_schema.GetField(s_WorksetVisibility));
+
+                        List<MapItemInfo> mapItems = new List<MapItemInfo>();
+                        IList<Entity> subEntities = entity.Get<IList<Entity>>(m_schema.GetField(s_MapItems));
+                        foreach (Entity subE in subEntities)
                         {
-                            Entity entity = ds.GetEntity(m_Schema);
-                            string sModelId = entity.Get<string>(m_Schema.GetField(s_SourceModelId));
-                            int sViewId = entity.Get<int>(m_Schema.GetField(s_SourceViewId));
-                            string rModelId = entity.Get<string>(m_Schema.GetField(s_RecipientModelId));
-                            int rViewId = entity.Get<int>(m_Schema.GetField(s_RecipientViewId));
+                            MapItemInfo mapItem = new MapItemInfo();
+                            mapItem.SourceModelId = subE.Get<string>(subSchema.GetField(s_SourceModelId));
+                            mapItem.RecipientModelId = subE.Get<string>(subSchema.GetField(s_RecipientModelId));
+                            mapItem.MapItemType = (MapType)Enum.Parse(typeof(MapType), subE.Get<string>(subSchema.GetField(s_MapItemType)));
+                            mapItem.SourceItemId = subE.Get<int>(subSchema.GetField(s_SourceItemId));
+                            mapItem.RecipientItemId = subE.Get<int>(subSchema.GetField(s_RecipientItemId));
+                            mapItem.SourceItemName = subE.Get<string>(subSchema.GetField(s_SourceItemName));
+                            mapItem.RecipientItemName = subE.Get<string>(subSchema.GetField(s_RecipientItemName));
+                            
+                            mapItems.Add(mapItem);
+                        }
+                        viewConfig.MapItems = mapItems;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get view configuration.\n" + ex.Message, "Get View Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return viewConfig;
+        }
 
-                            CameraViewMap map = new CameraViewMap();
-                            map.SourceModelId = sModelId;
-                            map.SourceViewId = sViewId;
-                            map.RecipientModelId = rModelId;
-                            map.RecipientViewId = rViewId;
+        public static bool StoreViewConfiguration(Document doc, ViewConfiguration vc)
+        {
+            bool stored = false;
+            try
+            {
+                if (null == m_schema)
+                {
+                    m_schema = CreateSchema();
+                }
 
-                            viewMapList.Add(map);
+                if (null != m_schema)
+                {
+                    IList<DataStorage> savedStorage = GetViewConfigurationStorage(doc, m_schema);
+                    if (savedStorage.Count > 0)
+                    {
+                        using (Transaction trans = new Transaction(doc))
+                        {
+                            trans.Start("Delete Storage");
+                            try
+                            {
+                                foreach (DataStorage storage in savedStorage)
+                                {
+                                    doc.Delete(storage.Id);
+                                }
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.RollBack();
+                                MessageBox.Show("Failed to delete data storage for mapping items.\n" + ex.Message, "Delete Data Storage", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            }
+                        }
+                    }
+
+                    using (Transaction trans = new Transaction(doc))
+                    {
+                        trans.Start("Save Storage");
+                        try
+                        {
+                            DataStorage storage = DataStorage.Create(doc);
+                            Entity entity = new Entity(schemaId);
+                            entity.Set<bool>(s_WorksetVisibility, vc.ApplyWorksetVisibility);
+
+                            List<Entity> subEntities = new List<Entity>();
+                            foreach (MapItemInfo mapItemInfo in vc.MapItems)
+                            {
+                                Entity subEntity = new Entity(subSchemaId);
+                                subEntity.Set<string>(s_SourceModelId, mapItemInfo.SourceModelId);
+                                subEntity.Set<string>(s_RecipientModelId, mapItemInfo.RecipientModelId);
+                                subEntity.Set<string>(s_MapItemType, mapItemInfo.MapItemType.ToString());
+                                subEntity.Set<int>(s_SourceItemId, mapItemInfo.SourceItemId);
+                                subEntity.Set<int>(s_RecipientItemId, mapItemInfo.RecipientItemId);
+                                subEntity.Set<string>(s_SourceItemName, mapItemInfo.SourceItemName);
+                                subEntity.Set<string>(s_RecipientItemName, mapItemInfo.RecipientItemName);
+                                subEntities.Add(subEntity);
+                            }
+
+                            entity.Set<IList<Entity>>(s_MapItems, subEntities);
+                            storage.SetEntity(entity);
+                            trans.Commit();
+                            stored = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            trans.RollBack();
+                            MessageBox.Show("Failed to save mapping items.\n" + ex.Message, "Store Mapping Information", MessageBoxButton.OK, MessageBoxImage.Warning);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to get camera view map.\n" + ex.Message, "Get Camera View Map", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return viewMapList;
-        }
-
-        public static bool StoreCameraViewMap(Document doc, List<CameraViewMap> viewMapList)
-        {
-            bool stored = false;
-            if (null == m_Schema)
-            {
-                m_Schema = CreateSchema();
-            }
-
-            if (null != m_Schema)
-            {
-                IList<DataStorage> savedStorage = GetCameraViewMapStorage(doc, m_Schema);
-                if (savedStorage.Count > 0)
-                {
-                    using (Transaction trans = new Transaction(doc))
-                    {
-                        trans.Start("Delete Storage");
-                        try
-                        {
-                            foreach (DataStorage storage in savedStorage)
-                            {
-                                doc.Delete(storage.Id);
-                            }
-                            trans.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            trans.RollBack();
-                            MessageBox.Show("Failed to delete data storage for model Id.\n" + ex.Message, "Delete Data Storage", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        }
-                    }
-                }
-
-                using (Transaction trans = new Transaction(doc))
-                {
-                    trans.Start("Save Storage");
-                    try
-                    {
-                        foreach (CameraViewMap vMap in viewMapList)
-                        {
-                            DataStorage storage = DataStorage.Create(doc);
-                            Entity entity = new Entity(schemaId);
-                            entity.Set<string>(s_SourceModelId, vMap.SourceModelId);
-                            entity.Set<int>(s_SourceViewId, vMap.SourceViewId);
-                            entity.Set<string>(s_RecipientModelId, vMap.RecipientModelId);
-                            entity.Set<int>(s_RecipientViewId, vMap.RecipientViewId);
-                            storage.SetEntity(entity);
-                        }
-                        trans.Commit();
-                        stored = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Failed to save model Id.\n" + ex.Message, "Store Model Id", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
-                }
+                MessageBox.Show("Failed to store model Id.\n" + ex.Message, "Store Model Id", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return stored;
         }
@@ -124,12 +153,23 @@ namespace HOK.CameraDuplicator
             Schema schema = null;
             try
             {
+                SchemaBuilder subBuilder = new SchemaBuilder(subSchemaId);
+                subBuilder.SetSchemaName("MapItemInfoList");
+                subBuilder.AddSimpleField(s_SourceModelId, typeof(string));
+                subBuilder.AddSimpleField(s_RecipientModelId, typeof(string));
+                subBuilder.AddSimpleField(s_MapItemType, typeof(string));
+                subBuilder.AddSimpleField(s_SourceItemId, typeof(int));
+                subBuilder.AddSimpleField(s_RecipientItemId, typeof(int));
+                subBuilder.AddSimpleField(s_SourceItemName, typeof(string));
+                subBuilder.AddSimpleField(s_RecipientItemName, typeof(string));
+                subSchema = subBuilder.Finish();
+
                 SchemaBuilder sBuilder = new SchemaBuilder(schemaId);
-                sBuilder.SetSchemaName("CameraViewInfoMap");
-                sBuilder.AddSimpleField(s_SourceModelId, typeof(string));
-                sBuilder.AddSimpleField(s_SourceViewId, typeof(int));
-                sBuilder.AddSimpleField(s_RecipientModelId, typeof(string));
-                sBuilder.AddSimpleField(s_RecipientViewId, typeof(int));
+                sBuilder.SetSchemaName("ViewConfiguration");
+                sBuilder.AddSimpleField(s_WorksetVisibility, typeof(bool));
+                FieldBuilder fBuilder = sBuilder.AddArrayField(s_MapItems, typeof(Entity));
+                fBuilder.SetSubSchemaGUID(subSchemaId);
+
                 schema = sBuilder.Finish();
             }
             catch (Exception ex)
@@ -139,7 +179,7 @@ namespace HOK.CameraDuplicator
             return schema;
         }
 
-        private static IList<DataStorage> GetCameraViewMapStorage(Document doc, Schema schema)
+        private static IList<DataStorage> GetViewConfigurationStorage(Document doc, Schema schema)
         {
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             collector.OfClass(typeof(DataStorage));

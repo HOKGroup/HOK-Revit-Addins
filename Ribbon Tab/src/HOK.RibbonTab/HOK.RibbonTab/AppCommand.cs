@@ -185,9 +185,9 @@ namespace HOK.RibbonTab
 
                     if (File.Exists(currentDirectory + "/HOK.CameraDuplicator.dll"))
                     {
-                        PushButton pb25 = splitButton.AddPushButton(new PushButtonData("Camera Duplicator", "Camera Duplicator", currentDirectory + "/HOK.CameraDuplicator.dll", "HOK.CameraDuplicator.CameraCommand")) as PushButton;
+                        PushButton pb25 = splitButton.AddPushButton(new PushButtonData("View Mover", "View Mover", currentDirectory + "/HOK.CameraDuplicator.dll", "HOK.CameraDuplicator.CameraCommand")) as PushButton;
                         pb25.LargeImage = LoadBitmapImage(assembly, "cameraview.png");
-                        pb25.ToolTip = "Duplicate camera views from one project to the other.";
+                        pb25.ToolTip = "Duplicate camera views of plan views from one project to the other.";
                         AddToolTips(pb25);
                         utilityExist = true;
                     }

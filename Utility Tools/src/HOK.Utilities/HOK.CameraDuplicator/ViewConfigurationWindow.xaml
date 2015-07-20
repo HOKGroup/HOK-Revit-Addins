@@ -1,0 +1,119 @@
+﻿<Window x:Class="HOK.CameraDuplicator.ViewConfigurationWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Icon="Images/hoklogo.ico" Title="View Configuration" ScrollViewer.CanContentScroll="True" MinHeight="850" MinWidth="700" Height="850" Width="700" UseLayoutRounding="True" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition/>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Header="Configuration Type" HorizontalAlignment="Stretch" Margin="7,0,7,0" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <RadioButton x:Name="radioButtonLevel" Content="Level" HorizontalAlignment="Center" Margin="0,15,0,0" VerticalAlignment="Top" Checked="radioButtonLevel_Checked" GroupName="configurationType"/>
+                <RadioButton Grid.Column="1" x:Name="radioButtonViewTemplate" Content="View Template" HorizontalAlignment="Center" Margin="0,15,0,0" VerticalAlignment="Top" Checked="radioButtonViewTemplate_Checked" GroupName="configurationType"/>
+                <RadioButton Grid.Column="2" x:Name="radioButtonScopeBox" Content="Scope Box" HorizontalAlignment="Center" Margin="0,15,0,0" VerticalAlignment="Top" GroupName="configurationType" Checked="radioButtonScopeBox_Checked"/>
+                <RadioButton Grid.Column="3" x:Name="radioButtonWorkset" Content="Workset" HorizontalAlignment="Center" Margin="0,15,0,0" VerticalAlignment="Top" GroupName="configurationType" Checked="radioButtonWorkset_Checked"/>
+                <RadioButton Grid.Column="4" x:Name="radioButtonPhase" Content="Phase" HorizontalAlignment="Center" Margin="0,15,0,0" VerticalAlignment="Top" GroupName="configurationType" Checked="radioButtonPhase_Checked"/>
+                <RadioButton Grid.Column="5" x:Name="radioButtonAreaScheme" Content="Area Scheme" HorizontalAlignment="Center" Margin="0,15,0,0" VerticalAlignment="Top" GroupName="configurationType" Checked="radioButtonAreaScheme_Checked"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Elements Mapping" HorizontalAlignment="Stretch" Margin="7,0,7,0" Grid.Row="1" VerticalAlignment="Stretch">
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="0.7*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Source:" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelSource" Content="Model Name" HorizontalAlignment="Left" Margin="60,10,0,0" VerticalAlignment="Top"/>
+                <Label Grid.Column="1" Content="Target:" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top"/>
+                <Label x:Name="labelTarget" Grid.Column="1" Content="Model Name" HorizontalAlignment="Left" Margin="60,10,0,0" VerticalAlignment="Top"/>
+                <DataGrid x:Name="dataGridSource" HorizontalAlignment="Stretch" Margin="15,0,15,0" Grid.Row="1" VerticalAlignment="Stretch" GridLinesVisibility="None" SelectionChanged="dataGridSource_SelectionChanged">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Item Name" Width="1*" Binding="{Binding ItemName}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <DataGrid x:Name="dataGridRecipient" HorizontalAlignment="Stretch" Margin="15,0,15,0" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" GridLinesVisibility="None">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Enabled}" Value="true">
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Enabled}" Value="false">
+                                    <Setter Property="Foreground" Value="Gray"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Item Name" Width="1*" Binding="{Binding ItemName}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Button x:Name="buttonAdd" HorizontalAlignment="Center" Margin="0,20,0,0" Grid.Row="2" VerticalAlignment="Top" Width="145" Height="25" Grid.ColumnSpan="2" Click="buttonAdd_Click">
+                    <StackPanel Orientation="Horizontal" Width="110">
+                        <Image Source="Images/arrow_down.png" />
+                        <TextBlock Margin="20,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center">Add Links</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="buttonRemove" HorizontalAlignment="Center" Margin="0,5,0,0" Grid.Row="3" VerticalAlignment="Top" Width="145" Height="25" Grid.ColumnSpan="2" Click="buttonRemove_Click">
+                    <StackPanel Orientation="Horizontal" Width="110">
+                        <Image Source="Images/arrow_up.png" />
+                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center">Remove Links</TextBlock>
+                    </StackPanel>
+                </Button>
+                <DataGrid x:Name="dataGridMap" HorizontalAlignment="Stretch" Margin="15,0,15,10" Grid.Row="4" VerticalAlignment="Stretch" Grid.ColumnSpan="2" GridLinesVisibility="None">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Source Item" Width="1*" Binding="{Binding SourceItemName}"/>
+                        <DataGridTextColumn Header="Recipient Item" Width="1*" Binding="{Binding RecipientItemName}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="buttonApply" Content="Apply" HorizontalAlignment="Right" Margin="0,13,95,0" Grid.Row="3" VerticalAlignment="Top" Height="27" Width="75" Click="buttonApply_Click"/>
+        <Button x:Name="buttonCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,13,15,0" Grid.Row="3" VerticalAlignment="Top" Height="27" Width="75" Click="buttonCancel_Click"/>
+        <GroupBox Header="Options" HorizontalAlignment="Stretch" Margin="7,0,7,0" Grid.Row="2" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+
+                </Grid.RowDefinitions>
+                <CheckBox x:Name="checkBoxWorkset" Content="Copy Workset Visibility from source views" HorizontalAlignment="Left" Margin="20,15,0,0" VerticalAlignment="Top" Checked="checkBoxWorkset_Checked" Unchecked="checkBoxWorkset_Unchecked"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>

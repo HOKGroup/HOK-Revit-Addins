@@ -431,11 +431,11 @@ namespace HOK.BetaToolsManager
                             cameraPath = GetTempInstallPath(cameraPath);
                             if (File.Exists(cameraPath))
                             {
-                                if (!utilityButtons.ContainsKey("Camera Duplicator"))
+                                if (!utilityButtons.ContainsKey("View Mover"))
                                 {
-                                    PushButton cameraButton = utilitySplitButton.AddPushButton(new PushButtonData("Camera Duplicator", "Camera Duplicator", cameraPath, "HOK.CameraDuplicator.CameraCommand")) as PushButton;
+                                    PushButton cameraButton = utilitySplitButton.AddPushButton(new PushButtonData("View Mover", "View Mover", cameraPath, "HOK.CameraDuplicator.CameraCommand")) as PushButton;
                                     cameraButton.LargeImage = ImageUtil.LoadBitmapImage("cameraview.png");
-                                    cameraButton.ToolTip = "Duplicate camera views from one project to the other.";
+                                    cameraButton.ToolTip = "Duplicate camera views and plan views from one project to the other.";
                                     AddToolTips(cameraButton);
                                 }
                                 else
