@@ -1,3 +1,7 @@
+View Mover (previously Camera Duplicator) v.0.1.1
+New
+-In addition to camera views, duplicate plan views with mapping configuration.
+
 Camera Duplicator v.0.1.0
 New 
 -Duplicate camera views from one project to another with orientation, display style, crop box, section box, and parameter values.
