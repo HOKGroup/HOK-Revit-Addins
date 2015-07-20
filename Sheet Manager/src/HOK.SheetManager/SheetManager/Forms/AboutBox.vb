@@ -28,7 +28,7 @@
         Dim name As Microsoft.Office.Interop.Outlook.NameSpace = outlookApplication.GetNamespace("MAPI")
         Dim folderInbox As Microsoft.Office.Interop.Outlook.MAPIFolder = name.GetDefaultFolder(Microsoft.Office.Interop.Outlook.OlDefaultFolders.olFolderInbox)
         Dim mailItem As Microsoft.Office.Interop.Outlook.MailItem = DirectCast(outlookApplication.CreateItem(Microsoft.Office.Interop.Outlook.OlItemType.olMailItem), Microsoft.Office.Interop.Outlook.MailItem)
-        mailItem.Subject = "Revit 2013 Problem Report: Sheet Manager"
+        mailItem.Subject = "Revit Problem Report: Sheet Manager"
         mailItem.Body = "**** This email will go to the Firmwide [_HOK BIM Support Request] team. ****" & vbCrLf & "What office are you in?" & vbCrLf & "What project are you working on?" & vbCrLf & "Describe the problem:"
         mailItem.Recipients.Add("jinsol.kim@hok.com")
         mailItem.Display(False)

@@ -242,8 +242,12 @@ Public Class form_SheetManager
             For Each row As DataRow In m_DataTable.Rows
 
                 Dim sheetNumber As String = row("Sheet Number").ToString
-                Dim sheetName As String = row("Sheet Name").ToString
+                Dim sheetName As String = ""
 
+                If m_DataTable.Columns.Contains("Sheet Name") Then
+                    sheetName = row("Sheet Name").ToString
+                End If
+          
                 'Check for empty sheet number, which can arise with Excel case
                 If sheetNumber = "" Then
                     Me.ProgressBar1.Increment(1)
@@ -456,7 +460,7 @@ Public Class form_SheetManager
 
         ' Tell the user if no discrepancies found
         If Me.TreeViewSheets.Nodes.Count < 1 Then
-            ShowRevitTaskDialog("SHeet Manager", "No Discrepancies Found!", "")
+            ShowRevitTaskDialog("Sheet Manager", "No Discrepancies Found!", "")
         End If
 
         ' Show the lower buttons

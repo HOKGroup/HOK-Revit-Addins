@@ -8,14 +8,14 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("Sheet Manager for Revit (multi-version)")> 
+<Assembly: AssemblyTitle("Sheet Manager for Revit")> 
 <Assembly: AssemblyDescription("Manage and Create Sheets in Revit")> 
 <Assembly: AssemblyCompany("HOK")> 
 <Assembly: AssemblyProduct("Sheet Manager for Muti-versions of Revit")> 
 <Assembly: AssemblyCopyright("Copyright © HOK 2014")> 
 <Assembly: AssemblyTrademark("Don Rudder, SF BIM Manager")> 
 
-<Assembly: ComVisible(True)> 
+<Assembly: ComVisible(False)> 
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
 <Assembly: Guid("440F379A-938C-4E75-AA89-54CAB65833D9")> 
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("2016.0.1.11")> 
-<Assembly: AssemblyFileVersion("2016.0.1.11")> 
+<Assembly: AssemblyVersion("2016.0.1.12")> 
+<Assembly: AssemblyFileVersion("2016.0.1.12")> 

@@ -304,6 +304,7 @@ Public Class clsUtilityInterop
                 If m_ExcelApp IsNot Nothing Then
                     If m_ExcelWorkbook IsNot Nothing Then
                         m_ExcelWorkbook.Save()
+                        m_ExcelWorkbook.Close()
                     End If
                     If m_ExcelApp IsNot Nothing Then
                         m_ExcelApp.Quit()
