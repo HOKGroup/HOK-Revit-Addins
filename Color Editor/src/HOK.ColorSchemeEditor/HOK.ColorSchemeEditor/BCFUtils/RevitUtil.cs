@@ -454,16 +454,29 @@ namespace HOK.ColorSchemeEditor.BCFUtils
                 {
                     collector = new FilteredElementCollector(doc, instanceIds);
                     List<ElementId> familyInstanceIds = collector.OfClass(typeof(FamilyInstance)).ToElementIds().ToList();
+
+#if RELEASE2015 || RELEASE2016
+                    collector = new FilteredElementCollector(doc, instanceIds);
+                    List<Element> directShapes = collector.OfClass(typeof(DirectShape)).ToElements().ToList();
+#endif
                     if (familyInstanceIds.Count > 0)
                     {
                         //family instance
                         paramDictionary = GetComponentFamilyParameters(doc, category, familyInstanceIds);
                     }
+#if RELEASE2015 || RELEASE2016
+                    else if (directShapes.Count > 0)
+                    {
+                        //direct shape
+                        paramDictionary = GetDirectShapeParameters(doc, category, directShapes);
+                    }
+#endif
                     else
                     {
                         //system family
-                        paramDictionary = GetSystemFamilyParameters(doc, category);
+                            paramDictionary = GetSystemFamilyParameters(doc, category);
                     }
+                    
                 }
             }
             catch (Exception ex)
@@ -565,6 +578,29 @@ namespace HOK.ColorSchemeEditor.BCFUtils
                     }
                 }
 
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get family parameters.\n" + ex.Message, "Get Family Parameters", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return paramDictionary;
+        }
+
+        private static Dictionary<int/*paramId*/, ParameterInfo> GetDirectShapeParameters(Document doc, Category category, List<Element> directShapes)
+        {
+            Dictionary<int, ParameterInfo> paramDictionary = new Dictionary<int, ParameterInfo>();
+            try
+            {
+                Element firstElement = directShapes.First();
+                foreach (Parameter param in firstElement.Parameters)
+                {
+                    string paramName = param.Definition.Name;
+                    if (!paramDictionary.ContainsKey(param.Id.IntegerValue) && !paramName.Contains("Extensions."))
+                    {
+                        ParameterInfo paramInfo = new ParameterInfo(param, true);
+                        paramDictionary.Add(paramInfo.ParamId.IntegerValue, paramInfo);
+                    }
+                }
             }
             catch (Exception ex)
             {

@@ -630,6 +630,7 @@ namespace HOK.BetaToolsManager
                                     PushButton createButton = massButtons["Create Mass"];
                                     createButton.AssemblyName = massTP.TempAssemblyPath;
                                 }
+#if RELEASE2013 || RELEASE2014
                                 if (!massButtons.ContainsKey("Update Data"))
                                 {
                                     PushButton updateButton = massSplitButton.AddPushButton(new PushButtonData("Update Data", "Update Data", massTP.TempAssemblyPath, "HOK.RoomsToMass.DataCommand"));
@@ -642,6 +643,7 @@ namespace HOK.BetaToolsManager
                                     PushButton updateButton = massButtons["Update Data"];
                                     updateButton.AssemblyName = massTP.TempAssemblyPath;
                                 }
+#endif
                                 if (!massButtons.ContainsKey("Mass Commands"))
                                 {
                                     PushButton commandButton = massSplitButton.AddPushButton(new PushButtonData("Mass Commands", "Mass Commands", massTP.TempAssemblyPath, "HOK.RoomsToMass.AssignerCommand"));
@@ -664,11 +666,13 @@ namespace HOK.BetaToolsManager
                                 PushButton createButton = massButtons["Create Mass"];
                                 createButton.Enabled = false;
                             }
+#if RELEASE2013|| RELEASE2014
                             if (massButtons.ContainsKey("Update Data"))
                             {
                                 PushButton updateButton = massButtons["Update Data"];
                                 updateButton.Enabled = false;
                             }
+#endif
                             if (massButtons.ContainsKey("Mass Commands"))
                             {
                                 PushButton commandButton = massButtons["Mass Commands"];

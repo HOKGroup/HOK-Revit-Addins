@@ -311,8 +311,10 @@ namespace HOK.BetaToolsManager
 
                     case ToolEnum.MassTool:
                         fileNames.Add("HOK.RoomsToMass.dll");
+#if RELEASE2013||RELEASE2014
                         fileNames.Add("Resources\\Mass Shared Parameters.txt");
                         fileNames.Add("Resources\\Mass.rfa");
+#endif
                         break;
 
                     case ToolEnum.RevitData:
