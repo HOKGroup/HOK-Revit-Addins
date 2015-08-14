@@ -1,0 +1,145 @@
+﻿<Window x:Class="BCFDBManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="BCF Database Mananger" Height="800" Width="1000" MinWidth="1000" Icon="Images/hoklogo.ico" WindowStartupLocation="CenterScreen" UseLayoutRounding="True">
+    <Window.Resources>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+        </Style>
+        <Style TargetType="{x:Type Image}">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="True">
+                    <Setter Property="Opacity" Value="1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="80"/>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <ToolBarTray  HorizontalAlignment="Stretch" Name="toolBarTray" VerticalAlignment="Stretch" Background="{x:Null}" >
+            <ToolBar Band="1" BandIndex="1" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="50" >
+                <Button Name="buttonNewDB" Click="buttonNewDB_Click">
+                    <StackPanel Orientation="Horizontal" Margin="5,0" >
+                        <Image Margin="0,0,5,0" Source="Images/database_add.png" Height="32" Width="32" Stretch="None"/>
+                        <TextBlock VerticalAlignment="Center">New Database</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="buttonConnectDB" Margin="5,0" Click="buttonConnectDB_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,0,5,0" Source="Images/database_connect.png" Height="32" Width="32" Stretch="None"/>
+                        <TextBlock VerticalAlignment="Center">Connect Database</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="buttonAddBCF" Margin="5,0" IsEnabled="False">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,0,5,0" Height="32" Width="32" Source="Images/document_new.ico"/>
+                        <TextBlock VerticalAlignment="Center">Add BCF</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button Name="buttonConvert" Margin="5,0" IsEnabled="False">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Margin="0,0,5,0" Source="Images/BCFicon32.ico" Height="32" Width="32" Stretch="None"/>
+                        <TextBlock VerticalAlignment="Center">Convert to BCF</TextBlock>
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <GroupBox Header="Database" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" Grid.Row="1">
+            <Grid>
+                <Label Content="Connected DB:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxDB" HorizontalAlignment="Stretch" Height="23" Margin="100,12,15,0" TextWrapping="Wrap" Text="Database Name" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="BCF Selection" HorizontalAlignment="Stretch" Margin="5,0,5,5" Grid.Row="2" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Label Content="BCF File:"  HorizontalAlignment="Left" Margin="20,10,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBoxFile" HorizontalAlignment="Stretch"  Margin="80,14,20,0" VerticalAlignment="Top"  SelectionChanged="comboBoxFile_SelectionChanged"/>
+                <Label Content="Issue Name:" Grid.Column="1"  HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBoxIssue" Grid.Column="1" HorizontalAlignment="Stretch" Margin="100,14,20,0" VerticalAlignment="Top" Grid.ColumnSpan="2" SelectionChanged="comboBoxIssue_SelectionChanged"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Comments" HorizontalAlignment="Stretch" Margin="5,0,5,0" Grid.Row="3" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <DataGrid x:Name="dataGridComments" Grid.Column="1" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="dataGridComments_SelectionChanged" CanUserAddRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Comment" Binding="{Binding Comment1}" Width="1*"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                        <DataGridTextColumn Header="BCF Status" Binding="{Binding VerbalStatus}" Width="100"/>
+                        <DataGridTextColumn Header="Author" Binding="{Binding Author}" Width="100"/>
+                        <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="150"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Image x:Name="imageSnapshot" HorizontalAlignment="Stretch" Margin="10"  VerticalAlignment="Stretch"/>
+                <Button x:Name="buttonAddComment" Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="120" Click="buttonAddComment_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="16" Width="16" Source="Images/comment_add.png"/>
+                        <TextBlock Margin="5,0,0,0">Add Comment</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="buttonEditComment" Grid.Column="1" HorizontalAlignment="Left" Margin="140,0,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="120" Click="buttonEditComment_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="16" Width="16" Source="Images/comment_edit.png" />
+                        <TextBlock Margin="5,0,0,0">Edit Comment</TextBlock>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="buttonDeleteComment" Grid.Column="1" HorizontalAlignment="Left" Margin="270,0,0,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="120" Click="buttonDeleteComment_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Height="16" Width="16" Source="Images/comment_delete.png"/>
+                        <TextBlock Margin="5,0,0,0">Delete Comment</TextBlock>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="buttonClose" Content="Close" HorizontalAlignment="Right" Margin="0,10,15,0" Grid.Row="4" VerticalAlignment="Top" Height="27" Width="75" Click="buttonClose_Click"/>
+        <StatusBar HorizontalAlignment="Stretch" Margin="0" Grid.Row="5" VerticalAlignment="Stretch">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="250"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Text="Ready" Name="statusLable" />
+            </StatusBarItem>
+            <StatusBarItem  Grid.Column="1">
+                <ProgressBar Value="0" Width="140" Height="16" Name="progressBar" Visibility="Hidden" />
+            </StatusBarItem>
+        </StatusBar>
+
+    </Grid>
+</Window>

@@ -1,0 +1,50 @@
+﻿<Window x:Class="BCFDBManager.CommentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Add Comments" Height="500" Width="500" Icon="Images/hoklogo.ico" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <Button x:Name="buttonApply" Content="Apply" HorizontalAlignment="Right" Margin="0,10,10,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Height="27" Click="buttonApply_Click"/>
+        <Button x:Name="buttonCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,10,90,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Height="27" Click="buttonCancel_Click"/>
+    
+        <GroupBox Header="Issue" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
+            <Grid>
+                <Label Content="Title: " HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxTopic" HorizontalAlignment="Stretch" Height="23" Margin="50,8,10,0" TextWrapping="Wrap"  VerticalAlignment="Top" IsReadOnly="True" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Comment" HorizontalAlignment="Stretch" Margin="5,0,5,0" Grid.Row="1" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Content="Comment: " HorizontalAlignment="Left" Margin="42,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxComment" HorizontalAlignment="Stretch" Height="23" Margin="115,12,15,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                <Label Content="Status: " HorizontalAlignment="Left" Margin="62,10,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBoxStatus" HorizontalAlignment="Stretch" Margin="115,12,15,0" Grid.Row="1" VerticalAlignment="Top" Background="{x:Null}" />
+                <Label Content="BCF Status: " HorizontalAlignment="Left" Margin="38,10,0,0" Grid.Row="2" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboboxVerbalStatus" HorizontalAlignment="Stretch" Margin="115,12,15,0" Grid.Row="2" VerticalAlignment="Top" Background="{x:Null}" />
+                <Label Content="Author:" HorizontalAlignment="Left" Margin="61,10,0,0" Grid.Row="3" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxAuthor" Grid.Row="3" HorizontalAlignment="Stretch" Height="23" Margin="115,12,15,0" TextWrapping="Wrap"  VerticalAlignment="Top" IsReadOnly="True"/>
+                <Label Content="Date:" HorizontalAlignment="Left" Margin="73,10,0,0" Grid.Row="4" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxDate" Grid.Row="4" HorizontalAlignment="Stretch" Height="23" Margin="115,12,15,0" TextWrapping="Wrap"  VerticalAlignment="Top" IsReadOnly="True"/>
+                <Label x:Name="labelModifiedAuthor" Content="Modified Author:" HorizontalAlignment="Left" Margin="10,10,0,0" Grid.Row="5" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxModifiedAuthor" Grid.Row="5" HorizontalAlignment="Stretch" Height="23" Margin="115,10,15,0" TextWrapping="Wrap"  VerticalAlignment="Top" IsReadOnly="True"/>
+                <Label x:Name="labelModifiedDate" Content="Modified Date:" HorizontalAlignment="Left" Margin="21,10,0,0" Grid.Row="6" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxModifiedDate" Grid.Row="6" HorizontalAlignment="Stretch" Height="23" Margin="115,10,15,0" TextWrapping="Wrap"  VerticalAlignment="Top" IsReadOnly="True"/>
+                
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+</Window>
