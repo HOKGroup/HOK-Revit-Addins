@@ -1,0 +1,134 @@
+﻿<Window x:Class="HOK.ElementMover.MappingWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Height="600" Width="500" MinHeight="600" MinWidth="600" Icon="Images/hoklogo.ico" Title="Elements Mapping" WindowStartupLocation="CenterScreen" UseLayoutRounding="True" Closing="Window_Closing">
+    <Window.Resources>
+        <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="False" />
+            <Setter Property="IsSelected" Value="{Binding IsInitiallySelected, Mode=OneTime}" />
+            <Setter Property="KeyboardNavigation.AcceptsReturn" Value="True" />
+        </Style>
+        <HierarchicalDataTemplate x:Key="ElementItemTemplate" ItemsSource="{Binding ChildrenNodes, Mode=OneTime}">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Focusable="False" IsChecked="{Binding IsChecked}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Name, Mode=OneTime}" Margin="2,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Matched}" Value="true">
+                                    <Setter Property="Foreground" Value="Black"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Matched}" Value="false">
+                                    <Setter Property="Foreground" Value="Red"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                    <TextBlock.ToolTip>
+                        <ToolTip Visibility="{Binding ToolTipVisibility}">
+                            <TextBlock Text="{Binding ToolTip}"/>
+                        </ToolTip>
+                    </TextBlock.ToolTip>
+                </TextBlock>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="FamilyItemTemplate" ItemsSource="{Binding ChildrenNodes, Mode=OneTime}">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox Focusable="False" IsChecked="{Binding IsChecked}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding Name, Mode=OneTime}" Margin="2,0"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <Style TargetType="{x:Type TabItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TabItem}">
+                        <Grid>
+                            <Border Name="Border" BorderBrush="Gray" BorderThickness="0.5,0.5,0.5,0.5" CornerRadius="4,4,0,0" >
+                                <ContentPresenter x:Name="ContentSite" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="12,4,12,4"/>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="LightGray" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="Transparent" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Select a Revit Link" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
+            <Grid>
+                <Label Content="Source Items from: " HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBoxLink" HorizontalAlignment="Stretch" Margin="130,14,50,0" VerticalAlignment="Top" SelectionChanged="comboBoxLink_SelectionChanged"/>
+            </Grid>
+        </GroupBox>
+        <TabControl HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch">
+            <TabItem Header="Element Mappings">
+                <Grid>
+                    <GroupBox Header="Element Mapping"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="40"/>
+                            </Grid.RowDefinitions>
+                            <TreeView x:Name="treeViewMapping" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneTime}" ItemTemplate="{StaticResource ElementItemTemplate}" HorizontalAlignment="Stretch" Margin="4,10,10,4" VerticalAlignment="Stretch" BorderBrush="#FFC0C4CD" SelectedItemChanged="treeViewMapping_SelectedItemChanged"/>
+                            <Button x:Name="buttonAdd"  HorizontalAlignment="Left" Margin="10,5,0,0" Grid.Row="1" VerticalAlignment="Top" Width="90" Height="25" Click="buttonAdd_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="Images/link_add.png" Stretch="None"/>
+                                    <TextBlock Margin="7,0,0,0">Add Link</TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="buttonRemove"  HorizontalAlignment="Left" Margin="105,5,0,0" Grid.Row="1" VerticalAlignment="Top" Width="105" Height="25" Click="buttonRemove_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="Images/link_break.png" Stretch="None"/>
+                                    <TextBlock Margin="7,0,0,0">Remove Link</TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Family Mappings">
+                <Grid>
+                    <GroupBox Header="Family Mappings" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="40"/>
+                            </Grid.RowDefinitions>
+                            <TreeView x:Name="treeViewFamilyMapping" ItemContainerStyle="{StaticResource TreeViewItemStyle}" ItemsSource="{Binding Mode=OneTime}" ItemTemplate="{StaticResource FamilyItemTemplate}" HorizontalAlignment="Stretch" Margin="4,10,10,4" VerticalAlignment="Stretch" BorderBrush="#FFC0C4CD"/>
+                            <Button x:Name="buttonAddFamily"  HorizontalAlignment="Left" Margin="10,5,0,0" Grid.Row="1" VerticalAlignment="Top" Width="90" Height="25" Click="buttonAddFamily_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="Images/link_add.png" Stretch="None"/>
+                                    <TextBlock Margin="7,0,0,0">Add Link</TextBlock>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="buttonRemoveFamily"  HorizontalAlignment="Left" Margin="105,5,0,0" Grid.Row="1" VerticalAlignment="Top" Width="105" Height="25" Click="buttonRemoveFamily_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="Images/link_break.png" Stretch="None"/>
+                                    <TextBlock Margin="7,0,0,0">Remove Link</TextBlock>
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <Button x:Name="buttonOK" Content="OK" HorizontalAlignment="Right" Margin="0,10,15,0" Grid.Row="2" VerticalAlignment="Top" Width="70" Height="27" Click="buttonOK_Click"/>
+
+    </Grid>
+</Window>

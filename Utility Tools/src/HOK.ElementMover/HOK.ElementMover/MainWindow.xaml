@@ -1,0 +1,104 @@
+﻿<Window x:Class="HOK.ElementMover.MainWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Height="700" Width="500" MinHeight="700" MinWidth="500" Icon="Images/hoklogo.ico" Title="Element Mover" WindowStartupLocation="CenterScreen" UseLayoutRounding="True" Closing="Window_Closing">
+    <Window.Resources>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Linked Models" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" Grid.ColumnSpan="2">
+            <Grid>
+                <Label Content="Linked Model:" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top" />
+                <ComboBox x:Name="comboBoxLinkModel" HorizontalAlignment="Stretch" Margin="105,14,100,0" VerticalAlignment="Top" SelectionChanged="comboBoxLinkModel_SelectionChanged"/>
+                <Button x:Name="buttonLink" Content="Select Link" HorizontalAlignment="Right" Margin="0,14,10,0" VerticalAlignment="Top" Width="79" Click="buttonLink_Click"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Update Existing Elements" HorizontalAlignment="Stretch" Margin="5,0,5,0" Grid.Row="1" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <RadioButton x:Name="radioButtonLocation" Content="Update Location Only" HorizontalAlignment="Left" Margin="15,12,0,0" VerticalAlignment="Top" IsThreeState="True" IsChecked="True"/>
+                <RadioButton x:Name="radioButtonReplace" Grid.Column="1" Content="Replace Elements" HorizontalAlignment="Left" Margin="15,12,0,0" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Model Categories" HorizontalAlignment="Stretch" Margin="5,0,5,0" Grid.Row="2" VerticalAlignment="Stretch" Grid.ColumnSpan="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <DataGrid x:Name="dataGridCategory" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
+                    <DataGrid.Columns>
+                        <DataGridCheckBoxColumn Binding="{Binding Selected}"/>
+                        <DataGridTextColumn Header="Category Name" Binding="{Binding CategoryName}" Width="1*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Number of Elements" Binding="{Binding ItemCount}" Width="0.5*" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Button x:Name="buttonAll" HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Top" Height="22" Width="22" Click="buttonAll_Click">
+                    <Button.Content>
+                        <Image Source="Images/checkbox_yes.png" />
+                    </Button.Content>
+                </Button>
+                <Button x:Name="buttonNone" HorizontalAlignment="Left" Margin="35,0,0,0" Grid.Row="1" VerticalAlignment="Top" Height="22" Width="22" Click="buttonNone_Click">
+                    <Button.Content>
+                        <Image Source="Images/checkbox_no.png" />
+                    </Button.Content>
+                </Button>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="buttonClose" Content="Close" HorizontalAlignment="Right" Margin="0,10,15,0" Grid.Row="3" VerticalAlignment="Top" Width="75" Height="27" Click="buttonClose_Click" Grid.Column="1"/>
+        <Button x:Name="buttonDuplicate" HorizontalAlignment="Right" Margin="0,10,95,0" Grid.Row="3" VerticalAlignment="Top" Width="140" Height="27" Click="buttonDuplicate_Click" Grid.ColumnSpan="2">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/copy.png"  Height="16" Width="16"/>
+                <TextBlock Margin="5,0,0,0">Duplicate Elements</TextBlock>
+            </StackPanel>
+        </Button>
+        <Button x:Name="buttonMapping" HorizontalAlignment="Right" Margin="0,10,240,0" Grid.Row="3" VerticalAlignment="Top" Width="130" Height="27" Click="buttonMapping_Click" >
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/mapping.png"  Height="16" Width="16"/>
+                <TextBlock Margin="5,0,0,0"><Run Text="Create Mappings"/></TextBlock>
+            </StackPanel>
+        </Button>
+        <StatusBar HorizontalAlignment="Stretch" Margin="0" Grid.Row="4" VerticalAlignment="Stretch">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem>
+                <TextBlock Text="Ready" Name="statusLable" />
+            </StatusBarItem>
+            <StatusBarItem  Grid.Column="1">
+                <ProgressBar Value="0" Width="140" Height="16" Name="progressBar" Visibility="Hidden" />
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
