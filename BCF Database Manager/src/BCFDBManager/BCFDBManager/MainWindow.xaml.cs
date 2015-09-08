@@ -31,9 +31,6 @@ namespace BCFDBManager
         private Markup selectedMarkup = null;
         private Comment selectedComment = null;
 
-        private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
-        private delegate void UpdateStatusLabelDelegate(System.Windows.DependencyProperty dp, Object value);
-
         public MainWindow()
         {
             InitializeComponent();
@@ -53,113 +50,6 @@ namespace BCFDBManager
             catch (Exception ex)
             {
                 MessageBox.Show("Display BCF Information.\n" + ex.Message, "Display UI", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private void buttonClose_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void buttonNewDB_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                OpenFileDialog openDialog = new OpenFileDialog();
-                openDialog.Title = "Select a BCFZip File to Create a Database File";
-                openDialog.DefaultExt = ".bcfzip";
-                openDialog.Filter = "BCF (.bcfzip)|*.bcfzip";
-                if ((bool)openDialog.ShowDialog())
-                {
-                    string bcfPath = openDialog.FileName;
-                    SaveFileDialog saveDialog = new SaveFileDialog();
-                    saveDialog.Title = "Specify a Database File Location";
-                    saveDialog.DefaultExt = ".sqlite";
-                    saveDialog.Filter = "SQLITE File (.sqlite)|*.sqlite";
-                    saveDialog.FileName = System.IO.Path.GetFileNameWithoutExtension(bcfPath);
-                    if ((bool)saveDialog.ShowDialog())
-                    {
-                        dbFile = saveDialog.FileName;
-
-                        double value = 0;
-                        UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
-                        Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
-
-                        UpdateStatusLabelDelegate updateLabelDelegate = new UpdateStatusLabelDelegate(statusLable.SetValue);
-                        Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Gathering information from the BCF file..." });
-
-                        progressBar.Visibility = System.Windows.Visibility.Visible;
-                        progressBar.Value = 0;
-                        progressBar.Maximum = 4;
-
-                        BCFZIP bcfzip = BCFFileManager.ReadBCF(bcfPath);
-                        value++;
-                        Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
-
-                        bcfzip = BCFFileManager.MapBinaryData(bcfzip);
-                        value++;
-                        Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
-
-                        if (bcfzip.BCFComponents.Count > 0)
-                        {
-                            Dispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Writing BCF Information to the database..." });
-                            bool created = DBManager.CreateTables(dbFile, bcfzip);
-                            value++;
-                            Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
-
-                            bool written = DBManager.WriteDatabase(dbFile, bcfzip);
-                            value++;
-                            Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
-
-                            if (created && written)
-                            {
-                                textBoxDB.Text = dbFile;
-
-                                MessageBox.Show("The database file has been successfully created!!\n" + dbFile, "Database Created", MessageBoxButton.OK, MessageBoxImage.Information);
-                                bcfDictionary = new Dictionary<string, BCFZIP>();
-                                bcfDictionary.Add(bcfzip.FileId, bcfzip);
-                                DisplayUI();
-                            }
-                            else
-                            {
-                                MessageBox.Show("The datbase file has not been successfully created.\nPlease check the log file.", "Database Error", MessageBoxButton.OK, MessageBoxImage.Information);
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.Show("An invalid BCFZip file has been selected.\n Please select another BCFZip file to create a database file.", "Invalid BCFZip", MessageBoxButton.OK, MessageBoxImage.Information);
-                        }
-
-                        progressBar.Visibility = System.Windows.Visibility.Hidden;
-                        statusLable.Text = "Ready";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to import BCF.\n" + ex.Message, "Import BCF", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private void buttonConnectDB_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                OpenFileDialog openDialog = new OpenFileDialog();
-                openDialog.Title = "Select a database to be connected";
-                openDialog.DefaultExt = ".sqlite";
-                openDialog.Filter = "SQLITE File (.sqlite)|*.sqlite";
-                if ((bool)openDialog.ShowDialog())
-                {
-                    dbFile = openDialog.FileName;
-                    bcfDictionary = DBManager.ReadDatabase(dbFile);
-                    DisplayUI();
-
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to connect Database.\n"+ex.Message, "Connect Database", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -221,6 +111,7 @@ namespace BCFDBManager
                     dataGridComments.ItemsSource = null;
                     dataGridComments.ItemsSource = comments;
                     dataGridComments.SelectedIndex = 0;
+                    //RefershSnapshotImage();
                 }
             }
             catch (Exception ex)
@@ -229,30 +120,55 @@ namespace BCFDBManager
             }
         }
 
-        private void dataGridComments_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private bool RefershSnapshotImage()
         {
+            bool refreshed = false;
             try
             {
                 if (null != dataGridComments.SelectedItem && null != selectedFile && null != selectedMarkup)
                 {
-                    selectedComment = (Comment) dataGridComments.SelectedItem;
+                    selectedComment = (Comment)dataGridComments.SelectedItem;
                     string viewPointId = selectedComment.Viewpoint.Guid;
+                    ViewPoint selectedViewpoint = null;
                     if (!string.IsNullOrEmpty(viewPointId))
                     {
                         var viewpoints = from vp in selectedMarkup.Viewpoints where vp.Guid == viewPointId select vp;
                         if (viewpoints.Count() > 0)
                         {
-                            ViewPoint viewPoint = viewpoints.First();
-                            if (null != viewPoint.SnapshotImage)
+                            selectedViewpoint = viewpoints.First();
+                        }
+                    }
+                    else if (selectedMarkup.Viewpoints.Count > 0)
+                    {
+                        selectedViewpoint = selectedMarkup.Viewpoints.First();
+                    }
+
+                    if (null != selectedViewpoint)
+                    {
+                        if (null != selectedViewpoint.SnapshotImage)
+                        {
+                            using (MemoryStream stream = new MemoryStream(selectedViewpoint.SnapshotImage))
                             {
-                                using (MemoryStream stream = new MemoryStream(viewPoint.SnapshotImage))
-                                {
-                                    imageSnapshot.Source = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
-                                }
+                                imageSnapshot.Source = BitmapFrame.Create(stream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                                refreshed = true;
                             }
                         }
                     }
+
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to refresh the snapshot image.\n"+ex.Message, "Refresh Image", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return refreshed;
+        }
+
+        private void dataGridComments_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                bool refreshed = RefershSnapshotImage();
             }
             catch (Exception ex)
             {
@@ -397,6 +313,209 @@ namespace BCFDBManager
             {
                 MessageBox.Show("Failed to delete an comment item.\n" + ex.Message, "Delete Comment", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private void buttonNewDB_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenFileDialog openDialog = new OpenFileDialog();
+                openDialog.Title = "Select a BCFZip File to Create a Database File";
+                openDialog.DefaultExt = ".bcfzip";
+                openDialog.Filter = "BCF (.bcfzip)|*.bcfzip";
+                if ((bool)openDialog.ShowDialog())
+                {
+                    string bcfPath = openDialog.FileName;
+                    SaveFileDialog saveDialog = new SaveFileDialog();
+                    saveDialog.Title = "Specify a Database File Location";
+                    saveDialog.DefaultExt = ".sqlite";
+                    saveDialog.Filter = "SQLITE File (.sqlite)|*.sqlite";
+                    saveDialog.FileName = System.IO.Path.GetFileNameWithoutExtension(bcfPath);
+                    if ((bool)saveDialog.ShowDialog())
+                    {
+                        dbFile = saveDialog.FileName;
+
+                        progressBar.Visibility = System.Windows.Visibility.Visible;
+
+                        BCFFileManager.progressBar = progressBar;
+                        BCFFileManager.statusLabel = statusLable;
+
+                        BCFZIP bcfzip = BCFFileManager.ReadBCF(bcfPath);
+                        bcfzip = BCFFileManager.MapBinaryData(bcfzip);
+
+                        if (bcfzip.BCFComponents.Count > 0)
+                        {
+                            DBManager.progressBar = progressBar;
+                            DBManager.statusLabel = statusLable;
+
+                            bool created = DBManager.CreateTables(dbFile, bcfzip);
+                            bool written = DBManager.WriteDatabase(dbFile, bcfzip, ConflictMode.IGNORE);
+
+                            if (created && written)
+                            {
+                                textBoxDB.Text = dbFile;
+
+                                MessageBox.Show("The database file has been successfully created!!\n" + dbFile, "Database Created", MessageBoxButton.OK, MessageBoxImage.Information);
+                                bcfDictionary = new Dictionary<string, BCFZIP>();
+                                bcfDictionary.Add(bcfzip.FileId, bcfzip);
+                                DisplayUI();
+                            }
+                            else
+                            {
+                                MessageBox.Show("The datbase file has not been successfully created.\nPlease check the log file.", "Database Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("An invalid BCFZip file has been selected.\n Please select another BCFZip file to create a database file.", "Invalid BCFZip", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+
+                        progressBar.Visibility = System.Windows.Visibility.Hidden;
+                        statusLable.Text = "Ready";
+                        buttonAddBCF.IsEnabled = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to import BCF.\n" + ex.Message, "Import BCF", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void buttonConnectDB_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenFileDialog openDialog = new OpenFileDialog();
+                openDialog.Title = "Select a database to be connected";
+                openDialog.DefaultExt = ".sqlite";
+                openDialog.Filter = "SQLITE File (.sqlite)|*.sqlite";
+                if ((bool)openDialog.ShowDialog())
+                {
+                    progressBar.Visibility = System.Windows.Visibility.Visible;
+
+                    dbFile = openDialog.FileName;
+                    textBoxDB.Text = dbFile;
+
+                    DBManager.progressBar = progressBar;
+                    DBManager.statusLabel = statusLable;
+                    bcfDictionary = DBManager.ReadDatabase(dbFile, false);
+                    DisplayUI();
+
+                    progressBar.Visibility = System.Windows.Visibility.Hidden;
+                    statusLable.Text = "Ready";
+                    buttonAddBCF.IsEnabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to connect Database.\n" + ex.Message, "Connect Database", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void buttonAddBCF_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(dbFile))
+                {
+                    MessageBox.Show("Please connect to a database file before adding BCF files.", "Empty Database", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                OpenFileDialog openDialog = new OpenFileDialog();
+                openDialog.Title = "Select a BCFZip File to Create a Database File";
+                openDialog.DefaultExt = ".bcfzip";
+                openDialog.Filter = "BCF (.bcfzip)|*.bcfzip";
+                if ((bool)openDialog.ShowDialog())
+                {
+                    string bcfPath = openDialog.FileName;
+
+                    progressBar.Visibility = System.Windows.Visibility.Visible;
+
+                    BCFFileManager.progressBar = progressBar;
+                    BCFFileManager.statusLabel = statusLable;
+
+                    BCFZIP bcfzip = BCFFileManager.ReadBCF(bcfPath);
+                    bcfzip = BCFFileManager.MapBinaryData(bcfzip);
+
+                    if (bcfzip.BCFComponents.Count > 0)
+                    {
+                        ConflictMode mode = ConflictMode.IGNORE;
+                        if (CheckDuplicateTopics(bcfzip))
+                        {
+                            MessageBoxResult mr = MessageBox.Show("Duplicate topics have been found.\nWould you like to replace the topic item?\n\nYes - Replace\tNo - Ignore", "Duplicates Found", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                            if (mr == MessageBoxResult.Yes)
+                            {
+                                mode = ConflictMode.REPLACE;
+                            }
+                            else if (mr == MessageBoxResult.Cancel)
+                            {
+                                progressBar.Visibility = System.Windows.Visibility.Hidden;
+                                statusLable.Text = "Ready";
+                                return;
+                            }
+                        }
+
+                        DBManager.progressBar = progressBar;
+                        DBManager.statusLabel = statusLable;
+
+                        bool written = DBManager.WriteDatabase(dbFile, bcfzip, mode);
+
+                        if (written)
+                        {
+                            textBoxDB.Text = dbFile;
+
+                            MessageBox.Show("The information of BCF has been successfully added to the database!!\n" + dbFile, "BCF Added", MessageBoxButton.OK, MessageBoxImage.Information);
+                            if (!bcfDictionary.ContainsKey(bcfzip.FileId))
+                            {
+                                bcfDictionary.Add(bcfzip.FileId, bcfzip);
+                                DisplayUI();
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("The datbase file has not been successfully created.\nPlease check the log file.", "Database Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+
+                    progressBar.Visibility = System.Windows.Visibility.Hidden;
+                    statusLable.Text = "Ready";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to add a BCF file into the current database.\n"+ex.Message, "Add BCF", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private bool CheckDuplicateTopics(BCFZIP bcfZip)
+        {
+            bool duplicate = false;
+            try
+            {
+                List<BCFZIP> zipList = bcfDictionary.Values.ToList();
+                foreach (string topicId in bcfZip.BCFComponents.Keys)
+                {
+                    var topicFound = from zip in zipList where zip.BCFComponents.ContainsKey(topicId) select zip;
+                    if (topicFound.Count() > 0)
+                    {
+                        duplicate = true;
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to check duplicates of topics.\n"+ex.Message, "Check Duplicates", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return duplicate;
+        }
+
+
+        private void buttonClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
 
 

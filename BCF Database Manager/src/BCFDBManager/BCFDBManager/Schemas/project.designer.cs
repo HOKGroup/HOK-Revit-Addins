@@ -22,11 +22,11 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
     public partial class ProjectExtension
     {
-        private string guidField;
+        private string guidField = "";
 
         private Project projectField;
 
-        private string extensionSchemaField;
+        private string extensionSchemaField = "";
 
         public ProjectExtension()
         {
@@ -93,11 +93,11 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = true)]
     public partial class Project
     {
-        private string guidField;
+        private string guidField = "";
 
-        private string nameField;
+        private string nameField = "";
 
-        private string projectIdField;
+        private string projectIdField = "";
 
         public Project()
         {

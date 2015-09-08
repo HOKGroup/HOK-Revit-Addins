@@ -13,13 +13,27 @@ using System.Windows.Threading;
 
 namespace BCFDBManager.DatabaseUtils
 {
+    public enum ConflictMode
+    {
+        ROLLBACK, ABORT, FAIL, IGNORE, REPLACE
+    }
+
     public static class DBManager
     {
-        public static Dictionary<string/*fileId*/, BCFZIP> ReadDatabase(string dbFile)
+        public static ProgressBar progressBar = null;
+        public static TextBlock statusLabel = null;
+
+        private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
+        private delegate void UpdateStatusLabelDelegate(System.Windows.DependencyProperty dp, Object value);
+
+        public static Dictionary<string/*fileId*/, BCFZIP> ReadDatabase(string dbFile, bool fullRead)
         {
             Dictionary<string/*fileId*/, BCFZIP> bcfFiles = new Dictionary<string/*fileId*/, BCFZIP>();
             try
             {
+                UpdateStatusLabelDelegate updateLabelDelegate = new UpdateStatusLabelDelegate(statusLabel.SetValue);
+                System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Reading BCF database..." });
+
                 using (SQLiteConnection connection = new SQLiteConnection("Data Source=" + dbFile + ";Version=3;"))
                 {
                     connection.Open();
@@ -41,16 +55,19 @@ namespace BCFDBManager.DatabaseUtils
                                 bcfZip.UploadedBy = reader.GetString(reader.GetOrdinal("UploadedBy"));
                                 bcfZip.UploadedDate = reader.GetDateTime(reader.GetOrdinal("UploadedDate"));
                                 bcfZip.CreationDate = reader.GetDateTime(reader.GetOrdinal("CreationDate"));
-                                
-                                string projectGuid = reader.GetString(reader.GetOrdinal("Project_Guid"));
-                                ProjectExtension projectExt = new ProjectExtension();
-                                projectExt.Guid = projectGuid;
-                                bcfZip.ProjectFile = projectExt;
 
-                                string versionGuid = reader.GetString(reader.GetOrdinal("Version_Guid"));
-                                Version version = new Version();
-                                version.Guid = versionGuid;
-                                bcfZip.VersionFile = version;
+                                if (fullRead)
+                                {
+                                    string projectGuid = reader.GetString(reader.GetOrdinal("Project_Guid"));
+                                    ProjectExtension projectExt = new ProjectExtension();
+                                    projectExt.Guid = projectGuid;
+                                    bcfZip.ProjectFile = projectExt;
+
+                                    string versionGuid = reader.GetString(reader.GetOrdinal("Version_Guid"));
+                                    Version version = new Version();
+                                    version.Guid = versionGuid;
+                                    bcfZip.VersionFile = version;
+                                }
 
                                 if (!bcfFiles.ContainsKey(bcfZip.FileId))
                                 {
@@ -60,18 +77,29 @@ namespace BCFDBManager.DatabaseUtils
                         }
 
                         List<string> fileIds = bcfFiles.Keys.ToList();
+                        
                         foreach (string fileId in fileIds)
                         {
                             BCFZIP bcfZip = bcfFiles[fileId];
+                            if(fullRead)
+                            {
+                                bcfZip.ProjectFile = ReadProjectInfo(connection, bcfZip.ProjectFile.Guid);
+                                bcfZip.VersionFile = ReadVersionInfo(connection, bcfZip.VersionFile.Guid);
+                            }
                             
-                            bcfZip.ProjectFile = ReadProjectInfo(connection, bcfZip.ProjectFile.Guid);
-                            bcfZip.VersionFile = ReadVersionInfo(connection, bcfZip.VersionFile.Guid);
-
                             List<string> topicIds = ReadTopicIds(connection, fileId);
+                            UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
+                            progressBar.Value = 0;
+                            progressBar.Maximum = topicIds.Count;
+
+                            double value = 0;
                             Dictionary<string, BCFComponent> components = new Dictionary<string, BCFComponent>();
                             foreach (string topicId in topicIds)
                             {
-                                BCFComponent component = ReadBCFComponent(connection, topicId);
+                                value++;
+                                System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
+
+                                BCFComponent component = ReadBCFComponent(connection, topicId, fullRead);
                                 if (!components.ContainsKey(topicId))
                                 {
                                     components.Add(topicId, component);
@@ -189,22 +217,27 @@ namespace BCFDBManager.DatabaseUtils
             return version;
         }
 
-        private static BCFComponent ReadBCFComponent(SQLiteConnection connection, string topicGuid)
+        private static BCFComponent ReadBCFComponent(SQLiteConnection connection, string topicGuid, bool fullRead)
         {
             BCFComponent component = new BCFComponent();
             try
             {
-                component.MarkupInfo = ReadMarkupInfo(connection, topicGuid);
-                Dictionary<string, VisualizationInfo> viewPoints = new Dictionary<string, VisualizationInfo>();
-                foreach (ViewPoint vp in component.MarkupInfo.Viewpoints)
+                //read markup information only
+                component.MarkupInfo = ReadMarkupInfo(connection, topicGuid, fullRead);
+
+                if(fullRead)
                 {
-                    VisualizationInfo visInfo = ReadVisInfo(connection, vp.Guid);
-                    if (!viewPoints.ContainsKey(vp.Guid))
+                    Dictionary<string, VisualizationInfo> viewPoints = new Dictionary<string, VisualizationInfo>();
+                    foreach (ViewPoint vp in component.MarkupInfo.Viewpoints)
                     {
-                        viewPoints.Add(vp.Guid, visInfo);
+                        VisualizationInfo visInfo = ReadVisInfo(connection, vp.Guid);
+                        if (!viewPoints.ContainsKey(vp.Guid))
+                        {
+                            viewPoints.Add(vp.Guid, visInfo);
+                        }
                     }
+                    component.Viewpoints = viewPoints;
                 }
-                component.Viewpoints = viewPoints;
             }
             catch (Exception ex)
             {
@@ -213,7 +246,7 @@ namespace BCFDBManager.DatabaseUtils
             return component;
         }
 
-        private static Markup ReadMarkupInfo(SQLiteConnection connection, string topicGuid)
+        private static Markup ReadMarkupInfo(SQLiteConnection connection, string topicGuid , bool fullRead)
         {
             Markup markup = new Markup();
             try
@@ -229,7 +262,7 @@ namespace BCFDBManager.DatabaseUtils
                     {
                         while (reader.Read())
                         {
-                            topic.Guid = reader.GetString(reader.GetOrdinal("Guid"));
+                            topic.Guid = reader.GetString(reader.GetOrdinal("Guid")); ;
                             topic.TopicType = reader.GetString(reader.GetOrdinal("TopicType"));
                             topic.TopicStatus = reader.GetString(reader.GetOrdinal("TopicStatus"));
                             topic.Title = reader.GetString(reader.GetOrdinal("Title"));
@@ -237,15 +270,19 @@ namespace BCFDBManager.DatabaseUtils
                             topic.Description = reader.GetString(reader.GetOrdinal("Description"));
                             topic.Priority = reader.GetString(reader.GetOrdinal("Priority"));
                             topic.Index = reader.GetString(reader.GetOrdinal("TopicIndex"));
-                            topic.CreationDate = reader.GetDateTime(reader.GetOrdinal("CreationDate"));
+                            
+                            if (reader["CreationDate"] != System.DBNull.Value)
+                            {
+                                topic.CreationDate = reader.GetDateTime(reader.GetOrdinal("CreationDate"));
+                            }
                             topic.CreationAuthor = reader.GetString(reader.GetOrdinal("CreationAuthor"));
 
                             if (reader["ModifiedDate"] != System.DBNull.Value)
                             {
                                 topic.ModifiedDateSpecified = true;
-                                topic.ModifiedDate = Convert.ToDateTime(reader["ModifiedDate"]);
+                                topic.ModifiedDate = reader.GetDateTime(reader.GetOrdinal("ModifiedDate"));
                             }
-                           
+
                             topic.ModifiedAuthor = reader.GetString(reader.GetOrdinal("ModifiedAuthor"));
                             topic.AssignedTo = reader.GetString(reader.GetOrdinal("AssignedTo"));
                         }
@@ -266,95 +303,99 @@ namespace BCFDBManager.DatabaseUtils
                     topic.Labels = labels;
                     #endregion
 
-                    #region HeaderFile
-                    List<HeaderFile> headerFiles = new List<HeaderFile>();
-                    cmd.CommandText = "SELECT * FROM HeaderFile WHERE Topic_Guid = '" + topicGuid + "'";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    if(fullRead)
                     {
-                        while (reader.Read())
+                        #region HeaderFile
+                        List<HeaderFile> headerFiles = new List<HeaderFile>();
+                        cmd.CommandText = "SELECT * FROM HeaderFile WHERE Topic_Guid = '" + topicGuid + "'";
+                        using (SQLiteDataReader reader = cmd.ExecuteReader())
                         {
-                            HeaderFile headerFile = new HeaderFile();
-                            headerFile.Guid = reader.GetString(reader.GetOrdinal("Guid"));
-                            headerFile.IfcProject = reader.GetString(reader.GetOrdinal("IfcProject"));
-                            headerFile.IfcSpatialStructureElement = reader.GetString(reader.GetOrdinal("IfcSpatialStructureElement"));
-                            headerFile.isExternal = reader.GetBoolean(reader.GetOrdinal("isExternal"));
-                            headerFile.Filename = reader.GetString(reader.GetOrdinal("FileName"));
-
-                            if (reader["Date"] != System.DBNull.Value)
+                            while (reader.Read())
                             {
-                                headerFile.DateSpecified = true;
-                                headerFile.Date = Convert.ToDateTime(reader["Date"]);
-                            }
-                            
-                            headerFile.Reference = reader.GetString(reader.GetOrdinal("Reference"));
-                            headerFiles.Add(headerFile);
-                        }
-                    }
-                    markup.Header = headerFiles;
-                    #endregion
+                                HeaderFile headerFile = new HeaderFile();
+                                headerFile.Guid = reader.GetString(reader.GetOrdinal("Guid"));
+                                headerFile.IfcProject = reader.GetString(reader.GetOrdinal("IfcProject"));
+                                headerFile.IfcSpatialStructureElement = reader.GetString(reader.GetOrdinal("IfcSpatialStructureElement"));
+                                headerFile.isExternal = reader.GetBoolean(reader.GetOrdinal("isExternal"));
+                                headerFile.Filename = reader.GetString(reader.GetOrdinal("FileName"));
 
-                    #region BimSnippet
-                    BimSnippet bimSnippet = null;
-                    cmd.CommandText = "SELECT * FROM BimSnippet WHERE Topic_Guid = '" + topicGuid + "'";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            bimSnippet = new BimSnippet();
-                            bimSnippet.Guid = reader.GetString(reader.GetOrdinal("Guid"));
-                            bimSnippet.SnippetType = reader.GetString(reader.GetOrdinal("SnippetType"));
-                            bimSnippet.isExternal = reader.GetBoolean(reader.GetOrdinal("isExternal"));
-                            bimSnippet.Reference = reader.GetString(reader.GetOrdinal("Reference"));
-                            bimSnippet.ReferenceSchema = reader.GetString(reader.GetOrdinal("ReferenceSchema"));
-                            if (reader["FileContent"] != System.DBNull.Value)
-                            {
-                                bimSnippet.FileContent = (byte[])reader["FileContent"];
+                                if (reader["Date"] != System.DBNull.Value)
+                                {
+                                    headerFile.DateSpecified = true;
+                                    headerFile.Date = reader.GetDateTime(reader.GetOrdinal("Date"));
+                                }
+
+                                headerFile.Reference = reader.GetString(reader.GetOrdinal("Reference"));
+                                headerFiles.Add(headerFile);
                             }
                         }
-                    }
-                    if (null != bimSnippet)
-                    {
-                        topic.BimSnippet = bimSnippet;
-                    }
-                    #endregion
+                        markup.Header = headerFiles;
+                        #endregion
 
-                    #region DocumentReferences
-                    List<TopicDocumentReferences> docReferences = new List<TopicDocumentReferences>();
-                    cmd.CommandText = "SELECT * FROM DocumentReferences WHERE Topic_Guid = '" + topicGuid + "'";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        #region BimSnippet
+                        BimSnippet bimSnippet = null;
+                        cmd.CommandText = "SELECT * FROM BimSnippet WHERE Topic_Guid = '" + topicGuid + "'";
+                        using (SQLiteDataReader reader = cmd.ExecuteReader())
                         {
-                            TopicDocumentReferences docRef = new TopicDocumentReferences();
-                            docRef.Guid = reader.GetString(reader.GetOrdinal("Guid"));
-                            docRef.isExternal = reader.GetBoolean(reader.GetOrdinal("isExternal"));
-                            docRef.ReferencedDocument = reader.GetString(reader.GetOrdinal("ReferenceDocument"));
-                            if (reader["FileContent"] != System.DBNull.Value)
+                            while (reader.Read())
                             {
-                                docRef.FileContent = (byte[])reader["FileContent"];
+                                bimSnippet = new BimSnippet();
+                                bimSnippet.Guid = reader.GetString(reader.GetOrdinal("Guid"));
+                                bimSnippet.SnippetType = reader.GetString(reader.GetOrdinal("SnippetType"));
+                                bimSnippet.isExternal = reader.GetBoolean(reader.GetOrdinal("isExternal"));
+                                bimSnippet.Reference = reader.GetString(reader.GetOrdinal("Reference"));
+                                bimSnippet.ReferenceSchema = reader.GetString(reader.GetOrdinal("ReferenceSchema"));
+                                if (reader["FileContent"] != System.DBNull.Value)
+                                {
+                                    bimSnippet.FileContent = (byte[])reader["FileContent"];
+                                }
                             }
-                            docRef.Description = reader.GetString(reader.GetOrdinal("Description"));
-                            docReferences.Add(docRef);
                         }
-                    }
-                    topic.DocumentReferences = docReferences;
-                    #endregion
-
-                    #region RelatedTopics
-                    List<TopicRelatedTopics> relTopics = new List<TopicRelatedTopics>();
-                    cmd.CommandText = "SELECT * FROM RelatedTopics WHERE Topic_Guid = '" + topicGuid + "'";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
+                        if (null != bimSnippet)
                         {
-                            TopicRelatedTopics relTopic = new TopicRelatedTopics();
-                            relTopic.Guid = reader.GetString(reader.GetOrdinal("Guid"));
-                            relTopics.Add(relTopic);
+                            topic.BimSnippet = bimSnippet;
                         }
+                        #endregion
+
+                        #region DocumentReferences
+                        List<TopicDocumentReferences> docReferences = new List<TopicDocumentReferences>();
+                        cmd.CommandText = "SELECT * FROM DocumentReferences WHERE Topic_Guid = '" + topicGuid + "'";
+                        using (SQLiteDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                TopicDocumentReferences docRef = new TopicDocumentReferences();
+                                docRef.Guid = reader.GetString(reader.GetOrdinal("Guid"));
+                                docRef.isExternal = reader.GetBoolean(reader.GetOrdinal("isExternal"));
+                                docRef.ReferencedDocument = reader.GetString(reader.GetOrdinal("ReferenceDocument"));
+                                if (reader["FileContent"] != System.DBNull.Value)
+                                {
+                                    docRef.FileContent = (byte[])reader["FileContent"];
+                                }
+                                docRef.Description = reader.GetString(reader.GetOrdinal("Description"));
+                                docReferences.Add(docRef);
+                            }
+                        }
+                        topic.DocumentReferences = docReferences;
+                        #endregion
+
+                        #region RelatedTopics
+                        List<TopicRelatedTopics> relTopics = new List<TopicRelatedTopics>();
+                        cmd.CommandText = "SELECT * FROM RelatedTopics WHERE Topic_Guid = '" + topicGuid + "'";
+                        using (SQLiteDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                TopicRelatedTopics relTopic = new TopicRelatedTopics();
+                                relTopic.Guid = reader.GetString(reader.GetOrdinal("Guid"));
+                                relTopics.Add(relTopic);
+                            }
+                        }
+                        topic.RelatedTopics = relTopics;
+                        #endregion
                     }
-                    topic.RelatedTopics = relTopics;
+                    
                     markup.Topic = topic;
-                    #endregion
 
                     #region comment
                     List<Comment> comments = new List<Comment>();
@@ -367,14 +408,18 @@ namespace BCFDBManager.DatabaseUtils
                             comment.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             comment.VerbalStatus = reader.GetString(reader.GetOrdinal("VerbalStatus"));
                             comment.Status = reader.GetString(reader.GetOrdinal("Status"));
-                            comment.Date = reader.GetDateTime(reader.GetOrdinal("Date"));
+                            if (reader["Date"] != System.DBNull.Value)
+                            {
+                                comment.Date = reader.GetDateTime(reader.GetOrdinal("Date"));
+                            }
+
                             comment.Author = reader.GetString(reader.GetOrdinal("Author"));
                             comment.Comment1 = reader.GetString(reader.GetOrdinal("Comment"));
                             
                             if (reader["ModifiedDate"] != System.DBNull.Value)
                             {
                                 comment.ModifiedDateSpecified = true;
-                                comment.ModifiedDate = Convert.ToDateTime(reader["ModifiedDate"]);
+                                comment.ModifiedDate = reader.GetDateTime(reader.GetOrdinal("ModifiedDate"));
                             }
                             comment.ModifiedAuthor = reader.GetString(reader.GetOrdinal("ModifiedAuthor"));
                             comments.Add(comment);
@@ -747,7 +792,7 @@ namespace BCFDBManager.DatabaseUtils
                         {
                             persCamera = new PerspectiveCamera();
                             persCamera.Guid = reader.GetString(reader.GetOrdinal("Guid"));
-                            viewPoint.Guid = reader.GetString(reader.GetOrdinal("CameraViewPoint"));
+                            viewPoint.Guid =reader.GetString(reader.GetOrdinal("CameraViewPoint"));
                             viewDirection.Guid = reader.GetString(reader.GetOrdinal("CameraDirection"));
                             upVector.Guid = reader.GetString(reader.GetOrdinal("CameraUpVector"));
                             persCamera.FieldOfView = reader.GetDouble(reader.GetOrdinal("FieldOfView"));
@@ -884,10 +929,21 @@ namespace BCFDBManager.DatabaseUtils
                                 command.CommandText = "PRAGMA foreign_keys = ON";
                                 command.ExecuteNonQuery();
 
+                                UpdateStatusLabelDelegate updateLabelDelegate = new UpdateStatusLabelDelegate(statusLabel.SetValue);
+                                System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Creating database tables..." });
+
+                                UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
+                                progressBar.Value = 0;
+                                progressBar.Maximum = tableInfo.Count;
+
                                 var tableOrders = ((TableNames[])Enum.GetValues(typeof(TableNames))).OrderBy(x => x);
 
+                                double value = 0;
                                 foreach (TableNames tn in tableOrders)
                                 {
+                                    value++;
+                                    System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
+
                                     string tableName = tn.ToString();
                                     if (tableInfo.ContainsKey(tableName))
                                     {
@@ -922,7 +978,7 @@ namespace BCFDBManager.DatabaseUtils
             return written;
         }
 
-        public static bool WriteDatabase(string dbFile, BCFZIP bcfzip)
+        public static bool WriteDatabase(string dbFile, BCFZIP bcfzip, ConflictMode mode)
         {
             bool result = false;
             try
@@ -933,10 +989,10 @@ namespace BCFDBManager.DatabaseUtils
                     connection.Open();
                     try
                     {
-                        bool projectValuesInserted = InsertProjectValues(bcfzip, connection);
-                        bool versionValuesInserted = InsertVersionValues(bcfzip, connection);
-                        bool componentValuesInserted = InsertBCFComponentValues(bcfzip, connection);
-                        bool customValuesInserted = InsertCustomValues(bcfzip, connection);
+                        bool projectValuesInserted = InsertProjectValues(bcfzip, connection, mode);
+                        bool versionValuesInserted = InsertVersionValues(bcfzip, connection, mode);
+                        bool componentValuesInserted = InsertBCFComponentValues(bcfzip, connection, mode);
+                        bool customValuesInserted = InsertCustomValues(bcfzip, connection, mode);
                         result = projectValuesInserted && versionValuesInserted && componentValuesInserted && customValuesInserted;
                     }
                     catch (Exception ex)
@@ -953,7 +1009,7 @@ namespace BCFDBManager.DatabaseUtils
             return result;
         }
 
-        private static bool InsertProjectValues(BCFZIP bcfZip, SQLiteConnection connection)
+        private static bool InsertProjectValues(BCFZIP bcfZip, SQLiteConnection connection, ConflictMode mode)
         {
             bool inserted = false;
             try
@@ -969,14 +1025,21 @@ namespace BCFDBManager.DatabaseUtils
                             ProjectExtension pExt = bcfZip.ProjectFile;
 
                             StringBuilder strBuilder = new StringBuilder();
-                            strBuilder.Append("INSERT INTO ProjectExtension (Guid, ExtensionSchema) VALUES ");
-                            strBuilder.Append("('"+pExt.Guid+"', '"+pExt.ExtensionSchema+"')");
+                            strBuilder.Append("INSERT OR "+mode.ToString()+" INTO ProjectExtension (Guid, ExtensionSchema) VALUES ");
+                            strBuilder.Append("(@guid, @extSchema)");
+                            cmd.Parameters.AddWithValue("@guid", pExt.Guid);
+                            cmd.Parameters.AddWithValue("@extSchema", pExt.ExtensionSchema);
                             cmd.CommandText = strBuilder.ToString();
                             int insertedRow = cmd.ExecuteNonQuery();
+                            cmd.Parameters.Clear();
 
                             strBuilder = new StringBuilder();
-                            strBuilder.Append("INSERT INTO Project (Guid, ProjectId, ProjectName, ProjectExtension_Guid) VALUES ");
-                            strBuilder.Append("('" + pExt.Project.Guid + "', '" + pExt.Project.ProjectId + "', '" + pExt.Project.Name + "', '" + pExt.Guid + "')");
+                            strBuilder.Append("INSERT OR "+mode.ToString()+" INTO Project (Guid, ProjectId, ProjectName, ProjectExtension_Guid) VALUES ");
+                            strBuilder.Append("(@guid, @projectId, @projectName, @projectExtGuid)");
+                            cmd.Parameters.AddWithValue("@guid", pExt.Project.Guid);
+                            cmd.Parameters.AddWithValue("@projectId", pExt.Project.ProjectId);
+                            cmd.Parameters.AddWithValue("@projectName", pExt.Project.Name);
+                            cmd.Parameters.AddWithValue("@projectExtGuid", pExt.Guid);
                             cmd.CommandText = strBuilder.ToString();
                             insertedRow = cmd.ExecuteNonQuery();
                             
@@ -999,7 +1062,7 @@ namespace BCFDBManager.DatabaseUtils
             return inserted;
         }
 
-        private static bool InsertVersionValues(BCFZIP bcfZip, SQLiteConnection connection)
+        private static bool InsertVersionValues(BCFZIP bcfZip, SQLiteConnection connection, ConflictMode mode)
         {
             bool inserted = false;
             try
@@ -1017,8 +1080,11 @@ namespace BCFDBManager.DatabaseUtils
                             StringBuilder strBuilder = new StringBuilder();
                             if (!string.IsNullOrEmpty(version.VersionId))
                             {
-                                strBuilder.Append("INSERT INTO Version (Guid, VersionId, DetailedVersion) VALUES ");
-                                strBuilder.Append("('" + version.Guid + "', '" + version.VersionId + "', '"+version.DetailedVersion+"')");
+                                strBuilder.Append("INSERT OR "+mode.ToString()+" INTO Version (Guid, VersionId, DetailedVersion) VALUES ");
+                                strBuilder.Append("(@guid, @versionId, @detailedVersion)");
+                                cmd.Parameters.AddWithValue("@guid", version.Guid);
+                                cmd.Parameters.AddWithValue("@versionId", version.VersionId);
+                                cmd.Parameters.AddWithValue("@detailedVersion", version.DetailedVersion);
                                 cmd.CommandText = strBuilder.ToString();
                                 int insertedRow = cmd.ExecuteNonQuery();
                             }
@@ -1040,16 +1106,26 @@ namespace BCFDBManager.DatabaseUtils
             return inserted;
         }
 
-        private static bool InsertBCFComponentValues(BCFZIP bcfzip, SQLiteConnection connection)
+        private static bool InsertBCFComponentValues(BCFZIP bcfzip, SQLiteConnection connection, ConflictMode mode)
         {
             bool inserted = false;
             try
             {
+                UpdateStatusLabelDelegate updateLabelDelegate = new UpdateStatusLabelDelegate(statusLabel.SetValue);
+                System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Writing BCF Information into database tables..." });
+
+                UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
+                progressBar.Value = 0;
+                progressBar.Maximum = bcfzip.BCFComponents.Count;
+
+                double value = 0;
                 foreach (string guid in bcfzip.BCFComponents.Keys)
                 {
+                    value++;
+                    System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
                     BCFComponent bcfComponent = bcfzip.BCFComponents[guid];
-                    bool insertedMarkup = InsertMarkupValues(bcfComponent, connection);
-                    bool insertedVisInfo = InsertVisInfoValues(bcfComponent, connection);
+                    bool insertedMarkup = InsertMarkupValues(bcfComponent, connection, mode);
+                    bool insertedVisInfo = InsertVisInfoValues(bcfComponent, connection, mode);
                 }
                 inserted = true;
             }
@@ -1060,7 +1136,7 @@ namespace BCFDBManager.DatabaseUtils
             return inserted;
         }
 
-        private static bool InsertMarkupValues(BCFComponent bcfComponent, SQLiteConnection connection)
+        private static bool InsertMarkupValues(BCFComponent bcfComponent, SQLiteConnection connection, ConflictMode mode)
         {
             bool inserted = false;
 
@@ -1078,50 +1154,58 @@ namespace BCFDBManager.DatabaseUtils
                             
                             #region Topic
                             Topic topic = markup.Topic;
-                            StringBuilder strBuilder = new StringBuilder();
-                            strBuilder.Append("INSERT INTO Topic (Guid, TopicType, TopicStatus, Title, ReferenceLink, Description, Priority, TopicIndex, CreationDate, CreationAuthor, ModifiedDate, ModifiedAuthor, AssignedTo) VALUES ");
-                            strBuilder.Append("('" + topic.Guid + "', '" + topic.TopicType + "', '" + topic.TopicStatus + "', '" + topic.Title+"', '"+ topic.ReferenceLink + "', '"+ topic.Description + "', '"+topic.Priority+"', '");
-                            strBuilder.Append(topic.Index+ "', @creationDate, '" + topic.CreationAuthor + "', @modifiedDate, '" + topic.ModifiedAuthor + "', '" + topic.AssignedTo + "') ");
+                            string topicSql = "INSERT OR "+mode.ToString()+" INTO Topic (Guid, TopicType, TopicStatus, Title, ReferenceLink, Description, Priority, TopicIndex, CreationDate, CreationAuthor, ModifiedDate, ModifiedAuthor, AssignedTo) VALUES ";
+                            topicSql += "(@guid, @topicType, @topicStatus, @title, @referenceLink, @description, @priority, @topicIndex, @creationDate, @creationAuthor, @modifiedDate,  @modifiedAuthor, @assignedTo )";
 
-                            cmd.CommandText = strBuilder.ToString();
-                            cmd.Prepare();
-                            cmd.Parameters.Add("@creationDate", DbType.DateTime);
-                            cmd.Parameters["@creationDate"].Value = topic.CreationDate;
-                            cmd.Parameters.Add("@modifiedDate", DbType.DateTime);
-                            cmd.Parameters["@modifiedDate"].Value = topic.ModifiedDate;
+                            cmd.Parameters.AddWithValue("@guid", topic.Guid);
+                            cmd.Parameters.AddWithValue("@topicType", topic.TopicType);
+                            cmd.Parameters.AddWithValue("@topicStatus", topic.TopicStatus);
+                            cmd.Parameters.AddWithValue("@title", topic.Title);
+                            cmd.Parameters.AddWithValue("@referenceLink", topic.ReferenceLink);
+                            cmd.Parameters.AddWithValue("@description", topic.Description);
+                            cmd.Parameters.AddWithValue("@priority", topic.Priority);
+                            cmd.Parameters.AddWithValue("@topicIndex", topic.Index);
+                            cmd.Parameters.AddWithValue("@creationDate", topic.CreationDate);
+                            cmd.Parameters.AddWithValue("@creationAuthor", topic.CreationAuthor);
+                            cmd.Parameters.AddWithValue("@modifiedDate", topic.ModifiedDate);
+                            cmd.Parameters.AddWithValue("@modifiedAuthor", topic.ModifiedAuthor);
+                            cmd.Parameters.AddWithValue("@assignedTo", topic.AssignedTo);
+
+                            cmd.CommandText = topicSql;
                             try
                             {
                                 int insertedRow = cmd.ExecuteNonQuery();
+                                cmd.Parameters.Clear();
                             }
                             catch (SQLiteException ex)
                             {
                                 string message = cmd.CommandText + "/n" + ex.Message;
                             }
-                            
-                            cmd.Parameters.Clear();
                             #endregion 
 
                             #region
                             if (topic.Labels.Count > 0)
                             {
-                                strBuilder = new StringBuilder();
-                                strBuilder.Append("INSERT INTO Labels (Label, Topic_Guid) VALUES ");
+                                cmd.Parameters.Add("@label", DbType.String);
+                                cmd.Parameters.Add("@topicGuid", DbType.String);
 
                                 foreach (string label in topic.Labels)
                                 {
-                                    strBuilder.Append("('" + label + "', '" + topic.Guid + "'), ");
+                                    string labelSql = "INSERT OR " + mode.ToString() + " INTO Labels (Label, Topic_Guid) VALUES ";
+                                    labelSql += "(@label, @topicGuid)";
+                                    cmd.Parameters["@label"].Value = label;
+                                    cmd.Parameters["@topicGuid"].Value = topic.Guid;
+                                    try
+                                    {
+                                        cmd.CommandText = labelSql;
+                                        int insertedRows = cmd.ExecuteNonQuery();
+                                    }
+                                    catch (SQLiteException ex)
+                                    {
+                                        string message = cmd.CommandText + "/n" + ex.Message;
+                                    }
                                 }
-
-                                strBuilder.Remove(strBuilder.Length - 2, 2);
-                                cmd.CommandText = strBuilder.ToString();
-                                try
-                                {
-                                    int insertedRows = cmd.ExecuteNonQuery();
-                                }
-                                catch (SQLiteException ex)
-                                {
-                                    string message = cmd.CommandText + "/n" + ex.Message;
-                                }
+                                cmd.Parameters.Clear();
                             }
                             #endregion
 
@@ -1129,29 +1213,41 @@ namespace BCFDBManager.DatabaseUtils
                             List<HeaderFile> headerFiles = markup.Header;
                             if (headerFiles.Count > 0)
                             {
-                                strBuilder = new StringBuilder();
-                                strBuilder.Append("INSERT INTO HeaderFile (Guid, IfcProject, IfcSpatialStructureElement, isExternal, FileName, Date, Reference, Topic_Guid) VALUES ");
-                                for (int i = 0; i < headerFiles.Count; i++)
-                                {
-                                    HeaderFile file = headerFiles[i];
-                                    string dateParam = "@date" + i;
-                                    strBuilder.Append("('" + file.Guid + "', '" + file.IfcProject + "', '" + file.IfcSpatialStructureElement + "', " + Convert.ToInt32(file.isExternal) + ", '" + file.Filename + "', ");
-                                    strBuilder.Append(dateParam + ", '" + file.Reference + "', '" + topic.Guid + "' ), ");
+                                cmd.Parameters.Add("@guid", DbType.String);
+                                cmd.Parameters.Add("@ifcProject", DbType.String);
+                                cmd.Parameters.Add("@ifcSpatialStructureElement", DbType.String);
+                                cmd.Parameters.Add("@isExternal", DbType.Boolean);
+                                cmd.Parameters.Add("@fileName", DbType.String);
+                                cmd.Parameters.Add("@date", DbType.DateTime);
+                                cmd.Parameters.Add("@reference", DbType.String);
+                                cmd.Parameters.Add("@topicGuid", DbType.String);
 
-                                    cmd.Parameters.Add(dateParam, DbType.DateTime);
-                                    cmd.Parameters[dateParam].Value = file.Date;
-                                }
-                                strBuilder.Remove(strBuilder.Length - 2, 2);
 
-                                cmd.CommandText = strBuilder.ToString();
-                                try
+                                foreach (HeaderFile file in headerFiles)
                                 {
-                                    int insertedRow = cmd.ExecuteNonQuery();
+                                    string headerSql = "INSERT OR " + mode.ToString() + " INTO HeaderFile (Guid, IfcProject, IfcSpatialStructureElement, isExternal, FileName, Date, Reference, Topic_Guid) VALUES ";
+                                    headerSql += "(@guid, @ifcProject, @ifcSpatialStructureElement, @isExternal, @fileName, @date, @reference, @topicGuid)";
+
+                                    cmd.Parameters["@guid"].Value = file.Guid;
+                                    cmd.Parameters["@ifcProject"].Value = file.IfcProject;
+                                    cmd.Parameters["@ifcSpatialStructureElement"].Value = file.IfcSpatialStructureElement;
+                                    cmd.Parameters["@isExternal"].Value = file.isExternal;
+                                    cmd.Parameters["@fileName"].Value = file.Filename;
+                                    cmd.Parameters["@date"].Value = file.Date;
+                                    cmd.Parameters["@reference"].Value = file.Reference;
+                                    cmd.Parameters["@topicGuid"].Value = topic.Guid;
+
+                                    try
+                                    {
+                                        cmd.CommandText = headerSql;
+                                        cmd.ExecuteNonQuery();
+                                    }
+                                    catch (SQLiteException ex)
+                                    {
+                                        string message = cmd.CommandText + "/n" + ex.Message;
+                                    }
                                 }
-                                catch (SQLiteException ex)
-                                {
-                                    string message = cmd.CommandText + "/n" + ex.Message;
-                                }
+                               
                                 cmd.Parameters.Clear();
                             }
                             #endregion
@@ -1160,23 +1256,20 @@ namespace BCFDBManager.DatabaseUtils
                             BimSnippet bimSnippet = topic.BimSnippet;
                             if (!string.IsNullOrEmpty(bimSnippet.Reference))
                             {
-                                strBuilder = new StringBuilder();
-                                strBuilder.Append("INSERT INTO BimSnippet (Guid, SnippetType, isExternal, Reference, ReferenceSchema, FileContent, Topic_Guid) VALUES ");
-                                strBuilder.Append("('"+bimSnippet.Guid+"', '"+bimSnippet.SnippetType+"', "+ Convert.ToInt32(bimSnippet.isExternal)+", '"+bimSnippet.Reference+"', '"+bimSnippet.ReferenceSchema+"', @fileContent, '"+topic.Guid+"')");
-                                if (!string.IsNullOrEmpty(bimSnippet.Reference) && null != bimSnippet.FileContent)
-                                {
-                                    cmd.Parameters.Add("@fileContent", DbType.Binary, bimSnippet.FileContent.Length);
-                                    cmd.Parameters["@fileContent"].Value = bimSnippet.FileContent;
-                                }
-                                else
-                                {
-                                    cmd.Parameters.Add("@fileContent", DbType.Binary);
-                                    cmd.Parameters["@fileContent"].Value = null;
-                                }
-                               
-                                cmd.CommandText = strBuilder.ToString();
+                                string bimSnippetSql = "INSERT OR " + mode.ToString() + " INTO BimSnippet (Guid, SnippetType, isExternal, Reference, ReferenceSchema, FileContent, Topic_Guid) VALUES ";
+                                bimSnippetSql += "(@guid, @snippetType, @isExternal, @reference, @referenceSchema, @fileContent, @topicGuid)";
+
+                                cmd.Parameters.AddWithValue("@guid", bimSnippet.Guid);
+                                cmd.Parameters.AddWithValue("@snippetType", bimSnippet.SnippetType);
+                                cmd.Parameters.AddWithValue("@isExternal", bimSnippet.isExternal);
+                                cmd.Parameters.AddWithValue("@reference", bimSnippet.Reference);
+                                cmd.Parameters.AddWithValue("@referenceSchema", bimSnippet.ReferenceSchema);
+                                cmd.Parameters.AddWithValue("@fileContent", bimSnippet.FileContent);
+                                cmd.Parameters.AddWithValue("@topicGuid", topic.Guid);
+
                                 try
                                 {
+                                    cmd.CommandText = bimSnippetSql;
                                     int insertedRow = cmd.ExecuteNonQuery();
                                 }
                                 catch (SQLiteException ex)
@@ -1191,35 +1284,35 @@ namespace BCFDBManager.DatabaseUtils
                             List<TopicDocumentReferences> docReferences = topic.DocumentReferences;
                             if (docReferences.Count > 0)
                             {
-                                strBuilder = new StringBuilder();
-                                strBuilder.Append("INSERT INTO DocumentReferences (Guid, isExternal, ReferenceDocument, FileContent, Description, Topic_Guid) VALUES ");
-                                for (int i = 0; i < docReferences.Count; i++)
-                                {
-                                    TopicDocumentReferences docRef = docReferences[i];
-                                    string contentParam = "@fileContent" + i;
-                                    strBuilder.Append("('" + docRef.Guid + "', " + Convert.ToInt32(docRef.isExternal) + ", '" + docRef.ReferencedDocument + "', "+contentParam+", '" + docRef.Description + "', '"+topic.Guid+"'), ");
-                                    if (!string.IsNullOrEmpty(docRef.ReferencedDocument) && null != docRef.FileContent)
-                                    {
-                                        cmd.Parameters.Add(contentParam, DbType.Binary, docRef.FileContent.Length);
-                                        cmd.Parameters[contentParam].Value = docRef.FileContent;
-                                    }
-                                    else
-                                    {
-                                        cmd.Parameters.Add(contentParam, DbType.Binary);
-                                        cmd.Parameters[contentParam].Value = null;
-                                    }
-                                }
-                                strBuilder.Remove(strBuilder.Length - 2, 2);
+                                cmd.Parameters.Add("@guid", DbType.String);
+                                cmd.Parameters.Add("@isExternal", DbType.Boolean);
+                                cmd.Parameters.Add("@referenceDoc", DbType.String);
+                                cmd.Parameters.Add("@fileContent", DbType.Binary);
+                                cmd.Parameters.Add("@description", DbType.String);
+                                cmd.Parameters.AddWithValue("@topicGuid", topic.Guid);
 
-                                cmd.CommandText = strBuilder.ToString();
-                                try
+                                foreach (TopicDocumentReferences docRef in docReferences)
                                 {
-                                    int insertedRow = cmd.ExecuteNonQuery();
+                                    string docRefSql = "INSERT OR " + mode.ToString() + " INTO DocumentReferences (Guid, isExternal, ReferenceDocument, FileContent, Description, Topic_Guid) VALUES ";
+                                    docRefSql += "(@guid, @isExternal, @referenceDoc, @fileContent, @description, @topicGuid)";
+
+                                    cmd.Parameters["@guid"].Value = docRef.Guid;
+                                    cmd.Parameters["@isExternal"].Value = docRef.isExternal;
+                                    cmd.Parameters["@referenceDoc"].Value = docRef.ReferencedDocument;
+                                    cmd.Parameters["@fileContent"].Value = docRef.FileContent;
+                                    cmd.Parameters["@description"].Value = docRef.Description;
+
+                                    try
+                                    {
+                                        cmd.CommandText = docRefSql;
+                                        int insertedRows = cmd.ExecuteNonQuery();
+                                    }
+                                    catch (SQLiteException ex)
+                                    {
+                                        string message = cmd.CommandText + "/n" + ex.Message;
+                                    }
                                 }
-                                catch (SQLiteException ex)
-                                {
-                                    string message = cmd.CommandText + "/n" + ex.Message;
-                                }
+
                                 cmd.Parameters.Clear();
                             }
                             #endregion
@@ -1228,23 +1321,28 @@ namespace BCFDBManager.DatabaseUtils
                             List<TopicRelatedTopics> relatedTopics = topic.RelatedTopics;
                             if (relatedTopics.Count > 0)
                             {
-                                strBuilder = new StringBuilder();
-                                strBuilder.Append("INSERT INTO RelatedTopics (Guid, Topic_Guid) VALUES ");
+                                cmd.Parameters.Add("@guid", DbType.String);
+                                cmd.Parameters.AddWithValue("@topicGuid", topic.Guid);
+
                                 foreach (TopicRelatedTopics relTopic in relatedTopics)
                                 {
-                                    strBuilder.Append("('" + relTopic.Guid + "', '" + topic.Guid + "'), ");
-                                }
-                                strBuilder.Remove(strBuilder.Length - 2, 2);
+                                    string relTopicSql = "INSERT OR " + mode.ToString() + " INTO RelatedTopics (Guid, Topic_Guid) VALUES ";
+                                    relTopicSql += "(@guid, @topicGuid)";
 
-                                cmd.CommandText = strBuilder.ToString();
-                                try
-                                {
-                                    int insertedRow = cmd.ExecuteNonQuery();
+                                    cmd.Parameters["@guid"].Value = relTopic.Guid;
+                                    cmd.Parameters["@topicGuid"].Value = topic.Guid;
+
+                                    try
+                                    {
+                                        cmd.CommandText = relTopicSql;
+                                        int insertedRows = cmd.ExecuteNonQuery();
+                                    }
+                                    catch (SQLiteException ex)
+                                    {
+                                        string message = cmd.CommandText + "/n" + ex.Message;
+                                    }
                                 }
-                                catch (SQLiteException ex)
-                                {
-                                    string message = cmd.CommandText + "/n" + ex.Message;
-                                }
+                                cmd.Parameters.Clear();
                             }
                             #endregion
 
@@ -1252,33 +1350,61 @@ namespace BCFDBManager.DatabaseUtils
                             List<Comment> comments = markup.Comment;
                             if (comments.Count > 0)
                             {
-                                strBuilder = new StringBuilder();
-                                strBuilder.Append("INSERT INTO Comment (Guid, VerbalStatus, Status, Date, Author, Comment, ModifiedDate, ModifiedAuthor, Topic_Guid) VALUES ");
+                                cmd.Parameters.Add("@guid", DbType.String);
+                                cmd.Parameters.Add("@verbalStatus", DbType.String);
+                                cmd.Parameters.Add("@status", DbType.String);
+                                cmd.Parameters.Add("@date", DbType.DateTime);
+                                cmd.Parameters.Add("@author", DbType.String);
+                                cmd.Parameters.Add("@comment", DbType.String);
+                                cmd.Parameters.Add("@modifiedDate", DbType.DateTime);
+                                cmd.Parameters.Add("@modifiedAuthor", DbType.String);
+                                cmd.Parameters.AddWithValue("@topicGuid", topic.Guid);
+                                cmd.Parameters.Add("@viewpointGuid", DbType.String);
+                                
+                                foreach (Comment comment in comments)
+                                {
+                                    string commentSql = "INSERT OR " + mode.ToString() + " INTO Comment (Guid, VerbalStatus, Status, Date, Author, Comment, ModifiedDate, ModifiedAuthor, Topic_Guid) VALUES ";
+                                    commentSql += "(@guid, @verbalStatus, @status, @date, @author, @comment, @modifiedDate, @modifiedAuthor, @topicGuid)";
 
-                                for (int i = 0; i < comments.Count; i++)
-                                {
-                                    Comment comment = comments[i];
-                                    string dateParam = "@date" + i;
-                                    string modifiedDateParam = "@modifiedDate" + i;
-                                    strBuilder.Append("('"+comment.Guid+"', '"+comment.VerbalStatus+"', '"+comment.Status+"', "+dateParam+", '"+comment.Author+"', '"+comment.Comment1+"', "+modifiedDateParam+", '"+comment.ModifiedAuthor+"', '"+topic.Guid+"'), ");
-                                    cmd.Parameters.Add(dateParam, DbType.DateTime);
-                                    cmd.Parameters[dateParam].Value = comment.Date;
-                                    cmd.Parameters.Add(modifiedDateParam, DbType.DateTime);
-                                    if (comment.ModifiedDateSpecified) { cmd.Parameters[modifiedDateParam].Value = comment.ModifiedDate; }
-                                }
-                                strBuilder.Remove(strBuilder.Length - 2, 2);
+                                    cmd.Parameters["@guid"].Value = comment.Guid;
+                                    cmd.Parameters["@verbalStatus"].Value = comment.VerbalStatus;
+                                    cmd.Parameters["@status"].Value = comment.Status;
+                                    cmd.Parameters["@date"].Value = comment.Date;
+                                    cmd.Parameters["@author"].Value = comment.Author;
+                                    cmd.Parameters["@comment"].Value = comment.Comment1;
+                                    cmd.Parameters["@modifiedDate"].Value = comment.ModifiedDate;
+                                    cmd.Parameters["@modifiedAuthor"].Value = comment.ModifiedAuthor;
 
-                                cmd.CommandText = strBuilder.ToString();
-                                try
-                                {
-                                    int insertedRow = cmd.ExecuteNonQuery();
-                                }
-                                catch (SQLiteException ex)
-                                {
-                                    string message = cmd.CommandText + "/n" + ex.Message;
+                                    try
+                                    {
+                                        cmd.CommandText = commentSql;
+                                        int insertedRows = cmd.ExecuteNonQuery();
+                                    }
+                                    catch (SQLiteException ex)
+                                    {
+                                        string message = cmd.CommandText + "/n" + ex.Message;
+                                    }
+
+                                    CommentViewpoint cv = comment.Viewpoint;
+                                    if (!string.IsNullOrEmpty(cv.Guid))
+                                    {
+                                        string viewpointSql = "INSERT OR " + mode.ToString() + " INTO Viewpoint (Guid, Comment_Guid) VALUES ";
+                                        viewpointSql += "(@viewpointGuid, @guid)";
+
+                                        cmd.Parameters["@viewpointGuid"].Value = cv.Guid;
+
+                                        try
+                                        {
+                                            cmd.CommandText = viewpointSql;
+                                            int insertedRow = cmd.ExecuteNonQuery();
+                                        }
+                                        catch (SQLiteException ex)
+                                        {
+                                            string message = cmd.CommandText + "/n" + ex.Message;
+                                        }
+                                    }
                                 }
                                 cmd.Parameters.Clear();
-                                     
                             }
                             #endregion
 
@@ -1286,69 +1412,35 @@ namespace BCFDBManager.DatabaseUtils
                             List<ViewPoint> viewpoints = markup.Viewpoints;
                             if (viewpoints.Count > 0)
                             {
-                                strBuilder = new StringBuilder();
-                                strBuilder.Append("INSERT INTO Viewpoints (Guid, Viewpoint, Snapshot, Snapshot_Image, Topic_Guid) VALUES ");
+                                cmd.Parameters.Add("@guid", DbType.String);
+                                cmd.Parameters.Add("@viewpoint", DbType.String);
+                                cmd.Parameters.Add("@snapshot", DbType.String);
+                                cmd.Parameters.Add("@snapshotImage", DbType.Binary);
+                                cmd.Parameters.AddWithValue("@topicGuid", topic.Guid);
 
-                                for (int i = 0; i < viewpoints.Count; i++)
+                                foreach (ViewPoint viewPoint in viewpoints)
                                 {
-                                    ViewPoint vp = viewpoints[i];
-                                    string imageParam = "@image" + i;
-                                    strBuilder.Append("('" + vp.Guid + "', '" + vp.Viewpoint + "', '" + vp.Snapshot + "', " + imageParam + ", '" + topic.Guid + "'), ");
-                                    if (!string.IsNullOrEmpty(vp.Snapshot) && null != vp.SnapshotImage)
-                                    {
-                                        cmd.Parameters.Add(imageParam, DbType.Binary, vp.SnapshotImage.Length);
-                                        cmd.Parameters[imageParam].Value = vp.SnapshotImage;
-                                    }
-                                    else
-                                    {
-                                        cmd.Parameters.Add(imageParam, DbType.Binary);
-                                        cmd.Parameters[imageParam].Value = null;
-                                    }
+                                    string viewpointSql = "INSERT OR " + mode.ToString() + " INTO Viewpoints (Guid, Viewpoint, Snapshot, Snapshot_Image, Topic_Guid) VALUES ";
+                                    viewpointSql += "(@guid, @viewpoint, @snapshot, @snapshotImage, @topicGuid)";
 
-                                    strBuilder.Remove(strBuilder.Length - 2, 2);
+                                    cmd.Parameters["@guid"].Value = viewPoint.Guid;
+                                    cmd.Parameters["@viewpoint"].Value = viewPoint.Viewpoint;
+                                    cmd.Parameters["@snapshot"].Value = viewPoint.Snapshot;
+                                    cmd.Parameters["@snapshotImage"].Value = viewPoint.SnapshotImage;
 
-                                    cmd.CommandText = strBuilder.ToString();
                                     try
                                     {
-                                        int insertedRow = cmd.ExecuteNonQuery();
+                                        cmd.CommandText = viewpointSql;
+                                        int insertedRows = cmd.ExecuteNonQuery();
                                     }
                                     catch (SQLiteException ex)
                                     {
                                         string message = cmd.CommandText + "/n" + ex.Message;
                                     }
-                                    cmd.Parameters.Clear();
                                 }
+                                cmd.Parameters.Clear();
                             }
                             #endregion
-
-                            #region commentViewpoint
-                            if (markup.Comment.Count > 0)
-                            {
-                                strBuilder = new StringBuilder();
-                                strBuilder.Append("INSERT INTO Viewpoint (Guid, Comment_Guid) VALUES ");
-
-                                foreach (Comment comment in markup.Comment)
-                                {
-                                    CommentViewpoint cv= comment.Viewpoint;
-                                    if (null != cv)
-                                    {
-                                        strBuilder.Append("('" + cv.Guid + "', '" + comment.Guid + "'), ");
-                                    }
-                                }
-                                strBuilder.Remove(strBuilder.Length - 2, 2);
-
-                                cmd.CommandText = strBuilder.ToString();
-                                try
-                                {
-                                    int insertedRow = cmd.ExecuteNonQuery();
-                                }
-                                catch (SQLiteException ex)
-                                {
-                                    string message = cmd.CommandText + "/n" + ex.Message;
-                                }
-                            }
-                            #endregion
-
                         }
                         trans.Commit();
                         inserted = true;
@@ -1367,7 +1459,7 @@ namespace BCFDBManager.DatabaseUtils
             return inserted;
         }
 
-        private static bool InsertVisInfoValues(BCFComponent bcfComponent, SQLiteConnection connection)
+        private static bool InsertVisInfoValues(BCFComponent bcfComponent, SQLiteConnection connection, ConflictMode mode)
         {
             bool inserted = false;
             try
@@ -1391,73 +1483,104 @@ namespace BCFDBManager.DatabaseUtils
                                 if (!string.IsNullOrEmpty(viewpoint_guid))
                                 {
                                     VisualizationInfo visInfo = bcfComponent.Viewpoints[fileName];
-                                    StringBuilder strBuilder = new StringBuilder();
-
+                                   
                                     #region Bitmaps
                                     List<VisualizationInfoBitmaps> bitMaps = visInfo.Bitmaps;
                                     if (bitMaps.Count > 0)
                                     {
-                                        StringBuilder pointBuilder = new StringBuilder();
-                                        StringBuilder directionBuilder = new StringBuilder();
+                                        cmd.Parameters.Add("@guid", DbType.String);
+                                        cmd.Parameters.Add("@bitmap", DbType.String);
+                                        cmd.Parameters.Add("@bitmapImage", DbType.Binary);
+                                        cmd.Parameters.Add("@reference", DbType.String);
+                                        cmd.Parameters.Add("@location", DbType.String);
+                                        cmd.Parameters.Add("@normal", DbType.String);
+                                        cmd.Parameters.Add("@up", DbType.String);
+                                        cmd.Parameters.Add("@height", DbType.Double);
+                                        cmd.Parameters.AddWithValue("@viewpointGuid", viewpoint_guid);
 
-                                        strBuilder.Append("INSERT INTO Bitmaps (Guid, Bitmap, Bitmap_Image, Reference, Location, Normal, Up, Height, Viewpoints_Guid) VALUES ");
-                                        pointBuilder.Append("INSERT INTO Point (Guid, X, Y, Z) VALUES ");
-                                        directionBuilder.Append("INSERT INTO Direction (Guid, X, Y, Z) VALUES ");
+                                        cmd.Parameters.Add("@pointGuid", DbType.String);
+                                        cmd.Parameters.Add("@pointX", DbType.Double);
+                                        cmd.Parameters.Add("@pointY", DbType.Double);
+                                        cmd.Parameters.Add("@pointZ", DbType.Double);
 
-                                        for (int i = 0; i < bitMaps.Count; i++)
+                                        cmd.Parameters.Add("@directionGuid", DbType.String);
+                                        cmd.Parameters.Add("@directionX", DbType.Double);
+                                        cmd.Parameters.Add("@directionY", DbType.Double);
+                                        cmd.Parameters.Add("@directionZ", DbType.Double);
+
+                                        foreach (VisualizationInfoBitmaps bitmap in bitMaps)
                                         {
-                                            VisualizationInfoBitmaps bitmap = bitMaps[i];
-                                            string imageParam = "@image" + i;
-                                            strBuilder.Append("('"+bitmap.Guid+"', '"+bitmap.Bitmap+"', "+imageParam+", '"+bitmap.Reference+"', '"+bitmap.Location.Guid+"', '"+bitmap.Normal.Guid+"', '"+bitmap.Up.Guid+"', "+bitmap.Height+", '"+viewpoint_guid+"'), ");
-                                            pointBuilder.Append("('" + bitmap.Location.Guid + "', " + bitmap.Location.X + ", " + bitmap.Location.Y + ", " + bitmap.Location.Z + "), ");
-                                            directionBuilder.Append("('" + bitmap.Normal.Guid + "', " + bitmap.Normal.X + ", " + bitmap.Normal.Y + ", " + bitmap.Normal.Z + "), ");
-                                            directionBuilder.Append("('" + bitmap.Up.Guid + "', " + bitmap.Up.X + ", " + bitmap.Up.Y + ", " + bitmap.Up.Z + "), ");
+                                            string bitmapSql = "INSERT OR " + mode.ToString() + " INTO Bitmaps (Guid, Bitmap, Bitmap_Image, Reference, Location, Normal, Up, Height, Viewpoints_Guid) VALUES ";
+                                            bitmapSql += "(@guid, @bitmap, @bitmapImage, @reference, @location, @normal, @up, @height, @viewpointGuid)";
 
-                                            string bitmapName = Path.GetFileName(bitmap.Reference);
-                                            if (!string.IsNullOrEmpty(bitmapName) && null != bitmap.BitmapImage)
+                                            cmd.Parameters["@guid"].Value = bitmap.Guid;
+                                            cmd.Parameters["@bitmap"].Value = bitmap.Bitmap.ToString();
+                                            cmd.Parameters["@bitmapImage"].Value = bitmap.BitmapImage;
+                                            cmd.Parameters["@reference"].Value = bitmap.Reference;
+                                            cmd.Parameters["@location"].Value = bitmap.Location.Guid;
+                                            cmd.Parameters["@normal"].Value = bitmap.Normal.Guid;
+                                            cmd.Parameters["@up"].Value = bitmap.Up.Guid;
+                                            cmd.Parameters["@height"].Value = bitmap.Height;
+
+                                            try
                                             {
-                                                cmd.Parameters.Add(imageParam, DbType.Binary, bitmap.BitmapImage.Length);
-                                                cmd.Parameters[imageParam].Value = bitmap.BitmapImage;
+                                                cmd.CommandText = bitmapSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
                                             }
-                                            else
+                                            catch (SQLiteException ex)
                                             {
-                                                cmd.Parameters.Add(imageParam, DbType.Binary);
-                                                cmd.Parameters[imageParam].Value = null;
+                                                string message = cmd.CommandText + "\n" + ex.Message;
                                             }
-                                        }
 
-                                        strBuilder.Remove(strBuilder.Length - 2, 2);
-                                        pointBuilder.Remove(pointBuilder.Length - 2, 2);
-                                        directionBuilder.Remove(directionBuilder.Length - 2, 2);
+                                            string pointSql = "INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z) VALUES ";
+                                            pointSql += "(@pointGuid, @pointX, @pointY, @pointZ)";
+                                            cmd.Parameters["@pointGuid"].Value = bitmap.Location.Guid;
+                                            cmd.Parameters["@pointX"].Value = bitmap.Location.X;
+                                            cmd.Parameters["@pointY"].Value = bitmap.Location.Y;
+                                            cmd.Parameters["@pointZ"].Value = bitmap.Location.Z;
 
-                                        cmd.CommandText = pointBuilder.ToString();
-                                        try
-                                        {
-                                            int insertedRows = cmd.ExecuteNonQuery();
-                                        }
-                                        catch (SQLiteException ex)
-                                        {
-                                            string message = cmd.CommandText + "\n" + ex.Message;
-                                        }
+                                            try
+                                            {
+                                                cmd.CommandText = pointSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
+                                            }
+                                            catch (SQLiteException ex)
+                                            {
+                                                string message = cmd.CommandText + "\n" + ex.Message;
+                                            }
 
-                                        cmd.CommandText = directionBuilder.ToString();
-                                        try
-                                        {
-                                            int insertedRows = cmd.ExecuteNonQuery();
-                                        }
-                                        catch (SQLiteException ex)
-                                        {
-                                            string message = cmd.CommandText + "\n" + ex.Message;
-                                        }
+                                            string directionSql = "INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z) VALUES ";
+                                            directionSql += "(@directionGuid, @directionX, @directionY, @directionZ)";
+                                            cmd.Parameters["@directionGuid"].Value = bitmap.Normal.Guid;
+                                            cmd.Parameters["@directionX"].Value = bitmap.Normal.X;
+                                            cmd.Parameters["@directionY"].Value = bitmap.Normal.Y;
+                                            cmd.Parameters["@directionZ"].Value = bitmap.Normal.Z;
 
-                                        cmd.CommandText = strBuilder.ToString();
-                                        try
-                                        {
-                                            int insertedRows = cmd.ExecuteNonQuery();
-                                        }
-                                        catch (SQLiteException ex)
-                                        {
-                                            string message = cmd.CommandText + "\n" + ex.Message;
+                                            try
+                                            {
+                                                cmd.CommandText = directionSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
+                                            }
+                                            catch (SQLiteException ex)
+                                            {
+                                                string message = cmd.CommandText + "\n" + ex.Message;
+                                            }
+
+                                            cmd.Parameters["@directionGuid"].Value = bitmap.Up.Guid;
+                                            cmd.Parameters["@directionX"].Value = bitmap.Up.X;
+                                            cmd.Parameters["@directionY"].Value = bitmap.Up.Y;
+                                            cmd.Parameters["@directionZ"].Value = bitmap.Up.Z;
+
+                                            try
+                                            {
+                                                cmd.CommandText = directionSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
+                                            }
+                                            catch (SQLiteException ex)
+                                            {
+                                                string message = cmd.CommandText + "\n" + ex.Message;
+                                            }
+
                                         }
                                         cmd.Parameters.Clear();
                                     }
@@ -1468,36 +1591,38 @@ namespace BCFDBManager.DatabaseUtils
                                     List<Component> components = visInfo.Components;
                                     if (components.Count > 0)
                                     {
-                                        strBuilder = new StringBuilder();
-                                        strBuilder.Append("INSERT INTO Components (Guid, IfcGuid, Selected, Visible, Color, OriginatingSystem, AuthoringToolId, Viewpoints_Guid) VALUES ");
+                                        cmd.Parameters.Add("@guid", DbType.String);
+                                        cmd.Parameters.Add("@ifcGuid", DbType.String);
+                                        cmd.Parameters.Add("@selected", DbType.Boolean);
+                                        cmd.Parameters.Add("@visible", DbType.Boolean);
+                                        cmd.Parameters.Add("@color", DbType.Binary);
+                                        cmd.Parameters.Add("@originatingSystem", DbType.String);
+                                        cmd.Parameters.Add("@authoringToolId", DbType.String);
+                                        cmd.Parameters.AddWithValue("@viewpointGuid", viewpoint_guid);
 
-                                        for (int i = 0; i < components.Count; i++)
+
+                                        foreach(Component comp in components)
                                         {
-                                            Component comp = components[i];
-                                            string colorParam = "@color" + i;
-                                            strBuilder.Append("('"+comp.Guid+"', '"+comp.IfcGuid+"', "+ Convert.ToInt32(comp.Selected)+", "+Convert.ToInt32(comp.Visible)+", "+colorParam+", '"+comp.OriginatingSystem+"', '"+comp.AuthoringToolId+"', '"+viewpoint_guid+"'), ");
+                                            string compSql = "INSERT OR " + mode.ToString() + " INTO Components (Guid, IfcGuid, Selected, Visible, Color, OriginatingSystem, AuthoringToolId, Viewpoints_Guid) VALUES ";
+                                            compSql += "(@guid, @ifcGuid, @selected, @visible, @color, @originatingSystem, @authoringToolId, @viewpointGuid)";
 
-                                            if (null != comp.Color)
+                                            cmd.Parameters["@guid"].Value = comp.Guid;
+                                            cmd.Parameters["@ifcGuid"].Value = comp.IfcGuid;
+                                            cmd.Parameters["@selected"].Value = comp.Selected;
+                                            cmd.Parameters["@visible"].Value = comp.Visible;
+                                            cmd.Parameters["@color"].Value = comp.Color;
+                                            cmd.Parameters["@originatingSystem"].Value = comp.OriginatingSystem;
+                                            cmd.Parameters["@authoringToolId"].Value = comp.AuthoringToolId;
+
+                                            try
                                             {
-                                                cmd.Parameters.Add(colorParam, DbType.Binary, comp.Color.Length);
-                                                cmd.Parameters[colorParam].Value = comp.Color;
+                                                cmd.CommandText = compSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
                                             }
-                                            else
+                                            catch (SQLiteException ex)
                                             {
-                                                cmd.Parameters.Add(colorParam, DbType.Binary);
-                                                cmd.Parameters[colorParam].Value = null;
+                                                string message = cmd.CommandText + "\n" + ex.Message;
                                             }
-                                        }
-                                        strBuilder.Remove(strBuilder.Length - 2, 2);
-
-                                        cmd.CommandText = strBuilder.ToString();
-                                        try
-                                        {
-                                            int insertedRows = cmd.ExecuteNonQuery();
-                                        }
-                                        catch (SQLiteException ex)
-                                        {
-                                            string message = cmd.CommandText + "\n" + ex.Message;
                                         }
                                         cmd.Parameters.Clear();
                                     }
@@ -1507,56 +1632,76 @@ namespace BCFDBManager.DatabaseUtils
                                     List<ClippingPlane> clippingPlanes = visInfo.ClippingPlanes;
                                     if (clippingPlanes.Count > 0)
                                     {
-                                        strBuilder = new StringBuilder();
-                                        StringBuilder pointBuilder = new StringBuilder();
-                                        StringBuilder directionBuilder = new StringBuilder();
+                                        cmd.Parameters.Add("@guid", DbType.String);
+                                        cmd.Parameters.Add("@location", DbType.String);
+                                        cmd.Parameters.Add("@direction", DbType.String);
+                                        cmd.Parameters.AddWithValue("@viewpointGuid", viewpoint_guid);
 
-                                        strBuilder.Append("INSERT INTO ClippingPlane (Guid, Location, Direction, Viewpoints_Guid) VALUES ");
-                                        pointBuilder.Append("INSERT INTO Point (Guid, X, Y, Z) VALUES ");
-                                        directionBuilder.Append("INSERT INTO Direction (Guid, X, Y, Z) VALUES ");
+                                        cmd.Parameters.Add("@locationGuid", DbType.String);
+                                        cmd.Parameters.Add("@locationX", DbType.Double);
+                                        cmd.Parameters.Add("@locationY", DbType.Double);
+                                        cmd.Parameters.Add("@locationZ", DbType.Double);
 
-                                        for (int i = 0; i < clippingPlanes.Count; i++)
-                                        {
-                                            ClippingPlane plane = clippingPlanes[i];
-                                            strBuilder.Append("('" + plane.Guid + "', '" + plane.Location.Guid + "', '" + plane.Direction.Guid + "', '" + viewpoint_guid + "'), ");
-                                            pointBuilder.Append("('"+plane.Location.Guid+"', "+ plane.Location.X+", "+plane.Location.Y+", "+plane.Location.Z+"), ");
-                                            directionBuilder.Append("('" + plane.Direction.Guid + "', " + plane.Direction.X + ", " + plane.Direction.Y + ", " + plane.Direction.Z + "), ");
-                                        }
+                                        cmd.Parameters.Add("@directionGuid", DbType.String);
+                                        cmd.Parameters.Add("@directionX", DbType.Double);
+                                        cmd.Parameters.Add("@directionY", DbType.Double);
+                                        cmd.Parameters.Add("@directionZ", DbType.Double);
 
-                                        strBuilder.Remove(strBuilder.Length - 2, 2);
-                                        pointBuilder.Remove(pointBuilder.Length - 2, 2);
-                                        directionBuilder.Remove(directionBuilder.Length - 2, 2);
+                                        foreach (ClippingPlane plane in clippingPlanes)
+                                        {
+                                            string planeSql = "INSERT OR " + mode.ToString() + " INTO ClippingPlane (Guid, Location, Direction, Viewpoints_Guid) VALUES ";
+                                            planeSql += "(@guid, @location, @direction, viewpointGuid)";
 
-                                        cmd.CommandText = pointBuilder.ToString();
-                                        try
-                                        {
-                                            int insertedRows = cmd.ExecuteNonQuery();
-                                        }
-                                        catch (SQLiteException ex)
-                                        {
-                                            string message = cmd.CommandText + "\n" + ex.Message;
-                                        }
- 
-                                        cmd.CommandText = directionBuilder.ToString();
-                                        try
-                                        {
-                                            int insertedRows = cmd.ExecuteNonQuery();
-                                        }
-                                        catch (SQLiteException ex)
-                                        {
-                                            string message = cmd.CommandText + "\n" + ex.Message;
-                                        }
+                                            cmd.Parameters["@guid"].Value = plane.Guid;
+                                            cmd.Parameters["@location"].Value = plane.Location.Guid;
+                                            cmd.Parameters["@direction"].Value = plane.Direction.Guid;
 
-                                        cmd.CommandText = strBuilder.ToString();
-                                        try
-                                        {
-                                            int insertedRows = cmd.ExecuteNonQuery();
-                                        }
-                                        catch (SQLiteException ex)
-                                        {
-                                            string message = cmd.CommandText + "\n" + ex.Message;
-                                        }
+                                            try
+                                            {
+                                                cmd.CommandText = planeSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
+                                            }
+                                            catch (SQLiteException ex)
+                                            {
+                                                string message = cmd.CommandText + "\n" + ex.Message;
+                                            }
 
+                                            string locationSql = "INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z) VALUES ";
+                                            locationSql += "(@locationGuid, @locationX, @locationY, @locationZ)";
+                                            cmd.Parameters["@locationGuid"].Value = plane.Location.Guid;
+                                            cmd.Parameters["@locationX"].Value = plane.Location.X;
+                                            cmd.Parameters["@locationY"].Value = plane.Location.Y;
+                                            cmd.Parameters["@locationZ"].Value = plane.Location.Z;
+
+                                            try
+                                            {
+                                                cmd.CommandText = locationSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
+                                            }
+                                            catch (SQLiteException ex)
+                                            {
+                                                string message = cmd.CommandText + "\n" + ex.Message;
+                                            }
+
+                                            string directionSql = "INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z) VALUES ";
+                                            directionSql += "(@directionGuid, @directionX, @directionY, @directionZ)";
+                                            cmd.Parameters["@directionGuid"].Value = plane.Direction.Guid;
+                                            cmd.Parameters["@directionX"].Value = plane.Direction.X;
+                                            cmd.Parameters["@directionY"].Value = plane.Direction.Y;
+                                            cmd.Parameters["@directionZ"].Value = plane.Direction.Z;
+
+                                            try
+                                            {
+                                                cmd.CommandText = directionSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
+                                            }
+                                            catch (SQLiteException ex)
+                                            {
+                                                string message = cmd.CommandText + "\n" + ex.Message;
+                                            }
+
+                                        }
+                                        cmd.Parameters.Clear();
                                     }
                                     #endregion
 
@@ -1564,42 +1709,69 @@ namespace BCFDBManager.DatabaseUtils
                                     List<Line> lines = visInfo.Lines;
                                     if (lines.Count > 0)
                                     {
-                                        strBuilder = new StringBuilder();
-                                        StringBuilder pointBuilder = new StringBuilder();
+                                        cmd.Parameters.Add("@guid", DbType.String);
+                                        cmd.Parameters.Add("@startPoint", DbType.String);
+                                        cmd.Parameters.Add("@endPoint", DbType.String);
+                                        cmd.Parameters.AddWithValue("@viewpointGuid", viewpoint_guid);
 
-                                        strBuilder.Append("INSERT INTO Lines (Guid, StartPoint, EndPoint, Viewpoints_Guid) VALUES ");
-                                        pointBuilder.Append("INSERT INTO Point (Guid, X, Y, Z) VALUES ");
+                                        cmd.Parameters.Add("@pointGuid", DbType.String);
+                                        cmd.Parameters.Add("@pointX", DbType.Double);
+                                        cmd.Parameters.Add("@pointY", DbType.Double);
+                                        cmd.Parameters.Add("@pointZ", DbType.Double);
 
-                                        for (int i = 0; i < lines.Count; i++)
+                                        foreach (Line line in lines)
                                         {
-                                            Line line = lines[i];
-                                            strBuilder.Append("('" + line.Guid + "', '" + line.StartPoint.Guid + "', '" + line.EndPoint.Guid + "', '" + viewpoint_guid + "'), ");
-                                            pointBuilder.Append("('" + line.StartPoint.Guid + "', " + line.StartPoint.X + ", " + line.StartPoint.Y + ", " + line.StartPoint.Z + "), ");
-                                            pointBuilder.Append("('" + line.EndPoint.Guid + "', " + line.EndPoint.X + ", " + line.EndPoint.Y + ", " + line.EndPoint.Z + "), ");
-                                        }
+                                            string lineSql = "INSERT OR " + mode.ToString() + " INTO Lines (Guid, StartPoint, EndPoint, Viewpoints_Guid) VALUES ";
+                                            lineSql += "(@guid, @startPoint, @endPoint, @viewpointGuid)";
 
-                                        strBuilder.Remove(strBuilder.Length - 2, 2);
-                                        pointBuilder.Remove(pointBuilder.Length - 2, 2);
+                                            cmd.Parameters["@guid"].Value = line.Guid;
+                                            cmd.Parameters["@startPoint"].Value = line.StartPoint.Guid;
+                                            cmd.Parameters["@endPoint"].Value = line.EndPoint.Guid;
 
-                                        cmd.CommandText = pointBuilder.ToString();
-                                        try
-                                        {
-                                            int insertedRows = cmd.ExecuteNonQuery();
-                                        }
-                                        catch (SQLiteException ex)
-                                        {
-                                            string message = cmd.CommandText + "\n" + ex.Message;
-                                        }
+                                            try
+                                            {
+                                                cmd.CommandText = lineSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
+                                            }
+                                            catch (SQLiteException ex)
+                                            {
+                                                string message = cmd.CommandText + "\n" + ex.Message;
+                                            }
 
-                                        cmd.CommandText = strBuilder.ToString();
-                                        try
-                                        {
-                                            int insertedRows = cmd.ExecuteNonQuery();
+                                            string pointSql = "INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z) VALUES ";
+                                            pointSql += "(@pointGuid, @pointX, @pointY, @pointZ)";
+
+                                            cmd.Parameters["@pointGuid"].Value = line.StartPoint.Guid;
+                                            cmd.Parameters["@pointX"].Value = line.StartPoint.X;
+                                            cmd.Parameters["@pointY"].Value = line.StartPoint.Y;
+                                            cmd.Parameters["@pointZ"].Value = line.StartPoint.Z;
+
+                                            try
+                                            {
+                                                cmd.CommandText = pointSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
+                                            }
+                                            catch (SQLiteException ex)
+                                            {
+                                                string message = cmd.CommandText + "\n" + ex.Message;
+                                            }
+
+                                            cmd.Parameters["@pointGuid"].Value = line.EndPoint.Guid;
+                                            cmd.Parameters["@pointX"].Value = line.EndPoint.X;
+                                            cmd.Parameters["@pointY"].Value = line.EndPoint.Y;
+                                            cmd.Parameters["@pointZ"].Value = line.EndPoint.Z;
+
+                                            try
+                                            {
+                                                cmd.CommandText = pointSql;
+                                                int insertedRows = cmd.ExecuteNonQuery();
+                                            }
+                                            catch (SQLiteException ex)
+                                            {
+                                                string message = cmd.CommandText + "\n" + ex.Message;
+                                            }
                                         }
-                                        catch (SQLiteException ex)
-                                        {
-                                            string message = cmd.CommandText + "\n" + ex.Message;
-                                        }
+                                        cmd.Parameters.Clear();
                                     }
                                     #endregion
 
@@ -1607,23 +1779,19 @@ namespace BCFDBManager.DatabaseUtils
                                     OrthogonalCamera orthoCamera = visInfo.OrthogonalCamera;
                                     if (orthoCamera.ViewToWorldScale != 0)
                                     {
-                                        strBuilder = new StringBuilder();
-                                        StringBuilder pointBuilder = new StringBuilder();
-                                        StringBuilder directionBuilder = new StringBuilder();
+                                        string orthoSql = "INSERT OR " + mode.ToString() + " INTO OrthogonalCamera (Guid, CameraViewPoint, CameraDirection, CameraUpVector, ViewToWorldScale, Viewpoints_Guid) VALUES ";
+                                        orthoSql += "(@guid, @cameraviewPoint, @cameraDirection, @cameraUpVector, @viewToWorldScale, @viewpointGuid)";
 
-                                        strBuilder.Append("INSERT INTO OrthogonalCamera (Guid, CameraViewPoint, CameraDirection, CameraUpVector, ViewToWorldScale, Viewpoints_Guid) VALUES ");
-                                        strBuilder.Append("('" + orthoCamera.Guid + "', '" + orthoCamera.CameraViewPoint.Guid + "', '" + orthoCamera.CameraDirection.Guid + "', '" + orthoCamera.CameraUpVector.Guid + "', " + orthoCamera.ViewToWorldScale + ", '" + viewpoint_guid + "')");
+                                        cmd.Parameters.AddWithValue("@guid", orthoCamera.Guid);
+                                        cmd.Parameters.AddWithValue("@cameraviewPoint", orthoCamera.CameraViewPoint.Guid);
+                                        cmd.Parameters.AddWithValue("@cameraDirection", orthoCamera.CameraDirection.Guid);
+                                        cmd.Parameters.AddWithValue("@cameraUpVector", orthoCamera.CameraUpVector.Guid);
+                                        cmd.Parameters.AddWithValue("@viewToWorldScale", orthoCamera.ViewToWorldScale);
+                                        cmd.Parameters.AddWithValue("@viewpointGuid", viewpoint_guid);
 
-                                        pointBuilder.Append("INSERT INTO Point (Guid, X, Y, Z) VALUES ");
-                                        pointBuilder.Append("('" + orthoCamera.CameraViewPoint.Guid + "', " + orthoCamera.CameraViewPoint.X + ", " + orthoCamera.CameraViewPoint.Y + ", " + orthoCamera.CameraViewPoint.Z + ")");
-
-                                        directionBuilder.Append("INSERT INTO Direction (Guid, X, Y, Z) VALUES ");
-                                        directionBuilder.Append("('" + orthoCamera.CameraDirection.Guid + "', " + orthoCamera.CameraDirection.X + ", " + orthoCamera.CameraDirection.Y + ", " + orthoCamera.CameraDirection.Z + "), ");
-                                        directionBuilder.Append("('" + orthoCamera.CameraUpVector.Guid + "', " + orthoCamera.CameraUpVector.X + ", " + orthoCamera.CameraUpVector.Y + ", " + orthoCamera.CameraUpVector.Z + ")");
-
-                                        cmd.CommandText = pointBuilder.ToString();
                                         try
                                         {
+                                            cmd.CommandText = orthoSql;
                                             int insertedRows = cmd.ExecuteNonQuery();
                                         }
                                         catch (SQLiteException ex)
@@ -1631,9 +1799,22 @@ namespace BCFDBManager.DatabaseUtils
                                             string message = cmd.CommandText + "\n" + ex.Message;
                                         }
 
-                                        cmd.CommandText = directionBuilder.ToString();
+                                        cmd.Parameters.Add("@pointGuid", DbType.String);
+                                        cmd.Parameters.Add("@pointX", DbType.Double);
+                                        cmd.Parameters.Add("@pointY", DbType.Double);
+                                        cmd.Parameters.Add("@pointZ", DbType.Double);
+
+                                        string pointSql = "INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z) VALUES ";
+                                        pointSql += "(@pointGuid, @pointX, @pointY, @pointZ)";
+
+                                        cmd.Parameters["@pointGuid"].Value = orthoCamera.CameraViewPoint.Guid;
+                                        cmd.Parameters["@pointX"].Value = orthoCamera.CameraViewPoint.X;
+                                        cmd.Parameters["@pointY"].Value = orthoCamera.CameraViewPoint.Y;
+                                        cmd.Parameters["@pointZ"].Value = orthoCamera.CameraViewPoint.Z;
+
                                         try
                                         {
+                                            cmd.CommandText = pointSql;
                                             int insertedRows = cmd.ExecuteNonQuery();
                                         }
                                         catch (SQLiteException ex)
@@ -1641,15 +1822,45 @@ namespace BCFDBManager.DatabaseUtils
                                             string message = cmd.CommandText + "\n" + ex.Message;
                                         }
 
-                                        cmd.CommandText = strBuilder.ToString();
+                                        cmd.Parameters.Add("@directionGuid", DbType.String);
+                                        cmd.Parameters.Add("@directionX", DbType.Double);
+                                        cmd.Parameters.Add("@directionY", DbType.Double);
+                                        cmd.Parameters.Add("@directionZ", DbType.Double);
+
+                                        string directionSql = "INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z) VALUES ";
+                                        directionSql += "(@directionGuid, @directionX, @directionY, @directionZ)";
+
+                                        cmd.Parameters["@directionGuid"].Value = orthoCamera.CameraDirection.Guid;
+                                        cmd.Parameters["@directionX"].Value = orthoCamera.CameraDirection.X;
+                                        cmd.Parameters["@directionY"].Value = orthoCamera.CameraDirection.Y;
+                                        cmd.Parameters["@directionZ"].Value = orthoCamera.CameraDirection.Z;
+
                                         try
                                         {
+                                            cmd.CommandText = directionSql;
                                             int insertedRows = cmd.ExecuteNonQuery();
                                         }
                                         catch (SQLiteException ex)
                                         {
                                             string message = cmd.CommandText + "\n" + ex.Message;
                                         }
+
+                                        cmd.Parameters["@directionGuid"].Value = orthoCamera.CameraUpVector.Guid;
+                                        cmd.Parameters["@directionX"].Value = orthoCamera.CameraUpVector.X;
+                                        cmd.Parameters["@directionY"].Value = orthoCamera.CameraUpVector.Y;
+                                        cmd.Parameters["@directionZ"].Value = orthoCamera.CameraUpVector.Z;
+
+                                        try
+                                        {
+                                            cmd.CommandText = directionSql;
+                                            int insertedRows = cmd.ExecuteNonQuery();
+                                        }
+                                        catch (SQLiteException ex)
+                                        {
+                                            string message = cmd.CommandText + "\n" + ex.Message;
+                                        }
+
+                                        cmd.Parameters.Clear();
                                     }
                                     #endregion
 
@@ -1657,23 +1868,19 @@ namespace BCFDBManager.DatabaseUtils
                                     PerspectiveCamera persCamera = visInfo.PerspectiveCamera;
                                     if (persCamera.FieldOfView != 0)
                                     {
-                                        strBuilder = new StringBuilder();
-                                        StringBuilder pointBuilder = new StringBuilder();
-                                        StringBuilder directionBuilder = new StringBuilder();
+                                        string persSql = "INSERT OR " + mode.ToString() + " INTO PerspectiveCamera (Guid, CameraViewPoint, CameraDirection, CameraUpVector, FieldOfView, Viewpoints_Guid) VALUES ";
+                                        persSql += "(@guid, @cameraviewPoint, @cameraDirection, @cameraUpVector, @fieldOfView, @viewpointGuid)";
 
-                                        strBuilder.Append("INSERT INTO PerspectiveCamera (Guid, CameraViewPoint, CameraDirection, CameraUpVector, FieldOfView, Viewpoints_Guid) VALUES ");
-                                        strBuilder.Append("('" + persCamera.Guid + "', '" + persCamera.CameraViewPoint.Guid + "', '" + persCamera.CameraDirection.Guid + "', '" + persCamera.CameraUpVector.Guid + "', " + persCamera.FieldOfView + ", '" + viewpoint_guid + "')");
+                                        cmd.Parameters.AddWithValue("@guid", persCamera.Guid);
+                                        cmd.Parameters.AddWithValue("@cameraviewPoint", persCamera.CameraViewPoint.Guid);
+                                        cmd.Parameters.AddWithValue("@cameraDirection", persCamera.CameraDirection.Guid);
+                                        cmd.Parameters.AddWithValue("@cameraUpVector", persCamera.CameraUpVector.Guid);
+                                        cmd.Parameters.AddWithValue("@fieldOfView", persCamera.FieldOfView);
+                                        cmd.Parameters.AddWithValue("@viewpointGuid", viewpoint_guid);
 
-                                        pointBuilder.Append("INSERT INTO Point (Guid, X, Y, Z) VALUES ");
-                                        pointBuilder.Append("('" + persCamera.CameraViewPoint.Guid + "', " + persCamera.CameraViewPoint.X + ", " + persCamera.CameraViewPoint.Y + ", " + persCamera.CameraViewPoint.Z + ")");
-
-                                        directionBuilder.Append("INSERT INTO Direction (Guid, X, Y, Z) VALUES ");
-                                        directionBuilder.Append("('" + persCamera.CameraDirection.Guid + "', " + persCamera.CameraDirection.X + ", " + persCamera.CameraDirection.Y + ", " + persCamera.CameraDirection.Z + "), ");
-                                        directionBuilder.Append("('" + persCamera.CameraUpVector.Guid + "', " + persCamera.CameraUpVector.X + ", " + persCamera.CameraUpVector.Y + ", " + persCamera.CameraUpVector.Z + ")");
-
-                                        cmd.CommandText = pointBuilder.ToString();
                                         try
                                         {
+                                            cmd.CommandText = persSql;
                                             int insertedRows = cmd.ExecuteNonQuery();
                                         }
                                         catch (SQLiteException ex)
@@ -1681,9 +1888,22 @@ namespace BCFDBManager.DatabaseUtils
                                             string message = cmd.CommandText + "\n" + ex.Message;
                                         }
 
-                                        cmd.CommandText = directionBuilder.ToString();
+                                        cmd.Parameters.Add("@pointGuid", DbType.String);
+                                        cmd.Parameters.Add("@pointX", DbType.Double);
+                                        cmd.Parameters.Add("@pointY", DbType.Double);
+                                        cmd.Parameters.Add("@pointZ", DbType.Double);
+
+                                        string pointSql = "INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z) VALUES ";
+                                        pointSql += "(@pointGuid, @pointX, @pointY, @pointZ)";
+
+                                        cmd.Parameters["@pointGuid"].Value = persCamera.CameraViewPoint.Guid;
+                                        cmd.Parameters["@pointX"].Value = persCamera.CameraViewPoint.X;
+                                        cmd.Parameters["@pointY"].Value = persCamera.CameraViewPoint.Y;
+                                        cmd.Parameters["@pointZ"].Value = persCamera.CameraViewPoint.Z;
+
                                         try
                                         {
+                                            cmd.CommandText = pointSql;
                                             int insertedRows = cmd.ExecuteNonQuery();
                                         }
                                         catch (SQLiteException ex)
@@ -1691,15 +1911,45 @@ namespace BCFDBManager.DatabaseUtils
                                             string message = cmd.CommandText + "\n" + ex.Message;
                                         }
 
-                                        cmd.CommandText = strBuilder.ToString();
+                                        cmd.Parameters.Add("@directionGuid", DbType.String);
+                                        cmd.Parameters.Add("@directionX", DbType.Double);
+                                        cmd.Parameters.Add("@directionY", DbType.Double);
+                                        cmd.Parameters.Add("@directionZ", DbType.Double);
+
+                                        string directionSql = "INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z) VALUES ";
+                                        directionSql += "(@directionGuid, @directionX, @directionY, @directionZ)";
+
+                                        cmd.Parameters["@directionGuid"].Value = persCamera.CameraDirection.Guid;
+                                        cmd.Parameters["@directionX"].Value = persCamera.CameraDirection.X;
+                                        cmd.Parameters["@directionY"].Value = persCamera.CameraDirection.Y;
+                                        cmd.Parameters["@directionZ"].Value = persCamera.CameraDirection.Z;
+
                                         try
                                         {
+                                            cmd.CommandText = directionSql;
                                             int insertedRows = cmd.ExecuteNonQuery();
                                         }
                                         catch (SQLiteException ex)
                                         {
                                             string message = cmd.CommandText + "\n" + ex.Message;
                                         }
+
+                                        cmd.Parameters["@directionGuid"].Value = persCamera.CameraUpVector.Guid;
+                                        cmd.Parameters["@directionX"].Value = persCamera.CameraUpVector.X;
+                                        cmd.Parameters["@directionY"].Value = persCamera.CameraUpVector.Y;
+                                        cmd.Parameters["@directionZ"].Value = persCamera.CameraUpVector.Z;
+
+                                        try
+                                        {
+                                            cmd.CommandText = directionSql;
+                                            int insertedRows = cmd.ExecuteNonQuery();
+                                        }
+                                        catch (SQLiteException ex)
+                                        {
+                                            string message = cmd.CommandText + "\n" + ex.Message;
+                                        }
+
+                                        cmd.Parameters.Clear();
                                     }
                                     #endregion
                                 }
@@ -1723,7 +1973,7 @@ namespace BCFDBManager.DatabaseUtils
             return inserted;
         }
 
-        private static bool InsertCustomValues(BCFZIP bcfzip, SQLiteConnection connection)
+        private static bool InsertCustomValues(BCFZIP bcfzip, SQLiteConnection connection, ConflictMode mode)
         {
             bool inserted = false;
             try
@@ -1737,7 +1987,7 @@ namespace BCFDBManager.DatabaseUtils
                             cmd.Transaction = trans;
 
                             StringBuilder strBuilder = new StringBuilder();
-                            strBuilder.Append("INSERT INTO BCFFileInfo (Guid, FileName, FilePath, UploadedBy, UploadedDate, CreationDate, Project_Guid, Version_Guid) VALUES ");
+                            strBuilder.Append("INSERT OR " + mode.ToString() + " INTO BCFFileInfo (Guid, FileName, FilePath, UploadedBy, UploadedDate, CreationDate, Project_Guid, Version_Guid) VALUES ");
                             strBuilder.Append("('" + bcfzip.FileId + "', '" + bcfzip.ZipFileName + "', '" + bcfzip.ZipFilePath + "', '" + bcfzip.UploadedBy + "', @uploadedDate, @creationDate, '"+bcfzip.ProjectFile.Guid+"', '"+bcfzip.VersionFile.Guid+"')");
 
                             cmd.Parameters.Add("@uploadedDate", DbType.DateTime);
@@ -1756,7 +2006,7 @@ namespace BCFDBManager.DatabaseUtils
                             }
 
                             strBuilder = new StringBuilder();
-                            strBuilder.Append("INSERT INTO FileTopics (Topic_Guid, File_Guid) VALUES ");
+                            strBuilder.Append("INSERT OR " + mode.ToString() + " INTO FileTopics (Topic_Guid, File_Guid) VALUES ");
                             foreach (string guid in bcfzip.BCFComponents.Keys)
                             {
                                 strBuilder.Append("('" + guid + "', '" + bcfzip.FileId + "'), ");

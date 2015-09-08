@@ -22,11 +22,11 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = false)]
     public partial class Version
     {
-        private string guidField;
+        private string guidField = "";
 
-        private string detailedVersionField;
+        private string detailedVersionField = "";
 
-        private string versionIdField;
+        private string versionIdField = "";
 
         public Version()
         {

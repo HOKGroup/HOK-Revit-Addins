@@ -142,13 +142,13 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = true)]
     public partial class Component
     {
-        private string guidField;
+        private string guidField = "";
 
-        private string originatingSystemField;
+        private string originatingSystemField = "";
 
-        private string authoringToolIdField;
+        private string authoringToolIdField = "";
 
-        private string ifcGuidField;
+        private string ifcGuidField = "";
 
         private bool selectedField;
 
@@ -291,7 +291,7 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = true)]
     public partial class ClippingPlane
     {
-        private string guidField;
+        private string guidField = "";
 
         private Point locationField;
 
@@ -360,7 +360,7 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = true)]
     public partial class Point
     {
-        private string guidField;
+        private string guidField = "";
 
         private double xField;
 
@@ -443,7 +443,7 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = true)]
     public partial class Direction
     {
-        private string guidField;
+        private string guidField = "";
 
         private double xField;
 
@@ -525,7 +525,7 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = true)]
     public partial class Line
     {
-        private string guidField;
+        private string guidField = "";
 
         private Point startPointField;
 
@@ -594,7 +594,7 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = true)]
     public partial class PerspectiveCamera
     {
-        private string guidField;
+        private string guidField = "";
 
         private Point cameraViewPointField;
 
@@ -694,7 +694,7 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlRootAttribute(Namespace = "", IsNullable = true)]
     public partial class OrthogonalCamera
     {
-        private string guidField;
+        private string guidField = "";
 
         private Point cameraViewPointField;
 
@@ -793,11 +793,11 @@ namespace BCFDBManager
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     public partial class VisualizationInfoBitmaps
     {
-        private string guidField;
+        private string guidField = "";
 
         private BitmapFormat bitmapField;
 
-        private string referenceField;
+        private string referenceField = "";
 
         private Point locationField;
 

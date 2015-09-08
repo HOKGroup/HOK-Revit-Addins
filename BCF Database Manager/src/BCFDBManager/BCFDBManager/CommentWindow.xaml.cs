@@ -28,9 +28,9 @@ namespace BCFDBManager
         private Markup selectedMarkup = null;
         private Comment selectedComment = null;
         private CommentMode commentMode = CommentMode.NONE;
-
-        private string[] statusItems = new string[] { "Assigned", "Closed", "Open", "Resolved" };
-        private string[] verbalStatusItems = new string[] { "Error", "Info", "Unknown", "Warning"  };
+        
+        private string[] statusItems = new string[] { "Error", "Info", "Unknown", "Warning"  };
+        private string[] verbalStatusItems = new string[] { "Assigned", "Closed", "Open", "Resolved" };
 
         public Markup SelectedMarkup { get { return selectedMarkup; } set { selectedMarkup = value; } }
         public Comment SelectedComment { get { return selectedComment; } set { selectedComment = value; } }

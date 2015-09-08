@@ -7,7 +7,7 @@ using System.Windows;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("BCFDBManager")]
+[assembly: AssemblyTitle("BCF Database Manager")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2015.0.1.0")]
-[assembly: AssemblyFileVersion("2015.0.1.0")]
+[assembly: AssemblyVersion("2015.0.1.6")]
+[assembly: AssemblyFileVersion("2015.0.1.6")]

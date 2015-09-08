@@ -101,19 +101,19 @@ namespace BCFDBManager {
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
     public partial class HeaderFile {
 
-        private string guidField;
+        private string guidField = "";
 
-        private string filenameField;
+        private string filenameField = "";
         
         private System.DateTime dateField;
         
         private bool dateFieldSpecified;
         
-        private string referenceField;
+        private string referenceField = "";
         
-        private string ifcProjectField;
+        private string ifcProjectField = "";
         
-        private string ifcSpatialStructureElementField;
+        private string ifcSpatialStructureElementField = "";
         
         private bool isExternalField;
         
@@ -233,11 +233,11 @@ namespace BCFDBManager {
     [System.Xml.Serialization.XmlRootAttribute(Namespace="", IsNullable=true)]
     public partial class ViewPoint {
         
-        private string viewpointField;
+        private string viewpointField = "";
         
-        private string snapshotField;
+        private string snapshotField = "";
         
-        private string guidField;
+        private string guidField = "";
 
         private byte[] snapshotImageField;
 
@@ -311,15 +311,15 @@ namespace BCFDBManager {
     [System.Xml.Serialization.XmlRootAttribute(Namespace="", IsNullable=true)]
     public partial class Comment {
         
-        private string verbalStatusField;
+        private string verbalStatusField = "";
         
-        private string statusField;
+        private string statusField = "";
         
         private System.DateTime dateField;
         
-        private string authorField;
+        private string authorField = "";
         
-        private string comment1Field;
+        private string comment1Field = "";
         
         private CommentViewpoint viewpointField;
         
@@ -327,9 +327,9 @@ namespace BCFDBManager {
         
         private bool modifiedDateFieldSpecified;
         
-        private string modifiedAuthorField;
+        private string modifiedAuthorField = "";
         
-        private string guidField;
+        private string guidField = "";
         
         public Comment() {
             this.viewpointField = new CommentViewpoint();
@@ -466,7 +466,7 @@ namespace BCFDBManager {
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
     public partial class CommentViewpoint {
         
-        private string guidField;
+        private string guidField = "";
         
         [System.Xml.Serialization.XmlAttributeAttribute()]
         public string Guid {
@@ -503,13 +503,13 @@ namespace BCFDBManager {
     [System.Xml.Serialization.XmlRootAttribute(Namespace="", IsNullable=true)]
     public partial class BimSnippet {
 
-        private string guidField;
+        private string guidField = "";
 
-        private string referenceField;
+        private string referenceField = "";
         
-        private string referenceSchemaField;
+        private string referenceSchemaField = "";
         
-        private string snippetTypeField;
+        private string snippetTypeField = "";
         
         private bool isExternalField;
 
@@ -612,29 +612,29 @@ namespace BCFDBManager {
     [System.Xml.Serialization.XmlRootAttribute(Namespace="", IsNullable=true)]
     public partial class Topic {
         
-        private string referenceLinkField;
+        private string referenceLinkField = "";
         
-        private string titleField;
+        private string titleField = "";
         
-        private string priorityField;
+        private string priorityField = "";
         
-        private string indexField;
+        private string indexField = "";
         
         private List<string> labelsField;
         
         private System.DateTime creationDateField;
         
-        private string creationAuthorField;
+        private string creationAuthorField = "";
         
         private System.DateTime modifiedDateField;
         
         private bool modifiedDateFieldSpecified;
         
-        private string modifiedAuthorField;
+        private string modifiedAuthorField = "";
         
-        private string assignedToField;
+        private string assignedToField = "";
         
-        private string descriptionField;
+        private string descriptionField = "";
         
         private BimSnippet bimSnippetField;
         
@@ -642,11 +642,11 @@ namespace BCFDBManager {
         
         private List<TopicRelatedTopics> relatedTopicsField;
         
-        private string guidField;
+        private string guidField = "";
         
-        private string topicTypeField;
+        private string topicTypeField = "";
         
-        private string topicStatusField;
+        private string topicStatusField = "";
         
         public Topic() {
             this.relatedTopicsField = new List<TopicRelatedTopics>();
@@ -873,11 +873,11 @@ namespace BCFDBManager {
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
     public partial class TopicDocumentReferences {
         
-        private string referencedDocumentField;
+        private string referencedDocumentField = "";
         
-        private string descriptionField;
+        private string descriptionField = "";
         
-        private string guidField;
+        private string guidField = "";
         
         private bool isExternalField;
 
@@ -966,7 +966,7 @@ namespace BCFDBManager {
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
     public partial class TopicRelatedTopics {
         
-        private string guidField;
+        private string guidField = "";
 
         public TopicRelatedTopics()
         {

@@ -17,7 +17,12 @@ namespace BCFDBManager.BCFUtils
 
     public static class BCFFileManager
     {
-        
+        public static ProgressBar progressBar = null;
+        public static TextBlock statusLabel = null;
+
+        private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
+        private delegate void UpdateStatusLabelDelegate(System.Windows.DependencyProperty dp, Object value);
+
         public static BCFZIP ReadBCF(string bcfPath)
         {
             BCFZIP bcfZip = new BCFZIP(bcfPath);
@@ -25,8 +30,19 @@ namespace BCFDBManager.BCFUtils
             {
                 using (ZipArchive archive = ZipFile.OpenRead(bcfPath))
                 {
+                    UpdateStatusLabelDelegate updateLabelDelegate = new UpdateStatusLabelDelegate(statusLabel.SetValue);
+                    System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Gathering information from the BCF file..." });
+
+                    UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
+                    progressBar.Value = 0;
+                    progressBar.Maximum = archive.Entries.Count;
+
+                    double value = 0;
                     foreach (ZipArchiveEntry entry in archive.Entries)
                     {
+                        value++;
+                        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
+
                         string entryFullName = entry.FullName;
                         string guid = "";
                         string fileName = "";
@@ -134,7 +150,15 @@ namespace BCFDBManager.BCFUtils
             BCFZIP bcfzip = zipFile;
             try
             {
+                UpdateStatusLabelDelegate updateLabelDelegate = new UpdateStatusLabelDelegate(statusLabel.SetValue);
+                System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, "Mapping binary file contents..." });
+
+                UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
                 List<string> guids = bcfzip.BCFComponents.Keys.ToList();
+                progressBar.Value = 0;
+                progressBar.Maximum = guids.Count;
+
+                double value = 0;
                 foreach (string guid in guids)
                 {
                     BCFComponent component = bcfzip.BCFComponents[guid];
@@ -228,6 +252,8 @@ namespace BCFDBManager.BCFUtils
 
                     bcfzip.BCFComponents.Remove(guid);
                     bcfzip.BCFComponents.Add(guid, component);
+                    value++;
+                    System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
                 }
             }
             catch (Exception ex)

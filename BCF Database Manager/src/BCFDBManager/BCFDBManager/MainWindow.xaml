@@ -49,7 +49,7 @@
                         <TextBlock VerticalAlignment="Center">Connect Database</TextBlock>
                     </StackPanel>
                 </Button>
-                <Button Name="buttonAddBCF" Margin="5,0" IsEnabled="False">
+                <Button Name="buttonAddBCF" Margin="5,0" IsEnabled="False" Click="buttonAddBCF_Click">
                     <StackPanel Orientation="Horizontal">
                         <Image Margin="0,0,5,0" Height="32" Width="32" Source="Images/document_new.ico"/>
                         <TextBlock VerticalAlignment="Center">Add BCF</TextBlock>
@@ -91,7 +91,7 @@
                     <ColumnDefinition Width="250"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <DataGrid x:Name="dataGridComments" Grid.Column="1" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="dataGridComments_SelectionChanged" CanUserAddRows="False">
+                <DataGrid x:Name="dataGridComments" Grid.Column="1" Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionChanged="dataGridComments_SelectionChanged" CanUserAddRows="False" IsReadOnly="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Comment" Binding="{Binding Comment1}" Width="1*"/>
                         <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
