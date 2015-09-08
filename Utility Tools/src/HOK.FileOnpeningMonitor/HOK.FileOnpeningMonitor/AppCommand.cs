@@ -8,6 +8,7 @@ using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Events;
 using System.Windows.Threading;
+using System.Windows;
 
 
 
@@ -111,19 +112,59 @@ namespace HOK.FileOnpeningMonitor
             bool isCentralFile = false;
             try
             {
-                ModelPath modelPath = document.GetWorksharingCentralModelPath();
-                string centralPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
-                if (!string.IsNullOrEmpty(centralPath))
+                ModelPath centralModelPath = document.GetWorksharingCentralModelPath();
+                if (null!=centralModelPath)
                 {
-                    if (document.PathName == centralPath)
+                    string userVisiblePath = ModelPathUtils.ConvertModelPathToUserVisiblePath(centralModelPath);
+                    if (centralModelPath.ServerPath)
                     {
-                        isCentralFile = true;
+                        string revitServerPrefix = "RSN://";
+                        string a360Prefix = "A360://";
+                        string relativePath = "";
+
+                        if (userVisiblePath.Contains(revitServerPrefix))
+                        {
+                            string serverLocation = revitServerPrefix + centralModelPath.CentralServerPath;
+                            relativePath = userVisiblePath.Substring(serverLocation.Length);
+                        }
+                        else if (userVisiblePath.Contains(a360Prefix))
+                        {
+                            string serverLocation = a360Prefix + centralModelPath.CentralServerPath;
+                            relativePath = userVisiblePath.Substring(serverLocation.Length);
+                        }
+
+                        ServerPath serverPath = new ServerPath(centralModelPath.CentralServerPath, relativePath);
+                        Guid centralGUID = document.Application.GetWorksharingCentralGUID(serverPath);
+                        if (centralGUID != Guid.Empty)
+                        {
+                            ModelPath currentModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(document.PathName);
+                            if (null!=currentModelPath)
+                            {
+#if RELEASE2015|| RELEASE2016
+                                Guid currentGuid = currentModelPath.GetModelGUID();
+                                if (currentGuid != Guid.Empty)
+                                {
+                                    if (centralGUID.Equals(currentGuid))
+                                    {
+                                        isCentralFile = true;
+                                    }
+                                }
+#endif
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (document.PathName == userVisiblePath)
+                        {
+                            isCentralFile = true;
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                MessageBox.Show("Failed to determine whether the file is central or local.\n"+ex.Message, "IsCentralFile", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return isCentralFile;
         }

@@ -28,6 +28,7 @@ namespace HOK.FileOnpeningMonitor
             fileInfo = info;
             
             InitializeComponent();
+            this.Title = "Central File Opened!  v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             if (!string.IsNullOrEmpty(fileInfo.DocCentralPath))
             {
                 textBlockFilePath.Text = "Central File Path:\n" + fileInfo.DocCentralPath;

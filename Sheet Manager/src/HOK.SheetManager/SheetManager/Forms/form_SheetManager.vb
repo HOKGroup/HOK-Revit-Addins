@@ -958,6 +958,121 @@ Public Class form_SheetManager
 
     End Sub
 
+    Private Sub buttonRenameViews_Click(sender As Object, e As EventArgs) Handles buttonRenameViews.Click
+        Dim listTestRename As New List(Of String)
+
+        'Do not allow Access case
+        If m_isExcel = False Then
+            ShowRevitTaskDialog("Sheet Manager", "Processing Stopped...", "Renumber not supported with Access database.")
+            Return
+        End If
+
+        'Get sheet values; assuming Excel
+        'm_UtilityInterop.FillDataTableFromExcelWorksheet(ListBoxTableSet.SelectedItem.ToString)
+        m_UtilityInterop.FillDataTableFromExcelWorksheet("Rename Views")
+        m_DataTable = m_UtilityInterop.DataTable
+        'Notes on Excel.  The number of rows at this point is the total, including blanks, to the last line.
+        'The use of "dataTable.Columns" correctly interprets the first line as columns and then
+        'A loop using "row in dataTable.Rows" seems to get each subsequent row, including blanks
+        'Another form is: Extended Properties=\"Excel 8.0;HDR=Yes\""); Apparently the HDR indicates that there is a header row.
+
+        ' Make sure the correct columns are present
+        If Not CheckColumnPresent(m_DataTable, "OldName") Then
+            Return
+        End If
+        If Not CheckColumnPresent(m_DataTable, "NewName") Then
+            Return
+        End If
+
+        'Start the progress bar and hide the buttons
+        Me.buttonAddViewsToSheets.Visible = False
+        Me.buttonClose.Visible = False
+        Me.buttonUpdateCreate.Visible = False
+        Me.buttonRenumberSheets.Visible = False
+        Me.buttonRenameViews.Visible = False
+        Me.buttonExportData.Visible = False
+        With Me.ProgressBar1
+            .Minimum = 0
+            .Maximum = m_DataTable.Rows.Count + 2
+            .Value = 0
+            .Visible = True
+        End With
+        Me.ProgressBar1.Increment(1)
+
+        Dim countView As Integer = 0
+        Using m_Trans As New Transaction(m_Settings.Document, "HOK View Rename")
+            m_Trans.Start()
+            Try
+                For Each row As DataRow In m_DataTable.Rows
+
+                    'Increment the progress bar
+                    Me.ProgressBar1.Increment(1)
+
+                    'Check for missing values and ignore them
+                    If row("OldName").ToString = "" Then
+                        Continue For
+                    End If
+                    If row("NewName").ToString = "" Then
+                        Continue For
+                    End If
+                Next
+
+                'Restart the progress bar
+                With Me.ProgressBar1
+                    .Minimum = 0
+                    .Maximum = m_DataTable.Rows.Count + 2
+                    .Value = 0
+                    .Visible = True
+                End With
+                Me.ProgressBar1.Increment(1)
+
+
+                'To avoid transparent look while waiting
+                'Process each row in rename table
+                For Each row As DataRow In m_DataTable.Rows
+                    'Increment the progress bar
+                    Me.ProgressBar1.Increment(1)
+
+                    Dim oldName As String = row("OldName").ToString
+                    Dim newName As String = row("NewName").ToString
+
+                    'See if sheet exists, otherwise ignore it.  If found renumber and update dictionary
+                    If m_Settings.Views.ContainsKey(oldName) And Not m_Settings.Views.ContainsKey(newName) Then
+                        m_View = m_Settings.Views(oldName)
+                        m_View.ViewName = newName
+                        m_Settings.Views.Add(newName, m_Settings.Views(oldName))
+                        m_Settings.Views.Remove(oldName)
+                        m_View.ViewName = newName
+                        countView = countView + 1
+                    End If
+                Next
+
+                ' Commit the transaction
+                m_Trans.Commit()
+            Catch ex As Exception
+                m_Trans.RollBack()
+                Dim message As String = ex.Message
+            End Try
+        End Using
+
+
+        'Empty the data table since it seems to fill up with repeated use of the command
+        m_DataTable.Clear()
+        If m_UtilityInterop.DataTable IsNot Nothing Then
+            m_UtilityInterop.DataTable.Clear()
+        End If
+
+        'Close the progress bar
+        Me.ProgressBar1.Visible = False
+        Me.buttonAddViewsToSheets.Visible = True
+        Me.buttonClose.Visible = True
+        Me.buttonUpdateCreate.Visible = True
+        Me.buttonRenumberSheets.Visible = True
+        Me.buttonRenameViews.Visible = True
+        Me.buttonExportData.Visible = True
+        'Completed message
+        ShowRevitTaskDialog("Sheet Manager", "Processing Completed", countView.ToString + " old view names were replaced with new numbers.")
+    End Sub
     ''' <summary>
     ''' Export Sheet Data
     ''' </summary>
@@ -1811,4 +1926,5 @@ UpdateExistingElement:
     End Sub
 
    
+    
 End Class

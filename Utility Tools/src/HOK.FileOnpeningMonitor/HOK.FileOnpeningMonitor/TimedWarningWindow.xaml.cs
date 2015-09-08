@@ -30,7 +30,8 @@ namespace HOK.FileOnpeningMonitor
             openedCentralFiles = centralFiles;
 
             InitializeComponent();
-            this.Title = "Central File Notification " + timerCount;
+            this.Title = "Central File Notification " + timerCount + " v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            
             if (centralFiles.Count > 0)
             {
                 listBoxFiles.ItemsSource = openedCentralFiles.Keys.ToList();

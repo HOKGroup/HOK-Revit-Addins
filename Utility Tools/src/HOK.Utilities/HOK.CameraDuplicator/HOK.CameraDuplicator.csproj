@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.CameraDuplicator</RootNamespace>
-    <AssemblyName>HOK.CameraDuplicator_v.2016.0.1.1</AssemblyName>
+    <AssemblyName>HOK.CameraDuplicator_v.2013.0.1.2</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

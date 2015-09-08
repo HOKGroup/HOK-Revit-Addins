@@ -39,6 +39,9 @@ namespace HOK.CameraDuplicator
             viewConfig = vc;
 
             InitializeComponent();
+            labelSource.Content = sModelInfo.ModelName;
+            labelTarget.Content = rModelInfo.ModelName;
+
             checkBoxWorkset.IsChecked = vc.ApplyWorksetVisibility;
             GetItems();
             //remove non-existing mapping items

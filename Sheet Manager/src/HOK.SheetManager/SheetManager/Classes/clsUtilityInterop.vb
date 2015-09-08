@@ -105,7 +105,7 @@ Public Class clsUtilityInterop
                 'note index starts at 1
                 worksheet = DirectCast(m_ExcelWorkbook.Sheets(i), Excel.Worksheet)
                 Dim worksheetName As String = worksheet.Name
-                If Not worksheetName = "Renumber Sheets" Then
+                If Not worksheetName = "Renumber Sheets" And Not worksheetName = "Rename Views" Then
                     row = m_DataTable.NewRow()
                     row(0) = worksheetName
                     m_DataTable.Rows.Add(row)
