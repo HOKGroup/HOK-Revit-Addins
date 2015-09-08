@@ -15,8 +15,8 @@ namespace HOK.AddInsInstaller
     {
         public static ToolNames[] tools2013 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor };
         public static ToolNames[] tools2014 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor };
-        public static ToolNames[] tools2015 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor };
-        public static ToolNames[] tools2016 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor };
+        public static ToolNames[] tools2015 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover };
+        public static ToolNames[] tools2016 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover };
 
         public static Dictionary<string/*versionNumber*/, ToolPackageInfo> GetToolPackageInfo()
         {
@@ -307,6 +307,22 @@ namespace HOK.AddInsInstaller
 
                             toolInfoDictionary.Add(projectInfo.ToolName, projectInfo);
                             break;
+                        case ToolNames.ElementMover:
+                            ToolInfo moverInfo = new ToolInfo(toolEnum);
+                            moverInfo.ToolName = "Element Mover";
+                            moverInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\HOK.ElementMover.dll";
+                            if (!File.Exists(betaDirectory + moverInfo.DllPath)) { break; }
+                            moverInfo.ToolIcon = ImageUtil.LoadBitmapImage("mover.png");
+
+                            moverInfo.SetBetaVersion(betaDirectory + moverInfo.DllPath);
+                            moverInfo.SetBetaDate(betaDirectory + moverInfo.DllPath);
+                            moverInfo.SetInstallVersion(installDirectory + moverInfo.DllPath);
+
+                            moverInfo.FilePaths.Add("\\HOK.ElementMover.addin");
+                            moverInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\HOK.ElementMover.dll");
+
+                            toolInfoDictionary.Add(moverInfo.ToolName, moverInfo);
+                            break;
                     }
                 }
             }
@@ -388,7 +404,8 @@ namespace HOK.AddInsInstaller
         None,
         SmartBCF,
         FileMonitor,
-        ProjectMonitor
+        ProjectMonitor,
+        ElementMover
     }
 
     public static class ImageUtil
