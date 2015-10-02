@@ -1074,9 +1074,12 @@ namespace HOK.LevelManager
                             {
                                 if (ElementId.InvalidElementId != eLevelId)
                                 {
-                                    Level eLevel = m_doc.GetElement(eLevelId) as Level;
-                                    XYZ direction = new XYZ(0, 0, eLevel.Elevation - toLevel.Elevation);
-                                    moved = element.Location.Move(direction);
+                                    if (null != element.Location)
+                                    {
+                                        Level eLevel = m_doc.GetElement(eLevelId) as Level;
+                                        XYZ direction = new XYZ(0, 0, eLevel.Elevation - toLevel.Elevation);
+                                        moved = element.Location.Move(direction);
+                                    }
                                 }
                             }
                         }
