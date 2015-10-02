@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.RoomUpdater</RootNamespace>
-    <AssemblyName>HOK.RoomUpdater</AssemblyName>
+    <AssemblyName>HOK.RoomUpdater_v.2016.0.4.14</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

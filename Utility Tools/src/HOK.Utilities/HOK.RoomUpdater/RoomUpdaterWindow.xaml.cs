@@ -732,6 +732,7 @@ namespace HOK.RoomUpdater
                                     XYZ firstPt = curve.GetEndPoint(0);
                                     XYZ secondPt = curve.GetEndPoint(1);
 #endif
+                                    XYZ centerPt = curve.Evaluate(0.5, true);
 
                                     if (sep.IsLinked && null != sep.LinkProperties)
                                     {
@@ -741,14 +742,21 @@ namespace HOK.RoomUpdater
 
                                     if (null != room)
                                     {
-                                        if (room.IsPointInRoom(firstPt) || room.IsPointInRoom(secondPt))
+                                        //modification: pick centroid
+                                        if (room.IsPointInRoom(centerPt))
                                         {
                                             revitElements.Add(element);
                                         }
+
+                                        /*
+                                        if (room.IsPointInRoom(firstPt) || room.IsPointInRoom(secondPt))
+                                        {
+                                            revitElements.Add(element);
+                                        }*/
                                     }
                                     else if (null != space)
                                     {
-                                        if (space.IsPointInSpace(firstPt) || space.IsPointInSpace(secondPt))
+                                        if (space.IsPointInSpace(centerPt))
                                         {
                                             revitElements.Add(element);
                                         }
