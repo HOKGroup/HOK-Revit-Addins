@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,27 +18,26 @@ namespace HOK.ModelManager.GoogleDocs
     public static class GoogleDriveUtil
     {
         public static DriveService service = null;
-        
+
+        private static string keyFile = "HOK Project Replicator.p12";
+        private static string serviceAccountEmail = "1008136763933-o7vgka08vtgd6oc4c4i90k1hvbjuvoe5@developer.gserviceaccount.com";
+
         private static DriveService GetUserCredential()
         {
             DriveService driveService = null;
             try
             {
-                UserCredential credential;
                 string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
                 string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
-                string jsonPath = System.IO.Path.Combine(currentDirectory, "Resources\\client_secrets_ProjectReplicator.json");
+                string keyFilePath = System.IO.Path.Combine(currentDirectory, "Resources\\" + keyFile);
 
-                using (var filestream = new System.IO.FileStream(jsonPath,
-                    System.IO.FileMode.Open, System.IO.FileAccess.Read))
-                {
-                    credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                        GoogleClientSecrets.Load(filestream).Secrets,
-                        new[] { DriveService.Scope.Drive },
-                        "user",
-                        CancellationToken.None).Result;
-                        
-                }
+                X509Certificate2 certificate = new X509Certificate2(keyFilePath, "notasecret", X509KeyStorageFlags.Exportable);
+
+                ServiceAccountCredential credential = new ServiceAccountCredential(
+                    new ServiceAccountCredential.Initializer(serviceAccountEmail)
+                    {
+                        Scopes = new[] { DriveService.Scope.Drive }
+                    }.FromCertificate(certificate));
 
                 // Create the service.
                 driveService = new DriveService(new BaseClientService.Initializer()
@@ -45,7 +45,6 @@ namespace HOK.ModelManager.GoogleDocs
                     HttpClientInitializer = credential,
                     ApplicationName = "HOK Project Replicator",
                 });
-
             }
             catch (Exception ex)
             {
@@ -60,6 +59,7 @@ namespace HOK.ModelManager.GoogleDocs
             try
             {
                 ProjectReplicatorSettings settings = DataStorageUtil.ReadSettings(modelInfo.Doc);
+                /*
                 sheetId = settings.GoogleSheetId;
                 if (!string.IsNullOrEmpty(sheetId))
                 {
@@ -73,6 +73,7 @@ namespace HOK.ModelManager.GoogleDocs
                         }
                     }
                 }
+                */
 
                 sheetId = FindGoogleSheetId(modelInfo);
                 settings.GoogleSheetId = sheetId;
