@@ -90,7 +90,12 @@ namespace HOK.ElementMover
                 FilteredElementCollector collector = new FilteredElementCollector(linkedDocument);
                 List<Element> elements = collector.WhereElementIsNotElementType().ToElements().ToList();
                 var elementCategories = from element in elements where null != element.Category select element.Category;
+#if RELEASE2014
+                var modelCategories = from category in elementCategories where category.HasMaterialQuantities select category;
+#elif RELEASE2015|| RELEASE2016
                 var modelCategories = from category in elementCategories where  category.HasMaterialQuantities && category.CategoryType == CategoryType.Model select category;
+#endif
+
                 var categoryNames = from category in modelCategories select category.Name;
                 List<string> categoryNameList = categoryNames.Distinct().ToList();
 
@@ -239,7 +244,10 @@ namespace HOK.ElementMover
                                 ElementType sourceType = linkedDocument.GetElement(familyInfo.SourceTypeId) as ElementType;
                                 if (null != sourceType)
                                 {
-                                    familyInfo = new LinkedFamilyInfo(familyInfo.SourceLinkInstanceId, sourceType, elementType);
+                                    ElementTypeInfo sourceTypeInfo = new ElementTypeInfo(sourceType);
+                                    ElementTypeInfo targetTypeInfo = new ElementTypeInfo(elementType);
+
+                                    familyInfo = new LinkedFamilyInfo(familyInfo.SourceLinkInstanceId, sourceTypeInfo, targetTypeInfo);
                                     if (!linkedFamilies.ContainsKey(familyInfo.TargetTypeId))
                                     {
                                         linkedFamilies.Add(familyInfo.TargetTypeId, familyInfo);
@@ -344,8 +352,9 @@ namespace HOK.ElementMover
                     ElementType elementType = linkedElement.Document.GetElement(typeId) as ElementType;
                     if (null != elementType)
                     {
-                        familyName = elementType.FamilyName;
-                        familyTypeName = elementType.Name;
+                        ElementTypeInfo typeInfo = new ElementTypeInfo(elementType);
+                        familyName = typeInfo.FamilyName;
+                        familyTypeName = typeInfo.Name;
                         linkDisplayText = "Source Id: " + sourceElementId.IntegerValue + ", Target Id: " + linkedElementId.IntegerValue;
                     }
                 }
@@ -466,17 +475,49 @@ namespace HOK.ElementMover
         {
         }
 
-        public LinkedFamilyInfo(ElementId linkInstanceId, ElementType sourceType, ElementType targetType)
+        public LinkedFamilyInfo(ElementId linkInstanceId, ElementTypeInfo sourceType, ElementTypeInfo targetType)
         {
             sourceLinkInstanceId = linkInstanceId;
             sourceTypeId = sourceType.Id;
             targetTypeId = targetType.Id;
 
-            categoryName = sourceType.Category.Name;
+            categoryName = sourceType.CategoryName;
             sourceFamilyName = sourceType.FamilyName;
             sourceTypeName = sourceType.Name;
             targetFamilyName = targetType.FamilyName;
             targetTypeName = targetType.Name;
+        }
+    }
+
+    public class ElementTypeInfo
+    {
+        private ElementId id = ElementId.InvalidElementId;
+        private string name = "";
+        private string familyName = "";
+        private string categoryName = "";
+
+        public ElementId Id { get { return id; } set { id = value; } }
+        public string Name { get { return name; } set { name = value; } }
+        public string FamilyName { get { return familyName; } set { familyName = value; } }
+        public string CategoryName { get { return categoryName; } set { categoryName = value; } }
+
+        public ElementTypeInfo(ElementType elementType)
+        {
+            id = elementType.Id;
+            name = elementType.Name;
+#if RELEASE2014
+            Parameter param = elementType.get_Parameter(BuiltInParameter.ALL_MODEL_FAMILY_NAME);
+            if (null != param)
+            {
+                familyName = param.AsString();
+            }
+#elif RELEASE2015 || RELEASE2016
+            familyName = elementType.FamilyName;
+#endif
+            if (null != elementType.Category)
+            {
+                categoryName = elementType.Category.Name;
+            }
         }
     }
 

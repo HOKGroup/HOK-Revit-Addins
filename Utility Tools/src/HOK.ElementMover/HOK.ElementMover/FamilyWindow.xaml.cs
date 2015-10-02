@@ -32,8 +32,11 @@ namespace HOK.ElementMover
         private Document linkedDoc = null;
         private Document hostDoc = null;
 
-        private List<ElementType> sourceTypes = new List<ElementType>();
-        private List<ElementType> targetTypes = new List<ElementType>();
+        private List<ElementTypeInfo> sourceTypesInfo = new List<ElementTypeInfo>();
+        private List<ElementTypeInfo> targetTypesInfo = new List<ElementTypeInfo>();
+
+        //private List<ElementType> sourceTypes = new List<ElementType>();
+        //private List<ElementType> targetTypes = new List<ElementType>();
 
         public LinkedInstanceProperties SelectedLink { get { return selectedLink; } set { selectedLink = value; } }
         public LinkedFamilyInfo FamilyInfo { get { return familyInfo; } set { familyInfo = value; } }
@@ -74,14 +77,21 @@ namespace HOK.ElementMover
                 List<ElementType> sTypes = collector.OfClass(typeof(ElementType)).ToElements().Cast<ElementType>().ToList();
                 var sElementTypes = from type in sTypes where null != type.Category select type;
                 sElementTypes = from type in sElementTypes where selectedLink.Categories.ContainsKey(type.Category.Id) select type;
-                sourceTypes = sElementTypes.ToList();
-                
+                foreach (ElementType eType in sElementTypes)
+                {
+                    ElementTypeInfo eTypeInfo = new ElementTypeInfo(eType);
+                    sourceTypesInfo.Add(eTypeInfo);
+                }
 
                 collector = new FilteredElementCollector(hostDoc);
                 List<ElementType> tTypes = collector.OfClass(typeof(ElementType)).ToElements().Cast<ElementType>().ToList();
                 var tElementTypes = from type in tTypes where null != type.Category select type;
                 tElementTypes = from type in tElementTypes where selectedLink.Categories.ContainsKey(type.Category.Id) select type;
-                targetTypes = tElementTypes.ToList();
+                foreach (ElementType eType in tElementTypes)
+                {
+                    ElementTypeInfo eTypeInfo = new ElementTypeInfo(eType);
+                    targetTypesInfo.Add(eTypeInfo);
+                }
             }
             catch (Exception ex)
             {
@@ -101,7 +111,7 @@ namespace HOK.ElementMover
                     comboBoxTargetType.ItemsSource = null;
 
                     CategoryProperties cp = (CategoryProperties)comboBoxCategory.SelectedItem;
-                    var sourceFamilies = from stype in sourceTypes where stype.Category.Name == cp.CategoryName select stype.FamilyName;
+                    var sourceFamilies = from stype in sourceTypesInfo where stype.CategoryName == cp.CategoryName select stype.FamilyName;
                     if (sourceFamilies.Count() > 0)
                     {
                         List<string> sourceFamilyNames = sourceFamilies.Distinct().OrderBy(o => o).ToList();
@@ -109,7 +119,7 @@ namespace HOK.ElementMover
                         comboBoxSourceFamily.SelectedIndex = 0;
                     }
 
-                    var targetFamilies = from ttype in targetTypes where ttype.Category.Name == cp.CategoryName select ttype.FamilyName;
+                    var targetFamilies = from ttype in targetTypesInfo where ttype.CategoryName == cp.CategoryName select ttype.FamilyName;
                     if (targetFamilies.Count() > 0)
                     {
                         List<string> targetFamilyNames = targetFamilies.Distinct().OrderBy(o => o).ToList();
@@ -132,12 +142,12 @@ namespace HOK.ElementMover
                 if (null != comboBoxSourceFamily.SelectedItem)
                 {
                     string selectedFamily = comboBoxSourceFamily.SelectedItem.ToString();
-                    var elementTypes = from sType in sourceTypes
+                    var elementTypes = from sType in sourceTypesInfo
                                        where sType.FamilyName == selectedFamily
                                        select sType;
                     if (elementTypes.Count() > 0)
                     {
-                        List<ElementType> types = elementTypes.OrderBy(o => o.Name).ToList();
+                        List<ElementTypeInfo> types = elementTypes.OrderBy(o => o.Name).ToList();
                         
                         comboBoxSourceType.ItemsSource = null;
                         comboBoxSourceType.ItemsSource = types;
@@ -158,12 +168,12 @@ namespace HOK.ElementMover
                 if (null != comboBoxTargetFamily.SelectedItem)
                 {
                     string selectedFamily = comboBoxTargetFamily.SelectedItem.ToString();
-                    var elementTypes = from tType in targetTypes
+                    var elementTypes = from tType in targetTypesInfo
                                        where tType.FamilyName== selectedFamily
                                        select tType;
                     if (elementTypes.Count() > 0)
                     {
-                        List<ElementType> types = elementTypes.OrderBy(o => o.Name).ToList();
+                        List<ElementTypeInfo> types = elementTypes.OrderBy(o => o.Name).ToList();
 
                         comboBoxTargetType.ItemsSource = null;
                         comboBoxTargetType.ItemsSource = types;
@@ -184,8 +194,8 @@ namespace HOK.ElementMover
                 if (null != comboBoxCategory.SelectedItem && null != comboBoxSourceFamily.SelectedItem && null != comboBoxTargetFamily.SelectedItem
                     && null != comboBoxSourceType.SelectedItem && null != comboBoxTargetType.SelectedItem)
                 {
-                    ElementType sourceType = (ElementType)comboBoxSourceType.SelectedItem;
-                    ElementType targetType = (ElementType)comboBoxTargetType.SelectedItem;
+                    ElementTypeInfo sourceType = (ElementTypeInfo)comboBoxSourceType.SelectedItem;
+                    ElementTypeInfo targetType = (ElementTypeInfo)comboBoxTargetType.SelectedItem;
                     if (null != sourceType && null != targetType)
                     {
                         familyInfo = new LinkedFamilyInfo(selectedLink.InstanceId, sourceType, targetType);

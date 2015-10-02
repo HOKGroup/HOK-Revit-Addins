@@ -339,30 +339,23 @@ namespace HOK.ElementMover
                                         Element element = m_doc.GetElement(eId);
                                         if (null != element)
                                         {
-                                            string sourceTypeName = "";
-                                            string sourceFamilyName = "";
-
+                                            ElementTypeInfo sourceTypeInfo = null;
                                             ElementId sourceTypeId = linkedElement.GetTypeId();
                                             ElementType sourceType = linkedDoc.GetElement(sourceTypeId) as ElementType;
                                             if (null != sourceType)
                                             {
-                                                sourceTypeName = sourceType.Name;
-                                                sourceFamilyName = sourceType.FamilyName;
+                                                sourceTypeInfo = new ElementTypeInfo(sourceType);
                                             }
 
-                                            string targetTypeName = "";
-                                            string targetFamilyName = "";
-
+                                            ElementTypeInfo targetTypeInfo = null;
                                             ElementId targetTypeId = element.GetTypeId();
                                             ElementType targetType = m_doc.GetElement(targetTypeId) as ElementType;
                                             if (null != targetType)
                                             {
-                                                targetTypeName = targetType.Name;
-                                                targetFamilyName = targetType.FamilyName;
+                                                targetTypeInfo = new ElementTypeInfo(targetType);
                                             }
 
-                                            if (!string.IsNullOrEmpty(sourceFamilyName) && !string.IsNullOrEmpty(targetFamilyName) 
-                                                && sourceFamilyName == targetFamilyName && sourceTypeName == targetTypeName)
+                                            if (null!=sourceTypeInfo && null!=targetType) 
                                             {
                                                 sourceElement = linkedElement;
                                                 targetElement = element;
@@ -371,8 +364,8 @@ namespace HOK.ElementMover
                                             else
                                             {
                                                 StringBuilder strBuilder = new StringBuilder();
-                                                strBuilder.AppendLine("Source Family Name: " + sourceFamilyName + ", Source Type Name: " + sourceTypeName);
-                                                strBuilder.AppendLine("Target Family Name: " + targetFamilyName + ", Target Type Name: " + targetTypeName);
+                                                strBuilder.AppendLine("Source Family Name: " + sourceTypeInfo.FamilyName + ", Source Type Name: " + sourceTypeInfo.Name);
+                                                strBuilder.AppendLine("Target Family Name: " + targetTypeInfo.FamilyName + ", Target Type Name: " + targetTypeInfo.Name);
                                                 strBuilder.AppendLine("");
                                                 strBuilder.AppendLine("Would you like to proceed with creating a map?");
                                                 MessageBoxResult result = MessageBox.Show(strBuilder.ToString(), "Mismatch Name", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -459,9 +452,21 @@ namespace HOK.ElementMover
                 try
                 {
                     UIDocument uidoc = new UIDocument(m_doc);
+#if RELEASE2014
+                    Element element = m_doc.GetElement(selectedLinkedInfo.LinkedElementId);
+                    if(null!=element)
+                    {
+                        SelElementSet selElements = uidoc.Selection.Elements;
+                        selElements.Insert(element);
+
+                        uidoc.Selection.Elements = selElements;
+                    }
+#elif RELEASE2015||RELEASE2016
                     List<ElementId> selectedIds = new List<ElementId>();
                     selectedIds.Add(selectedLinkedInfo.LinkedElementId);
                     uidoc.Selection.SetElementIds(selectedIds);
+#endif
+
                     uidoc.ShowElements(selectedLinkedInfo.LinkedElementId);
                     trans.Commit();
                 }

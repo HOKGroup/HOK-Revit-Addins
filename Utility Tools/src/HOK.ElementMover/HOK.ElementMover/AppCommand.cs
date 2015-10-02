@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,6 +41,13 @@ namespace HOK.ElementMover
 
             PushButton moverButton = panel.AddItem(new PushButtonData("ElementMover", "Element Mover", currentAssembly, "HOK.ElementMover.MoverCommand")) as PushButton;
             moverButton.LargeImage = moverImage;
+
+            string instructionFile = @"V:\RVT-Data\HOK Program\Documentation\Element Mover_Instruction.pdf";
+            if (File.Exists(instructionFile))
+            {
+                ContextualHelp contextualHelp = new ContextualHelp(ContextualHelpType.Url, instructionFile);
+                moverButton.SetContextualHelp(contextualHelp);
+            }
 
             ctrApp.DocumentChanged += new EventHandler<Autodesk.Revit.DB.Events.DocumentChangedEventArgs>(CtrApp_DocumentChanged);
             return Result.Succeeded;
