@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,8 @@ using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.Win32;
+using SolibriBatchSetup.Schema;
+using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace SolibriBatchSetup
 {
@@ -24,233 +27,170 @@ namespace SolibriBatchSetup
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string configFile = "";
-        private batch batchConfig = new batch();
+        private Batch batch= new Batch();
+        private ObservableCollection<ProcessUnit> processUnits = new ObservableCollection<ProcessUnit>();
+        private ObservableCollection<OpenRuleset> commonRuleSets = new ObservableCollection<OpenRuleset>();
+
         private AutorunSettings settings = new AutorunSettings();
+        private bool isEditing = false;
 
         public MainWindow()
         {
             InitializeComponent();
-            this.Title = "Solibri Batch Configuration v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            this.Title = "Solibri Batch Manager v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            DisplayConfig();
+            LoadUserSettings();
         }
 
-        private bool ReadBatchConfig(string fileName, out batch batchFromFile)
+        private void DisplayConfig()
         {
-            bool validated = false;
-            batchFromFile = new batch();
             try
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(batch));
-                using (FileStream fs = new FileStream(fileName, FileMode.Open))
+                dataGridOpenSolibri.ItemsSource = null;
+                dataGridOpenSolibri.ItemsSource = processUnits;
+                if (dataGridOpenSolibri.Items.Count > 0)
                 {
-                    XmlReader reader = XmlReader.Create(fs);
-
-                    if (serializer.CanDeserialize(reader))
-                    {
-                        batchFromFile = (batch)serializer.Deserialize(reader);
-                        validated = true;
-                    }
-                    fs.Close();
+                    dataGridOpenSolibri.SelectedIndex = 0;
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to read batch configuration file.\n"+ex.Message, "Read Batch Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return validated;
-        }
 
-        private bool DisplayBatchConfig(batch batchSetting)
-        {
-            bool displayed = false;
-            try
-            {
-                textBoxConfig.Text = configFile;
-
-                List<model> ifcFiles = batchSetting.target.openmodel.OrderBy(o => o.file).ToList();
-                dataGridIFC.ItemsSource = null;
-                dataGridIFC.ItemsSource = ifcFiles;
-
-                List<model> rulesetFiles = batchSetting.target.openruleset.OrderBy(o => o.file).ToList();
                 dataGridRuleset.ItemsSource = null;
-                dataGridRuleset.ItemsSource = rulesetFiles;
+                dataGridRuleset.ItemsSource = commonRuleSets;
 
-                textBoxBCF.Text = "";
-                if (batchSetting.target.bcfreport.Count > 0)
-                {
-                    textBoxBCF.Text = batchSetting.target.bcfreport.First().file;
-                }
+                dataGridBCF.ItemsSource = null;
+                dataGridBCF.ItemsSource = processUnits;
 
-                textBoxSolibri.Text = "";
-                if (batchSetting.target.savemodel.Count > 0)
-                {
-                    textBoxSolibri.Text = batchSetting.target.savemodel.First().file;
-                }
+                dataGridSaveSolibri.ItemsSource = null;
+                dataGridSaveSolibri.ItemsSource = processUnits;
 
+                statusLable.Text = System.IO.Path.GetFileNameWithoutExtension(batch.FilePath);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to display batch settings.\n" + ex.Message, "Display Batch Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to display configuration file.\n" + ex.Message, "Display Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            return displayed;
         }
 
-        private void Window_Drop(object sender, DragEventArgs e)
+        private void LoadUserSettings()
         {
             try
             {
-                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                settings.SolibriSetup = new SolibriProperties(Properties.Settings.Default.SolibriVersionNumber, Properties.Settings.Default.SolibriExe);
+                settings.RemoteSetup = new RempoteMachine(Properties.Settings.Default.ComputerLocation, Properties.Settings.Default.ComputerName, Properties.Settings.Default.DirectoryName);
+                settings.SaveSolibriSettings = new SaveModelSettings(BatchFileType.Solibri, Properties.Settings.Default.SolibriSaveInPlace, Properties.Settings.Default.SolibriOutputFolder, Properties.Settings.Default.SolibriAppendDate);
+                settings.SaveBCFSettings = new SaveModelSettings(BatchFileType.BCF, Properties.Settings.Default.BCFSaveInPlace, Properties.Settings.Default.BCFOutputFolder, Properties.Settings.Default.BCFAppendDate);
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+       
+        #region Menu Items
+        private void NewConfig(object sender, ExecutedRoutedEventArgs e)
+        {
+            try
+            {
+                if (isEditing)
                 {
-                    bool fileAdded = false;
-                    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                    string xmlFile = "";
-                    List<string> ifcFiles = new List<string>();
-                    List<string> rulesetFiles = new List<string>();
-                    foreach (string file in files)
+                    MessageBoxResult result = MessageBox.Show("Would you like to save the curent configuration file?", "Save File", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.Yes || result == MessageBoxResult.No)
                     {
-                        if (System.IO.Path.GetExtension(file).Contains("xml"))
+                        if (result == MessageBoxResult.Yes)
                         {
-                            xmlFile = file; break;
+                            SaveConfig();
                         }
-                        if (System.IO.Path.GetExtension(file).Contains("ifc"))
-                        {
-                            ifcFiles.Add(file);
-                        }
-                        if (System.IO.Path.GetExtension(file).Contains("cset"))
-                        {
-                            rulesetFiles.Add(file);
-                        }
+                        batch = new Batch();
+                        processUnits = BatchSetupUtils.ExtractProcessUnits(batch);
+                        commonRuleSets = BatchSetupUtils.ExtractRulesets(batch);
+                        DisplayConfig();
+                        statusLable.Text = "Ready";
+                        isEditing = false;
                     }
-                    if (!string.IsNullOrEmpty(xmlFile))
-                    {
-                        batch batchFromFile = new batch();
-                        if (ReadBatchConfig(xmlFile, out batchFromFile))
-                        {
-                            batchConfig = batchFromFile;
-                            configFile = xmlFile;
-                            fileAdded = true;
-                        }
-                    }
-                    if (ifcFiles.Count > 0)
-                    {
-                        foreach (string fileItem in ifcFiles)
-                        {
-                            var itemFound = from ifcFile in batchConfig.target.openmodel where ifcFile.file == fileItem select ifcFile;
-                            if (File.Exists(fileItem) && itemFound.Count() == 0)
-                            {
-                                model modelItem = new model();
-                                modelItem.file = fileItem;
-
-                                batchConfig.target.openmodel.Add(modelItem);
-                                fileAdded = true;
-                            }
-                        }
-                    }
-                    if (rulesetFiles.Count > 0)
-                    {
-                        foreach (string fileItem in rulesetFiles)
-                        {
-                            var itemFound = from rule in batchConfig.target.openruleset where rule.file == fileItem select rule;
-                            if (File.Exists(fileItem) && itemFound.Count() == 0)
-                            {
-                                FileInfo fi = new FileInfo(fileItem);
-                                model modelItem = new model();
-                                modelItem.file = fileItem;
-
-                                batchConfig.target.openruleset.Add(modelItem);
-                                fileAdded = true;
-                            }
-                        }
-                    }
-                    if (fileAdded)
-                    {
-                        DisplayBatchConfig(batchConfig);
-                    }
+                }
+                else
+                {
+                    batch = new Batch();
+                    processUnits = BatchSetupUtils.ExtractProcessUnits(batch);
+                    commonRuleSets = BatchSetupUtils.ExtractRulesets(batch);
+                    DisplayConfig();
+                    statusLable.Text = "Ready";
+                    isEditing = false;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to drop files.\n"+ex.Message, "Drop Files", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string message = ex.Message;
             }
         }
 
-        private void buttonOpenConfig_Click(object sender, RoutedEventArgs e)
+        private void OpenConfig(object sender, ExecutedRoutedEventArgs e)
         {
             try
             {
-                OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "xml files (*.xml)|*.xml";
-                openFileDialog.RestoreDirectory = false;
-                if (settings.RunRemote && Directory.Exists(settings.RemoteDirectory)) { openFileDialog.InitialDirectory = settings.RemoteDirectory; }
-                openFileDialog.Multiselect = false;
-                openFileDialog.Title = "Open Solibri Batch Configuration File";
-
-                if (openFileDialog.ShowDialog() == true)
+                OpenFileDialog openDialog = new OpenFileDialog();
+                openDialog.Filter = "Batch Configuration File (*.xml)|*.xml";
+                openDialog.Title = "Open Batch Configuration File";
+                openDialog.InitialDirectory = settings.RemoteSetup.DirectoryName;
+                openDialog.Multiselect = false;
+                if (openDialog.ShowDialog() == true)
                 {
-                    string xmlFile = openFileDialog.FileName;
-                    batch batchFromFile = new batch();
-                    if (ReadBatchConfig(xmlFile, out batchFromFile))
+                    string xmlFile = openDialog.FileName;
+                    bool read = BatchSetupUtils.ReadBatchConfig(xmlFile, out batch);
+                    if (read)
                     {
-                        batchConfig = batchFromFile;
-                        configFile = xmlFile;
-                        DisplayBatchConfig(batchConfig);
+                        processUnits = BatchSetupUtils.ExtractProcessUnits(batch);
+                        commonRuleSets = BatchSetupUtils.ExtractRulesets(batch);
+                        DisplayConfig();
+                        isEditing = false;
                     }
                 }
+
+                /*
+                OpenFileWindow openWindow = new OpenFileWindow(settings.RemoteSetup.DirectoryName);
+                openWindow.Owner = this;
+                if (openWindow.ShowDialog() == true)
+                {
+                    string xmlFile = openWindow.ConfigFileName;
+                    bool read = BatchSetupUtils.ReadBatchConfig(xmlFile, out batch);
+                    if (read)
+                    {
+                        processUnits = BatchSetupUtils.ExtractProcessUnits(batch);
+                        commonRuleSets = BatchSetupUtils.ExtractRulesets(batch);
+                        DisplayConfig();
+                        isEditing = false;
+                    }
+                }*/
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to open the configuration file.\n"+ex.Message, "Open Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to open configuration file.\n" + ex.Message, "Open Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
-        private void buttonSave_Click(object sender, RoutedEventArgs e)
+        private void SaveConfig()
         {
             try
             {
-                if (IsValidateConfig(batchConfig))
+                if (string.IsNullOrEmpty(batch.FilePath))
                 {
-                    SaveFileDialog saveFileDialog = new SaveFileDialog();
-                    saveFileDialog.Filter = "xml files (*.xml)|*.xml";
-                    saveFileDialog.RestoreDirectory = false;
-                    if (settings.RunRemote && Directory.Exists(settings.RemoteDirectory)) { saveFileDialog.InitialDirectory = settings.RemoteDirectory; }
-                    saveFileDialog.Title = "Save Solibri Batch Configuration File";
-                    if (!string.IsNullOrEmpty(configFile))
+                    SaveFileWindow saveWindow = new SaveFileWindow(settings.RemoteSetup.DirectoryName);
+                    saveWindow.Owner = this;
+                    if (saveWindow.ShowDialog() == true)
                     {
-                        saveFileDialog.FileName = System.IO.Path.GetFileName(configFile);
+                        batch.FilePath = saveWindow.ConfigFileName;
                     }
+                }
 
-                    if (saveFileDialog.ShowDialog() == true)
+                if (!string.IsNullOrEmpty(batch.FilePath))
+                {
+                    batch.Target.Elements = BatchSetupUtils.ConvertToGenericElements(processUnits, commonRuleSets);
+                    bool savedConfig = BatchSetupUtils.SaveBatchConfig(batch.FilePath, batch);
+                    bool savedBatch = BatchSetupUtils.CreateBatchFile(batch.FilePath, settings);
+                    if (savedConfig && savedBatch)
                     {
-                        string xmlFile = saveFileDialog.FileName;
-                        if (settings.RunRemote)
-                        {
-                            if (System.IO.Path.GetDirectoryName(xmlFile) != settings.RemoteDirectory)
-                            {
-                                MessageBox.Show("Please save the configuration file in the assigned directory in the remote machine.", "Invalid File Directory", MessageBoxButton.OK, MessageBoxImage.Information);
-                                return;
-                            }
-                        }
-                        XmlSerializer serializer = new XmlSerializer(typeof(batch));
-                        using (FileStream fs = new FileStream(xmlFile, FileMode.Create))
-                        {
-                            XmlWriter writer = XmlWriter.Create(fs);
-                            serializer.Serialize(writer, batchConfig);
-                            fs.Close();
-                        }
-                        if (File.Exists(xmlFile))
-                        {
-                            configFile = xmlFile;
-                            textBoxConfig.Text = configFile;
-                            bool batchCreated = CreateBatchFile(xmlFile);
-                            if (batchCreated)
-                            {
-                                MessageBoxResult msgResult = MessageBox.Show("Batch configuration files are successfully saved in " + xmlFile+"\nWould you like to close this application?", "Batch Configuration Saved", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                                if (msgResult == MessageBoxResult.Yes)
-                                {
-                                    this.Close();
-                                }
-                            }
-                        }
+                        statusLable.Text = System.IO.Path.GetFileNameWithoutExtension(batch.FilePath);
+                        isEditing = false;
+                        MessageBox.Show("Batch configuration files are successfully saved!!", "Batch Configuration Saved", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
             }
@@ -260,85 +200,239 @@ namespace SolibriBatchSetup
             }
         }
 
-        private bool IsValidateConfig(batch batchSetting)
+        private void SaveConfig(object sender, ExecutedRoutedEventArgs e)
         {
-            bool validated = true;
+            SaveConfig();
+        }
+
+        private void SaveAsConfig(object sender, ExecutedRoutedEventArgs e)
+        {
             try
             {
-                if (batchSetting.target.openmodel.Count == 0)
+                SaveFileWindow saveWindow = new SaveFileWindow(settings.RemoteSetup.DirectoryName);
+                saveWindow.Owner = this;
+                if (saveWindow.ShowDialog() == true)
                 {
-                    MessageBox.Show("Please select IFC files to be opened in Solibri.", "IFC Files Missing", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return false;
-                }
-
-                if (batchConfig.target.savemodel.Count == 0)
-                {
-                    MessageBox.Show("Please assign a file path for the Solibri file to be saved.", "Solibri File Missing", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return false;
-                }
-
-                if (batchSetting.target.openruleset.Count > 0 && batchSetting.target.bcfreport.Count > 0)
-                {
-                    //auto check
-                    if (batchConfig.target.check.Count == 0)
+                    batch.FilePath = saveWindow.ConfigFileName;
+                    batch.Target.Elements = BatchSetupUtils.ConvertToGenericElements(processUnits, commonRuleSets);
+                    bool savedConfig = BatchSetupUtils.SaveBatchConfig(batch.FilePath, batch);
+                    bool savedBatch = BatchSetupUtils.CreateBatchFile(batch.FilePath, settings);
+                    if (savedConfig && savedBatch)
                     {
-                        batchConfig.target.check.Add(new object());
-                    }
-                    if (batchConfig.target.autocomment.Count == 0)
-                    {
-                        batchConfig.target.autocomment.Add(new autocomment());
-                    }
-                    if (batchConfig.target.createpresentation.Count == 0)
-                    {
-                        batchConfig.target.createpresentation.Add(new object());
+                        statusLable.Text = System.IO.Path.GetFileNameWithoutExtension(batch.FilePath);
+                        isEditing = false;
+                        MessageBox.Show("Batch configuration files are successfully saved!!", "Batch Configuration Saved", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
 
-                if (batchConfig.target.closemodel.Count == 0)
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to save the configuration file in a different location.\n" + ex.Message, "Save As Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void menuOptions_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SettingWindow settingWindow = new SettingWindow(settings);
+                settingWindow.Owner = this;
+                if (settingWindow.ShowDialog() == true)
                 {
-                    batchConfig.target.closemodel.Add(new object());
+                    settings = settingWindow.Settings;
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void menuHelp_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void menuBug_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Outlook.Application outlookApp = new Outlook.Application();
+                Outlook.NameSpace nameSpace = outlookApp.GetNamespace("MAPI");
+                Outlook.Folder folderInbox = (Outlook.Folder)nameSpace.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox);
+                Outlook.MailItem mailItem = (Outlook.MailItem)outlookApp.CreateItem(Outlook.OlItemType.olMailItem);
+
+                mailItem.Subject = "Solibri Batch Manager Problem Report";
+                mailItem.Body = "**** This email will go to the developer of the application. ****\nPlease attach the configuration file generated or screen captured images of the application.\n";
+
+                mailItem.Recipients.Add("jinsol.kim@hok.com");
+                mailItem.Display(false);
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void menuAbout_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void menuExit_Click(object sender, RoutedEventArgs e)
+        {
+            if (isEditing)
+            {
+                MessageBoxResult result = MessageBox.Show("Would you like to save the curent configuration file?", "Save File", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes || result == MessageBoxResult.No)
+                {
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        SaveConfig();
+                    }
+                }
+            }
+            this.Close();
+        }
+        #endregion
+
+        private void expanderIFC_Collapsed(object sender, RoutedEventArgs e)
+        {
+            expanderIFC.Header = "Show IFC Files";
+             GridLength collapsedHeight = new GridLength(40, GridUnitType.Pixel);
+             expanderRowDefinition.Height = collapsedHeight;
+        }
+
+        private void expanderIFC_Expanded(object sender, RoutedEventArgs e)
+        {
+            expanderIFC.Header = "Hide IFC Files";
+            GridLength expandedHeight = new GridLength(1, GridUnitType.Star);
+            expanderRowDefinition.Height = expandedHeight;
+        }
+
+        private void dataGridOpenSolibri_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                dataGridIfc.ItemsSource = null;
+                if (null != dataGridOpenSolibri.SelectedItem)
+                {
+                    ProcessUnit selectedUnit = dataGridOpenSolibri.SelectedItem as ProcessUnit;
+                    dataGridIfc.ItemsSource = selectedUnit.IfcFiles;
+
+                    int index = dataGridOpenSolibri.SelectedIndex;
+                    dataGridBCF.SelectedIndex = index;
+                    dataGridSaveSolibri.SelectedIndex = index;
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void dataGridBCF_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                int index = dataGridBCF.SelectedIndex;
+                dataGridOpenSolibri.SelectedIndex = index;
+                dataGridSaveSolibri.SelectedIndex = index;
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void dataGridSaveSolibri_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                int index = dataGridSaveSolibri.SelectedIndex;
+                dataGridOpenSolibri.SelectedIndex = index;
+                dataGridBCF.SelectedIndex = index;
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                if (isEditing)
+                {
+                    MessageBoxResult result = MessageBox.Show("Would you like to save the curent configuration file?", "Save File", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.Yes || result == MessageBoxResult.No)
+                    {
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            SaveConfig();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void buttonSetting_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                SettingWindow settingWindow = new SettingWindow(settings);
+                settingWindow.Owner = this;
+                if (settingWindow.ShowDialog() == true)
+                {
+                    settings = settingWindow.Settings;
+                    for (int i = processUnits.Count-1; i >-1; i--)
+                    {
+                        ProcessUnit unit = processUnits[i];
+                        unit = ApplySettings(unit);
+                        processUnits.RemoveAt(i);
+                        processUnits.Insert(i, unit);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        #region Add or Remove Items
+        private void buttonAddSolibri_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenFileDialog openDialog = new OpenFileDialog();
+                openDialog.Filter = "Solibri Model Checker Files (*.smc)|*.smc";
+                openDialog.Title = "Open Solibri Models";
+                openDialog.Multiselect = true;
+                if (openDialog.ShowDialog() == true)
+                {
+                    string fileName = openDialog.FileName;
+                    ProcessUnit unit = new ProcessUnit();
+                    unit.OpenSolibri = new OpenModel(fileName);
+                    unit = ApplySettings(unit);
+                    processUnits.Add(unit);
+                    isEditing = true;
                 }
                 
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to validate the configuration setting.\n" + ex.Message, "Validate Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to add solibri files.\n"+ex.Message, "Add Solibri Items", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            return validated;
         }
 
-        private bool CreateBatchFile(string xmlFile)
-        {
-            bool created = false;
-            try
-            {
-                string batchFile = System.IO.Path.GetDirectoryName(xmlFile) + "\\" + System.IO.Path.GetFileName(xmlFile).Replace(".xml", ".bat");
-                using (StreamWriter writer = File.CreateText(batchFile))
-                {
-                    writer.WriteLineAsync("echo %TIME%");
-                    writer.WriteLineAsync("\""+settings.ExeFile+"\" \"" + xmlFile + "\"");
-                    writer.WriteLineAsync("echo %TIME%");
-                    writer.WriteLineAsync("pause");
-                    writer.Close();
-                }
-                if (File.Exists(batchFile))
-                {
-                    created = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to create a batch file.\n"+ex.Message, "Create a Batch File", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return created;
-        }
-
-        private void buttonCancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void buttonAddIFC_Click(object sender, RoutedEventArgs e)
+        private void buttonCombineIFC_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -347,28 +441,93 @@ namespace SolibriBatchSetup
                 openFileDialog.RestoreDirectory = false;
                 openFileDialog.Title = "Open IFC Files";
                 openFileDialog.Multiselect = true;
-
                 if (openFileDialog.ShowDialog() == true)
                 {
-                    foreach (string fileName in openFileDialog.FileNames)
+                    if (openFileDialog.FileNames.Length > 0)
                     {
-                        var itemFound = from ifcFile in batchConfig.target.openmodel where ifcFile.file == fileName select ifcFile;
-                        if (File.Exists(fileName) && itemFound.Count() == 0)
+                        ProcessUnit unit = new ProcessUnit();
+                        foreach (string fileName in openFileDialog.FileNames)
                         {
-                            model modelItem = new model();
-                            modelItem.file = fileName;
-                            batchConfig.target.openmodel.Add(modelItem);
+                            unit.IfcFiles.Add(new OpenModel(fileName));
                         }
-                    }
 
-                    List<model> ifcFiles = batchConfig.target.openmodel.OrderBy(o => o.file).ToList();
-                    dataGridIFC.ItemsSource = null;
-                    dataGridIFC.ItemsSource = ifcFiles;
+                        IFCWindow ifcWindow = new IFCWindow(unit);
+                        if (ifcWindow.ShowDialog() == true)
+                        {
+                            unit = ifcWindow.Unit;
+                            if (commonRuleSets.Count > 0)
+                            {
+                                //autorunSetting
+                                unit = ApplySettings(unit);
+                            }
+                            processUnits.Add(unit);
+                        }
+                        isEditing = true;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to add IFC files into the list.\n" + ex.Message, "Add IFC Files", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to combine IFC files.\n"+ex.Message, "Combine IFC files", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+       
+        private void buttonDeleteSolibri_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (dataGridOpenSolibri.SelectedItems.Count > 0)
+                {
+                    for (int i = dataGridOpenSolibri.SelectedItems.Count - 1; i > -1; i--)
+                    {
+                        ProcessUnit unit = dataGridOpenSolibri.SelectedItems[i] as ProcessUnit;
+                        if (null != unit)
+                        {
+                            processUnits.Remove(unit);
+                        }
+                    }
+
+                    isEditing = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to delete Solibri items.\n"+ex.Message, "Delete Solibri Items", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void buttonAddIFC_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (null != dataGridOpenSolibri.SelectedItem)
+                {
+                    int index = dataGridOpenSolibri.SelectedIndex;
+                    ProcessUnit unit = processUnits[index];
+
+                    OpenFileDialog openDialog = new OpenFileDialog();
+                    openDialog.Filter = "IFC files (*.ifc)|*.ifc";
+                    openDialog.Title = "Add IFC Files to be Combined";
+                    openDialog.Multiselect = true;
+                    if (openDialog.ShowDialog() == true)
+                    {
+                        foreach (string fileName in openDialog.FileNames)
+                        {
+                            unit.IfcFiles.Add(new OpenModel(fileName));
+                        }
+
+                        processUnits.RemoveAt(index);
+                        processUnits.Insert(index, unit);
+                        dataGridOpenSolibri.SelectedIndex = index;
+
+                        isEditing = true;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to add IFC items.\n"+ex.Message, "Add IFC Items", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -376,21 +535,27 @@ namespace SolibriBatchSetup
         {
             try
             {
-                if (null != dataGridIFC.SelectedItem)
+                if (dataGridIfc.SelectedItems.Count > 0)
                 {
-                    foreach (model model in dataGridIFC.SelectedItems)
+                    int index = dataGridOpenSolibri.SelectedIndex;
+                    ProcessUnit unit = processUnits[index];
+
+                    for (int i = dataGridIfc.SelectedItems.Count - 1; i > -1; i--)
                     {
-                        batchConfig.target.openmodel.Remove(model);
+                        OpenModel model = dataGridIfc.SelectedItems[i] as OpenModel;
+                        unit.IfcFiles.Remove(model);
                     }
 
-                    List<model> ifcFiles = batchConfig.target.openmodel.OrderBy(o => o.file).ToList();
-                    dataGridIFC.ItemsSource = null;
-                    dataGridIFC.ItemsSource = ifcFiles;
+                    processUnits.RemoveAt(index);
+                    processUnits.Insert(index, unit);
+                    dataGridOpenSolibri.SelectedIndex = index;
+                    isEditing = true;
                 }
+               
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to delete IFC files from the list.\n" + ex.Message, "Delete IFC Files", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to delete IFC items.\n"+ex.Message, "Delete IFC Items", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -406,25 +571,27 @@ namespace SolibriBatchSetup
 
                 if (openFileDialog.ShowDialog() == true)
                 {
+                    bool updateBCF = false;
+                    if (commonRuleSets.Count == 0) { updateBCF = true; }
                     foreach (string fileName in openFileDialog.FileNames)
                     {
-                        var itemFound = from ruleset in batchConfig.target.openruleset where ruleset.file == fileName select ruleset;
-                        if (File.Exists(fileName) && itemFound.Count() == 0)
-                        {
-                            model modelItem = new model();
-                            modelItem.file = fileName;
-                            batchConfig.target.openruleset.Add(modelItem);
-                        }
+                        var existingFound = from rule in commonRuleSets where rule.File == fileName select rule;
+                        if (existingFound.Count() > 0) { continue; }
+                        commonRuleSets.Add(new OpenRuleset(fileName));
                     }
 
-                    List<model> rulesetFiles = batchConfig.target.openruleset.OrderBy(o => o.file).ToList();
-                    dataGridRuleset.ItemsSource = null;
-                    dataGridRuleset.ItemsSource = rulesetFiles;
+                    if (updateBCF)
+                    {
+                        //update bcf path
+                        UpdateSettings();
+                    }
+
+                    isEditing = true;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to add Rulesets files into the list.\n" + ex.Message, "Add Rulesets Files", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to add ruleset files.\n"+ex.Message, "Add Ruleset Items", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -432,108 +599,207 @@ namespace SolibriBatchSetup
         {
             try
             {
-                if (null != dataGridRuleset.SelectedItem)
+                for (int i = dataGridRuleset.SelectedItems.Count-1; i >-1; i--)
                 {
-                    foreach (model model in dataGridRuleset.SelectedItems)
+                    OpenRuleset ruleSet = dataGridRuleset.SelectedItems[i] as OpenRuleset;
+                    commonRuleSets.Remove(ruleSet);
+                }
+
+                if (commonRuleSets.Count == 0)
+                {
+                    //remove bcf path
+                    UpdateSettings();
+                }
+                
+                isEditing = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to delete ruleset items.\n"+ex.Message, "Delete Ruleset Items", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        #endregion
+
+        private void Window_Drop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                {
+                    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                    string xmlFile = "";
+                    List<string> solibriFiles =new List<string>();
+                    List<string> ifcFiles = new List<string>();
+                    List<string> rulesetFiles = new List<string>();
+                    foreach (string file in files)
                     {
-                        batchConfig.target.openruleset.Remove(model);
+                        if (System.IO.Path.GetExtension(file).Contains("smc"))
+                        {
+                            solibriFiles.Add(file);
+                        }
+                        if (System.IO.Path.GetExtension(file).Contains("xml"))
+                        {
+                            xmlFile = file; break;
+                        }
+                        if (System.IO.Path.GetExtension(file).Contains("ifc"))
+                        {
+                            ifcFiles.Add(file);
+                        }
+                        if (System.IO.Path.GetExtension(file).Contains("cset"))
+                        {
+                            rulesetFiles.Add(file);
+                        }
                     }
 
-                    List<model> rulesetFiles = batchConfig.target.openruleset.OrderBy(o => o.file).ToList();
-                    dataGridRuleset.ItemsSource = null;
-                    dataGridRuleset.ItemsSource = rulesetFiles;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to delete Rulesets files.\n" + ex.Message, "Dlete Rulesets Files", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
+                    if (!string.IsNullOrEmpty(xmlFile))
+                    {
+                        bool read = BatchSetupUtils.ReadBatchConfig(xmlFile, out batch);
+                        if (read)
+                        {
+                            processUnits = BatchSetupUtils.ExtractProcessUnits(batch);
+                            commonRuleSets = BatchSetupUtils.ExtractRulesets(batch);
+                            DisplayConfig();
+                        }
+                    }
+                    else
+                    {
+                        if (solibriFiles.Count > 0)
+                        {
+                            foreach (string sfile in solibriFiles)
+                            {
+                                ProcessUnit pUnit = new ProcessUnit();
+                                pUnit.OpenSolibri = new OpenModel(sfile);
+                                pUnit = ApplySettings(pUnit);
+                                processUnits.Add(pUnit);
+                            }
+                            dataGridOpenSolibri.SelectedIndex = processUnits.Count - 1;
+                            isEditing = true;
+                        }
+                        
+                        if (rulesetFiles.Count > 0)
+                        {
+                            bool updateBCF = false;
+                            if (commonRuleSets.Count == 0) { updateBCF = true; }
 
-        private void buttonSaveBCF_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.Filter = "BCFZIP files (*.bcfzip)|*.bcfzip";
-                saveFileDialog.RestoreDirectory = false;
-                saveFileDialog.Title = "Save BCFZIP File";
+                            foreach (string ruleset in rulesetFiles)
+                            {
+                                commonRuleSets.Add(new OpenRuleset(ruleset));
+                            }
+                            if (updateBCF) { UpdateSettings(); }
+                            isEditing = true;
+                        }
+                        if (ifcFiles.Count > 0)
+                        {
+                            ProcessUnit pUnit = new ProcessUnit();
+                            foreach (string ifcFile in ifcFiles)
+                            {
+                                pUnit.IfcFiles.Add(new OpenModel(ifcFile));
+                            }
+                            IFCWindow ifcWindow = new IFCWindow(pUnit);
+                            if (ifcWindow.ShowDialog() == true)
+                            {
+                                pUnit = ifcWindow.Unit;
+                                pUnit = ApplySettings(pUnit);
+                                processUnits.Add(pUnit);
+                                dataGridOpenSolibri.SelectedIndex = processUnits.Count - 1;
+                                isEditing = true;
+                            }
+                        }
+                    }
+                }
                 
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    bcf bcfItem = new bcf();
-                    bcfItem.file = saveFileDialog.FileName;
-                    bcfItem.version = "2";
-                    batchConfig.target.bcfreport = new List<bcf>();
-                    batchConfig.target.bcfreport.Add(bcfItem);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to drop files.\n" + ex.Message, "File Drop", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
 
-                    textBoxBCF.Text = bcfItem.file;
+        private ProcessUnit ApplySettings(ProcessUnit unit)
+        {
+            ProcessUnit pUnit = unit;
+            try
+            {
+                string solibriFileName = unit.OpenSolibri.File;
+                string dateSuffix = DateTime.Now.ToString("yyyy-MM-dd");
+                string fileNameOnly = System.IO.Path.GetFileNameWithoutExtension(solibriFileName);
+                string smcFileName = System.IO.Path.GetFileName(solibriFileName);
+                if (settings.SaveSolibriSettings.SaveInPlace)
+                {
+                    if (settings.SaveSolibriSettings.AppendDate)
+                    {
+                        solibriFileName = solibriFileName.Replace(smcFileName, fileNameOnly + "-" + dateSuffix + ".smc");
+                    }
+                }
+                else
+                {
+                    string folder = settings.SaveSolibriSettings.OutputFolder;
+                    if (settings.SaveSolibriSettings.AppendDate)
+                    {
+                        solibriFileName = System.IO.Path.Combine(folder, fileNameOnly + "-" + dateSuffix + ".smc");
+                    }
+                    else
+                    {
+                        solibriFileName = System.IO.Path.Combine(folder, smcFileName);
+                    }
+                }
+                unit.SaveSolibri = new SaveModel(solibriFileName);
+
+                string bcfFileName = "";
+                if (commonRuleSets.Count > 0)
+                {
+                    if (settings.SaveBCFSettings.SaveInPlace)
+                    {
+                        string directory = System.IO.Path.GetDirectoryName(unit.OpenSolibri.File);
+                        if (settings.SaveBCFSettings.AppendDate)
+                        {
+                            bcfFileName = System.IO.Path.Combine(directory, fileNameOnly + "-" + dateSuffix + ".bcfzip");
+                        }
+                        else
+                        {
+                            bcfFileName = System.IO.Path.Combine(directory, fileNameOnly + ".bcfzip");
+                        }
+                    }
+                    else
+                    {
+                        string folder = settings.SaveBCFSettings.OutputFolder;
+                        if (settings.SaveBCFSettings.AppendDate)
+                        {
+                            bcfFileName = System.IO.Path.Combine(folder, fileNameOnly + "-" + dateSuffix + ".bcfzip");
+                        }
+                        else
+                        {
+                            bcfFileName = System.IO.Path.Combine(folder, fileNameOnly + ".bcfzip");
+                        }
+                    }
+                }
+
+                unit.BCFReport = new BCFReport(bcfFileName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to apply settings.\n" + ex.Message, "Apply Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return pUnit;
+        }
+
+        private void UpdateSettings()
+        {
+            try
+            {
+                for (int i = processUnits.Count - 1; i > -1; i--)
+                {
+                    ProcessUnit unit = processUnits[i];
+                    unit = ApplySettings(unit);
+                    processUnits.RemoveAt(i);
+                    processUnits.Insert(i, unit);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to save BCF Files.\n" + ex.Message, "Save BCF", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string message = ex.Message;
             }
         }
 
-        private void buttonSaveSolibri_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                saveFileDialog.Filter = "Solibri Model Checker Files (*.smc)|*.smc";
-                saveFileDialog.RestoreDirectory = false;
-                saveFileDialog.Title = "Save Solibri File";
-
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    model modelItem = new model();
-                    modelItem.file = saveFileDialog.FileName;
-
-                    batchConfig.target.savemodel = new List<model>();
-                    batchConfig.target.savemodel.Add(modelItem);
-
-                    textBoxSolibri.Text = modelItem.file;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to save Solibri Files.\n" + ex.Message, "Save Solibri", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private void buttonSetting_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                SettingWindow settingWindow = new SettingWindow(settings);
-                settingWindow.Owner = this;
-                if (settingWindow.ShowDialog() == true)
-                {
-                    settings = settingWindow.Settings;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to oepn settings window.\n" + ex.Message, "Open Settings Window", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private void buttonDefault_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                configFile = "";
-                batchConfig = new batch();
-                settings = new AutorunSettings();
-                DisplayBatchConfig(batchConfig);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to set default properties.\n" + ex.Message, "Set Default", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-      
     }
 }

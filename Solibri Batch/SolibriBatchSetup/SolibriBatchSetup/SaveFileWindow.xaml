@@ -1,0 +1,25 @@
+﻿<Window x:Class="SolibriBatchSetup.SaveFileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Save Configuration" Height="200" Width="400" MinHeight="200" MinWidth="400" Icon="hoklogo.ico" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Configuration File" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Content="Enter a Configuration File Name." HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <TextBox x:Name="textBoxFileName" HorizontalAlignment="Stretch" Height="23" Margin="10,10,10,0" Grid.Row="1" TextWrapping="Wrap" Text="" VerticalAlignment="Top" />
+            </Grid>
+        </GroupBox>
+        <Button x:Name="buttonSave" Content="Save" HorizontalAlignment="Right" Margin="0,10,10,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="28" Click="buttonSave_Click" IsDefault="True"/>
+        <Button x:Name="buttonCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,10,90,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="28" Click="buttonCancel_Click"/>
+        
+
+    </Grid>
+</Window>

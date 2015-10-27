@@ -1,7 +1,39 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="uri:settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="SolibriBatchSetup.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SolibriVersionNumber" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Solibri Model Checker v9.6</Value>
+    </Setting>
+    <Setting Name="DirectoryName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">\\NY-BAT-D001\SolibriBatch</Value>
+    </Setting>
+    <Setting Name="SolibriSaveInPlace" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="SolibriOutputFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SolibriAppendDate" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="BCFSaveInPlace" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="BCFOutputFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="BCFAppendDate" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="SolibriExe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Program Files\Solibri\SMCv9.6\Solibri Model Checker v9.6.exe</Value>
+    </Setting>
+    <Setting Name="ComputerName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">NY-BAT-D001</Value>
+    </Setting>
+    <Setting Name="ComputerLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)">NY</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

@@ -8,22 +8,150 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SolibriBatchSetup.Properties
-{
-
-
+namespace SolibriBatchSetup.Properties {
+    
+    
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
-    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
-    {
-
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
-
-        public static Settings Default
-        {
-            get
-            {
+        
+        public static Settings Default {
+            get {
                 return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Solibri Model Checker v9.6")]
+        public string SolibriVersionNumber {
+            get {
+                return ((string)(this["SolibriVersionNumber"]));
+            }
+            set {
+                this["SolibriVersionNumber"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\\\NY-BAT-D001\\SolibriBatch")]
+        public string DirectoryName {
+            get {
+                return ((string)(this["DirectoryName"]));
+            }
+            set {
+                this["DirectoryName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SolibriSaveInPlace {
+            get {
+                return ((bool)(this["SolibriSaveInPlace"]));
+            }
+            set {
+                this["SolibriSaveInPlace"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SolibriOutputFolder {
+            get {
+                return ((string)(this["SolibriOutputFolder"]));
+            }
+            set {
+                this["SolibriOutputFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SolibriAppendDate {
+            get {
+                return ((bool)(this["SolibriAppendDate"]));
+            }
+            set {
+                this["SolibriAppendDate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool BCFSaveInPlace {
+            get {
+                return ((bool)(this["BCFSaveInPlace"]));
+            }
+            set {
+                this["BCFSaveInPlace"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BCFOutputFolder {
+            get {
+                return ((string)(this["BCFOutputFolder"]));
+            }
+            set {
+                this["BCFOutputFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool BCFAppendDate {
+            get {
+                return ((bool)(this["BCFAppendDate"]));
+            }
+            set {
+                this["BCFAppendDate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files\\Solibri\\SMCv9.6\\Solibri Model Checker v9.6.exe")]
+        public string SolibriExe {
+            get {
+                return ((string)(this["SolibriExe"]));
+            }
+            set {
+                this["SolibriExe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("NY-BAT-D001")]
+        public string ComputerName {
+            get {
+                return ((string)(this["ComputerName"]));
+            }
+            set {
+                this["ComputerName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("NY")]
+        public string ComputerLocation {
+            get {
+                return ((string)(this["ComputerLocation"]));
+            }
+            set {
+                this["ComputerLocation"] = value;
             }
         }
     }
