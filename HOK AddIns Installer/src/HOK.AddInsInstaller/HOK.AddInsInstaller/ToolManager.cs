@@ -13,10 +13,10 @@ namespace HOK.AddInsInstaller
 {
     public static class ToolManager
     {
-        public static ToolNames[] tools2013 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor };
-        public static ToolNames[] tools2014 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor };
-        public static ToolNames[] tools2015 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover };
-        public static ToolNames[] tools2016 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover };
+        public static ToolNames[] tools2013 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor};
+        public static ToolNames[] tools2014 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator };
+        public static ToolNames[] tools2015 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager };
+        public static ToolNames[] tools2016 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager };
 
         public static Dictionary<string/*versionNumber*/, ToolPackageInfo> GetToolPackageInfo()
         {
@@ -64,6 +64,8 @@ namespace HOK.AddInsInstaller
                 string addinDirectory = Path.Combine(installDirectory, "HOK-Addin.bundle");
                 string contentDirectory = Path.Combine(addinDirectory, "Contents_Beta");
                 string resourceDirectory = Path.Combine(contentDirectory, "Resources");
+                string x64Directory = Path.Combine(contentDirectory, "x64");
+                string x86Directory = Path.Combine(contentDirectory, "x86");
 
                 if (!Directory.Exists(addinDirectory))
                 {
@@ -78,6 +80,15 @@ namespace HOK.AddInsInstaller
                 if (!Directory.Exists(resourceDirectory))
                 {
                     Directory.CreateDirectory(resourceDirectory);
+                }
+
+                if (!Directory.Exists(x64Directory))
+                {
+                    Directory.CreateDirectory(x64Directory);
+                }
+                if (!Directory.Exists(x86Directory))
+                {
+                    Directory.CreateDirectory(x86Directory);
                 }
 
                 created = Directory.Exists(resourceDirectory);
@@ -97,54 +108,62 @@ namespace HOK.AddInsInstaller
             {
                 if (CreateDefaultDirectories(installedPackage))
                 {
-                    List<string> toolNames = installedPackage.ToolInfoDictionary.Keys.ToList();
-                    List<ToolInfo> selectedTools = new List<ToolInfo>();
-                    int numFiles = 0;
-                    foreach (string toolName in toolNames)
+                    
+                    var selectedItems = from tool in installedPackage.ToolInfoDictionary.Values where tool.IsSelected select tool;
+                    if (selectedItems.Count() > 0)
                     {
-                        ToolInfo tInfo = installedPackage.ToolInfoDictionary[toolName];
-                        if (tInfo.IsSelected)
-                        {
-                            selectedTools.Add(tInfo);
-                            numFiles += tInfo.FilePaths.Count;
-                        }
-                    }
+                        List<ToolInfo> selectedTools = selectedItems.ToList();
+                        var selectedFiles = from file in selectedItems select file.FilePaths;
+                        int numFiles = selectedFiles.Count();
 
-                    ProgressWindow pWindow = new ProgressWindow();
-                    pWindow.RefreshProgressBar(numFiles);
-                    pWindow.SetStatusLabel("Installing selected tools in " + installedPackage.TargetSoftware + " . . .");
-                    pWindow.Show();
+                        ProgressWindow pWindow = new ProgressWindow();
+                        pWindow.RefreshProgressBar(numFiles);
+                        pWindow.SetStatusLabel("Installing selected tools in " + installedPackage.TargetSoftware + " . . .");
+                        pWindow.Show();
 
-                    double progressValue = 0;
-                    foreach (ToolInfo tInfo in selectedTools)
-                    {
-                        bool copied = true;
-                        foreach (string path in tInfo.FilePaths)
+                        double progressValue = 0;
+                        foreach (ToolInfo tInfo in selectedTools)
                         {
-                            string betaPath = installedPackage.BetaDirectory + path;
-                            string installPath = installedPackage.InstallDirectory + path;
-                            if (File.Exists(betaPath))
+                            bool copied = true;
+                            
+                            foreach (string path in tInfo.FilePaths)
                             {
-                                try
+                                string betaPath = installedPackage.BetaDirectory + path;
+                                string installPath = installedPackage.InstallDirectory + path;
+                                if (File.Exists(betaPath))
                                 {
-                                    File.Copy(betaPath, installPath, true);
+                                    try
+                                    {
+                                        File.Copy(betaPath, installPath, true);
+                                    }
+                                    catch { copied = false; }
                                 }
-                                catch { copied = false; }
+                                progressValue++;
+                                pWindow.SetProgressBar(progressValue);
                             }
-                            progressValue++;
-                            pWindow.SetProgressBar(progressValue);
-                        }
-                        if (copied)
-                        {
-                            tInfo.InstallVersionInfo = tInfo.BetaVersionInfo;
-                            tInfo.InstallVersionNumber = tInfo.BetaVersionNumber;
-                            installedPackage.ToolInfoDictionary.Remove(tInfo.ToolName);
-                            installedPackage.ToolInfoDictionary.Add(tInfo.ToolName, tInfo);
-                            installedTools++;
-                        }
-                    }
 
-                    if (null != pWindow) { pWindow.Close(); }
+                            if (tInfo.ToolNameEnum == ToolNames.SheetManager)
+                            {
+                                MessageBoxResult result = MessageBox.Show("Sheet Data Editor will be installed as a ClickOnce application.\nPlease follow the on-screen instructions to complete the process.", "Sheet Data Editor Installeation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                                if (result == MessageBoxResult.OK)
+                                {
+                                    Process.Start(tInfo.ExePath);
+                                }
+                            }
+
+                            if (copied)
+                            {
+                                tInfo.InstallVersionInfo = tInfo.BetaVersionInfo;
+                                tInfo.InstallVersionNumber = tInfo.BetaVersionNumber;
+                                installedPackage.ToolInfoDictionary.Remove(tInfo.ToolName);
+                                installedPackage.ToolInfoDictionary.Add(tInfo.ToolName, tInfo);
+                                installedTools++;
+                            }
+                        }
+
+                        if (null != pWindow) { pWindow.Close(); }
+
+                    }
                 }
             }
             catch (Exception ex)
@@ -323,6 +342,66 @@ namespace HOK.AddInsInstaller
 
                             toolInfoDictionary.Add(moverInfo.ToolName, moverInfo);
                             break;
+                        case ToolNames.ProjectReplicator:
+                            ToolInfo replicatorInfo = new ToolInfo(toolEnum);
+                            replicatorInfo.ToolName = "Project Replicator";
+                            replicatorInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\HOK.ModelManager.dll";
+                            if (!File.Exists(betaDirectory + replicatorInfo.DllPath)) { break; }
+                            replicatorInfo.ToolIcon = ImageUtil.LoadBitmapImage("replicator.png");
+
+                            replicatorInfo.SetBetaVersion(betaDirectory + replicatorInfo.DllPath);
+                            replicatorInfo.SetBetaDate(betaDirectory + replicatorInfo.DllPath);
+                            replicatorInfo.SetInstallVersion(installDirectory + replicatorInfo.DllPath);
+
+                            replicatorInfo.FilePaths.Add("\\HOK.ModelManager.addin");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\HOK.ModelManager.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Auth.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Auth.PlatformServices.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Core.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Drive.v2.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.PlatformServices.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.GData.Client.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.GData.Extensions.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.GData.Spreadsheets.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\log4net.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Microsoft.Threading.Tasks.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Microsoft.Threading.Tasks.Extensions.Desktop.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Microsoft.Threading.Tasks.Extensions.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Newtonsoft.Json.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Net.Http.Extensions.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Net.Http.Primitives.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Zlib.Portable.dll");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Resources\\client_secrets_ProjectReplicator.json");
+                            replicatorInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Resources\\HOK Project Replicator.p12");
+
+                            toolInfoDictionary.Add(replicatorInfo.ToolName, replicatorInfo);
+                            break;
+                        case ToolNames.SheetManager:
+                            ToolInfo sheetInfo = new ToolInfo(toolEnum);
+                            sheetInfo.ToolName = "Sheet Manager Tools";
+                            sheetInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\HOK.SheetDataManager.dll";
+                            if (!File.Exists(betaDirectory + sheetInfo.DllPath)) { break; }
+                            sheetInfo.ToolIcon = ImageUtil.LoadBitmapImage("sync.png");
+
+                            sheetInfo.SetBetaVersion(betaDirectory + sheetInfo.DllPath);
+                            sheetInfo.SetBetaDate(betaDirectory + sheetInfo.DllPath);
+                            sheetInfo.SetInstallVersion(installDirectory + sheetInfo.DllPath);
+
+                            sheetInfo.FilePaths.Add(@"\HOK.SheetDataManager.addin");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.SheetDataManager.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\EntityFramework.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\EntityFramework.SqlServer.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\System.Data.SQLite.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\System.Data.SQLite.EF6.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\System.Data.SQLite.Linq.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\x64\SQLite.Interop.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\x86\SQLite.Interop.dll");
+
+                            sheetInfo.ExePath = @"\\Group\hok\FWR\RESOURCES\Apps\HOK Sheet Data Editor\HOK Sheet Data Editor.application";
+                            
+                            toolInfoDictionary.Add(sheetInfo.ToolName, sheetInfo);
+                            break;
                     }
                 }
             }
@@ -339,6 +418,7 @@ namespace HOK.AddInsInstaller
         private ToolNames toolNameEnum = ToolNames.None;
         private List<string> filePaths = new List<string>();
         private string dllPath = "";
+        private string exePath = "";
         private FileVersionInfo betaVersionInfo = null;
         private FileVersionInfo installVersionInfo = null;
         private string betaversionNumber = "Not Exist";
@@ -351,6 +431,7 @@ namespace HOK.AddInsInstaller
         public ToolNames ToolNameEnum { get { return toolNameEnum; } set { toolNameEnum = value; } }
         public List<string> FilePaths { get { return filePaths; } set { filePaths = value; } }
         public string DllPath { get { return dllPath; } set { dllPath = value; } }
+        public string ExePath { get { return exePath; } set { exePath = value; } }
         public FileVersionInfo BetaVersionInfo { get { return betaVersionInfo; } set { betaVersionInfo = value; } }
         public FileVersionInfo InstallVersionInfo { get { return installVersionInfo; } set { installVersionInfo = value; } }
         public string BetaVersionNumber { get { return betaversionNumber; } set { betaversionNumber = value; } }
@@ -405,7 +486,9 @@ namespace HOK.AddInsInstaller
         SmartBCF,
         FileMonitor,
         ProjectMonitor,
-        ElementMover
+        ElementMover, 
+        ProjectReplicator, 
+        SheetManager
     }
 
     public static class ImageUtil
