@@ -427,6 +427,8 @@ namespace HOK.BetaToolsManager
                                 }
                             }
 
+#if RELEASE2014|| RELEASE2015|| RELEASE2016
+
                             string cameraPath = Path.Combine(directoryName, "HOK.CameraDuplicator.dll");
                             cameraPath = GetTempInstallPath(cameraPath);
                             if (File.Exists(cameraPath))
@@ -440,10 +442,11 @@ namespace HOK.BetaToolsManager
                                 }
                                 else
                                 {
-                                    PushButton cameraButton = utilityButtons["Camera Duplicator"];
+                                    PushButton cameraButton = utilityButtons["View Mover"];
                                     cameraButton.AssemblyName = cameraPath;
                                 }
                             }
+#endif
                         }
                         else
                         {
@@ -492,9 +495,9 @@ namespace HOK.BetaToolsManager
                                 PushButton elevationButton = utilityButtons["Room Elevation"];
                                 elevationButton.Enabled = false;
                             }
-                            if (utilityButtons.ContainsKey("Camera Duplicator"))
+                            if (utilityButtons.ContainsKey("View Mover"))
                             {
-                                PushButton cameraButton = utilityButtons["Camera Duplicator"];
+                                PushButton cameraButton = utilityButtons["View Mover"];
                                 cameraButton.Enabled = false;
                             }
                         }
