@@ -1105,7 +1105,7 @@ Public Class form_SheetManager
 
         Dim m_Dlg As New TaskDialog("Sheet Manager")
         m_Dlg.MainInstruction = "Warning"
-        m_Dlg.MainContent = "This command will overwrite data." & vbLf & "Be sure that the proper data dable is selected before proceeding."
+        m_Dlg.MainContent = "This command will overwrite data." & vbLf & "Be sure that the proper data table is selected before proceeding."
         m_Dlg.AllowCancellation = True
         m_Dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Continue with Export")
         m_Dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Cancel and do Nothing")
