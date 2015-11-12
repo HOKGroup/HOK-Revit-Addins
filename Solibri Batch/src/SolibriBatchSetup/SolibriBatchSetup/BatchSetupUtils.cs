@@ -161,7 +161,16 @@ namespace SolibriBatchSetup
                 XmlSerializer serializer = new XmlSerializer(typeof(Batch));
                 using (FileStream fs = new FileStream(fileName, FileMode.Create))
                 {
-                    XmlWriter writer = XmlWriter.Create(fs);
+                    XmlWriterSettings settings = new XmlWriterSettings
+                    {
+                        Indent = true,
+                        IndentChars = "\t",
+                        NewLineChars = Environment.NewLine,
+                        NewLineHandling = NewLineHandling.Replace,
+                        Encoding = new UTF8Encoding(false)
+                    };
+
+                    XmlWriter writer = XmlWriter.Create(fs, settings);
                     serializer.Serialize(writer, batch);
                     fs.Close();
                 }
