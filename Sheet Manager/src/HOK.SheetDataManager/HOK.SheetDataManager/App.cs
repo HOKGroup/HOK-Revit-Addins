@@ -44,7 +44,7 @@ namespace HOK.SheetDataManager
             sheetButton.LargeImage = sheetImage;
             sheetButton.AvailabilityClassName = "HOK.SheetDataManager.Availability";
 
-            string instructionFile = @"V:\RVT-Data\HOK Program\Documentation\SheetDataManager_Instruction.pdf";
+            string instructionFile = @"V:\RVT-Data\HOK Program\Documentation\SheetManagerTools_Instruction.pdf";
             if (File.Exists(instructionFile))
             {
                 ContextualHelp contextualHelp = new ContextualHelp(ContextualHelpType.Url, instructionFile);

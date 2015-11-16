@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -343,11 +344,6 @@ namespace HOK.SheetDataEditor
         }
         #endregion
 
-        private void buttonClose_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             DatabaseUtil.CloseDatabse();
@@ -470,6 +466,20 @@ namespace HOK.SheetDataEditor
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to reload data.\n" + ex.Message, "Reload Data", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void buttonClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            string helpDocument = @"V:\RVT-Data\HOK Program\Documentation\SheetManagerTools_Instruction.pdf";
+            if (File.Exists(helpDocument))
+            {
+                Process.Start(helpDocument);
             }
         }
     }

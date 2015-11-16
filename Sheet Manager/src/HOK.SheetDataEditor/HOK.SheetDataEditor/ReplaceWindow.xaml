@@ -28,16 +28,8 @@
         
         <GroupBox Header="Items" HorizontalAlignment="Stretch" Margin="7" Grid.Row="1" VerticalAlignment="Stretch">
             <Grid>
-                <DataGrid x:Name="dataGridItem" HorizontalAlignment="Stretch" Margin="5" Grid.Row="1" VerticalAlignment="Stretch" EnableColumnVirtualization="True" SelectionMode="Extended" SelectionUnit="Cell" 
-                          MouseDown="dataGridItem_MouseDown" DragOver="dataGridItem_DragOver" Drop="dataGridItem_Drop" AllowDrop="True" CanUserDeleteRows="True" CanUserSortColumns="False" CellEditEnding="dataGridItem_CellEditEnding" >
-                    <DataGrid.InputBindings>
-                        <KeyBinding Key="C" Modifiers="Control" Command="Copy"/>
-                        <KeyBinding Key="V" Modifiers="Control" Command="Paste"/>
-                    </DataGrid.InputBindings>
-                    <DataGrid.CommandBindings>
-                        <CommandBinding Command="Copy" Executed="CopyCommand"/>
-                        <CommandBinding Command="Paste" Executed="PasteCommand"/>
-                    </DataGrid.CommandBindings>
+                <DataGrid x:Name="dataGridItem" HorizontalAlignment="Stretch" Margin="5" Grid.Row="1" VerticalAlignment="Stretch" EnableColumnVirtualization="True" SelectionMode="Extended" SelectionUnit="CellOrRowHeader" 
+                          RowHeaderWidth="10" MouseDown="dataGridItem_MouseDown" DragOver="dataGridItem_DragOver" Drop="dataGridItem_Drop" AllowDrop="True" CanUserSortColumns="False" CellEditEnding="dataGridItem_CellEditEnding" >
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Source Value" Width="1*" Binding="{Binding SourceValue}" CanUserSort="True" />
                         <DataGridTextColumn Header="Target Value" Width="1*" Binding="{Binding TargetValue}" CanUserSort="True"/>

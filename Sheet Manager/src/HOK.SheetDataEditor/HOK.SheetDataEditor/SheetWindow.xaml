@@ -55,7 +55,7 @@
                 </Button>
                 <DataGrid Grid.Row="1" x:Name="dataGridSheet" MouseDown="dataGridSheet_MouseDown" DragOver="dataGridSheet_DragOver" Drop="dataGridSheet_Drop" 
                       SelectionMode="Extended" SelectionUnit="CellOrRowHeader" AllowDrop="True" 
-                      RowHeaderWidth="10" KeyUp="dataGridSheet_KeyUp" BeginningEdit="dataGridSheet_BeginningEdit" CellEditEnding="dataGridSheet_CellEditEnding" CanUserResizeColumns="False" ClipToBounds="True" IsTextSearchEnabled="True" SelectedCellsChanged="dataGridSheet_SelectedCellsChanged">
+                      RowHeaderWidth="10" CanUserResizeColumns="False" ClipToBounds="True" IsTextSearchEnabled="True" SelectedCellsChanged="dataGridSheet_SelectedCellsChanged">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Sheet Number" Binding="{Binding Number}" Width ="1*">
                             <DataGridTextColumn.ElementStyle>

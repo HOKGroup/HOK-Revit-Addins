@@ -51,8 +51,8 @@
                 <Button x:Name="buttonSearch" HorizontalAlignment="Right" Margin="0,10,15,0" VerticalAlignment="Top" Width="24" Height="24" Click="buttonSearch_Click" >
                     <Image Source="Images/search.png" Height="16" Width="16"/>
                 </Button>
-                <DataGrid Grid.Row="1" x:Name="dataGridView" AllowDrop="True" SelectionMode="Extended" SelectionUnit="CellOrRowHeader" CanUserAddRows="True" CanUserDeleteRows="True" 
-                          MouseDown="dataGridView_MouseDown" DragOver="dataGridView_DragOver" Drop="dataGridView_Drop" KeyUp="dataGridView_KeyUp" BeginningEdit="dataGridView_BeginningEdit" CellEditEnding="dataGridView_CellEditEnding">
+                <DataGrid Grid.Row="1" x:Name="dataGridView" AllowDrop="True" SelectionMode="Extended" SelectionUnit="CellOrRowHeader" CanUserAddRows="True" CanUserDeleteRows="True" RowHeaderWidth="10"
+                          MouseDown="dataGridView_MouseDown" DragOver="dataGridView_DragOver" Drop="dataGridView_Drop">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="View Name" Binding="{Binding Name}" Width ="2*">
                             <DataGridTextColumn.ElementStyle>

@@ -260,33 +260,6 @@ namespace HOK.SheetDataEditor
             this.Close();
         }
 
-        private void dataGridSheet_KeyUp(object sender, KeyEventArgs e)
-        {
-            try
-            {
-                if (!cellIsEditing && e.Key==Key.Delete && Keyboard.Modifiers == ModifierKeys.None)
-                {
-                    foreach (DataGridCellInfo cellInfo in dataGridSheet.SelectedCells)
-                    {
-                        DataGridUtils.SetPropertyValue(cellInfo.Item, cellInfo.Column.SortMemberPath, null);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-        }
-
-        private void dataGridSheet_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {
-            cellIsEditing = true;
-        }
-
-        private void dataGridSheet_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            cellIsEditing = false;
-        }
 
         private void buttonSearch_Click(object sender, RoutedEventArgs e)
         {

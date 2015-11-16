@@ -26,7 +26,6 @@ namespace HOK.SheetDataEditor
         private Dictionary<Guid, RevitView> itemDictionary = new Dictionary<Guid, RevitView>();
         private CellCopyInfo copyInfo = new CellCopyInfo();
         private ObservableCollection<object> viewItems = new ObservableCollection<object>();
-        private bool cellIsEditing = false;
         private List<int> tempDragRows = new List<int>();
 
         public RevitSheetData SheetData { get { return sheetData; } set { sheetData = value; } }
@@ -188,34 +187,6 @@ namespace HOK.SheetDataEditor
             {
                 string message = ex.Message;
             }
-        }
-
-        private void dataGridView_KeyUp(object sender, KeyEventArgs e)
-        {
-            try
-            {
-                if (!cellIsEditing && e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.None)
-                {
-                    foreach (DataGridCellInfo cellInfo in dataGridView.SelectedCells)
-                    {
-                        DataGridUtils.SetPropertyValue(cellInfo.Item, cellInfo.Column.SortMemberPath, null);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-        }
-
-        private void dataGridView_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {
-            cellIsEditing = true;
-        }
-
-        private void dataGridView_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            cellIsEditing = false;
         }
 
         private bool CleanEmptyItems()

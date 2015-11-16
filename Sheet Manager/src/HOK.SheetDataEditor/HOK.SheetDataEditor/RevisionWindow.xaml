@@ -27,8 +27,8 @@
                     <RowDefinition x:Name="expanderRowDefinition" Height="40"/>
                 </Grid.RowDefinitions>
                 <DataGrid x:Name="dataGridRevision" SelectionMode="Extended" SelectionUnit="CellOrRowHeader" AllowDrop="True" CanUserAddRows="True" CanUserDeleteRows="True" 
-                          RowHeaderWidth="10" MouseDown="dataGridRevision_MouseDown" DragOver="dataGridRevision_DragOver" Drop="dataGridRevision_Drop" KeyUp="dataGridRevision_KeyUp" 
-                          BeginningEdit="dataGridRevision_BeginningEdit" CellEditEnding="dataGridRevision_CellEditEnding" SelectedCellsChanged="dataGridRevision_SelectedCellsChanged">
+                          RowHeaderWidth="10" MouseDown="dataGridRevision_MouseDown" DragOver="dataGridRevision_DragOver" Drop="dataGridRevision_Drop" 
+                           SelectedCellsChanged="dataGridRevision_SelectedCellsChanged">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width ="3*">
                             <DataGridTextColumn.ElementStyle>

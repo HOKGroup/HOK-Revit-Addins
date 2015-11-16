@@ -27,7 +27,6 @@ namespace HOK.SheetDataEditor
         private Dictionary<Guid, RevitRevision> itemDictionary = new Dictionary<Guid, RevitRevision>();
         private CellCopyInfo copyInfo = new CellCopyInfo();
         private ObservableCollection<object> revisionItems = new ObservableCollection<object>();
-        private bool cellIsEditing = false;
         private List<int> tempDragRows = new List<int>();
 
         public RevitSheetData SheetData { get { return sheetData; } set { sheetData = value; } }
@@ -169,33 +168,6 @@ namespace HOK.SheetDataEditor
             }
         }
 
-        private void dataGridRevision_KeyUp(object sender, KeyEventArgs e)
-        {
-            try
-            {
-                if (!cellIsEditing && e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.None)
-                {
-                    foreach (DataGridCellInfo cellInfo in dataGridRevision.SelectedCells)
-                    {
-                        DataGridUtils.SetPropertyValue(cellInfo.Item, cellInfo.Column.SortMemberPath, null);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-        }
-
-        private void dataGridRevision_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
-        {
-            cellIsEditing = true;
-        }
-
-        private void dataGridRevision_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
-        {
-            cellIsEditing = false;
-        }
 
         private void buttonDocument_Click(object sender, RoutedEventArgs e)
         {
