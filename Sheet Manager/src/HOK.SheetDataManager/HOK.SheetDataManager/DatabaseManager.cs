@@ -75,7 +75,7 @@ namespace HOK.SheetDataManager
                             connection.Close();
                         }
                     }
-                    connection = new SQLiteConnection("Data Source=" + databaseFile + ";Version=3;");
+                    connection = new SQLiteConnection("Data Source=" + databaseFile + ";Version=3;", true);
                     connection.Open();
                    
                     command = new SQLiteCommand(connection);

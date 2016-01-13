@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Management;
 using System.Resources;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace HOK.SheetDataEditor
                             connection.Close();
                         }
                     }
-                    connection = new SQLiteConnection("Data Source=" + databaseFile + ";Version=3;");
+                    connection = new SQLiteConnection("Data Source=" + dbFile + ";Version=3;", true);
                     connection.Open();
 
                     command = new SQLiteCommand(connection);

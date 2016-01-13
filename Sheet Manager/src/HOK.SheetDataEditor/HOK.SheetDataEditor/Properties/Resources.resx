@@ -156,7 +156,7 @@
 )</value>
   </data>
   <data name="Revisions" xml:space="preserve">
-    <value>CREATE TABLE "Revisions" (
+    <value>CREATE TABLE IF NOT EXISTS "Revisions" (
 	`Revision_Id`	TEXT NOT NULL UNIQUE,
 	`Revision_Description`	TEXT,
 	`Revision_IssuedBy`	TEXT,
@@ -175,7 +175,7 @@
 )</value>
   </data>
   <data name="Sheets" xml:space="preserve">
-    <value>CREATE TABLE "Sheets" (
+    <value>CREATE TABLE IF NOT EXISTS "Sheets" (
 	`Sheet_Id`	TEXT NOT NULL UNIQUE,
 	`Sheet_Number`	TEXT NOT NULL,
 	`Sheet_Name`	TEXT,
@@ -207,7 +207,7 @@
 )</value>
   </data>
   <data name="LinkedRevisions" xml:space="preserve">
-    <value>CREATE TABLE "LinkedRevisions" (
+    <value>CREATE TABLE IF NOT EXISTS "LinkedRevisions" (
 	`LinkedRevision_Id`	TEXT NOT NULL UNIQUE,
 	`LinkedRevision_Sequence`	INTEGER,
 	`LinkedRevision_Number`	TEXT,
@@ -220,7 +220,7 @@
 )</value>
   </data>
   <data name="LinkedSheets" xml:space="preserve">
-    <value>CREATE TABLE "LinkedSheets" (
+    <value>CREATE TABLE IF NOT EXISTS "LinkedSheets" (
 	`LinkedSheet_Id`	TEXT NOT NULL UNIQUE,
 	`LinkedSheet_Sheet_Id`	TEXT,
 	`LinkedSheet_Project_Id`	TEXT,

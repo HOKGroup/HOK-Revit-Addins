@@ -91,7 +91,7 @@ namespace HOK.SheetDataEditor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CREATE TABLE &quot;LinkedRevisions&quot; (
+        ///   Looks up a localized string similar to CREATE TABLE IF NOT EXISTS &quot;LinkedRevisions&quot; (
         ///	`LinkedRevision_Id`	TEXT NOT NULL UNIQUE,
         ///	`LinkedRevision_Sequence`	INTEGER,
         ///	`LinkedRevision_Number`	TEXT,
@@ -110,7 +110,7 @@ namespace HOK.SheetDataEditor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CREATE TABLE &quot;LinkedSheets&quot; (
+        ///   Looks up a localized string similar to CREATE TABLE IF NOT EXISTS &quot;LinkedSheets&quot; (
         ///	`LinkedSheet_Id`	TEXT NOT NULL UNIQUE,
         ///	`LinkedSheet_Sheet_Id`	TEXT,
         ///	`LinkedSheet_Project_Id`	TEXT,
@@ -158,7 +158,7 @@ namespace HOK.SheetDataEditor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CREATE TABLE &quot;Revisions&quot; (
+        ///   Looks up a localized string similar to CREATE TABLE IF NOT EXISTS &quot;Revisions&quot; (
         ///	`Revision_Id`	TEXT NOT NULL UNIQUE,
         ///	`Revision_Description`	TEXT,
         ///	`Revision_IssuedBy`	TEXT,
@@ -189,7 +189,7 @@ namespace HOK.SheetDataEditor.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CREATE TABLE &quot;Sheets&quot; (
+        ///   Looks up a localized string similar to CREATE TABLE IF NOT EXISTS &quot;Sheets&quot; (
         ///	`Sheet_Id`	TEXT NOT NULL UNIQUE,
         ///	`Sheet_Number`	TEXT NOT NULL,
         ///	`Sheet_Name`	TEXT,

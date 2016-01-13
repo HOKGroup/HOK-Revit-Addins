@@ -55,6 +55,7 @@ namespace HOK.SheetDataManager
             CollectRevitElements();
 
             InitializeComponent();
+            this.Title = "Sheet Data Manager - v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 
             updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
 
