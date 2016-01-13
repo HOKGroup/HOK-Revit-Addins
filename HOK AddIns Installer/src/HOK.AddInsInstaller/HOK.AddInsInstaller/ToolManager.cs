@@ -142,9 +142,9 @@ namespace HOK.AddInsInstaller
                                 pWindow.SetProgressBar(progressValue);
                             }
 
-                            if (tInfo.ToolNameEnum == ToolNames.SheetManager)
+                            if (!string.IsNullOrEmpty(tInfo.ExePath))
                             {
-                                MessageBoxResult result = MessageBox.Show("Sheet Data Editor will be installed as a ClickOnce application.\nPlease follow the on-screen instructions to complete the process.", "Sheet Data Editor Installeation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
+                                MessageBoxResult result = MessageBox.Show("The desktop version of "+tInfo.ToolName+" will be installed.\nPlease follow the on-screen instructions to complete the process.", "ClickOnce Installeation", MessageBoxButton.OKCancel, MessageBoxImage.Question);
                                 if (result == MessageBoxResult.OK)
                                 {
                                     Process.Start(tInfo.ExePath);
@@ -260,7 +260,7 @@ namespace HOK.AddInsInstaller
                         case ToolNames.SmartBCF:
                             ToolInfo bcfInfo = new ToolInfo(toolEnum);
                             bcfInfo.ToolName = "Smart BCF";
-                            bcfInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\HOK.SmartBCF.dll";
+                            bcfInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\HOK.SmartBCF.AddIn.dll";
                             if (!File.Exists(betaDirectory + bcfInfo.DllPath)) { break; }
                             bcfInfo.ToolIcon = ImageUtil.LoadBitmapImage("walker.png");
 
@@ -269,27 +269,21 @@ namespace HOK.AddInsInstaller
                             bcfInfo.SetInstallVersion(installDirectory + bcfInfo.DllPath);
 
                             bcfInfo.FilePaths.Add("\\HOK.SmartBCF.addin");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\HOK.SmartBCF.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Auth.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Auth.PlatformServices.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Core.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.Drive.v2.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.Apis.PlatformServices.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.GData.Client.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.GData.Extensions.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Google.GData.Spreadsheets.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\log4net.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Microsoft.Threading.Tasks.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Microsoft.Threading.Tasks.Extensions.Desktop.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Microsoft.Threading.Tasks.Extensions.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Newtonsoft.Json.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Net.Http.Extensions.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Net.Http.Primitives.dll");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Zlib.Portable.dll");
+                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\HOK.SmartBCF.AddIn.dll");
 
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Resources\\Addins Shared Parameters.txt");
-                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Resources\\HOK smartBCF.p12");
+                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\EntityFramework.dll");
+                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\EntityFramework.SqlServer.dll");
+                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\HOK.SmartBCF.dll");
+                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Data.SQLite.dll");
+                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Data.SQLite.EF6.dll");
+                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Data.SQLite.Linq.dll");
+                            bcfInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\System.Windows.Interactivity.dll");
+
+                            bcfInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\x64\SQLite.Interop.dll");
+                            bcfInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\x86\SQLite.Interop.dll");
+                            bcfInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\Resources\Addins Shared Parameters.txt");
+
+                            bcfInfo.ExePath = @"\\Group\hok\FWR\RESOURCES\Apps\HOK SmartBCF\HOK SmartBCF Manager.application";
 
                             toolInfoDictionary.Add(bcfInfo.ToolName, bcfInfo);
                             break;
