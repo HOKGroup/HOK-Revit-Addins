@@ -736,8 +736,9 @@ namespace HOK.RoomsToMass.ToMass
                 try
                 {
                     Family newFamily = null;
-                    doc.LoadFamily(fileName, new FamilyOption(), out newFamily);
-
+                    bool loaded = doc.LoadFamily(fileName, new FamilyOption(), out newFamily);
+                    if (loaded)
+                    {
 #if RELEASE2013||RELEASE2014
                     FamilySymbolSetIterator symbolIterator = newFamily.Symbols.ForwardIterator();
                     symbolIterator.MoveNext();
@@ -748,32 +749,36 @@ namespace HOK.RoomsToMass.ToMass
                     SketchPlane skPlane = collector.OfClass(typeof(SketchPlane)).First<Element>(e => e.Name.Equals(level.Name)) as SketchPlane;
                     familyInstance = doc.Create.NewFamilyInstance(new XYZ(0, 0, skPlane.Plane.Origin.Z), symbol, skPlane, StructuralType.NonStructural);
 #elif RELEASE2014
+                    if (!symbol.IsActive) { symbol.Activate(); }
                     SketchPlane skPlane = SketchPlane.Create(doc, level.Id);
                     familyInstance = doc.Create.NewFamilyInstance(new XYZ(0, 0, skPlane.GetPlane().Origin.Z), symbol, skPlane, StructuralType.NonStructural);
 #endif
 
 #elif RELEASE2015 || RELEASE2016
-                    List<ElementId> elementIds = newFamily.GetFamilySymbolIds().ToList();
-                    if (elementIds.Count > 0)
-                    {
-                        ElementId symbolId = elementIds.First();
-                        FamilySymbol fSymbol = doc.GetElement(symbolId) as FamilySymbol;
-                        if (null != fSymbol)
+                        List<ElementId> elementIds = newFamily.GetFamilySymbolIds().ToList();
+                        if (elementIds.Count > 0)
                         {
-                            SketchPlane skPlane = SketchPlane.Create(doc, level.Id);
-                            if (null != skPlane)
+                            ElementId symbolId = elementIds.First();
+                            FamilySymbol fSymbol = doc.GetElement(symbolId) as FamilySymbol;
+                            if (null != fSymbol)
                             {
-                                familyInstance = doc.Create.NewFamilyInstance(new XYZ(0, 0, skPlane.GetPlane().Origin.Z), fSymbol, skPlane, StructuralType.NonStructural);
-                            }
+                                if (!fSymbol.IsActive) { fSymbol.Activate(); }
+                                SketchPlane skPlane = SketchPlane.Create(doc, level.Id);
+                                if (null != skPlane)
+                                {
+                                    familyInstance = doc.Create.NewFamilyInstance(new XYZ(0, 0, skPlane.GetPlane().Origin.Z), fSymbol, skPlane, StructuralType.NonStructural);
+                                }
 
+                            }
                         }
-                    }
 #endif
+                    }
+
                     trans.Commit();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Failed to load mass family." + ex.Message, "MassCreator:LoadMassFamily", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Failed to load mass family.\n" + ex.Message, "MassCreator : Load Mass Family", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     trans.RollBack();
                 }
             }
