@@ -1,0 +1,337 @@
+﻿<UserControl x:Class="HOK.SmartBCF.UserControls.BCFPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             mc:Ignorable="d" 
+             xmlns:ut="clr-namespace:HOK.SmartBCF.Utils"
+             d:DesignHeight="800" d:DesignWidth="1000" Loaded="UserControl_Loaded">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type DataGrid}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+        </Style>
+        <Style x:Key="commentButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Background" Value="#FFE6E6E6"/>
+            <Setter Property="BorderBrush" Value="#cccccc"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="16,3,16,3"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                SnapsToDevicePixels="true">
+                            <ContentPresenter Name="Presenter" Margin="{TemplateBinding Padding}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    RecognizesAccessKey="True"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#333333" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1ba1e2" />
+                                <Setter Property="BorderBrush" Value="#1ba1e2" />
+                                <Setter Property="Foreground" Value="#ffffff" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FF6BC3EE" />
+                                <Setter Property="BorderBrush" Value="#FF6BC3EE"/>
+                                <Setter Property="Foreground" Value="#ffffff"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#1ba1e2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <ut:ImageSourceConverter x:Key="imageConverter"/>
+        <ut:CommentFilterConverter x:Key="commentConverter"/>
+        <ut:ComponentFilterConverter x:Key="componentConverter"/>
+        <ut:ColorConverter x:Key="colorConverter"/>
+        <ut:IndexConverter x:Key="indexConverter"/>
+        <ut:ExtensionFilterConverter x:Key="extensionConverter"/>
+        <sys:String x:Key="action">BCF_Action</sys:String>
+        <sys:String x:Key="responsibility">BCF_Responsibility</sys:String>
+        <DataTemplate x:Key="extensionTemplate">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{Binding Path=Color, Converter={StaticResource colorConverter}}" Margin="2"/>
+                <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Text="{Binding ParameterValue}" Margin="2"/>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+    <UserControl.CommandBindings>
+        <CommandBinding Command="ut:RoutedCommands.MoveForward" Executed="MoveForward_Executed"/>
+        <CommandBinding Command="ut:RoutedCommands.MoveBackward" Executed="MoveBackward_Executed"/>
+    </UserControl.CommandBindings>
+    <UserControl.InputBindings>
+        <KeyBinding Command="ut:RoutedCommands.MoveForward" Key="Right"/>
+        <KeyBinding Command="ut:RoutedCommands.MoveBackward" Key="Left"/>
+    </UserControl.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition x:Name="expanderRowDefinition" Height="40"/>
+        </Grid.RowDefinitions>
+        <!--Topic Selectiono-->
+        <ComboBox x:Name="comboBoxIssue" HorizontalAlignment="Center" VerticalAlignment="Center" Width="400" Height="60" BorderThickness="1" ItemsSource="{Binding Markups}" SelectedIndex="{Binding SelectedMarkup, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectionChanged="comboBoxIssue_SelectionChanged">
+            <ComboBox.Background>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.WindowColorKey}}"/>
+            </ComboBox.Background>
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Image HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="{Binding Path=TopicImage, Converter={StaticResource imageConverter}}" Margin="2"/>
+                        <TextBlock Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Text="{Binding Topic.Title}" Margin="5,2,2,2"/>
+                    </Grid>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction  Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.IssueChangedCommand}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </ComboBox>
+
+        <Button x:Name="buttonForward" HorizontalAlignment="Center" Margin="705,20,235,20" VerticalAlignment="Center" Width="60" Height="60" Background="Transparent" BorderBrush="Transparent" Click="buttonForward_Click">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Image x:Name="forwardImg" Source="Images/forward.png" Height="48" Width="48"/>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderBrush" Value="Transparent"/>
+                            <Setter Property="Source" TargetName="forwardImg" Value="Images/forward_blue.png"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Opacity" Value="0.6"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+
+        <Button x:Name="buttonBackward" HorizontalAlignment="Center" Margin="-465,0,0,0" VerticalAlignment="Center" Width="60" Height="60" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonBackward_Click" >
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <Image x:Name="backwardImg" Source="Images/backward.png" Height="48" Width="48"/>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="BorderBrush" Value="Transparent"/>
+                            <Setter TargetName="backwardImg" Property="Source" Value="Images/backward_blue.png"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Opacity" Value="0.6"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        <!--Topic Description-->
+        <Grid Grid.Row="1" x:Name="descriptionGrid" MaxHeight="100">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Stretch" Margin="100,0,100,0">
+                <TextBlock HorizontalAlignment="Center" Name="textBlockDescription" TextWrapping="Wrap" Text="{Binding ElementName=comboBoxIssue, Path=SelectedItem.Topic.Description}" FontStyle="Italic"/>
+            </ScrollViewer>
+            <TextBlock x:Name="textBlockIndex" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="10" FontStyle="Italic"/>
+        </Grid>
+
+        <!--Viewpoint and Comments-->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition x:Name="commentColumn" Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="viewpointGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                <Image x:Name="imageSnapshot" Panel.ZIndex="1" Margin="7" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                       Source="{Binding ElementName=comboBoxIssue, Path=SelectedItem.SelectedViewpoint.SnapshotImage, Converter={StaticResource imageConverter}}" Stretch="Uniform"/>
+                <Button x:Name="buttonView" Tag="Expand" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,20,10" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonView_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Image Height="24" Width="24" Tag="{Binding Tag, ElementName=buttonView}">
+                                <Image.Style>
+                                    <Style TargetType="{x:Type Image}">
+                                        <Style.Triggers>
+                                            <Trigger Property="Tag" Value="Expand">
+                                                <Setter Property="Source" Value="Images/zoom_in.png"/>
+                                                <Setter Property="ToolTip" Value="Zoom In"/>
+                                            </Trigger>
+                                            <Trigger Property="Tag" Value="Collapse">
+                                                <Setter Property="Source" Value="Images/zoom_out.png"/>
+                                                <Setter Property="ToolTip" Value="Zoom Out"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button x:Name="buttonDeleteView" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,55,10" 
+                        Background="{x:Null}" BorderBrush="{x:Null}" ToolTip="Delete View">
+                    <Image Source="Images/minus.png" Width="24" Height="24" IsEnabled="False"/>
+                </Button>
+                <Button x:Name="buttonEditView" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,90,10" 
+                        Background="{x:Null}" BorderBrush="{x:Null}" ToolTip="Edit Markup">
+                    <Image Source="Images/pencil.png" Width="24" Height="24" IsEnabled="False"/>
+                </Button>
+                <Button x:Name="buttonAddView" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,125,10" 
+                        Background="{x:Null}" BorderBrush="{x:Null}" ToolTip="Add View">
+                    <Image Source="Images/plus.png" Width="24" Height="24" IsEnabled="False"/>
+                </Button>
+                <Button x:Name="buttonBack" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="5,0,0,0" Background="Transparent" BorderBrush="Transparent">
+                    <Image Height="32" Width="32" Source="Images/arrow_left.png"/>
+                </Button>
+                <Button x:Name="buttonNext" HorizontalAlignment="Right" VerticalAlignment="Center" Height="36" Width="36" Margin="0,0,5,0" Background="Transparent" BorderBrush="Transparent">
+                    <Image Height="32" Width="32" Source="Images/arrow_right.png" />
+                </Button>
+            </Grid>
+
+            <Grid x:Name="commentGrid"  Visibility="Visible" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"
+                  DataContext="{Binding ElementName=comboBoxIssue, Path=SelectedItem}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7" Content="Topic Type:"/>
+                    <ComboBox x:Name="comboBoxTopicType" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="80,0,10,0" Height="27" 
+                              Background="White" BorderBrush="#cccccc" SelectedItem="{Binding Topic.TopicType}" SelectionChanged="comboBoxTopicType_SelectionChanged"/>
+                    <Label Grid.Column="1" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="7" Content="Topic Status:"/>
+                    <ComboBox x:Name="comboBoxTopicStatus"  Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="85,0,10,0" Height="27" 
+                              Background="White" BorderBrush="#cccccc" SelectedItem="{Binding Topic.TopicStatus}" SelectionChanged="comboBoxTopicStatus_SelectionChanged"/>
+                </Grid>
+                <DataGrid x:Name="dataGridComment" Grid.Row="1" Margin="10,10,10,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HeadersVisibility="Column" CanUserAddRows="False"
+                      SelectionUnit="FullRow" SelectionMode="Single" CanUserDeleteRows="False" CellEditEnding="dataGridComment_CellEditEnding">
+                    <DataGrid.ItemsSource>
+                        <MultiBinding Converter="{StaticResource commentConverter}">
+                            <Binding Path="Comment"/>
+                            <Binding Path="SelectedViewpoint"/>
+                        </MultiBinding>
+                    </DataGrid.ItemsSource>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Comment" Binding="{Binding Path=Comment1}" Width="2*"/>
+                        <DataGridTextColumn Header="Modified Author" Width="1*" Binding="{Binding Path=ModifiedAuthor}" IsReadOnly="True"/>
+                        <DataGridTextColumn IsReadOnly="True" Header="Modified Date" Width="1*" Binding="{Binding Path=ModifiedDate}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="buttonAddComment"  Style="{StaticResource commentButtonStyle}" Margin="10,0,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="buttonAddComment_Click" >
+                        <StackPanel  Orientation="Horizontal">
+                            <Image Width="20" Height="20" Source="Images/add.png" />
+                            <TextBlock TextAlignment="Center" Margin="10,0,0,0" Text="Add Comment"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="buttonDeleteComment" Grid.Column="2" Style="{StaticResource commentButtonStyle}" Margin="5,0,10,5"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="buttonDeleteComment_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Width="20" Height="20" Source="Images/cancel.png" />
+                            <TextBlock TextAlignment="Center" Margin="10,0,0,0" Text="Delete Comment"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Grid>
+
+        </Grid>
+
+        <!--Components-->
+        <Expander x:Name="expanderComponent" Grid.Row="3" Margin="4,10,10,4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Header="Show Revit Elements" Collapsed="expanderComponent_Collapsed" Expanded="expanderComponent_Expanded" >
+            <Expander.Background>
+                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+            </Expander.Background>
+            <Grid DataContext="{Binding ElementName=comboBoxIssue, Path=SelectedItem.SelectedViewpoint.VisInfo}" >
+                <DataGrid Grid.Row="1" x:Name="dataGridComponent" HeadersVisibility="Column" CanUserAddRows="False" CanUserDeleteRows="False"
+                          ItemsSource="{Binding Components}" Margin="10,5,0,5" SelectionUnit="FullRow" SelectionMode="Extended" >
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="IFC Guid" Binding="{Binding IfcGuid}" Width="1*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Element Id" Binding="{Binding AuthoringToolId}" Width="1*" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Element Name" Binding="{Binding ElementName}" Width="1*" IsReadOnly="True"/>
+                        <DataGridTemplateColumn x:Name="dataTemplateAction" Header="Action" Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox x:Name="comboBoxAction" SelectedItem="{Binding Action, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.ExtensionColor.Extensions, 
+                                        Converter={StaticResource extensionConverter}, ConverterParameter={StaticResource action}}" 
+                                              Background="{x:Null}" BorderBrush="#cccccc" ItemTemplate="{StaticResource extensionTemplate}" SelectionChanged="comboBoxAction_SelectionChanged">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:InvokeCommandAction  Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ComponentChangedCommand}"
+                                                                        CommandParameter="{Binding ElementName=dataGridComponent, Path=SelectedItem}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn x:Name="dataColumnResponsibilities" Header="Responsibility" Width="1*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox x:Name="comboBoxResponsibility" SelectedItem="{Binding Responsibility, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              ItemsSource="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.ExtensionColor.Extensions,
+                                        Converter={StaticResource extensionConverter}, ConverterParameter={StaticResource responsibility}}" 
+                                              Background="{x:Null}" BorderBrush="#cccccc" ItemTemplate="{StaticResource extensionTemplate}" SelectionChanged="comboBoxResponsibility_SelectionChanged">
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="SelectionChanged">
+                                                <i:InvokeCommandAction  Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ComponentChangedCommand}"
+                                                                        CommandParameter="{Binding ElementName=dataGridComponent, Path=SelectedItem}"/>
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
+                                    </ComboBox>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Color" Width="0.5*" IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="{x:Type TextBlock}">
+                                    <Setter Property="Background" Value="{Binding Color,  Mode=TwoWay, UpdateSourceTrigger =PropertyChanged, Converter={StaticResource colorConverter}}"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Expander>
+    </Grid>
+</UserControl>

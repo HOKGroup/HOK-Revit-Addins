@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="BCFFileInfo" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS `BCFFileInfo` (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`FileName`	TEXT,
+	`FilePath`	TEXT,
+	`UploadedBy`	TEXT,
+	`UploadedDate`	DATETIME,
+	`CreationDate`	DATETIME,
+	`IsPrimary` 	BOOLEAN,
+	PRIMARY KEY(Guid)
+);</value>
+  </data>
+  <data name="BimSnippet" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS `BimSnippet` (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`SnippetType`	TEXT,
+	`isExternal`	BOOLEAN,
+	`Reference`	TEXT,
+	`ReferenceSchema`	TEXT,
+	`FileContent`	BLOB,
+	`Topic_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Topic_Guid`) REFERENCES Topic ( Guid )
+)</value>
+  </data>
+  <data name="Bitmaps" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "Bitmaps" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`Bitmap`	TEXT,
+	`Bitmap_Image`	BLOB,
+	`Reference`	TEXT,
+	`Location`	TEXT,
+	`Normal`	TEXT,
+	`Up`	TEXT,
+	`Height`	REAL,
+	`Viewpoints_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Viewpoints_Guid`) REFERENCES Viewpoints ( Guid )
+)</value>
+  </data>
+  <data name="ClippingPlane" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "ClippingPlane" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`Location`	TEXT,
+	`Direction`	TEXT,
+	`Viewpoints_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Viewpoints_Guid`) REFERENCES Viewpoints ( Guid )
+)</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "Comment" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`VerbalStatus`	TEXT,
+	`Status`	TEXT,
+	`Date`	NUMERIC,
+	`Author`	TEXT,
+	`Comment`	TEXT,
+	`ModifiedDate`	NUMERIC,
+	`ModifiedAuthor`	TEXT,
+	`Topic_Guid`	TEXT,
+	`Viewpoint_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Topic_Guid`) REFERENCES Topic ( Guid ),
+	FOREIGN KEY(`Viewpoint_Guid`) REFERENCES Viewpoints (Guid)
+)</value>
+  </data>
+  <data name="Components" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS `Components` (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`IfcGuid`	TEXT,
+	`Selected`	BOOLEAN,
+	`Visible`	BOOLEAN,
+	`Color`	BLOB,
+	`OriginatingSystem`	TEXT,
+	`AuthoringToolId`	TEXT,
+	`Viewpoints_Guid`	TEXT,
+	`ElementName`	TEXT,
+	`Action`	TEXT,
+	`Responsibility`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Viewpoints_Guid`) REFERENCES Viewpoints ( Guid )
+);</value>
+  </data>
+  <data name="Direction" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "Direction" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`X`	REAL,
+	`Y`	REAL,
+	`Z`	REAL,
+	`File_Guid`	INTEGER,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`File_Guid`) REFERENCES BCFFileInfo ( Guid )
+)</value>
+  </data>
+  <data name="DocumentReferences" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS `DocumentReferences` (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`isExternal`	BOOLEAN,
+	`ReferenceDocument`	TEXT,
+	`FileContent`	BLOB,
+	`Description`	TEXT,
+	`Topic_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Topic_Guid`) REFERENCES Topic ( Guid )
+)</value>
+  </data>
+  <data name="HeaderFile" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS `HeaderFile` (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`IfcProject`	TEXT,
+	`IfcSpatialStructureElement`	TEXT,
+	`isExternal`	BOOLEAN,
+	`FileName`	TEXT,
+	`Date`	DATETIME,
+	`Reference`	TEXT,
+	`Topic_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Topic_Guid`) REFERENCES Topic ( Guid )
+)</value>
+  </data>
+  <data name="Labels" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS `Labels` (
+	`Label`	TEXT,
+	`Topic_Guid`	TEXT,
+	FOREIGN KEY(`Topic_Guid`) REFERENCES Topic ( Guid )
+)</value>
+  </data>
+  <data name="Lines" xml:space="preserve">
+    <value>CREATE TABLE  IF NOT EXISTS "Lines" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`StartPoint`	TEXT,
+	`EndPoint`	TEXT,
+	`Viewpoints_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Viewpoints_Guid`) REFERENCES Viewpoints ( Guid )
+)</value>
+  </data>
+  <data name="OrthogonalCamera" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "OrthogonalCamera" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`CameraViewPoint`	TEXT,
+	`CameraDirection`	TEXT,
+	`CameraUpVector`	TEXT,
+	`ViewToWorldScale`	REAL,
+	`Viewpoints_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Viewpoints_Guid`) REFERENCES Viewpoints ( Guid )
+)</value>
+  </data>
+  <data name="PerspectiveCamera" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "PerspectiveCamera" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`CameraViewPoint`	TEXT,
+	`CameraDirection`	TEXT,
+	`CameraUpVector`	TEXT,
+	`FieldOfView`	REAL,
+	`Viewpoints_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Viewpoints_Guid`) REFERENCES Viewpoints ( Guid )
+)</value>
+  </data>
+  <data name="Point" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "Point" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`X`	REAL,
+	`Y`	REAL,
+	`Z`	REAL,
+	`File_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`File_Guid`) REFERENCES BCFFileInfo ( Guid )
+)</value>
+  </data>
+  <data name="Project" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS `Project` (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`ProjectId`	TEXT,
+	`ProjectName`	TEXT,
+	`ProjectExtension_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`ProjectExtension_Guid`) REFERENCES ProjectExtension ( Guid )
+)</value>
+  </data>
+  <data name="ProjectExtension" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "ProjectExtension" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`ExtensionSchema`	TEXT,
+	`File_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`File_Guid`) REFERENCES BCFFileInfo ( Guid )
+)</value>
+  </data>
+  <data name="RelatedTopics" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS `RelatedTopics` (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`Topic_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Topic_Guid`) REFERENCES Topic ( Guid )
+)</value>
+  </data>
+  <data name="RevitExtensions" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS `RevitExtensions` (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`ParameterName`	TEXT,
+	`ParameterValue`	TEXT,
+	`Color`	BLOB,
+	PRIMARY KEY(Guid)
+);</value>
+  </data>
+  <data name="Topic" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "Topic" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`TopicType`	TEXT,
+	`TopicStatus`	TEXT,
+	`Title`	TEXT,
+	`ReferenceLink`	TEXT,
+	`Description`	TEXT,
+	`Priority`	TEXT,
+	`TopicIndex`	INTEGER,
+	`CreationDate`	DATETIME,
+	`CreationAuthor`	TEXT,
+	`ModifiedDate`	DATETIME,
+	`ModifiedAuthor`	TEXT,
+	`AssignedTo`	TEXT,
+	`File_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`File_Guid`) REFERENCES BCFFileInfo ( Guid )
+)</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "Version" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`VersionId`	TEXT,
+	`DetailedVersion`	TEXT,
+	`File_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`File_Guid`) REFERENCES BCFFileInfo ( Guid )
+)</value>
+  </data>
+  <data name="Viewpoints" xml:space="preserve">
+    <value>CREATE TABLE IF NOT EXISTS "Viewpoints" (
+	`Guid`	TEXT NOT NULL UNIQUE,
+	`Viewpoint`	TEXT,
+	`Snapshot`	TEXT,
+	`Snapshot_Image`	BLOB,
+	`Topic_Guid`	TEXT,
+	PRIMARY KEY(Guid),
+	FOREIGN KEY(`Topic_Guid`) REFERENCES Topic ( Guid )
+)</value>
+  </data>
+</root>
