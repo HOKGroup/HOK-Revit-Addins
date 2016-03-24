@@ -1,3 +1,8 @@
+v.0.1.5 (New Sheet Manager)
+- Combined Visual Studio projects
+- Custom Parameter Support (new data structure)
+- Modeless Dialog
+
 v.0.1.12
 Fix
 -Fixed an error occured while reading Excel worksheets for adding views.
