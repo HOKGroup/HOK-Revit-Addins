@@ -26,7 +26,8 @@ namespace HOK.BetaToolsManager
         LEEDView,
         Utility,
         ColorEditor, 
-        SmartBCF
+        SmartBCF,
+        ElementFlatter
     }
 
     public class AppCommand:IExternalApplication
@@ -49,6 +50,7 @@ namespace HOK.BetaToolsManager
         private RibbonPanel dataPanel = null;
         private RibbonPanel analysisPanel = null;
         private SplitButton analysisSplitButton = null;
+        private RibbonPanel shapePanel = null;
 
         Result IExternalApplication.OnShutdown(UIControlledApplication application)
         {
@@ -79,6 +81,7 @@ namespace HOK.BetaToolsManager
                 CreateCustomPanel();
                 CreateDataPanel();
                 CreateAnalysisPanel();
+                CreateDirectShapePanel();
             }
 
             return Result.Succeeded;
@@ -94,6 +97,7 @@ namespace HOK.BetaToolsManager
                 CreateCustomPanel();
                 CreateDataPanel();
                 CreateAnalysisPanel();
+                CreateDirectShapePanel();
             }
         }
 
@@ -447,6 +451,23 @@ namespace HOK.BetaToolsManager
                                 }
                             }
 #endif
+                            string renamePath = Path.Combine(directoryName, "HOK.RenameFamily.dll");
+                            renamePath = GetTempInstallPath(renamePath);
+                            if (File.Exists(renamePath))
+                            {
+                                if (!utilityButtons.ContainsKey("Rename Family"))
+                                {
+                                    PushButton renameButton = utilitySplitButton.AddPushButton(new PushButtonData("Rename Family", "Rename Family", renamePath, "HOK.RenameFamily.RenameCommand")) as PushButton;
+                                    renameButton.LargeImage = ImageUtil.LoadBitmapImage("update.png");
+                                    renameButton.ToolTip = "Rename families and types as assigned in .csv file.";
+                                    AddToolTips(renameButton);
+                                }
+                                else
+                                {
+                                    PushButton renameButton = utilityButtons["Rename Family"];
+                                    renameButton.AssemblyName = renamePath;
+                                }
+                            }
                         }
                         else
                         {
@@ -499,6 +520,11 @@ namespace HOK.BetaToolsManager
                             {
                                 PushButton cameraButton = utilityButtons["View Mover"];
                                 cameraButton.Enabled = false;
+                            }
+                            if (utilityButtons.ContainsKey("Rename Family"))
+                            {
+                                PushButton renameButton = utilityButtons["Rename Family"];
+                                renameButton.Enabled = false;
                             }
                         }
 
@@ -892,6 +918,59 @@ namespace HOK.BetaToolsManager
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to create Analysis panel.\n"+ex.Message, "Create Analysis Panel", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void CreateDirectShapePanel()
+        {
+            try
+            {
+                ToolProperties flatterTP = null; //element flatter properties
+
+                if (toolInfoDictionary.ContainsKey(ToolEnum.ElementFlatter))
+                {
+                    flatterTP = toolInfoDictionary[ToolEnum.ElementFlatter];
+                }
+                if (null != flatterTP)
+                {
+                    if (flatterTP.InstallExist)
+                    {
+                        if (null == shapePanel)
+                        {
+                            shapePanel = m_app.CreateRibbonPanel(tabName, "Direct Shape");
+                        }
+                        if (null != shapePanel)
+                        {
+                            Dictionary<string, PushButton> shapeButtons = CheckExistingButtons(shapePanel);
+
+                            if (!shapeButtons.ContainsKey("Element Flatter"))
+                            {
+                                PushButton flatterButton = shapePanel.AddItem(new PushButtonData("Element Flatter", "Element Flatter", flatterTP.TempAssemblyPath, "HOK.ElementFlatter.Command")) as PushButton;
+                                flatterButton.LargeImage = ImageUtil.LoadBitmapImage("create.ico");
+                                flatterButton.ToolTip = "Flatten elements as direct shapes";
+                                AddToolTips(flatterButton);
+                            }
+                            else
+                            {
+                                PushButton flatterButton = shapeButtons["Element Flatter"];
+                                flatterButton.AssemblyName = flatterTP.TempAssemblyPath;
+                            }
+                        }
+                    }
+                    else if (!flatterTP.InstallExist && null != shapePanel)
+                    {
+                        Dictionary<string, PushButton> shapeButtons = CheckExistingButtons(shapePanel);
+                        if (shapeButtons.ContainsKey("Element Flatter"))
+                        {
+                            PushButton flatterButton = shapeButtons["Element Flatter"];
+                            flatterButton.Enabled = false;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create Direct Shape panel.\n" + ex.Message, "Create Direct Shape Panel", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

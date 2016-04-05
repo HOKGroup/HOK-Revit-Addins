@@ -109,7 +109,14 @@ namespace HOK.BetaToolsManager
                                     {
                                         foreach (string installedFile in installedFiles)
                                         {
-                                            File.Delete(installedFile);
+                                            try
+                                            {
+                                                File.Delete(installedFile);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                string message = ex.Message;
+                                            }
                                         }
                                     }
                                     File.Copy(betaDirectory + fileName, installDirectory + fileName, true);

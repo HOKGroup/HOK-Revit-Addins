@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             Title="HOK Beta Tools Installer" Icon="Resources/hoklogo.ico" Height="400" Width="600" WindowStartupLocation="CenterScreen">
+             Title="HOK Beta Tools Installer" Icon="Resources/hoklogo.ico" Height="400" Width="600" WindowStartupLocation="CenterScreen" UseLayoutRounding="True">
     <Window.Resources>
         <Style TargetType="{x:Type DataGrid}">
             <Setter Property="Background" Value="White"/>

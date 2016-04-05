@@ -68,7 +68,7 @@
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-	<Reference Include="RevitAPI, Version=16.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2016'">
+    <Reference Include="RevitAPI, Version=16.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -177,6 +177,8 @@
     <EmbeddedResource Include="Resources\cameraview.png" />
     <EmbeddedResource Include="Resources\elevation.png" />
     <EmbeddedResource Include="Resources\eq.ico" />
+    <EmbeddedResource Include="Resources\create.ico" />
+    <EmbeddedResource Include="Resources\update.png" />
     <Content Include="Resources\HOK.Tooltip.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

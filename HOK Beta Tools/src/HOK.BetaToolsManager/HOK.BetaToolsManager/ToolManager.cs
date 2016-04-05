@@ -70,7 +70,8 @@ namespace HOK.BetaToolsManager
                         {
                             string fileName = Path.GetFileName(filePath);
                             string tempFile = Path.Combine(tempInstallDirectory, fileName);
-                            File.Copy(filePath, tempFile);
+                            try { File.Copy(filePath, tempFile, true); }
+                            catch { }
                         }
                     }
 
@@ -86,7 +87,8 @@ namespace HOK.BetaToolsManager
                         {
                             string fileName = Path.GetFileName(filePath);
                             string tempFile = Path.Combine(tempResourceFolder, fileName);
-                            File.Copy(filePath, tempFile);
+                            try { File.Copy(filePath, tempFile, true); }
+                            catch { }
                         }
                     }
                 }
@@ -229,6 +231,19 @@ namespace HOK.BetaToolsManager
 
                             dictionary.Add(tool, tp);
                             break;
+
+                        case ToolEnum.ElementFlatter:
+                            tp.ToolName = "Element Flatter";
+                            tp.DllName = "HOK.ElementFlatter.dll";
+                            tp.BetaPath = betaDirectory + tp.DllName;
+                            tp.BetaExist = File.Exists(tp.BetaPath);
+                            tp.InstallPath = installDirectory + tp.DllName;
+                            tp.InstallExist = File.Exists(tp.InstallPath);
+                            if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
+                            tp.ToolIcon = ImageUtil.LoadBitmapImage("create.ico");
+
+                            dictionary.Add(tool, tp);
+                            break;
 #endif
                         case ToolEnum.Utility:
                             tp.ToolName = "Utility Tools";
@@ -338,6 +353,9 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("Resources\\Addins Shared Parameters.txt");
                         break;
 
+                    case ToolEnum.ElementFlatter:
+                        fileNames.Add("HOK.ElementFlatter.dll");
+                        break;
                     case ToolEnum.Utility:
                         fileNames.Add("HOK.Utilities.dll");
                         fileNames.Add("HOK.Arrowhead.dll");
@@ -350,6 +368,7 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("HOK.ViewDepth.dll");
                         fileNames.Add("HOK.WorksetView.dll");
                         fileNames.Add("HOK.CameraDuplicator.dll");
+                        fileNames.Add("HOK.RenameFamily.dll");
                         break;
                     case ToolEnum.ColorEditor:
                         fileNames.Add("HOK.ColorSchemeEditor.dll");
