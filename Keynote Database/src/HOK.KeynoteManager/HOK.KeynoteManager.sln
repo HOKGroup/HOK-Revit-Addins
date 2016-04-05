@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.KeynoteManager", "HOK.KeynoteManager\HOK.KeynoteManager.csproj", "{E6AA9195-A23C-4F51-B354-3C7000F662AD}"
+	ProjectSection(ProjectDependencies) = postProject
+		{489D4CF7-9D18-47B8-A9BF-6D3F5A94A164} = {489D4CF7-9D18-47B8-A9BF-6D3F5A94A164}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.KeynoteEditor", "HOK.KeynoteEditor\HOK.KeynoteEditor.csproj", "{C4F70DB6-85A5-4FEB-A08F-186664DCF7E3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{489D4CF7-9D18-47B8-A9BF-6D3F5A94A164} = {489D4CF7-9D18-47B8-A9BF-6D3F5A94A164}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.Keynote", "HOK.Keynote\HOK.Keynote.csproj", "{489D4CF7-9D18-47B8-A9BF-6D3F5A94A164}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E6AA9195-A23C-4F51-B354-3C7000F662AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6AA9195-A23C-4F51-B354-3C7000F662AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6AA9195-A23C-4F51-B354-3C7000F662AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6AA9195-A23C-4F51-B354-3C7000F662AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4F70DB6-85A5-4FEB-A08F-186664DCF7E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4F70DB6-85A5-4FEB-A08F-186664DCF7E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4F70DB6-85A5-4FEB-A08F-186664DCF7E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4F70DB6-85A5-4FEB-A08F-186664DCF7E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{489D4CF7-9D18-47B8-A9BF-6D3F5A94A164}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{489D4CF7-9D18-47B8-A9BF-6D3F5A94A164}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{489D4CF7-9D18-47B8-A9BF-6D3F5A94A164}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{489D4CF7-9D18-47B8-A9BF-6D3F5A94A164}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

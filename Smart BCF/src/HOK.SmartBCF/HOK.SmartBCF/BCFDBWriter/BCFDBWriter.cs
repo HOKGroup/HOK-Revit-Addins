@@ -123,7 +123,7 @@ namespace HOK.SmartBCF.BCFDBWriter
                                 var tableOrders = ((BCFTables[])Enum.GetValues(typeof(BCFTables))).OrderBy(x => x);
 
                                 ProgressManager.InitializeProgress("Creating Database tables..", tableOrders.Count());
-
+                                ProgressManager.databaseFilePath = databaseFile;
                                 foreach (BCFTables tName in tableOrders)
                                 {
                                     ProgressManager.StepForward();
@@ -137,7 +137,7 @@ namespace HOK.SmartBCF.BCFDBWriter
                                         string message = tName.ToString() + "\n" + ex.Message;
                                     }
                                 }
-                                ProgressManager.FinalizeProgress(databaseFile);
+                                ProgressManager.FinalizeProgress();
                             }
                             trans.Commit();
                             created = true;
@@ -163,13 +163,14 @@ namespace HOK.SmartBCF.BCFDBWriter
             try
             {
                 ProgressManager.InitializeProgress("Writing Database..", 5);
+                ProgressManager.databaseFilePath = databaseFile;
                 bool fileInfoValuesInserted = InsertBCFFileInfo(bcfzip, mode); ProgressManager.StepForward();
                 bool projectValuesInserted = InsertProjectValues(bcfzip, mode); ProgressManager.StepForward();
                 bool versionValuesInserted = InsertVersionValues(bcfzip, mode); ProgressManager.StepForward();
                 bool extensionValuesInserted = InsertExtensionValues(bcfzip); ProgressManager.StepForward();
                 bool markupValuesInserted = InsertMarkupValues(bcfzip, mode); ProgressManager.StepForward();
                 result = (fileInfoValuesInserted && projectValuesInserted && versionValuesInserted  && markupValuesInserted);
-                ProgressManager.FinalizeProgress(databaseFile);
+                ProgressManager.FinalizeProgress();
             }
             catch (SQLiteException ex)
             {
@@ -1099,7 +1100,7 @@ namespace HOK.SmartBCF.BCFDBWriter
                                 string message = ex.Message;
                             }
                             ProgressManager.StepForward();
-                            ProgressManager.FinalizeProgress("");
+                            ProgressManager.FinalizeProgress();
                         }
                         trans.Commit();
                         deleted = true;

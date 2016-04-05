@@ -35,7 +35,51 @@
                             <Trigger Property="IsSelected" Value="False">
                                 <Setter TargetName="Border" Property="Background" Value="Transparent" />
                             </Trigger>
-                            
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="commandButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Background" Value="{x:Null}"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                SnapsToDevicePixels="true">
+                            <ContentPresenter Name="Presenter" Margin="{TemplateBinding Padding}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    RecognizesAccessKey="True"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#FF818080" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFC5C5C5" />
+                                <Setter Property="BorderBrush" Value="#FFC5C5C5" />
+                                <Setter Property="Foreground" Value="#ffffff" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FFE0E4E6" />
+                                <Setter Property="BorderBrush" Value="#FFE0E4E6"/>
+                                <Setter Property="Foreground" Value="#ffffff"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter TargetName="Chrome" Property="Background" Value="#FFE0E4E6" />
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -49,52 +93,47 @@
             <RowDefinition/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
-        <ToolBarTray  HorizontalAlignment="Stretch" Name="toolBarTray" VerticalAlignment="Stretch" Background="{x:Null}" >
-            <ToolBar Band="1" BandIndex="1" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="80" >
-                <Button Width="100" Height="74" Name="buttonNewDB" Command="{Binding CreateDBCommand}">
-                    <StackPanel Orientation="Vertical" Margin="5,0" >
-                        <Image Margin="0,0,5,5" Height="32" Width="32" Stretch="None" Source="Images/database_new.png"/>
-                        <TextBlock VerticalAlignment="Center">New Database</TextBlock>
-                    </StackPanel>
-                </Button>
-                <Button Width="100" Height="74" Name="buttonConnectDB" Margin="5,0" Command="{Binding OpenDBCommand}">
-                    <StackPanel Orientation="Vertical">
-                        <Image Margin="0,0,5,5" Height="32" Width="32" Stretch="None" Source="Images/database_open.png" />
-                        <TextBlock VerticalAlignment="Center">Open Database</TextBlock>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Width="100" Height="74" Name="buttonAddBCF" Margin="5,0" IsEnabled="{Binding DatabaseOpened}" Command="{Binding AddBCFCommand}">
-                    <StackPanel Orientation="Vertical">
-                        <Image Margin="0,0,5,5" Height="32" Width="32" Source="Images/bcf_add.ico" />
-                        <TextBlock VerticalAlignment="Center">Add BCF</TextBlock>
-                    </StackPanel>
-                </Button>
-                <Button Width="100" Height="74" Name="buttonConvert" Margin="5,0" IsEnabled="{Binding DatabaseOpened}" Command="{Binding ConvertBCFCommand}">
-                    <StackPanel Orientation="Vertical">
-                        <Image Margin="0,0,5,5"  Height="32" Width="32" Stretch="None" Source="Images/bcf_convert.ico" />
-                        <TextBlock VerticalAlignment="Center">Convert to BCF</TextBlock>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Width="100" Height="74" Name="buttonComponent" Margin="5,0" IsEnabled="{Binding ComponentEnabled}"
+        <StackPanel Orientation="Horizontal" Background="#FFF0F1F1">
+            <Button Width="80"  Name="buttonNewDB" Command="{Binding CreateDBCommand}" Style="{StaticResource commandButtonStyle}">
+                <StackPanel Orientation="Vertical" >
+                    <Image Margin="0,0,0,5" Height="32" Width="32" Source="Images/database.png"/>
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">New</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Width="80"  Name="buttonConnectDB"  Command="{Binding OpenDBCommand}" Style="{StaticResource commandButtonStyle}">
+                <StackPanel Orientation="Vertical">
+                    <Image Margin="0,0,0,5" Height="32" Width="32" Source="Images/folder.png" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Open</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Width="80" Name="buttonAddBCF" IsEnabled="{Binding DatabaseOpened}" Command="{Binding AddBCFCommand}" Style="{StaticResource commandButtonStyle}">
+                <StackPanel Orientation="Vertical">
+                    <Image Margin="0,0,0,5" Height="32" Width="32" Source="Images/bcf_add.ico" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Add</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Width="80" Name="buttonConvert" IsEnabled="{Binding DatabaseOpened}" Command="{Binding ConvertBCFCommand}" Style="{StaticResource commandButtonStyle}">
+                <StackPanel Orientation="Vertical">
+                    <Image Margin="0,0,0,5" Height="32" Width="32" Source="Images/bcf_convert.ico" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Convert</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Width="80" Name="buttonComponent" IsEnabled="{Binding ComponentEnabled}" Style="{StaticResource commandButtonStyle}"
                         Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ComponentCommand}">
-                    <StackPanel Orientation="Vertical">
-                        <Image Margin="0,0,5,5"  Height="32" Width="32"  Source="Images/elements.png" />
-                        <TextBlock VerticalAlignment="Center">Components</TextBlock>
-                    </StackPanel>
-                </Button>
-                <Separator/>
-                <Button Width="100" Height="74" Name="buttonSetting" Margin="5,0" IsEnabled="{Binding DatabaseOpened}" Command="{Binding SettingCommand}">
-                    <StackPanel Orientation="Vertical">
-                        <Image Margin="0,0,5,5"  Height="32" Width="32" Stretch="Uniform" Source="Images/settings.png" />
-                        <TextBlock VerticalAlignment="Center">Settings</TextBlock>
-                    </StackPanel>
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
+                <StackPanel Orientation="Vertical">
+                    <Image Margin="0,0,0,5"  Height="32" Width="32"  Source="Images/elements.png" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Components</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Width="80"  Name="buttonSetting" IsEnabled="{Binding DatabaseOpened}" Command="{Binding SettingCommand}" Style="{StaticResource commandButtonStyle}">
+                <StackPanel Orientation="Vertical">
+                    <Image Margin="0,0,0,5"  Height="32" Width="32" Stretch="Uniform" Source="Images/config.png" />
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Settings</TextBlock>
+                </StackPanel>
+            </Button>
+        </StackPanel>
         <TabControl x:Name="tabControlBCFs" ItemsSource="{Binding BCFFiles}" SelectedIndex="{Binding SelectedIndex}" 
-                    HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch">
+                    HorizontalAlignment="Stretch" Grid.Row="1" VerticalAlignment="Stretch" BorderThickness="0" BorderBrush="Gray">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">

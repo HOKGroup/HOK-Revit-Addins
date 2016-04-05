@@ -9,14 +9,41 @@ namespace HOK.WorksetView
 {
     public static class ViewCreator
     {
-        public static ToolStripProgressBar progressBar;
 
-        public static View3D Create3DView(Document doc, WorksetInfo worksetInfo, ViewFamilyType view3dFamilyType, bool overwrite)
+        public static View3D Create3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite)
         {
             View3D view3D = null;
             try
             {
-                string viewName = "WS - 3D - " + worksetInfo.WorksetName;
+                switch (itemInfo.ItemType)
+                {
+                    case ViewBy.Workset:
+                        view3D = CreateWorkset3DView(doc, itemInfo, view3dFamilyType, overwrite);
+                        break;
+                    case ViewBy.Phase:
+                        view3D = CreatePhase3DView(doc, itemInfo, view3dFamilyType, overwrite);
+                        break;
+                    case ViewBy.DesignOption:
+                        view3D = CreateDesignOption3DView(doc, itemInfo, view3dFamilyType, overwrite);
+                        break;
+                    case ViewBy.Link:
+                        view3D = CreateLink3DView(doc, itemInfo, view3dFamilyType, overwrite);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create 3d view.\n" + ex.Message, "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return view3D;
+        }
+
+        public static View3D CreateWorkset3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite)
+        {
+            View3D view3D = null;
+            try
+            {
+                string viewName = "WS - 3D - " + itemInfo.ItemName;
                 using (TransactionGroup tg = new TransactionGroup(doc))
                 {
                     tg.Start("Create 3D View");
@@ -45,7 +72,7 @@ namespace HOK.WorksetView
                                 {
                                     view3D = View3D.CreateIsometric(doc, view3dFamilyType.Id);
                                     view3D.Name = viewName;
-                                    if(view3D.CanModifyViewDiscipline())
+                                    if (view3D.CanModifyViewDiscipline())
                                     {
                                         view3D.Discipline = ViewDiscipline.Coordination;
                                     }
@@ -54,7 +81,7 @@ namespace HOK.WorksetView
                                 catch (Exception ex)
                                 {
                                     trans.RollBack();
-                                    MessageBox.Show("Failed to create Isometric.\n"+ex.Message, "Create Isometric", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                    MessageBox.Show("Failed to create Isometric.\n" + ex.Message, "Create Isometric", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                                 }
                             }
                         }
@@ -71,7 +98,7 @@ namespace HOK.WorksetView
                                 {
                                     if (ws.Kind == WorksetKind.UserWorkset)
                                     {
-                                        if (ws.Id.IntegerValue == worksetInfo.WorksetId.IntegerValue)
+                                        if (ws.Id.IntegerValue == itemInfo.ItemId)
                                         {
                                             view3D.SetWorksetVisibility(ws.Id, WorksetVisibility.Visible);
                                         }
@@ -86,7 +113,7 @@ namespace HOK.WorksetView
                             catch (Exception ex)
                             {
                                 trans.RollBack();
-                                MessageBox.Show("Failed to set visibility.\n"+ex.Message, "Set Visibility", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                MessageBox.Show("Failed to set visibility.\n" + ex.Message, "Set Visibility", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }
                         }
 
@@ -115,7 +142,7 @@ namespace HOK.WorksetView
                             catch (Exception ex)
                             {
                                 trans.RollBack();
-                                MessageBox.Show("Failed to set sectionbox.\n"+ex.Message, "Set Sectionbox", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                MessageBox.Show("Failed to set sectionbox.\n" + ex.Message, "Set Sectionbox", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }
                         }
                     }
@@ -129,82 +156,17 @@ namespace HOK.WorksetView
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create 3d views by worksets.\n"+ex.Message, "Create 3D Views by Worksets", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to create workset views.\n" + ex.Message, "Create Workset 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             return view3D;
         }
 
-        private static BoundingBoxXYZ GetBoundingBox(List<Element> elements)
-        {
-            BoundingBoxXYZ boundingBox = new BoundingBoxXYZ();
-            try
-            {
-                progressBar.Value = 0;
-                progressBar.Maximum = elements.Count;
-
-                boundingBox.Enabled = true;
-                for (int i = 0; i < 3; i++)
-                {
-                    boundingBox.set_MinEnabled(i, true);
-                    boundingBox.set_MaxEnabled(i, true);
-                    boundingBox.set_BoundEnabled(0, i, true);
-                    boundingBox.set_BoundEnabled(1, i, true);
-                }
-
-                BoundingBoxXYZ tempBoundingBox = elements.First().get_BoundingBox(null);
-                tempBoundingBox.Enabled = true;
-
-                double maxX = tempBoundingBox.Max.X;
-                double maxY = tempBoundingBox.Max.Y;
-                double maxZ = tempBoundingBox.Max.Z;
-                double minX = tempBoundingBox.Min.X;
-                double minY = tempBoundingBox.Min.Y;
-                double minZ = tempBoundingBox.Min.Z;
-
-                foreach (Element element in elements)
-                {
-                    try
-                    {
-                        progressBar.PerformStep();
-
-                        BoundingBoxXYZ bbBox = element.get_BoundingBox(null);
-                        bbBox.Enabled = true;
-                        if (null != boundingBox)
-                        {
-                            if (bbBox.Max.X > maxX) { maxX = bbBox.Max.X; }
-                            if (bbBox.Max.Y > maxY) { maxY = bbBox.Max.Y; }
-                            if (bbBox.Max.Z > maxZ) { maxZ = bbBox.Max.Z; }
-                            if (bbBox.Min.X < minX) { minX = bbBox.Min.X; }
-                            if (bbBox.Min.Y < minY) { minY = bbBox.Min.Y; }
-                            if (bbBox.Min.Z < minZ) { minZ = bbBox.Min.Z; }
-                        }
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-                }
-
-                XYZ xyzMax = new XYZ(maxX, maxY, maxZ);
-                XYZ xyzMin = new XYZ(minX, minY, minZ);
-
-                boundingBox.set_Bounds(0, xyzMin);
-                boundingBox.set_Bounds(1, xyzMax);
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to get bounding box XYZ.\n" + ex.Message, "Get Bounding Box", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            return boundingBox;
-        }
-
-        public static View3D Create3DView(Document doc, PhaseInfo phaseInfo, ViewFamilyType view3dFamilyType, bool overwrite)
+        public static View3D CreatePhase3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite)
         {
             View3D view3D = null;
             try
             {
-                string viewName = "PH - 3D - " + phaseInfo.PhaseName;
+                string viewName = "PH - 3D - " + itemInfo.ItemName;
                 using (Transaction trans = new Transaction(doc))
                 {
                     FilteredElementCollector collector = new FilteredElementCollector(doc);
@@ -233,13 +195,13 @@ namespace HOK.WorksetView
                             {
                                 view3D.Discipline = ViewDiscipline.Coordination;
                             }
-                            
+
                             Parameter param = view3D.get_Parameter(BuiltInParameter.VIEW_PHASE);
                             if (null != param)
                             {
                                 if (!param.IsReadOnly)
                                 {
-                                    param.Set(phaseInfo.PhaseId);
+                                    param.Set(itemInfo.ItemId);
                                 }
                             }
                             trans.Commit();
@@ -249,7 +211,7 @@ namespace HOK.WorksetView
                             trans.RollBack();
                             MessageBox.Show("Failed to create 3d view by phases.\n" + ex.Message, "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
-                        
+
                     }
 
                     /*
@@ -288,12 +250,12 @@ namespace HOK.WorksetView
             return view3D;
         }
 
-        public static View3D Create3DView(Document doc, DesignOptionInfo designOptionInfo, ViewFamilyType view3dFamilyType, bool overwrite)
+        public static View3D CreateDesignOption3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite)
         {
             View3D view3D = null;
             try
             {
-                string viewName = "OP - 3D - " + designOptionInfo.DesignOptionName;
+                string viewName = "OP - 3D - " + itemInfo.ItemName;
                 using (Transaction trans = new Transaction(doc))
                 {
                     trans.Start("Create 3D View");
@@ -322,14 +284,14 @@ namespace HOK.WorksetView
                             {
                                 view3D.Discipline = ViewDiscipline.Coordination;
                             }
-                            
+
                             trans.Commit();
                         }
                     }
                     catch (Exception ex)
                     {
                         trans.RollBack();
-                        MessageBox.Show("Failed to create a 3d view for the design option, " + designOptionInfo.DesignOptionName + "\n" + ex.Message, "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Failed to create a 3d view for the design option, " + itemInfo.ItemName + "\n" + ex.Message, "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }
@@ -340,10 +302,191 @@ namespace HOK.WorksetView
             return view3D;
         }
 
-        public static ViewPlan CreateFloorPlan(Document doc, WorksetInfo worksetInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite)
+        public static View3D CreateLink3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite)
+        {
+            View3D view3D = null;
+            try
+            {
+                string viewName = "LINKRVT - 3D - " + itemInfo.ItemName;
+                using (TransactionGroup tg = new TransactionGroup(doc))
+                {
+                    tg.Start("Create 3D View");
+                    try
+                    {
+                        FilteredElementCollector collector = new FilteredElementCollector(doc);
+                        List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
+                        var views = from view in view3ds where view.Name == viewName select view;
+                        if (views.Count() > 0)
+                        {
+                            if (overwrite)
+                            {
+                                view3D = views.First();
+                            }
+                            else
+                            {
+                                return view3D;
+                            }
+                        }
+                        if (null == view3D)
+                        {
+                            using (Transaction trans = new Transaction(doc))
+                            {
+                                trans.Start("Create Isometric");
+                                try
+                                {
+                                    view3D = View3D.CreateIsometric(doc, view3dFamilyType.Id);
+                                    view3D.Name = viewName;
+                                    if (view3D.CanModifyViewDiscipline())
+                                    {
+                                        view3D.Discipline = ViewDiscipline.Coordination;
+                                    }
+                                    trans.Commit();
+                                }
+                                catch (Exception ex)
+                                {
+                                    trans.RollBack();
+                                    MessageBox.Show("Failed to create Isometric.\n" + ex.Message, "Create Isometric", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                }
+                            }
+                        }
+
+                        
+                        using (Transaction trans = new Transaction(doc))
+                        {
+                            trans.Start("Set SectionBox");
+                            try
+                            {
+                                collector = new FilteredElementCollector(doc);
+                                List<Element> linkInstances = collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().ToElements().ToList();
+                                var selectedLinks = from link in linkInstances where link.Name.Contains(itemInfo.ItemName) && null!=link.Location select link;
+                                if (selectedLinks.Count() > 0)
+                                {
+                                    BoundingBoxXYZ boundingBox = GetBoundingBox(selectedLinks.ToList());
+                                    if (null != boundingBox)
+                                    {
+#if RELEASE2013
+                                        view3D.SectionBox = boundingBox;
+#else
+                                        view3D.SetSectionBox(boundingBox);
+#endif
+                                        //view3d.GetSectionBox().Enabled = true;
+                                    }
+                                }
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.RollBack();
+                                MessageBox.Show("Failed to set sectionbox.\n" + ex.Message, "Set Sectionbox", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Failed to create 3d views by worksets.\n" + ex.Message, "Create 3D Views by Worksets", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        tg.RollBack();
+                    }
+                    tg.Assimilate();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create workset views.\n" + ex.Message, "Create Workset 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return view3D;
+        }
+
+        private static BoundingBoxXYZ GetBoundingBox(List<Element> elements)
+        {
+            BoundingBoxXYZ boundingBox = new BoundingBoxXYZ();
+            try
+            {
+                boundingBox.Enabled = true;
+                for (int i = 0; i < 3; i++)
+                {
+                    boundingBox.set_MinEnabled(i, true);
+                    boundingBox.set_MaxEnabled(i, true);
+                    boundingBox.set_BoundEnabled(0, i, true);
+                    boundingBox.set_BoundEnabled(1, i, true);
+                }
+
+                BoundingBoxXYZ tempBoundingBox = elements.First().get_BoundingBox(null);
+                if (null != tempBoundingBox)
+                {
+                    tempBoundingBox.Enabled = true;
+
+                    double maxX = tempBoundingBox.Max.X;
+                    double maxY = tempBoundingBox.Max.Y;
+                    double maxZ = tempBoundingBox.Max.Z;
+                    double minX = tempBoundingBox.Min.X;
+                    double minY = tempBoundingBox.Min.Y;
+                    double minZ = tempBoundingBox.Min.Z;
+
+                    foreach (Element element in elements)
+                    {
+                        try
+                        {
+                            BoundingBoxXYZ bbBox = element.get_BoundingBox(null);
+                            if (null != boundingBox)
+                            {
+                                bbBox.Enabled = true;
+                                if (bbBox.Max.X > maxX) { maxX = bbBox.Max.X; }
+                                if (bbBox.Max.Y > maxY) { maxY = bbBox.Max.Y; }
+                                if (bbBox.Max.Z > maxZ) { maxZ = bbBox.Max.Z; }
+                                if (bbBox.Min.X < minX) { minX = bbBox.Min.X; }
+                                if (bbBox.Min.Y < minY) { minY = bbBox.Min.Y; }
+                                if (bbBox.Min.Z < minZ) { minZ = bbBox.Min.Z; }
+                            }
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                    }
+
+                    XYZ xyzMax = new XYZ(maxX, maxY, maxZ);
+                    XYZ xyzMin = new XYZ(minX, minY, minZ);
+
+                    boundingBox.set_Bounds(0, xyzMin);
+                    boundingBox.set_Bounds(1, xyzMax);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get bounding box XYZ.\n" + ex.Message, "Get Bounding Box", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return boundingBox;
+        }
+
+        public static ViewPlan CreateFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite)
         {
             ViewPlan viewPlan = null;
-            string viewName = planLevel.Name + " - " + worksetInfo.WorksetName;
+            try
+            {
+                switch (itemInfo.ItemType)
+                {
+                    case ViewBy.Workset:
+                        viewPlan = CreateWorksetFloorPlan(doc, itemInfo, viewPlanFamilyType, planLevel, overwrite);
+                        break;
+                    case ViewBy.Phase:
+                        viewPlan = CreatePhaseFloorPlan(doc, itemInfo, viewPlanFamilyType, planLevel, overwrite);
+                        break;
+                    case ViewBy.DesignOption:
+                        viewPlan = CreateDesignOptionFloorPlan(doc, itemInfo, viewPlanFamilyType, planLevel, overwrite);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create floor plan.\n" + ex.Message, "Create Floor Plan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return viewPlan;
+        }
+
+        public static ViewPlan CreateWorksetFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite)
+        {
+            ViewPlan viewPlan = null;
+            string viewName = planLevel.Name + " - " + itemInfo.ItemName;
             using (TransactionGroup tg = new TransactionGroup(doc))
             {
                 tg.Start("Create Floor Plan");
@@ -396,7 +539,7 @@ namespace HOK.WorksetView
                             {
                                 if (ws.Kind == WorksetKind.UserWorkset)
                                 {
-                                    if (ws.Id.IntegerValue == worksetInfo.WorksetId.IntegerValue)
+                                    if (ws.Id.IntegerValue == itemInfo.ItemId)
                                     {
                                         viewPlan.SetWorksetVisibility(ws.Id, WorksetVisibility.Visible);
                                     }
@@ -425,12 +568,12 @@ namespace HOK.WorksetView
             return viewPlan;
         }
 
-        public static ViewPlan CreateFloorPlan(Document doc, PhaseInfo phaseInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite)
+        public static ViewPlan CreatePhaseFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite)
         {
             ViewPlan viewPlan = null;
             try
             {
-                string viewName = planLevel.Name + " - " + phaseInfo.PhaseName;
+                string viewName = planLevel.Name + " - " + itemInfo.ItemName;
                 using (Transaction trans = new Transaction(doc))
                 {
                     try
@@ -460,7 +603,7 @@ namespace HOK.WorksetView
                             {
                                 if (!param.IsReadOnly)
                                 {
-                                    param.Set(phaseInfo.PhaseId);
+                                    param.Set(itemInfo.ItemId);
                                 }
                             }
                             trans.Commit();
@@ -497,7 +640,7 @@ namespace HOK.WorksetView
                     catch (Exception ex)
                     {
                         trans.RollBack();
-                        MessageBox.Show("Failed to create a plan view for the phase, " + phaseInfo.PhaseName + "\n" + ex.Message, "Create Plan View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Failed to create a plan view for the phase, " + itemInfo.ItemName + "\n" + ex.Message, "Create Plan View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }
@@ -508,12 +651,12 @@ namespace HOK.WorksetView
             return viewPlan;
         }
 
-        public static ViewPlan CreateFloorPlan(Document doc, DesignOptionInfo optionInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite)
+        public static ViewPlan CreateDesignOptionFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite)
         {
             ViewPlan viewPlan = null;
             try
             {
-                string viewName = planLevel.Name + " - " + optionInfo.DesignOptionName;
+                string viewName = planLevel.Name + " - " + itemInfo.ItemName;
                 using (Transaction trans = new Transaction(doc))
                 {
                     try
@@ -545,7 +688,7 @@ namespace HOK.WorksetView
                     catch (Exception ex)
                     {
                         trans.RollBack();
-                        MessageBox.Show("Failed to create a plan view for the design option, " + optionInfo.DesignOptionName + "\n" + ex.Message, "Create Plan View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Failed to create a plan view for the design option, " + itemInfo.ItemName + "\n" + ex.Message, "Create Plan View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }

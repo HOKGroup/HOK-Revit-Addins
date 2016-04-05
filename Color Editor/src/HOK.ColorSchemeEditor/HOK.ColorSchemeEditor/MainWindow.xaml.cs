@@ -1804,9 +1804,10 @@ namespace HOK.ColorSchemeEditor
                         }
                         trans.Commit();
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         trans.RollBack();
+                        MessageBox.Show("Failed to set override graphics settings.\n" + ex.Message, "Get Override Graphics Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
                     }
                 }
             }
@@ -1977,10 +1978,10 @@ namespace HOK.ColorSchemeEditor
                                     trans.Commit();
                                     coloredElements.Add(ep.ElementId);
                                 }
-                                catch
+                                catch(Exception ex)
                                 {
                                     colored = false;
-                                    strBuilder.AppendLine(ep.ElementId.IntegerValue + " " + ep.RevitElement.Name);
+                                    strBuilder.AppendLine(ep.ElementId.IntegerValue + " " + ep.RevitElement.Name+": "+ex.Message);
                                     trans.RollBack();
                                 }
                             }

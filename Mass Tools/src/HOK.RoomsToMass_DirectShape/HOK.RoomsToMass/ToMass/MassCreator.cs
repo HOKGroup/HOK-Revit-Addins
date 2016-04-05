@@ -10,6 +10,7 @@ using System.IO;
 using System.Windows.Forms;
 using Autodesk.Revit.DB.Structure;
 using System.Drawing;
+using Autodesk.Revit.DB.IFC;
 
 namespace HOK.RoomsToMass.ToMass
 {
@@ -24,10 +25,10 @@ namespace HOK.RoomsToMass.ToMass
             try
             {
                 string appGuid = doc.Application.ActiveAddInId.GetGUID().ToString();
-                if (rp.Linked && null != rp.LinkedMass)
+                if (null != rp.Linked3dMass)
                 {
                     //delete existing mass first
-                    MassProperties existingMass = rp.LinkedMass;
+                    MassProperties existingMass = rp.Linked3dMass;
                     doc.Delete(new ElementId(existingMass.MassId));
                 }
 
@@ -73,6 +74,47 @@ namespace HOK.RoomsToMass.ToMass
             return created;
         }
 
+        public static bool CreateRoomFace(Document doc, RoomProperties rp, out MassProperties createdMass)
+        {
+            bool created = false;
+            createdMass = null;
+            try
+            {
+                string appGuid = doc.Application.ActiveAddInId.GetGUID().ToString();
+                if (null != rp.Linked2dMass)
+                {
+                    //delete existing mass first
+                    MassProperties existingMass = rp.Linked2dMass;
+                    doc.Delete(new ElementId(existingMass.MassId));
+                }
+
+                if (null != rp.BottomFace)
+                {
+                    IList<GeometryObject> roomGeometries = GetGeometryObjectsFromFace(rp.BottomFace);
+
+                    DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory), appGuid, rp.RoomId.ToString());
+                    createdShape.SetShape(roomGeometries);
+                    createdShape.SetName(rp.RoomName);
+
+                    Element massElement = doc.GetElement(createdShape.Id);
+                    if (null != massElement)
+                    {
+                        createdMass = new MassProperties(massElement);
+                        createdMass.MassElementType = MassType.MASS2D;
+                        createdMass.SetHostInfo(rp.RoomUniqueId, SourceType.Rooms, rp.RoomSolidCentroid, 0);
+                        bool stored = MassDataStorageUtil.SetLinkedHostInfo(massElement, SourceType.Rooms.ToString(), rp.RoomUniqueId, rp.RoomSolidCentroid, 0);
+                        created = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create room face.\n" + ex.Message, "Create Room Face", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            return created;
+        }
+
         public static bool CreateAreaSolid(Document doc, AreaProperties ap, out MassProperties createdMass)
         {
             bool created = false;
@@ -80,10 +122,10 @@ namespace HOK.RoomsToMass.ToMass
             try
             {
                 string appGuid = doc.Application.ActiveAddInId.GetGUID().ToString();
-                if (ap.Linked && null != ap.LinkedMass)
+                if (null != ap.Linked3dMass)
                 {
                     //delete existing mass first
-                    MassProperties existingMass = ap.LinkedMass;
+                    MassProperties existingMass = ap.Linked3dMass;
                     doc.Delete(new ElementId(existingMass.MassId));
                 }
 
@@ -120,7 +162,51 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create room solid.\n" + ex.Message, "Create Room Solid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to create area solid.\n" + ex.Message, "Create Area Solid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            return created;
+        }
+
+        public static bool CreateAreaFace(Document doc, AreaProperties ap, out MassProperties createdMass)
+        {
+            bool created = false;
+            createdMass = null;
+            try
+            {
+                string appGuid = doc.Application.ActiveAddInId.GetGUID().ToString();
+                if (null != ap.Linked2dMass)
+                {
+                    //delete existing mass first
+                    MassProperties existingMass = ap.Linked2dMass;
+                    doc.Delete(new ElementId(existingMass.MassId));
+                }
+
+                IList<GeometryObject> areaGeometries = GetGeometryObjectsFromFace(ap.AreaFace);
+               
+                DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory), appGuid, ap.AreaId.ToString());
+#if RELEASE2016
+                DirectShapeOptions options = createdShape.GetOptions();
+                options.ReferencingOption = DirectShapeReferencingOption.Referenceable;
+                createdShape.SetOptions(options);
+#endif
+                createdShape.SetShape(areaGeometries);
+                createdShape.SetName(ap.AreaName);
+
+                Element massElement = doc.GetElement(createdShape.Id);
+                if (null != massElement)
+                {
+                    createdMass = new MassProperties(massElement);
+                    createdMass.MassElementType = MassType.MASS2D;
+                    createdMass.SetHostInfo(ap.AreaUniqueId, SourceType.Areas, ap.AreaCenterPoint,0);
+                    bool stored = MassDataStorageUtil.SetLinkedHostInfo(massElement, SourceType.Areas.ToString(), ap.AreaUniqueId, ap.AreaCenterPoint, 0);
+                    created = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create area face.\n" + ex.Message, "Create Area Face", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             return created;
@@ -133,10 +219,10 @@ namespace HOK.RoomsToMass.ToMass
             try
             {
                 string appGuid = doc.Application.ActiveAddInId.GetGUID().ToString();
-                if (fp.Linked && null != fp.LinkedMass)
+                if (null != fp.Linked3dMass)
                 {
                     //delete existing mass first
-                    MassProperties existingMass = fp.LinkedMass;
+                    MassProperties existingMass = fp.Linked3dMass;
                     doc.Delete(new ElementId(existingMass.MassId));
                 }
 
@@ -179,11 +265,122 @@ namespace HOK.RoomsToMass.ToMass
             return created;
         }
 
+        public static bool CreateFloorFace(Document doc, FloorProperties fp, out MassProperties createdMass)
+        {
+            bool created = false;
+            createdMass = null;
+            try
+            {
+                string appGuid = doc.Application.ActiveAddInId.GetGUID().ToString();
+                if (null != fp.Linked2dMass)
+                {
+                    //delete existing mass first
+                    MassProperties existingMass = fp.Linked2dMass;
+                    doc.Delete(new ElementId(existingMass.MassId));
+                }
+
+                IList<GeometryObject> floorGeometries = GetGeometryObjectsFromFace(fp.TopFace);
+
+                DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory), appGuid, fp.FloorId.ToString());
+#if RELEASE2016
+                DirectShapeOptions options = createdShape.GetOptions();
+                options.ReferencingOption = DirectShapeReferencingOption.Referenceable;
+                createdShape.SetOptions(options);
+#endif
+                createdShape.SetShape(floorGeometries);
+                createdShape.SetName(fp.FloorName);
+
+                Element massElement = doc.GetElement(createdShape.Id);
+                if (null != massElement)
+                {
+                    createdMass = new MassProperties(massElement);
+                    createdMass.MassElementType = MassType.MASS2D;
+                    createdMass.SetHostInfo(fp.FloorUniqueId, SourceType.Floors, fp.FloorSolidCentroid, 0);
+                    bool stored = MassDataStorageUtil.SetLinkedHostInfo(massElement, SourceType.Floors.ToString(), fp.FloorUniqueId, fp.FloorSolidCentroid, 0);
+                    created = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create room solid.\n" + ex.Message, "Create Room Solid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+            return created;
+        }
+
+        private static IList<GeometryObject> GetGeometryObjectsFromFace(Face face)
+        {
+            IList<GeometryObject> shapeGeometries = null;
+            try
+            {
+                List<CurveLoop> profiles = new List<CurveLoop>();
+                XYZ normal = face.ComputeNormal(new UV(0, 0));
+ 
+                IList<CurveLoop> curveLoops = face.GetEdgesAsCurveLoops();
+                IList<IList<CurveLoop>> sortedCurveLoops = ExporterIFCUtils.SortCurveLoops(curveLoops);
+                foreach (IList<CurveLoop> curveLoopList in sortedCurveLoops)
+                {
+                    foreach (CurveLoop curveLoop in curveLoopList)
+                    {
+                        if (curveLoop.IsCounterclockwise(normal))
+                        {
+                            profiles.Insert(0, curveLoop);
+                        }
+                        else
+                        {
+                            profiles.Add(curveLoop);
+                        }
+                    }
+                }
+
+                List<List<XYZ>> allLoopVertices = new List<List<XYZ>>();
+                for (int i = 0; i < profiles.Count; i++)
+                {
+                    List<XYZ> vertices = new List<XYZ>();
+                    CurveLoop curveLoop = profiles[i];
+                    foreach (Curve curve in curveLoop)
+                    {
+                        IList<XYZ> tessellatedVertices = curve.Tessellate();
+                        tessellatedVertices.RemoveAt(tessellatedVertices.Count - 1);
+                        vertices.AddRange(tessellatedVertices);
+                    }
+                    allLoopVertices.Add(vertices);
+                }
+
+                TessellatedShapeBuilder builder = new TessellatedShapeBuilder();
+                builder.OpenConnectedFaceSet(false);
+
+                TessellatedFace tesseFace = new TessellatedFace(allLoopVertices.ToArray(), ElementId.InvalidElementId);
+                if (builder.DoesFaceHaveEnoughLoopsAndVertices(tesseFace))
+                {
+                    builder.AddFace(tesseFace);
+                }
+
+                builder.CloseConnectedFaceSet();
+
+                TessellatedShapeBuilderResult result = builder.Build(TessellatedShapeBuilderTarget.AnyGeometry, TessellatedShapeBuilderFallback.Mesh, ElementId.InvalidElementId);
+                shapeGeometries = result.GetGeometricalObjects();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get geometry objects from a face.\n" + ex.Message, "Get Geometry Objects", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return shapeGeometries;
+        }
+
+    }
+
+    public enum MassType
+    {
+        MASS3D, MASS2D, NONE
     }
 
     public class MassProperties
     {
         private Element massElement = null;
+        private MassType massElementType = MassType.NONE;
         private int massId = -1;
         private string massUniqueId = "";
         private string hostUniqueId = "";
@@ -194,6 +391,7 @@ namespace HOK.RoomsToMass.ToMass
         private double massHeight = 0;
 
         public Element MassElement { get { return massElement; } set { massElement = value; } }
+        public MassType MassElementType { get { return massElementType; } set { massElementType = value; } }
         public int MassId { get { return massId; } set { massId = value; } }
         public string MassUniqueId { get { return massUniqueId; } set { massUniqueId = value; } }
         public string HostUniqueId { get { return hostUniqueId; } set { hostUniqueId = value; } }
@@ -217,6 +415,14 @@ namespace HOK.RoomsToMass.ToMass
             hostType = sourceType;
             hostSolidCentroid = centroid;
             massHeight = height;
+            if (height == 0)
+            {
+                massElementType = MassType.MASS2D;
+            }
+            else
+            {
+                massElementType = MassType.MASS3D;
+            }
         }
 
         private void GetMassGeometry()
@@ -233,10 +439,7 @@ namespace HOK.RoomsToMass.ToMass
                             Solid solid = geomObj as Solid;
                             if (null != solid)
                             {
-                                if (solid.Volume > 0)
-                                {
-                                    massSolid = solid; break;
-                                }
+                                massSolid = solid; break;
                             }
                         }
                     }

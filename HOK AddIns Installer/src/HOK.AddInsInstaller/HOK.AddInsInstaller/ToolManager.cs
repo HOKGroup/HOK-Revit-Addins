@@ -373,8 +373,8 @@ namespace HOK.AddInsInstaller
                             break;
                         case ToolNames.SheetManager:
                             ToolInfo sheetInfo = new ToolInfo(toolEnum);
-                            sheetInfo.ToolName = "Sheet Manager Tools";
-                            sheetInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\HOK.SheetDataManager.dll";
+                            sheetInfo.ToolName = "Sheet Manager";
+                            sheetInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\HOK.SheetManager.AddIn.dll";
                             if (!File.Exists(betaDirectory + sheetInfo.DllPath)) { break; }
                             sheetInfo.ToolIcon = ImageUtil.LoadBitmapImage("sync.png");
 
@@ -383,7 +383,8 @@ namespace HOK.AddInsInstaller
                             sheetInfo.SetInstallVersion(installDirectory + sheetInfo.DllPath);
 
                             sheetInfo.FilePaths.Add(@"\HOK.SheetDataManager.addin");
-                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.SheetDataManager.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.SheetManager.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.SheetManager.AddIn.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\EntityFramework.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\EntityFramework.SqlServer.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\System.Data.SQLite.dll");
@@ -392,7 +393,7 @@ namespace HOK.AddInsInstaller
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\x64\SQLite.Interop.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\x86\SQLite.Interop.dll");
 
-                            sheetInfo.ExePath = @"\\Group\hok\FWR\RESOURCES\Apps\HOK Sheet Data Editor\HOK Sheet Data Editor.application";
+                            sheetInfo.ExePath = @"\\Group\hok\FWR\RESOURCES\Apps\HOK Sheet Data Editor\HOK SheetManager Editor.application";
                             
                             toolInfoDictionary.Add(sheetInfo.ToolName, sheetInfo);
                             break;
@@ -482,7 +483,8 @@ namespace HOK.AddInsInstaller
         ProjectMonitor,
         ElementMover, 
         ProjectReplicator, 
-        SheetManager
+        SheetManager,
+        ElementFlatter
     }
 
     public static class ImageUtil

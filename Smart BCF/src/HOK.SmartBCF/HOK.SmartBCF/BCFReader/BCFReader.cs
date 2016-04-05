@@ -174,7 +174,7 @@ namespace HOK.SmartBCF.BCFReader
                             }
                         }
                     }
-                    ProgressManager.FinalizeProgress("");
+                    ProgressManager.FinalizeProgress();
                 }
             }
             catch (Exception ex)

@@ -10,6 +10,7 @@ using System.Windows;
 using System.Xml.Serialization;
 using HOK.SmartBCF.Schemas;
 using Version = HOK.SmartBCF.Schemas.Version;
+using HOK.SmartBCF.Utils;
 
 namespace HOK.SmartBCF.BCFWriter
 {
@@ -20,6 +21,8 @@ namespace HOK.SmartBCF.BCFWriter
             bool written = false;
             try
             {
+                ProgressManager.InitializeProgress("Writing BCF..", bcf.Markups.Count);
+
                 string tempDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "SmartBCF", bcf.FileId);
                 if (Directory.Exists(tempDirectory))
                 {
@@ -62,6 +65,8 @@ namespace HOK.SmartBCF.BCFWriter
                 XmlSerializer extInfoSerializer = new XmlSerializer(typeof(ComponentExtensionInfo));
                 foreach (Markup markup in bcf.Markups)
                 {
+                    ProgressManager.StepForward();
+
                     string topicDirectory = System.IO.Path.Combine(tempDirectory, markup.Topic.Guid);
                     Directory.CreateDirectory(topicDirectory);
 
@@ -101,22 +106,28 @@ namespace HOK.SmartBCF.BCFWriter
                                 string extensionPath = visInfoPath.Replace(".bcfv", ".bcfvx");
                                 ComponentExtensionInfo extInfo = new ComponentExtensionInfo();
                                 extInfo.ViewpointGuid = vp.Guid;
-                                var revitComponents = from comp in visInfo.Components 
-                                                      where (!string.IsNullOrEmpty(comp.Action.Guid))||(!string.IsNullOrEmpty(comp.Responsibility.Guid))||(!string.IsNullOrEmpty(comp.ElementName)) 
+                                var revitComponents = from comp in visInfo.Components
+                                                      where (null != comp.Action) && (null!=comp.Responsibility)
                                                       select comp;
                                 if (revitComponents.Count() > 0)
                                 {
-                                    ObservableCollection<ComponentExtension> compExtensions = new ObservableCollection<ComponentExtension>();
-                                    List<Component> componentList = revitComponents.ToList();
-                                    foreach (Component comp in componentList)
+                                    var componentsToWrite = from comp in revitComponents
+                                                            where (comp.Action.Guid != Guid.Empty.ToString()) || (comp.Responsibility.Guid != Guid.Empty.ToString()) || (!string.IsNullOrEmpty(comp.ElementName))
+                                                            select comp;
+                                    if (componentsToWrite.Count() > 0)
                                     {
-                                        compExtensions.Add(new ComponentExtension(comp));
-                                    }
-                                    extInfo.Extensions = compExtensions;
-                                    using (FileStream stream = new FileStream(extensionPath, FileMode.Create))
-                                    {
-                                        extInfoSerializer.Serialize(stream, extInfo);
-                                        stream.Close();
+                                        ObservableCollection<ComponentExtension> compExtensions = new ObservableCollection<ComponentExtension>();
+                                        List<Component> componentList = revitComponents.ToList();
+                                        foreach (Component comp in componentList)
+                                        {
+                                            compExtensions.Add(new ComponentExtension(comp));
+                                        }
+                                        extInfo.Extensions = compExtensions;
+                                        using (FileStream stream = new FileStream(extensionPath, FileMode.Create))
+                                        {
+                                            extInfoSerializer.Serialize(stream, extInfo);
+                                            stream.Close();
+                                        }
                                     }
                                 }
 
@@ -152,11 +163,12 @@ namespace HOK.SmartBCF.BCFWriter
                 {
                     written = true;
                 }
-
+                ProgressManager.FinalizeProgress();
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to write the BCF file.\n" + ex.Message, "Write BCF", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ProgressManager.FinalizeProgress();
             }
             return written;
         }

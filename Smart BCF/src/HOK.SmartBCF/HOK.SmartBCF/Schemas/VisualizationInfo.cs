@@ -221,14 +221,15 @@ namespace HOK.SmartBCF.Schemas
             get { return action; }
             set
             {
-                action = value;
-                if (null != action)
+                if (null != value)
                 {
+                    action = value;
                     if (null != action.Color)
                     {
                         this.Color = action.Color;
                     }
                 }
+                
                 NotifyPropertyChanged("Action");
             }
         }
@@ -237,7 +238,14 @@ namespace HOK.SmartBCF.Schemas
         public RevitExtension Responsibility
         {
             get { return responsibility; }
-            set { responsibility = value; NotifyPropertyChanged("Responsibility"); }
+            set 
+            {
+                if (null != value)
+                {
+                    responsibility = value;
+                    NotifyPropertyChanged("Responsibility"); 
+                }
+            }
         }
 
         public virtual Component Clone()

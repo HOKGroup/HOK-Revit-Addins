@@ -195,9 +195,9 @@ namespace HOK.RoomsToMass.ToMass
                     foreach (var selectedItem in dataGridFloor.SelectedItems)
                     {
                         FloorProperties selectedFloor = (FloorProperties)selectedItem;
-                        if (selectedFloor.Linked && null != selectedFloor.LinkedMass)
+                        if (null!=selectedFloor.Linked3dMass)
                         {
-                            selectedIds.Add(selectedFloor.LinkedMass.MassElement.Id);
+                            selectedIds.Add(selectedFloor.Linked3dMass.MassElement.Id);
                         }
                     }
 
@@ -226,7 +226,52 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to view elements in the background.\n" + ex.Message, "View Selected Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to view 3d mass elements in the background.\n" + ex.Message, "View Selected Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void menuItem2dMassView_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (null != dataGridFloor.SelectedItems)
+                {
+                    List<ElementId> selectedIds = new List<ElementId>();
+                    foreach (var selectedItem in dataGridFloor.SelectedItems)
+                    {
+                        FloorProperties selectedFloor = (FloorProperties)selectedItem;
+                        if (null != selectedFloor.Linked2dMass)
+                        {
+                            selectedIds.Add(selectedFloor.Linked2dMass.MassElement.Id);
+                        }
+                    }
+
+                    if (selectedIds.Count > 0)
+                    {
+                        using (Transaction trans = new Transaction(m_doc))
+                        {
+                            trans.Start("Select Elements");
+                            try
+                            {
+                                UIDocument uidoc = m_app.ActiveUIDocument;
+                                Selection selection = uidoc.Selection;
+                                uidoc.ShowElements(selectedIds);
+                                selection.SetElementIds(selectedIds);
+
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.RollBack();
+                                string message = ex.Message;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to view 2d mass elements in the background.\n" + ex.Message, "View Selected Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -336,7 +381,7 @@ namespace HOK.RoomsToMass.ToMass
                     UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
                     using (TransactionGroup tg = new TransactionGroup(m_doc))
                     {
-                        tg.Start("Create Masses");
+                        tg.Start("Create 3D Masses");
                         try
                         {
                             double count = 0;
@@ -358,11 +403,111 @@ namespace HOK.RoomsToMass.ToMass
                                             {
                                                 FloorProperties updatedFloor = new FloorProperties(fp);
                                                 updatedFloor.IsSelected = false;
-                                                updatedFloor.Linked = true;
-                                                updatedFloor.LinkedMass = createdMass;
+                                                updatedFloor.Linked3d = true;
+                                                updatedFloor.Linked3dMass = createdMass;
                                                 updatedFloor.ModifiedHost = false;
-                                                updatedFloor.ToolTip = "Mass Id: " + createdMass.MassId;
+                                                updatedFloor.ToolTip = "Mass 3D Id: " + createdMass.MassId;
+                                                if (updatedFloor.Linked2d && null != updatedFloor.Linked2dMass)
+                                                {
+                                                    updatedFloor.ToolTip += "\nMass 2D Id: " + updatedFloor.Linked2dMass.MassId;
+                                                }
 
+                                                if (createdParamMaps)
+                                                {
+                                                    bool parameterUpdated = UpdateParameter(fp.FloorElement, createdMass.MassElement);
+                                                }
+                                                floorDictionary.Remove(fp.FloorUniqueId);
+                                                floorDictionary.Add(fp.FloorUniqueId, updatedFloor);
+                                            }
+                                        }
+                                        trans.Commit();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        trans.RollBack();
+                                        string message = ex.Message;
+                                    }
+                                }
+
+                                count++;
+                                Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, count });
+                            }
+
+                            DisplayFloorInfo();
+                            tg.Assimilate();
+                        }
+                        catch (Exception ex)
+                        {
+                            tg.RollBack();
+                            MessageBox.Show("Failed to create masses from the selected floors\n" + ex.Message, "Create 3D Masses from Floors", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        }
+                    }
+
+                    progressBar.Visibility = System.Windows.Visibility.Hidden;
+                    statusLable.Text = "Ready";
+                }
+                else
+                {
+                    MessageBox.Show("Please select floors to update masses.", "Select Floors", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create masses from the selected floors.\n" + ex.Message, "Create 3D Masses from Floors", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void button2DCreate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                List<FloorProperties> floorList = (List<FloorProperties>)dataGridFloor.ItemsSource;
+                var selectedFloors = from floor in floorList where floor.IsSelected select floor;
+
+                if (selectedFloors.Count() > 0)
+                {
+                    statusLable.Text = "Creating 2D Masses ..";
+                    progressBar.Visibility = System.Windows.Visibility.Visible;
+                    progressBar.Value = 0;
+                    progressBar.Maximum = selectedFloors.Count();
+
+                    bool createdParamMaps = (massConfig.UpdateType != ParameterUpdateType.None && massConfig.MassParameters.Count > 0) ? true : false;
+
+                    UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
+                    using (TransactionGroup tg = new TransactionGroup(m_doc))
+                    {
+                        tg.Start("Create 2D Masses");
+                        try
+                        {
+                            double count = 0;
+                            foreach (FloorProperties fp in selectedFloors)
+                            {
+                                using (Transaction trans = new Transaction(m_doc))
+                                {
+                                    trans.Start("Create 2D Mass");
+                                    try
+                                    {
+                                        MassProperties createdMass = null;
+                                        if (MassCreator.CreateFloorFace(m_doc, fp, out createdMass))
+                                        {
+                                            if (floorDictionary.ContainsKey(fp.FloorUniqueId))
+                                            {
+                                                FloorProperties updatedFloor = new FloorProperties(fp);
+                                                updatedFloor.IsSelected = false;
+                                                updatedFloor.Linked2d = true;
+                                                updatedFloor.Linked2dMass = createdMass;
+                                                updatedFloor.ModifiedHost = false;
+                                                if (updatedFloor.Linked3d && null != updatedFloor.Linked3dMass)
+                                                {
+                                                    updatedFloor.ToolTip = "Mass 3D Id: " + updatedFloor.Linked3dMass.MassId;
+                                                    updatedFloor.ToolTip += "\nMass 2D Id: " + updatedFloor.Linked2dMass.MassId;
+                                                }
+                                                else
+                                                {
+                                                    updatedFloor.ToolTip = "Mass 2D Id: " + updatedFloor.Linked3dMass.MassId;
+                                                }
+                                                
                                                 if (createdParamMaps)
                                                 {
                                                     bool parameterUpdated = UpdateParameter(fp.FloorElement, createdMass.MassElement);
@@ -557,7 +702,16 @@ namespace HOK.RoomsToMass.ToMass
                                         trans.Start("Update Parameter");
                                         try
                                         {
-                                            bool updated = UpdateParameter(fp.FloorElement, fp.LinkedMass.MassElement);
+                                            bool updated = false;
+                                            if (null != fp.Linked2dMass)
+                                            {
+                                                updated = UpdateParameter(fp.FloorElement, fp.Linked2dMass.MassElement);
+                                            }
+                                            if (null != fp.Linked3dMass)
+                                            {
+                                                updated = UpdateParameter(fp.FloorElement, fp.Linked3dMass.MassElement);
+                                            }
+
                                             if (updated)
                                             {
                                                 FloorProperties updatedFloor = new FloorProperties(fp);
@@ -602,6 +756,5 @@ namespace HOK.RoomsToMass.ToMass
             }
         }
 
-        
     }
 }

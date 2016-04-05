@@ -26,10 +26,13 @@ namespace HOK.RoomsToMass.ToMass
         private string phaseName = "";
         private Solid roomSolid = null;
         private XYZ roomSolidCentroid = null;
+        private Face bottomFace = null;
         private IList<CurveLoop> roomProfiles = new List<CurveLoop>();
 
-        private MassProperties linkedMass = null;
-        private bool linked = false;
+        private MassProperties linked3dMass = null;
+        private MassProperties linked2dMass = null;
+        private bool linked3d = false;
+        private bool linked2d = false;
         private bool modifiedHost = false;
 
         //for datagrid
@@ -53,9 +56,13 @@ namespace HOK.RoomsToMass.ToMass
         public string PhaseName { get { return phaseName; } set { phaseName = value; } }
         public Solid RoomSolid { get { return roomSolid; } set { roomSolid = value; } }
         public XYZ RoomSolidCentroid { get { return roomSolidCentroid; } set { roomSolidCentroid = value; } }
+        public Face BottomFace { get { return bottomFace; } set { bottomFace = value; } }
         public IList<CurveLoop> RoomProfiles { get { return roomProfiles; } set { roomProfiles = value; } }
-        public MassProperties LinkedMass { get { return linkedMass; } set { linkedMass = value; } }
-        public bool Linked { get { return linked; } set { linked = value; } }
+
+        public MassProperties Linked3dMass { get { return linked3dMass; } set { linked3dMass = value; } }
+        public MassProperties Linked2dMass { get { return linked2dMass; } set { linked2dMass = value; } }
+        public bool Linked3d { get { return linked3d; } set { linked3d = value; } }
+        public bool Linked2d { get { return linked2d; } set { linked2d = value; } }
         public bool ModifiedHost { get { return modifiedHost; } set { modifiedHost = value; } }
         public bool IsSelected { get { return isSelected; } set { isSelected = value; } }
         public string ToolTip { get { return tooltip; } set { tooltip = value; } }
@@ -88,8 +95,10 @@ namespace HOK.RoomsToMass.ToMass
             this.RoomSolid = rp.RoomSolid;
             this.RoomSolidCentroid = rp.RoomSolidCentroid;
             this.RoomProfiles = rp.RoomProfiles;
-            this.LinkedMass = rp.LinkedMass;
-            this.Linked = rp.Linked;
+            this.Linked3dMass = rp.Linked3dMass;
+            this.Linked2dMass = rp.Linked2dMass;
+            this.Linked3d = rp.Linked3d;
+            this.Linked2d = rp.Linked2d;
             this.ModifiedHost = rp.ModifiedHost;
             this.IsSelected = rp.IsSelected;
             this.ToolTip = rp.ToolTip;
@@ -172,7 +181,6 @@ namespace HOK.RoomsToMass.ToMass
                 if (null != roomSolid)
                 {
                     roomSolidCentroid = roomSolid.ComputeCentroid();
-                    Face bottomFace = null;
                     foreach (Face face in roomSolid.Faces)
                     {
                         XYZ normal = face.ComputeNormal(new UV(0, 0));

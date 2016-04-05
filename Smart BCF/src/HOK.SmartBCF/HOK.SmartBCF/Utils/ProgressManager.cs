@@ -12,6 +12,7 @@ namespace HOK.SmartBCF.Utils
         public static ProgressBar progressBar = null;
         public static TextBlock statusLabel = null;
         public static double progressValue = 0;
+        public static string databaseFilePath = "";
 
         private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
         private delegate void UpdateStatusLabelDelegate(System.Windows.DependencyProperty dp, Object value);
@@ -44,16 +45,17 @@ namespace HOK.SmartBCF.Utils
             }
         }
 
-        public static void FinalizeProgress(string dbPath)
+        public static void FinalizeProgress()
         {
             if (null != progressBar && null != statusLabel)
             {
+
                 progressValue = 0;
                 progressBar.Visibility = System.Windows.Visibility.Hidden;
 
-                if (!string.IsNullOrEmpty(dbPath))
+                if (!string.IsNullOrEmpty(databaseFilePath))
                 {
-                    statusLabel.Text = dbPath;
+                    statusLabel.Text = databaseFilePath;
                 }
                 else
                 {

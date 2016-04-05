@@ -61,17 +61,21 @@ namespace HOK.SmartBCF.AddIn
                 foreach (RevitLinkProperties link in linkDictionary.Values)
                 {
                     Document doc = link.LinkedDocument;
-                    FilteredElementCollector collector = new FilteredElementCollector(doc);
-                    List<Room> rooms = collector.OfCategory(BuiltInCategory.OST_Rooms).ToElements().Cast<Room>().ToList();
-
-                    foreach (Room room in rooms)
+                    if (null != doc)
                     {
-                        RoomProperties rp = new RoomProperties(room, link);
-                        if (!string.IsNullOrEmpty(rp.IfcGuid) && !dictionary.ContainsKey(rp.IfcGuid))
+                        FilteredElementCollector collector = new FilteredElementCollector(doc);
+                        List<Room> rooms = collector.OfCategory(BuiltInCategory.OST_Rooms).ToElements().Cast<Room>().ToList();
+
+                        foreach (Room room in rooms)
                         {
-                            dictionary.Add(rp.IfcGuid, rp);
+                            RoomProperties rp = new RoomProperties(room, link);
+                            if (!string.IsNullOrEmpty(rp.IfcGuid) && !dictionary.ContainsKey(rp.IfcGuid))
+                            {
+                                dictionary.Add(rp.IfcGuid, rp);
+                            }
                         }
                     }
+                    
                 }                
             }
             catch (Exception ex)
@@ -99,7 +103,7 @@ namespace HOK.SmartBCF.AddIn
                     foreach (RevitLinkInstance instance in instances)
                     {
                         RevitLinkProperties p = new RevitLinkProperties(instance);
-                        if (!dictionary.ContainsKey(p.IfcProjectGuid))
+                        if (null != p.LinkedDocument && !dictionary.ContainsKey(p.IfcProjectGuid))
                         {
                             dictionary.Add(p.IfcProjectGuid, p);
                         }

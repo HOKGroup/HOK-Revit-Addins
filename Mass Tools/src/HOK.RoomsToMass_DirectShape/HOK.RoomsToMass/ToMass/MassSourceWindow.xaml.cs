@@ -33,7 +33,7 @@ namespace HOK.RoomsToMass.ToMass
         private Document m_doc = null;
         private Dictionary<string, RevitDocumentProperties> modelDictionary = new Dictionary<string,RevitDocumentProperties>();
         private SourceType selectedSource = SourceType.None;
-        private Dictionary<string/*hostUniqueId*/, MassProperties> massDictionary = new Dictionary<string, MassProperties>();
+        private List<MassProperties> massList = new List<MassProperties>();
         private Dictionary<string, RoomProperties> roomDictionary = new Dictionary<string, RoomProperties>();
         private Dictionary<string, AreaProperties> areaDictionary = new Dictionary<string, AreaProperties>();
         private Dictionary<string, FloorProperties> floorDictionary = new Dictionary<string, FloorProperties>();
@@ -76,11 +76,7 @@ namespace HOK.RoomsToMass.ToMass
                             {
                                 MassProperties mp = new MassProperties(element);
                                 mp.SetHostInfo(hostUniqueId, sourceType, hostCentroid, massHeight);
-
-                                if (!massDictionary.ContainsKey(mp.HostUniqueId))
-                                {
-                                    massDictionary.Add(mp.HostUniqueId, mp);
-                                }
+                                massList.Add(mp);
                             }
                         }
                     }
@@ -109,7 +105,8 @@ namespace HOK.RoomsToMass.ToMass
                     if (selectedIds.Count > 0)
                     {
                         FilteredElementCollector collector = new FilteredElementCollector(m_doc, selection.GetElementIds());
-                        sourceRooms = collector.OfCategory(BuiltInCategory.OST_Rooms).Cast<Room>().ToList();
+                        ElementClassFilter classFilter = new ElementClassFilter(typeof(DirectShape), true);
+                        sourceRooms = collector.OfCategory(BuiltInCategory.OST_Rooms).WherePasses(classFilter).ToElements().Cast<Room>().ToList();
                         if (sourceRooms.Count > 0)
                         {
                             CollectRoomsInfo(sourceRooms, Autodesk.Revit.DB.Transform.Identity);
@@ -123,7 +120,8 @@ namespace HOK.RoomsToMass.ToMass
                         foreach (RevitDocumentProperties rdp in modelDictionary.Values)
                         {
                             FilteredElementCollector collector = new FilteredElementCollector(rdp.DocumentObj);
-                            List<Room> rooms = collector.OfCategory(BuiltInCategory.OST_Rooms).Cast<Room>().ToList();
+                            ElementClassFilter classFilter = new ElementClassFilter(typeof(DirectShape), true);
+                            List<Room> rooms = collector.OfCategory(BuiltInCategory.OST_Rooms).WherePasses(classFilter).ToElements().Cast<Room>().ToList();
 
                             if (rooms.Count > 0)
                             {
@@ -169,23 +167,52 @@ namespace HOK.RoomsToMass.ToMass
    
                     RoomProperties rp = new RoomProperties(room);
                     rp.GetRoomGeometry(roomTransform);
-                    if (massDictionary.ContainsKey(rp.RoomUniqueId))
+
+                    StringBuilder strBuilder = new StringBuilder();
+                    var mass3dFound = from mass in massList 
+                                    where mass.HostType == SourceType.Rooms && mass.HostUniqueId == rp.RoomUniqueId && mass.MassElementType == MassType.MASS3D 
+                                    select mass;
+                    if (mass3dFound.Count() > 0)
                     {
-                        MassProperties mp = massDictionary[rp.RoomUniqueId];
-                        rp.LinkedMass = mp;
-                        rp.Linked = true;
-                        rp.ToolTip = "Mass Id: " + mp.MassId;
+                        MassProperties mp = mass3dFound.First();
+                        rp.Linked3dMass = mp;
+                        rp.Linked3d = true;
                         rp.UserHeight = mp.MassHeight;
+                        strBuilder.AppendLine("Mass 3D Id: " + mp.MassId);
                         if (null != mp.MassSolid)
                         {
                             if (!rp.RoomSolidCentroid.IsAlmostEqualTo(mp.HostSolidCentroid))
                             {
                                 rp.ModifiedHost = true;
-                                rp.ToolTip += " (the room has been modified)";
+                                strBuilder.Append(" (the room has been modified)");
                             }
                         }
                     }
-                   
+
+                    var mass2dFound = from mass in massList
+                                      where mass.HostType == SourceType.Rooms && mass.HostUniqueId == rp.RoomUniqueId && mass.MassElementType == MassType.MASS2D
+                                      select mass;
+                    if (mass2dFound.Count() > 0)
+                    {
+                        MassProperties mp = mass2dFound.First();
+                        rp.Linked2dMass = mp;
+                        rp.Linked2d = true;
+                        strBuilder.AppendLine("Mass 2D Id: " + mp.MassId);
+                        if (null != mp.MassSolid)
+                        {
+                            if (!rp.RoomSolidCentroid.IsAlmostEqualTo(mp.HostSolidCentroid))
+                            {
+                                rp.ModifiedHost = true;
+                                strBuilder.Append(" (the room has been modified)");
+                            }
+                        }
+                    }
+
+                    if (strBuilder.Length > 0)
+                    {
+                        rp.ToolTip = strBuilder.ToString();
+                    }
+
                     if (!roomDictionary.ContainsKey(rp.RoomUniqueId))
                     {
                         roomDictionary.Add(rp.RoomUniqueId, rp);
@@ -265,21 +292,50 @@ namespace HOK.RoomsToMass.ToMass
 
                     AreaProperties ap = new AreaProperties(area);
                     ap.GetAreaProfile();
-                    if (massDictionary.ContainsKey(ap.AreaUniqueId))
+
+                    StringBuilder strBuilder = new StringBuilder();
+                    var mass3dFound = from mass in massList
+                                      where mass.HostType == SourceType.Areas && mass.HostUniqueId == ap.AreaUniqueId && mass.MassElementType == MassType.MASS3D
+                                      select mass;
+                    if (mass3dFound.Count() > 0)
                     {
-                        MassProperties mp = massDictionary[ap.AreaUniqueId];
-                        ap.LinkedMass = mp;
-                        ap.Linked = true;
-                        ap.ToolTip = "Mass Id: " + mp.MassId;
+                        MassProperties mp = mass3dFound.First();
+                        ap.Linked3dMass = mp;
+                        ap.Linked3d = true;
                         ap.UserHeight = mp.MassHeight;
+                        strBuilder.AppendLine("Mass 3D Id: " + mp.MassId);
                         if (null != mp.MassSolid)
                         {
                             if (!ap.AreaCenterPoint.IsAlmostEqualTo(mp.HostSolidCentroid))
                             {
                                 ap.ModifiedHost = true;
-                                ap.ToolTip += " (the area has been modified)";
+                                strBuilder.Append(" (the area has been modified)");
                             }
                         }
+                    }
+
+                    var mass2dFound = from mass in massList
+                                      where mass.HostType == SourceType.Areas && mass.HostUniqueId == ap.AreaUniqueId && mass.MassElementType == MassType.MASS2D
+                                      select mass;
+                    if (mass2dFound.Count() > 0)
+                    {
+                        MassProperties mp = mass2dFound.First();
+                        ap.Linked2dMass = mp;
+                        ap.Linked2d = true;
+                        strBuilder.AppendLine("Mass 2D Id: " + mp.MassId);
+                        if (null != mp.MassSolid)
+                        {
+                            if (!ap.AreaCenterPoint.IsAlmostEqualTo(mp.HostSolidCentroid))
+                            {
+                                ap.ModifiedHost = true;
+                                strBuilder.Append(" (the area has been modified)");
+                            }
+                        }
+                    }
+
+                    if (strBuilder.Length > 0)
+                    {
+                        ap.ToolTip = strBuilder.ToString();
                     }
 
                     if (!areaDictionary.ContainsKey(ap.AreaUniqueId))
@@ -368,21 +424,50 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     FloorProperties fp = new FloorProperties(floor);
                     fp.GetFloorGeometry(floorTransform);
-                    if (massDictionary.ContainsKey(fp.FloorUniqueId))
+
+                    StringBuilder strBuilder = new StringBuilder();
+                    var mass3dFound = from mass in massList
+                                      where mass.HostType == SourceType.Floors && mass.HostUniqueId == fp.FloorUniqueId && mass.MassElementType == MassType.MASS3D
+                                      select mass;
+                    if (mass3dFound.Count() > 0)
                     {
-                        MassProperties mp = massDictionary[fp.FloorUniqueId];
-                        fp.LinkedMass = mp;
-                        fp.Linked = true;
-                        fp.ToolTip = "Mass Id: " + mp.MassId;
+                        MassProperties mp = mass3dFound.First();
+                        fp.Linked3dMass = mp;
+                        fp.Linked3d = true;
                         fp.UserHeight = mp.MassHeight;
+                        strBuilder.AppendLine("Mass 3D Id: " + mp.MassId);
                         if (null != mp.MassSolid)
                         {
                             if (!fp.FloorSolidCentroid.IsAlmostEqualTo(mp.HostSolidCentroid))
                             {
                                 fp.ModifiedHost = true;
-                                fp.ToolTip += " (the floor has been modified)";
+                                strBuilder.Append(" (the floor has been modified)");
                             }
                         }
+                    }
+
+                    var mass2dFound = from mass in massList
+                                      where mass.HostType == SourceType.Floors && mass.HostUniqueId == fp.FloorUniqueId && mass.MassElementType == MassType.MASS2D
+                                      select mass;
+                    if (mass2dFound.Count() > 0)
+                    {
+                        MassProperties mp = mass2dFound.First();
+                        fp.Linked2dMass = mp;
+                        fp.Linked2d = true;
+                        strBuilder.AppendLine("Mass 2D Id: " + mp.MassId);
+                        if (null != mp.MassSolid)
+                        {
+                            if (!fp.FloorSolidCentroid.IsAlmostEqualTo(mp.HostSolidCentroid))
+                            {
+                                fp.ModifiedHost = true;
+                                strBuilder.Append(" (the floor has been modified)");
+                            }
+                        }
+                    }
+
+                    if (strBuilder.Length > 0)
+                    {
+                        fp.ToolTip = strBuilder.ToString();
                     }
 
                     if (!floorDictionary.ContainsKey(fp.FloorUniqueId))

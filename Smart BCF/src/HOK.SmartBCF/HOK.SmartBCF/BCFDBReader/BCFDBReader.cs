@@ -107,6 +107,7 @@ namespace HOK.SmartBCF.BCFDBReader
                         }
 
                         ProgressManager.InitializeProgress("Reading "+bcfZip.ZipFileName+"...", topicIds.Count);
+                        ProgressManager.databaseFilePath = dbFile;
                         foreach (string topicId in topicIds)
                         {
                             //Get Markup
@@ -269,7 +270,7 @@ namespace HOK.SmartBCF.BCFDBReader
                         bcfZip.SelectedMarkup =0;
                         bcfDictionary.Add(bcfZip.FileId, bcfZip);
                     }
-                    ProgressManager.FinalizeProgress(dbFile);
+                    ProgressManager.FinalizeProgress();
                     connection.Close();
                 }
             }

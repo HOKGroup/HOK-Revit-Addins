@@ -19,12 +19,11 @@ namespace HOK.WorksetView
         {
             m_app = commandData.Application;
 
-            ViewCreatorForm worksetForm = new ViewCreatorForm(m_app);
-            if (worksetForm.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            ViewCreatorWindow mainWindow = new ViewCreatorWindow(m_app);
+            if ((bool)mainWindow.ShowDialog())
             {
-                worksetForm.Close();
+                mainWindow.Close();
             }
-
             return Result.Succeeded;
         }
     }

@@ -134,8 +134,8 @@ namespace HOK.SmartBCF.AddIn
                         this.SelectedComponentIndex = -1;
                         this.RvtComponents.Clear();
 
-                        var selectedProjects = from header in selectedMarkup.Header select header.IfcProject;
-                        List<string> ifcProjectGuids = (selectedProjects.Count() > 0) ? selectedProjects.ToList() : new List<string>();
+                        var selectedProjects = from header in selectedMarkup.Header where linkDictionary.ContainsKey(header.IfcProject) select header.IfcProject;
+                        List<string> ifcProjectGuids = (selectedProjects.Count() > 0) ? selectedProjects.ToList() : linkDictionary.Keys.ToList();
 
                         ObservableCollection<Component> componentsToUpdate = new ObservableCollection<Component>();
                         foreach (Component comp in selectedViewPoint.VisInfo.Components)
@@ -146,19 +146,17 @@ namespace HOK.SmartBCF.AddIn
                             {
                                 foreach (string projectId in ifcProjectGuids)
                                 {
-                                    if (linkDictionary.ContainsKey(projectId))
+                                    RevitLinkProperties rlp = linkDictionary[projectId];
+                                    rvtComponent = new RevitComponent(comp, rlp);
+                                    if (rvtComponent.ElementExist && rvtComponent.ElementMatched)
                                     {
-                                        RevitLinkProperties rlp = linkDictionary[projectId];
-                                        rvtComponent = new RevitComponent(comp, rlp);
-                                        if (rvtComponent.ElementExist && rvtComponent.ElementMatched)
-                                        {
-                                            break;
-                                        }
-                                        else{
-                                            rvtComponent = null;
-                                        }
+                                        break;
                                     }
-                                }                           
+                                    else
+                                    {
+                                        rvtComponent = null;
+                                    }
+                                }          
                             }
                             else if (roomDictionary.ContainsKey(comp.IfcGuid))
                             {

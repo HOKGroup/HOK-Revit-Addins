@@ -49,7 +49,7 @@ namespace HOK.SmartBCF.AddIn
             }
 
             InitializeComponent();
-            this.Title = "SmartBCF v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            this.Title = "SmartBCF AddIn v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

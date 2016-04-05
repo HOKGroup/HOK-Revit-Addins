@@ -168,33 +168,34 @@ namespace HOK.RoomsToMass.ToMass
                 }
 
                 List<RoomProperties> roomList = (List<RoomProperties>)dataGridRoom.ItemsSource;
-                var selectedRooms = from room in roomList where room.IsSelected select room;
-
-                if (selectedRooms.Count() > 0)
+                var roomsFound = from room in roomList where room.IsSelected select room;
+                List<RoomProperties> selectedRooms = roomsFound.ToList();
+                if (selectedRooms.Count > 0)
                 {
                     statusLable.Text = "Creating 3D Masses ..";
                     progressBar.Visibility = System.Windows.Visibility.Visible;
                     progressBar.Value = 0;
-                    progressBar.Maximum = selectedRooms.Count();
+                    progressBar.Maximum = selectedRooms.Count;
 
                     bool createdParamMaps = (massConfig.UpdateType != ParameterUpdateType.None && massConfig.MassParameters.Count > 0) ? true : false;
 
                     UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
                     using (TransactionGroup tg = new TransactionGroup(m_doc))
                     {
-                        tg.Start("Create Masses");
+                        tg.Start("Create 3D Masses");
                         try
                         {
                             double count = 0;
-                            foreach (RoomProperties rp in selectedRooms)
+                            for (int i = 0; i < selectedRooms.Count; i++)
                             {
+                                RoomProperties rp = selectedRooms[i];
                                 if (useDefaultHeight)
                                 {
                                     rp.UserHeight = defaultHeight;
                                 }
                                 using (Transaction trans = new Transaction(m_doc))
                                 {
-                                    trans.Start("Create Mass");
+                                    trans.Start("Create 3D Mass");
                                     try
                                     {
                                         MassProperties createdMass = null;
@@ -204,10 +205,14 @@ namespace HOK.RoomsToMass.ToMass
                                             {
                                                 RoomProperties updatedRoom = new RoomProperties(rp);
                                                 updatedRoom.IsSelected = false;
-                                                updatedRoom.Linked = true;
-                                                updatedRoom.LinkedMass = createdMass;
+                                                updatedRoom.Linked3d = true;
+                                                updatedRoom.Linked3dMass = createdMass;
                                                 updatedRoom.ModifiedHost = false;
-                                                updatedRoom.ToolTip = "Mass Id: " + createdMass.MassId;
+                                                updatedRoom.ToolTip = "Mass 3D Id: " + createdMass.MassId;
+                                                if (updatedRoom.Linked2d && null != updatedRoom.Linked2dMass)
+                                                {
+                                                    updatedRoom.ToolTip += "\nMass 2D Id: " + updatedRoom.Linked2dMass.MassId;
+                                                }
 
                                                 if (createdParamMaps)
                                                 {
@@ -251,7 +256,102 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create masses from the selected rooms.\n"+ex.Message, "Create 3D Masses from Rooms", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to create 3d masses from the selected rooms.\n"+ex.Message, "Create 3D Masses from Rooms", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void button2DCreate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                List<RoomProperties> roomList = (List<RoomProperties>)dataGridRoom.ItemsSource;
+                var selectedRooms = from room in roomList where room.IsSelected select room;
+
+                if (selectedRooms.Count() > 0)
+                {
+                    statusLable.Text = "Creating 2D Masses ..";
+                    progressBar.Visibility = System.Windows.Visibility.Visible;
+                    progressBar.Value = 0;
+                    progressBar.Maximum = selectedRooms.Count();
+
+                    bool createdParamMaps = (massConfig.UpdateType != ParameterUpdateType.None && massConfig.MassParameters.Count > 0) ? true : false;
+
+                    UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
+                    using (TransactionGroup tg = new TransactionGroup(m_doc))
+                    {
+                        tg.Start("Create 2D Masses");
+                        try
+                        {
+                            double count = 0;
+                            foreach (RoomProperties rp in selectedRooms)
+                            {
+                                using (Transaction trans = new Transaction(m_doc))
+                                {
+                                    trans.Start("Create 2D Mass");
+                                    try
+                                    {
+                                        MassProperties createdMass = null;
+                                        if (MassCreator.CreateRoomFace(m_doc, rp, out createdMass))
+                                        {
+                                            if (roomDictionary.ContainsKey(rp.RoomUniqueId))
+                                            {
+                                                RoomProperties updatedRoom = new RoomProperties(rp);
+                                                updatedRoom.IsSelected = false;
+                                                updatedRoom.Linked2d = true;
+                                                updatedRoom.Linked2dMass = createdMass;
+                                                updatedRoom.ModifiedHost = false;
+                                                if (updatedRoom.Linked3d && null != updatedRoom.Linked3dMass)
+                                                {
+                                                    updatedRoom.ToolTip = "Mass 3D Id: " + updatedRoom.Linked3dMass.MassId;
+                                                    updatedRoom.ToolTip += "\nMass 2D Id: " + updatedRoom.Linked2dMass.MassId;
+                                                }
+                                                else
+                                                {
+                                                    updatedRoom.ToolTip = "Mass 2D Id: " + updatedRoom.Linked2dMass.MassId;
+                                                }
+
+                                                if (createdParamMaps)
+                                                {
+                                                    bool parameterUpdated = UpdateParameter(rp.RoomElement, createdMass.MassElement);
+                                                }
+                                                roomDictionary.Remove(rp.RoomUniqueId);
+                                                roomDictionary.Add(rp.RoomUniqueId, updatedRoom);
+                                            }
+                                        }
+                                        trans.Commit();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        trans.RollBack();
+                                        string message = ex.Message;
+                                    }
+                                }
+
+                                count++;
+                                Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, count });
+                            }
+
+                            DisplayRoomInfo();
+                            tg.Assimilate();
+                        }
+                        catch (Exception ex)
+                        {
+                            tg.RollBack();
+                            MessageBox.Show("Failed to create masses from the selected rooms\n" + ex.Message, "Create 3D Masses from Rooms", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        }
+                    }
+
+                    progressBar.Visibility = System.Windows.Visibility.Hidden;
+                    statusLable.Text = "Ready";
+                }
+                else
+                {
+                    MessageBox.Show("Please select rooms to update masses.", "Select Rooms", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Failed to create 2d masses from the selected rooms.\n"+ex.Message, "Create 2D Masses from Rooms", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -387,9 +487,9 @@ namespace HOK.RoomsToMass.ToMass
                     foreach (var selectedItem in dataGridRoom.SelectedItems)
                     {
                         RoomProperties selectedRoom = (RoomProperties)selectedItem;
-                        if (selectedRoom.Linked && null != selectedRoom.LinkedMass)
+                        if (null != selectedRoom.Linked3dMass)
                         {
-                            selectedIds.Add(selectedRoom.LinkedMass.MassElement.Id);
+                            selectedIds.Add(selectedRoom.Linked3dMass.MassElement.Id);
                         }
                     }
 
@@ -418,7 +518,52 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to view elements in the background.\n" + ex.Message, "View Selected Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to view 3d elements in the background.\n" + ex.Message, "View Selected Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void menuItem2dMassView_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (null != dataGridRoom.SelectedItems)
+                {
+                    List<ElementId> selectedIds = new List<ElementId>();
+                    foreach (var selectedItem in dataGridRoom.SelectedItems)
+                    {
+                        RoomProperties selectedRoom = (RoomProperties)selectedItem;
+                        if (null != selectedRoom.Linked2dMass)
+                        {
+                            selectedIds.Add(selectedRoom.Linked2dMass.MassElement.Id);
+                        }
+                    }
+
+                    if (selectedIds.Count > 0)
+                    {
+                        using (Transaction trans = new Transaction(m_doc))
+                        {
+                            trans.Start("Select Elements");
+                            try
+                            {
+                                UIDocument uidoc = m_app.ActiveUIDocument;
+                                Selection selection = uidoc.Selection;
+                                uidoc.ShowElements(selectedIds);
+                                selection.SetElementIds(selectedIds);
+
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.RollBack();
+                                string message = ex.Message;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to view 2d mass elements in the background.\n" + ex.Message, "View Selected Eleemnts", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -478,7 +623,16 @@ namespace HOK.RoomsToMass.ToMass
                                         trans.Start("Update Parameter");
                                         try
                                         {
-                                            bool updated = UpdateParameter(rp.RoomElement, rp.LinkedMass.MassElement);
+                                            bool updated = false;
+                                            if (null != rp.Linked2dMass)
+                                            {
+                                                updated = UpdateParameter(rp.RoomElement, rp.Linked2dMass.MassElement);
+                                            }
+                                            if (null != rp.Linked3dMass)
+                                            {
+                                                updated = UpdateParameter(rp.RoomElement, rp.Linked3dMass.MassElement);
+                                            }
+                                            
                                             if (updated)
                                             {
                                                 RoomProperties updatedRoom = new RoomProperties(rp);
@@ -610,6 +764,10 @@ namespace HOK.RoomsToMass.ToMass
         {
             this.Close();
         }
+
+        
+
+       
 
         
 

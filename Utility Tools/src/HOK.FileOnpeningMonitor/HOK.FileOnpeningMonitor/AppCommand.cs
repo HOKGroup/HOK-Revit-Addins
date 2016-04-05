@@ -9,6 +9,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Events;
 using System.Windows.Threading;
 using System.Windows;
+using System.IO;
 
 
 
@@ -53,12 +54,15 @@ namespace HOK.FileOnpeningMonitor
             try
             {
                 openedDocument = args.Document;
+                if (null == openedDocument.ActiveView) { return; } // to distinguish linked model 
                 if (openedDocument.IsWorkshared)
                 {
                     if (string.IsNullOrEmpty(openedDocument.PathName)) { return; }
 #if RELEASE2015 || RELEASE2016
                     if (openedDocument.IsDetached) { return; }
 #endif
+                    bool isOnNetwork = IsNetworkDrive(openedDocument.PathName);
+                    if (!isOnNetwork) { return; }
 
                     isCentral = IsCentralFile(openedDocument);
                     if (isCentral)
@@ -105,6 +109,29 @@ namespace HOK.FileOnpeningMonitor
             {
                 string message = ex.Message;
             }
+        }
+
+        public bool IsNetworkDrive(string pathName)
+        {
+            bool onNetwork = false;
+            try
+            {
+                if (pathName.StartsWith(@"\\")) { return true; }
+
+                DriveInfo[] infoArray = DriveInfo.GetDrives();
+                foreach (DriveInfo info in infoArray)
+                {
+                    if (info.DriveType == DriveType.Network)
+                    {
+                        if (pathName.StartsWith(info.Name)) { return true; }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to get information of the file location.\n" + ex.Message, "Find File Location", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return onNetwork;
         }
 
         public bool IsCentralFile(Document document)

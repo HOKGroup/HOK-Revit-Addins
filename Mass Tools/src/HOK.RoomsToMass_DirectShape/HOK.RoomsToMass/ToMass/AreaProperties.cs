@@ -20,12 +20,14 @@ namespace HOK.RoomsToMass.ToMass
         private ElementId levelId = ElementId.InvalidElementId;
         private string levelName = "";
         private string designOption = "";
-        
+        private Face areaFace = null;
         private List<CurveLoop> areaProfile = new List<CurveLoop>();
         private XYZ areaCenterPoint = null;
 
-        private MassProperties linkedMass = null;
-        private bool linked = false;
+        private MassProperties linked3dMass = null;
+        private MassProperties linked2dMass = null;
+        private bool linked3d = false;
+        private bool linked2d = false;
         private bool modifiedHost = false;
 
         //for datagrid
@@ -44,10 +46,14 @@ namespace HOK.RoomsToMass.ToMass
         public ElementId LevelId { get { return levelId; } set { levelId = value; } }
         public string LevelName { get { return levelName; } set { levelName = value; } }
         public string AreaDesignOption { get { return designOption; } set { designOption = value; } }
+        public Face AreaFace { get { return areaFace; } set { areaFace = value; } }
         public List<CurveLoop> AreaProfile { get { return areaProfile; } set { areaProfile = value; } }
         public XYZ AreaCenterPoint { get { return areaCenterPoint; } set { areaCenterPoint = value; } }
-        public MassProperties LinkedMass { get { return linkedMass; } set { linkedMass = value; } }
-        public bool Linked { get { return linked; } set { linked = value; } }
+
+        public MassProperties Linked3dMass { get { return linked3dMass; } set { linked3dMass = value; } }
+        public MassProperties Linked2dMass { get { return linked2dMass; } set { linked2dMass = value; } }
+        public bool Linked3d { get { return linked3d; } set { linked3d = value; } }
+        public bool Linked2d { get { return linked2d; } set { linked2d = value; } }
         public bool ModifiedHost { get { return modifiedHost; } set { modifiedHost = value; } }
         public bool IsSelected { get { return isSelected; } set { isSelected = value; } }
         public string ToolTip { get { return tooltip; } set { tooltip = value; } }
@@ -74,10 +80,13 @@ namespace HOK.RoomsToMass.ToMass
             this.LevelId = ap.LevelId;
             this.LevelName = ap.LevelName;
             this.AreaDesignOption = ap.AreaDesignOption;
+            this.AreaFace = ap.AreaFace;
             this.AreaProfile = ap.AreaProfile;
             this.AreaCenterPoint = ap.AreaCenterPoint;
-            this.LinkedMass = ap.LinkedMass;
-            this.Linked = ap.Linked;
+            this.Linked3dMass = ap.Linked3dMass;
+            this.Linked2dMass = ap.Linked2dMass;
+            this.Linked3d = ap.Linked3d;
+            this.Linked2d = ap.Linked2d;
             this.ModifiedHost = ap.ModifiedHost;
             this.IsSelected = ap.IsSelected;
             this.ToolTip = ap.ToolTip;
@@ -122,7 +131,8 @@ namespace HOK.RoomsToMass.ToMass
             try
             {
                 SpatialElementBoundaryOptions opt = new SpatialElementBoundaryOptions();
-                opt.StoreFreeBoundaryFaces = false;
+                opt.StoreFreeBoundaryFaces = true;
+                opt.SpatialElementBoundaryLocation = SpatialElementBoundaryLocation.Center;
                 IList<IList<BoundarySegment>> boundaryListList = m_area.GetBoundarySegments(opt);
                 List<CurveLoop> profiles = new List<CurveLoop>();
 
@@ -171,6 +181,17 @@ namespace HOK.RoomsToMass.ToMass
                             if (null != tempSolid)
                             {
                                 areaCenterPoint = tempSolid.ComputeCentroid();
+                                foreach (Face face in tempSolid.Faces)
+                                {
+                                    XYZ normal = face.ComputeNormal(new UV(0, 0));
+                                    if (normal.Z < 0)
+                                    {
+                                        if (Math.Abs(normal.Z) > Math.Abs(normal.X) && Math.Abs(normal.Z) > Math.Abs(normal.Y))
+                                        {
+                                            areaFace = face; break;
+                                        }
+                                    }
+                                }
                             }
                         }
                         catch (Exception ex)

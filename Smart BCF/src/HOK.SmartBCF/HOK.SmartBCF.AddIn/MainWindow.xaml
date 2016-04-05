@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:HOK.SmartBCF.AddIn"
              xmlns:ctr ="clr-namespace:HOK.SmartBCF.UserControls;assembly=HOK.SmartBCF"
              mc:Ignorable="d" 
-             Title="SmartBCF" Height="800" Width="1100" MinWidth="1000"  WindowStartupLocation="CenterScreen" UseLayoutRounding="True" Icon="Resources/hoklogo.ico" Closing="Window_Closing">
+             Title="SmartBCF AddIn" Height="800" Width="1100" MinWidth="1000"  WindowStartupLocation="CenterScreen" UseLayoutRounding="True" Icon="Resources/hoklogo.ico" Closing="Window_Closing"
+        BorderThickness="0,5,0,0" BorderBrush="#FFE83C53">
     <Grid>
         <ctr:CommandPanel DataContext="{Binding BCFView}"/>
     </Grid>

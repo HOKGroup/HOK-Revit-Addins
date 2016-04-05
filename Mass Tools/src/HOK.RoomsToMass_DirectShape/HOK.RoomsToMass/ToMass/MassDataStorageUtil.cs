@@ -19,6 +19,7 @@ namespace HOK.RoomsToMass.ToMass
         private static string s_SourceCentroid = "SourceCentroid";
         private static string s_MassHeight = "MassHeight";
 
+
         public static bool GetLinkedHostInfo(Element massElement, out string hostCategory, out string hostUniqueId, out XYZ centroid, out double userHeight)
         {
             bool found = false;
@@ -42,7 +43,7 @@ namespace HOK.RoomsToMass.ToMass
                         hostUniqueId = entity.Get<string>(m_schema.GetField(s_LinkedSourceId));
                         centroid = entity.Get<XYZ>(m_schema.GetField(s_SourceCentroid), DisplayUnitType.DUT_DECIMAL_FEET);
                         userHeight = entity.Get<double>(m_schema.GetField(s_MassHeight), DisplayUnitType.DUT_DECIMAL_FEET);
-                        if (!string.IsNullOrEmpty(hostCategory) && !string.IsNullOrEmpty(hostUniqueId) && null != centroid && userHeight > 0)
+                        if (!string.IsNullOrEmpty(hostCategory) && !string.IsNullOrEmpty(hostUniqueId) && null != centroid && userHeight >= 0)
                         {
                             found = true;
                         }
