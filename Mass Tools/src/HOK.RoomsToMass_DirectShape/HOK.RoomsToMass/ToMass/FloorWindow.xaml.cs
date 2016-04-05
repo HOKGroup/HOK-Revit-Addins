@@ -505,7 +505,7 @@ namespace HOK.RoomsToMass.ToMass
                                                 }
                                                 else
                                                 {
-                                                    updatedFloor.ToolTip = "Mass 2D Id: " + updatedFloor.Linked3dMass.MassId;
+                                                    updatedFloor.ToolTip = "Mass 2D Id: " + updatedFloor.Linked2dMass.MassId;
                                                 }
                                                 
                                                 if (createdParamMaps)

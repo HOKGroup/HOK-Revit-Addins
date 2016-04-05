@@ -128,7 +128,7 @@ namespace HOK.RoomsToMass.ToMass
                 }
 
                 roomHeight = m_room.UnboundedHeight;
-                userHeight = roomHeight;
+                userHeight = Math.Round(roomHeight,2);
                 levelId = m_room.LevelId;
                 Level level = m_room.Document.GetElement(levelId) as Level;
                 if (null != level)
