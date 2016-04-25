@@ -1,0 +1,39 @@
+﻿<Window x:Class="HOK.RenameFamily.ExportWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Height="600" Width="400" Icon="Images/hoklogo.ico" Title="Select Categories" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Categories" Margin="7">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <ListBox x:Name="listBoxCategory" Margin="5" ItemsSource="{Binding Categories, UpdateSourceTrigger=PropertyChanged}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding Path=CategoryName}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button x:Name="buttonCheckAll" Grid.Row="1" HorizontalAlignment="Left" Margin="5,0,0,0" Height="22" Width="22" 
+                             Background="#FFF0F1F1" BorderBrush="#FFC5C5C5" Click="buttonCheckAll_Click">
+                    <Image Height="16" Width="16" Source="Images/checkbox_yes.png"/>
+                </Button>
+                <Button x:Name="buttonUncheckAll" Grid.Row="1" HorizontalAlignment="Left" Margin="35,0,0,0" Height="22" Width="22" 
+                          Background="#FFF0F1F1" BorderBrush="#FFC5C5C5" Click="buttonUncheckAll_Click">
+                    <Image Height="16" Width="16" Source="Images/checkbox_no.png" />
+                </Button>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="buttonCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,8,10,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="28" Click="buttonCancel_Click"/>
+        <Button x:Name="buttonExport" Content="Export" HorizontalAlignment="Right" Margin="0,8,90,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="28" Click="buttonExport_Click"/>
+    </Grid>
+</Window>

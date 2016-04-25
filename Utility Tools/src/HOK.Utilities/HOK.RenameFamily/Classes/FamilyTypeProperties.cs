@@ -44,15 +44,23 @@ namespace HOK.RenameFamily.Classes
             typeName = tName;
         }
 
-        public void SetCurrentFamily(FamilySymbol symbol)
+        public void SetCurrentFamily(ElementType eType)
         {
-            familyTypeId = symbol.Id;
-            if (!string.IsNullOrEmpty(symbol.Category.Name))
+            familyTypeId = eType.Id;
+            if (!string.IsNullOrEmpty(eType.Category.Name))
             {
-                categoryName = symbol.Category.Name;
+                categoryName = eType.Category.Name;
             }
-            currentFamilyName = symbol.Family.Name;
-            currentTypeName = symbol.Name;
+#if RELEASE2013 || RELEASE2014
+            Parameter param = eType.get_Parameter(BuiltInParameter.ALL_MODEL_FAMILY_NAME);
+            if (null != param)
+            {
+                currentFamilyName = param.AsString();
+            }
+#elif RELEASE2015 ||RELEASE2016
+            currentFamilyName = eType.FamilyName;
+#endif
+            currentTypeName = eType.Name;
 
             if (familyName == currentFamilyName && typeName == currentTypeName)
             {

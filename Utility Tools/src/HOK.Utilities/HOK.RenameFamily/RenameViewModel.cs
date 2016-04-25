@@ -22,12 +22,13 @@ namespace HOK.RenameFamily
         private UIApplication m_app;
         private Document m_doc;
         private string fileName = "";
-        private List<FamilySymbol> familySymbols = new List<FamilySymbol>();
+        private List<ElementType> elementTypes = new List<ElementType>();
         private ObservableCollection<string> modelNames = new ObservableCollection<string>();
         private ObservableCollection<string> categoryNames = new ObservableCollection<string>();
         private int selectedModelIndex = -1;
         private int selectedCategoryIndex = -1;
         private ObservableCollection<FamilyTypeProperties> typeProperties = new ObservableCollection<FamilyTypeProperties>();
+        private string[] columnNames = new string[] { "Model", "Type ID", "Family Name", "Type Name" };
         private string statusText = "Ready.";
 
         private RelayCommand importFileCommand;
@@ -35,6 +36,7 @@ namespace HOK.RenameFamily
         private RelayCommand uncheckAllCommand;
         private RelayCommand renameAllCommand;
         private RelayCommand renameSelectedCommand;
+        private RelayCommand exportCommand;
 
         public string FileName { get { return fileName; } set { fileName = value; NotifyPropertyChanged("FileName"); } }
         public ObservableCollection<string> ModelNames { get { return modelNames; } set { modelNames = value; NotifyPropertyChanged("ModelNames"); } }
@@ -49,6 +51,7 @@ namespace HOK.RenameFamily
         public ICommand UncheckAllCommand { get { return uncheckAllCommand; } }
         public ICommand RenameAllCommand { get { return renameAllCommand; } }
         public ICommand RenameSelectedCommand { get { return renameSelectedCommand; } }
+        public ICommand ExportCommand { get { return exportCommand; } }
 
         public RenameViewModel(UIApplication uiapp)
         {
@@ -60,6 +63,7 @@ namespace HOK.RenameFamily
             uncheckAllCommand = new RelayCommand(param => this.UncheckAllExecuted(param));
             renameAllCommand = new RelayCommand(param => this.RenameAllExecuted(param));
             renameSelectedCommand = new RelayCommand(param => this.RenameSelectedExecuted(param));
+            exportCommand = new RelayCommand(param => this.ExportExecuted(param));
 
             CollectRevitFamilies();
         }
@@ -69,7 +73,7 @@ namespace HOK.RenameFamily
             try
             {
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                familySymbols = collector.OfClass(typeof(FamilySymbol)).ToElements().Cast<FamilySymbol>().ToList();
+                elementTypes = collector.OfClass(typeof(ElementType)).ToElements().Cast<ElementType>().ToList();
             }
             catch (Exception ex)
             {
@@ -103,8 +107,6 @@ namespace HOK.RenameFamily
         {
             try
             {
-                string[] columnNames = new string[] { "Model", "Type ID", "Family Name", "Type Name" };
-
                 modelNames.Clear();
                 categoryNames.Clear();
                 typeProperties.Clear();
@@ -147,7 +149,7 @@ namespace HOK.RenameFamily
                                 string typeName = fields[3];
 
                                 FamilyTypeProperties ftp = new FamilyTypeProperties(modelName, typeId, familyName, typeName);
-                                var symbolFound = from symbol in familySymbols where symbol.Id.IntegerValue == typeId select symbol;
+                                var symbolFound = from elementType in elementTypes where elementType.Id.IntegerValue == typeId select elementType;
                                 if (symbolFound.Count() > 0)
                                 {
                                     ftp.SetCurrentFamily(symbolFound.First());
@@ -174,8 +176,6 @@ namespace HOK.RenameFamily
                         this.SelectedModelIndex = 0;
                         this.SelectedCategoryIndex = 0;
                     }
-
-                   
                 }
             }
             catch (Exception ex)
@@ -250,17 +250,20 @@ namespace HOK.RenameFamily
                         FamilyTypeProperties ftp = typeProperties[i];
                         if (ftp.IsLinked) { continue; }
 
-                        FamilySymbol symbol = m_doc.GetElement(ftp.FamilyTypeId) as FamilySymbol;
-                        if (null != symbol)
+                        ElementType eType = m_doc.GetElement(ftp.FamilyTypeId) as ElementType;
+                        if (null != eType)
                         {
                             using (Transaction trans = new Transaction(m_doc))
                             {
                                 trans.Start("Rename");
                                 try
                                 {
-                                    symbol.Family.Name = ftp.FamilyName;
-                                    symbol.Name = ftp.TypeName;
-
+                                    if (eType is FamilySymbol)
+                                    {
+                                        (eType as FamilySymbol).Family.Name = ftp.FamilyName;
+                                    }
+                                   
+                                    eType.Name = ftp.TypeName;
                                     trans.Commit();
 
                                     typeProperties[i].CurrentFamilyName = ftp.FamilyName;
@@ -311,7 +314,7 @@ namespace HOK.RenameFamily
                                 if (ftp.IsLinked) { continue; }
                                 int index = typeProperties.IndexOf(ftp);
 
-                                FamilySymbol symbol = m_doc.GetElement(ftp.FamilyTypeId) as FamilySymbol;
+                                ElementType symbol = m_doc.GetElement(ftp.FamilyTypeId) as ElementType;
                                 if (null != symbol)
                                 {
                                     using (Transaction trans = new Transaction(m_doc))
@@ -319,7 +322,10 @@ namespace HOK.RenameFamily
                                         trans.Start("Rename");
                                         try
                                         {
-                                            symbol.Family.Name = ftp.FamilyName;
+                                            if (symbol is FamilySymbol)
+                                            {
+                                                (symbol as FamilySymbol).Family.Name = ftp.FamilyName;
+                                            }
                                             symbol.Name = ftp.TypeName;
 
                                             trans.Commit();
@@ -349,6 +355,47 @@ namespace HOK.RenameFamily
                     tg.RollBack();
                     MessageBox.Show("Failed to rename families and types.\n" + ex.Message, "Rename Families and Types", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
+            }
+        }
+
+        public void ExportExecuted(object param)
+        {
+            try
+            {
+                ExportWindow exportWindow = new ExportWindow(m_app);
+                exportWindow.ElementTypes = elementTypes;
+                if ((bool)exportWindow.ShowDialog())
+                {
+                    modelNames.Clear();
+                    categoryNames.Clear();
+                    typeProperties.Clear();
+
+                    this.FileName = exportWindow.FileName;
+                    this.TypeProperties = new ObservableCollection<FamilyTypeProperties>(exportWindow.TypeProperties);
+
+                    if (typeProperties.Count > 0)
+                    {
+                        var modelNameFound = from ftp in typeProperties select ftp.ModelName;
+                        if (modelNameFound.Count() > 0)
+                        {
+                            this.ModelNames = new ObservableCollection<string>(modelNameFound.Distinct().OrderBy(o => o).ToList());
+                        }
+
+                        var categoryNameFound = from ftp in TypeProperties select ftp.CategoryName;
+                        if (categoryNameFound.Count() > 0)
+                        {
+                            this.CategoryNames = new ObservableCollection<string>(categoryNameFound.Distinct().OrderBy(o => o).ToList());
+                        }
+
+                        this.SelectedModelIndex = 0;
+                        this.SelectedCategoryIndex = 0;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to export to csv file.\n" + ex.Message, "Export CSV File", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

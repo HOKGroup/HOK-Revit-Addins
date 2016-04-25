@@ -13,6 +13,7 @@ namespace HOK.ElementFlatter.Commands
     public static class DirectShapeCreator
     {
         private const string appGUID = "Flatten";
+        public static DirectShapeLibrary shapeLibrary = null;
 
         public static DirectShapeInfo CreateDirectShapes(Document doc, CategoryInfo catInfo, ElementId elementId)
         {
@@ -45,7 +46,6 @@ namespace HOK.ElementFlatter.Commands
                         if (hostedShapes.Count > 0)
                         {
                             var familyIds = from ds in hostedShapes select ds.OriginId;
-                            //doc.Delete(familyIds.ToList());
                         }
 
                         RunCategoryAction(doc, catInfo, element);
@@ -100,15 +100,32 @@ namespace HOK.ElementFlatter.Commands
                 GeometryElement geoElement = element.get_Geometry(geoOptions);
                 if (null != geoElement)
                 {
-                    string appDataGUID = element.Id.IntegerValue.ToString();
-                    DirectShape ds = DirectShape.CreateElement(doc, element.Category.Id, appGUID, appDataGUID);
-                    ds.SetName(element.Name);
                     try
                     {
-                        List<GeometryObject> shapeGeometries = new List<GeometryObject>();
-                        FindElementGeometry(ds, geoElement, ref shapeGeometries);
-                        ds.SetShape(shapeGeometries);
+                        DirectShape directShape = null;
+                        ElementId shapeTypeId = ElementId.InvalidElementId;
+
+                        string appDataGUID = element.Id.IntegerValue.ToString();
+                        List<GeometryObject> shapeGeometries = FindElementGeometry(geoElement);
                         
+                        if (shapeGeometries.Count > 0)
+                        {
+                            directShape = DirectShape.CreateElement(doc, element.Category.Id, appGUID, appDataGUID);
+                            //shapeLibrary.AddDefinition(element.UniqueId, shapeGeometries);
+                            directShape.SetShape(shapeGeometries);
+                        }
+
+                        if (null != directShape)
+                        {
+                            directShape.SetName(element.Name);
+#if RELEASE2016
+                            DirectShapeOptions dsOptions = directShape.GetOptions();
+                            dsOptions.ReferencingOption = DirectShapeReferencingOption.Referenceable;
+                            directShape.SetOptions(dsOptions);
+#endif
+
+                            shapeInfo = new DirectShapeInfo(directShape.Id, element.Id);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -116,11 +133,6 @@ namespace HOK.ElementFlatter.Commands
                         elementIds.Add(element.Id);
                         LogMessageInfo messageInfo = new LogMessageInfo(LogMessageType.EXCEPTION, "Cannot Set Geometry of DirectShape.\n" + ex.Message, DateTime.Now, elementIds);
                         LogManager.AppendLog(messageInfo);
-                    }
-
-                    if (null != ds)
-                    {
-                        shapeInfo = new DirectShapeInfo(ds.Id, element.Id);
                     }
                 }
             }
@@ -165,12 +177,13 @@ namespace HOK.ElementFlatter.Commands
             return hostedElements;
         }
 
-        private static void FindElementGeometry(DirectShape ds, GeometryElement geoElement, ref List<GeometryObject> geoObjects)
+        private static List<GeometryObject> FindElementGeometry(GeometryElement geoElement)
         {
+            List<GeometryObject> geoObjects = new List<GeometryObject>();
             try
             {
                 var solidGeometries = from geoObj in geoElement 
-                                      where geoObj.GetType() == typeof(Solid) && ds.IsValidGeometry(geoObj as Solid) && (geoObj as Solid).Volume > 0
+                                      where geoObj.GetType() == typeof(Solid) && (geoObj as Solid).Volume != 0
                                       select geoObj;
                 if (solidGeometries.Count() > 0)
                 {
@@ -187,16 +200,17 @@ namespace HOK.ElementFlatter.Commands
                 {
                     foreach (GeometryInstance geoInst in geoInstances)
                     {
-                        GeometryElement geoElement2 = geoInst.GetSymbolGeometry(geoInst.Transform);
-                        FindElementGeometry(ds, geoElement2, ref geoObjects);
+                        GeometryElement geoElem2 = geoInst.GetSymbolGeometry(geoInst.Transform);
+                        geoObjects.AddRange(FindElementGeometry(geoElem2));
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogManager.AppendLog(LogMessageType.EXCEPTION, "Cannot Find Element Geometry " + ds.Name);
+                LogManager.AppendLog(LogMessageType.EXCEPTION, "Cannot Find Element Geometry. " + ex.Message);
                 string message = ex.Message;
             }
+            return geoObjects;
         }
 
         private static void RunCategoryAction(Document doc, CategoryInfo catInfo, Element element)

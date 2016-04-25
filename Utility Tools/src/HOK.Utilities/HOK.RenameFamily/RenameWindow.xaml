@@ -107,6 +107,8 @@
                 Command="{Binding RenameAllCommand}"/>
         <Button Content="Rename Selected" HorizontalAlignment="Right" Margin="0,10,170,0" Grid.Row="2" VerticalAlignment="Top" Width="110" Height="28"
         	Command="{Binding RenameSelectedCommand}"/>
+        <Button Content="Export Names" HorizontalAlignment="Right" Margin="0,10,285,0" Grid.Row="2" VerticalAlignment="Top" Width="110" Height="28"
+        	Command="{Binding ExportCommand}"/>
         <Button x:Name="buttonClose" Content="Close" HorizontalAlignment="Right" Margin="0,10,10,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Height="28" Click="buttonClose_Click"/>
        
     </Grid>

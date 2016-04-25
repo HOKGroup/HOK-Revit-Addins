@@ -28,7 +28,8 @@ namespace HOK.ElementFlatter
             BuiltInCategory.OST_CurtainWallMullions,
             BuiltInCategory.OST_DetailComponents,
             BuiltInCategory.OST_HVAC_Zones,
-            BuiltInCategory.OST_ShaftOpening
+            BuiltInCategory.OST_ShaftOpening, 
+            BuiltInCategory.OST_StructuralFramingSystem
         };
  
         private RelayCommand flattenCategoryCommand;
@@ -116,6 +117,8 @@ namespace HOK.ElementFlatter
                 {
                     LogManager.ClearLog();
                     LogManager.AppendLog(LogMessageType.INFO,"Element Flatter Started");
+
+                    DirectShapeCreator.shapeLibrary = DirectShapeLibrary.GetDirectShapeLibrary(m_doc);
                     foreach (CategoryInfo catInfo in selectedCategories)
                     {
                         using (TransactionGroup tg = new TransactionGroup(m_doc))
@@ -127,7 +130,7 @@ namespace HOK.ElementFlatter
                                 int index = categories.IndexOf(catInfo);
                                 this.StatusText = "Flattening " + catInfo.Name + "..";
                                 ProgressManager.InitializeProgress("Flattening " + catInfo.Name + "..", catInfo.ElementIds.Count);
-
+                                
                                 foreach (ElementId elementId in catInfo.ElementIds)
                                 {
                                     ProgressManager.StepForward();
@@ -193,6 +196,7 @@ namespace HOK.ElementFlatter
                     tg.Start("Flatten Model");
                     try
                     {
+                        DirectShapeCreator.shapeLibrary = DirectShapeLibrary.GetDirectShapeLibrary(m_doc);
                         foreach (CategoryInfo catInfo in categories)
                         {
                             LogManager.AppendLog(LogMessageType.INFO, "Flatten " + catInfo.Name + " Started");
