@@ -1,12 +1,11 @@
-﻿using HOK.Keynote.REST;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HOK.Keynote.ClassModels
+namespace HOK.KeynoteUploader
 {
     public class KeynoteInfo : INotifyPropertyChanged
     {
@@ -43,6 +42,52 @@ namespace HOK.Keynote.ClassModels
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(info));
             }
+        }
+    }
+
+    public class KeynoteProjectInfo
+    {
+        public string _id { get; set; }
+        public string projectNumber { get; set; }
+        public string projectName { get; set; }
+        public string office { get; set; }
+        public string keynoteSet_id { get; set; }
+
+        public KeynoteProjectInfo()
+        {
+
+        }
+
+        public KeynoteProjectInfo(string idVal, string pNumber, string pName, string officeName, string keynoteSetId)
+        {
+            _id = idVal;
+            projectNumber = pNumber;
+            projectName = pName;
+            office = officeName;
+            keynoteSet_id = keynoteSetId;
+        }
+    }
+
+    public class KeynoteSetInfo
+    {
+        public string _id { get; set; }
+        public string name { get; set; }
+        public string createdBy { get; set; }
+        public DateTime dateModified { get; set; }
+        public string modifiedBy { get; set; }
+
+        public KeynoteSetInfo()
+        {
+        }
+
+        public KeynoteSetInfo(string idVal, string setName, string createdByStr, DateTime modifiedDate, string modifiedByStr)
+        {
+            _id = idVal;
+            name = setName;
+            createdBy = createdByStr;
+            dateModified = modifiedDate;
+            modifiedBy = modifiedByStr;
+
         }
     }
 }

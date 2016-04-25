@@ -18,5 +18,14 @@ namespace HOK.Keynote.ClassModels
         {
 
         }
+
+        public KeynoteProjectInfo(string idVal, string pNumber, string pName, string officeName, string keynoteSetId)
+        {
+            _id = idVal;
+            projectNumber = pNumber;
+            projectName = pName;
+            office = officeName;
+            keynoteSet_id = keynoteSetId;
+        }
     }
 }

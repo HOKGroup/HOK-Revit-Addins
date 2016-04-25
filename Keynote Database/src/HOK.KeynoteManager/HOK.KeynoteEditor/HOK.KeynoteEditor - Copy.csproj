@@ -50,20 +50,12 @@
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016'">
+    <Reference Include="RevitAPI">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2016'">
+    <Reference Include="RevitAPIUI">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -93,8 +85,6 @@
     <Compile Include="Utils\KeynoteConfiguration.cs" />
     <Compile Include="Utils\ProgressManager.cs" />
     <Compile Include="Utils\RelayCommand.cs" />
-    <Compile Include="Utils\ValueConverter.cs" />
-    <Compile Include="Utils\WPFUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HOK.Keynote\HOK.Keynote.csproj">
@@ -118,12 +108,7 @@
   <ItemGroup>
     <Resource Include="UserControls\Images\add.png" />
     <Resource Include="UserControls\Images\cancel.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UserControls\Images\addchild.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="UserControls\Images\import.png" />
+    <Resource Include="UserControls\Images\setting.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

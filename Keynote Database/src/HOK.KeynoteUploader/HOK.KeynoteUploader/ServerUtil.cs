@@ -1,5 +1,4 @@
-﻿using HOK.Keynote.ClassModels;
-using RestSharp;
+﻿using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HOK.Keynote.REST
+namespace HOK.KeynoteUploader
 {
     public static class ServerUtil
     {
@@ -33,7 +32,7 @@ namespace HOK.Keynote.REST
             }
         }
 
-        #region get 
+        #region get
         public static List<KeynoteProjectInfo> GetProjects(string query)
         {
             List<KeynoteProjectInfo> projectInfoList = new List<KeynoteProjectInfo>();

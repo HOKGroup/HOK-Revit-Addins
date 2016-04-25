@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HOK.Keynote.ClassModels
 {
-    class KeynoteSetInfo
+    public class KeynoteSetInfo
     {
         public string _id { get; set; }
         public string name { get; set; }
@@ -16,6 +16,16 @@ namespace HOK.Keynote.ClassModels
     
         public KeynoteSetInfo()
         {
+        }
+
+        public KeynoteSetInfo(string idVal, string setName, string createdByStr, DateTime modifiedDate, string modifiedByStr)
+        {
+            _id = idVal;
+            name = setName;
+            createdBy = createdByStr;
+            dateModified = modifiedDate;
+            modifiedBy = modifiedByStr;
+                
         }
     }
 }
