@@ -179,6 +179,7 @@
     <EmbeddedResource Include="Resources\eq.ico" />
     <EmbeddedResource Include="Resources\create.ico" />
     <EmbeddedResource Include="Resources\update.png" />
+    <EmbeddedResource Include="Resources\kruler.png" />
     <Content Include="Resources\HOK.Tooltip.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

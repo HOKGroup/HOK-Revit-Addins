@@ -369,6 +369,9 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("HOK.WorksetView.dll");
                         fileNames.Add("HOK.CameraDuplicator.dll");
                         fileNames.Add("HOK.RenameFamily.dll");
+#if RELEASE2015|| RELEASE2016
+                        fileNames.Add("HOK.RoomMeasure.dll");
+#endif
                         break;
                     case ToolEnum.ColorEditor:
                         fileNames.Add("HOK.ColorSchemeEditor.dll");

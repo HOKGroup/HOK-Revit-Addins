@@ -468,6 +468,26 @@ namespace HOK.BetaToolsManager
                                     renameButton.AssemblyName = renamePath;
                                 }
                             }
+
+#if RELEASE2015|| RELEASE2016
+                            string measurePath = Path.Combine(directoryName, "HOK.RoomMeasure.dll");
+                            measurePath = GetTempInstallPath(measurePath);
+                            if (File.Exists(measurePath))
+                            {
+                                if (!utilityButtons.ContainsKey("Room W X L"))
+                                {
+                                    PushButton measureButton = utilitySplitButton.AddPushButton(new PushButtonData("Room W X L", "Room W X L", measurePath, "HOK.RoomMeasure.MeasureCommand")) as PushButton;
+                                    measureButton.LargeImage = ImageUtil.LoadBitmapImage("kruler.png");
+                                    measureButton.ToolTip = "Measuring the width and length of all rooms in the project";
+                                    AddToolTips(measureButton);
+                                }
+                                else
+                                {
+                                    PushButton measureButton = utilityButtons["Room W X L"];
+                                    measureButton.AssemblyName = measurePath;
+                                }
+                            }
+#endif
                         }
                         else
                         {
@@ -525,6 +545,11 @@ namespace HOK.BetaToolsManager
                             {
                                 PushButton renameButton = utilityButtons["Rename Family"];
                                 renameButton.Enabled = false;
+                            }
+                            if (utilityButtons.ContainsKey("Room W X L"))
+                            {
+                                PushButton measureButton = utilityButtons["Room W X L"];
+                                measureButton.Enabled = false;
                             }
                         }
 
