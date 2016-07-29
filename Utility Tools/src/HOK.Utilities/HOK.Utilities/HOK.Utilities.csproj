@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.Utilities</RootNamespace>
-    <AssemblyName>HOK.Utilities_v.2016.0.4.30</AssemblyName>
+    <AssemblyName>HOK.Utilities_v.2016.0.4.31</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

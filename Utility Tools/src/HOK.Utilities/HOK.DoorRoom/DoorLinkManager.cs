@@ -28,8 +28,7 @@ namespace HOK.DoorRoom
         private const string fromRoomName = "FromRoomName";
 
         private Dictionary<int, DoorProperties> doorDictionary = new Dictionary<int, DoorProperties>();
-        private Dictionary<int, LinkedInstanceProperties> linkedInstanceDictionary = new Dictionary<int, LinkedInstanceProperties>();
-
+        
         public DoorLinkManager(UIApplication uiapp, DoorLinkType linkType)
         {
             m_app = uiapp;
@@ -58,7 +57,6 @@ namespace HOK.DoorRoom
                             }
                             break;
                         case DoorLinkType.FindFromLink:
-                            Dictionary<int, LinkedRoomProperties> linkedRoomDictionary = CollectLinkedRooms();
                             result = CopyLinkedRoomData(doorInstances);
                             if (result)
                             {
@@ -85,45 +83,51 @@ namespace HOK.DoorRoom
             try
             {
                 StringBuilder strBuilder = new StringBuilder();
-                using (Transaction trans = new Transaction(m_doc, "copy room data"))
+
+                using (TransactionGroup tg = new TransactionGroup(m_doc, "Copy Room Data"))
                 {
-                    foreach (FamilyInstance door in doorInstances)
+                    tg.Start();
+                    try
                     {
-                        try
+                        foreach (FamilyInstance door in doorInstances)
                         {
-                            trans.Start();
+                            using (Transaction trans = new Transaction(m_doc, "Copy Room"))
+                            {
+                                trans.Start();
+                                try
+                                {
 #if RELEASE2015 || RELEASE2016
-                            DoorProperties dp = AssignToFromRoom(door);
-                            if (null != dp.ToRoom)
-                            {
-                                string roomNumber = GetRoomNumber(dp.ToRoom);
-                                string roomName = GetRoomName(dp.ToRoom);
-                                Parameter toParam = door.LookupParameter(toRoomNumber);
-                                if (null != toParam)
-                                {
-                                    toParam.Set(roomNumber);
-                                }
-                                toParam = door.LookupParameter(toRoomName);
-                                if (null != toParam)
-                                {
-                                    toParam.Set(roomName);
-                                }
-                            }
-                            if (null != dp.FromRoom)
-                            {
-                                string roomNumber = GetRoomNumber(dp.FromRoom);
-                                string roomName = GetRoomName(dp.FromRoom);
-                                Parameter fromParam = door.LookupParameter(fromRoomNumber);
-                                if (null != fromParam)
-                                {
-                                    fromParam.Set(roomNumber);
-                                }
-                                fromParam = door.LookupParameter(fromRoomName);
-                                if (null != fromParam)
-                                {
-                                    fromParam.Set(roomName);
-                                }
-                            }
+                                    DoorProperties dp = AssignToFromRoom(door);
+                                    if (null != dp.ToRoom)
+                                    {
+                                        string roomNumber = GetRoomNumber(dp.ToRoom);
+                                        string roomName = GetRoomName(dp.ToRoom);
+                                        Parameter toParam = door.LookupParameter(toRoomNumber);
+                                        if (null != toParam)
+                                        {
+                                            toParam.Set(roomNumber);
+                                        }
+                                        toParam = door.LookupParameter(toRoomName);
+                                        if (null != toParam)
+                                        {
+                                            toParam.Set(roomName);
+                                        }
+                                    }
+                                    if (null != dp.FromRoom)
+                                    {
+                                        string roomNumber = GetRoomNumber(dp.FromRoom);
+                                        string roomName = GetRoomName(dp.FromRoom);
+                                        Parameter fromParam = door.LookupParameter(fromRoomNumber);
+                                        if (null != fromParam)
+                                        {
+                                            fromParam.Set(roomNumber);
+                                        }
+                                        fromParam = door.LookupParameter(fromRoomName);
+                                        if (null != fromParam)
+                                        {
+                                            fromParam.Set(roomName);
+                                        }
+                                    }
 #else
                             DoorProperties dp = AssignToFromRoom(door);
                             if (null != dp.ToRoom)
@@ -157,19 +161,29 @@ namespace HOK.DoorRoom
                                 }
                             }
 #endif
-                            trans.Commit();
+                                    trans.Commit();
+                                }
+                                catch (Exception ex)
+                                {
+                                    result = false;
+                                    strBuilder.AppendLine(door.Id.IntegerValue + "\t" + door.Name + ": " + ex.Message);
+                                    trans.RollBack();
+                                }
+                            }
+
                         }
-                        catch(Exception ex)
-                        {
-                            trans.RollBack();
-                            result = false;
-                            strBuilder.AppendLine(door.Id.IntegerValue+"\t"+door.Name+": "+ex.Message);
-                        }
+                        tg.Assimilate();
                     }
-                    if (strBuilder.Length > 0)
+                    catch (Exception ex)
                     {
-                        MessageBox.Show("The following doors have been skipped due to some issues.\n\n" + strBuilder.ToString(), "Skipped Door Elements", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        string message = ex.Message;
+                        tg.RollBack();
                     }
+                }
+
+                if (strBuilder.Length > 0)
+                {
+                    MessageBox.Show("The following doors have been skipped due to some issues.\n\n" + strBuilder.ToString(), "Skipped Door Elements", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (Exception ex)
@@ -257,8 +271,183 @@ namespace HOK.DoorRoom
             }
             return dp;
         }
-       
+
         private bool CopyLinkedRoomData(List<FamilyInstance> doorInstances)
+        {
+            bool result = true;
+            try
+            {
+                Dictionary<int, LinkedInstanceProperties> linkedInstanceDictionary = CollectLinkedInstances();
+
+                StringBuilder strBuilder = new StringBuilder();
+                using (TransactionGroup tg = new TransactionGroup(m_doc, "Set Door Parameters"))
+                {
+                    tg.Start();
+                    try
+                    {
+
+                        foreach (FamilyInstance door in doorInstances)
+                        {
+                            using (Transaction trans = new Transaction(m_doc, "Set Parameter"))
+                            {
+                                trans.Start();
+                                try
+                                {
+                                    DoorProperties dp = new DoorProperties(door);
+                                    if (null != dp.FromPoint && null != dp.ToPoint)
+                                    {
+                                        GeometryElement geomElem = door.get_Geometry(new Options());
+                                        XYZ direction = door.FacingOrientation;
+
+                                        Dictionary<int, LinkedRoomProperties> linkedRooms = new Dictionary<int, LinkedRoomProperties>();
+                                        foreach (LinkedInstanceProperties lip in linkedInstanceDictionary.Values)
+                                        {
+                                            GeometryElement trnasformedElem = geomElem.GetTransformed(lip.TransformValue.Inverse);
+                                            BoundingBoxXYZ bb = trnasformedElem.GetBoundingBox();
+                                            //extended bounding box
+                                           
+                                            XYZ midPt = 0.5 * (bb.Min + bb.Max);
+                                            XYZ extMin = bb.Min + (bb.Min - midPt).Normalize();
+                                            XYZ extMax = bb.Max + (bb.Max - midPt).Normalize();
+
+                                            Outline outline = new Outline(extMin, extMax);
+
+                                            BoundingBoxIntersectsFilter bbIntersectFilter = new BoundingBoxIntersectsFilter(outline);
+                                            BoundingBoxIsInsideFilter bbInsideFilter = new BoundingBoxIsInsideFilter(outline);
+                                            LogicalOrFilter orFilter = new LogicalOrFilter(bbIntersectFilter, bbInsideFilter);
+                                            FilteredElementCollector collector = new FilteredElementCollector(lip.LinkedDocument);
+                                            List<Room> roomList = collector.OfCategory(BuiltInCategory.OST_Rooms).WherePasses(orFilter).WhereElementIsNotElementType().ToElements().Cast<Room>().ToList();
+                                            if (roomList.Count > 0)
+                                            {
+                                                foreach (Room room in roomList)
+                                                {
+                                                    LinkedRoomProperties lrp = new LinkedRoomProperties(room);
+                                                    lrp.LinkedInstance = lip;
+                                                    if (!linkedRooms.ContainsKey(lrp.RoomId))
+                                                    {
+                                                        linkedRooms.Add(lrp.RoomId, lrp);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        LinkedRoomProperties fromRoom = null;
+                                        LinkedRoomProperties toRoom = null;
+
+                                        if (linkedRooms.Count > 0)
+                                        {
+                                            foreach (LinkedRoomProperties lrp in linkedRooms.Values)
+                                            {
+                                                XYZ tFrom = lrp.LinkedInstance.TransformValue.Inverse.OfPoint(dp.FromPoint);
+                                                XYZ tTo = lrp.LinkedInstance.TransformValue.Inverse.OfPoint(dp.ToPoint);
+
+                                                if (lrp.RoomObject.IsPointInRoom(tFrom))
+                                                {
+                                                    dp.FromRoom = lrp.RoomObject;
+                                                    fromRoom = lrp;
+                                                }
+                                                if (lrp.RoomObject.IsPointInRoom(tTo))
+                                                {
+                                                    dp.ToRoom = lrp.RoomObject;
+                                                    toRoom = lrp;
+                                                }
+                                            }
+                                        }
+
+                                        if (null != fromRoom)
+                                        {
+#if RELEASE2015 || RELEASE2016
+                                            Parameter fParam = door.LookupParameter(fromRoomNumber);
+                                            if (null != fParam)
+                                            {
+                                                fParam.Set(fromRoom.RoomNumber);
+                                            }
+                                            fParam = door.LookupParameter(fromRoomName);
+                                            if (null != fParam)
+                                            {
+                                                fParam.Set(fromRoom.RoomName);
+                                            }
+#else
+                                    Parameter fParam = door.get_Parameter(fromRoomNumber);
+                                    if (null != fParam)
+                                    {
+                                        fParam.Set(fromRoom.RoomNumber);
+                                    }
+                                    fParam = door.get_Parameter(fromRoomName);
+                                    if (null != fParam)
+                                    {
+                                        fParam.Set(fromRoom.RoomName);
+                                    }
+#endif
+                                        }
+
+
+                                        if (null != toRoom)
+                                        {
+#if RELEASE2015 || RELEASE2016
+                                            Parameter tParam = door.LookupParameter(toRoomNumber);
+                                            if (null != tParam)
+                                            {
+                                                tParam.Set(toRoom.RoomNumber);
+                                            }
+                                            tParam = door.LookupParameter(toRoomName);
+                                            if (null != tParam)
+                                            {
+                                                tParam.Set(toRoom.RoomName);
+                                            }
+#else
+                                     Parameter tParam = door.get_Parameter(toRoomNumber);
+                                    if (null != tParam)
+                                    {
+                                        tParam.Set(toRoom.RoomNumber);
+                                    }
+                                    tParam = door.get_Parameter(toRoomName);
+                                    if (null != tParam)
+                                    {
+                                        tParam.Set(toRoom.RoomName);
+                                    }
+#endif
+                                        }
+
+                                        if (!doorDictionary.ContainsKey(dp.DoorId))
+                                        {
+                                            doorDictionary.Add(dp.DoorId, dp);
+                                        }
+                                    }
+                                    trans.Commit();
+                                }
+                                catch (Exception ex)
+                                {
+                                    trans.RollBack();
+                                    string message = ex.Message;
+                                    result = false;
+                                    strBuilder.AppendLine(door.Id.IntegerValue + "\t" + door.Name + ": " + ex.Message);
+                                }
+                            }
+                        }
+                        tg.Assimilate();
+                    }
+                    catch (Exception ex)
+                    {
+                        tg.RollBack();
+                        string message = ex.Message;
+                    }
+
+                    if (strBuilder.Length > 0)
+                    {
+                        MessageBox.Show("The following doors have been skipped due to some issues.\n\n" + strBuilder.ToString(), "Skipped Door Elements", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to collect door data.\n" + ex.Message, "Collect Door Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return result;
+        }
+
+        /*
+        private bool CopyLinkedRoomData_Old(List<FamilyInstance> doorInstances)
         {
             bool result = true;
             try
@@ -406,10 +595,11 @@ namespace HOK.DoorRoom
             }
             return result;
         }
+         */
 
-        private Dictionary<int, LinkedRoomProperties> CollectLinkedRooms()
+        private Dictionary<int, LinkedInstanceProperties> CollectLinkedInstances()
         {
-            Dictionary<int, LinkedRoomProperties>  linkedRoomDictionary = new Dictionary<int, LinkedRoomProperties>();
+            Dictionary<int, LinkedInstanceProperties> linkedInstanceDictionary = new Dictionary<int, LinkedInstanceProperties>();
             try
             {
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
@@ -417,6 +607,45 @@ namespace HOK.DoorRoom
                 List<RevitLinkInstance> revitLinkInstances = collector.ToElements().Cast<RevitLinkInstance>().ToList();
 
                 Dictionary<int/*typeId*/, RevitLinkType> linkTypes = new Dictionary<int, RevitLinkType>();
+                foreach (RevitLinkInstance instance in revitLinkInstances)
+                {
+#if RELEASE2013
+                    if (null == instance.Document) { continue; }
+            
+#elif RELEASE2014 || RELEASE2015 || RELEASE2016
+                    if (null == instance.GetLinkDocument()) { continue; }
+#endif
+                    LinkedInstanceProperties lip = new LinkedInstanceProperties(instance);
+
+                    FilteredElementCollector linkedCollector = new FilteredElementCollector(lip.LinkedDocument);
+                    List<Room> rooms = linkedCollector.OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements().Cast<Room>().ToList();
+                    if (rooms.Count > 0)
+                    {
+                        if (!linkedInstanceDictionary.ContainsKey(lip.InstanceId))
+                        {
+                            linkedInstanceDictionary.Add(lip.InstanceId, lip);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to collect linked instances.\n"+ex.Message, "Collect Linked Instances", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return linkedInstanceDictionary;
+        }
+
+        /*
+        private Dictionary<int, LinkedRoomProperties> CollectLinkedRooms()
+        {
+            Dictionary<int, LinkedRoomProperties> linkedRoomDictionary = new Dictionary<int, LinkedRoomProperties>();
+            try
+            {
+                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+                collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType();
+                List<RevitLinkInstance> revitLinkInstances = collector.ToElements().Cast<RevitLinkInstance>().ToList();
+
+                Dictionary<int, RevitLinkType> linkTypes = new Dictionary<int, RevitLinkType>();
                 foreach (RevitLinkInstance instance in revitLinkInstances)
                 {
 #if RELEASE2013
@@ -450,11 +679,11 @@ namespace HOK.DoorRoom
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect linked rooms.\n"+ex.Message, "Collect Linked Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to collect linked rooms.\n" + ex.Message, "Collect Linked Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             return linkedRoomDictionary;
         }
-        
+        */
     }
 
     public class DoorProperties
@@ -477,6 +706,7 @@ namespace HOK.DoorRoom
         {
             doorInstance = instance;
             doorId = instance.Id.IntegerValue;
+
             CreateDoorPoints();
         }
 
@@ -500,6 +730,7 @@ namespace HOK.DoorRoom
                 string message = ex.Message;
             }
         }
+
     }
 
     public class LinkedRoomProperties
