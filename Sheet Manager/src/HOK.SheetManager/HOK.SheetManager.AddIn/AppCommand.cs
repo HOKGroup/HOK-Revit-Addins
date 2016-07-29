@@ -22,7 +22,7 @@ namespace HOK.SheetManager.AddIn
     public class AppCommand :IExternalApplication
     {
         internal static AppCommand thisApp = null;
-        private MainWindow mainWindow = null;
+        public MainWindow mainWindow = null;
         private string tabName = "  HOK - Beta";
         private string versionNumber = "";
         public static AddInId addinId = null;
@@ -56,8 +56,8 @@ namespace HOK.SheetManager.AddIn
                     sheetButton.SetContextualHelp(contextualHelp);
                 }
 
-                application.ControlledApplication.DocumentOpened += new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
-                application.ControlledApplication.DocumentClosing += new EventHandler<DocumentClosingEventArgs>(DocumentClosing);
+                //application.ControlledApplication.DocumentOpened += new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
+                //application.ControlledApplication.DocumentClosing += new EventHandler<DocumentClosingEventArgs>(DocumentClosing);
             }
             catch (Exception ex)
             {
@@ -75,8 +75,8 @@ namespace HOK.SheetManager.AddIn
                     mainWindow.Close();
                 }
 
-                application.ControlledApplication.DocumentOpened -= new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
-                application.ControlledApplication.DocumentClosing -= new EventHandler<DocumentClosingEventArgs>(DocumentClosing);
+                //application.ControlledApplication.DocumentOpened -= new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
+                //application.ControlledApplication.DocumentClosing -= new EventHandler<DocumentClosingEventArgs>(DocumentClosing);
             }
             catch (Exception ex)
             {

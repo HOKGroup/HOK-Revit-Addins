@@ -225,19 +225,27 @@ namespace HOK.SheetManager.Windows.Editor
                         bool sheetDBUpdated = SheetDataWriter.ChangeRevisionItem(rvtRevision, CommandType.INSERT);
 
                         //update Revision On Sheet
-                        List<RevisionOnSheet> rosList = new List<RevisionOnSheet>();
-                        for (int sheetIndex = 0; sheetIndex < rvtSheetData.Sheets.Count; sheetIndex++)
+                        if (rvtSheetData.Sheets.Count > 0)
                         {
-                            RevisionOnSheet ros = new RevisionOnSheet(Guid.NewGuid(), rvtSheetData.Sheets[sheetIndex].Id, rvtRevision, false);
-                            if (!rvtSheetData.Sheets[sheetIndex].SheetRevisions.ContainsKey(ros.RvtRevision.Id))
+                            List<RevisionOnSheet> rosList = new List<RevisionOnSheet>();
+                            for (int sheetIndex = 0; sheetIndex < rvtSheetData.Sheets.Count; sheetIndex++)
                             {
-                                this.RvtSheetData.Sheets[sheetIndex].SheetRevisions.Add(ros.RvtRevision.Id, ros);
-                                rosList.Add(ros);
+                                RevisionOnSheet ros = new RevisionOnSheet(Guid.NewGuid(), rvtSheetData.Sheets[sheetIndex].Id, rvtRevision, false);
+                                if (!rvtSheetData.Sheets[sheetIndex].SheetRevisions.ContainsKey(ros.RvtRevision.Id))
+                                {
+                                    this.RvtSheetData.Sheets[sheetIndex].SheetRevisions.Add(ros.RvtRevision.Id, ros);
+                                    rosList.Add(ros);
+                                }
                             }
+
+                            bool rosDBUpdated = SheetDataWriter.InsertMultipleRevisionOnSheet(rosList);
+                            added = rosDBUpdated;
+                        }
+                        else
+                        {
+                            added = true;
                         }
 
-                        bool rosDBUpdated = SheetDataWriter.InsertMultipleRevisionOnSheet(rosList);
-                        added = rosDBUpdated;
                         break;
                     }
                 }

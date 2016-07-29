@@ -201,9 +201,9 @@
   <data name="Sheets" xml:space="preserve">
     <value>CREATE TABLE IF NOT EXISTS "Sheets" (
 	`Sheet_Id`	TEXT NOT NULL UNIQUE,
-	`Sheet Number`	TEXT NOT NULL,
+	`Sheet_Number`	TEXT NOT NULL,
 	`Sheet_Name`	TEXT,
-	  `Sheet_Discipline_Id`	TEXT,
+	`Sheet_Discipline_Id`	TEXT,
 	PRIMARY KEY(Sheet_Id)
 )</value>
   </data>
@@ -213,8 +213,8 @@
 	`View_Name`	TEXT NOT NULL,
 	`View_Sheet_Id`	TEXT,
 	`View_ViewType_Id`	TEXT,
-	`View_LocationU`	REAL,
-	`View_LocationV`	REAL,
+	`View_LocationX`	REAL,
+	`View_LocationY`	REAL,
 	PRIMARY KEY(View_Id)
 )</value>
   </data>

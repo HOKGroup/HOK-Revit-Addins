@@ -96,7 +96,7 @@ namespace HOK.SheetManager.Database
                 if (null != connection && null != command)
                 {
                     //Discipline
-                    ResourceManager rManager = Properties.Resources.ResourceManager;
+                    ResourceManager rManager = HOK.SheetManager.Core.Properties.Resources.ResourceManager;
                     string[] tableNames = DatabaseResources.TableNames;
                     int count = 0;
                     foreach (string tableName in tableNames)
@@ -394,12 +394,12 @@ namespace HOK.SheetManager.Database
                     switch (cmdType)
                     {
                         case CommandType.INSERT:
-                            command.CommandText = @"INSERT INTO Views (View_Id, View_Name, View_Sheet_Id, View_ViewType_Id, View_LocationU, View_LocationV) " +
+                            command.CommandText = @"INSERT INTO Views (View_Id, View_Name, View_Sheet_Id, View_ViewType_Id, View_LocationX, View_LocationY) " +
                                 "VALUES ('" + item.Id.ToString() + "', '" + item.Name + "', '" + item.Sheet.Id.ToString() + "', '" + item.ViewType.Id.ToString() + "', " + item.LocationU + ", " + item.LocationV + ")";
                             if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
                         case CommandType.UPDATE:
-                            command.CommandText = @"UPDATE Views SET View_Name = '" + item.Name + "', View_Sheet_Id = '" + item.Sheet.Id.ToString() + "', View_ViewType_Id = '" + item.ViewType.Id.ToString() + "', View_LocationU = " + item.LocationU + ", View_LocationV =" + item.LocationV +
+                            command.CommandText = @"UPDATE Views SET View_Name = '" + item.Name + "', View_Sheet_Id = '" + item.Sheet.Id.ToString() + "', View_ViewType_Id = '" + item.ViewType.Id.ToString() + "', View_LocationX = " + item.LocationU + ", View_LocationY =" + item.LocationV +
                                 " WHERE View_Id = '" + item.Id.ToString() + "'";
                             if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
@@ -424,7 +424,7 @@ namespace HOK.SheetManager.Database
             {
                 if (null != connection && null != command)
                 {
-                    command.CommandText = @"INSERT INTO Views (View_Id, View_Name, View_Sheet_Id, View_ViewType_Id, View_LocationU, View_LocationV) VALUES";
+                    command.CommandText = @"INSERT INTO Views (View_Id, View_Name, View_Sheet_Id, View_ViewType_Id, View_LocationX, View_LocationY) VALUES";
                     foreach (RevitView viewItem in viewItems)
                     {
                         command.CommandText += "('" + viewItem.Id.ToString() + "', '" + viewItem.Name + "', '" + viewItem.Sheet.Id.ToString() + "','" + viewItem.ViewType.Id.ToString() + "', "+viewItem.LocationU+", "+viewItem.LocationV+"),";
@@ -458,11 +458,11 @@ namespace HOK.SheetManager.Database
                         case "View Type":
                             command.CommandText = @"UPDATE Views SET View_ViewType_Id = '" + propertyValue + "' WHERE View_Id = '" + viewId + "'";
                             break;
-                        case "U":
-                            command.CommandText = @"UPDATE Views SET View_LocationU = " + propertyValue + " WHERE View_Id = '" + viewId + "'";
+                        case "X":
+                            command.CommandText = @"UPDATE Views SET View_LocationX = " + propertyValue + " WHERE View_Id = '" + viewId + "'";
                             break;
-                        case "V":
-                            command.CommandText = @"UPDATE Views SET View_LocationV = " + propertyValue + " WHERE View_Id = '" + viewId + "'";
+                        case "Y":
+                            command.CommandText = @"UPDATE Views SET View_LocationY = " + propertyValue + " WHERE View_Id = '" + viewId + "'";
                             break;
 
                     }

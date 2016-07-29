@@ -17,10 +17,10 @@ namespace HOK.SheetManager.AddIn.Utils
             try
             {
                 CheckRevisionLinks(doc, projectId, ref sheetData);
-                InsertRevisionElements(doc, projectId, ref sheetData);
+                //InsertRevisionElements(doc, projectId, ref sheetData);
 
                 CheckSheetLinks(doc, projectId, ref sheetData);
-                InsertSheetElements(doc, projectId, ref sheetData);
+                //InsertSheetElements(doc, projectId, ref sheetData);
 
                 CheckViewLinks(doc, projectId, ref sheetData);
             }

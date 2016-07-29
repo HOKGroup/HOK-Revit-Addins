@@ -140,14 +140,14 @@ namespace HOK.SheetManager.Windows.Editor
                         case "View Type":
                             cv.Filter = o => { RevitView view = o as RevitView; return (view.ViewType.Name.ToUpper().Contains(searchText.ToUpper())); };
                             break;
-                        case "U":
+                        case "X":
                             double uVal;
                             if (double.TryParse(searchText, out uVal))
                             {
                                 cv.Filter = o => { RevitView view = o as RevitView; return (view.LocationU == uVal); };
                             }
                             break;
-                        case "V":
+                        case "Y":
                             double vVal;
                             if (double.TryParse(searchText, out vVal))
                             {

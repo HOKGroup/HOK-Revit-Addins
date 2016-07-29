@@ -411,14 +411,19 @@ namespace HOK.SheetManager.AddIn.Windows
             {
                 if (SheetDataWriter.dbFile != dbFile) { SheetDataWriter.OpenDatabase(dbFile); }
 
-                RevisionWindow revisionWindow = new RevisionWindow(config.ModelId);
+                m_handler.ViewModel = this;
+
+                RevisionWindow revisionWindow = new RevisionWindow(config.ModelId, m_handler, m_event);
+                revisionWindow.Owner = AppCommand.thisApp.mainWindow;
                 revisionWindow.DataContext = rvtSheetData;
+                revisionWindow.Show();
+
+                /*
                 if ((bool)revisionWindow.ShowDialog())
                 {
-                    m_handler.ViewModel = this;
                     m_handler.Request.Make(RequestId.UpdateRevision);
                     m_event.Raise();
-                }
+                }*/
             }
             catch (Exception ex)
             {

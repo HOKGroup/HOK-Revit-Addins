@@ -442,8 +442,8 @@ namespace HOK.SheetManager.Database
                                 }
                             }
 
-                            view.LocationU = reader.GetDouble(reader.GetOrdinal("View_LocationU"));
-                            view.LocationV = reader.GetDouble(reader.GetOrdinal("View_LocationV"));
+                            view.LocationU = reader.GetDouble(reader.GetOrdinal("View_LocationX"));
+                            view.LocationV = reader.GetDouble(reader.GetOrdinal("View_LocationY"));
 
                             sheetData.Views.Add(view);
                         }

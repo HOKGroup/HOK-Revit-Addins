@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.SheetManager", "HOK.SheetManager\HOK.SheetManager.csproj", "{3248C64F-E777-4897-8DB7-8340FC3FC65B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.SheetManager.Core", "HOK.SheetManager\HOK.SheetManager.Core.csproj", "{3248C64F-E777-4897-8DB7-8340FC3FC65B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.SheetManager.AddIn", "HOK.SheetManager.AddIn\HOK.SheetManager.AddIn.csproj", "{5CFAF74D-DA4B-42A9-8781-0A7052E120F1}"
 EndProject

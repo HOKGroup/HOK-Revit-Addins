@@ -4,6 +4,7 @@ using HOK.SheetManager.AddIn.Updaters;
 using HOK.SheetManager.AddIn.Windows;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -18,10 +19,12 @@ namespace HOK.SheetManager.AddIn
         private Document m_doc = null;
         private Request m_request = new Request();
         private AddInViewModel viewModel = null;
+        private ObservableCollection<Revision> revisionCollection = new ObservableCollection<Revision>();
 
         public Request Request { get { return m_request; } }
         public AddInViewModel ViewModel { get { return viewModel; } set { viewModel = value; } }
         public Document CurrentDocument { get { return m_doc; } set { m_doc = value; } }
+        public ObservableCollection<Revision> RevisionCollection { get { return revisionCollection; } set { revisionCollection = value; } }
 
         public SheetManagerHandler(UIApplication uiapp)
         {
@@ -41,6 +44,7 @@ namespace HOK.SheetManager.AddIn
                         break;
                     case RequestId.UpdateRevision:
                         viewModel.UpdateRevisions(m_doc);
+                        GetRevisionsInRevit();
                         break;
                     case RequestId.UpdateRevisionOnSheet:
                         viewModel.UpdateRevisionOnSheets(m_doc);
@@ -63,6 +67,9 @@ namespace HOK.SheetManager.AddIn
                     case RequestId.UpdaterChanged:
                         viewModel.ChangeUpdater(m_doc);
                         break;
+                    case RequestId.GetRevisions:
+                        GetRevisionsInRevit();
+                        break;
                     default:
                         break;
                 }
@@ -73,6 +80,28 @@ namespace HOK.SheetManager.AddIn
             }
         }
 
+        private void GetRevisionsInRevit()
+        {
+            try
+            {
+                revisionCollection.Clear();
+
+                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+                List<Revision> revisions = collector.OfCategory(BuiltInCategory.OST_Revisions).ToElements().Cast<Revision>().ToList();
+                revisions = revisions.OrderBy(o => o.SequenceNumber).ToList();
+
+                for (int i = 0; i < revisions.Count; i++)
+                {
+                    revisionCollection.Add(revisions[i]);
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+
         public string GetName()
         {
             return "Sheet Manager Handler";
@@ -81,7 +110,7 @@ namespace HOK.SheetManager.AddIn
 
     public enum RequestId : int
     {
-        None = 0,  UpdateSheet= 1, UpdateRevision = 2, UpdateRevisionOnSheet = 3, PlaceView = 4, ImportView =5, RenumberSheet = 6, RenameView = 7, StoreConfiguration = 8, UpdaterChanged = 9
+        None = 0, UpdateSheet = 1, UpdateRevision = 2, UpdateRevisionOnSheet = 3, PlaceView = 4, ImportView = 5, RenumberSheet = 6, RenameView = 7, StoreConfiguration = 8, UpdaterChanged = 9, GetRevisions =10
     }
 
 
