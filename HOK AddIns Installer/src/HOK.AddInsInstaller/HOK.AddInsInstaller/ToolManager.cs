@@ -14,9 +14,9 @@ namespace HOK.AddInsInstaller
     public static class ToolManager
     {
         public static ToolNames[] tools2013 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor};
-        public static ToolNames[] tools2014 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator };
-        public static ToolNames[] tools2015 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager };
-        public static ToolNames[] tools2016 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager };
+        public static ToolNames[] tools2014 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.MissionControl, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
+        public static ToolNames[] tools2015 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager, ToolNames.MissionControl, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
+        public static ToolNames[] tools2016 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager, ToolNames.MissionControl, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
 
         public static Dictionary<string/*versionNumber*/, ToolPackageInfo> GetToolPackageInfo()
         {
@@ -383,7 +383,7 @@ namespace HOK.AddInsInstaller
                             sheetInfo.SetInstallVersion(installDirectory + sheetInfo.DllPath);
 
                             sheetInfo.FilePaths.Add(@"\HOK.SheetDataManager.addin");
-                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.SheetManager.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.SheetManager.Core.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.SheetManager.AddIn.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\EntityFramework.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\EntityFramework.SqlServer.dll");
@@ -396,6 +396,63 @@ namespace HOK.AddInsInstaller
                             sheetInfo.ExePath = @"\\Group\hok\FWR\RESOURCES\Apps\HOK Sheet Data Editor\HOK SheetManager Editor.application";
                             
                             toolInfoDictionary.Add(sheetInfo.ToolName, sheetInfo);
+                            break;
+                        case ToolNames.MissionControl:
+                            ToolInfo dtmInfo = new ToolInfo(toolEnum);
+                            dtmInfo.ToolName = "Mission Control";
+                            dtmInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\HOK.MissionControl.dll";
+                            if (!File.Exists(betaDirectory + dtmInfo.DllPath)) { break; }
+                            dtmInfo.ToolIcon = ImageUtil.LoadBitmapImage("dtm.png");
+
+                            dtmInfo.SetBetaVersion(betaDirectory + dtmInfo.DllPath);
+                            dtmInfo.SetBetaDate(betaDirectory + dtmInfo.DllPath);
+                            dtmInfo.SetInstallVersion(installDirectory + dtmInfo.DllPath);
+
+                            dtmInfo.FilePaths.Add("\\HOK.MissionControl.addin");
+                            dtmInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\HOK.MissionControl.dll");
+
+                            toolInfoDictionary.Add(dtmInfo.ToolName, dtmInfo);
+                            break;
+                        case ToolNames.CaseIssueTracker:
+                            ToolInfo citInfo = new ToolInfo(toolEnum);
+                            citInfo.ToolName = "Case Issue Tracker";
+                            citInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\Case.IssueTracker.Revit.dll";
+                            if (!File.Exists(betaDirectory + citInfo.DllPath)) { break; }
+                            citInfo.ToolIcon = ImageUtil.LoadBitmapImage("case_issue.png");
+
+                            citInfo.SetBetaVersion(betaDirectory + citInfo.DllPath);
+                            citInfo.SetBetaDate(betaDirectory + citInfo.DllPath);
+                            citInfo.SetInstallVersion(installDirectory + citInfo.DllPath);
+
+                            citInfo.FilePaths.Add("\\Case.IssueTracker.Revit.addin");
+                            citInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Case.IssueTracker.dll");
+                            citInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Case.IssueTracker.Revit.dll");
+                            citInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Ionic.Zip.dll");
+
+                            citInfo.ExePath = @"\\Group\hok\FWR\RESOURCES\Apps\Case Issue Tracker\Case.IssueTracker.Win.application";
+
+                            toolInfoDictionary.Add(citInfo.ToolName, citInfo);
+                            break;
+                        case ToolNames.ArupIssueTracker:
+                            ToolInfo aitInfo = new ToolInfo(toolEnum);
+                            aitInfo.ToolName = "Arup Issue Tracker";
+                            aitInfo.DllPath = @"\HOK-Addin.bundle\Contents_Beta\ARUP.IssueTracker.Revit.dll";
+                            if (!File.Exists(betaDirectory + aitInfo.DllPath)) { break; }
+                            aitInfo.ToolIcon = ImageUtil.LoadBitmapImage("arup_issue.png");
+
+                            aitInfo.SetBetaVersion(betaDirectory + aitInfo.DllPath);
+                            aitInfo.SetBetaDate(betaDirectory + aitInfo.DllPath);
+                            aitInfo.SetInstallVersion(installDirectory + aitInfo.DllPath);
+
+                            aitInfo.FilePaths.Add("\\ARUP.IssueTracker.Revit.addin");
+                            aitInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\ARUP.IssueTracker.dll");
+                            aitInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\ARUP.IssueTracker.Revit.dll");
+                            aitInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Arup.RestSharp.dll");
+                            aitInfo.FilePaths.Add("\\HOK-Addin.bundle\\Contents_Beta\\Ionic.Zip.dll");
+
+                            aitInfo.ExePath = @"\\Group\hok\FWR\RESOURCES\Apps\Arup Issue Tracker\ARUP.IssueTracker.Win.application";
+
+                            toolInfoDictionary.Add(aitInfo.ToolName, aitInfo);
                             break;
                     }
                 }
@@ -484,7 +541,10 @@ namespace HOK.AddInsInstaller
         ElementMover, 
         ProjectReplicator, 
         SheetManager,
-        ElementFlatter
+        ElementFlatter,
+        MissionControl,
+        CaseIssueTracker,
+        ArupIssueTracker
     }
 
     public static class ImageUtil
