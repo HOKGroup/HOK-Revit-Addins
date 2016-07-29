@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>EngineIoClientDotNet</id>
+    <version>0.9.22</version>
+    <title>EngineIoClientDotNet</title>
+    <authors>Matthias Ludwig</authors>
+    <owners>Matthias Ludwig</owners>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/Quobject/EngineIoClientDotNet/</projectUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>This is the Engine.IO Client Library for C#.</description>
+    <summary>This library supports all of the features the JS client does, including events, options and upgrading transport. EngineIoClientDotNet has a similar api to those of the JavaScript client.</summary>
+    <releaseNotes>System.NullReferenceException Client Socket OnClose #15
+System.Collections.Generic.KeyNotFoundException #14</releaseNotes>
+    <tags>engine.io.client</tags>
+    <dependencies>
+      <group targetFramework=".NETCore4.5">
+        <dependency id="Newtonsoft.Json" version="8.0.1" />
+      </group>
+      <group targetFramework=".NETPortable0.0-wp81+wpa81">
+        <dependency id="Newtonsoft.Json" version="8.0.1" />
+      </group>
+      <group targetFramework=".NETFramework3.5">
+        <dependency id="WebSocket4Net" version="0.14.1" />
+        <dependency id="Newtonsoft.Json" version="8.0.1" />
+        <dependency id="System.Threading.Tasks.Unofficial" version="3.1.0" />
+      </group>
+      <group targetFramework=".NETFramework4.0">
+        <dependency id="WebSocket4Net" version="0.14.1" />
+        <dependency id="Newtonsoft.Json" version="8.0.1" />
+      </group>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="WebSocket4Net" version="0.14.1" />
+        <dependency id="Newtonsoft.Json" version="8.0.1" />
+      </group>
+      <group targetFramework="WindowsPhone8.0">
+        <dependency id="WebSocket4Net" version="0.12.0" />
+        <dependency id="Newtonsoft.Json" version="8.0.1" />
+      </group>
+      <group targetFramework="MonoAndroid1.0">
+        <dependency id="WebSocket4Net" version="0.14.1" />
+        <dependency id="Newtonsoft.Json" version="8.0.1" />
+      </group>
+      <group targetFramework="Unsupported0.0">
+        <dependency id="WebSocket4Net" version="0.14.1" />
+        <dependency id="Newtonsoft.Json" version="8.0.1" />
+      </group>
+      <group targetFramework="MonoTouch1.0">
+        <dependency id="WebSocket4Net" version="0.14.1" />
+        <dependency id="Newtonsoft.Json" version="8.0.1" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Web" targetFramework=".NETFramework4.5" />
+    </frameworkAssemblies>
+  </metadata>
+</package>
