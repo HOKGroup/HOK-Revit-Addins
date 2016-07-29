@@ -9,6 +9,7 @@ using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
 using SolibriBatchSetup.Schema;
+using System.ComponentModel;
 
 namespace SolibriBatchSetup
 {
@@ -47,7 +48,7 @@ namespace SolibriBatchSetup
             try
             {
                 ProcessUnit unit = new ProcessUnit();
-                List<GenericElement> elements = batch.Target.Elements;
+                ObservableCollection<GenericElement> elements = batch.Target.Elements;
                 for (int i = 0; i < elements.Count; i++)
                 {
                     GenericElement element = elements[i];
@@ -114,9 +115,9 @@ namespace SolibriBatchSetup
             return rulesets;
         }
 
-        public static List<GenericElement> ConvertToGenericElements(ObservableCollection<ProcessUnit> processUnits, ObservableCollection<OpenRuleset> rulesets)
+        public static ObservableCollection<GenericElement> ConvertToGenericElements(ObservableCollection<ProcessUnit> processUnits, ObservableCollection<OpenRuleset> rulesets)
         {
-            List<GenericElement> elements = new List<GenericElement>();
+            ObservableCollection<GenericElement> elements = new ObservableCollection<GenericElement>();
             try
             {
                 bool runCheck = (rulesets.Count > 0) ? true : false;
@@ -125,7 +126,10 @@ namespace SolibriBatchSetup
                     //open models
                     if (unit.IfcFiles.Count > 0)
                     {
-                        elements.AddRange(unit.IfcFiles);
+                        foreach (OpenModel model in unit.IfcFiles)
+                        {
+                            elements.Add(model);
+                        }
                     }
                     else
                     {
@@ -134,7 +138,11 @@ namespace SolibriBatchSetup
 
                     if (rulesets.Count > 0)
                     {
-                        elements.AddRange(rulesets);
+                        foreach (OpenRuleset rule in rulesets)
+                        {
+                            elements.Add(rule);
+                        }
+
                         elements.Add(new Check());
                         elements.Add(new AutoComment());
                         elements.Add(new CreatePresentation());
@@ -213,23 +221,32 @@ namespace SolibriBatchSetup
         }
     }
 
-    public class ProcessUnit
+    public class ProcessUnit :INotifyPropertyChanged
     {
         private Guid unitId = Guid.Empty;
         private OpenModel openSolibri = new OpenModel();
-        private List<OpenModel> ifcFiles = new List<OpenModel>();
+        private ObservableCollection<OpenModel> ifcFiles = new ObservableCollection<OpenModel>();
         private BCFReport bcfReport = new BCFReport();
         private SaveModel saveSolibri = new SaveModel();
 
-        public Guid UnitId { get { return unitId; } set { unitId = value; } }
-        public OpenModel OpenSolibri { get { return openSolibri; } set { openSolibri = value; } }
-        public List<OpenModel> IfcFiles { get { return ifcFiles; } set { ifcFiles = value; } }
-        public BCFReport BCFReport { get { return bcfReport; } set { bcfReport = value; } }
-        public SaveModel SaveSolibri { get { return saveSolibri; } set { saveSolibri = value; } }
+        public Guid UnitId { get { return unitId; } set { unitId = value; NotifyPropertyChanged("UnitId"); } }
+        public OpenModel OpenSolibri { get { return openSolibri; } set { openSolibri = value; NotifyPropertyChanged("OpenSolibri"); } }
+        public ObservableCollection<OpenModel> IfcFiles { get { return ifcFiles; } set { ifcFiles = value; NotifyPropertyChanged("IfcFiles"); } }
+        public BCFReport BCFReport { get { return bcfReport; } set { bcfReport = value; NotifyPropertyChanged("BCFReport"); } }
+        public SaveModel SaveSolibri { get { return saveSolibri; } set { saveSolibri = value; NotifyPropertyChanged("SaveSolibri"); } }
         
 
         public ProcessUnit()
         {
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(String info)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(info));
+            }
         }
     }
 

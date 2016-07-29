@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using SolibriBatchSetup.Schema;
+using System.Collections.ObjectModel;
 
 namespace SolibriBatchSetup
 {
@@ -22,29 +23,36 @@ namespace SolibriBatchSetup
     public partial class IFCWindow : Window
     {
         private ProcessUnit unit = new ProcessUnit();
-
+        private string[] disciplines = new string[]
+        {
+            "Architectural", "Air Conditioning", "Building Services", "Electrical", "Heat", "Structural", "Ventilation", "Plumbing", "Sprinkler", "Inventory", "Facility Management",
+            "Landscape", "Prefab Concrete", "Steel Structure", "Site Operations", "Cooling", "Special Piping", "Process", "HVAC"
+        };
         public ProcessUnit Unit { get { return unit; } set { unit = value; } }
  
         public IFCWindow(ProcessUnit pUnit)
         {
             unit = pUnit;
             InitializeComponent();
-            DisplayIfcFiles();
         }
 
-        private void DisplayIfcFiles()
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
                 dataGridIfc.ItemsSource = null;
-                List<OpenModel> openIfcs = unit.IfcFiles.OrderBy(o => o.File).ToList();
+                ObservableCollection<OpenModel> openIfcs = new ObservableCollection<OpenModel>(unit.IfcFiles.OrderBy(o => o.File).ToList());
                 dataGridIfc.ItemsSource = openIfcs;
+
+                disciplines = disciplines.OrderBy(o => o).ToArray();
+                DataGridColumnDiscipline.ItemsSource = disciplines;
             }
             catch (Exception ex)
             {
                 string message = ex.Message;
             }
         }
+
 
         private void buttonAddSolibri_Click(object sender, RoutedEventArgs e)
         {
@@ -93,6 +101,7 @@ namespace SolibriBatchSetup
             this.Close();
         }
 
+       
         
     }
 }

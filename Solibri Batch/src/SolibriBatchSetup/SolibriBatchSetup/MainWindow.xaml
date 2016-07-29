@@ -103,7 +103,17 @@
                         </Grid.RowDefinitions>
                         <DataGrid x:Name="dataGridIfc" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="7,7,7,0" IsReadOnly="True" SelectionMode="Extended">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="File Name" Width="1*" Binding="{Binding File}"/>
+                                <DataGridTextColumn Header="File Name" Width="1*" Binding="{Binding File}">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="ToolTip">
+                                                <Setter.Value>
+                                                    <TextBlock Text="{Binding ToolTip}"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                         <Button x:Name="buttonAddIFC" HorizontalAlignment="Left" Margin="10,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" Click="buttonAddIFC_Click" >

@@ -54,6 +54,9 @@ namespace SolibriBatchSetup
                 //remote machines
                 RempoteMachine rm = new RempoteMachine("NY", "NY-BAT-D001", @"\\NY-BAT-D001\SolibriBatch");
                 remoteComputers.Add(rm);
+                RempoteMachine rm2 = new RempoteMachine("PHI", "PHI-BAT-D001", @"\\PHI-BAT-D001\SolibriBatch");
+                remoteComputers.Add(rm2);
+
                 remoteComputers = remoteComputers.OrderBy(o => o.ComputerName).ToList();
 
                 comboBoxComputer.ItemsSource = null;

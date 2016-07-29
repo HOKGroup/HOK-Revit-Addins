@@ -1,7 +1,7 @@
 ﻿<Window x:Class="SolibriBatchSetup.IFCWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Combine IFC Files" Height="500" Width="500" MinHeight="500" MinWidth="500" Icon="hoklogo.ico" WindowStartupLocation="CenterScreen">
+        Title="Combine IFC Files" Height="500" Width="700" MinHeight="500" MinWidth="700" Icon="hoklogo.ico" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
     <Window.Resources>
         <Style TargetType="{x:Type DataGrid}">
             <Setter Property="Background" Value="White"/>
@@ -29,9 +29,11 @@
         </Button>
         <GroupBox Header="IFC Files" HorizontalAlignment="Stretch" Margin="10,0,10,0" Grid.Row="1" VerticalAlignment="Stretch">
             <Grid>
-                <DataGrid x:Name="dataGridIfc" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" IsReadOnly="True" >
+                <DataGrid x:Name="dataGridIfc" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" CanUserAddRows="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="File Name" Width="1*" Binding="{Binding File}"/>
+                        <DataGridTextColumn Header="File Name" Width="1*" Binding="{Binding File}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Short Name" Width="0.3*" Binding="{Binding ShortName}"/>
+                        <DataGridComboBoxColumn x:Name="DataGridColumnDiscipline" Header="Discipline" Width="0.3*" SelectedItemBinding="{Binding Discipline}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>
