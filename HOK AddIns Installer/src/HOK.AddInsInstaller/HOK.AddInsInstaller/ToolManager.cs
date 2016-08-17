@@ -385,6 +385,7 @@ namespace HOK.AddInsInstaller
                             sheetInfo.FilePaths.Add(@"\HOK.SheetDataManager.addin");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.SheetManager.Core.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.SheetManager.AddIn.dll");
+                            sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\HOK.MissionControl.Core.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\EntityFramework.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\EntityFramework.SqlServer.dll");
                             sheetInfo.FilePaths.Add(@"\HOK-Addin.bundle\Contents_Beta\System.Data.SQLite.dll");
