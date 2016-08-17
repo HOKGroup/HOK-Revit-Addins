@@ -34,6 +34,7 @@ namespace HOK.ModelReporting
         private DateTime endTime = DateTime.Now;
         private string userLocation = "";
         private string ipAddress = "";
+        private bool isRecordable = true;
 
         public Document Doc { get { return m_doc; } set { m_doc = value; } }
         public string DocCentralPath { get { return docCentralPath; } set { docCentralPath = value; } }
@@ -55,6 +56,7 @@ namespace HOK.ModelReporting
         public DateTime EndTime { get { return endTime; } set { endTime = value; } }
         public string UserLocation { get { return userLocation; } set { userLocation = value; } }
         public string IPAddress { get { return ipAddress; } set { ipAddress = value; } }
+        public bool IsRecordable { get { return isRecordable; } set { isRecordable = value; } }
 
         public EventSettings(Document doc)
         {
@@ -94,6 +96,7 @@ namespace HOK.ModelReporting
                     docCentralPath = m_doc.PathName;
                 }
                 docLocalPath = m_doc.PathName;
+
             }
             catch (Exception ex)
             {
@@ -122,7 +125,8 @@ namespace HOK.ModelReporting
             {
                 try
                 {
-                    string regPattern = @"\\([0-9]{2}[\.|\-][0-9]{4,5}[\.|\-][0-9]{2})(.*?)\\";
+                    //string regPattern = @"\\([0-9]{2}[\.|\-][0-9]{4,5}[\.|\-][0-9]{2})(.*?)\\";
+                    string regPattern = @"[\\|/](\d{2}\.\d{5}\.\d{2})\s+(.+?(?=[\\|/]))";
                     Regex regex = new Regex(regPattern, RegexOptions.IgnoreCase);
                     Match match = regex.Match(docCentralPath);
                     if (match.Success)
@@ -137,6 +141,15 @@ namespace HOK.ModelReporting
                 {
                     projectName=GetProjectName(docCentralPath);
                     projectNumber = "00.00000.00";
+
+                    if (docCentralPath.StartsWith(@"\\GROUP\HOK") || docCentralPath.StartsWith("RSN:") || docCentralPath.StartsWith("A360:"))
+                    {
+                        isRecordable = true;
+                    }
+                    else
+                    {
+                        isRecordable = false;
+                    }
                 }
             }
 
@@ -176,11 +189,16 @@ namespace HOK.ModelReporting
             {
                 if (!string.IsNullOrEmpty(path))
                 {
-                    Regex regServer = new Regex(@"^\\\\group\\hok\\(.+?(?=\\))|^\\\\(.{2,3})-\d{2}svr(\.group\.hok\.com)?\\", RegexOptions.IgnoreCase);
+                    //Regex regServer = new Regex(@"^\\\\group\\hok\\(.+?(?=\\))|^\\\\(.{2,3})-\d{2}svr(\.group\.hok\.com)?\\", RegexOptions.IgnoreCase);
+                    Regex regServer = new Regex(@"^\\\\group\\hok\\(.+?(?=\\))|[\\|/](\w{2,3})-\d{2}svr(\.group\.hok\.com)?[\\|/]|^[rR]:\\(\w{2,3})\\", RegexOptions.IgnoreCase);
                     Match regMatch = regServer.Match(path);
                     if (regMatch.Success)
                     {
-                        if (string.IsNullOrEmpty(regMatch.Groups[1].Value))
+                        if(!string.IsNullOrEmpty(regMatch.Groups[4].ToString()))
+                        {
+                            fileLocation = regMatch.Groups[4].Value;
+                        }
+                        else if (!string.IsNullOrEmpty(regMatch.Groups[2].ToString()))
                         {
                             fileLocation = regMatch.Groups[2].Value;
                         }
@@ -216,6 +234,20 @@ namespace HOK.ModelReporting
                 return "";
             }
             return name;
+        }
+
+        private void GetProjectInfoOnRevitServer(string path, out string pNumber, out string pName)
+        {
+            pNumber = "00.00000.00";
+            pName = "";
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
         }
 
         public long GetFileSize()

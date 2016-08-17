@@ -146,6 +146,11 @@ namespace HOK.ModelReporting
                         }
                         openSettingsDictionary.Add(openSettings.DocCentralPath, openSettings);
                     }
+
+                    if (!openSettings.IsRecordable)
+                    {
+                        //warning message
+                    }
                 }
             }
             catch { }
@@ -304,5 +309,7 @@ namespace HOK.ModelReporting
             }
             return docCentralPath;
         }
+
+        
     }
 }

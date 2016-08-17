@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HOK Model Reporting for Revit (Multi-Versions)")]
-[assembly: AssemblyDescription("HOK Model Reporting for Revit (Multi-Versions)")]
+[assembly: AssemblyTitle("ConsoleApplication1")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
-[assembly: AssemblyProduct("HOK.ModelReporting")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2014")]
+[assembly: AssemblyProduct("ConsoleApplication1")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("7b879adf-db5e-4be8-b9d4-3c36fa53e6c2")]
+[assembly: Guid("97f0c8be-e1a4-4dfb-92f4-14a08e1482da")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2013.10.1.5")]
-[assembly: AssemblyFileVersion("2013.10.1.5")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
