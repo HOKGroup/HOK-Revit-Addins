@@ -126,6 +126,7 @@ namespace HOK.SheetManager.Database
                     {
                         command.Parameters.Clear();
                         connection.Close();
+                        dbFile = "";
                     }
                 }
             }

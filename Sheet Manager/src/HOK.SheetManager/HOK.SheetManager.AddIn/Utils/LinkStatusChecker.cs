@@ -12,15 +12,21 @@ namespace HOK.SheetManager.AddIn.Utils
 {
     public static class LinkStatusChecker
     {
-        public static void CheckLinkStatus(Document doc, Guid projectId, ref RevitSheetData sheetData)
+        public static void CheckLinkStatus(Document doc, Guid projectId, ref RevitSheetData sheetData, bool autoUpdate)
         {
             try
             {
                 CheckRevisionLinks(doc, projectId, ref sheetData);
-                //InsertRevisionElements(doc, projectId, ref sheetData);
-
+                if (autoUpdate)
+                {
+                    InsertRevisionElements(doc, projectId, ref sheetData);
+                }
+               
                 CheckSheetLinks(doc, projectId, ref sheetData);
-                //InsertSheetElements(doc, projectId, ref sheetData);
+                if (autoUpdate)
+                {
+                    InsertSheetElements(doc, projectId, ref sheetData);
+                }
 
                 CheckViewLinks(doc, projectId, ref sheetData);
             }
@@ -61,8 +67,10 @@ namespace HOK.SheetManager.AddIn.Utils
                         else
                         {
                             //item deleted
+                            sheetData.Revisions[i].LinkStatus.Modified = true;
+                            sheetData.Revisions[i].LinkStatus.ToolTip = "Linked Revision Not Found.";
                             sheetData.Revisions[i].LinkedRevisions.Remove(linkedRevision);
-                            bool revisionDBUpdated = SheetDataWriter.ChangeLinkedRevision(linkedRevision, CommandType.DELETE);
+                            //bool revisionDBUpdated = SheetDataWriter.ChangeLinkedRevision(linkedRevision, CommandType.DELETE);
                         }
                     }
                 }
@@ -135,8 +143,10 @@ namespace HOK.SheetManager.AddIn.Utils
                         else
                         {
                             //item deleted
+                            sheetData.Sheets[i].LinkStatus.Modified = true;
+                            sheetData.Sheets[i].LinkStatus.ToolTip = "Linked Sheet Not Found.";
                             sheetData.Sheets[i].LinkedSheets.Remove(linkedSheet);
-                            bool linkedSheetDBUpdated = SheetDataWriter.ChangeLinkedSheet(linkedSheet, CommandType.DELETE);
+                            //bool linkedSheetDBUpdated = SheetDataWriter.ChangeLinkedSheet(linkedSheet, CommandType.DELETE);
                         }
                     }
                 }
@@ -166,9 +176,9 @@ namespace HOK.SheetManager.AddIn.Utils
                         {
                             SheetParameterValue paramValue = rvtSheet.SheetParameters[sheetParam.ParameterId];
                             Parameter param = viewSheet.LookupParameter(sheetParam.ParameterName);
-                            if (null != param)
+                            string paramValueStr = "";
+                            if (null != param && param.HasValue)
                             {
-                                string paramValueStr = "";
                                 switch (param.StorageType)
                                 {
                                     case StorageType.Double:
@@ -184,13 +194,12 @@ namespace HOK.SheetManager.AddIn.Utils
                                         paramValueStr = param.AsString();
                                         break;
                                 }
-
-                                if (paramValueStr != paramValue.ParameterValue.ToString())
-                                {
-                                    modified = true;
-                                    tooltip = sheetParam.ParameterName+ " values are different from the linked element.";
-                                    break;
-                                }
+                            }
+                            if (paramValueStr != paramValue.ParameterValue.ToString())
+                            {
+                                modified = true;
+                                tooltip = sheetParam.ParameterName + " values are different from the linked element.";
+                                break;
                             }
                         }
                     }

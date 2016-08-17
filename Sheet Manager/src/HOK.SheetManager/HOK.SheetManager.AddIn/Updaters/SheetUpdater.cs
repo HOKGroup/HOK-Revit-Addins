@@ -44,8 +44,11 @@ namespace HOK.SheetManager.AddIn.Updaters
 
             dataManager = new UpdaterDataManager(configuration.DatabaseFile);
             rvtSheetParameters = dataManager.GetSheetParameters();
+            
+            //update project id
             CollectSheetParamIds();
         }
+
 
         private void CollectSheetParamIds()
         {
@@ -151,7 +154,7 @@ namespace HOK.SheetManager.AddIn.Updaters
 
                 foreach (ElementId sheetId in data.GetDeletedElementIds())
                 {
-                    bool deleted = DeleteSheet(sheetId);
+                    //bool deleted = DeleteSheet(sheetId);
                 }
                 
             }

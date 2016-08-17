@@ -1,5 +1,6 @@
 ﻿using HOK.SheetManager.Classes;
 using HOK.SheetManager.Database;
+using HOK.SheetManager.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -157,6 +158,55 @@ namespace HOK.SheetManager.Windows.Editor
             userMode = true;
             dataGridMatrix.MouseEnter -= dataGridMatrix_MouseEnter;
         }
+
+        private void menuItemCheckSelected_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                IList<DataGridCellInfo> selectedCells = dataGridMatrix.SelectedCells;
+                foreach (DataGridCellInfo cell in selectedCells)
+                {
+                    FrameworkElement cellContent= cell.Column.GetCellContent(cell.Item);
+                    DataGridCell gridCell = (DataGridCell)cellContent.Parent;
+
+                    CheckBox checkBox = DataGridUtils.FindVisualChild<CheckBox>(gridCell);
+                    if (null != checkBox)
+                    {
+                        checkBox.IsChecked = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void menuItemUncheckSelected_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                IList<DataGridCellInfo> selectedCells = dataGridMatrix.SelectedCells;
+                foreach (DataGridCellInfo cell in selectedCells)
+                {
+                    FrameworkElement cellContent = cell.Column.GetCellContent(cell.Item);
+                    DataGridCell gridCell = (DataGridCell)cellContent.Parent;
+
+                    CheckBox checkBox = DataGridUtils.FindVisualChild<CheckBox>(gridCell);
+                    if (null != checkBox)
+                    {
+                        checkBox.IsChecked = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+
+
 
         
     }

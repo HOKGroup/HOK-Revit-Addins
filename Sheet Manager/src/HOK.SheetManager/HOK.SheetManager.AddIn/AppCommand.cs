@@ -1,6 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
+using HOK.MissionControl.Core.Classes;
+using HOK.MissionControl.Core.Utils;
 using HOK.SheetManager.AddIn.Classes;
 using HOK.SheetManager.AddIn.Updaters;
 using HOK.SheetManager.AddIn.Utils;
@@ -56,8 +58,8 @@ namespace HOK.SheetManager.AddIn
                     sheetButton.SetContextualHelp(contextualHelp);
                 }
 
-                //application.ControlledApplication.DocumentOpened += new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
-                //application.ControlledApplication.DocumentClosing += new EventHandler<DocumentClosingEventArgs>(DocumentClosing);
+                application.ControlledApplication.DocumentOpened += new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
+                application.ControlledApplication.DocumentClosing += new EventHandler<DocumentClosingEventArgs>(DocumentClosing);
             }
             catch (Exception ex)
             {
@@ -75,8 +77,8 @@ namespace HOK.SheetManager.AddIn
                     mainWindow.Close();
                 }
 
-                //application.ControlledApplication.DocumentOpened -= new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
-                //application.ControlledApplication.DocumentClosing -= new EventHandler<DocumentClosingEventArgs>(DocumentClosing);
+                application.ControlledApplication.DocumentOpened -= new EventHandler<DocumentOpenedEventArgs>(DocumentOpened);
+                application.ControlledApplication.DocumentClosing -= new EventHandler<DocumentClosingEventArgs>(DocumentClosing);
             }
             catch (Exception ex)
             {
@@ -128,15 +130,59 @@ namespace HOK.SheetManager.AddIn
                 Document doc = args.Document;
                 if (null != doc)
                 {
-                    SheetManagerConfiguration config = DataStorageUtil.GetConfiguration(doc);
-                    if (config.AutoUpdate && !string.IsNullOrEmpty(config.DatabaseFile))
+                    SheetManagerConfiguration sheetConfig = DataStorageUtil.GetConfiguration(doc);
+                    if (doc.IsWorkshared)
                     {
-                        if (File.Exists(config.DatabaseFile))
+                        Configuration configFound = ServerUtil.GetConfigurationByCentralPath(sheetConfig.CentralPath);
+                        if (null != configFound)
                         {
-                            //register updater
-                            bool registered = UpdaterUtil.RegisterUpdaters(doc, config);
+                            foreach (ProjectUpdater updater in configFound.updaters)
+                            {
+                                if (updater.updaterName == "Sheet Tracker")
+                                {
+                                    sheetConfig.AutoUpdate = updater.isUpdaterOn;
+                                    sheetConfig.DatabaseFile = configFound.SheetDatabase;
+                                }
+                            }
                         }
                     }
+
+                    if (sheetConfig.AutoUpdate && !string.IsNullOrEmpty(sheetConfig.DatabaseFile))
+                    {
+                        if (File.Exists(sheetConfig.DatabaseFile))
+                        {
+                            //update project info
+                            UpdaterDataManager dbManager = new UpdaterDataManager(sheetConfig.DatabaseFile);
+                            List<LinkedProject> projects = dbManager.GetLinkedProjects();
+                            var projectFound = from project in projects where project.FilePath == sheetConfig.CentralPath select project;
+                            if (projectFound.Count() > 0)
+                            {
+                                LinkedProject linkedProject = projectFound.First();
+                                sheetConfig.ModelId = linkedProject.Id;
+                            }
+                            else
+                            {
+                                bool dbOpened = SheetDataWriter.OpenDatabase(sheetConfig.DatabaseFile);
+                                if (dbOpened)
+                                {
+                                    LinkedProject linkedProject = new LinkedProject(sheetConfig.ModelId)
+                                    {
+                                        FilePath = sheetConfig.CentralPath,
+                                        ProjectNumber = doc.ProjectInformation.Number,
+                                        ProjectName = doc.ProjectInformation.Name,
+                                        LinkedBy = Environment.UserName,
+                                        LinkedDate = DateTime.Now
+                                    };
+                                    bool updated = SheetDataWriter.ChangeLinkedProject(linkedProject, CommandType.INSERT);
+                                    SheetDataWriter.CloseDatabse();
+                                }
+                            }
+
+                            bool registered = UpdaterUtil.RegisterUpdaters(doc, sheetConfig);
+                        }
+                    }
+
+                    DataStorageUtil.StoreConfiguration(doc, sheetConfig);
                 }
             }
             catch (Exception ex)
@@ -144,6 +190,8 @@ namespace HOK.SheetManager.AddIn
                 MessageBox.Show("Failed to trigger the document opened event.\n" + ex.Message, "Document Opened Event", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
+        
 
         public void DocumentClosing(object sender, DocumentClosingEventArgs args)
         {

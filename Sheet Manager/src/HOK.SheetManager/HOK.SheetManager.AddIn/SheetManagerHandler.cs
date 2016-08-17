@@ -64,9 +64,6 @@ namespace HOK.SheetManager.AddIn
                     case RequestId.StoreConfiguration:
                         viewModel.StoreConfiguration(m_doc);
                         break;
-                    case RequestId.UpdaterChanged:
-                        viewModel.ChangeUpdater(m_doc);
-                        break;
                     case RequestId.GetRevisions:
                         GetRevisionsInRevit();
                         break;
@@ -110,7 +107,7 @@ namespace HOK.SheetManager.AddIn
 
     public enum RequestId : int
     {
-        None = 0, UpdateSheet = 1, UpdateRevision = 2, UpdateRevisionOnSheet = 3, PlaceView = 4, ImportView = 5, RenumberSheet = 6, RenameView = 7, StoreConfiguration = 8, UpdaterChanged = 9, GetRevisions =10
+        None = 0, UpdateSheet = 1, UpdateRevision = 2, UpdateRevisionOnSheet = 3, PlaceView = 4, ImportView = 5, RenumberSheet = 6, RenameView = 7, StoreConfiguration = 8, GetRevisions =9
     }
 
 

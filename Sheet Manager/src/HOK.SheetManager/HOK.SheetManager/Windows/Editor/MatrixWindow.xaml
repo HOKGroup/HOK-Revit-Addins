@@ -24,7 +24,21 @@
         <GroupBox Header="Revision Schedule" HorizontalAlignment="Stretch" Margin="7" VerticalAlignment="Stretch">
             <Grid>
                 <DataGrid x:Name="dataGridMatrix" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch"  AreRowDetailsFrozen="True" 
-                          BorderBrush="LightGray" AutoGenerateColumns="False" SelectionUnit="Cell" CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding Sheets}"  MouseEnter="dataGridMatrix_MouseEnter" >
+                          BorderBrush="LightGray" AutoGenerateColumns="False" SelectionUnit="Cell" CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding Sheets}"  MouseEnter="dataGridMatrix_MouseEnter" SelectionMode="Extended" >
+                    <DataGrid.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem x:Name="menuItemCheckSelected" Header="Check Selected" Click="menuItemCheckSelected_Click">
+                                <MenuItem.Icon>
+                                    <Image Source="Images/checkbox_yes.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem x:Name="menuItemUncheckSelected" Header="Uncheck Selected" Click="menuItemUncheckSelected_Click">
+                                <MenuItem.Icon>
+                                    <Image Source="Images/checkbox_no.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </DataGrid.ContextMenu>
                     <DataGrid.RowHeaderStyle>
                         <Style TargetType="DataGridRowHeader">
                             <Setter Property="Template">

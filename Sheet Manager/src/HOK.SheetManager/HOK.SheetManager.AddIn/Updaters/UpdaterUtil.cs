@@ -33,13 +33,13 @@ namespace HOK.SheetManager.AddIn.Updaters
                     var sheetUpdaterFound = from updater in registeredUpdaters where updater.UpdaterName == "SheetDBUpdater" select updater;
                     if (sheetUpdaterFound.Count() == 0)
                     {
-                        sheetUpdaterRegistered = RegisterSheetUpdater(doc, config);
+                        sheetUpdaterRegistered = RegisterSheetUpdater(doc, ref config);
                     }
 
                     var revisionUpdaterFound = from updater in registeredUpdaters where updater.UpdaterName == "RevisionDBUpdater" select updater;
                     if (revisionUpdaterFound.Count() == 0)
                     {
-                        revisionUpdaterRegistered = RegisterRevisionUpdater(doc, config);
+                        revisionUpdaterRegistered = RegisterRevisionUpdater(doc, ref config);
                     }
                 }
                 if (sheetUpdaterRegistered && revisionUpdaterRegistered) { registered = true; }
@@ -51,7 +51,7 @@ namespace HOK.SheetManager.AddIn.Updaters
             return registered;
         }
 
-        private static bool RegisterSheetUpdater(Document doc, SheetManagerConfiguration config)
+        private static bool RegisterSheetUpdater(Document doc, ref SheetManagerConfiguration config)
         {
             bool registered = false;
             try
@@ -85,7 +85,7 @@ namespace HOK.SheetManager.AddIn.Updaters
             return registered;
         }
 
-        private static bool RegisterRevisionUpdater(Document doc, SheetManagerConfiguration config)
+        private static bool RegisterRevisionUpdater(Document doc, ref SheetManagerConfiguration config)
         {
             bool registered = false;
             try

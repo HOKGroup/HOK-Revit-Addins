@@ -50,6 +50,41 @@ namespace HOK.SheetManager.AddIn.Updaters
             return opened;
         }
 
+        public List<LinkedProject> GetLinkedProjects()
+        {
+            List<LinkedProject> projects = new List<LinkedProject>();
+            try
+            {
+                if (null != connection && null != command)
+                {
+                    using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                    {
+                        cmd.CommandText = "SELECT * FROM LinkedProjects";
+                        using (SQLiteDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                LinkedProject project = new LinkedProject();
+                                project.Id = new Guid(reader.GetString(reader.GetOrdinal("LinkedProject_Id")));
+                                project.ProjectNumber = reader.GetString(reader.GetOrdinal("LinkedProject_Number"));
+                                project.ProjectName = reader.GetString(reader.GetOrdinal("LinkedProject_Name"));
+                                project.FilePath = reader.GetString(reader.GetOrdinal("LinkedProject_FilePath"));
+                                project.LinkedDate = reader.GetDateTime(reader.GetOrdinal("LinkedProject_LinkedDate"));
+                                project.LinkedBy = reader.GetString(reader.GetOrdinal("LinkedProject_LinkedBy"));
+
+                                projects.Add(project);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+            return projects;
+        }
+
         public List<Guid> GetSheetIds()
         {
             List<Guid> sheetIds = new List<Guid>();

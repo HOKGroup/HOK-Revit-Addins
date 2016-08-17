@@ -168,28 +168,6 @@
                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap">Sheet Settings</TextBlock>
                 </StackPanel>
             </Button>
-            <Button Width="90"  Name="buttonUpdater" Command="{Binding UpdaterCommand}" IsEnabled="false" Style="{StaticResource commandButtonStyle}">
-                <Button.ToolTip>
-                    <TextBlock Text="Turn On or Off the Dynamic Updater to synchronice with the database"/>
-                </Button.ToolTip>
-                <StackPanel Orientation="Vertical">
-                    <Image Margin="0,0,0,5"  Height="32" Width="32">
-                        <Image.Style>
-                            <Style TargetType="{x:Type Image}">
-                                <Style.Triggers>
-                                    <DataTrigger Value="True" Binding="{Binding AutoUpdate}">
-                                        <Setter Property="Source" Value="Images/updater_on.ico"/>
-                                    </DataTrigger>
-                                    <DataTrigger Value="False" Binding="{Binding AutoUpdate}">
-                                        <Setter Property="Source" Value="Images/updater_off.ico"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Image.Style>
-                    </Image>
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap">On/Off Updater</TextBlock>
-                </StackPanel>
-            </Button>
             <Button Width="90"  Name="buttonHelp" Command="{Binding HelpCommand}" IsEnabled="{Binding DatabaseOpened}" Style="{StaticResource commandButtonStyle}">
                 <Button.ToolTip>
                     <TextBlock Text="Help Documentation"/>

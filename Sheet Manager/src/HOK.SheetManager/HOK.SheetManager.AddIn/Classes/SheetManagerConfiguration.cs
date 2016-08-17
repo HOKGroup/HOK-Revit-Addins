@@ -12,6 +12,7 @@ namespace HOK.SheetManager.AddIn.Classes
     public class SheetManagerConfiguration :INotifyPropertyChanged
     {
         private Guid modelId = Guid.Empty;
+        private string configId = "";
         private string centralPath = "";
         private string databaseFile = "";
         private ElementId titleblockId = ElementId.InvalidElementId;
@@ -19,6 +20,7 @@ namespace HOK.SheetManager.AddIn.Classes
         private bool autoUpdate = false;
 
         public Guid ModelId { get { return modelId; } set { modelId = value; NotifyPropertyChanged("ModelId"); } }
+        public string ConfigId { get { return configId; } set { configId = value; NotifyPropertyChanged("ConfigId"); } }
         public string CentralPath { get { return centralPath; } set { centralPath = value; NotifyPropertyChanged("CentralPath"); } }
         public string DatabaseFile { get { return databaseFile; } set { databaseFile = value; NotifyPropertyChanged("DatabaseFile"); } }
         public ElementId TitleblockId { get { return titleblockId; } set { titleblockId = value; NotifyPropertyChanged("TitleblockId"); } }

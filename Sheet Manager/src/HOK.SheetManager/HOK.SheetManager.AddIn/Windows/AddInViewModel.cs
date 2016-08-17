@@ -47,7 +47,6 @@ namespace HOK.SheetManager.AddIn.Windows
         private RelayCommand renumberSheetCommand;
         private RelayCommand renameViewCommand;
         private RelayCommand settingCommand;
-        private RelayCommand updaterCommand;
         private RelayCommand helpCommand;
         private RelayCommand checkAllCommand;
         private RelayCommand uncheckAllCommand;
@@ -74,7 +73,6 @@ namespace HOK.SheetManager.AddIn.Windows
         public ICommand RenumberSheetCommand { get { return renumberSheetCommand; } }
         public ICommand RenameViewCommand { get { return renameViewCommand; } }
         public ICommand SettingCommand { get { return settingCommand; } }
-        public ICommand UpdaterCommand { get { return updaterCommand; } }
         public ICommand HelpCommand { get { return helpCommand; } }
         public ICommand CheckAllCommand { get { return checkAllCommand; } }
         public ICommand UncheckAllCommand { get { return uncheckAllCommand; } }
@@ -100,7 +98,6 @@ namespace HOK.SheetManager.AddIn.Windows
             renumberSheetCommand = new RelayCommand(param => this.RenumberSheetExecuted(param));
             renameViewCommand = new RelayCommand(param => this.RenameViewExecuted(param));
             settingCommand = new RelayCommand(param => this.SettingExecuted(param));
-            updaterCommand = new RelayCommand(param => this.UpdaterExecuted(param));
             helpCommand = new RelayCommand(param => this.HelpExecuted(param));
             checkAllCommand = new RelayCommand(param => this.CheckAllExectued(param));
             uncheckAllCommand = new RelayCommand(param => this.UncheckAllExecuted(param));
@@ -146,7 +143,7 @@ namespace HOK.SheetManager.AddIn.Windows
 
                     UpdateProjectInfo(currentDoc);
 
-                    LinkStatusChecker.CheckLinkStatus(currentDoc, currentProject.Id, ref rvtSheetData);
+                    LinkStatusChecker.CheckLinkStatus(currentDoc, currentProject.Id, ref rvtSheetData, config.AutoUpdate);
                     this.RvtSheetData.SelectedDisciplineIndex = 0;
                     this.DatabaseOpened = true;
                     this.StatusText = file;
@@ -1130,58 +1127,6 @@ namespace HOK.SheetManager.AddIn.Windows
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to store tool's configuration.\n" + ex.Message, "Store Configuration", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        public void UpdaterExecuted(object param)
-        {
-            try
-            {
-                m_handler.ViewModel = this;
-                m_handler.Request.Make(RequestId.UpdaterChanged);
-                m_event.Raise();
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-        }
-
-        public void ChangeUpdater(Document doc)
-        {
-            try
-            {
-                using (Transaction trans = new Transaction(doc))
-                {
-                    trans.Start("Change Updater");
-                    try
-                    {
-                        if (autoUpdate)
-                        {
-                            this.AutoUpdate = false;
-                            config.AutoUpdate = false;
-                            bool unregistered = UpdaterUtil.UnregisterUpdaters(doc, config);
-                        }
-                        else
-                        {
-                            this.AutoUpdate = true;
-                            config.AutoUpdate = true;
-                            bool registered = UpdaterUtil.RegisterUpdaters(doc, config);
-                        }
-                        trans.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.RollBack();
-                        string message = ex.Message;
-                    }
-                }
-               
-                bool stored = DataStorageUtil.StoreConfiguration(doc, config);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to update registered updaters.\n" + ex.Message, "Change Updater", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

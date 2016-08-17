@@ -115,7 +115,7 @@ namespace HOK.SheetManager.AddIn.Updaters
                 }
                 foreach (ElementId revisionId in data.GetDeletedElementIds())
                 {
-                    bool deleted = DeleteRevision(revisionId);
+                    //bool deleted = DeleteRevision(revisionId);
                 }
 
             }
