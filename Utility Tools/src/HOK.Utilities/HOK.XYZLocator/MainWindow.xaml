@@ -1,0 +1,51 @@
+﻿<Window x:Class="HOK.XYZLocator.MainWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Height="450" Width="300" MinHeight="450" MinWidth="300" Icon="Images/hoklogo.ico" Title="XYZ Locator" WindowStartupLocation="CenterScreen">
+    <Grid>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Location - 1" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" Grid.ColumnSpan="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Content="Site: " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBoxSite1" HorizontalAlignment="Stretch" Margin="45,12,10,0" VerticalAlignment="Top" Height="25" Background="Transparent" DisplayMemberPath="Name" SelectionChanged="comboBoxSite1_SelectionChanged"/>
+                <Label Content="Description: " Grid.Row="1" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="radioButtonSiteName1" Content="Site Name" HorizontalAlignment="Left" Margin="85,10,0,0" Grid.Row="1" VerticalAlignment="Top" IsChecked="True"/>
+                <RadioButton x:Name="radioButtonProjectBase1" Content="Project Base Point" HorizontalAlignment="Left" Margin="85,10,0,0" Grid.Row="2" VerticalAlignment="Top" IsEnabled="False"/>
+                <RadioButton x:Name="radioButtonInternal1" Content="Internal Origin" HorizontalAlignment="Left" Margin="85,10,0,0" Grid.Row="3" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Header="Location - 2 (Optional)" HorizontalAlignment="Stretch" Margin="5,0,5,5" VerticalAlignment="Stretch" Grid.ColumnSpan="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Content="Site: " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBoxSite2" HorizontalAlignment="Stretch" Margin="45,12,10,0" VerticalAlignment="Top" Height="25" Background="Transparent" DisplayMemberPath="Name" SelectionChanged="comboBoxSite2_SelectionChanged"/>
+                <Label Content="Description: " Grid.Row="1" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top"/>
+                <RadioButton x:Name="radioButtonSiteName2" Content="Site Name" HorizontalAlignment="Left" Margin="85,10,0,0" Grid.Row="1" VerticalAlignment="Top" IsChecked="True"/>
+                <RadioButton x:Name="radioButtonProjectBase2" Content="Project Base Point" HorizontalAlignment="Left" Margin="85,10,0,0" Grid.Row="2" VerticalAlignment="Top" IsEnabled="False"/>
+                <RadioButton x:Name="radioButtonInternal2" Content="Internal Origin" HorizontalAlignment="Left" Margin="85,10,0,0" Grid.Row="3" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+        <Button x:Name="buttonProcess" Content="Process" HorizontalAlignment="Right" Margin="0,5,10,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Height="27" Click="buttonProcess_Click" Grid.Column="1"/>
+        <Button x:Name="buttonCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,5,90,0" Grid.Row="2" VerticalAlignment="Top" Width="75" Height="27" Click="buttonCancel_Click" Grid.ColumnSpan="2"/>
+
+    </Grid>
+</Window>
