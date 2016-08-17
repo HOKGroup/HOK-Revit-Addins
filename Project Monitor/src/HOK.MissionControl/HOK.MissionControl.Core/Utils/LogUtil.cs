@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HOK.MissionControl.Utils
+namespace HOK.MissionControl.Core.Utils
 {
     public static class LogUtil
     {
@@ -28,7 +28,7 @@ namespace HOK.MissionControl.Utils
                 string tempFolder = Path.GetTempPath();
                 string hokLogFolder = Path.Combine(tempFolder, "HOKReivtAddInLogs");
                 logDirectory = Path.Combine(hokLogFolder, "MissionControl");
-                
+
                 if (!Directory.Exists(hokLogFolder))
                 {
                     Directory.CreateDirectory(hokLogFolder);
@@ -42,7 +42,7 @@ namespace HOK.MissionControl.Utils
                 if (Directory.Exists(logDirectory))
                 {
                     string dateStr = DateTime.Now.ToString("yyyy-MM-dd");
-                    logFilePath = "log-" + dateStr+".log";
+                    logFilePath = "log-" + dateStr + ".log";
                     logFilePath = Path.Combine(logDirectory, logFilePath);
 
                     if (!File.Exists(logFilePath))
@@ -65,7 +65,7 @@ namespace HOK.MissionControl.Utils
         {
             try
             {
-                logBuilder.AppendLine(DateTime.Now.ToString()+"\t"+str);
+                logBuilder.AppendLine(DateTime.Now.ToString() + "\t" + str);
             }
             catch (Exception ex)
             {

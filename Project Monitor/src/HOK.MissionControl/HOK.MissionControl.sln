@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.MissionControl", "HOK.MissionControl\HOK.MissionControl.csproj", "{8F2BB60A-09BC-41EC-A013-2AE8BE5BCEC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.MissionControl.Core", "HOK.MissionControl.Core\HOK.MissionControl.Core.csproj", "{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		2013|Any CPU = 2013|Any CPU
@@ -25,6 +27,18 @@ Global
 		{8F2BB60A-09BC-41EC-A013-2AE8BE5BCEC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F2BB60A-09BC-41EC-A013-2AE8BE5BCEC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F2BB60A-09BC-41EC-A013-2AE8BE5BCEC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.2013|Any CPU.ActiveCfg = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.2013|Any CPU.Build.0 = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.2014|Any CPU.ActiveCfg = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.2014|Any CPU.Build.0 = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.2015|Any CPU.ActiveCfg = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.2015|Any CPU.Build.0 = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.2016|Any CPU.ActiveCfg = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.2016|Any CPU.Build.0 = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09FDA7EE-7A4B-4D34-8B22-4CE0AF04CCE0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

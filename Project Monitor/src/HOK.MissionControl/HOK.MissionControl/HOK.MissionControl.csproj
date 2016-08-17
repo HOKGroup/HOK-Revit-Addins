@@ -68,10 +68,6 @@
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="RestSharp, Version=100.0.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\..\Windows\assembly\GAC_MSIL\RestSharp\100.0.0.0__598062e77f915f75\RestSharp.dll</HintPath>
-    </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2013'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -116,13 +112,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppCommand.cs" />
-    <Compile Include="Classes\CategoryTrigger.cs" />
-    <Compile Include="Classes\Configuration.cs" />
-    <Compile Include="Classes\Project.cs" />
-    <Compile Include="Classes\ProjectAddress.cs" />
-    <Compile Include="Classes\ProjectUpdater.cs" />
-    <Compile Include="Classes\RvtFile.cs" />
-    <Compile Include="Classes\TriggerRecord.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tools\CADoor\DoorFailure.cs" />
     <Compile Include="Tools\CADoor\DoorUpdater.cs" />
@@ -133,16 +122,14 @@
       <DependentUpon>DTMWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\DTMTool\ReportingElementInfo.cs" />
-    <Compile Include="Tools\RevisionTracker\RevisionFailure.cs" />
-    <Compile Include="Tools\RevisionTracker\RevisionUpdater.cs" />
+    <Compile Include="Tools\SheetTracker\RevisionFailure.cs" />
+    <Compile Include="Tools\SheetTracker\RevisionUpdater.cs" />
     <Compile Include="Tools\SingleSession\SingleSessionMonitor.cs" />
     <Compile Include="Tools\SingleSession\SingleSessionWindow.xaml.cs">
       <DependentUpon>SingleSessionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\FailureProcessor.cs" />
     <Compile Include="Utils\FileInfoUtil.cs" />
-    <Compile Include="Utils\LogUtil.cs" />
-    <Compile Include="Utils\ServerUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Tools\DTMTool\Images\dtm.png" />
@@ -160,7 +147,12 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\HOK.MissionControl.Core\HOK.MissionControl.Core.csproj">
+      <Project>{09fda7ee-7a4b-4d34-8b22-4ce0af04cce0}</Project>
+      <Name>HOK.MissionControl.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Tools\SingleSession\Images\open-box.png" />
   </ItemGroup>

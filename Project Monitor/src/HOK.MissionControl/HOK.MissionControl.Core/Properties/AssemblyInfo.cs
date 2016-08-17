@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HOK.MissionControl")]
-[assembly: AssemblyDescription("This addin will activate updaters based on configurations stored in MongoDB")]
+[assembly: AssemblyTitle("HOK.MissionControl.Core")]
+[assembly: AssemblyDescription("Classes and Utilities for Mission Control")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
-[assembly: AssemblyProduct("HOK.MissionControl")]
+[assembly: AssemblyProduct("HOK.MissionControl.Core")]
 [assembly: AssemblyCopyright("Copyright © HOK Group 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("7abde2f8-b02f-4312-b0f8-38873549cd2e")]
+[assembly: Guid("2f8af927-85d1-4f32-9600-79279ed94840")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2015.0.1.3")]
-[assembly: AssemblyFileVersion("2015.0.1.3")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

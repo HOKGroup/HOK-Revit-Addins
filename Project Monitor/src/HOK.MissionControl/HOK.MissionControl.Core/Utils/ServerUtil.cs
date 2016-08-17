@@ -1,4 +1,4 @@
-﻿using HOK.MissionControl.Classes;
+﻿using HOK.MissionControl.Core.Classes;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -6,15 +6,14 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
-namespace HOK.MissionControl.Utils
+namespace HOK.MissionControl.Core.Utils
 {
     public static class ServerUtil
     {
-        public static bool UseLocalServer = false;
-
-        public const string baseUrlLocal = "http://localhost:80/";
+        public static bool UseLocalServer = true;
+        public const string baseUrlLocal = "http://hok-184vs/";
+        //public const string baseUrlLocal = "http://localhost:80/";
         public const string baseUrlGlobal = "http://hokmissioncontrol.herokuapp.com/";
         public const string apiVersion = "api/v1";
 
@@ -307,7 +306,7 @@ namespace HOK.MissionControl.Utils
             return status;
         }
 
-        
+
         #endregion
 
         #region DELETE

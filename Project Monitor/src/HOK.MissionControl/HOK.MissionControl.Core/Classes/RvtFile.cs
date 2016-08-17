@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HOK.MissionControl.Classes
+namespace HOK.MissionControl.Core.Classes
 {
-    public class RvtFile 
+    public class RvtFile
     {
         private string idVal = "";
         private string centralPathVal = "";

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HOK.MissionControl.Classes
+namespace HOK.MissionControl.Core.Classes
 {
     public class ProjectAddress
     {
@@ -19,7 +18,7 @@ namespace HOK.MissionControl.Classes
         private string placeIdVal = "";
         private GeometryLocation geoLocationVal = new GeometryLocation();
 
-        public string formattedAddress { get { return formattedAddressVal; } set { formattedAddressVal = value;  } }
+        public string formattedAddress { get { return formattedAddressVal; } set { formattedAddressVal = value; } }
         public string street1 { get { return street1Val; } set { street1Val = value; } }
         public string street2 { get { return street2Val; } set { street2Val = value; } }
         public string city { get { return cityVal; } set { cityVal = value; } }
@@ -31,7 +30,7 @@ namespace HOK.MissionControl.Classes
 
     }
 
-    public class GeometryLocation 
+    public class GeometryLocation
     {
         private double latitudeVal = 0;
         private double longitudeVal = 0;
@@ -43,6 +42,6 @@ namespace HOK.MissionControl.Classes
         {
         }
 
-       
+
     }
 }

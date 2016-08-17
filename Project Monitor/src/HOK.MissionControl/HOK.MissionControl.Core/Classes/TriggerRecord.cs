@@ -1,14 +1,12 @@
-﻿using RestSharp.Serializers;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HOK.MissionControl.Classes
+namespace HOK.MissionControl.Core.Classes
 {
-    public class TriggerRecord 
+    public class TriggerRecord
     {
         private string idVal;
         private string configIdVal = "";
