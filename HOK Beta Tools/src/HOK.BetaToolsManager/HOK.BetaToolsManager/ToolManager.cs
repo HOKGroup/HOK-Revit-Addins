@@ -369,6 +369,7 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("HOK.WorksetView.dll");
                         fileNames.Add("HOK.CameraDuplicator.dll");
                         fileNames.Add("HOK.RenameFamily.dll");
+                        fileNames.Add("HOK.XYZLocator.dll");
 #if RELEASE2015|| RELEASE2016
                         fileNames.Add("HOK.RoomMeasure.dll");
 #endif
@@ -468,6 +469,7 @@ namespace HOK.BetaToolsManager
 
                 image.BeginInit();
                 image.StreamSource = stream;
+               
                 image.EndInit();
             }
             catch (Exception ex)

@@ -469,6 +469,24 @@ namespace HOK.BetaToolsManager
                                 }
                             }
 
+                            string xyzPath = Path.Combine(directoryName, "HOK.XYZLocator.dll");
+                            xyzPath = GetTempInstallPath(xyzPath);
+                            if (File.Exists(xyzPath))
+                            {
+                                if (!utilityButtons.ContainsKey("XYZ Locator"))
+                                {
+                                    PushButton xyzButton = utilitySplitButton.AddPushButton(new PushButtonData("XYZ Locator", "XYZ Locator", xyzPath, "HOK.XYZLocator.XYZCommand")) as PushButton;
+                                    xyzButton.LargeImage = ImageUtil.LoadBitmapImage("location.ico");
+                                    xyzButton.ToolTip = "Report location of a 3D family using shared coordinates";
+                                    AddToolTips(xyzButton);
+                                }
+                                else
+                                {
+                                    PushButton xyzButton = utilityButtons["XYZ Locator"];
+                                    xyzButton.AssemblyName = xyzPath;
+                                }
+                            }
+
 #if RELEASE2015|| RELEASE2016
                             string measurePath = Path.Combine(directoryName, "HOK.RoomMeasure.dll");
                             measurePath = GetTempInstallPath(measurePath);
@@ -550,6 +568,11 @@ namespace HOK.BetaToolsManager
                             {
                                 PushButton measureButton = utilityButtons["Room W X L"];
                                 measureButton.Enabled = false;
+                            }
+                            if (utilityButtons.ContainsKey("XYZ Locator"))
+                            {
+                                PushButton xyzButton = utilityButtons["XYZ Locator"];
+                                xyzButton.Enabled = false;
                             }
                         }
 
