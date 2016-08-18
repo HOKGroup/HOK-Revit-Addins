@@ -321,7 +321,7 @@ namespace HOK.SmartBCF.AddIn
             {
 #if RELEASE2013||RELEASE2014
                  Parameter param = element.get_Parameter(bcfParam.ToString());
-#elif RELEASE2015||RELEASE2016
+#else
                 Parameter param = element.LookupParameter(bcfParam.ToString());
 #endif
                 if (null != param)

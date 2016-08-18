@@ -17,6 +17,7 @@ namespace HOK.AddInsInstaller
         public static ToolNames[] tools2014 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.MissionControl, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
         public static ToolNames[] tools2015 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager, ToolNames.MissionControl, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
         public static ToolNames[] tools2016 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager, ToolNames.MissionControl, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
+        public static ToolNames[] tools2017 = new ToolNames[] { ToolNames.SmartBCF};
 
         public static Dictionary<string/*versionNumber*/, ToolPackageInfo> GetToolPackageInfo()
         {
@@ -45,6 +46,11 @@ namespace HOK.AddInsInstaller
                 ToolPackageInfo toolPackage2016 = new ToolPackageInfo("2016");
                 toolPackage2016.SetToolInfo(tools2016, pWindow);
                 toolPackageDictionary.Add("2016", toolPackage2016);
+
+                pWindow.SetStatusLabel("Gathering information about installed components in 2017. . .");
+                ToolPackageInfo toolPackage2017 = new ToolPackageInfo("2017");
+                toolPackage2017.SetToolInfo(tools2017, pWindow);
+                toolPackageDictionary.Add("2017", toolPackage2017);
 
                 if (null!=pWindow) { pWindow.Close(); }
             }
