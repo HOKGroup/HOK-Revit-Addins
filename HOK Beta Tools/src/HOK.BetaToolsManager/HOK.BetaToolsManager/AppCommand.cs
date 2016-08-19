@@ -431,7 +431,7 @@ namespace HOK.BetaToolsManager
                                 }
                             }
 
-#if RELEASE2014|| RELEASE2015|| RELEASE2016
+#if RELEASE2014|| RELEASE2015|| RELEASE2016|| RELEASE2017
 
                             string cameraPath = Path.Combine(directoryName, "HOK.CameraDuplicator.dll");
                             cameraPath = GetTempInstallPath(cameraPath);
@@ -487,7 +487,7 @@ namespace HOK.BetaToolsManager
                                 }
                             }
 
-#if RELEASE2015|| RELEASE2016
+#if RELEASE2015|| RELEASE2016 || RELEASE2017
                             string measurePath = Path.Combine(directoryName, "HOK.RoomMeasure.dll");
                             measurePath = GetTempInstallPath(measurePath);
                             if (File.Exists(measurePath))
@@ -576,7 +576,7 @@ namespace HOK.BetaToolsManager
                             }
                         }
 
-#if RELEASE2014||RELEASE2015 || RELEASE2016
+#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                         if (colorTP.InstallExist)
                         {
                             if (!utilityButtons.ContainsKey("Color Editor"))

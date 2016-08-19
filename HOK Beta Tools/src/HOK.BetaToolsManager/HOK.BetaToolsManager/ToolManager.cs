@@ -218,7 +218,7 @@ namespace HOK.BetaToolsManager
 
                             dictionary.Add(tool, tp);
                             break;
-#if RELEASE2015||RELEASE2016
+#if RELEASE2015||RELEASE2016 || RELEASE2017
                         case ToolEnum.LEEDView:
                             tp.ToolName = "LEED View Analysis";
                             tp.DllName = "HOK.ViewAnalysis.dll";
@@ -370,7 +370,7 @@ namespace HOK.BetaToolsManager
                         fileNames.Add("HOK.CameraDuplicator.dll");
                         fileNames.Add("HOK.RenameFamily.dll");
                         fileNames.Add("HOK.XYZLocator.dll");
-#if RELEASE2015|| RELEASE2016
+#if RELEASE2015|| RELEASE2016 ||RELEASE2017
                         fileNames.Add("HOK.RoomMeasure.dll");
 #endif
                         break;
