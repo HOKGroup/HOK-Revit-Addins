@@ -80,15 +80,18 @@ namespace HOK.RoomsToMass
                     {
                         LinkedInstanceProperties lip = new LinkedInstanceProperties(instance);
                         Document linkedDoc = instance.GetLinkDocument();
-                        if (modelDictionary.ContainsKey(linkedDoc.Title))
+                        if (null != linkedDoc)
                         {
-                            modelDictionary[linkedDoc.Title].LinkedInstances.Add(lip.InstanceId, lip);
-                        }
-                        else
-                        {
-                            RevitDocumentProperties linkedModel = new RevitDocumentProperties(linkedDoc);
-                            linkedModel.LinkedInstances.Add(lip.InstanceId, lip);
-                            modelDictionary.Add(linkedModel.DocumentTitle, linkedModel);
+                            if (modelDictionary.ContainsKey(linkedDoc.Title))
+                            {
+                                modelDictionary[linkedDoc.Title].LinkedInstances.Add(lip.InstanceId, lip);
+                            }
+                            else
+                            {
+                                RevitDocumentProperties linkedModel = new RevitDocumentProperties(linkedDoc);
+                                linkedModel.LinkedInstances.Add(lip.InstanceId, lip);
+                                modelDictionary.Add(linkedModel.DocumentTitle, linkedModel);
+                            }
                         }
                     }
                 }
@@ -99,7 +102,7 @@ namespace HOK.RoomsToMass
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to get the inforamtion of models loaded into this project.\n"+ex.Message, "Get Model Informaion", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to get the inforamtion of models loaded into this project.\n"+ex.Message, "Get Model Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
