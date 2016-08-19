@@ -10,11 +10,11 @@ namespace HOK.SmartBCF.Schemas
 {
     public enum TopicType
     {
-        Error = 0, Info = 1, Unknown = 2, Warning = 3
+        Error = 0, Info = 1, Unknown = 2, Warning = 3, Issue = 4, Fault = 5, Clash = 6, Request = 7, Inquiry = 8, Remark = 9, Undefined =10
     }
     public enum TopicStatus
     {
-        Assigned = 0, Closed = 1, Open = 2, Resolved = 3
+        Active = 0, Assigned = 0, Closed = 1, Open = 2, Resolved = 3
     }
 
     public enum TopicLable

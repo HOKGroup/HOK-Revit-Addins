@@ -25,8 +25,9 @@ namespace HOK.SmartBCF.UserControls
     {
         private Markup selectedMarkup = null;
 
-        public TopicType[] topicTypes = new TopicType[] { TopicType.Error, TopicType.Info, TopicType.Unknown, TopicType.Warning };
-        public TopicStatus[] topicStatus = new TopicStatus[] { TopicStatus.Assigned, TopicStatus.Closed, TopicStatus.Open, TopicStatus.Resolved };
+        public TopicType[] topicTypes = new TopicType[] { TopicType.Error, TopicType.Info, TopicType.Unknown, TopicType.Warning, 
+            /*BIMCollab*/ TopicType.Issue, TopicType.Fault, TopicType.Clash, TopicType.Request, TopicType.Inquiry, TopicType.Remark, TopicType.Undefined };
+        public TopicStatus[] topicStatus = new TopicStatus[] { TopicStatus.Active, TopicStatus.Assigned, TopicStatus.Closed, TopicStatus.Open, TopicStatus.Resolved };
 
         private bool loadedUI = false;
         private bool isCellEditable = true;
