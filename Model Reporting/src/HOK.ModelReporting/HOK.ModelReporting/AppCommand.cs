@@ -32,7 +32,7 @@ namespace HOK.ModelReporting
                 application.ControlledApplication.DocumentSynchronizingWithCentral += new EventHandler<DocumentSynchronizingWithCentralEventArgs>(EventSwcStart);
                 application.ControlledApplication.DocumentSynchronizedWithCentral += new EventHandler<DocumentSynchronizedWithCentralEventArgs>(EventSwcStop);
 
-#if RELEASE2014 || RELEASE2015 || RELEASE2016
+#if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
                 application.ControlledApplication.DocumentChanged += new EventHandler<DocumentChangedEventArgs>(EventCommandFinished);
 
                 if (binding == null)
@@ -63,7 +63,7 @@ namespace HOK.ModelReporting
                 application.ControlledApplication.DocumentSynchronizingWithCentral -= new EventHandler<DocumentSynchronizingWithCentralEventArgs>(EventSwcStart);
                 application.ControlledApplication.DocumentSynchronizedWithCentral -= new EventHandler<DocumentSynchronizedWithCentralEventArgs>(EventSwcStop);
 
-#if RELEASE2014 || RELEASE2015 ||RELEASE2016
+#if RELEASE2014 || RELEASE2015 ||RELEASE2016 || RELEASE2017
                 application.ControlledApplication.DocumentChanged -= new EventHandler<DocumentChangedEventArgs>(EventCommandFinished);
                
                 if (commandId.HasBinding)
@@ -182,7 +182,7 @@ namespace HOK.ModelReporting
             catch { }
         }
 
-#if RELEASE2014 || RELEASE2015 || RELEASE2016
+#if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
         private void EventCommandStart(object sender, BeforeExecutedEventArgs e)
         {
             try

@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 // Original file name:
-// Generation date: 8/10/2016 11:00:00 AM
+// Generation date: 8/19/2016 2:39:11 PM
 namespace HOK.ModelReporting.KNetBIMDataServiceReference
 {
     
