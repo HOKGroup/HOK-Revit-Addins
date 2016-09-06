@@ -356,7 +356,7 @@ namespace HOK.RibbonTab
                         pb15.ToolTip = "Calculating Lighting Power Density";
                         AddToolTips(pb15);
                     }
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                     if (File.Exists(currentDirectory + "/HOK.ViewAnalysis.dll"))
                     {
                         PushButton pb24 = splitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", currentDirectory + "/HOK.ViewAnalysis.dll", "HOK.ViewAnalysis.Command")) as PushButton;
