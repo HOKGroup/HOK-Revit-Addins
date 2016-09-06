@@ -70,7 +70,7 @@ namespace HOK.ColorSchemeEditor
                         if (null != category)
                         {
                             if (null != category.Parent) { continue; } //skip subcategories
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                             if (category.CategoryType != CategoryType.Model) { continue; }
 #endif
                             CategoryInfo catInfo = new CategoryInfo(category, filterCatIds);
@@ -133,7 +133,7 @@ namespace HOK.ColorSchemeEditor
                         if (null != category)
                         {
                             if (null != category.Parent) { continue; } //skip subcategories
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                             if (category.CategoryType != CategoryType.Model) { continue; }
 #endif
 
