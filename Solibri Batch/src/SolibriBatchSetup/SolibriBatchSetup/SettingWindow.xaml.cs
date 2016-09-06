@@ -56,6 +56,8 @@ namespace SolibriBatchSetup
                 remoteComputers.Add(rm);
                 RempoteMachine rm2 = new RempoteMachine("PHI", "PHI-BAT-D001", @"\\PHI-BAT-D001\SolibriBatch");
                 remoteComputers.Add(rm2);
+                RempoteMachine rm3 = new RempoteMachine("HOU", "HOU-BAT-D001", @"\\HOU-BAT-D001\SolibriBatch");
+                remoteComputers.Add(rm3);
 
                 remoteComputers = remoteComputers.OrderBy(o => o.ComputerName).ToList();
 

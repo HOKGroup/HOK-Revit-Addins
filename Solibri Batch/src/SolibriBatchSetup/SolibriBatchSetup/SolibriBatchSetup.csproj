@@ -52,10 +52,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>8056BF8ACF1E135EF79B40820BF32BB521D15BE2</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>A5FD83404BDBBEB1B28DD80BA7D1CE424049CBD2</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>SolibriBatchSetup_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>SolibriBatchSetup_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -162,6 +162,7 @@
     <None Include="Schema\Autorun.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="SolibriBatchSetup_1_TemporaryKey.pfx" />
     <None Include="SolibriBatchSetup_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
