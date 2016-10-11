@@ -109,7 +109,7 @@ namespace HOK.RenameFamily
                                 {
                                     familyName = param.AsString();
                                 }
-#elif RELEASE2015 ||RELEASE2016
+#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
             familyName = eType.FamilyName;
 #endif
                                 FamilyTypeProperties ftp = new FamilyTypeProperties(modelName, eType.Id.IntegerValue, familyName, eType.Name);

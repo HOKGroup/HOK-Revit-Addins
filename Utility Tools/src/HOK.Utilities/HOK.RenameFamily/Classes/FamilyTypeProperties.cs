@@ -57,7 +57,7 @@ namespace HOK.RenameFamily.Classes
             {
                 currentFamilyName = param.AsString();
             }
-#elif RELEASE2015 ||RELEASE2016
+#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
             currentFamilyName = eType.FamilyName;
 #endif
             currentTypeName = eType.Name;
