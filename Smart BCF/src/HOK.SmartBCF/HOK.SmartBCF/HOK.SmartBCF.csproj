@@ -142,12 +142,16 @@
     <Compile Include="UserControls\CommandPanel.xaml.cs">
       <DependentUpon>CommandPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utils\ImageUtil.cs" />
     <Compile Include="Utils\ProgressManager.cs" />
     <Compile Include="Utils\RelayCommand.cs" />
     <Compile Include="Utils\RoutedCommands.cs" />
     <Compile Include="Utils\ValueConverters.cs" />
     <Compile Include="Utils\WPFUtil.cs" />
     <Compile Include="Utils\ZipArchiveEntryExtensions.cs" />
+    <Compile Include="Windows\AddViewWindow.xaml.cs">
+      <DependentUpon>AddViewWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\OptionWindow.xaml.cs">
       <DependentUpon>OptionWindow.xaml</DependentUpon>
     </Compile>
@@ -162,6 +166,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +179,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\CommandPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\AddViewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -251,8 +260,19 @@
     <Resource Include="UserControls\Images\folder.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Windows\Images\camera.png" />
+    <Resource Include="Windows\Images\browse.png" />
+    <Resource Include="UserControls\Images\users32.png" />
+    <Resource Include="Windows\Images\users.png" />
     <Resource Include="UserControls\Images\config.png" />
     <Resource Include="UserControls\Images\database.png" />
+    <Resource Include="UserControls\Images\user.png" />
+    <Resource Include="UserControls\Images\add32.png" />
+    <Resource Include="UserControls\Images\cancel32.png" />
+    <Resource Include="UserControls\Images\magnifier32.png" />
+    <Resource Include="UserControls\Images\edit32.png" />
+    <Content Include="UserControls\Images\next.png" />
+    <Content Include="UserControls\Images\previous.png" />
     <Content Include="UserControls\Images\new.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

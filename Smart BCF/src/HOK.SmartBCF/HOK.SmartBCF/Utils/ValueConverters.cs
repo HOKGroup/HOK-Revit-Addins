@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using HOK.SmartBCF.Schemas;
 using System.Drawing;
+using System.Windows;
 
 namespace HOK.SmartBCF.Utils
 {
@@ -140,6 +141,30 @@ namespace HOK.SmartBCF.Utils
         }
     }
 
+    public class ViewPointIndexConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            string indexText = "";
+            if (values.Length == 2)
+            {
+                Markup markup = values[0] as Markup;
+                ViewPoint selectedViewpoint = values[1] as ViewPoint;
+                if (null != markup && null != selectedViewpoint)
+                {
+                    int index = markup.Viewpoints.IndexOf(selectedViewpoint);
+                    indexText = "( " + (index + 1) + " of " + markup.Viewpoints.Count + ")";
+                }
+            }
+            return indexText;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [ValueConversion(typeof(byte[]), typeof(System.Windows.Media.Brush))]
     public class ColorConverter : IValueConverter
     {
@@ -222,4 +247,37 @@ namespace HOK.SmartBCF.Utils
             throw new NotImplementedException();
         }
     }
+
+    public enum ComponentOption
+    {
+        OnlyVisible, SelectedElements, None
+    }
+
+    public class ComponentOptionConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            string parameterString = parameter as string;
+            if (parameterString == null)
+                return DependencyProperty.UnsetValue;
+
+            if (Enum.IsDefined(value.GetType(), value) == false)
+                return DependencyProperty.UnsetValue;
+
+            object parameterValue = Enum.Parse(value.GetType(), parameterString);
+
+            return parameterValue.Equals(value);
+        }
+
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            string parameterString = parameter as string;
+            if (parameterString == null)
+                return DependencyProperty.UnsetValue;
+
+            return Enum.Parse(targetType, parameterString);
+        }
+    }
+
 }

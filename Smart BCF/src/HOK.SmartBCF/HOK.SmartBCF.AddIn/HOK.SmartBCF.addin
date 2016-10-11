@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Smart BCF</Name>
+    <Assembly>HOK.SmartBCF.AddIn.dll</Assembly>
+    <AddInId>9D7AC49B-69D4-461A-869C-385025229EAF</AddInId>
+    <FullClassName>HOK.SmartBCF.AddIn.AppCommand</FullClassName>
+    <VendorId>JKIM</VendorId>
+    <VendorDescription>JKIM</VendorDescription>
+  </AddIn>
+</RevitAddIns>

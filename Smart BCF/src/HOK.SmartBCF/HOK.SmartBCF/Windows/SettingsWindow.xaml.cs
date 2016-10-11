@@ -29,6 +29,7 @@ namespace HOK.SmartBCF.Windows
         private RevitExtensionInfo extInfo = new RevitExtensionInfo();
         private int primaryIndex = -1;
         private bool colorChanged = false;
+        private List<RevitExtension> deletedExts = new List<RevitExtension>(); //to delete from database
 
         private string[] parameters = { "BCF_Action", "BCF_Responsibility" };
 
@@ -46,7 +47,7 @@ namespace HOK.SmartBCF.Windows
 
             comboBoxParameter.ItemsSource = null;
             comboBoxParameter.ItemsSource = parameters;
-
+ 
             dataGridColor.ItemsSource = extInfo.Extensions;
 
             comboBoxPrimary.ItemsSource = viewModel.BCFFiles;
@@ -58,6 +59,11 @@ namespace HOK.SmartBCF.Windows
         {
             try
             {
+                if (deletedExts.Count > 0)
+                {
+                    bool deleted = BCFDBWriter.BCFDBWriter.ReplaceObsoleteExtensions(deletedExts);
+                }
+
                 if (colorChanged)
                 {
                     bool updated = BCFDBWriter.BCFDBWriter.UpdateExtensions(extInfo);
@@ -89,28 +95,30 @@ namespace HOK.SmartBCF.Windows
         {
             try
             {
-                WinForm.ColorDialog colorDialog = new WinForm.ColorDialog();
-                if (colorDialog.ShowDialog()==WinForm.DialogResult.OK)
+                DataGridRow row = WPFUtil.FindVisualParent<DataGridRow>(e.OriginalSource as UIElement);
+                if (null != row)
                 {
-                    System.Drawing.Color selectedColor = colorDialog.Color;
-                    Button button = e.OriginalSource as Button;
-                    if (null != button)
+                    RevitExtension selectedExt = row.Item as RevitExtension;
+                    if (null != selectedExt)
                     {
-                        DataGridRow row = WPFUtil.FindVisualParent<DataGridRow>(e.OriginalSource as UIElement);
-                        if (null != row)
+                        if (selectedExt.Guid == Guid.Empty.ToString()) { return; }
+
+                        WinForm.ColorDialog colorDialog = new WinForm.ColorDialog();
+                        if (colorDialog.ShowDialog() == WinForm.DialogResult.OK)
                         {
-                            RevitExtension selectedExt = row.Item as RevitExtension;
-                            if (null != selectedExt)
+                            System.Drawing.Color selectedColor = colorDialog.Color;
+                            Button button = e.OriginalSource as Button;
+                            if (null != button)
                             {
                                 int index = extInfo.Extensions.IndexOf(selectedExt);
                                 extInfo.Extensions[index].Color[0] = selectedColor.R;
                                 extInfo.Extensions[index].Color[1] = selectedColor.G;
                                 extInfo.Extensions[index].Color[2] = selectedColor.B;
+                                button.Background = new SolidColorBrush(Color.FromRgb(selectedColor.R, selectedColor.G, selectedColor.B));
                             }
+                            colorChanged = true;
                         }
-                        button.Background = new SolidColorBrush(Color.FromRgb(selectedColor.R, selectedColor.G, selectedColor.B));
                     }
-                    colorChanged = true;
                 }
             }
             catch(Exception ex)
@@ -132,14 +140,14 @@ namespace HOK.SmartBCF.Windows
                 RevitExtension rvtExtension = new RevitExtension();
                 rvtExtension.Guid = Guid.NewGuid().ToString();
                 rvtExtension.ParameterName = parameters[0];
-                rvtExtension.ParameterValue = "";
+                rvtExtension.ParameterValue = "New Parameter";
                 Random random = new Random();
                 rvtExtension.Color = new byte[3];
                 rvtExtension.Color[0] = (byte)random.Next(255);
                 rvtExtension.Color[1] = (byte)random.Next(255);
                 rvtExtension.Color[2] = (byte)random.Next(255);
                 extInfo.Extensions.Add(rvtExtension);
-
+                colorChanged = true;
             }
             catch (Exception ex)
             {
@@ -156,7 +164,9 @@ namespace HOK.SmartBCF.Windows
                     RevitExtension selectedExt = dataGridColor.SelectedItem as RevitExtension;
                     if (null != selectedExt)
                     {
+                        deletedExts.Add(selectedExt);
                         bool deleted = extInfo.Extensions.Remove(selectedExt);
+                        colorChanged = true;
                     }
                 }
             }
@@ -166,9 +176,27 @@ namespace HOK.SmartBCF.Windows
             }
         }
 
-       
-
-
-
+        private void dataGridColor_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            try
+            {
+                if (null != e.Row)
+                {
+                    DataGridRow row = e.Row;
+                    RevitExtension extension = row.Item as RevitExtension;
+                    if (null != extension)
+                    {
+                        if (extension.Guid == Guid.Empty.ToString())
+                        {
+                            e.Cancel = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
     }
 }

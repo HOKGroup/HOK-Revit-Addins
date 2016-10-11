@@ -24,8 +24,8 @@ namespace HOK.SmartBCF.UserControls
         private int primaryFileIndex = 0;
         private int selectedIndex = 0;
 
+        private bool isAddInMode = false;
         private bool databaseOpened = false;
-        private bool componentEnabled = false;
         private string statusText = "";
 
         //Commands
@@ -38,11 +38,12 @@ namespace HOK.SmartBCF.UserControls
         public bool AddInMode { get { return addInMode; } set { addInMode = value; NotifyPropertyChanged("AddInMode"); } }
         public string DatabaseFile { get { return databaseFile; } set { databaseFile = value; NotifyPropertyChanged("DatabaseFile"); } }
         public ObservableCollection<BCFZIP> BCFFiles { get { return bcfFiles; } set { bcfFiles = value; NotifyPropertyChanged("BCFFiles"); } }
+        
         public int PrimaryFileIndex { get { return primaryFileIndex; } set { primaryFileIndex = value; NotifyPropertyChanged("PrimaryFileIndex"); } }
         public int SelectedIndex { get { return selectedIndex; } set { selectedIndex = value; NotifyPropertyChanged("SelectedIndex"); } }
 
+        public bool IsAddInMode { get { return isAddInMode; } set { isAddInMode = value; NotifyPropertyChanged("IsAddInMode"); } }
         public bool DatabaseOpened { get { return databaseOpened; } set { databaseOpened = value; NotifyPropertyChanged("DatabaseOpened"); } }
-        public bool ComponentEnabled { get { return componentEnabled; } set { componentEnabled = value; NotifyPropertyChanged("ComponentEnabled"); } }
         public string StatusText { get { return statusText; } set { statusText = value; NotifyPropertyChanged("StatusText"); } }
 
         public ICommand CreateDBCommand { get { return createDBCommand; }}
@@ -51,9 +52,10 @@ namespace HOK.SmartBCF.UserControls
         public ICommand ConvertBCFCommand { get { return convertBCFCommand; } }
         public ICommand SettingCommand { get { return settingCommand; } }
 
+
         public BCFViewModel(bool addIn)
         {
-            addInMode = addIn;
+            isAddInMode = addIn;
 
             createDBCommand = new RelayCommand(param => this.CreateDBExecuted(param));
             openDBCommand = new RelayCommand(param => this.OpenDBExecuted(param));
@@ -208,6 +210,7 @@ namespace HOK.SmartBCF.UserControls
                 }
                 this.SelectedIndex = selectedBCF;
                 this.BCFFiles[selectedBCF].SelectedMarkup = selectedMarkup;
+               
             }
             catch (Exception ex)
             {
@@ -238,7 +241,7 @@ namespace HOK.SmartBCF.UserControls
 
                 this.StatusText = dbPath;
                 this.DatabaseOpened = true;
-                if (addInMode) { this.ComponentEnabled = true; }
+                //if (addInMode) { this.ComponentEnabled = true; }
                 openDB = true;
             }
             catch (Exception ex)
@@ -293,7 +296,7 @@ namespace HOK.SmartBCF.UserControls
                                 //MessageBox.Show("The database file has been successfully created!!\n" + dbFile, "Database Created", MessageBoxButton.OK, MessageBoxImage.Information);
                                 this.BCFFiles.Add(bcfzip);
                                 this.DatabaseOpened = true;
-                                if (addInMode) { this.ComponentEnabled = true; }
+                                //if (addInMode) { this.ComponentEnabled = true; }
                                 this.SelectedIndex = bcfFiles.Count - 1;
                             }
                             else

@@ -23,8 +23,8 @@ namespace HOK.SmartBCF.AddIn
         private BCFViewModel bcfView;
         private BCFHandler m_handler;
         private ExternalEvent m_event;
-        private Dictionary<string, RoomProperties> roomDictionary = new Dictionary<string, RoomProperties>();
         private Dictionary<string/*ifcProjectGuid*/, RevitLinkProperties> linkDictionary = new Dictionary<string, RevitLinkProperties>();
+        private Dictionary<string/*ifcGuid*/, RevitComponent> compDictionary = new Dictionary<string, RevitComponent>();
 
         private RevitComponent selectedComponent = null;
         private int selectedComponentIndex =-1;
@@ -53,8 +53,9 @@ namespace HOK.SmartBCF.AddIn
         private bool uiChanged = false;
 
         public BCFViewModel BCFView { get { return bcfView; } set { bcfView = value; NotifyPropertyChanged("BCFView"); } }
-        public Dictionary<string, RoomProperties> RoomDictionary { get { return roomDictionary; } set { roomDictionary = value; NotifyPropertyChanged("RoomDictionary"); } }
         public Dictionary<string, RevitLinkProperties> LinkDictionary { get { return linkDictionary; } set { linkDictionary = value; NotifyPropertyChanged("LinkDictionary"); } }
+        public Dictionary<string, RevitComponent> CompDictionary { get { return compDictionary; } set { compDictionary = value; NotifyPropertyChanged("CompDictionary"); } }
+
         public RevitComponent SelectedComponent { get { return selectedComponent; } set { selectedComponent = value; NotifyPropertyChanged("SelectedComponent"); } }
         public int SelectedComponentIndex { get { return selectedComponentIndex; } set { selectedComponentIndex = value; SetIndexText(); NotifyPropertyChanged("SelectedComponentIndex"); } }
         public BCFZIP SelectedBCF { get { return selectedBCF; } set { selectedBCF = value; NotifyPropertyChanged("SelectedBCF"); } }
@@ -81,15 +82,15 @@ namespace HOK.SmartBCF.AddIn
         public ICommand ComponentChangedCommand { get { return componentChangedCommand; } }
         public bool UIChanged { get { return uiChanged; } set { uiChanged = value; } }
 
-        public ComponentViewModel(BCFViewModel bcfViewModel, Dictionary<string, RoomProperties> rooms, Dictionary<string, RevitLinkProperties> links,  BCFHandler handler, ExternalEvent extEvent)
+        public ComponentViewModel(BCFViewModel bcfViewModel, Dictionary<string, RevitLinkProperties> links, Dictionary<string, RevitComponent> comps, BCFHandler handler, ExternalEvent extEvent)
         {
             try
             {
                 bcfView = bcfViewModel;
                 m_handler = handler;
                 m_event = extEvent;
-                roomDictionary = rooms;
                 linkDictionary = links;
+                compDictionary = comps;
 
                 moveComponentCommand = new RelayCommand(param => this.MoveComponentExecuted(param));
                 writeParametersCommand = new RelayCommand(param => this.WriteParametersExecuted(param));
@@ -142,28 +143,44 @@ namespace HOK.SmartBCF.AddIn
                         {
                             int compIndex = selectedViewPoint.VisInfo.Components.IndexOf(comp);
                             RevitComponent rvtComponent = null;
-                            if (!string.IsNullOrEmpty(comp.AuthoringToolId))
-                            {
-                                foreach (string projectId in ifcProjectGuids)
-                                {
-                                    RevitLinkProperties rlp = linkDictionary[projectId];
-                                    rvtComponent = new RevitComponent(comp, rlp);
-                                    if (rvtComponent.ElementExist && rvtComponent.ElementMatched)
-                                    {
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        rvtComponent = null;
-                                    }
-                                }          
-                            }
-                            else if (roomDictionary.ContainsKey(comp.IfcGuid))
-                            {
-                                RoomProperties rp = roomDictionary[comp.IfcGuid];
-                                rvtComponent = new RevitComponent(comp, rp);
-                            }
 
+                            if (!string.IsNullOrEmpty(comp.IfcGuid) && compDictionary.ContainsKey(comp.IfcGuid))
+                            {
+                                RevitComponent sampleComp = compDictionary[comp.IfcGuid];
+                                if (linkDictionary.ContainsKey(sampleComp.IfcProjectGuid))
+                                {
+                                    RevitLinkProperties rlp = linkDictionary[sampleComp.IfcProjectGuid];
+                                    Element compElement = rlp.LinkedDocument.GetElement(sampleComp.ElementId);
+                                    if (null != compElement)
+                                    {
+                                        rvtComponent = new RevitComponent(comp, compElement, rlp);
+                                    } 
+                                }
+                                /*
+                                BuiltInParameter bip = BuiltInParameter.IFC_GUID;
+                                ParameterValueProvider provider = new ParameterValueProvider(new ElementId(bip));
+                                FilterStringRuleEvaluator evaluator = new FilterStringEquals();
+
+                                FilterRule rule = new FilterStringRule(provider, evaluator, comp.IfcGuid, true);
+                                ElementParameterFilter filter = new ElementParameterFilter(rule);
+
+                                foreach (RevitLinkProperties rlp in linkDictionary.Values)
+                                {
+                                    if (null != rlp.LinkedDocument)
+                                    {
+                                        FilteredElementCollector collector = new FilteredElementCollector(rlp.LinkedDocument);
+                                        ICollection<Element> elements = collector.WherePasses(filter).WhereElementIsNotElementType().ToElements();
+
+                                        if (elements.Count > 0)
+                                        {
+                                            Element element = elements.First();
+                                            rvtComponent = new RevitComponent(comp, element, rlp);
+                                            break;
+                                        }
+                                    }
+                                }*/
+                            }
+                           
                             if (null != rvtComponent)
                             {
                                 var foundAction = from ext in selectedBCF.ExtensionColor.Extensions where ext.Guid == rvtComponent.Action.Guid select ext;
@@ -249,6 +266,8 @@ namespace HOK.SmartBCF.AddIn
         {
             try
             {
+                m_handler.SetDefaultView();
+
                 this.IsHighlightChecked = false;
                 this.IsIsolateChecked = false;
                 this.IsSectionBoxChecked = false;

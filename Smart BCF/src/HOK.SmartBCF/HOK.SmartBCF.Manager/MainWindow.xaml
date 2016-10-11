@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ctr ="clr-namespace:HOK.SmartBCF.UserControls;assembly=HOK.SmartBCF"
         xmlns:local="clr-namespace:HOK.SmartBCF.Manager"
-        Title="SmartBCF Desktop" Height="800" Width="1100" MinWidth="1000" Icon="Images/hoklogo.ico" WindowStartupLocation="CenterScreen" 
+        Title="SmartBCF Desktop" Height="800" Width="1100" MinWidth="1000" MinHeight="800" Icon="Images/hoklogo.ico" WindowStartupLocation="CenterScreen" 
         UseLayoutRounding="True" Closing="Window_Closing" BorderThickness="0,5,0,0" BorderBrush="#FF1E8BE6">
     <Window.DataContext>
         <local:WindowViewModel/>

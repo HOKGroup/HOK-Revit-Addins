@@ -14,7 +14,7 @@ namespace HOK.SmartBCF.Schemas
     }
     public enum TopicStatus
     {
-        Active = 0, Assigned = 0, Closed = 1, Open = 2, Resolved = 3
+        Active = 0, Assigned = 1, Closed = 2, Open = 3, Resolved = 4
     }
 
     public enum TopicLable
@@ -32,7 +32,7 @@ namespace HOK.SmartBCF.Schemas
         private ObservableCollection<RevitExtension> extensions = new ObservableCollection<RevitExtension>();
        
         [System.Xml.Serialization.XmlArrayItemAttribute(IsNullable = false)]
-        public ObservableCollection<RevitExtension> Extensions { get { return extensions; } set { extensions = value; NotifyPropertyChanged("Actions"); } }
+        public ObservableCollection<RevitExtension> Extensions { get { return extensions; } set { extensions = value; NotifyPropertyChanged("Extensions"); } }
 
         public RevitExtensionInfo() { }
 
@@ -171,4 +171,5 @@ namespace HOK.SmartBCF.Schemas
             }
         }
     }
+
 }

@@ -367,6 +367,7 @@ namespace HOK.SmartBCF.Schemas
             set
             {
                 this.dateField = value;
+                if (!modifiedDateFieldSpecified) { this.modifiedDateField = value; }
                 NotifyPropertyChanged("Date");
             }
         }

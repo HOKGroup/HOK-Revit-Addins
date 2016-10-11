@@ -22,6 +22,7 @@ namespace HOK.SmartBCF.Schemas
         private List<ClippingPlane> clippingPlanesField;
         private List<VisualizationInfoBitmaps> bitmapsField;
         private string viewPointGuidField = "";
+        private bool isPerspectiveField;
 
         public VisualizationInfo()
         {
@@ -31,6 +32,7 @@ namespace HOK.SmartBCF.Schemas
             this.perspectiveCameraField = new PerspectiveCamera();
             this.orthogonalCameraField = new OrthogonalCamera();
             this.componentsField = new ObservableCollection<Component>();
+            this.isPerspectiveField = false;
         }
 
         public VisualizationInfo(VisualizationInfo visInfo)
@@ -41,6 +43,7 @@ namespace HOK.SmartBCF.Schemas
             this.Lines = visInfo.Lines;
             this.ClippingPlanes = visInfo.ClippingPlanes;
             this.Bitmaps = visInfo.Bitmaps;
+            this.isPerspectiveField = visInfo.isPerspectiveField;
         }
 
         [System.Xml.Serialization.XmlArrayItemAttribute(IsNullable = false)]
@@ -54,14 +57,14 @@ namespace HOK.SmartBCF.Schemas
         public OrthogonalCamera OrthogonalCamera
         {
             get { return this.orthogonalCameraField; }
-            set { this.orthogonalCameraField = value; }
+            set { this.orthogonalCameraField = value; isPerspectiveField = (orthogonalCameraField.ViewToWorldScale != 0) ? false : true; }
         }
 
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
         public PerspectiveCamera PerspectiveCamera
         {
             get { return this.perspectiveCameraField; }
-            set { this.perspectiveCameraField = value; }
+            set { this.perspectiveCameraField = value; isPerspectiveField = (perspectiveCameraField.FieldOfView != 0) ? true : false; }
         }
 
         [System.Xml.Serialization.XmlArrayItemAttribute(IsNullable = false)]
@@ -90,6 +93,13 @@ namespace HOK.SmartBCF.Schemas
         {
             get { return this.viewPointGuidField; }
             set { this.viewPointGuidField = value; }
+        }
+
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool IsPersepective
+        {
+            get { return this.isPerspectiveField; }
+            set { this.isPerspectiveField = value; }
         }
 
         public virtual VisualizationInfo Clone()

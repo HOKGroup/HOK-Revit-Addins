@@ -568,7 +568,6 @@ namespace HOK.SmartBCF.BCFDBWriter
                 }
                 #endregion
 
-
                 #region Viewpoints
                 ObservableCollection<ViewPoint> viewpoints = markup.Viewpoints;
                 if (viewpoints.Count > 0)
@@ -729,8 +728,8 @@ namespace HOK.SmartBCF.BCFDBWriter
 
                             if (null != bitmap.Location)
                             {
-                                cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, File_Guid) VALUES " +
-                               "('" + bitmap.Location.Guid + "', " + bitmap.Location.X + ", " + bitmap.Location.Y + ", " + bitmap.Location.Z + ", '" + fileId + "')";
+                                cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, Viewpoints_Guid, File_Guid) VALUES " +
+                               "('" + bitmap.Location.Guid + "', " + bitmap.Location.X + ", " + bitmap.Location.Y + ", " + bitmap.Location.Z + ", '"+viewpoint_guid+"', '" + fileId + "')";
 
                                 try
                                 {
@@ -744,9 +743,9 @@ namespace HOK.SmartBCF.BCFDBWriter
 
                             if (null != bitmap.Normal && null != bitmap.Up)
                             {
-                                cmd.CommandText = "INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z, File_Guid) VALUES " +
-                                "('" + bitmap.Normal.Guid + "', " + bitmap.Normal.X + ", " + bitmap.Normal.Y + ", " + bitmap.Normal.Z + ", '" + fileId + "'), " +
-                                "('" + bitmap.Up.Guid + "', " + bitmap.Up.X + ", " + bitmap.Up.Y + ", " + bitmap.Up.Z + ", '" + fileId + "')";
+                                cmd.CommandText = "INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z, Viewpoints_Guid, File_Guid) VALUES " +
+                                "('" + bitmap.Normal.Guid + "', " + bitmap.Normal.X + ", " + bitmap.Normal.Y + ", " + bitmap.Normal.Z + ", '" + viewpoint_guid + "', '" + fileId + "'), " +
+                                "('" + bitmap.Up.Guid + "', " + bitmap.Up.X + ", " + bitmap.Up.Y + ", " + bitmap.Up.Z + ", '" +viewpoint_guid+"', '"+ fileId + "')";
 
                                 try
                                 {
@@ -820,8 +819,8 @@ namespace HOK.SmartBCF.BCFDBWriter
 
                             if (null != plane.Location)
                             {
-                                cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, File_Guid) VALUES " +
-                                "('" + plane.Location.Guid + "', " + plane.Location.X + ", " + plane.Location.Y + ", " + plane.Location.Z + ", '" + fileId + "')";
+                                cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, Viewpoints_Guid, File_Guid) VALUES " +
+                                "('" + plane.Location.Guid + "', " + plane.Location.X + ", " + plane.Location.Y + ", " + plane.Location.Z + ", '"+viewpoint_guid+"', '" + fileId + "')";
 
                                 try
                                 {
@@ -835,8 +834,8 @@ namespace HOK.SmartBCF.BCFDBWriter
 
                             if (null != plane.Direction)
                             {
-                                cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z, File_Guid) VALUES " +
-                                "('" + plane.Direction.Guid + "', " + plane.Direction.X + ", " + plane.Direction.Y + ", " + plane.Direction.Z + ", '" + fileId + "')";
+                                cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z, Viewpoints_Guid, File_Guid) VALUES " +
+                                "('" + plane.Direction.Guid + "', " + plane.Direction.X + ", " + plane.Direction.Y + ", " + plane.Direction.Z + ", '"+viewpoint_guid+"', '" + fileId + "')";
 
                                 try
                                 {
@@ -871,9 +870,9 @@ namespace HOK.SmartBCF.BCFDBWriter
                                     string message = cmd.CommandText + "\n" + ex.Message;
                                 }
 
-                                cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, File_Guid) VALUES " +
-                                    "('" + line.StartPoint.Guid + "', " + line.StartPoint.X + ", " + line.StartPoint.Y + ", " + line.StartPoint.Z + ",'" + fileId + "'), " +
-                                    "('" + line.EndPoint.Guid + "', " + line.EndPoint.X + ", " + line.EndPoint.Y + ", " + line.EndPoint.Z + ",'" + fileId + "')";
+                                cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, Viewpoints_Guid, File_Guid) VALUES " +
+                                    "('" + line.StartPoint.Guid + "', " + line.StartPoint.X + ", " + line.StartPoint.Y + ", " + line.StartPoint.Z + ",'" + viewpoint_guid + "', '" + fileId + "'), " +
+                                    "('" + line.EndPoint.Guid + "', " + line.EndPoint.X + ", " + line.EndPoint.Y + ", " + line.EndPoint.Z + ", '"+ viewpoint_guid+"', '" + fileId + "')";
 
                                 try
                                 {
@@ -911,8 +910,8 @@ namespace HOK.SmartBCF.BCFDBWriter
 
                         if (null != orthoCamera.CameraViewPoint)
                         {
-                            cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, File_Guid) VALUES " +
-                            "('" + orthoCamera.CameraViewPoint.Guid + "', " + orthoCamera.CameraViewPoint.X + ", " + orthoCamera.CameraViewPoint.Y + ", " + orthoCamera.CameraViewPoint.Z + ",'" + fileId + "')";
+                            cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, Viewpoints_Guid, File_Guid) VALUES " +
+                            "('" + orthoCamera.CameraViewPoint.Guid + "', " + orthoCamera.CameraViewPoint.X + ", " + orthoCamera.CameraViewPoint.Y + ", " + orthoCamera.CameraViewPoint.Z + ", '"+viewpoint_guid+"', '" + fileId + "')";
 
                             try
                             {
@@ -926,9 +925,9 @@ namespace HOK.SmartBCF.BCFDBWriter
 
                         if (null != orthoCamera.CameraDirection && null != orthoCamera.CameraUpVector)
                         {
-                            cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z, File_Guid) VALUES " +
-                            "('" + orthoCamera.CameraDirection.Guid + "', " + orthoCamera.CameraDirection.X + ", " + orthoCamera.CameraDirection.Y + ", " + orthoCamera.CameraDirection.Z + ",'" + fileId + "'), " +
-                            "('" + orthoCamera.CameraUpVector.Guid + "', " + orthoCamera.CameraUpVector.X + ", " + orthoCamera.CameraUpVector.Y + ", " + orthoCamera.CameraUpVector.Z + ", '" + fileId + "')";
+                            cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z, Viewpoints_Guid, File_Guid) VALUES " +
+                            "('" + orthoCamera.CameraDirection.Guid + "', " + orthoCamera.CameraDirection.X + ", " + orthoCamera.CameraDirection.Y + ", " + orthoCamera.CameraDirection.Z + ", '" +viewpoint_guid+"', '"+ fileId + "'), " +
+                            "('" + orthoCamera.CameraUpVector.Guid + "', " + orthoCamera.CameraUpVector.X + ", " + orthoCamera.CameraUpVector.Y + ", " + orthoCamera.CameraUpVector.Z + ", '"+viewpoint_guid+"', '" + fileId + "')";
 
                             try
                             {
@@ -967,8 +966,8 @@ namespace HOK.SmartBCF.BCFDBWriter
 
                         if (null != persCamera.CameraViewPoint)
                         {
-                            cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, File_Guid) VALUES " +
-                            "('" + persCamera.CameraViewPoint.Guid + "', " + persCamera.CameraViewPoint.X + ", " + persCamera.CameraViewPoint.Y + ", " + persCamera.CameraViewPoint.Z + ", '" + fileId + "')";
+                            cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Point (Guid, X, Y, Z, Viewpoints_Guid, File_Guid) VALUES " +
+                            "('" + persCamera.CameraViewPoint.Guid + "', " + persCamera.CameraViewPoint.X + ", " + persCamera.CameraViewPoint.Y + ", " + persCamera.CameraViewPoint.Z + ", '"+viewpoint_guid+"', '" + fileId + "')";
 
                             try
                             {
@@ -982,9 +981,9 @@ namespace HOK.SmartBCF.BCFDBWriter
 
                         if (null != persCamera.CameraDirection && null != persCamera.CameraUpVector)
                         {
-                            cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z, File_Guid) VALUES " +
-                            "('" + persCamera.CameraDirection.Guid + "', " + persCamera.CameraDirection.X + ", " + persCamera.CameraDirection.Y + ", " + persCamera.CameraDirection.Z + ", '" + fileId + "'), " +
-                            "('" + persCamera.CameraUpVector.Guid + "', " + persCamera.CameraUpVector.X + ", " + persCamera.CameraUpVector.Y + ", " + persCamera.CameraUpVector.Z + ", '" + fileId + "')";
+                            cmd.CommandText = @"INSERT OR " + mode.ToString() + " INTO Direction (Guid, X, Y, Z, Viewpoints_Guid, File_Guid) VALUES " +
+                            "('" + persCamera.CameraDirection.Guid + "', " + persCamera.CameraDirection.X + ", " + persCamera.CameraDirection.Y + ", " + persCamera.CameraDirection.Z + ", '"+viewpoint_guid+"', '" + fileId + "'), " +
+                            "('" + persCamera.CameraUpVector.Guid + "', " + persCamera.CameraUpVector.X + ", " + persCamera.CameraUpVector.Y + ", " + persCamera.CameraUpVector.Z + ", '" + viewpoint_guid + "', '" + fileId + "')";
 
                             try
                             {
@@ -1326,6 +1325,40 @@ namespace HOK.SmartBCF.BCFDBWriter
             return updated;
         }
 
+        public static bool UpdateTopicAssign(Topic topic)
+        {
+            bool updated = false;
+            if (null == sqlConnection) { return false; }
+
+            using (SQLiteTransaction trans = sqlConnection.BeginTransaction())
+            {
+                try
+                {
+                    using (SQLiteCommand cmd = sqlConnection.CreateCommand())
+                    {
+                        cmd.Transaction = trans;
+                        try
+                        {
+                            cmd.CommandText = @"UPDATE Topic SET AssignedTo = '" + topic.AssignedTo + "' WHERE Guid = '" + topic.Guid + "'";
+                            cmd.ExecuteNonQuery();
+                            updated = true;
+                        }
+                        catch (SQLiteException ex)
+                        {
+                            string message = ex.Message;
+                        }
+                    }
+                    trans.Commit();
+                }
+                catch (SQLiteException ex)
+                {
+                    trans.Rollback();
+                    string message = ex.Message;
+                }
+            }
+            return updated;
+        }
+
         public static bool InsertComment(Comment comment)
         {
             bool inserted = false;
@@ -1568,6 +1601,50 @@ namespace HOK.SmartBCF.BCFDBWriter
             return updated;
         }
 
+        public static bool ReplaceObsoleteExtensions(List<RevitExtension> extensions)
+        {
+           bool updated = false;
+           if (null == sqlConnection) { return false; }
+
+            using (SQLiteTransaction trans = sqlConnection.BeginTransaction())
+            {
+                try
+                {
+                    using (SQLiteCommand cmd = sqlConnection.CreateCommand())
+                    {
+                        cmd.Transaction = trans;
+                        try
+                        {
+                            foreach (RevitExtension ext in extensions)
+                            {
+                                if (ext.ParameterName.Contains("Action"))
+                                {
+                                    cmd.CommandText = @"UPDATE Components SET Action = '" + Guid.Empty.ToString() + "' WHERE Action = '" + ext.Guid + "'";
+                                }
+                                else if (ext.ParameterName.Contains("Responsibility"))
+                                {
+                                    cmd.CommandText = @"UPDATE Components SET Responsibility = '" + Guid.Empty.ToString() + "' WHERE Responsibility = '" + ext.Guid + "'";
+                                }
+                                cmd.ExecuteNonQuery();
+                            }
+                            updated = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            string message = ex.Message;
+                        }
+                    }
+                    trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    string message = ex.Message;
+                }
+            }
+            return updated;
+        }
+
         public static bool UpdateBCFFileInfo(ObservableCollection<BCFZIP> bcfFiles)
         {
             bool updated = false;
@@ -1593,6 +1670,182 @@ namespace HOK.SmartBCF.BCFDBWriter
 
                             cmd.Parameters.Clear();
                             updated = true;
+                        }
+                        catch (SQLiteException ex)
+                        {
+                            string message = ex.Message;
+                        }
+                    }
+                    trans.Commit();
+                }
+                catch (SQLiteException ex)
+                {
+                    trans.Rollback();
+                    string message = ex.Message;
+                }
+            }
+            return updated;
+        }
+
+        public static bool InsertViewPoint(string fileId, ViewPoint viewPoint)
+        {
+            bool inserted = false;
+            if (null == sqlConnection) { return false; }
+
+            using (SQLiteTransaction trans = sqlConnection.BeginTransaction())
+            {
+                try
+                {
+                    using (SQLiteCommand cmd = sqlConnection.CreateCommand())
+                    {
+                        cmd.Transaction = trans;
+                        try
+                        {
+                            cmd.Parameters.Add("@snapshotImage", DbType.Binary);
+
+                            cmd.CommandText = @"INSERT OR IGNORE INTO Viewpoints (Guid, Viewpoint, Snapshot, Snapshot_Image, Topic_Guid) VALUES " +
+                                   "('" + viewPoint.Guid + "', '" + viewPoint.Viewpoint + "', '" + viewPoint.Snapshot + "',  @snapshotImage, '" + viewPoint.TopicGuid + "')";
+
+                            cmd.Parameters["@snapshotImage"].Value = viewPoint.SnapshotImage;
+
+                            try
+                            {
+                                int insertedRows = cmd.ExecuteNonQuery();
+                            }
+                            catch (SQLiteException ex)
+                            {
+                                string message = cmd.CommandText + "/n" + ex.Message;
+                            }
+
+                            bool insertedVisInfo = InsertVisInfoValues(fileId, viewPoint, cmd, ConflictMode.IGNORE);
+                            cmd.Parameters.Clear();
+                            inserted = true;
+                        }
+                        catch (SQLiteException ex)
+                        {
+                            string message = ex.Message;
+                        }
+                    }
+                    trans.Commit();
+                }
+                catch (SQLiteException ex)
+                {
+                    trans.Rollback();
+                    string message = ex.Message;
+                }
+            }
+            return inserted;
+        }
+
+        public static bool DeleteViewPoint(string viewpoint_guid)
+        {
+            bool deleted = false;
+            using (SQLiteTransaction trans = sqlConnection.BeginTransaction())
+            {
+                try
+                {
+                    using (SQLiteCommand cmd = sqlConnection.CreateCommand())
+                    {
+                        cmd.Transaction = trans;
+                        try
+                        {
+                            cmd.CommandText = "DELETE FROM Viewpoints WHERE Guid ='" + viewpoint_guid + "'";
+                            try
+                            {
+                                int deletedRows = cmd.ExecuteNonQuery();
+                            }
+                            catch (SQLiteException ex)
+                            {
+                                string message = cmd.CommandText + "/n" + ex.Message;
+                            }
+
+                            bool deletedVisInfo = DeleteVisInfoValues(viewpoint_guid, cmd);
+
+                            deleted = true;
+                        }
+                        catch (SQLiteException ex)
+                        {
+                            string message = ex.Message;
+                        }
+                    }
+                    trans.Commit();
+                }
+                catch (SQLiteException ex)
+                {
+                    trans.Rollback();
+                    string message = ex.Message;
+                }
+            }
+            return deleted;
+        }
+
+        private static bool DeleteVisInfoValues(String viewpoint_guid, SQLiteCommand cmd)
+        {
+            bool inserted = false;
+            try
+            {
+                //Bitmaps
+                cmd.CommandText = "DELETE FROM Bitmaps WHERE Viewpoints_Guid ='" + viewpoint_guid + "'";
+                cmd.ExecuteNonQuery();
+
+                //Components
+                cmd.CommandText = "DELETE FROM Components WHERE Viewpoints_Guid ='" + viewpoint_guid + "'";
+                cmd.ExecuteNonQuery();
+
+                //ClippingPlane
+                cmd.CommandText = "DELETE FROM ClippingPlane WHERE Viewpoints_Guid ='" + viewpoint_guid + "'";
+                cmd.ExecuteNonQuery();
+
+                //Lines
+                cmd.CommandText = "DELETE FROM Lines WHERE Viewpoints_Guid ='" + viewpoint_guid + "'";
+                cmd.ExecuteNonQuery();
+
+                //OrthogonalCamera
+                cmd.CommandText = "DELETE FROM OrthogonalCamera WHERE Viewpoints_Guid ='" + viewpoint_guid + "'";
+                cmd.ExecuteNonQuery();
+
+                //PerspectiveCamera
+                cmd.CommandText = "DELETE FROM PerspectiveCamera WHERE Viewpoints_Guid ='" + viewpoint_guid + "'";
+                cmd.ExecuteNonQuery();
+
+                //Point
+                cmd.CommandText = "DELETE FROM Point WHERE Viewpoints_Guid ='" + viewpoint_guid + "'";
+                cmd.ExecuteNonQuery();
+
+                //Direction
+                cmd.CommandText = "DELETE FROM Direction WHERE Viewpoints_Guid ='" + viewpoint_guid + "'";
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to delete Visualization Information tables values.\n" + ex.Message, "Delete Visualization Information Tables Values", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            return inserted;
+        }
+
+        public static bool UpdateViewPointImage(ViewPoint viewPoint)
+        {
+            bool updated = false;
+            if (null == sqlConnection) { return false; }
+
+            using (SQLiteTransaction trans = sqlConnection.BeginTransaction())
+            {
+                try
+                {
+                    using (SQLiteCommand cmd = sqlConnection.CreateCommand())
+                    {
+                        cmd.Transaction = trans;
+                        try
+                        {
+                            cmd.Parameters.Add("@snapshotImage", DbType.Binary);
+                            cmd.CommandText = @"UPDATE Viewpoints SET Snapshot_Image = @snapshotImage WHERE Guid = '" + viewPoint.Guid + "'";
+                            cmd.Parameters["@snapshotImage"].Value = viewPoint.SnapshotImage;
+
+                            int updatedRows = cmd.ExecuteNonQuery();
+
+                            cmd.Parameters.Clear();
+                            updated = (updatedRows > 0) ? true : false;
                         }
                         catch (SQLiteException ex)
                         {

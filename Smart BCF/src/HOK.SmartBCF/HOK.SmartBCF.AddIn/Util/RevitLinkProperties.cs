@@ -40,6 +40,7 @@ namespace HOK.SmartBCF.AddIn.Util
             isLinked = false;
             linkedDocument = doc;
             ifcProjectGuid = ExporterIFCUtils.CreateProjectLevelGUID(linkedDocument, IFCProjectLevelGUIDType.Project);
+
         }
 
         public void CollectLinkInstanceInfo()
@@ -57,19 +58,12 @@ namespace HOK.SmartBCF.AddIn.Util
                     transformValue = m_instance.GetTotalTransform();
                 }
 
-#if RELEASE2014||RELEASE2015||RELEASE2016
                 linkedDocument = m_instance.GetLinkDocument();
                 if (null != linkedDocument)
                 {
                     linkDocTitle = linkedDocument.Title;
                 }
-#elif  RELEASE2013
-                linkedDocument = m_instance.Document;
-                if (null != linkedDocument)
-                {
-                    linkDocTitle = linkedDocument.Title;
-                }
-#endif
+
                 if (null != linkedDocument)
                 {
                     ifcProjectGuid = ExporterIFCUtils.CreateProjectLevelGUID(linkedDocument, IFCProjectLevelGUIDType.Project);
@@ -81,5 +75,6 @@ namespace HOK.SmartBCF.AddIn.Util
                 string message = ex.Message;
             }
         }
+
     }
 }

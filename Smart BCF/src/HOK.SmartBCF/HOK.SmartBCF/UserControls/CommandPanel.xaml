@@ -118,7 +118,7 @@
                     <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Convert</TextBlock>
                 </StackPanel>
             </Button>
-            <Button Width="80" Name="buttonComponent" IsEnabled="{Binding ComponentEnabled}" Style="{StaticResource commandButtonStyle}"
+            <Button Width="80" Name="buttonComponent" IsEnabled="{Binding IsAddInMode}" Style="{StaticResource commandButtonStyle}"
                         Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.ComponentCommand}">
                 <StackPanel Orientation="Vertical">
                     <Image Margin="0,0,0,5"  Height="32" Width="32"  Source="Images/elements.png" />

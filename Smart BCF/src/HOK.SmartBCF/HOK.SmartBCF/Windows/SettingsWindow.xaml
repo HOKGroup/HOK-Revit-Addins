@@ -102,10 +102,16 @@
                                 <RowDefinition Height="40"/>
                             </Grid.RowDefinitions>
                             <DataGrid x:Name="dataGridColor" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" VerticalContentAlignment="Center"
-                                      CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single">
+                                      CanUserAddRows="False" CanUserDeleteRows="False" SelectionMode="Single" BeginningEdit="dataGridColor_BeginningEdit">
                                 <DataGrid.Columns>
                                     <DataGridComboBoxColumn x:Name="comboBoxParameter" Header="Parameter Name" SelectedItemBinding="{Binding ParameterName}" Width="1*"/>
-                                    <DataGridTextColumn Header="Parameter Value" Binding="{Binding ParameterValue}" Width="1*"/>
+                                    <DataGridTextColumn Header="Parameter Value" Binding="{Binding ParameterValue}" Width="1*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
                                     <DataGridTemplateColumn Header="Color" Width="1*">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -120,13 +126,13 @@
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
-                                <Button x:Name="buttonAddItem" IsEnabled="False"  Style="{StaticResource colorButtonStyle}" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="buttonAddItem_Click">
+                                <Button x:Name="buttonAddItem"  Style="{StaticResource colorButtonStyle}" Margin="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="buttonAddItem_Click">
                                     <StackPanel  Orientation="Horizontal">
                                         <Image Width="20" Height="20" Source="Images/add.png" />
                                         <TextBlock TextAlignment="Center" Margin="10,0,0,0" Text="Add Item"/>
                                     </StackPanel>
                                 </Button>
-                                <Button x:Name="buttonDeleteItem" IsEnabled="False" Grid.Column="2" Style="{StaticResource colorButtonStyle}" Margin="5"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="buttonDeleteItem_Click">
+                                <Button x:Name="buttonDeleteItem" Grid.Column="2" Style="{StaticResource colorButtonStyle}" Margin="5"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Click="buttonDeleteItem_Click">
                                     <StackPanel Orientation="Horizontal">
                                         <Image Width="20" Height="20" Source="Images/cancel.png" />
                                         <TextBlock TextAlignment="Center" Margin="10,0,0,0" Text="Delete Item"/>
@@ -153,7 +159,7 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <Button x:Name="buttonApply" Content="Apply" HorizontalAlignment="Right" Margin="10,5,10,10" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="25" Click="buttonApply_Click"/>
-        <Button x:Name="buttonCancel" Content="Cancel" HorizontalAlignment="Right" Margin="0,5,90,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="25" Click="buttonCancel_Click"/>
+        <Button x:Name="buttonApply" Style="{StaticResource colorButtonStyle}" Content="Apply" HorizontalAlignment="Right" Margin="10,5,10,10" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="25" Click="buttonApply_Click"/>
+        <Button x:Name="buttonCancel" Style="{StaticResource colorButtonStyle}" Content="Cancel" HorizontalAlignment="Right" Margin="0,5,90,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Height="25" Click="buttonCancel_Click"/>
     </Grid>
 </Window>

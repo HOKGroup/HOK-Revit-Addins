@@ -6,6 +6,7 @@ using HOK.SmartBCF.AddIn.Util;
 using HOK.SmartBCF.Schemas;
 using HOK.SmartBCF.UserControls;
 using HOK.SmartBCF.Utils;
+using HOK.SmartBCF.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,21 +25,25 @@ namespace HOK.SmartBCF.AddIn
         private ExternalEvent m_event;
         private BCFViewModel bcfViewModel;
         private ComponentViewModel componentViewModel;
-        private Dictionary<string/*ifcGuid*/, RoomProperties> roomDictionary = new Dictionary<string, RoomProperties>();
+        private AddViewModel addViewModel;
         private Dictionary<string/*ifcProjectGuid*/, RevitLinkProperties> linkDictionary = new Dictionary<string, RevitLinkProperties>();
+        private Dictionary<string/*ifcGuid*/, RevitComponent> compDictionary = new Dictionary<string, RevitComponent>();
 
         private RelayCommand componentCommad;
         private RelayCommand issueChangedCommand;
         private RelayCommand componentChangedCommand;
+        private RelayCommand addViewCommand;
 
         public BCFViewModel BCFView { get { return bcfViewModel; } set { bcfViewModel = value; } }
         public ComponentViewModel ComponentView { get { return componentViewModel; } set { componentViewModel = value; } }
-        public Dictionary<string, RoomProperties> RoomDictionary { get { return roomDictionary; } set { roomDictionary = value; } }
+        public AddViewModel AddView { get { return addViewModel; } set { addViewModel = value; } }
         public Dictionary<string, RevitLinkProperties> LinkDictionary { get { return linkDictionary; } set { linkDictionary = value; } }
+        public Dictionary<string, RevitComponent> CompDictionary { get { return compDictionary; } set { compDictionary = value; } }
 
         public ICommand ComponentCommand { get { return componentCommad; } }
         public ICommand IssueChangedCommand { get { return issueChangedCommand; } }
         public ICommand ComponentChangedCommand { get { return componentChangedCommand; } }
+        public ICommand AddViewCommand { get { return addViewCommand; } }
 
         public WindowViewModel(ExternalEvent exEvent, BCFHandler handler)
         {
@@ -46,43 +51,12 @@ namespace HOK.SmartBCF.AddIn
             m_handler = handler;
             bcfViewModel = new BCFViewModel(true);
             linkDictionary = CollectLinkInfo();
-            roomDictionary = CollectRoomInfo();
+            compDictionary = CollectElementInfo();
 
             componentCommad = new RelayCommand(param => this.ComponentExecuted(param));
             issueChangedCommand = new RelayCommand(param => this.IssueChanged(param));
             componentChangedCommand = new RelayCommand(param => this.ComponentChanged(param));
-        }
-
-        public Dictionary<string, RoomProperties> CollectRoomInfo()
-        {
-            Dictionary<string, RoomProperties> dictionary = new Dictionary<string, RoomProperties>();
-            try
-            {
-                foreach (RevitLinkProperties link in linkDictionary.Values)
-                {
-                    Document doc = link.LinkedDocument;
-                    if (null != doc)
-                    {
-                        FilteredElementCollector collector = new FilteredElementCollector(doc);
-                        List<Room> rooms = collector.OfCategory(BuiltInCategory.OST_Rooms).ToElements().Cast<Room>().ToList();
-
-                        foreach (Room room in rooms)
-                        {
-                            RoomProperties rp = new RoomProperties(room, link);
-                            if (!string.IsNullOrEmpty(rp.IfcGuid) && !dictionary.ContainsKey(rp.IfcGuid))
-                            {
-                                dictionary.Add(rp.IfcGuid, rp);
-                            }
-                        }
-                    }
-                    
-                }                
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-            return dictionary;
+            addViewCommand = new RelayCommand(param => this.AddViewCommandExecuted(param));
         }
 
         public Dictionary<string, RevitLinkProperties> CollectLinkInfo()
@@ -117,13 +91,60 @@ namespace HOK.SmartBCF.AddIn
             return dictionary;
         }
 
+        public Dictionary<string, RevitComponent> CollectElementInfo()
+        {
+            Dictionary<string, RevitComponent> dictionary = new Dictionary<string, RevitComponent>();
+            try
+            {
+                foreach (RevitLinkProperties rlp in linkDictionary.Values)
+                {
+                    Document doc = rlp.LinkedDocument;
+                    FilteredElementCollector collector = new FilteredElementCollector(doc);
+                    IList<Element> foundElements = collector
+                        .WhereElementIsNotElementType()
+                        .WhereElementIsViewIndependent()
+                        .WherePasses(new LogicalOrFilter(new ElementIsElementTypeFilter(false), new ElementIsElementTypeFilter(true))).ToElements();
+                    
+                    var distinctElements = from elem in foundElements select elem;
+#if RELEASE2014
+                    var elementsFiltered = from elem in distinctElements where null != elem.Category select elem;
+#else
+                    var elementsFiltered = from elem in distinctElements where null != elem.Category && elem.Category.CategoryType == CategoryType.Model select elem;
+#endif
+
+                    if (elementsFiltered.Count() > 0)
+                    {
+                        foreach (Element element in elementsFiltered)
+                        {
+                            RevitComponent rvtComp = new RevitComponent()
+                            {
+                                ElementId=element.Id,
+                                IfcGuid = element.IfcGUID(),
+                                IfcProjectGuid = rlp.IfcProjectGuid
+                            };
+
+                            if (!dictionary.ContainsKey(rvtComp.IfcGuid))
+                            {
+                                dictionary.Add(rvtComp.IfcGuid, rvtComp);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+            return dictionary;
+        }
+
         public void ComponentExecuted(object param)
         {
             try
             {
                 if (componentViewModel == null)
                 {
-                    componentViewModel = new ComponentViewModel(bcfViewModel, roomDictionary, linkDictionary, m_handler, m_event);
+                    componentViewModel = new ComponentViewModel(bcfViewModel, linkDictionary, compDictionary, m_handler, m_event);
                     if (componentViewModel.RvtComponents.Count > 0)
                     {
                         ComponentWindow compWindow = new ComponentWindow(componentViewModel);
@@ -189,9 +210,29 @@ namespace HOK.SmartBCF.AddIn
             }
         }
 
+        public void AddViewCommandExecuted(object param)
+        {
+            try
+            {
+                if (addViewModel == null)
+                {
+                    addViewModel = new AddViewModel(bcfViewModel, m_event, m_handler);
+                    AddViewWindow viewWindow = new AddViewWindow();
+                    viewWindow.DataContext = addViewModel;
+                    viewWindow.Closed += WindowClosed;
+                    viewWindow.Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
         public void WindowClosed(object sender, System.EventArgs e)
         {
             componentViewModel = null;
+            addViewModel = null;
         }
 
     }

@@ -15,6 +15,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using HOK.SmartBCF.Schemas;
 using HOK.SmartBCF.Utils;
+using HOK.SmartBCF.Windows;
+using System.IO;
+using System.Diagnostics;
 
 namespace HOK.SmartBCF.UserControls
 {
@@ -44,6 +47,7 @@ namespace HOK.SmartBCF.UserControls
             comboBoxTopicType.ItemsSource = topicTypes;
             comboBoxTopicStatus.ItemsSource = null;
             comboBoxTopicStatus.ItemsSource = topicStatus;
+            
 
             bool foucsed = buttonForward.Focus();
             loadedUI = true;
@@ -299,6 +303,20 @@ namespace HOK.SmartBCF.UserControls
             }
         }
 
+        private void textBoxAssignedTo_LostFocus(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (!loadedUI) { return; }
+                selectedMarkup.Topic.AssignedTo = textBoxAssignedTo.Text;
+                bool updated = BCFDBWriter.BCFDBWriter.UpdateTopicAssign(selectedMarkup.Topic);
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
         private void comboBoxAction_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
@@ -344,5 +362,103 @@ namespace HOK.SmartBCF.UserControls
             }
         }
 
+        private void buttonNext_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int vpIndex = selectedMarkup.Viewpoints.IndexOf(selectedMarkup.SelectedViewpoint);
+                if (vpIndex < selectedMarkup.Viewpoints.Count - 1)
+                {
+                    vpIndex++;
+                    selectedMarkup.SelectedViewpoint = selectedMarkup.Viewpoints[vpIndex];
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void buttonBack_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                int vpIndex = selectedMarkup.Viewpoints.IndexOf(selectedMarkup.SelectedViewpoint);
+                if (vpIndex > 0)
+                {
+                    selectedMarkup.SelectedViewpoint = selectedMarkup.Viewpoints[vpIndex - 1];
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void buttonDeleteView_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                bool deleted = BCFDBWriter.BCFDBWriter.DeleteViewPoint(selectedMarkup.SelectedViewpoint.Guid);
+                int vpIndex = selectedMarkup.Viewpoints.IndexOf(selectedMarkup.SelectedViewpoint);
+                selectedMarkup.Viewpoints.RemoveAt(vpIndex);
+                selectedMarkup.SelectedViewpoint = null;
+                if (selectedMarkup.Viewpoints.Count > 0)
+                {
+                    selectedMarkup.SelectedViewpoint = selectedMarkup.Viewpoints[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void buttonEditView_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                byte[] imageArray = selectedMarkup.SelectedViewpoint.SnapshotImage;
+                string tempImg = ImageUtil.ConvertToImageFile(imageArray);
+                if (!string.IsNullOrEmpty(tempImg))
+                {
+                    Process paint = new Process();
+                    ProcessStartInfo paintInfo = new ProcessStartInfo(tempImg);
+                    paintInfo.Verb = "edit";
+                    paint.StartInfo = paintInfo;
+                    paint.Start();
+                    paint.WaitForExit();
+
+                    //addViewPoint
+                    EditViewPoint(tempImg);
+                    File.Delete(tempImg);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                string messag = ex.Message;
+            }
+        }
+
+        private void EditViewPoint(string tempImg)
+        {
+            try
+            {
+                byte[] imgArray = ImageUtil.GetImageArray(tempImg);
+
+                int vpIndex = selectedMarkup.Viewpoints.IndexOf(selectedMarkup.SelectedViewpoint);
+                selectedMarkup.Viewpoints[vpIndex].SnapshotImage = imgArray;
+                selectedMarkup.SelectedViewpoint = selectedMarkup.Viewpoints[vpIndex];
+
+                bool dbUpdated = BCFDBWriter.BCFDBWriter.UpdateViewPointImage(selectedMarkup.SelectedViewpoint);
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        
     }
 }

@@ -186,6 +186,7 @@ namespace HOK.SmartBCF.Properties {
         ///	`X`	REAL,
         ///	`Y`	REAL,
         ///	`Z`	REAL,
+        ///	`Viewpoints_Guid`	TEXT,
         ///	`File_Guid`	INTEGER,
         ///	PRIMARY KEY(Guid),
         ///	FOREIGN KEY(`File_Guid`) REFERENCES BCFFileInfo ( Guid )
@@ -306,6 +307,7 @@ namespace HOK.SmartBCF.Properties {
         ///	`X`	REAL,
         ///	`Y`	REAL,
         ///	`Z`	REAL,
+        ///	`Viewpoints_Guid`	TEXT,
         ///	`File_Guid`	TEXT,
         ///	PRIMARY KEY(Guid),
         ///	FOREIGN KEY(`File_Guid`) REFERENCES BCFFileInfo ( Guid )

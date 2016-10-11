@@ -8,7 +8,7 @@
              xmlns:aut ="clr-namespace:HOK.SmartBCF.AddIn.Util"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
-             Height="600" Width="450" MinHeight="600" MinWidth="450" MaxHeight="600" MaxWidth="450" Title="Revit Elements" Icon="Resources/hoklogo.ico" WindowStartupLocation="CenterScreen" UseLayoutRounding="True">
+             Height="700" Width="450" MinHeight="700" MinWidth="450" MaxHeight="700" MaxWidth="450" Title="Revit Elements" Icon="Resources/hoklogo.ico" WindowStartupLocation="CenterScreen" UseLayoutRounding="True">
     <Window.Resources>
         <ut:ColorConverter x:Key="colorConverter"/>
         <ut:ExtensionFilterConverter x:Key="extensionConverter"/>
@@ -151,6 +151,10 @@
                     <RowDefinition Height="20"/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="120"/>
@@ -158,11 +162,14 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="BCF Name: " HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
                 <Label Content="Topic: " Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <Label Content="Comment: " Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <Label Content="Author: " Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <Label Content="Date: " Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <Label Content="Action: " Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                <Label Content="Responsibility: " Grid.Row="7" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Label Content="Topic Type: " Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Label Content="Topic Status: " Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Label Content="Assigned To: " Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Label Content="Comment: " Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Label Content="Author: " Grid.Row="7" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Label Content="Date: " Grid.Row="8" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Label Content="Action: " Grid.Row="10" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Label Content="Responsibility: " Grid.Row="11" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0"/>
 
                 <TextBlock x:Name="textBlockBCFName" Margin="5,0,15,0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextWrapping="Wrap"
                            Text="{Binding SelectedBCF.ZipFileName}"/>
@@ -171,13 +178,19 @@
                            Text="{Binding SelectedMarkup.Topic.Title}"/>
                 </ScrollViewer>
 
-                <ComboBox x:Name="comboBoxComment" Margin="5,0,15,0" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Transparent" Height="27"
+                <TextBlock x:Name="textBlockTopicType" Margin="5,0,15,0" Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Text="{Binding SelectedMarkup.Topic.TopicType}"/>
+                <TextBlock x:Name="textBlockTopicStatus" Margin="5,0,15,0" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Text="{Binding SelectedMarkup.Topic.TopicStatus}"/>
+                <TextBlock x:Name="textBlockAssignedTo" Margin="5,0,15,0" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextWrapping="Wrap"
+                           Text="{Binding SelectedMarkup.Topic.AssignedTo}"/>
+                <ComboBox x:Name="comboBoxComment" Margin="5,0,15,0" Grid.Column="1" Grid.Row="6" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Transparent" Height="27"
                           ItemsSource="{Binding Comments}" DisplayMemberPath="Comment1" SelectedItem="{Binding SelectedComment}"/>
-                <TextBlock x:Name="textBlockAuthor" Margin="5,0,15,0" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextWrapping="Wrap"
+                <TextBlock x:Name="textBlockAuthor" Margin="5,0,15,0" Grid.Column="1" Grid.Row="7" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextWrapping="Wrap"
                            Text="{Binding ElementName=comboBoxComment, Path=SelectedItem.ModifiedAuthor}"/>
-                <TextBlock x:Name="textBlockDate"  Margin="5,0,15,0" Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextWrapping="Wrap"
+                <TextBlock x:Name="textBlockDate"  Margin="5,0,15,0" Grid.Column="1" Grid.Row="8" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextWrapping="Wrap"
                             Text="{Binding ElementName=comboBoxComment, Path=SelectedItem.ModifiedDate}"/>
-                <ComboBox x:Name="comboBoxAction" Margin="5,0,15,0" Grid.Column="1" Grid.Row="6" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Transparent" Height="27"
+                <ComboBox x:Name="comboBoxAction" Margin="5,0,15,0" Grid.Column="1" Grid.Row="10" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Transparent" Height="27"
                           ItemsSource="{Binding SelectedBCF.ExtensionColor.Extensions, Converter={StaticResource extensionConverter}, ConverterParameter={StaticResource action}}" 
                           SelectedItem="{Binding ElementName=comboBoxComponent, Path=SelectedItem.Action}" ItemTemplate="{StaticResource extensionTemplate}">
                     <i:Interaction.Triggers>
@@ -186,7 +199,7 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </ComboBox>
-                <ComboBox x:Name="comboBoxResponsibility" Margin="5,0,15,0" Grid.Column="1" Grid.Row="7" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Transparent" Height="27"
+                <ComboBox x:Name="comboBoxResponsibility" Margin="5,0,15,0" Grid.Column="1" Grid.Row="11" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Transparent" Height="27"
                           ItemsSource="{Binding SelectedBCF.ExtensionColor.Extensions, Converter={StaticResource extensionConverter}, ConverterParameter={StaticResource responsibility}}" 
                           SelectedItem="{Binding ElementName=comboBoxComponent, Path=SelectedItem.Responsibility}" ItemTemplate="{StaticResource extensionTemplate}">
                     <i:Interaction.Triggers>

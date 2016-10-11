@@ -64,12 +64,57 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="viewButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#333333"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Name="Chrome"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                SnapsToDevicePixels="true">
+                            <ContentPresenter Name="Presenter" Margin="{TemplateBinding Padding}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    RecognizesAccessKey="True"
+                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#333333" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1ba1e2" />
+                                <Setter Property="BorderBrush" Value="#1ba1e2" />
+                                <Setter Property="Foreground" Value="#ffffff" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#1ba1e2" />
+                                <Setter Property="BorderBrush" Value="#1ba1e2"/>
+                                <Setter Property="Foreground" Value="#ffffff"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="true">
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#1ba1e2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <ut:ImageSourceConverter x:Key="imageConverter"/>
         <ut:CommentFilterConverter x:Key="commentConverter"/>
         <ut:ComponentFilterConverter x:Key="componentConverter"/>
         <ut:ColorConverter x:Key="colorConverter"/>
         <ut:IndexConverter x:Key="indexConverter"/>
         <ut:ExtensionFilterConverter x:Key="extensionConverter"/>
+        <ut:ViewPointIndexConverter x:Key="viewPointIndexConverter"/>
         <sys:String x:Key="action">BCF_Action</sys:String>
         <sys:String x:Key="responsibility">BCF_Responsibility</sys:String>
         <DataTemplate x:Key="extensionTemplate">
@@ -177,9 +222,10 @@
                     <RowDefinition/>
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
-                <Image x:Name="imageSnapshot" Panel.ZIndex="1" Margin="7" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                <Image x:Name="imageSnapshot" Panel.ZIndex="1" Margin="45" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                        Source="{Binding ElementName=comboBoxIssue, Path=SelectedItem.SelectedViewpoint.SnapshotImage, Converter={StaticResource imageConverter}}" Stretch="Uniform"/>
-                <Button x:Name="buttonView" Tag="Expand" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,20,10" Background="{x:Null}" BorderBrush="{x:Null}" Click="buttonView_Click">
+                <Button x:Name="buttonView" Tag="Expand" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" 
+                        Width="30" Height="30" Margin="10,10,20,10" Style="{StaticResource viewButtonStyle}" Click="buttonView_Click">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Image Height="24" Width="24" Tag="{Binding Tag, ElementName=buttonView}">
@@ -187,11 +233,11 @@
                                     <Style TargetType="{x:Type Image}">
                                         <Style.Triggers>
                                             <Trigger Property="Tag" Value="Expand">
-                                                <Setter Property="Source" Value="Images/zoom_in.png"/>
+                                                <Setter Property="Source" Value="Images/magnifier32.png"/>
                                                 <Setter Property="ToolTip" Value="Zoom In"/>
                                             </Trigger>
                                             <Trigger Property="Tag" Value="Collapse">
-                                                <Setter Property="Source" Value="Images/zoom_out.png"/>
+                                                <Setter Property="Source" Value="Images/magnifier32.png"/>
                                                 <Setter Property="ToolTip" Value="Zoom Out"/>
                                             </Trigger>
                                         </Style.Triggers>
@@ -201,29 +247,41 @@
                         </ControlTemplate>
                     </Button.Template>
                 </Button>
-                <Button x:Name="buttonDeleteView" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,55,10" 
-                        Background="{x:Null}" BorderBrush="{x:Null}" ToolTip="Delete View">
-                    <Image Source="Images/minus.png" Width="24" Height="24" IsEnabled="False"/>
+                <Button x:Name="buttonAddView" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,125,10" 
+                        Style="{StaticResource viewButtonStyle}"  ToolTip="Add View"
+                        Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=DataContext.AddViewCommand}">
+                    <Image Source="Images/add32.png" Width="24" Height="24" />
                 </Button>
                 <Button x:Name="buttonEditView" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,90,10" 
-                        Background="{x:Null}" BorderBrush="{x:Null}" ToolTip="Edit Markup">
-                    <Image Source="Images/pencil.png" Width="24" Height="24" IsEnabled="False"/>
+                        Style="{StaticResource viewButtonStyle}" ToolTip="Edit View" Click="buttonEditView_Click">
+                    <Image Source="Images/edit32.png" Width="24" Height="24"/>
                 </Button>
-                <Button x:Name="buttonAddView" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,125,10" 
-                        Background="{x:Null}" BorderBrush="{x:Null}" ToolTip="Add View">
-                    <Image Source="Images/plus.png" Width="24" Height="24" IsEnabled="False"/>
+                <Button x:Name="buttonDeleteView" Panel.ZIndex="2" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Margin="10,10,55,10" 
+                        Style="{StaticResource viewButtonStyle}" ToolTip="Delete View" Click="buttonDeleteView_Click">
+                    <Image Source="Images/cancel32.png" Width="24" Height="24"/>
                 </Button>
-                <Button x:Name="buttonBack" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="5,0,0,0" Background="Transparent" BorderBrush="Transparent">
+                <Button x:Name="buttonBack" HorizontalAlignment="Left" VerticalAlignment="Center" Height="36" Width="36" Margin="5,0,0,0" 
+                        Style="{StaticResource viewButtonStyle}" Click="buttonBack_Click">
                     <Image Height="32" Width="32" Source="Images/arrow_left.png"/>
                 </Button>
-                <Button x:Name="buttonNext" HorizontalAlignment="Right" VerticalAlignment="Center" Height="36" Width="36" Margin="0,0,5,0" Background="Transparent" BorderBrush="Transparent">
+                <Button x:Name="buttonNext" HorizontalAlignment="Right" VerticalAlignment="Center" Height="36" Width="36" Margin="0,0,5,0" 
+                        Style="{StaticResource viewButtonStyle}" Click="buttonNext_Click">
                     <Image Height="32" Width="32" Source="Images/arrow_right.png" />
                 </Button>
+                <TextBlock x:Name="textBlockViewPointIndex" HorizontalAlignment="Center" Margin="0,0,0,10" TextWrapping="Wrap" VerticalAlignment="Bottom" FontStyle="Italic">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource viewPointIndexConverter}">
+                            <Binding ElementName="comboBoxIssue" Path="SelectedItem"/>
+                            <Binding ElementName="comboBoxIssue" Path="SelectedItem.SelectedViewpoint"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
             </Grid>
 
             <Grid x:Name="commentGrid"  Visibility="Visible" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"
                   DataContext="{Binding ElementName=comboBoxIssue, Path=SelectedItem}">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
                     <RowDefinition Height="40"/>
                     <RowDefinition/>
                     <RowDefinition Height="40"/>
@@ -234,13 +292,22 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Label HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7" Content="Topic Type:"/>
-                    <ComboBox x:Name="comboBoxTopicType" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="80,0,10,0" Height="27" 
+                    <ComboBox x:Name="comboBoxTopicType" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="90,0,10,0" Height="27" 
                               Background="White" BorderBrush="#cccccc" SelectedItem="{Binding Topic.TopicType}" SelectionChanged="comboBoxTopicType_SelectionChanged"/>
                     <Label Grid.Column="1" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Center" Margin="7" Content="Topic Status:"/>
                     <ComboBox x:Name="comboBoxTopicStatus"  Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="85,0,10,0" Height="27" 
                               Background="White" BorderBrush="#cccccc" SelectedItem="{Binding Topic.TopicStatus}" SelectionChanged="comboBoxTopicStatus_SelectionChanged"/>
                 </Grid>
-                <DataGrid x:Name="dataGridComment" Grid.Row="1" Margin="10,10,10,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HeadersVisibility="Column" CanUserAddRows="False"
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label HorizontalAlignment="Left" VerticalAlignment="Center" Margin="7" Content="Assigned To:"/>
+                    <TextBox x:Name="textBoxAssignedTo" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,0,10,0" Height="27" Text="{Binding Topic.AssignedTo}" LostFocus="textBoxAssignedTo_LostFocus"/>
+                </Grid>
+                
+                <DataGrid x:Name="dataGridComment" Grid.Row="2" Margin="10,10,10,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HeadersVisibility="Column" CanUserAddRows="False"
                       SelectionUnit="FullRow" SelectionMode="Single" CanUserDeleteRows="False" CellEditEnding="dataGridComment_CellEditEnding">
                     <DataGrid.ItemsSource>
                         <MultiBinding Converter="{StaticResource commentConverter}">
@@ -254,7 +321,7 @@
                         <DataGridTextColumn IsReadOnly="True" Header="Modified Date" Width="1*" Binding="{Binding Path=ModifiedDate}"/>
                     </DataGrid.Columns>
                 </DataGrid>
-                <Grid Grid.Row="2">
+                <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
