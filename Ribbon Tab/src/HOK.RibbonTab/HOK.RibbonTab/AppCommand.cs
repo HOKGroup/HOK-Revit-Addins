@@ -191,6 +191,34 @@ namespace HOK.RibbonTab
                         AddToolTips(pb25);
                         utilityExist = true;
                     }
+
+                    if (File.Exists(currentDirectory + "/HOK.RenameFamily.dll"))
+                    {
+                        PushButton pb26 = splitButton.AddPushButton(new PushButtonData("Rename Family", "Rename Family", currentDirectory + "/HOK.RenameFamily.dll", "HOK.RenameFamily.RenameCommand")) as PushButton;
+                        pb26.LargeImage = LoadBitmapImage(assembly, "update.png");
+                        pb26.ToolTip = "Rename families and types as assigned in .csv file.";
+                        AddToolTips(pb26);
+                        utilityExist = true;
+                    }
+
+                    if (File.Exists(currentDirectory + "/HOK.XYZLocator.dll"))
+                    {
+                        PushButton pb27 = splitButton.AddPushButton(new PushButtonData("XYZ Locator", "XYZ Locator", currentDirectory + "/HOK.XYZLocator.dll", "HOK.XYZLocator.XYZCommand")) as PushButton;
+                        pb27.LargeImage = LoadBitmapImage(assembly, "location.ico");
+                        pb27.ToolTip = "Report location of a 3D family using shared coordinates";
+                        AddToolTips(pb27);
+                        utilityExist = true;
+                    }
+
+                    if (File.Exists(currentDirectory + "/HOK.RoomMeasure.dll"))
+                    {
+                        PushButton pb28 = splitButton.AddPushButton(new PushButtonData("Room W X L", "Room W X L", currentDirectory + "/HOK.RoomMeasure.dll", "HOK.RoomMeasure.MeasureCommand")) as PushButton;
+                        pb28.LargeImage = LoadBitmapImage(assembly, "kruler.png");
+                        pb28.ToolTip = "Measuring the width and length of all rooms in the project"; 
+                        AddToolTips(pb28);
+                        utilityExist = true;
+                    }
+
                 }
                 if (!utilityExist)
                 {

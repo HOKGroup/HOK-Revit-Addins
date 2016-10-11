@@ -77,7 +77,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
-	<Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2017'">
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2017'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -214,6 +214,9 @@
     <Content Include="Resources\HOK.Tooltip.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Resources\kruler.png" />
+    <EmbeddedResource Include="Resources\location.ico" />
+    <EmbeddedResource Include="Resources\update.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
