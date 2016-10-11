@@ -123,7 +123,7 @@ namespace HOK.RoomElevation
 
                         //LocationPoint locationPoint = m_room.Location as LocationPoint;
                         //markerLocation = locationPoint.Point;
-#if RELEASE2014||RELEASE2015 || RELEASE2016
+#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                         if (m_room.Document.IsLinked)
                         {
                             var documents = from doc in linkedDocuments.Values where doc.DocumentTitle == m_room.Document.Title select doc;
@@ -183,7 +183,7 @@ namespace HOK.RoomElevation
 
 #if RELEASE2013 || RELEASE2014
                                 Parameter param = viewElevation.get_Parameter("Title on Sheet");
-#elif RELEASE2015 ||RELEASE2016
+#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                                 Parameter param = viewElevation.LookupParameter("Title on Sheet");
 #endif
                                 if (null != param)
@@ -258,7 +258,7 @@ namespace HOK.RoomElevation
                         
                         //LocationPoint locationPoint = m_room.Location as LocationPoint;
                         //markerLocation = locationPoint.Point;
-#if RELEASE2014||RELEASE2015 || RELEASE2016
+#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                         if (m_room.Document.IsLinked)
                         {
                             var documents = from doc in linkedDocuments.Values where doc.DocumentTitle == m_room.Document.Title select doc;
@@ -300,7 +300,7 @@ namespace HOK.RoomElevation
 
 #if RELEASE2013 || RELEASE2014
                                     Parameter param = viewElevation.get_Parameter("Title on Sheet");
-#elif RELEASE2015 ||RELEASE2016
+#elif RELEASE2015 ||RELEASE2016|| RELEASE2017
                                     Parameter param = viewElevation.LookupParameter("Title on Sheet");
 #endif
                                     if (null != param)
@@ -425,7 +425,7 @@ namespace HOK.RoomElevation
             {
 #if RELEASE2013 || RELEASE2014
                 Parameter param = room.get_Parameter(parameterName);
-#elif RELEASE2015 ||RELEASE2016
+#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                 Parameter param = room.LookupParameter(parameterName);
 #endif
                 if (null != param)
@@ -556,7 +556,7 @@ namespace HOK.RoomElevation
             {
                 LocationCurve locationCurve = m_wall.Location as LocationCurve;
                 Curve curve = locationCurve.Curve;
-#if RELEASE2014||RELEASE2015 || RELEASE2016 
+#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                 if (m_wall.Document.IsLinked)
                 {
                     var documents = from doc in linkedDocuments.Values where doc.DocumentTitle == m_wall.Document.Title select doc;
@@ -643,7 +643,7 @@ namespace HOK.RoomElevation
                 XYZ point2 = new XYZ(markerPoint.X, markerPoint.Y, markerPoint.Z + 10);
 #if RELEASE2013
                 Line axis = m_app.Application.Create.NewLineBound(point1, point2);
-#elif RELEASE2014 || RELEASE2015 ||RELEASE2016
+#elif RELEASE2014 || RELEASE2015 ||RELEASE2016 || RELEASE2017
                 Line axis = Line.CreateBound(point1, point2);
 #endif
 
@@ -667,7 +667,7 @@ namespace HOK.RoomElevation
                 GeometryElement geomElement = m_room.ClosedShell;
                 if (null != geomElement)
                 {
-#if RELEASE2014||RELEASE2015 || RELEASE2016 
+#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                     if (null != roomLink)
                     {
                         geomElement = geomElement.GetTransformed(roomLink.TransformValue);

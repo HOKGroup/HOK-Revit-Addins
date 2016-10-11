@@ -76,7 +76,7 @@ namespace HOK.RoomElevation
             instanceId = instance.Id.IntegerValue;
 #if RELEASE2013
             linkedDocument = instance.Document;
-#elif RELEASE2014 || RELEASE2015 || RELEASE2016
+#elif RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
             linkedDocument = instance.GetLinkDocument();
 #endif
             documentTitle = linkedDocument.Title;
