@@ -39,7 +39,7 @@ namespace HOK.RoomMeasure
                 {
                     MessageBox.Show("Room Parameter [" + roomWidthParamName + "] doesn't exist.\n Please add room parameters before running this tool.", "Room Parameter Missing", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-#elif RELEASE2015||RELEASE2016
+#elif RELEASE2015||RELEASE2016 || RELEASE2017
                 Parameter parameter = room.LookupParameter(roomWidthParamName);
                 if (null != parameter)
                 {
@@ -79,8 +79,12 @@ namespace HOK.RoomMeasure
                 {
                     geoList = solidGeometries.ToList();
                 }
-
+#if RELEASE2017
+                roomShape = DirectShape.CreateElement(room.Document, room.Category.Id);
+#else
                 roomShape = DirectShape.CreateElement(room.Document, room.Category.Id, "Measure", room.UniqueId);
+#endif
+
                 roomShape.SetShape(geoList);
             }
             catch (Exception ex)
