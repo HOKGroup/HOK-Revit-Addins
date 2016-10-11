@@ -148,7 +148,7 @@ namespace HOK.XYZLocator
             bool result = false;
             try
             {
-               #if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                 Parameter param = instance.LookupParameter(paramName);
                 if (null != param)
                 {
