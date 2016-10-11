@@ -488,7 +488,7 @@ namespace HOK.BCFReader.GenericForms
 
                     UIDocument uidoc = m_app.ActiveUIDocument;
                     List<ElementId> elementIds = new List<ElementId>();
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                     Selection selection = uidoc.Selection;
                     foreach (ListViewItem item in listViewComponents.SelectedItems)
                     {
@@ -606,7 +606,7 @@ namespace HOK.BCFReader.GenericForms
 
                     view3d.Name = selectedView;
 
-#if RELEASE2014||RELEASE2015 || RELEASE2016
+#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                     SetElementTransparency(view3d, elementDictionary);
 #endif
 
@@ -626,7 +626,7 @@ namespace HOK.BCFReader.GenericForms
             return result;
         }
 
-#if RELEASE2014||RELEASE2015 || RELEASE2016
+#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
         private void SetElementTransparency(View3D view3d, Dictionary<int, Element> elementDictionary)
         {
             try
@@ -775,7 +775,7 @@ namespace HOK.BCFReader.GenericForms
                                         Element element = item.Tag as Element;
                                         foreach (string defName in bcfParameters)
                                         {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                                             Parameter parameter = element.LookupParameter(defName);
 #else
                                             Parameter parameter = element.get_Parameter(defName);
@@ -827,7 +827,7 @@ namespace HOK.BCFReader.GenericForms
 
                 foreach (string defName in bcfParameters)
                 {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                     Parameter parameter = element.LookupParameter(defName);
 #else
                     Parameter parameter = element.get_Parameter(defName);
@@ -840,7 +840,7 @@ namespace HOK.BCFReader.GenericForms
 #if RELEASE2015 
                         ExternalDefinitonCreationOptions option = new ExternalDefinitonCreationOptions(defName, ParameterType.Text);
                         definition = defGroup.Definitions.Create(option);
-#elif RELEASE2016
+#elif RELEASE2016 || RELEASE2017
                         ExternalDefinitionCreationOptions option = new ExternalDefinitionCreationOptions(defName, ParameterType.Text);
                         definition = defGroup.Definitions.Create(option);
 #else
@@ -878,7 +878,7 @@ namespace HOK.BCFReader.GenericForms
         {
             try
             {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                 Parameter parameter = element.LookupParameter(defName);
 #else
                 Parameter parameter = element.get_Parameter(defName);
