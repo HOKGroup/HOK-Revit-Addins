@@ -1,4 +1,5 @@
 ﻿using Autodesk.Revit.DB;
+using HOK.SheetManager.AddIn.Utils;
 using HOK.SheetManager.Classes;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,26 @@ namespace HOK.SheetManager.AddIn.Classes
         public bool AutoUpdate { get { return autoUpdate; } set { autoUpdate = value; NotifyPropertyChanged("AutoUpdate"); } }
 
         public SheetManagerConfiguration() { }
+
+        public SheetManagerConfiguration(Document doc)
+        {
+            try
+            {
+                modelId = Guid.NewGuid();
+                centralPath = RevitUtil.GetCentralFilePath(doc);
+
+                FilteredElementCollector collector = new FilteredElementCollector(doc);
+                List<ElementId> elementIds = collector.OfCategory(BuiltInCategory.OST_TitleBlocks).WhereElementIsElementType().ToElementIds().ToList();
+                if (elementIds.Count > 0)
+                {
+                    titleblockId = elementIds.First();
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(String info)

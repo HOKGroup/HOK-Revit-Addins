@@ -28,6 +28,7 @@ namespace HOK.SheetManager.AddIn
         private string tabName = "  HOK - Beta";
         private string versionNumber = "";
         public static AddInId addinId = null;
+        public Dictionary<string, SheetManagerConfiguration> configDictionary = new Dictionary<string, SheetManagerConfiguration>();
 
         Result IExternalApplication.OnStartup(UIControlledApplication application)
         {
@@ -94,7 +95,18 @@ namespace HOK.SheetManager.AddIn
                 if (mainWindow == null)
                 {
                     Document doc = uiapp.ActiveUIDocument.Document;
-                    SheetManagerConfiguration config = DataStorageUtil.GetConfiguration(doc);
+                    string centralPath = RevitUtil.GetCentralFilePath(doc);
+                    SheetManagerConfiguration config = null;
+                    if (configDictionary.ContainsKey(centralPath))
+                    {
+                        config = configDictionary[centralPath];
+                    }
+                    else
+                    {
+                        config = new SheetManagerConfiguration(doc);
+                        configDictionary.Add(config.CentralPath, config);
+                    }
+
                     AddInViewModel viewModel = new AddInViewModel(config);
                     viewModel.Handler = new SheetManagerHandler(uiapp);
                     viewModel.ExtEvent = ExternalEvent.Create(viewModel.Handler);
@@ -106,7 +118,6 @@ namespace HOK.SheetManager.AddIn
                     mainWindow.DataContext = viewModel;
                     mainWindow.Closed += WindowClosed;
                     mainWindow.Show();
-                   
                 }
             }
             catch (Exception ex)
@@ -130,7 +141,7 @@ namespace HOK.SheetManager.AddIn
                 Document doc = args.Document;
                 if (null != doc)
                 {
-                    SheetManagerConfiguration sheetConfig = DataStorageUtil.GetConfiguration(doc);
+                    SheetManagerConfiguration sheetConfig = new SheetManagerConfiguration(doc);
                     if (doc.IsWorkshared)
                     {
                         Configuration configFound = ServerUtil.GetConfigurationByCentralPath(sheetConfig.CentralPath);
@@ -142,6 +153,7 @@ namespace HOK.SheetManager.AddIn
                                 {
                                     sheetConfig.AutoUpdate = updater.isUpdaterOn;
                                     sheetConfig.DatabaseFile = configFound.SheetDatabase;
+                                    break;
                                 }
                             }
                         }
@@ -182,7 +194,10 @@ namespace HOK.SheetManager.AddIn
                         }
                     }
 
-                    DataStorageUtil.StoreConfiguration(doc, sheetConfig);
+                    if (!configDictionary.ContainsKey(sheetConfig.CentralPath))
+                    {
+                        configDictionary.Add(sheetConfig.CentralPath, sheetConfig);
+                    }
                 }
             }
             catch (Exception ex)
@@ -201,8 +216,13 @@ namespace HOK.SheetManager.AddIn
                 if (null != doc)
                 {
                     //unregister updater
-                    SheetManagerConfiguration config = DataStorageUtil.GetConfiguration(doc);
-                    bool unregistered = UpdaterUtil.UnregisterUpdaters(doc, config);
+                    string centralPath = RevitUtil.GetCentralFilePath(doc);
+                    if (configDictionary.ContainsKey(centralPath))
+                    {
+                        SheetManagerConfiguration config = configDictionary[centralPath];
+                        bool unregistered = UpdaterUtil.UnregisterUpdaters(doc, config);
+                        configDictionary.Remove(centralPath);
+                    }
                 }
             }
             catch (Exception ex)

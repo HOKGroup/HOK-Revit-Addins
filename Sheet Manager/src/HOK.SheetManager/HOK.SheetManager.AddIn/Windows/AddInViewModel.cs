@@ -1122,7 +1122,13 @@ namespace HOK.SheetManager.AddIn.Windows
         {
             try
             {
-                bool stored = DataStorageUtil.StoreConfiguration(doc, config);
+                string centralPath = RevitUtil.GetCentralFilePath(doc);
+                if (AppCommand.thisApp.configDictionary.ContainsKey(centralPath))
+                {
+                    AppCommand.thisApp.configDictionary.Remove(centralPath);
+                }
+
+                AppCommand.thisApp.configDictionary.Add(centralPath, config);
             }
             catch (Exception ex)
             {

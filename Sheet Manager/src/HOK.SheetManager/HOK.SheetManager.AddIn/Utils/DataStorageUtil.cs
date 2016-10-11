@@ -35,11 +35,10 @@ namespace HOK.SheetManager.AddIn.Utils
 
                 if (null != configSchema)
                 {
-                    IList<DataStorage> savedStorage = GetStorage(doc, configSchema);
-                    if (savedStorage.Count > 0)
+                    DataStorage savedStorage = GetStorage(doc, configSchema);
+                    if (null != savedStorage)
                     {
-                        DataStorage storage = savedStorage.First();
-                        Entity entity = storage.GetEntity(configSchema);
+                        Entity entity = savedStorage.GetEntity(configSchema);
                         config.ModelId = entity.Get<Guid>(configSchema.GetField(s_ModelId));
                         config.CentralPath = entity.Get<string>(configSchema.GetField(s_CentralPath));
                         config.TitleblockId = entity.Get<ElementId>(configSchema.GetField(s_TitleBlcokId));
@@ -92,13 +91,20 @@ namespace HOK.SheetManager.AddIn.Utils
             return schema;
         }
 
-        private static IList<DataStorage> GetStorage(Document doc, Schema schema)
+        private static DataStorage GetStorage(Document doc, Schema schema)
         {
             FilteredElementCollector collector = new FilteredElementCollector(doc);
-            collector.OfClass(typeof(DataStorage));
-            Func<DataStorage, bool> hasTargetData = ds => (ds.GetEntity(schema) != null && ds.GetEntity(schema).IsValid());
+            var dataStorages = collector.OfClass(typeof(DataStorage));
 
-            return collector.Cast<DataStorage>().Where<DataStorage>(hasTargetData).ToList<DataStorage>();
+            foreach (DataStorage storage in dataStorages)
+            {
+                Entity entity = storage.GetEntity(schema);
+                if (entity.IsValid())
+                {
+                    return storage;
+                }
+            }
+            return null;
         }
 
         public static string GetCentralFilePath(Document doc)
@@ -142,18 +148,26 @@ namespace HOK.SheetManager.AddIn.Utils
 
                 if (null != configSchema)
                 {
-                    IList<DataStorage> savedStorage = GetStorage(doc, configSchema);
-                    if (savedStorage.Count > 0)
+                    DataStorage savedStorage = GetStorage(doc, configSchema);
+                    if (null == savedStorage)
+                    {
+                        savedStorage = DataStorage.Create(doc);
+                    }
+                    if (null!=savedStorage)
                     {
                         using (Transaction trans = new Transaction(doc))
                         {
-                            trans.Start("Delete Storage");
+                            trans.Start("Store Storage");
                             try
                             {
-                                foreach (DataStorage storage in savedStorage)
-                                {
-                                    doc.Delete(storage.Id);
-                                }
+                                Entity entity = new Entity(configSchemaId);
+                                entity.Set<Guid>(s_ModelId, config.ModelId);
+                                entity.Set<string>(s_CentralPath, config.CentralPath);
+                                entity.Set<ElementId>(s_TitleBlcokId, config.TitleblockId);
+                                entity.Set<bool>(s_IsPlaceHolder, config.IsPlaceholder);
+                                entity.Set<string>(s_DatabaseFile, config.DatabaseFile);
+                                entity.Set<bool>(s_AutoUpdate, config.AutoUpdate);
+                                savedStorage.SetEntity(entity);
                                 trans.Commit();
                             }
                             catch (Exception ex)
@@ -161,29 +175,6 @@ namespace HOK.SheetManager.AddIn.Utils
                                 trans.RollBack();
                                 string message = ex.Message;
                             }
-                        }
-                    }
-
-                    using (Transaction trans = new Transaction(doc))
-                    {
-                        trans.Start("Store Storage");
-                        try
-                        {
-                            DataStorage dStorage = DataStorage.Create(doc);
-                            Entity entity = new Entity(configSchemaId);
-                            entity.Set<Guid>(s_ModelId, config.ModelId);
-                            entity.Set<string>(s_CentralPath, config.CentralPath);
-                            entity.Set<ElementId>(s_TitleBlcokId, config.TitleblockId);
-                            entity.Set<bool>(s_IsPlaceHolder, config.IsPlaceholder);
-                            entity.Set<string>(s_DatabaseFile, config.DatabaseFile);
-                            entity.Set<bool>(s_AutoUpdate, config.AutoUpdate);
-                            dStorage.SetEntity(entity);
-                            trans.Commit();
-                        }
-                        catch (Exception ex)
-                        {
-                            trans.RollBack();
-                            string message = ex.Message;
                         }
                     }
                 }

@@ -45,6 +45,17 @@ namespace HOK.SheetManager.Database
                     command.Parameters.Add("@include", System.Data.DbType.Boolean);
                     command.Parameters.Add("@isSource", System.Data.DbType.Boolean);
 
+                    command.Parameters.Add("@parameterName", System.Data.DbType.String);
+                    command.Parameters.Add("@sourceValue", System.Data.DbType.String);
+                    command.Parameters.Add("@targetValue", System.Data.DbType.String);
+
+                    command.Parameters.Add("@sheetNumber", System.Data.DbType.String);
+                    command.Parameters.Add("@sheetName", System.Data.DbType.String);
+
+                    command.Parameters.Add("@revisionDescription", System.Data.DbType.String);
+                    command.Parameters.Add("@viewName", System.Data.DbType.String);
+
+                    command.Parameters.Add("@parameterValue", System.Data.DbType.String);
                     opened = true;
                 }
             }
@@ -180,22 +191,25 @@ namespace HOK.SheetManager.Database
             {
                 if (null != connection && null != command)
                 {
+                    
                     switch (cmdType)
                     {
                         case CommandType.INSERT:
                             command.CommandText = @"INSERT INTO ReplaceItems (ReplaceItem_Id, ReplaceItem_Type, ReplaceItem_Parameter, ReplaceItem_Source_Id, ReplaceItem_Source_Value, ReplaceItem_Target_Value) " +
-                                "VALUES ('" + item.ItemId.ToString() + "', '" + item.ItemType.ToString() + "', '" + item.ParameterName + "', '"+item.SourceId+"', '" + item.SourceValue + "', '" + item.TargetValue + "')";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
+                                "VALUES ('" + item.ItemId.ToString() + "', '" + item.ItemType.ToString() + "', @parameterName, '" + item.SourceId + "', @sourceValue, @targetValue)";
                             break;
                         case CommandType.UPDATE:
-                            command.CommandText = "UPDATE ReplaceItems SET ReplaceItem_Source_Value = '" + item.SourceValue.ToString() + "', ReplaceItem_Target_Value = '" + item.TargetValue.ToString() + "'  WHERE ReplaceItem_Id = '" + item.ItemId.ToString() + "'";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
+                            command.CommandText = "UPDATE ReplaceItems SET ReplaceItem_Source_Value = @sourceValue, ReplaceItem_Target_Value = @targetValue  WHERE ReplaceItem_Id = '" + item.ItemId.ToString() + "'";
                             break;
                         case CommandType.DELETE:
                             command.CommandText = "DELETE FROM ReplaceItems WHERE ReplaceItem_Id = '" + item.ItemId.ToString() + "'";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
                     }
+                    command.Parameters["@parameterName"].Value = item.ParameterName;
+                    command.Parameters["@sourceValue"].Value = item.SourceValue;
+                    command.Parameters["@targetValue"].Value = item.TargetValue;
+                    if (command.ExecuteNonQuery() > 0) { result = true; }
+
                 }
             }
             catch (Exception ex)
@@ -216,19 +230,19 @@ namespace HOK.SheetManager.Database
                     {
                         case CommandType.INSERT:
                             command.CommandText = @"INSERT INTO Sheets (Sheet_Id, Sheet_Number, Sheet_Name, Sheet_Discipline_Id)" +
-                                "VALUES ('" + item.Id.ToString() + "', '" + item.Number + "', '" + item.Name + "', '" + item.DisciplineObj.Id.ToString() + "')";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
+                                "VALUES ('" + item.Id.ToString() + "', @sheetNumber, @sheetName, '" + item.DisciplineObj.Id.ToString() + "')";
                             break;
                         case CommandType.UPDATE:
-                            command.CommandText = @"UPDATE Sheets SET Sheet_Number = '" + item.Number + "', Sheet_Name = '" + item.Name + "', Sheet_Discipline_Id ='" + item.DisciplineObj.Id.ToString() + "'"+
+                            command.CommandText = @"UPDATE Sheets SET Sheet_Number = @sheetNumber, Sheet_Name = @sheetName, Sheet_Discipline_Id ='" + item.DisciplineObj.Id.ToString() + "'" +
                                 " WHERE Sheet_Id = '" + item.Id.ToString() + "'";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
                         case CommandType.DELETE:
                             command.CommandText = "DELETE FROM Sheets WHERE Sheet_Id = '" + item.Id.ToString() + "'";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
                     }
+                    command.Parameters["@sheetNumber"].Value = item.Number;
+                    command.Parameters["@sheetName"].Value = item.Name;
+                    if (command.ExecuteNonQuery() > 0) { result = true; }
                 }
             }
             catch (Exception ex)
@@ -267,7 +281,8 @@ namespace HOK.SheetManager.Database
                     {
                         case CommandType.INSERT:
                             command.CommandText = @"INSERT INTO Revisions (Revision_Id, Revision_Description, Revision_IssuedBy, Revision_IssuedTo, Revision_Date, Revision_Document_Id) " +
-                                "VALUES ('" + item.Id.ToString() + "', '" + item.Description + "', '" + item.IssuedBy + "', '" + item.IssuedTo + "', '" + item.Date + "', '" + item.Document.Id.ToString() + "' )";
+                                "VALUES ('" + item.Id.ToString() + "', @revisionDescription, '" + item.IssuedBy + "', '" + item.IssuedTo + "', '" + item.Date + "', '" + item.Document.Id.ToString() + "' )";
+                            command.Parameters["@revisionDescription"].Value = item.Description;
                             if (command.ExecuteNonQuery() > 0) { result = true; }
                             if (item.Document.Id != Guid.Empty)
                             {
@@ -277,8 +292,9 @@ namespace HOK.SheetManager.Database
                             }
                             break;
                         case CommandType.UPDATE:
-                            command.CommandText = @"UPDATE Revisions SET Revision_Description = '" + item.Description + "', Revision_IssuedBy ='" + item.IssuedBy + "', Revision_IssuedTo = '" + item.IssuedTo + "', Revision_Date = '" + item.Date + "', " +
+                            command.CommandText = @"UPDATE Revisions SET Revision_Description = @revisionDescription, Revision_IssuedBy ='" + item.IssuedBy + "', Revision_IssuedTo = '" + item.IssuedTo + "', Revision_Date = '" + item.Date + "', " +
                                 "Revision_Document_Id ='" + item.Document.Id.ToString() + "' WHERE Revision_Id = '" + item.Id.ToString() + "'";
+                            command.Parameters["@revisionDescription"].Value = item.Description;
                             if (command.ExecuteNonQuery() > 0) { result = true; }
                             if (item.Document.Id != Guid.Empty)
                             {
@@ -396,19 +412,18 @@ namespace HOK.SheetManager.Database
                     {
                         case CommandType.INSERT:
                             command.CommandText = @"INSERT INTO Views (View_Id, View_Name, View_Sheet_Id, View_ViewType_Id, View_LocationX, View_LocationY) " +
-                                "VALUES ('" + item.Id.ToString() + "', '" + item.Name + "', '" + item.Sheet.Id.ToString() + "', '" + item.ViewType.Id.ToString() + "', " + item.LocationU + ", " + item.LocationV + ")";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
+                                "VALUES ('" + item.Id.ToString() + "', @viewName, '" + item.Sheet.Id.ToString() + "', '" + item.ViewType.Id.ToString() + "', " + item.LocationU + ", " + item.LocationV + ")";
                             break;
                         case CommandType.UPDATE:
-                            command.CommandText = @"UPDATE Views SET View_Name = '" + item.Name + "', View_Sheet_Id = '" + item.Sheet.Id.ToString() + "', View_ViewType_Id = '" + item.ViewType.Id.ToString() + "', View_LocationX = " + item.LocationU + ", View_LocationY =" + item.LocationV +
+                            command.CommandText = @"UPDATE Views SET View_Name = @viewName, View_Sheet_Id = '" + item.Sheet.Id.ToString() + "', View_ViewType_Id = '" + item.ViewType.Id.ToString() + "', View_LocationX = " + item.LocationU + ", View_LocationY =" + item.LocationV +
                                 " WHERE View_Id = '" + item.Id.ToString() + "'";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
                         case CommandType.DELETE:
                             command.CommandText = "DELETE FROM Views WHERE View_Id = '" + item.Id.ToString() + "'";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
                     }
+                    command.Parameters["@viewName"].Value = item.Name;
+                    if (command.ExecuteNonQuery() > 0) { result = true; }
                 }
             }
             catch (Exception ex)
@@ -451,7 +466,8 @@ namespace HOK.SheetManager.Database
                     switch (propertyName)
                     {
                         case "View Name":
-                            command.CommandText = @"UPDATE Views SET View_Name = '" + propertyValue + "' WHERE View_Id = '" + viewId + "'";
+                            command.CommandText = @"UPDATE Views SET View_Name = @viewName WHERE View_Id = '" + viewId + "'";
+                            command.Parameters["@viewName"].Value = propertyValue;
                             break;
                         case "Sheet Number":
                             command.CommandText = @"UPDATE Views SET View_Sheet_Id = '" + propertyValue + "' WHERE View_Id = '" + viewId + "'";
@@ -489,12 +505,14 @@ namespace HOK.SheetManager.Database
                     {
                         case CommandType.INSERT:
                             command.CommandText = @"INSERT INTO SheetParameters (Parameter_Id, Parameter_Name, Parameter_Type)" +
-                                "VALUES ('" + item.ParameterId.ToString() + "', '" + item.ParameterName + "', '" + item.ParameterType + "')";
+                                "VALUES ('" + item.ParameterId.ToString() + "', @parameterName, '" + item.ParameterType + "')";
+                            command.Parameters["@parameterName"].Value = item.ParameterName;
                             if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
                         case CommandType.UPDATE:
-                            command.CommandText = @"UPDATE SheetParameters SET Parameter_Name = '" + item.ParameterName + "', Parameter_Type = '" + item.ParameterType + "'"+
+                            command.CommandText = @"UPDATE SheetParameters SET Parameter_Name =  @parameterName, Parameter_Type = '" + item.ParameterType + "'" +
                             " WHERE Parameter_Id = '" + item.ParameterId.ToString() + "'";
+                            command.Parameters["@parameterName"].Value = item.ParameterName;
                             if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
                         case CommandType.DELETE:
@@ -524,19 +542,17 @@ namespace HOK.SheetManager.Database
                     {
                         case CommandType.INSERT:
                             command.CommandText = @"INSERT INTO SheetParameterValues (ParameterValue_Id, ParameterValue_Sheet_Id, ParameterValue_Parameter_Id, ParameterValue_Parameter_Value)" +
-                                "VALUES ('" + item.ParameterValueId.ToString() + "', '" + item.SheetId.ToString() + "', '" + item.Parameter.ParameterId.ToString() + "', '"+item.ParameterValue+"')";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
+                                "VALUES ('" + item.ParameterValueId.ToString() + "', '" + item.SheetId.ToString() + "', '" + item.Parameter.ParameterId.ToString() + "', @parameterValue)";
                             break;
                         case CommandType.UPDATE:
-                            command.CommandText = @"UPDATE SheetParameterValues SET ParameterValue_Parameter_Value = '" + item.ParameterValue + "'" +
-                            " WHERE ParameterValue_Id = '" + item.ParameterValueId.ToString() + "'";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
+                            command.CommandText = @"UPDATE SheetParameterValues SET ParameterValue_Parameter_Value = @parameterValue WHERE ParameterValue_Id = '" + item.ParameterValueId.ToString() + "'";
                             break;
                         case CommandType.DELETE:
                             command.CommandText = "DELETE FROM SheetParameterValues WHERE ParameterValue_Id = '" + item.ParameterValueId.ToString() + "'";
-                            if (command.ExecuteNonQuery() > 0) { result = true; }
                             break;
                     }
+                    command.Parameters["@parameterValue"].Value = item.ParameterValue;
+                    if (command.ExecuteNonQuery() > 0) { result = true; }
                 }
             }
             catch (Exception ex)
