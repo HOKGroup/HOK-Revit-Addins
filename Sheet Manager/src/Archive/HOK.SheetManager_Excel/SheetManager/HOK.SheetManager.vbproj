@@ -10,10 +10,10 @@
     <ProjectGuid>{04F9F82F-782D-48B7-89D1-34F21D329352}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>HOK.SheetManager</RootNamespace>
-    <AssemblyName>HOK.SheetManager_v.2013.0.1.13</AssemblyName>
+    <AssemblyName>HOK.SheetManager_v.2017.0.1.13</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -22,7 +22,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>HOK.SheetManager_v.2013.0.1.13.xml</DocumentationFile>
+    <DocumentationFile>HOK.SheetManager_v.2017.0.1.13.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files\Autodesk\Revit Architecture 2011\Program\Revit.exe</StartProgram>
@@ -34,7 +34,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>HOK.SheetManager_v.2013.0.1.13.xml</DocumentationFile>
+    <DocumentationFile>HOK.SheetManager_v.2017.0.1.13.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -76,59 +76,76 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\2016\</OutputPath>
-    <DocumentationFile>HOK.SheetManager_v.2013.0.1.13.xml</DocumentationFile>
+    <DocumentationFile>HOK.SheetManager_v.2017.0.1.13.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>RELEASE2016</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2017|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\2017\</OutputPath>
+    <DocumentationFile>HOK.SheetManager_v.2017.0.1.13.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DefineConstants>RELEASE2017</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="dao, Version=10.0.4504.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="Microsoft.Office.Interop.Access, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.Office.interop.access.dao, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="RevitAPI, Version=16.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2013'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI, Version=16.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2013'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPI, Version=2013.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2013'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2014'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI, Version=2013.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2013'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2014'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPI.dll</HintPath>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI, Version=2014.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2014'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI, Version=2015.0.0.0, Culture=neutral, processorArchitecture=AMD64" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
