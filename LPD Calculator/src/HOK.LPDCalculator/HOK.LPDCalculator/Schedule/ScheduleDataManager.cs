@@ -91,7 +91,7 @@ namespace HOK.LPDCalculator.Schedule
             {
                 ViewScheduleExportOptions options = new ViewScheduleExportOptions();
                 options.ColumnHeaders = ExportColumnHeaders.OneRow;
-#if RELEASE2014 || RELEASE2015 || RELEASE2016
+#if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
                 options.Title = false;
 #endif
 
@@ -163,7 +163,12 @@ namespace HOK.LPDCalculator.Schedule
                             {
                                 FieldProperties fp = new FieldProperties();
                                 fp.ColumnHeading = field.ColumnHeading;
+#if RELEASE2017
+                                fp.HasTotals = (field.DisplayType == ScheduleFieldDisplayType.Totals) ? true : false;
+#else
                                 fp.HasTotals = field.HasTotals;
+#endif
+
                                 fp.IsHidden = field.IsHidden;
                                 fieldDictionary.Add(fieldName, fp);
                             }
@@ -174,7 +179,12 @@ namespace HOK.LPDCalculator.Schedule
                                 {
                                     continue;
                                 }
+#if RELEASE2017
+                                if (field.CanTotal()) { field.DisplayType = ScheduleFieldDisplayType.Totals; }
+#else
                                 if (field.CanTotal()) { field.HasTotals = true; }
+#endif
+
                                 field.IsHidden = false;
                             }
                         }
@@ -207,7 +217,12 @@ namespace HOK.LPDCalculator.Schedule
                         if (fieldDictionary.ContainsKey(fieldName))
                         {
                             FieldProperties originalField = fieldDictionary[fieldName];
+#if RELEASE2017
+                            if (field.CanTotal()) { field.DisplayType = (originalField.HasTotals) ? ScheduleFieldDisplayType.Totals : ScheduleFieldDisplayType.Standard; }
+#else
                             if (field.CanTotal()) { field.HasTotals = originalField.HasTotals; }
+#endif
+
                             field.IsHidden = originalField.IsHidden;
                         }
                     }

@@ -136,7 +136,7 @@ namespace HOK.LPDCalculator
                                     foreach (Element element in elementList)
                                     {
                                         LightingProperties lp = new LightingProperties(element);
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                             Parameter calculatedParam = element.LookupParameter("Apparent VA Calculated Load");
 #else
                                         Parameter calculatedParam = element.get_Parameter("Apparent VA Calculated Load");
@@ -162,8 +162,8 @@ namespace HOK.LPDCalculator
                                     ap.ActualLightingLoad = totalAL;
                                     ap.LPD = totalAL / ap.Area;
 
-#if RELEASE2015 || RELEASE2016
-                        Parameter param = area.LookupParameter("ActualLightingLoad");
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+                                    Parameter param = area.LookupParameter("ActualLightingLoad");
 #else
                                     Parameter param = area.get_Parameter("ActualLightingLoad");
 #endif
@@ -172,8 +172,8 @@ namespace HOK.LPDCalculator
                                     {
                                         bool setLoad = param.Set(ap.ActualLightingLoad);
                                     }
-#if RELEASE2015 || RELEASE2016
-                        param = area.LookupParameter("ActualLPD");
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+                                    param = area.LookupParameter("ActualLPD");
 #else
                                     param = area.get_Parameter("ActualLPD");
 #endif
@@ -364,7 +364,7 @@ namespace HOK.LPDCalculator
                             double length = 0;
                             foreach (Autodesk.Revit.DB.BoundarySegment boundarySegment in boundarySegments)
                             {
-#if RELEASE2016
+#if RELEASE2016 || RELEASE2017
                                 Curve curve = boundarySegment.GetCurve();
 #else
                                 Curve curve = boundarySegment.Curve;
@@ -753,7 +753,7 @@ namespace HOK.LPDCalculator
             bool result = false;
             try
             {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                 Parameter param = area.LookupParameter("RoomName");
 #else
                 Parameter param = area.get_Parameter("RoomName");
@@ -767,7 +767,7 @@ namespace HOK.LPDCalculator
                     }
                 }
 
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                 param = area.LookupParameter("RoomNumber");
 #else
                 param = area.get_Parameter("RoomNumber");

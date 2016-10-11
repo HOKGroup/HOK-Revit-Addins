@@ -112,7 +112,7 @@ namespace HOK.LPDCalculator.Schedule
             string paramValue = "";
             try
             {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                 Parameter param = annotationType.LookupParameter(paramName);
 #else
                 Parameter param = annotationType.get_Parameter(paramName);
@@ -133,7 +133,7 @@ namespace HOK.LPDCalculator.Schedule
         {
             try
             {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                 Parameter param = annotationType.LookupParameter(paramName);
 #else
                 Parameter param = annotationType.get_Parameter(paramName);
@@ -152,7 +152,7 @@ namespace HOK.LPDCalculator.Schedule
             double paramValue = 0;
             try
             {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                 Parameter param = annotationType.LookupParameter(paramName);
 #else
                 Parameter param = annotationType.get_Parameter(paramName);
@@ -170,7 +170,7 @@ namespace HOK.LPDCalculator.Schedule
         {
             try
             {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                 Parameter param = annotationType.LookupParameter(paramName);
 #else
                 Parameter param = annotationType.get_Parameter(paramName);
@@ -188,7 +188,7 @@ namespace HOK.LPDCalculator.Schedule
         {
             try
             {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                 Parameter param = annotationType.LookupParameter(paramName);
 #else
                 Parameter param = annotationType.get_Parameter(paramName);
