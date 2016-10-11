@@ -57,7 +57,12 @@ namespace HOK.LevelManager
                             {
                                 foreach (Autodesk.Revit.DB.BoundarySegment segment in boundaryList)
                                 {
+#if RELEASE2017
+                                    Element element = m_doc.GetElement(segment.ElementId);
+#else
                                     Element element = segment.Element;
+#endif
+
                                     if (null != element)
                                     {
                                         if (element.Category.Id.IntegerValue == (int)BuiltInCategory.OST_RoomSeparationLines)
