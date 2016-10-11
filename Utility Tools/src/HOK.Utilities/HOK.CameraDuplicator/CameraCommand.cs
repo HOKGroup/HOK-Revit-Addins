@@ -89,7 +89,7 @@ namespace HOK.CameraDuplicator
             cropBox = view3d.CropBox;
 #if RELEASE2013
             sectionBox = view3d.SectionBox;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016
+#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
             isSectionBoxOn = view3d.IsSectionBoxActive;
             sectionBox = view3d.GetSectionBox();
 #endif

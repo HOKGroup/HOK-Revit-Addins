@@ -97,7 +97,7 @@ namespace HOK.CameraDuplicator
             foreach (Document doc in m_app.Application.Documents)
             {
                 if (doc.IsFamilyDocument) { continue; }
-#if RELEASE204 ||RELEASE2015 || RELEASE2016
+#if RELEASE204 ||RELEASE2015 || RELEASE2016 || RELEASE2017
                 if (doc.IsLinked) { continue; }
 #endif
                 string modelId = ModelDataStorageUtil.GetModelId(doc);
@@ -406,7 +406,7 @@ namespace HOK.CameraDuplicator
                         createdView.CropBox = cameraInfo.CropBox;
 #if RELEASE2013
                         createdView.SectionBox = cameraInfo.SectionBox;
-#elif RELEASE2014 ||RELEASE2015 || RELEASE2016
+#elif RELEASE2014 ||RELEASE2015 || RELEASE2016 || RELEASE2017
                         createdView.IsSectionBoxActive = cameraInfo.IsSectionBoxOn;
                         createdView.SetSectionBox(cameraInfo.SectionBox);
 #endif
@@ -419,7 +419,7 @@ namespace HOK.CameraDuplicator
                             Parameter sourceParam = cameraInfo.ViewParameters[paramName];
 #if RELEASE2013||RELEASE2014
                             Parameter recipientParam = createdView.get_Parameter(paramName);
-#elif RELEASE2015||RELEASE2016
+#elif RELEASE2015||RELEASE2016 || RELEASE2017
                              Parameter recipientParam = createdView.LookupParameter(paramName);
 #endif
                             if (parametersToSkip.Contains(sourceParam.Id.IntegerValue)) { continue; }
@@ -660,7 +660,7 @@ namespace HOK.CameraDuplicator
                                     Parameter sourceParam = planInfo.ViewParameters[paramName];
 #if RELEASE2013||RELEASE2014
                                     Parameter recipientParam = createdView.get_Parameter(paramName);
-#elif RELEASE2015||RELEASE2016
+#elif RELEASE2015||RELEASE2016 || RELEASE2017
                                     Parameter recipientParam = createdView.LookupParameter(paramName);
 #endif
                                     if (parametersToSkip.Contains(sourceParam.Id.IntegerValue)) { continue; }
