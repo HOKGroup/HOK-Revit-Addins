@@ -116,15 +116,21 @@ namespace HOK.ViewAnalysis
                     foreach (Autodesk.Revit.DB.BoundarySegment segment in segmentList)
                     {
                         SegmentData sData = new SegmentData(segment);
-                        if (null != segment.Element)
+#if RELEASE2015
+                        Element element = segment.Element;
+#else
+                        Element element = m_doc.GetElement(segment.ElementId);
+#endif
+
+                        if (null != element)
                         {
-                            if (null != segment.Element.Category)
+                            if (null != element.Category)
                             {
                                 Wall wall = null;
                                 Transform transform = Transform.Identity;
-                                if (segment.Element.Category.Id.IntegerValue == (int)(BuiltInCategory.OST_Walls))
+                                if (element.Category.Id.IntegerValue == (int)(BuiltInCategory.OST_Walls))
                                 {
-                                    wall = segment.Element as Wall;
+                                    wall = element as Wall;
                                     if (null != wall)
                                     {
                                         var linkIds = from linkId in exteriorElementIds where linkId.HostElementId == wall.Id select linkId;
@@ -134,9 +140,9 @@ namespace HOK.ViewAnalysis
                                         }
                                     }
                                 }
-                                else if (includeLinkedModel &&  segment.Element.Category.Id.IntegerValue == (int)(BuiltInCategory.OST_RvtLinks))
+                                else if (includeLinkedModel && element.Category.Id.IntegerValue == (int)(BuiltInCategory.OST_RvtLinks))
                                 {
-                                    RevitLinkInstance instance = segment.Element as RevitLinkInstance;
+                                    RevitLinkInstance instance = element as RevitLinkInstance;
                                     transform = instance.GetTotalTransform();
                                     Document linkDoc = instance.GetLinkDocument();
 
@@ -340,13 +346,25 @@ namespace HOK.ViewAnalysis
         public SegmentData(Autodesk.Revit.DB.BoundarySegment segment)
         {
             m_segment = segment;
+#if RELEASE2017
+            boundaryCurve = segment.GetCurve();
+#else
             boundaryCurve = segment.Curve;
-            
-            
+#endif
+
+#if RELEASE2015
             if (null == segment.Element)
             {
                 visibleCurves.Add(boundaryCurve);
             }
+#else
+            if (ElementId.InvalidElementId!=segment.ElementId)
+            {
+                visibleCurves.Add(boundaryCurve);
+            }
+#endif
+
+            
         }
 
         public void GetViewPoints(bool isCurtainWall)

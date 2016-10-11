@@ -54,7 +54,7 @@ namespace HOK.AVFManager.UrbanPlanning
                         progressBar.PerformStep();
                         Area area = element as Area;
                         if (area.Area == 0) { continue; }
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                         if (null == area.LookupParameter("Plot Code"))
                         {
                             MessageBox.Show("Cannot find a parameter named Plot Code in Area elements\n Please add required parameters in both Area and Mass to calculate FAR."
@@ -146,7 +146,7 @@ namespace HOK.AVFManager.UrbanPlanning
 
                 foreach (Element element in elements)
                 {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                     Parameter parameter = element.LookupParameter("Building Function");
 #else 
                     Parameter parameter = element.get_Parameter("Building Function");
@@ -224,7 +224,7 @@ namespace HOK.AVFManager.UrbanPlanning
                             CurveArray curveArray = new CurveArray();
                             foreach (Autodesk.Revit.DB.BoundarySegment boundarySegment in boundarySegments)
                             {
-#if RELEASE2016
+#if RELEASE2016 || RELEASE2017
                                 Curve curve = boundarySegment.GetCurve();
 #else
                                  Curve curve = boundarySegment.Curve;
@@ -444,7 +444,7 @@ namespace HOK.AVFManager.UrbanPlanning
         }
         public string DistricCode
         {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
             get { try { return m_mass.LookupParameter("District Code").AsString(); } catch { return ""; } }
             set { try { m_mass.LookupParameter("District Code").Set(value); } catch { } }
 #else
@@ -454,7 +454,7 @@ namespace HOK.AVFManager.UrbanPlanning
         }
         public string PlotCode
         {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
             get { try { return m_mass.LookupParameter("Plot Code").AsString(); } catch { return ""; } }
             set { try { m_mass.LookupParameter("Plot Code").Set(value); } catch { } }
 #else
@@ -464,7 +464,7 @@ namespace HOK.AVFManager.UrbanPlanning
         }
         public double GrossFloorArea
         {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
             get { try { return m_mass.LookupParameter("Gross Floor Area").AsDouble(); } catch { return 0; } }
 #else
             get { try { return m_mass.get_Parameter("Gross Floor Area").AsDouble(); } catch { return 0; } }
@@ -512,7 +512,7 @@ namespace HOK.AVFManager.UrbanPlanning
         }
         public string DistricCode
         {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
             get { try { return m_area.LookupParameter("District Code").AsString(); } catch { return ""; } }
 #else
              get { try { return m_area.get_Parameter("District Code").AsString(); } catch { return ""; } }
@@ -520,7 +520,7 @@ namespace HOK.AVFManager.UrbanPlanning
         }
         public string PlotCode
         {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
             get { try { return m_area.LookupParameter("Plot Code").AsString(); } catch { return ""; } }
 #else
             get { try { return m_area.get_Parameter("Plot Code").AsString(); } catch { return ""; } }
@@ -528,15 +528,15 @@ namespace HOK.AVFManager.UrbanPlanning
         }
         public double Area
         {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
             get { try { return m_area.LookupParameter("Area").AsDouble(); } catch { return 0; } }
 #else
              get { try { return m_area.get_Parameter("Area").AsDouble(); } catch { return 0; } }
 #endif
         }
-        public double FARParameter 
+        public double FARParameter
         {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
             get { try { return m_area.LookupParameter("FAR").AsDouble(); } catch { return 0; } }
             set { try { m_area.LookupParameter("FAR").Set(value); } catch { } }
 #else

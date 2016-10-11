@@ -11,7 +11,7 @@ using HOK.AVFManager.GenericClasses;
 
 namespace HOK.AVFManager
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Automatic)]
+    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
     [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
     public class Command:IExternalCommand
     {
@@ -92,35 +92,68 @@ namespace HOK.AVFManager
 
         public void IsolateCategory(Autodesk.Revit.DB.View view, string categoryName)
         {
-            foreach (Category category in visDictionary.Keys)
+            using (Transaction trans = new Transaction(doc))
             {
-                if (category.Name == categoryName)
+                trans.Start("Isolate Category");
+                try
                 {
+                    foreach (Category category in visDictionary.Keys)
+                    {
+                        if (category.Name == categoryName)
+                        {
 #if RELEASE2013
                     view.setVisibility(category, true);
+#elif RELEASE2017
+                            view.SetCategoryHidden(category.Id, true);
 #else
                     view.SetVisibility(category, true);
 #endif
-                }
-                else
-                {
+                        }
+                        else
+                        {
 #if RELEASE2013
                     view.setVisibility(category, false);
+#elif RELEASE2017
+                            view.SetCategoryHidden(category.Id, true);
 #else
                     view.SetVisibility(category, false);
 #endif
+                        }
+                    }
+                    trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    trans.RollBack();
+                    MessageBox.Show("Cannot isolate categories.\n" + ex.Message, "Isolate Categories", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }
+
         public void ResetVisibility(Autodesk.Revit.DB.View view)
         {
-            foreach (Category category in visDictionary.Keys)
+            using (Transaction trans = new Transaction(doc))
             {
+                trans.Start("Reset Visibility");
+                try
+                {
+                    foreach (Category category in visDictionary.Keys)
+                    {
 #if RELEASE2013
                 view.setVisibility(category, visDictionary[category]);
+#elif RELEASE2017
+                        view.SetCategoryHidden(category.Id, visDictionary[category]);
 #else
                 view.SetVisibility(category, visDictionary[category]);
 #endif
+                    }
+                    trans.Commit();
+                }
+                catch (Exception ex)
+                {
+                    trans.RollBack();
+                    MessageBox.Show("Cannot reset visibility.\n" + ex.Message, "Reset Visibility", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
     }

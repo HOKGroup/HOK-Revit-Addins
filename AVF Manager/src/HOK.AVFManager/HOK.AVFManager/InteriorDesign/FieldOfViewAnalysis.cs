@@ -511,6 +511,23 @@ namespace HOK.AVFManager.InteriorDesign
                             {
                                 foreach (Autodesk.Revit.DB.BoundarySegment boundarySegment in boundarySegments)
                                 {
+#if RELEASE2017
+
+                                    if (boundarySegment.ElementId == ElementId.InvalidElementId) { continue; }
+                                    Wall boundaryWall = doc.GetElement(boundarySegment.ElementId) as Wall;
+                                    if (boundaryWall != null)
+                                    {
+                                        if (!wallFaces.ContainsKey(boundaryWall.Id.IntegerValue))
+                                        {
+                                            Face sideFace = GetSideWallFace(boundaryWall);
+                                            if (null != sideFace)
+                                            {
+                                                wallFaces.Add(boundaryWall.Id.IntegerValue, sideFace);
+                                            }
+                                        }
+                                    }
+#else
+                                    
                                     if (null == boundarySegment.Element) { continue; }
 
                                     if (boundarySegment.Element.Category.Name == "Walls")
@@ -528,6 +545,7 @@ namespace HOK.AVFManager.InteriorDesign
                                             }
                                         }
                                     }
+#endif
                                 }
                             }
                         }

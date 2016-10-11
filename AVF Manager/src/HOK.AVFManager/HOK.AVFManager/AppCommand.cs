@@ -8,8 +8,7 @@ using System.Windows.Media.Imaging;
 
 namespace HOK.AVFManager
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Automatic)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
+
     public class AppCommand:IExternalApplication
     {
         public Result OnShutdown(UIControlledApplication application)

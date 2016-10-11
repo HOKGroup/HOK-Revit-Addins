@@ -545,24 +545,50 @@ namespace HOK.AVFManager.GenericForms
                 DialogResult dr = MessageBox.Show("[" + curSettingProperties.LegendTitle + "] already exists.\n Do you want to overwrite it?", "Exisiting Analysis Result", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (dr == DialogResult.Yes)
                 {
-                    HideExistingAnalysis();
-                    progressBarAnalysis.Visible = true;
-                    toolStripStatusLabel.Visible = true;
-                    toolStripStatusLabel.Text = "Calculating .. ";
-                    AnalysisDataManager dataManager = new AnalysisDataManager(doc, curSettingProperties, progressBarAnalysis);
-                    if (dataManager.CreateSpatialField()) { this.Close(); }
-                    else { toolStripStatusLabel.Text = "Ready"; }
+                    using (Transaction trans = new Transaction(doc))
+                    {
+                        trans.Start("Run Analysis");
+                        try
+                        {
+                            HideExistingAnalysis();
+                            progressBarAnalysis.Visible = true;
+                            toolStripStatusLabel.Visible = true;
+                            toolStripStatusLabel.Text = "Calculating .. ";
+                            AnalysisDataManager dataManager = new AnalysisDataManager(doc, curSettingProperties, progressBarAnalysis);
+                            if (dataManager.CreateSpatialField()) { this.Close(); }
+                            else { toolStripStatusLabel.Text = "Ready"; }
+                            trans.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            trans.RollBack();
+                            MessageBox.Show("Failed to run analysis.\n" + ex.Message, "AVF Manager - Run Analysis", MessageBoxButtons.OK, MessageBoxIcon.Warning); 
+                        }
+                    }
                 }
             }
             else if(valid)
             {
-                HideExistingAnalysis();
-                AnalysisDataManager dataManager = new AnalysisDataManager(doc, curSettingProperties, progressBarAnalysis);
-                progressBarAnalysis.Visible = true;
-                toolStripStatusLabel.Visible = true;
-                toolStripStatusLabel.Text = "Calculating .. ";
-                if (dataManager.CreateSpatialField()) { this.Close(); }
-                else { toolStripStatusLabel.Text = "Ready"; }
+                using (Transaction trans = new Transaction(doc))
+                {
+                    trans.Start("Run Analysis");
+                    try
+                    {
+                        HideExistingAnalysis();
+                        AnalysisDataManager dataManager = new AnalysisDataManager(doc, curSettingProperties, progressBarAnalysis);
+                        progressBarAnalysis.Visible = true;
+                        toolStripStatusLabel.Visible = true;
+                        toolStripStatusLabel.Text = "Calculating .. ";
+                        if (dataManager.CreateSpatialField()) { this.Close(); }
+                        else { toolStripStatusLabel.Text = "Ready"; }
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.RollBack();
+                        MessageBox.Show("Failed to run analysis.\n" + ex.Message, "AVF Manager - Run Analysis", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
             }
         }
 
