@@ -11,8 +11,12 @@ namespace HOK.ModelManager.RegistryManager
         //KeyNames: CompanyName, ModelBuilderActivated
 #if RELEASE2014
         private static string keyAddress = "Software\\Autodesk\\Revit\\Autodesk Revit 2014\\ModelManager";
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015
         private static string keyAddress = "Software\\Autodesk\\Revit\\Autodesk Revit 2015\\ModelManager";
+#elif RELEASE2016
+        private static string keyAddress = "Software\\Autodesk\\Revit\\Autodesk Revit 2016\\ModelManager";
+#elif RELEASE2017
+        private static string keyAddress = "Software\\Autodesk\\Revit\\Autodesk Revit 2017\\ModelManager";
 #endif
 
         public static void SetRegistryKey(string keyName, object value)

@@ -256,9 +256,10 @@ namespace HOK.ModelReporting
             try
             {
                 if (docCentralPath.StartsWith("C:")) { return fileSize; }
-                if (!string.IsNullOrEmpty(docCentralPath))
+
+                if (!string.IsNullOrEmpty(docLocalPath))
                 {
-                    FileInfo fileInfo = new FileInfo(docCentralPath);
+                    FileInfo fileInfo = new FileInfo(docLocalPath);
                     fileSize = fileInfo.Length / 1024;
                 }
                 

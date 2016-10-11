@@ -316,7 +316,7 @@ namespace HOK.ModelManager
                                     {
 #if RELEASE2014
                                     Parameter rParam = viewSheet.get_Parameter(param.Definition.Name);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                                         Parameter rParam = viewSheet.LookupParameter(param.Definition.Name);
 #endif
 
@@ -429,8 +429,8 @@ namespace HOK.ModelManager
                                             {
 #if RELEASE2014
                                                 Parameter rParam = recipientViewport.get_Parameter(param.Definition.Name);
-#elif RELEASE2015 || RELEASE2016
-                                            Parameter rParam = recipientViewport.LookupParameter(param.Definition.Name);
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
+                                                Parameter rParam = recipientViewport.LookupParameter(param.Definition.Name);
 #endif
 
                                                 if (null != rParam)
@@ -652,6 +652,30 @@ namespace HOK.ModelManager
                 double maxZ = double.MinValue;
                
                 ViewCropRegionShapeManager cropRegion = View.GetCropRegionShapeManagerForReferenceCallout(doc, calloutId);
+#if RELEASE2016 || RELEASE2017
+                IList<CurveLoop> curveLoops = cropRegion.GetCropShape();
+                foreach (CurveLoop cLoop in curveLoops)
+                {
+                    foreach (Curve curve in cLoop)
+                    {
+                        XYZ point = curve.GetEndPoint(0);
+                        if (point.X < minX) { minX = point.X; }
+                        if (point.Y < minY) { minY = point.Y; }
+                        if (point.Z < minZ) { minZ = point.Z; }
+                        if (point.X > maxX) { maxX = point.X; }
+                        if (point.Y > maxY) { maxY = point.Y; }
+                        if (point.Z > maxZ) { maxZ = point.Z; }
+                    }
+                    
+                }
+
+                if (curveLoops.Count() > 0)
+                {
+                    firstPoint = new XYZ(minX, minY, minZ);
+                    secondPoint = new XYZ(maxX, maxY, maxZ);
+                    result = true;
+                }
+#else
                 CurveLoop curveLoop = cropRegion.GetCropRegionShape();
                 foreach (Curve curve in curveLoop)
                 {
@@ -670,6 +694,9 @@ namespace HOK.ModelManager
                     secondPoint = new XYZ(maxX, maxY, maxZ);
                     result = true;
                 }
+#endif
+
+
             }
             catch (Exception ex)
             {
