@@ -15,6 +15,8 @@ namespace SolibriBatchSetup
 {
     public static class BatchSetupUtils
     {
+        private static string[] modelExtensions = new string[] { ".ifc", ".zip", ".dwg", ".ifczip" };
+
         public static bool ReadBatchConfig(string fileName, out Batch batchFromFile)
         {
             bool validated = false;
@@ -61,26 +63,65 @@ namespace SolibriBatchSetup
                             {
                                 unit.OpenSolibri = openModel;
                             }
-                            else if (openModel.FileExtension == ".ifc")
+                            else if (modelExtensions.Contains(openModel.FileExtension))
                             {
-                                unit.IfcFiles.Add(openModel);
+                                InputModel modeltoOpen = new InputModel(openModel);
+                                unit.Models.Add(modeltoOpen);
                             }
+                            break;
+                        case "UpdateModel":
+                            UpdateModel updateModel = element as UpdateModel;
+                            InputModel modeltoUpdate = new InputModel(updateModel);
+                            unit.Models.Add(modeltoUpdate);
+                            break;
+                        case "OpenRuleset":
+                            OpenRuleset ruleset = element as OpenRuleset;
+                            unit.Rulesets.Add(ruleset);
+                            break;
+                        case "OpenClassification":
+                            OpenClassification classification = element as OpenClassification;
+                            unit.Classifications.Add(classification);
+                            break;
+                        case "Check":
+                            Check check = element as Check;
+                            check.IsSpecified = true;
+                            unit.CheckTask = check;
+                            break;
+                        case "AutoComment":
+                            AutoComment comment = element as AutoComment;
+                            comment.IsSpecified = true;
+                            unit.CommentTask = comment;
+                            break;
+                        case "WriterReport":
+                            unit.CheckingReport = element as WriterReport;
+                            break;
+                        case "CreatePresentation":
+                            CreatePresentation createP = element as CreatePresentation;
+                            createP.IsSelected = true;
+                            unit.PresentationCreate = createP;
+                            break;
+                        case "UpdatePresentation":
+                            UpdatePresentation updateP = element as UpdatePresentation;
+                            updateP.IsSelected = true;
+                            unit.PresentationUpdate = updateP;
+                            break;
+                        case "GeneralReport":
+                            unit.PresentationReport = element as GeneralReport;
                             break;
                         case "BCFReport":
                             unit.BCFReport = element as BCFReport;
                             break;
+                        case "CoordinationReport":
+                            unit.CoordReport = element as CoordinationReport;
+                            break;
                         case "SaveModel":
                             unit.SaveSolibri = element as SaveModel;
-                            if (unit.IfcFiles.Count > 0)
-                            {
-                                unit.OpenSolibri = new OpenModel(unit.SaveSolibri.File);
-                            }
+                            unit.TaskName = System.IO.Path.GetFileNameWithoutExtension(unit.SaveSolibri.File);
                             break;
                         case "CloseModel":
                             processUnits.Add(unit);
                             unit = new ProcessUnit();
                             break;
-
                     }
                 }
             }
@@ -91,64 +132,89 @@ namespace SolibriBatchSetup
             return processUnits;
         }
 
-        public static ObservableCollection<OpenRuleset> ExtractRulesets(Batch batch)
-        {
-            ObservableCollection<OpenRuleset> rulesets = new ObservableCollection<OpenRuleset>();
-            try
-            {
-                var elements = from element in batch.Target.Elements where element.GetType().Name == "OpenRuleset" select element;
-                List<OpenRuleset> elementList = elements.Cast<OpenRuleset>().ToList();
-                List<string> fileNames = new List<string>();
-                foreach (OpenRuleset ruleset in elementList)
-                {
-                    if (!fileNames.Contains(ruleset.File))
-                    {
-                        fileNames.Add(ruleset.File);
-                        rulesets.Add(ruleset);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to extract rulesets.\n" + ex.Message, "Extract Rulesets", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-            return rulesets;
-        }
-
-        public static ObservableCollection<GenericElement> ConvertToGenericElements(ObservableCollection<ProcessUnit> processUnits, ObservableCollection<OpenRuleset> rulesets)
+        public static ObservableCollection<GenericElement> ConvertToGenericElements(ObservableCollection<ProcessUnit> processUnits)
         {
             ObservableCollection<GenericElement> elements = new ObservableCollection<GenericElement>();
             try
             {
-                bool runCheck = (rulesets.Count > 0) ? true : false;
                 foreach (ProcessUnit unit in processUnits)
                 {
                     //open models
-                    if (unit.IfcFiles.Count > 0)
-                    {
-                        foreach (OpenModel model in unit.IfcFiles)
-                        {
-                            elements.Add(model);
-                        }
-                    }
-                    else
+                    if (!string.IsNullOrEmpty(unit.OpenSolibri.File))
                     {
                         elements.Add(unit.OpenSolibri);
                     }
-
-                    if (rulesets.Count > 0)
+                    if (unit.Models.Count > 0)
                     {
-                        foreach (OpenRuleset rule in rulesets)
+                        foreach (InputModel model in unit.Models)
+                        {
+                            if (model.IsUpdate)
+                            {
+                                UpdateModel updateModel = new UpdateModel(model);
+                                elements.Add(updateModel);
+                            }
+                            else
+                            {
+                                OpenModel openModel = new OpenModel(model);
+                                elements.Add(openModel);
+                            }
+                        }
+                    }
+
+                    if (unit.Classifications.Count > 0)
+                    {
+                        foreach (OpenClassification classification in unit.Classifications)
+                        {
+                            elements.Add(classification);
+                        }
+                    }
+
+                    if (unit.Rulesets.Count > 0)
+                    {
+                        foreach (OpenRuleset rule in unit.Rulesets)
                         {
                             elements.Add(rule);
                         }
-
-                        elements.Add(new Check());
-                        elements.Add(new AutoComment());
-                        elements.Add(new CreatePresentation());
-                        elements.Add(unit.BCFReport);
                     }
 
+                    if (unit.CheckEnabled)
+                    {
+                        elements.Add(unit.CheckTask);
+
+                        if (!string.IsNullOrEmpty(unit.CheckingReport.PdfFile) || !string.IsNullOrEmpty(unit.CheckingReport.RtfFile))
+                        {
+                            elements.Add(unit.CheckingReport);
+                        }
+
+                        if (unit.PresentationCreate.IsSelected)
+                        {
+                            elements.Add(unit.CommentTask);
+                            elements.Add(unit.PresentationCreate);
+                        }
+
+                        if (unit.PresentationUpdate.IsSelected)
+                        {
+                            elements.Add(unit.CommentTask);
+                            elements.Add(unit.PresentationUpdate);
+                        }
+
+                        if (!string.IsNullOrEmpty(unit.PresentationReport.PdfFile) || !string.IsNullOrEmpty(unit.PresentationReport.RtfFile))
+                        {
+                            elements.Add(unit.PresentationReport);
+                        }
+
+                        if (!string.IsNullOrEmpty(unit.BCFReport.File))
+                        {
+                            elements.Add(unit.BCFReport);
+                        }
+
+                        if (!string.IsNullOrEmpty(unit.CoordReport.File))
+                        {
+                            elements.Add(unit.CoordReport);
+                        }
+                    }
+
+                   
                     elements.Add(unit.SaveSolibri);
                     elements.Add(new CloseModel());
                 }
@@ -161,13 +227,42 @@ namespace SolibriBatchSetup
             return elements;
         }
 
-        public static bool SaveBatchConfig(string fileName, Batch batch)
+        private static void DetermineCheckEnabled(ProcessUnit unit, out bool checkEnabled, out bool commentEnabled)
+        {
+            checkEnabled = false;
+            commentEnabled = false;
+            try
+            {
+                if (unit.PresentationCreate.IsSelected || unit.PresentationUpdate.IsSelected)
+                {
+                    checkEnabled = true;
+                    commentEnabled = true;
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(unit.CheckingReport.PdfFile) || !string.IsNullOrEmpty(unit.CheckingReport.RtfFile))
+                {
+                    checkEnabled = true;
+                }
+                if (!string.IsNullOrEmpty(unit.PresentationReport.PdfFile)|| !string.IsNullOrEmpty(unit.PresentationReport.RtfFile) || !string.IsNullOrEmpty(unit.BCFReport.File) || !string.IsNullOrEmpty(unit.CoordReport.File))
+                {
+                    checkEnabled = true;
+                    commentEnabled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        public static bool SaveBatchConfig(Batch batch)
         {
             bool saved = false;
             try
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(Batch));
-                using (FileStream fs = new FileStream(fileName, FileMode.Create))
+                using (FileStream fs = new FileStream(batch.FilePath, FileMode.Create))
                 {
                     XmlWriterSettings settings = new XmlWriterSettings
                     {
@@ -182,7 +277,7 @@ namespace SolibriBatchSetup
                     serializer.Serialize(writer, batch);
                     fs.Close();
                 }
-                if (File.Exists(fileName))
+                if (File.Exists(batch.FilePath))
                 {
                     saved = true;
                 }
@@ -221,33 +316,6 @@ namespace SolibriBatchSetup
         }
     }
 
-    public class ProcessUnit :INotifyPropertyChanged
-    {
-        private Guid unitId = Guid.Empty;
-        private OpenModel openSolibri = new OpenModel();
-        private ObservableCollection<OpenModel> ifcFiles = new ObservableCollection<OpenModel>();
-        private BCFReport bcfReport = new BCFReport();
-        private SaveModel saveSolibri = new SaveModel();
-
-        public Guid UnitId { get { return unitId; } set { unitId = value; NotifyPropertyChanged("UnitId"); } }
-        public OpenModel OpenSolibri { get { return openSolibri; } set { openSolibri = value; NotifyPropertyChanged("OpenSolibri"); } }
-        public ObservableCollection<OpenModel> IfcFiles { get { return ifcFiles; } set { ifcFiles = value; NotifyPropertyChanged("IfcFiles"); } }
-        public BCFReport BCFReport { get { return bcfReport; } set { bcfReport = value; NotifyPropertyChanged("BCFReport"); } }
-        public SaveModel SaveSolibri { get { return saveSolibri; } set { saveSolibri = value; NotifyPropertyChanged("SaveSolibri"); } }
-        
-
-        public ProcessUnit()
-        {
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String info)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
-            }
-        }
-    }
+    
 
 }

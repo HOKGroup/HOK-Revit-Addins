@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<xs:schema id="Autorun" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="batch">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name ="target" type="target" minOccurs ="0"/>
+      </xs:sequence>
+      <xs:attribute name ="name" type="xs:string"/>
+      <xs:attribute name ="default" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="target">
+    <xs:sequence>
+      <xs:group ref="processgroup" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name ="exit"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string"/>
+  </xs:complexType>
+  <xs:group name ="processgroup">
+    <xs:sequence>
+      <xs:element name="openmodel" type="model" minOccurs="0" maxOccurs ="unbounded"/>
+      <xs:element name ="openruleset" type ="model" minOccurs="0" maxOccurs ="unbounded"/>
+      <xs:element name ="check" minOccurs="0"/>
+      <xs:element name ="autocomment" type="autocomment" minOccurs="0"/>
+      <xs:element name ="createpresentation" minOccurs="0"/>
+      <xs:element name ="coordinationreport" type ="coordination" minOccurs="0"/>
+      <xs:element name ="generalreport" type ="pdf" minOccurs="0"/>
+      <xs:element name ="writereport" type ="pdf" minOccurs="0"/>
+      <xs:element name ="bcfreport" type="bcf" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name ="savemodel" type="model" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name ="closemodel" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name ="model">
+    <xs:attribute name ="file" type="xs:string" use ="optional"/>
+  </xs:complexType>
+  <xs:complexType name ="autocomment">
+    <xs:attribute name ="zoom" type="xs:string" />
+    <xs:attribute name ="maxsnapshotsincategory" type="xs:integer"/>
+  </xs:complexType>
+  <xs:complexType name ="bcf">
+    <xs:attribute name ="file" type="xs:string"/>
+    <xs:attribute name ="version" type ="xs:integer"/>
+  </xs:complexType>
+  <xs:complexType name="pdf">
+    <xs:attribute name ="pdffile" type ="xs:string"/>
+    <xs:attribute name ="rtffile" type ="xs:string"/>
+    <xs:attribute name ="major" type="xs:boolean" use ="optional"/>
+    <xs:attribute name ="normal" type ="xs:boolean" use ="optional"/>
+    <xs:attribute name ="minor" type="xs:boolean" use ="optional"/>
+    <xs:attribute name ="rejected" type ="xs:boolean" use ="optional"/>
+    <xs:attribute name ="accepted" type ="xs:boolean" use ="optional"/>
+  </xs:complexType>
+  <xs:complexType name="coordination">
+    <xs:attribute name ="file" type="xs:string"/>
+    <xs:attribute name ="templatefile" type ="xs:string"/>
+  </xs:complexType>
+</xs:schema>

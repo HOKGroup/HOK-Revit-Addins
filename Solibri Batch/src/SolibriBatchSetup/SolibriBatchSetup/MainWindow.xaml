@@ -1,20 +1,17 @@
 ﻿<Window x:Class="SolibriBatchSetup.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Solibri Batch Manager" Height="850" Width="1200" MinHeight="800" MinWidth ="1200" Icon="Images/hoklogo.ico" UseLayoutRounding="True" AllowDrop="True" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Drop="Window_Drop">
+        xmlns:ut ="clr-namespace:SolibriBatchSetup.Utils"
+        Title="Solibri Batch Manager" Height="1000" Width="1200" MinHeight="1000" MinWidth ="1000" Icon="Images/hoklogo.ico" 
+        UseLayoutRounding="True" AllowDrop="True" WindowStartupLocation="CenterScreen" Closing="Window_Closing" Drop="Window_Drop">
     <Window.Resources>
-        <Style TargetType="{x:Type DataGrid}">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="AutoGenerateColumns" Value="False"/>
-            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
-            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
-            <Setter Property="HeadersVisibility" Value="Column"/>
-            <Setter Property="SelectionMode" Value="Single"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="BorderBrush" Value="LightGray"/>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="MetroStyles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <ut:ExpanderConverter x:Key="expanderConverter"/>
+            <ut:LabelConverter x:Key="labelConverter"/>
+        </ResourceDictionary>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="New" Executed="NewConfig"/>
@@ -29,8 +26,7 @@
     </Window.InputBindings>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="250"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -64,120 +60,387 @@
                 </MenuItem>
             </Menu>
         </StackPanel>
-        <Button x:Name="buttonSetting" Grid.Column="2" HorizontalAlignment="Right" Margin="0,10,15,0" Grid.Row="1" VerticalAlignment="Top" Height="27" Width="95" Click="buttonSetting_Click">
+        <Label Content="Click (+) Button to Start Creating a Task." HorizontalAlignment="Left" Margin="10,0,0,0" Grid.Row="1" VerticalAlignment="Center" Foreground="#FFE74C3C"
+               Visibility="{Binding ElementName=dataGridTasks, Path=SelectedItem, Converter={StaticResource labelConverter}}"/>
+        <Button x:Name="buttonSetting" Grid.Column="2" HorizontalAlignment="Right" Margin="0,10,15,0" Grid.Row="1" VerticalAlignment="Top" Height="28" Width="95" Click="buttonSetting_Click">
             <StackPanel Orientation="Horizontal">
-                <Image Source="Images/setting.png" />
-                <TextBlock Margin="5,0,0,0">Settings</TextBlock>
+                <Image Source="Images/setting.png" Height="24" Width="24"/>
+                <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" >Settings</TextBlock>
             </StackPanel>
         </Button>
-        <GroupBox Grid.Row="2"  Margin="10" Header="Open Models">
-            <Grid>
+
+        <!--Task-->
+        <Expander x:Name="expanderTask" Grid.Row="2" Header="Tasks" Margin="10" HorizontalAlignment="Stretch" IsExpanded="True" BorderBrush="#FF95A5A6" Foreground="White">
+            <Expander.Background>
+                <SolidColorBrush Color="#FF95A5A6"/>
+            </Expander.Background>
+            <Grid Background="White" Margin="2">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition Height="50"/>
-                    <RowDefinition x:Name="expanderRowDefinition" Height="40"/>
                 </Grid.RowDefinitions>
-                <DataGrid x:Name="dataGridOpenSolibri" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="7,7,7,0" IsReadOnly="True" SelectionMode="Single" SelectionChanged="dataGridOpenSolibri_SelectionChanged" >
+                <DataGrid x:Name="dataGridTasks" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="7,7,7,0" 
+                          SelectionMode="Single" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Solibri File" Width="1*" Binding="{Binding OpenSolibri.File}"/>
-                        <DataGridTextColumn Header="Combined IFC" Width="0.4*" Binding="{Binding IfcFiles.Count}" />
+                        <DataGridTextColumn Header="Task Name" Width="1*" Binding="{Binding TaskName}">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="ToolTip">
+                                        <Setter.Value>
+                                            <TextBlock Text="{Binding TaskName}"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
-                <Button x:Name="buttonAddSolibri" HorizontalAlignment="Left" Margin="10,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" Click="buttonAddSolibri_Click" >
-                    <Image Height="22" Width="22" Source="Images/solibri_add.png"/>
+                <Button x:Name="buttonAddTask" HorizontalAlignment="Left" Margin="10,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" Click="buttonAddTask_Click">
+                    <Image  Height="20" Width="20" Source="Images/add.png" />
                 </Button>
-                <Button x:Name="buttonCombineIFC" HorizontalAlignment="Left" Margin="43,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" ToolTip="Combine IFC Files to SMC" Click="buttonCombineIFC_Click">
-                    <Image Height="22" Width="22" Source="Images/ifc_add.ico"/>
+                <Button x:Name="buttonDeleteTask" HorizontalAlignment="Left" Margin="43,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" Click="buttonDeleteTask_Click">
+                    <Image Height="20" Width="20" Source="Images/delete.png"/>
                 </Button>
-                <Button x:Name="buttonDeleteSolibri" HorizontalAlignment="Left" Margin="76,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" Click="buttonDeleteSolibri_Click" >
-                    <Image Height="16" Width="16" Source="Images/delete.png" />
-                </Button>
-                <Expander x:Name="expanderIFC" Grid.Row="2" Header="Show IFC Files" Margin="7,0,7,7" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Collapsed="expanderIFC_Collapsed" Expanded="expanderIFC_Expanded">
+            </Grid>
+        </Expander>
+
+        <ScrollViewer Grid.Row="2" Grid.Column="1" VerticalScrollBarVisibility="Auto" DataContext="{Binding ElementName=dataGridTasks, Path=SelectedItem}">
+            <StackPanel>
+                <!--Input Models-->
+                <Expander x:Name="expanderInput" Header="Input Models" Margin="10" HorizontalAlignment="Stretch" BorderBrush="#FF1ABC9C" Foreground="#FFF7F3F3" IsExpanded="True">  
                     <Expander.Background>
-                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                        <SolidColorBrush Color="#FF1ABC9C"/>
                     </Expander.Background>
-                    <Grid>
+                    <Grid Background="White" Margin="2">
                         <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
                             <RowDefinition/>
                             <RowDefinition Height="40"/>
                         </Grid.RowDefinitions>
-                        <DataGrid x:Name="dataGridIfc" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="7,7,7,0" IsReadOnly="True" SelectionMode="Extended">
+                        <Label Margin="10,7,0,5" HorizontalAlignment="Left" Content="Solibri Model:"/>
+                        <TextBox x:Name="textBoxOpenSolibri" HorizontalAlignment="Stretch" Margin="95,7,50,5" Text="{Binding OpenSolibri.File}"/>
+                        <Button x:Name="buttonOpenSolibri" HorizontalAlignment="Right" Margin="10,7,10,0" VerticalAlignment="Top" Width="28" Height="28" Click="buttonOpenSolibri_Click" >
+                            <Image Height="15" Width="16" Source="Images/folder.png"/>
+                        </Button>
+                        <Button x:Name="buttonCheckAll" HorizontalAlignment="Left" Margin="10,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="20" Height="20" Click="buttonCheckAll_Click" ToolTip="Reload All Models" >
+                            <Image Height="16" Width="16" Source="Images/checked.png"/>
+                        </Button>
+                        <Button x:Name="buttonCheckNone" HorizontalAlignment="Left" Margin="35,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="20" Height="20"  ToolTip="Uncheck All" Click="buttonCheckNone_Click" >
+                            <Image Height="16" Width="16" Source="Images/unchecked.png"/>
+                        </Button>
+                        <DataGrid Grid.Row="2" x:Name="dataGridIfc" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="7,7,7,0" 
+                                  SelectionMode="Extended" CanUserAddRows="False" CanUserDeleteRows="False" ItemsSource="{Binding Models}"
+                                  VerticalContentAlignment="Center">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="File Name" Width="1*" Binding="{Binding File}">
-                                    <DataGridTextColumn.CellStyle>
-                                        <Style TargetType="DataGridCell">
-                                            <Setter Property="ToolTip">
-                                                <Setter.Value>
-                                                    <TextBlock Text="{Binding ToolTip}"/>
-                                                </Setter.Value>
-                                            </Setter>
+                                <DataGridCheckBoxColumn Header="Update" Width="50" Binding="{Binding IsUpdate, UpdateSourceTrigger=PropertyChanged, NotifyOnTargetUpdated=True}"/>
+                                <DataGridTextColumn Header="Model Path" Width="1*" Binding="{Binding File}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Short Name" Width="100" Binding="{Binding ShortName}"/>
+                                <DataGridComboBoxColumn Header="Discipline" Width="100" SelectedValueBinding="{Binding Discipline}">
+                                    <DataGridComboBoxColumn.ElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Disciplines}"/>
                                         </Style>
-                                    </DataGridTextColumn.CellStyle>
-                                </DataGridTextColumn>
+                                    </DataGridComboBoxColumn.ElementStyle>
+                                    <DataGridComboBoxColumn.EditingElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type DataGrid}}, Path=DataContext.Disciplines}"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.EditingElementStyle>
+                                </DataGridComboBoxColumn>
+                                <DataGridTemplateColumn Header="Update With" Width="1*" IsReadOnly="True">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0">
+                                                <TextBlock Text="{Binding With}" HorizontalAlignment="Stretch" Margin="0,0,5,0"/>
+                                                <Button x:Name="buttonWith" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="2" Width="20" Height="20" Click="buttonWith_Click">
+                                                    <Image Height="15" Width="16" Source="Images/folder.png"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <Button x:Name="buttonAddIFC" HorizontalAlignment="Left" Margin="10,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" Click="buttonAddIFC_Click" >
-                            <Image Height="22" Width="22" Source="Images/ifc_add.ico"/>
+                        <Button x:Name="buttonAddIFC" HorizontalAlignment="Left" Margin="10,7,0,0" Grid.Row="3" VerticalAlignment="Top" Width="28" Height="28" Click="buttonAddIFC_Click" ToolTip="Add IFC File" >
+                            <Image Height="20" Width="20" Source="Images/add.png"/>
                         </Button>
-                        <Button x:Name="buttonDeleteIFC" HorizontalAlignment="Left" Margin="43,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" Click="buttonDeleteIFC_Click" >
-                            <Image Height="22" Width="22" Source="Images/ifc_delete.ico" />
+                        <Button x:Name="buttonDeleteIFC" HorizontalAlignment="Left" Margin="43,7,0,0" Grid.Row="3" VerticalAlignment="Top" Width="28" Height="28" Click="buttonDeleteIFC_Click" ToolTip="Delete Item" >
+                            <Image Height="20" Width="20" Source="Images/delete.png" />
                         </Button>
                     </Grid>
                 </Expander>
-            </Grid>
-        </GroupBox>
-        <GroupBox Margin="10" Grid.Row="2" Grid.Column="1" Header="Rulesets">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition Height="40"/>
-                </Grid.RowDefinitions>
-                <DataGrid x:Name="dataGridRuleset" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="7,7,7,0" IsReadOnly="True" SelectionMode="Extended" CanUserAddRows="False" CanUserDeleteRows="False">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="File Name" Width="1*" Binding="{Binding File}"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-                <Button x:Name="buttonAddRule" HorizontalAlignment="Left" Margin="10,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" Click="buttonAddRule_Click">
-                    <Image  Height="16" Width="16" Source="Images/add.png" />
-                </Button>
-                <Button x:Name="buttonDeleteRule" HorizontalAlignment="Left" Margin="43,7,0,0" Grid.Row="1" VerticalAlignment="Top" Width="28" Height="28" Click="buttonDeleteRule_Click">
-                    <Image Height="16" Width="16" Source="Images/delete.png"/>
-                </Button>
-            </Grid>
-        </GroupBox>
-        <GroupBox Grid.Row="2" Grid.Column="2" Margin="10" Header="Save Files">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <GroupBox Header="BCF Report" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch">
-                    <Grid>
-                        <DataGrid x:Name="dataGridBCF" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False" SelectionChanged="dataGridBCF_SelectionChanged">
+
+                <!--Classifications and Rulesets-->
+                <Expander x:Name="expanderRuleset" Header="Classification and Rulesets" Margin="10,0,10,10" HorizontalAlignment="Stretch" BorderBrush="#FF2ECC71" Foreground="White" IsExpanded="False">
+                    <Expander.Background>
+                        <SolidColorBrush Color="#FF2ECC71"/>
+                    </Expander.Background>
+                    <Grid Background="White" Margin="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition />
+                            <RowDefinition Height="40"/>
+                        </Grid.RowDefinitions>
+                        
+                        <DataGrid x:Name="dataGridClassification" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="7,7,7,0" 
+                                  IsReadOnly="True" SelectionMode="Extended" CanUserAddRows="False" CanUserDeleteRows="False"
+                                  ItemsSource="{Binding Classifications}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="File Name" Width="1*" Binding="{Binding BCFReport.File}"/>
+                                <DataGridTextColumn Header="Classification File" Width="1*" Binding="{Binding File}"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                    </Grid>
-                </GroupBox>
-                <GroupBox Grid.Row="1" Header="Solibri Files" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" >
-                    <Grid>
-                        <DataGrid x:Name="dataGridSaveSolibri" HorizontalAlignment="Stretch" Margin="5" VerticalAlignment="Stretch" IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False" SelectionChanged="dataGridSaveSolibri_SelectionChanged">
+                        <Button Grid.Row="1" ToolTip="Add a Classification" x:Name="buttonAddClass" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Width="28" Height="28" Click="buttonAddClass_Click" >
+                            <Image  Height="20" Width="20" Source="Images/add.png" />
+                        </Button>
+                        <Button Grid.Row="1" ToolTip="Delete the Selected Classificaiton" x:Name="buttonDeleteClass" HorizontalAlignment="Left" Margin="43,7,0,0" VerticalAlignment="Top" Width="28" Height="28" Click="buttonDeleteClass_Click" >
+                            <Image Height="20" Width="20" Source="Images/delete.png"/>
+                        </Button>
+                        <Button Grid.Row="1" ToolTip="Import from Settings" x:Name="buttonImportClass" HorizontalAlignment="Right" Margin="0,7,10,0" VerticalAlignment="Top" Width="28" Height="28" Click="buttonImportClass_Click">
+                            <Image Height="20" Width="20" Source="Images/import.png"/>
+                        </Button>
+                        <DataGrid Grid.Row="2" x:Name="dataGridRuleset" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="7,7,7,0" 
+                                  IsReadOnly="True" SelectionMode="Extended" CanUserAddRows="False" CanUserDeleteRows="False"
+                                  ItemsSource="{Binding Rulesets}">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="File Name" Width="1*" Binding="{Binding SaveSolibri.File}"/>
+                                <DataGridTextColumn Header="Ruleset File" Width="1*" Binding="{Binding File}"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <Button Grid.Row="3" x:Name="buttonAddRule" HorizontalAlignment="Left" Margin="10,7,0,0" VerticalAlignment="Top" Width="28" Height="28" Click="buttonAddRule_Click" >
+                            <Image  Height="20" Width="20" Source="Images/add.png" />
+                        </Button>
+                        <Button Grid.Row="3" x:Name="buttonDeleteRule" HorizontalAlignment="Left" Margin="43,7,0,0" VerticalAlignment="Top" Width="28" Height="28" Click="buttonDeleteRule_Click" >
+                            <Image Height="20" Width="20" Source="Images/delete.png"/>
+                        </Button>
+                        <Button Grid.Row="3" ToolTip="Import from Settings" x:Name="buttonImportRule" HorizontalAlignment="Right" Margin="0,7,10,0" VerticalAlignment="Top" Width="28" Height="28" Click="buttonImportRule_Click">
+                            <Image Height="20" Width="20" Source="Images/import.png"/>
+                        </Button>
                     </Grid>
-                </GroupBox>
-               
-            </Grid>
-        </GroupBox>
+                </Expander>
+                
+                <!-- Reporting-->
+                <Expander x:Name="expanderReporting" Header="Reporting" Margin="10,0,10,10" HorizontalAlignment="Stretch" BorderBrush="#FF3498DB" Foreground="White" IsExpanded="False">
+                    <Expander.Background>
+                        <SolidColorBrush Color="#FF3498DB"/>
+                    </Expander.Background>
+                    <Grid Background="White" Margin="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <ToggleButton x:Name="toggleCheck" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource AnimatedSwitch}" 
+                                      Margin="0,0,100,0" Height="25" ToolTip="Check On/Off to create presentation and reports"
+                                      IsChecked="{Binding CheckEnabled}"/>
+                        <Label HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Medium">
+                            <Label.Style>
+                                <Style TargetType="Label">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=toggleCheck, Path=IsChecked}" Value="True">
+                                            <Setter Property="Content" Value="Check On"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=toggleCheck, Path=IsChecked}" Value="False">
+                                            <Setter Property="Content" Value="Check Off"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Label.Style>
+                        </Label>
+                        <GroupBox Grid.Row="1" Margin="5" Header="Report Settings" Foreground="Black"
+                                  IsEnabled="{Binding ElementName=toggleCheck, Path=IsChecked}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition  Height="40"/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox  x:Name="checkBoxCreate"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,10,0,5" Content="Create Presentation"
+                                      IsChecked="{Binding PresentationCreate.IsSelected}" Checked="checkBoxCreate_Checked"/>
+                                    <CheckBox  x:Name="checkBoxUpdate" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,10,0,5"  Grid.Column="1" Content="Update Presentation" 
+                                      IsChecked="{Binding PresentationUpdate.IsSelected}" Checked="checkBoxUpdate_Checked"/>
+                                </Grid>
+                                <GroupBox Header="Report from Checking View" HorizontalAlignment="Stretch" Margin="5" Grid.Row="1" VerticalAlignment="Stretch" Foreground="Black">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+
+                                        <Label  Margin="10,7,0,5" HorizontalAlignment="Left" Content="PDF File:"/>
+                                        <TextBox  x:Name="textBoxCheckingPdf" HorizontalAlignment="Stretch" Margin="65,7,50,5"
+                                          Text="{Binding CheckingReport.PdfFile}"/>
+                                        <Button  x:Name="buttonCheckingPdf" HorizontalAlignment="Right" Margin="10,7,10,5" VerticalAlignment="Top" Width="28" Height="28" Click="buttonCheckingPdf_Click" >
+                                            <Image Height="20" Width="20" Source="Images/save.png"/>
+                                        </Button>
+                                        <Label Grid.Row="1" Margin="10,7,0,5" HorizontalAlignment="Left" Content="RTF File:"/>
+                                        <TextBox x:Name="textBoxCheckingRtf" Grid.Row="1" HorizontalAlignment="Stretch" Margin="65,7,50,5"
+                                         Text="{Binding CheckingReport.RtfFile}"/>
+                                        <Button Grid.Row="1" x:Name="buttonCheckingRtf" HorizontalAlignment="Right" Margin="10,7,10,5" VerticalAlignment="Top" Width="28" Height="28" Click="buttonCheckingRtf_Click" >
+                                            <Image Height="20" Width="20" Source="Images/save.png"/>
+                                        </Button>
+                                        <Expander Grid.Row="2" x:Name="expanderReportOption" Header="Report Options" Margin="10" HorizontalAlignment="Stretch" BorderBrush="#FFECF0F1">
+                                            <Expander.Background>
+                                                <SolidColorBrush Color="#FFECF0F1"/>
+                                            </Expander.Background>
+                                            <Grid Background="White" Margin="2">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Label Margin="0,0,5,0" HorizontalAlignment="Right" Content="Include Severity:" VerticalAlignment="Center"/>
+                                                <CheckBox x:Name="checkBoxMajor" Grid.Column="1"  HorizontalAlignment="Left" VerticalAlignment="Center" Content="Major"
+                                                  IsChecked="{Binding CheckingReport.Major}"/>
+                                                <CheckBox x:Name="checkBoxNormal" Grid.Column="2"  HorizontalAlignment="Left" VerticalAlignment="Center" Content="Normal"
+                                                  IsChecked="{Binding CheckingReport.Normal}"/>
+                                                <CheckBox x:Name="checkBoxMinor" Grid.Column="3"  HorizontalAlignment="Left" VerticalAlignment="Center" Content="Minor"
+                                                  IsChecked="{Binding CheckingReport.Minor}"/>
+                                                <Label Grid.Row="1" Margin="0,0,5,0" HorizontalAlignment="Right" Content="Include Checking Decision:"/>
+                                                <CheckBox x:Name="checkBoxRejected" Grid.Row="1" Grid.Column="1"  HorizontalAlignment="Left" VerticalAlignment="Center" Content="Rejected"
+                                                  IsChecked="{Binding CheckingReport.Rejected}"/>
+                                                <CheckBox x:Name="checkBoxaccepted" Grid.Row="1" Grid.Column="2"  HorizontalAlignment="Left" VerticalAlignment="Center" Content="Accepted"
+                                                  IsChecked="{Binding CheckingReport.Accepted}"/>
+                                            </Grid>
+                                        </Expander>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Header="Report from Presentation View" HorizontalAlignment="Stretch" Margin="5" Grid.Row="2" VerticalAlignment="Stretch" Foreground="Black">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Margin="10,7,0,5" HorizontalAlignment="Left" Content="PDF File:"/>
+                                        <TextBox x:Name="textBoxPdf" HorizontalAlignment="Stretch" Margin="65,7,50,5" Text="{Binding PresentationReport.PdfFile}"/>
+                                        <Button x:Name="buttonPdf" HorizontalAlignment="Right" Margin="10,7,10,5" VerticalAlignment="Top" Width="28" Height="28" Click="buttonPdf_Click">
+                                            <Image Height="20" Width="20" Source="Images/save.png"/>
+                                        </Button>
+                                        <Label Grid.Row="1" Margin="10,7,0,5" HorizontalAlignment="Left" Content="RTF File:"/>
+                                        <TextBox x:Name="textBoxRtf" Grid.Row="1" HorizontalAlignment="Stretch" Margin="65,7,50,5" Text="{Binding PresentationReport.RtfFile}"/>
+                                        <Button Grid.Row="1" x:Name="buttonRtf" HorizontalAlignment="Right" Margin="10,7,10,5" VerticalAlignment="Top" Width="28" Height="28" Click="buttonRtf_Click">
+                                            <Image Height="20" Width="20" Source="Images/save.png"/>
+                                        </Button>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Header="BCF Report" HorizontalAlignment="Stretch" Margin="5" Grid.Row="4" Grid.ColumnSpan="3" VerticalAlignment="Stretch" Foreground="Black">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <RadioButton x:Name="radioButtonBCF1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5" 
+                                                 Content="BCF 1.0" GroupName="BCFVersion" Tag="{Binding BCFReport.Version}">
+                                                <RadioButton.Style>
+                                                    <Style TargetType="RadioButton">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BCFReport.Version}" Value="1">
+                                                                <Setter Property="IsChecked" Value="True"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding BCFReport.Version}" Value="2">
+                                                                <Setter Property="IsChecked" Value="False"/>
+                                                            </DataTrigger>
+                                                            <Trigger Property="IsChecked" Value="True">
+                                                                <Setter Property="Tag" Value="1"/>
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </RadioButton.Style>
+                                            </RadioButton>
+                                            <RadioButton x:Name="radioButtonBCF2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,5,0,5" 
+                                                 Content="BCF 2.0" IsChecked="True" GroupName="BCFVersion" Tag="{Binding BCFReport.Version}">
+                                                <RadioButton.Style>
+                                                    <Style TargetType="RadioButton">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BCFReport.Version}" Value="1">
+                                                                <Setter Property="IsChecked" Value="False"/>
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding BCFReport.Version}" Value="2">
+                                                                <Setter Property="IsChecked" Value="True"/>
+                                                            </DataTrigger>
+                                                            <Trigger Property="IsChecked" Value="True">
+                                                                <Setter Property="Tag" Value="2"/>
+                                                            </Trigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </RadioButton.Style>
+                                            </RadioButton>
+                                        </Grid>
+                                        <Label Grid.Row="1" Margin="10,7,0,5" HorizontalAlignment="Left" Content="BCF File:"/>
+                                        <TextBox x:Name="textBoxBcf" Grid.Row="1" HorizontalAlignment="Stretch" Margin="65,7,50,5" Text="{Binding BCFReport.File}"/>
+                                        <Button Grid.Row="1" x:Name="buttonBcf" HorizontalAlignment="Right" Margin="10,7,10,5" VerticalAlignment="Top" Width="28" Height="28" Click="buttonBcf_Click" >
+                                            <Image Height="20" Width="20" Source="Images/bcf.ico"/>
+                                        </Button>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Header="Coordination Report" HorizontalAlignment="Stretch" Margin="5" Grid.Row="5" VerticalAlignment="Stretch" Foreground="Black">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Label Margin="35,7,0,5" HorizontalAlignment="Left" Content="Excel File:"/>
+                                        <TextBox x:Name="textBoxExcel" HorizontalAlignment="Stretch" Margin="95,7,50,5" Text="{Binding CoordReport.File}"/>
+                                        <Button x:Name="buttonExcel" HorizontalAlignment="Right" Margin="10,7,10,5" VerticalAlignment="Top" Width="28" Height="28" Click="buttonExcel_Click" >
+                                            <Image Height="20" Width="20" Source="Images/save.png"/>
+                                        </Button>
+                                        <Label Grid.Row="1" Margin="10,7,0,5" HorizontalAlignment="Left" Content="Template File:"/>
+                                        <TextBox x:Name="textBoxTemplate" Grid.Row="1" HorizontalAlignment="Stretch" Margin="95,7,50,5" Text="{Binding CoordReport.TemplateFile}"/>
+                                        <Button Grid.Row="1" x:Name="buttonTemplate" HorizontalAlignment="Right" Margin="10,7,10,5" VerticalAlignment="Top" Width="28" Height="28" Click="buttonTemplate_Click" >
+                                            <Image Height="15" Width="16" Source="Images/folder.png"/>
+                                        </Button>
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
+                        </GroupBox>
+                        
+                        
+                    </Grid>
+                </Expander>
+
+                <!--Saving Models-->
+                <Expander  Header="Saving Models" Margin="10,0,10,10" BorderBrush="#FF9B59B6" Foreground="White" IsExpanded="True"> 
+                    <Expander.Background>
+                        <SolidColorBrush Color="#FF9B59B6"/>
+                    </Expander.Background>
+                    <Grid Background="White" Margin="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Label Margin="10,7,0,5" HorizontalAlignment="Left" Content="Solibri Model:"/>
+                        <TextBox x:Name="textBoxSaveSolibri" HorizontalAlignment="Stretch" Margin="95,7,50,5" Text="{Binding SaveSolibri.File}"/>
+                        <Button x:Name="buttonSaveSolibri" HorizontalAlignment="Right" Margin="10,7,10,0" VerticalAlignment="Top" Width="28" Height="28" Click="buttonSaveSolibri_Click" >
+                            <Image Height="22" Width="22" Source="Images/solibri_add.png"/>
+                        </Button>
+                    </Grid>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
         <StatusBar HorizontalAlignment="Stretch" Margin="0" Grid.Row="4" VerticalAlignment="Stretch" Grid.ColumnSpan="3">
             <StatusBarItem>
                 <TextBlock Margin="5,0,5,0" Text="Ready" Name="statusLable" />
             </StatusBarItem>
         </StatusBar>
-        
+       
+
 
     </Grid>
 </Window>

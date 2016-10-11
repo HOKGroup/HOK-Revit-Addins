@@ -54,15 +54,18 @@ namespace SolibriBatchSetup.Schema
         
         [System.Xml.Serialization.XmlElementAttribute("openmodel", typeof(OpenModel))]
         [System.Xml.Serialization.XmlElementAttribute("openruleset", typeof(OpenRuleset))]
+        [System.Xml.Serialization.XmlElementAttribute("openclassification", typeof(OpenClassification))]
         [System.Xml.Serialization.XmlElementAttribute("check", typeof(Check))]
         [System.Xml.Serialization.XmlElementAttribute("autocomment", typeof(AutoComment))]
-        [System.Xml.Serialization.XmlElementAttribute("createpresentation", typeof(CreatePresentation))]
-        [System.Xml.Serialization.XmlElementAttribute("coordinationreport", typeof(CoordinationReport))]
-        [System.Xml.Serialization.XmlElementAttribute("generalreport", typeof(GeneralReport))]
         [System.Xml.Serialization.XmlElementAttribute("writereport", typeof(WriterReport))]
+        [System.Xml.Serialization.XmlElementAttribute("createpresentation", typeof(CreatePresentation))]
+        [System.Xml.Serialization.XmlElementAttribute("generalreport", typeof(GeneralReport))]
         [System.Xml.Serialization.XmlElementAttribute("bcfreport", typeof(BCFReport))]
+        [System.Xml.Serialization.XmlElementAttribute("coordinationreport", typeof(CoordinationReport))]
         [System.Xml.Serialization.XmlElementAttribute("savemodel", typeof(SaveModel))]
         [System.Xml.Serialization.XmlElementAttribute("closemodel", typeof(CloseModel))]
+        [System.Xml.Serialization.XmlElementAttribute("updatemodel", typeof(UpdateModel))]
+        [System.Xml.Serialization.XmlElementAttribute("updatepresentation", typeof(UpdatePresentation))]
         public ObservableCollection<GenericElement> Elements { get { return elements; } set { elements = value; NotifyPropertyChanged("Elements"); } }
 
         [System.Xml.Serialization.XmlElementAttribute("exit")]
@@ -105,40 +108,116 @@ namespace SolibriBatchSetup.Schema
         private string shortName = "";
         private string discipline = "";
         private string fileExtension = "";
-        private string toolTip = "";
 
         [System.Xml.Serialization.XmlAttributeAttribute("file")]
         public string File { get { return file; } set { file = value; fileExtension = System.IO.Path.GetExtension(file); NotifyPropertyChanged("File"); } }
         [System.Xml.Serialization.XmlAttributeAttribute("shortname")]
-        public string ShortName { get { return shortName; } set { shortName = value; SetToolTip(); NotifyPropertyChanged("ShortName"); } }
+        public string ShortName { get { return shortName; } set { shortName = value; NotifyPropertyChanged("ShortName"); } }
         [System.Xml.Serialization.XmlAttributeAttribute("discipline")]
-        public string Discipline { get { return discipline; } set { discipline = value; SetToolTip(); NotifyPropertyChanged("Discipline"); } }
+        public string Discipline { get { return discipline; } set { discipline = value; NotifyPropertyChanged("Discipline"); } }
         [System.Xml.Serialization.XmlIgnore]
         public string FileExtension { get { return fileExtension; } set { fileExtension = value; NotifyPropertyChanged("FileExtension"); } }
-        [System.Xml.Serialization.XmlIgnore]
-        public string ToolTip { get { return toolTip; } set { toolTip = value; NotifyPropertyChanged("ToolTip"); } }
+       
 
         public OpenModel() { }
 
         public OpenModel(string fileName)
         {
             file = fileName;
-            fileExtension = System.IO.Path.GetExtension(file); 
+            fileExtension = System.IO.Path.GetExtension(file);
         }
 
-        public void SetToolTip()
+        public OpenModel(InputModel model)
         {
-            toolTip = "";
-            if (!string.IsNullOrEmpty(shortName))
-            {
-                toolTip = "shortname = " + shortName+", ";
-            }
-            if (!string.IsNullOrEmpty(discipline))
-            {
-                toolTip += "discipline = " + discipline;
-            }
+            file = model.File;
+            shortName = model.ShortName;
+            discipline = model.Discipline;
+            fileExtension = model.FileExtension;
         }
-        
+    }
+
+    public class UpdateModel : GenericElement
+    {
+        private string file = "";
+        private string with = "";
+
+        [System.Xml.Serialization.XmlAttributeAttribute("file")]
+        public string File { get { return file; } set { file = value; NotifyPropertyChanged("File"); } }
+        [System.Xml.Serialization.XmlAttributeAttribute("with")]
+        public string With { get { return with; } set { with = value; NotifyPropertyChanged("With"); } }
+
+        public UpdateModel() { }
+
+        public UpdateModel(string oldPath, string updatePath)
+        {
+            file = oldPath;
+            with = updatePath;
+        }
+
+        public UpdateModel(InputModel model)
+        {
+            file = model.File;
+            with = model.With;
+        }
+    }
+
+    //Custom Class for InputModel to combine properties from OpenModel and UpdateModel
+    public class InputModel : GenericElement
+    {
+        private bool isUpdate = false; //false:OpenModel, true:UpdateModel
+        private string file = "";
+        private string shortName = "";
+        private string discipline = "";
+        private string fileExtension = "";
+        private string with = "";
+
+        public bool IsUpdate 
+        { 
+            get { return isUpdate; } 
+            set 
+            { 
+                isUpdate = value;
+                if (isUpdate && string.IsNullOrEmpty(with))
+                {
+                    this.With = file;
+                }
+                else
+                {
+                    this.With = "";
+                }
+                NotifyPropertyChanged("IsUpdate"); 
+            } 
+        }
+        public string File { get { return file; } set { file = value; NotifyPropertyChanged("File");  } }
+        public string ShortName { get { return shortName; } set { shortName = value; NotifyPropertyChanged("ShortName"); } }
+        public string Discipline { get { return discipline; } set { discipline = value; NotifyPropertyChanged("Discipline"); } }
+        public string FileExtension { get { return fileExtension; } set { fileExtension = value; NotifyPropertyChanged("FileExtension"); } }
+        public string With { get { return with; } set { with = value; NotifyPropertyChanged("With"); } }
+
+        public InputModel()
+        {
+        }
+
+        public InputModel(string fileName)
+        {
+            file = fileName;
+        }
+
+        public InputModel(OpenModel model)
+        {
+            isUpdate = false;
+            file = model.File;
+            shortName = model.ShortName;
+            discipline = model.Discipline;
+            fileExtension = model.FileExtension;
+        }
+
+        public InputModel(UpdateModel model)
+        {
+            isUpdate = true;
+            file = model.File;
+            with = model.With;
+        }
     }
 
     public class OpenRuleset : GenericElement
@@ -156,16 +235,52 @@ namespace SolibriBatchSetup.Schema
         }
     }
 
+    public class OpenClassification : GenericElement
+    {
+        private string file = "";
+        private string provider = "";
+        private string resource = "";
+
+        [System.Xml.Serialization.XmlAttributeAttribute("file")]
+        public string File { get { return file; } set { file = value; NotifyPropertyChanged("File"); } }
+        [System.Xml.Serialization.XmlAttributeAttribute("provider")]
+        public string Provider { get { return provider; } set { provider = value; NotifyPropertyChanged("Provider"); } }
+        [System.Xml.Serialization.XmlAttributeAttribute("resource")]
+        public string Resource { get { return resource; } set { resource = value; NotifyPropertyChanged("Resource"); } }
+
+        public OpenClassification() { }
+
+        public OpenClassification(string fileName)
+        {
+            file = fileName;
+        }
+
+        public OpenClassification(string providerName, string resourceName)
+        {
+            provider = providerName;
+            resource = resourceName;
+        }
+    
+    }
+
     public class Check : GenericElement
     {
+        private bool isSpecified = false;
+
+        [System.Xml.Serialization.XmlIgnore]
+        public bool IsSpecified { get { return isSpecified; } set { isSpecified = value; NotifyPropertyChanged("IsSpecified"); } }
+
         public Check() { }
     }
 
     public class AutoComment : GenericElement
     {
+        private bool isSpecified = false;
         private string zoom = "TRUE";
         private string maxSnapshotsInCategory = "3";
-
+        
+        [System.Xml.Serialization.XmlIgnore]
+        public bool IsSpecified { get { return isSpecified; } set { isSpecified = value; NotifyPropertyChanged("IsSpecified"); } }
         [System.Xml.Serialization.XmlAttributeAttribute("zoom")]
         public string Zoom { get { return zoom; } set { zoom = value; NotifyPropertyChanged("Zoom"); } }
         [System.Xml.Serialization.XmlAttributeAttribute("maxsnapshotsincategory")]
@@ -173,21 +288,77 @@ namespace SolibriBatchSetup.Schema
 
     }
 
+    public class WriterReport : GenericElement
+    {
+        private string pdffile;
+        private string rtffile;
+        private bool major;
+        //private bool majorSpecified;
+        private bool normal;
+        //private bool normalSpecified;
+        private bool minor;
+        //private bool minorSpecified;
+        private bool rejected;
+        //private bool rejectedSpecified;
+        private bool accepted;
+        //private bool acceptedSpecified;
+
+        [System.Xml.Serialization.XmlAttributeAttribute("pdffile")]
+        public string PdfFile { get { return pdffile; } set { pdffile = value; NotifyPropertyChanged("PdfFile"); } }
+
+        [System.Xml.Serialization.XmlAttributeAttribute("rtffile")]
+        public string RtfFile { get { return rtffile; } set { rtffile = value; NotifyPropertyChanged("RtfFile"); } }
+
+        [System.Xml.Serialization.XmlAttributeAttribute("major")]
+        public bool Major { get { return major; } set { major = value; NotifyPropertyChanged("Major"); } }
+
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool MajorSpecified { get { return majorSpecified; } set { majorSpecified = value; NotifyPropertyChanged("MajorSpecified"); } }
+
+        [System.Xml.Serialization.XmlAttributeAttribute("normal")]
+        public bool Normal { get { return normal; } set { normal = value; NotifyPropertyChanged("Normal"); } }
+
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool NormalSpecified { get { return normalSpecified; } set { normalSpecified = value; NotifyPropertyChanged("NormalSpecified"); } }
+
+        [System.Xml.Serialization.XmlAttributeAttribute("minor")]
+        public bool Minor { get { return minor; } set { minor = value; NotifyPropertyChanged("Minor"); } }
+
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool MinorSpecified { get { return minorSpecified; } set { minorSpecified = value; NotifyPropertyChanged("MinorSpecified"); } }
+
+        [System.Xml.Serialization.XmlAttributeAttribute("rejected")]
+        public bool Rejected { get { return rejected; } set { rejected = value; NotifyPropertyChanged("Rejected"); } }
+
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool RejectedSpecified { get { return rejectedSpecified; } set { rejectedSpecified = value; NotifyPropertyChanged("RejectedSpecified"); } }
+
+        [System.Xml.Serialization.XmlAttributeAttribute("accepted")]
+        public bool Accepted { get { return accepted; } set { accepted = value; NotifyPropertyChanged("Accepted"); } }
+
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool AcceptedSpecified { get { return acceptedSpecified; } set { acceptedSpecified = value; NotifyPropertyChanged("AcceptedSpecified"); } }
+
+    }
+
     public class CreatePresentation : GenericElement
     {
+        private bool isSelected = false;
+
+        [System.Xml.Serialization.XmlIgnore]
+        public bool IsSelected { get { return isSelected; } set { isSelected = value; NotifyPropertyChanged("IsSelected"); } }
+
         public CreatePresentation() { }
     }
 
-    public class CoordinationReport : GenericElement
+    public class UpdatePresentation : GenericElement
     {
-        private string file = "";
-        private string templateFile = "";
+        private bool isSelected = false;
 
-        [System.Xml.Serialization.XmlAttributeAttribute("file")]
-        public string File { get { return file; } set { file = value; NotifyPropertyChanged("File"); } }
-        [System.Xml.Serialization.XmlAttributeAttribute("templatefile")]
-        public string TemplateFile { get { return templateFile; } set { templateFile = value; NotifyPropertyChanged("TemplateFile"); } }
+        [System.Xml.Serialization.XmlIgnore]
+        public bool IsSelected { get { return isSelected; } set { isSelected = value; NotifyPropertyChanged("IsSelected"); } }
 
+        public UpdatePresentation() { }
     }
 
     public class GeneralReport : GenericElement
@@ -195,15 +366,15 @@ namespace SolibriBatchSetup.Schema
         private string pdffile;
         private string rtffile;
         private bool major;
-        private bool majorSpecified;
+        //private bool majorSpecified;
         private bool normal;
-        private bool normalSpecified;
+        //private bool normalSpecified;
         private bool minor;
-        private bool minorSpecified;
+        //private bool minorSpecified;
         private bool rejected;
-        private bool rejectedSpecified;
+        //private bool rejectedSpecified;
         private bool accepted;
-        private bool acceptedSpecified;
+        //private bool acceptedSpecified;
 
         [System.Xml.Serialization.XmlAttributeAttribute("pdffile")]
         public string PdfFile { get { return pdffile; } set { pdffile = value; NotifyPropertyChanged("PdfFile"); } }
@@ -214,86 +385,32 @@ namespace SolibriBatchSetup.Schema
         [System.Xml.Serialization.XmlAttributeAttribute("major")]
         public bool Major { get { return major; } set { major = value; NotifyPropertyChanged("Major"); } }
 
-        [System.Xml.Serialization.XmlAttributeAttribute("majorspecified")]
-        public bool MajorSpecified { get { return majorSpecified; } set { majorSpecified = value; NotifyPropertyChanged("MajorSpecified"); } }
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool MajorSpecified { get { return majorSpecified; } set { majorSpecified = value; NotifyPropertyChanged("MajorSpecified"); } }
 
         [System.Xml.Serialization.XmlAttributeAttribute("normal")]
-        public bool Normal { get { return normal; } set { normal = value; NotifyPropertyChanged("File"); } }
+        public bool Normal { get { return normal; } set { normal = value; NotifyPropertyChanged("Normal"); } }
 
-        [System.Xml.Serialization.XmlAttributeAttribute("normalspecified")]
-        public bool NormalSpecified { get { return normalSpecified; } set { normalSpecified = value; NotifyPropertyChanged("File"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("minor")]
-        public bool Minor { get { return minor; } set { minor = value; NotifyPropertyChanged("File"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("minorspecified")]
-        public bool MinorSpecified { get { return minorSpecified; } set { minorSpecified = value; NotifyPropertyChanged("File"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("rejected")]
-        public bool Rejected { get { return rejected; } set { rejected = value; NotifyPropertyChanged("File"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("rejectedspecified")]
-        public bool RejectedSpecified { get { return rejectedSpecified; } set { rejectedSpecified = value; NotifyPropertyChanged("File"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("accepted")]
-        public bool Accepted { get { return accepted; } set { accepted = value; NotifyPropertyChanged("File"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("acceptedspecified")]
-        public bool AcceptedSpecified { get { return acceptedSpecified; } set { acceptedSpecified = value; NotifyPropertyChanged("File"); } }
-
-        
-    }
-
-    public class WriterReport : GenericElement
-    {
-        private string pdffile;
-        private string rtffile;
-        private bool major;
-        private bool majorSpecified;
-        private bool normal;
-        private bool normalSpecified;
-        private bool minor;
-        private bool minorSpecified;
-        private bool rejected;
-        private bool rejectedSpecified;
-        private bool accepted;
-        private bool acceptedSpecified;
-
-        [System.Xml.Serialization.XmlAttributeAttribute("pdffile")]
-        public string PdfFile { get { return pdffile; } set { pdffile = value; NotifyPropertyChanged("PdfFile"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("rtffile")]
-        public string RtfFile { get { return rtffile; } set { rtffile = value; NotifyPropertyChanged("RtfFile"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("major")]
-        public bool Major { get { return major; } set { major = value; NotifyPropertyChanged("Major"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("majorspecified")]
-        public bool MajorSpecified { get { return majorSpecified; } set { majorSpecified = value; NotifyPropertyChanged("MajorSpecified"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("normal")]
-        public bool Normal { get { return normal; } set { normal = value; NotifyPropertyChanged("File"); } }
-
-        [System.Xml.Serialization.XmlAttributeAttribute("normalspecified")]
-        public bool NormalSpecified { get { return normalSpecified; } set { normalSpecified = value; NotifyPropertyChanged("File"); } }
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool NormalSpecified { get { return normalSpecified; } set { normalSpecified = value; NotifyPropertyChanged("NormalSpecified"); } }
 
         [System.Xml.Serialization.XmlAttributeAttribute("minor")]
-        public bool Minor { get { return minor; } set { minor = value; NotifyPropertyChanged("File"); } }
+        public bool Minor { get { return minor; } set { minor = value; NotifyPropertyChanged("Minor"); } }
 
-        [System.Xml.Serialization.XmlAttributeAttribute("minorspecified")]
-        public bool MinorSpecified { get { return minorSpecified; } set { minorSpecified = value; NotifyPropertyChanged("File"); } }
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool MinorSpecified { get { return minorSpecified; } set { minorSpecified = value; NotifyPropertyChanged("MinorSpecified"); } }
 
         [System.Xml.Serialization.XmlAttributeAttribute("rejected")]
-        public bool Rejected { get { return rejected; } set { rejected = value; NotifyPropertyChanged("File"); } }
+        public bool Rejected { get { return rejected; } set { rejected = value; NotifyPropertyChanged("Rejected"); } }
 
-        [System.Xml.Serialization.XmlAttributeAttribute("rejectedspecified")]
-        public bool RejectedSpecified { get { return rejectedSpecified; } set { rejectedSpecified = value; NotifyPropertyChanged("File"); } }
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool RejectedSpecified { get { return rejectedSpecified; } set { rejectedSpecified = value; NotifyPropertyChanged("RejectedSpecified"); } }
 
         [System.Xml.Serialization.XmlAttributeAttribute("accepted")]
-        public bool Accepted { get { return accepted; } set { accepted = value; NotifyPropertyChanged("File"); } }
+        public bool Accepted { get { return accepted; } set { accepted = value; NotifyPropertyChanged("Accepted"); } }
 
-        [System.Xml.Serialization.XmlAttributeAttribute("acceptedspecified")]
-        public bool AcceptedSpecified { get { return acceptedSpecified; } set { acceptedSpecified = value; NotifyPropertyChanged("File"); } }
+        //[System.Xml.Serialization.XmlIgnoreAttribute]
+        //public bool AcceptedSpecified { get { return acceptedSpecified; } set { acceptedSpecified = value; NotifyPropertyChanged("AcceptedSpecified"); } }
 
     }
 
@@ -317,6 +434,18 @@ namespace SolibriBatchSetup.Schema
 
     }
 
+    public class CoordinationReport : GenericElement
+    {
+        private string file = "";
+        private string templateFile = "";
+
+        [System.Xml.Serialization.XmlAttributeAttribute("file")]
+        public string File { get { return file; } set { file = value; NotifyPropertyChanged("File"); } }
+        [System.Xml.Serialization.XmlAttributeAttribute("templatefile")]
+        public string TemplateFile { get { return templateFile; } set { templateFile = value; NotifyPropertyChanged("TemplateFile"); } }
+
+    }
+    
     public class SaveModel : GenericElement
     {
         private string file = "";
@@ -341,7 +470,5 @@ namespace SolibriBatchSetup.Schema
     {
         public CloseModel() { }
     }
-
-   
 
 }

@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="SolibriVersionNumber" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Solibri Model Checker v9.7</Value>
+      <Value Profile="(Default)">Solibri Model Checker v9.6</Value>
     </Setting>
     <Setting Name="DirectoryName" Type="System.String" Scope="User">
       <Value Profile="(Default)">\\NY-BAT-D001\SolibriBatch</Value>
@@ -17,44 +17,23 @@
     <Setting Name="SolibriAppendDate" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ReportSaveInPlace" Type="System.Boolean" Scope="User">
+    <Setting Name="BCFSaveInPlace" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ReportOutputFolder" Type="System.String" Scope="User">
+    <Setting Name="BCFOutputFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ReportAppendDate" Type="System.Boolean" Scope="User">
+    <Setting Name="BCFAppendDate" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="SolibriExe" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Program Files\Solibri\SMCv9.7\Solibri Model Checker v9.7.exe</Value>
+      <Value Profile="(Default)">C:\Program Files\Solibri\SMCv9.6\Solibri Model Checker v9.6.exe</Value>
     </Setting>
     <Setting Name="ComputerName" Type="System.String" Scope="User">
       <Value Profile="(Default)">NY-BAT-D001</Value>
     </Setting>
     <Setting Name="ComputerLocation" Type="System.String" Scope="User">
       <Value Profile="(Default)">NY</Value>
-    </Setting>
-    <Setting Name="Classifications" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="Rulesets" Type="System.Collections.Specialized.StringCollection" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="ReportCheckingSelected" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="ReportPresentationSelected" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="ReportBCFSelected" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="ReportCoordinationSelected" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="ReportTemplate" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

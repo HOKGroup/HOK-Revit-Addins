@@ -13,6 +13,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using SolibriBatchSetup.Schema;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace SolibriBatchSetup
 {
@@ -23,102 +26,142 @@ namespace SolibriBatchSetup
     {
         private AutorunSettings settings = new AutorunSettings();
         private List<SolibriProperties> solibries = new List<SolibriProperties>();
-        private List<RempoteMachine> remoteComputers = new List<RempoteMachine>();
+        private List<RemoteMachine> remoteComputers = new List<RemoteMachine>();
 
         public AutorunSettings Settings { get { return settings; } set { settings = value; } }
 
         public SettingWindow(AutorunSettings autoSetting)
         {
             settings = autoSetting;
+
             InitializeComponent();
-            CollectDefaultSettings();
-            DisplaySetting();
         }
 
-        private void CollectDefaultSettings()
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                //solibri versions
-                SolibriProperties sp = new SolibriProperties("Solibri Model Checker v9.5", @"C:\Program Files\Solibri\SMCv9.5\Solibri Model Checker v9.5.exe");
-                solibries.Add(sp);
-                sp = new SolibriProperties("Solibri Model Checker v9.6", @"C:\Program Files\Solibri\SMCv9.6\Solibri Model Checker v9.6.exe");
-                solibries.Add(sp);
-                solibries = solibries.OrderBy(o => o.VersionNumber).ToList();
-
-                comboBoxSolibri.ItemsSource = null;
-                comboBoxSolibri.ItemsSource = solibries;
-
-                comboBoxSolibri.DisplayMemberPath = "VersionNumber";
-
-                //remote machines
-                RempoteMachine rm = new RempoteMachine("NY", "NY-BAT-D001", @"\\NY-BAT-D001\SolibriBatch");
-                remoteComputers.Add(rm);
-                RempoteMachine rm2 = new RempoteMachine("PHI", "PHI-BAT-D001", @"\\PHI-BAT-D001\SolibriBatch");
-                remoteComputers.Add(rm2);
-                RempoteMachine rm3 = new RempoteMachine("HOU", "HOU-BAT-D001", @"\\HOU-BAT-D001\SolibriBatch");
-                remoteComputers.Add(rm3);
-
-                remoteComputers = remoteComputers.OrderBy(o => o.ComputerName).ToList();
-
-                comboBoxComputer.ItemsSource = null;
-                comboBoxComputer.ItemsSource = remoteComputers;
-                comboBoxComputer.DisplayMemberPath = "DirectoryName";
-
+                this.DataContext = settings;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect default settings.\n"+ex.Message, "Collect Default Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string message = ex.Message;
             }
+           
         }
 
-        private void DisplaySetting()
+
+        private void buttonAddClass_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                int solibriIndex = solibries.FindIndex(o => o.VersionNumber == settings.SolibriSetup.VersionNumber);
-                if (solibriIndex > -1)
+                OpenFileDialog openDialog = new OpenFileDialog();
+                openDialog.Filter = "CLASSIFICATION File (*.classification)|*.classification";
+                openDialog.Title = "Add Classification Files";
+                openDialog.Multiselect = true;
+                if (openDialog.ShowDialog() == true)
                 {
-                    comboBoxSolibri.SelectedIndex = solibriIndex;
+                    foreach (string fileName in openDialog.FileNames)
+                    {
+                       settings.Classifications.Add(new OpenClassification(fileName));
+                    }
                 }
-
-                int remoteIndex = remoteComputers.FindIndex(o => o.DirectoryName == settings.RemoteSetup.DirectoryName);
-                if (remoteIndex > -1)
-                {
-                    comboBoxComputer.SelectedIndex = remoteIndex;
-                }
-
-                if (settings.SaveSolibriSettings.SaveInPlace)
-                {
-                    radioButtonInPlaceSolibri.IsChecked = true;
-                }
-                else
-                {
-                    radioButtonFolderSolibri.IsChecked = true;
-                }
-                textBoxSolibriFolder.Text = settings.SaveSolibriSettings.OutputFolder;
-                checkBoxAppendSolibri.IsChecked = settings.SaveSolibriSettings.AppendDate;
-
-                if (settings.SaveBCFSettings.SaveInPlace)
-                {
-                    radioButtonInPlaceBCF.IsChecked = true;
-                }
-                else
-                {
-                    radioButtonFolderBCF.IsChecked = true;
-                }
-                textBoxBCFFolder.Text = settings.SaveBCFSettings.OutputFolder;
-                checkBoxAppendBCF.IsChecked = settings.SaveBCFSettings.AppendDate;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to display settings.\n" + ex.Message, "Display Settings", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string message = ex.Message;
             }
         }
 
-        private void buttonCancel_Click(object sender, RoutedEventArgs e)
+        private void buttonDeleteClass_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            try
+            {
+                for (int i = dataGridClassification.SelectedItems.Count - 1; i > -1; i--)
+                {
+                    OpenClassification classification = dataGridClassification.SelectedItems[i] as OpenClassification;
+                    settings.Classifications.Remove(classification);
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void buttonAddRule_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenFileDialog openDialog = new OpenFileDialog();
+                openDialog.Filter = "CSET File (*.cset)|*.cset";
+                openDialog.Title = "Add Ruleset Files";
+                openDialog.Multiselect = true;
+                if (openDialog.ShowDialog() == true)
+                {
+                    foreach (string fileName in openDialog.FileNames)
+                    {
+                        settings.Rulesets.Add(new OpenRuleset(fileName));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void buttonDeleteRule_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                for (int i = dataGridRuleset.SelectedItems.Count - 1; i > -1; i--)
+                {
+                    OpenRuleset ruleset = dataGridRuleset.SelectedItems[i] as OpenRuleset;
+                    settings.Rulesets.Remove(ruleset);
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void buttonOpenReportFolder_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                FileFolderDialog folderDialog = new FileFolderDialog();
+                folderDialog.Dialog.Title = "Select an Output Folder for BCF Reports";
+                System.Windows.Forms.DialogResult result = folderDialog.ShowDialog();
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    string folderName = folderDialog.SelectedPath;
+                    settings.ReportSettings.OutputFolder = folderName;
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void buttonOpenTemplate_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                OpenFileDialog openDialog = new OpenFileDialog();
+                openDialog.Filter = "Microsoft Excel 97-2003 Worksheet (*.xls)|*.xls";
+                openDialog.Title = "Open a Template File";
+                if (openDialog.ShowDialog() == true)
+                {
+                    settings.ReportSettings.CoordinationTemplate = openDialog.FileName;
+                }
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
         }
 
         private void buttonOpenSolibriFolder_Click(object sender, RoutedEventArgs e)
@@ -131,7 +174,7 @@ namespace SolibriBatchSetup
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     string folderName = folderDialog.SelectedPath;
-                    textBoxSolibriFolder.Text = folderName;
+                    settings.SaveSolibriSettings.OutputFolder = folderName;
                 }
             }
             catch (Exception ex)
@@ -140,23 +183,37 @@ namespace SolibriBatchSetup
             }
         }
 
-        private void buttonOpenBCFFolder_Click(object sender, RoutedEventArgs e)
+
+        private void buttonDefault_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                FileFolderDialog folderDialog = new FileFolderDialog();
-                folderDialog.Dialog.Title = "Select an Output Folder for BCF Reports";
-                System.Windows.Forms.DialogResult result = folderDialog.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    string folderName = folderDialog.SelectedPath;
-                    textBoxBCFFolder.Text = folderName;
-                }
+                comboBoxSolibri.SelectedIndex = solibries.FindIndex(o => o.VersionNumber == "Solibri Model Checker v9.7");
+                comboBoxComputer.SelectedIndex = remoteComputers.FindIndex(o => o.ComputerName == "NY-BAT-D001");
+                settings.Classifications = new ObservableCollection<OpenClassification>();
+                settings.Rulesets = new ObservableCollection<OpenRuleset>();
+                
+                settings.ReportSettings.IsCheckingSelected = false;
+                settings.ReportSettings.IsPresentationSelected = false;
+                settings.ReportSettings.IsBCFSelected = false;
+                settings.ReportSettings.IsCoordinationSelected = false;
+                settings.ReportSettings.SaveInPlace = true;
+                settings.ReportSettings.OutputFolder = "";
+                settings.ReportSettings.AppendDate = true;
+
+                settings.SaveSolibriSettings.SaveInPlace = true;
+                settings.SaveSolibriSettings.OutputFolder = "";
+                settings.SaveSolibriSettings.AppendDate = true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to set an output folder location.\n" + ex.Message, "Solibri Output Folder", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string message = ex.Message;
             }
+        }
+
+        private void buttonCancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
 
         private void buttonApply_Click(object sender, RoutedEventArgs e)
@@ -165,19 +222,24 @@ namespace SolibriBatchSetup
             {
                 if (null != comboBoxSolibri.SelectedItem && null != comboBoxComputer.SelectedItem)
                 {
-                    settings.SolibriSetup = comboBoxSolibri.SelectedItem as SolibriProperties;
-                    settings.RemoteSetup = comboBoxComputer.SelectedItem as RempoteMachine;
-
-                    settings.SaveSolibriSettings.SaveInPlace = (bool)radioButtonInPlaceSolibri.IsChecked;
-                    settings.SaveSolibriSettings.OutputFolder = textBoxSolibriFolder.Text;
-                    settings.SaveSolibriSettings.AppendDate = (bool)checkBoxAppendSolibri.IsChecked;
-
-                    settings.SaveBCFSettings.SaveInPlace = (bool)radioButtonInPlaceBCF.IsChecked;
-                    settings.SaveBCFSettings.OutputFolder = textBoxBCFFolder.Text;
-                    settings.SaveBCFSettings.AppendDate = (bool)checkBoxAppendBCF.IsChecked;
-
-                    SaveUserSettings();
-                    this.DialogResult = true;
+                    if (!settings.ReportSettings.SaveInPlace && string.IsNullOrEmpty(settings.ReportSettings.OutputFolder))
+                    {
+                        MessageBox.Show("Please enter a valid directory for reports.", "Reports - Save In Folder", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else if (!settings.ReportSettings.SaveInPlace && string.IsNullOrEmpty(settings.ReportSettings.OutputFolder))
+                    {
+                        MessageBox.Show("Please enter a valid directory for solibri.", "Saving Solibri Model - Save In Folder", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        SaveUserSettings();
+                        this.DialogResult = true;
+                    }
+                    
+                }
+                else
+                {
+                    MessageBox.Show("Please select a valid batch option.", "Batch Option Missing", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
@@ -197,13 +259,34 @@ namespace SolibriBatchSetup
                 Properties.Settings.Default.ComputerName = settings.RemoteSetup.ComputerName;
                 Properties.Settings.Default.DirectoryName = settings.RemoteSetup.DirectoryName;
 
+                Properties.Settings.Default.Classifications = new StringCollection();
+                var classificaitonFiles = from classificaiton in settings.Classifications select classificaiton.File;
+                if (classificaitonFiles.Count() > 0)
+                {
+                    string[]  cFiles = classificaitonFiles.ToArray();
+                    Properties.Settings.Default.Classifications.AddRange(cFiles);
+                }
+
+                Properties.Settings.Default.Rulesets = new StringCollection();
+                var rulesetFiles = from ruleset in settings.Rulesets select ruleset.File;
+                if (rulesetFiles.Count() > 0)
+                {
+                    string[] rFiles = rulesetFiles.ToArray();
+                    Properties.Settings.Default.Rulesets.AddRange(rFiles);
+                }
+
+                Properties.Settings.Default.ReportCheckingSelected = settings.ReportSettings.IsCheckingSelected;
+                Properties.Settings.Default.ReportPresentationSelected = settings.ReportSettings.IsPresentationSelected;
+                Properties.Settings.Default.ReportBCFSelected = settings.ReportSettings.IsBCFSelected;
+                Properties.Settings.Default.ReportCoordinationSelected = settings.ReportSettings.IsCoordinationSelected;
+                Properties.Settings.Default.ReportSaveInPlace = settings.ReportSettings.SaveInPlace;
+                Properties.Settings.Default.ReportOutputFolder = settings.ReportSettings.OutputFolder;
+                Properties.Settings.Default.ReportAppendDate = settings.ReportSettings.AppendDate;
+
+
                 Properties.Settings.Default.SolibriSaveInPlace = settings.SaveSolibriSettings.SaveInPlace;
                 Properties.Settings.Default.SolibriOutputFolder = settings.SaveSolibriSettings.OutputFolder;
                 Properties.Settings.Default.SolibriAppendDate = settings.SaveSolibriSettings.AppendDate;
-
-                Properties.Settings.Default.BCFSaveInPlace = settings.SaveBCFSettings.SaveInPlace;
-                Properties.Settings.Default.BCFOutputFolder = settings.SaveBCFSettings.OutputFolder;
-                Properties.Settings.Default.BCFAppendDate = settings.SaveBCFSettings.AppendDate;
 
                 Properties.Settings.Default.Save();
             }
@@ -213,102 +296,8 @@ namespace SolibriBatchSetup
             }
         }
 
+        
     }
 
-    public class AutorunSettings
-    {
-        private SolibriProperties solibriSetup = new SolibriProperties();
-        private RempoteMachine remoteSetup = new RempoteMachine();
-        private SaveModelSettings saveSolibriSettings = new SaveModelSettings(BatchFileType.Solibri);
-        private SaveModelSettings saveBCFSettings = new SaveModelSettings(BatchFileType.BCF);
-
-        public SolibriProperties SolibriSetup { get { return solibriSetup; } set { solibriSetup = value; } }
-        public RempoteMachine RemoteSetup { get { return remoteSetup; } set { remoteSetup = value; } }
-        public SaveModelSettings SaveSolibriSettings { get { return saveSolibriSettings; } set { saveSolibriSettings = value; } }
-        public SaveModelSettings SaveBCFSettings { get { return saveBCFSettings; } set { saveBCFSettings = value; } }
-
-        public AutorunSettings()
-        {
-            solibriSetup = new SolibriProperties("Solibri Model Checker v9.6", @"C:\Program Files\Solibri\SMCv9.6\Solibri Model Checker v9.6.exe");
-            remoteSetup = new RempoteMachine("NY", "NY-BAT-D001", @"\\NY-BAT-D001\SolibriBatch");
-        }
-
-        public AutorunSettings(SolibriProperties solibri, RempoteMachine remote)
-        {
-            solibriSetup = solibri;
-            remoteSetup = remote;
-        }
-    }
-
-    public class SolibriProperties
-    {
-        private string versionNumber = "";
-        private string exeFile = "";
-
-        public string VersionNumber { get { return versionNumber; } set { versionNumber = value; } }
-        public string ExeFile { get { return exeFile; } set { exeFile = value; } }
-
-        public SolibriProperties()
-        {
-        }
-
-        public SolibriProperties(string version, string exe)
-        {
-            versionNumber = version;
-            exeFile = exe;
-        }
-    }
-
-    public class RempoteMachine
-    {
-        private string location = "";
-        private string computerName = "";
-        private string directoryName = "";
-
-        public string Location { get { return location; } set { location = value; } }
-        public string ComputerName { get { return computerName; } set { computerName = value; } }
-        public string DirectoryName { get { return directoryName; } set { directoryName = value; } }
-
-        public RempoteMachine()
-        {
-        }
-
-        public RempoteMachine(string officeLocation, string comName, string directory)
-        {
-            location = officeLocation;
-            computerName = comName;
-            directoryName = directory;
-        }
-    }
-
-    public class SaveModelSettings
-    {
-        private BatchFileType fileType = BatchFileType.None;
-        private bool saveInPlace = true;
-        private string outputFolder = "";
-        private bool appendDate = true;
-
-        public BatchFileType FileType { get { return fileType; } set { fileType = value; } }
-        public bool SaveInPlace { get { return saveInPlace; } set { saveInPlace = value; } }
-        public string OutputFolder { get { return outputFolder; } set { outputFolder = value; } }
-        public bool AppendDate { get { return appendDate; } set { appendDate = value; } }
-
-        public SaveModelSettings(BatchFileType type)
-        {
-            fileType = type;
-        }
-
-        public SaveModelSettings(BatchFileType type, bool inPlace, string folderName, bool append)
-        {
-            fileType = type;
-            saveInPlace = inPlace;
-            outputFolder = folderName;
-            appendDate = append;
-        }
-    }
-
-    public enum BatchFileType
-    {
-        None, Solibri, IFC, BCF, Ruleset, PDF
-    }
+  
 }
