@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.DB.Events;
-using Autodesk.Revit.DB;
-using Autodesk.Revit.UI.Events;
 using System.Windows.Threading;
 using System.Windows;
 using System.IO;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Events;
 
 
 
@@ -58,7 +57,7 @@ namespace HOK.FileOnpeningMonitor
                 if (openedDocument.IsWorkshared)
                 {
                     if (string.IsNullOrEmpty(openedDocument.PathName)) { return; }
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                     if (openedDocument.IsDetached) { return; }
 #endif
                     bool isOnNetwork = IsNetworkDrive(openedDocument.PathName);
@@ -117,6 +116,7 @@ namespace HOK.FileOnpeningMonitor
             try
             {
                 if (pathName.StartsWith(@"\\")) { return true; }
+                if (pathName.StartsWith("RSN:")) { return true; }
 
                 DriveInfo[] infoArray = DriveInfo.GetDrives();
                 foreach (DriveInfo info in infoArray)
@@ -167,7 +167,7 @@ namespace HOK.FileOnpeningMonitor
                             ModelPath currentModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(document.PathName);
                             if (null!=currentModelPath)
                             {
-#if RELEASE2015|| RELEASE2016
+#if RELEASE2015|| RELEASE2016 || RELEASE2017
                                 Guid currentGuid = currentModelPath.GetModelGUID();
                                 if (currentGuid != Guid.Empty)
                                 {
@@ -182,7 +182,7 @@ namespace HOK.FileOnpeningMonitor
                     }
                     else
                     {
-                        if (document.PathName == userVisiblePath)
+                        if (document.PathName.ToUpper() == userVisiblePath.ToUpper())
                         {
                             isCentralFile = true;
                         }

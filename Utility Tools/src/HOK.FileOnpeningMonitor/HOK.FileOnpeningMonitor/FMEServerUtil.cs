@@ -69,7 +69,8 @@ namespace HOK.FileOnpeningMonitor
             {
                 userId = "revit";
                 password = "revit";
-                host = "hok-119vs";
+                //host = "hok-119vs";
+                host = "fme.hok.com";
                 port = 7071;
                 clientId = "app_revitnotification";
 
