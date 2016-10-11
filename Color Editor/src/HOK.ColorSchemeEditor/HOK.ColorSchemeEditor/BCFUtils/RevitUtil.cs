@@ -455,7 +455,7 @@ namespace HOK.ColorSchemeEditor.BCFUtils
                     collector = new FilteredElementCollector(doc, instanceIds);
                     List<ElementId> familyInstanceIds = collector.OfClass(typeof(FamilyInstance)).ToElementIds().ToList();
 
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                     collector = new FilteredElementCollector(doc, instanceIds);
                     List<Element> directShapes = collector.OfClass(typeof(DirectShape)).ToElements().ToList();
 #endif
@@ -464,7 +464,7 @@ namespace HOK.ColorSchemeEditor.BCFUtils
                         //family instance
                         paramDictionary = GetComponentFamilyParameters(doc, category, familyInstanceIds);
                     }
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                     else if (directShapes.Count > 0)
                     {
                         //direct shape
