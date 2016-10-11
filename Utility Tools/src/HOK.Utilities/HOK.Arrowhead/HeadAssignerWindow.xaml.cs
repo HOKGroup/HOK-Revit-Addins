@@ -112,7 +112,7 @@ namespace HOK.Arrowhead
                         foreach (Family family in families)
                         {
                             value += 1;
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                             List<ElementId> symbolIds = family.GetFamilySymbolIds().ToList();
                             foreach (ElementId eId in symbolIds)
                             {
