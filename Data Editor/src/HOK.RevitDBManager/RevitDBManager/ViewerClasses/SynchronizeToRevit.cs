@@ -212,7 +212,7 @@ namespace RevitDBManager.Classes
 
 #if RELEASE2013||RELEASE2014
                      Autodesk.Revit.DB.Parameter parameter = element.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                     Autodesk.Revit.DB.Parameter parameter = element.LookupParameter(paramName);
 #endif
 
@@ -284,7 +284,7 @@ namespace RevitDBManager.Classes
 
 #if RELEASE2013 ||RELEASE2014
                     Autodesk.Revit.DB.Parameter parameter = element.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                     Autodesk.Revit.DB.Parameter parameter = element.LookupParameter(paramName);
 #endif
                     

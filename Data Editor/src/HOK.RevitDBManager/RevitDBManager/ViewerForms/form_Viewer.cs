@@ -22,6 +22,7 @@ namespace RevitDBManager.Forms
     public partial class form_Viewer : System.Windows.Forms.Form
     {
         private UIApplication m_app;
+        private Autodesk.Revit.DB.Document m_doc;
         private string dbPath = "";
         private DataSet dataSet=new DataSet();
         private Database database;
@@ -64,6 +65,7 @@ namespace RevitDBManager.Forms
             try
             {
                 m_app = application;
+                m_doc = m_app.ActiveUIDocument.Document;
                 dbPath = filePath;
                 warningMode = fixingMode;
 
@@ -865,7 +867,7 @@ namespace RevitDBManager.Forms
                 }
                 uidoc.ShowElements(elementIds);
                 uidoc.Selection.Elements = newSelection;
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                 Selection selection = uidoc.Selection;
                 foreach (DataGridViewCell cell in dataGridParam.SelectedCells)
                 {
@@ -1187,32 +1189,38 @@ namespace RevitDBManager.Forms
 
         private void bttnSync_Click(object sender, EventArgs e)
         {
-            try
+            using (Transaction trans = new Transaction(m_doc))
             {
-                DataTable table = tableDictionary[selectedTable];
-
-                if (changedValues.ContainsKey(table.TableName))
+                trans.Start("Sync");
+                try
                 {
-                    toolStripStatusLabel1.Visible = false;
-                    toolStripProgressBar.Visible = true;
+                    DataTable table = tableDictionary[selectedTable];
 
-                    syncRevit.ChangedValues = changedValues;
-                    syncRevit.LockTypeFields = dbViewer.LockTypeFields;
-
-                    if (syncRevit.SyncTableToRevit(table.TableName))
+                    if (changedValues.ContainsKey(table.TableName))
                     {
-                        dataSet.Tables.Remove(table.TableName);
-                        dataSet.Tables.Add(table);
-                        changedValues.Remove(table.TableName);
-                        BindDataSource(tableDictionary[selectedTable], dataGridParam, true);
+                        toolStripStatusLabel1.Visible = false;
+                        toolStripProgressBar.Visible = true;
+
+                        syncRevit.ChangedValues = changedValues;
+                        syncRevit.LockTypeFields = dbViewer.LockTypeFields;
+
+                        if (syncRevit.SyncTableToRevit(table.TableName))
+                        {
+                            dataSet.Tables.Remove(table.TableName);
+                            dataSet.Tables.Add(table);
+                            changedValues.Remove(table.TableName);
+                            BindDataSource(tableDictionary[selectedTable], dataGridParam, true);
+                        }
+                        toolStripStatusLabel1.Visible = true;
+                        toolStripProgressBar.Visible = false;
                     }
-                    toolStripStatusLabel1.Visible = true;
-                    toolStripProgressBar.Visible = false;
+                    trans.Commit();
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to synchronize the selected table,"+selectedTable+"\n" + ex.Message, "Error: Data Editor", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                catch (Exception ex)
+                {
+                    trans.RollBack();
+                    MessageBox.Show("Cannot synch data into Revit.\n" + ex.Message, "Revit Data Manager - Sync", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
 

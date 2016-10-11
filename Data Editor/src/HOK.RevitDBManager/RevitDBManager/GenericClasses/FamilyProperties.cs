@@ -331,7 +331,7 @@ namespace RevitDBManager.Classes
         public string Number { get { try { return m_room.Number; } catch { return "0"; } } }
 #if RELEASE2013
         public string Level { get { try { return m_room.Level.Name; } catch { return "null"; } } }
-#elif RELEASE2014 || RELEASE2015 || RELEASE2016
+#elif RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
         public string Level 
         { 
             get 
@@ -405,7 +405,7 @@ namespace RevitDBManager.Classes
 
 #if RELEASE2013
         public string Level { get { try { return m_space.Level.Name; } catch { return "null"; } } }
-#elif RELEASE2014||RELEASE2015 || RELEASE2016
+#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
         public string Level
         {
             get
@@ -472,7 +472,7 @@ namespace RevitDBManager.Classes
         public string Number { get { try { return m_area.Number; } catch { return "0"; } } set { m_area.Number = value; } }
 #if RELEASE2013
         public string Level { get { try { return m_area.Level.Name; } catch { return "null"; } } }
-#elif RELEASE2014 ||RELEASE2015 || RELEASE2016
+#elif RELEASE2014 ||RELEASE2015 || RELEASE2016 || RELEASE2017
         public string Level
         {
             get
@@ -541,7 +541,7 @@ namespace RevitDBManager.Classes
         public string Name { get { try { return m_view.Name; } catch { return "null"; } } set { m_view.Name = value; } }
 #if RELEASE2013
         public string Level { get { try { return m_view.Level.Name; } catch { return "null"; } } }
-#elif RELEASE2014||RELEASE2015 || RELEASE2016
+#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
         public string Level
         {
             get

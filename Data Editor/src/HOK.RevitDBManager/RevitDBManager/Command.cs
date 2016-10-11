@@ -10,10 +10,11 @@ using RevitDBManager.Classes;
 using Microsoft.Office.Interop.Access.Dao;
 using RevitDBManager.ViewerClasses;
 using System.IO;
+using Autodesk.Revit.DB;
 
 namespace RevitDBManager
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Automatic)]
+    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
     [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
     [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
 
@@ -38,9 +39,9 @@ namespace RevitDBManager
                     dbPath = fielSelectionForm.DefualtFilePath;
                     if (string.Empty != dbPath)
                     {
-                        RevitDBViewer dbViewer = new RevitDBViewer(m_app, dbPath, false,false);
+                        RevitDBViewer dbViewer = new RevitDBViewer(m_app, dbPath, false, false);
                         database = dbViewer.DaoDB;
-                        
+
                         ExternalReference externalReference = new ExternalReference(database);
 
                         ReadFromRevit readRevit = new ReadFromRevit(doc, database);
@@ -51,7 +52,7 @@ namespace RevitDBManager
                         readRevit.ExternalFields = externalReference.ExternalFields;
                         readRevit.SourceTables = externalReference.SourceTables;
                         readRevit.ProgressbarText = "Synchronizing...";
-     
+
                         readRevit.CollectRevitElementsData();
                         readRevit.SaveRevitData(); //Save Revit Data into Database (ReadOnly, RevitOnly, LockAll)
 

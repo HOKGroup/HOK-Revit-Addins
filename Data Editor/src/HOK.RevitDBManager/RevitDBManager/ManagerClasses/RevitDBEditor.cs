@@ -308,7 +308,7 @@ namespace RevitDBManager.Classes
                             symbolsToExclude.Add(symbol.Id);
                         }
                     }
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                     foreach (ElementId symbolId in family.GetFamilySymbolIds())
                     {
                         if (!symbolsToExclude.Contains(symbolId))
