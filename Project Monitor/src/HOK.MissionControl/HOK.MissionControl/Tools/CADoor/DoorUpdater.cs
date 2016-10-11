@@ -127,7 +127,7 @@ namespace HOK.MissionControl.Tools.CADoor
                 {
 #if RELEASE2013 ||RELEASE2014
                     var doors = from door in doorInstances where door.Symbol.Family.Name == doorFamily.Name select door;
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                     var doors = from door in doorInstances where door.Symbol.FamilyName == doorFamily.Name select door;
 #endif
 
@@ -136,7 +136,7 @@ namespace HOK.MissionControl.Tools.CADoor
                         FamilyInstance doorInstance = doors.First();
 #if RELEASE2013 || RELEASE2014
                         Parameter pullParam = doorInstance.get_Parameter(pullParamName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         Parameter pullParam = doorInstance.LookupParameter(pullParamName);
 #endif
                         if (null != pullParam)
@@ -146,7 +146,7 @@ namespace HOK.MissionControl.Tools.CADoor
 
 #if RELEASE2013||RELEASE2014
                         Parameter pushParam = doorInstance.get_Parameter(pushParamName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         Parameter pushParam = doorInstance.LookupParameter(pushParamName);
 #endif
                         if (null != pushParam)
@@ -156,7 +156,7 @@ namespace HOK.MissionControl.Tools.CADoor
 
 #if RELEASE2013||RELEASE2014
                         Parameter caParam = doorInstance.get_Parameter(stateCAParamName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         Parameter caParam = doorInstance.LookupParameter(stateCAParamName);
 #endif
                         if (null != caParam)
@@ -191,7 +191,7 @@ namespace HOK.MissionControl.Tools.CADoor
                     {
 #if RELEASE2013||RELEASE2014
                         Parameter pushParameter = doorInstance.get_Parameter(pushParamName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         Parameter pushParameter = doorInstance.LookupParameter(pushParamName);
 #endif
 
@@ -204,6 +204,7 @@ namespace HOK.MissionControl.Tools.CADoor
                                 {
                                     DoorFailure.IsDoorFailed = true;
                                     DoorFailure.FailingDoorId = doorId;
+                                    DoorFailure.CurrentDoc = doc;
                                     FailureProcessor.IsFailureFound = true;
 
                                     MessageBoxResult dr = MessageBox.Show(pushValue + " is not a correct value for the parameter " + pushParamName, "Invalid Door Parameter.", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -212,7 +213,7 @@ namespace HOK.MissionControl.Tools.CADoor
                         }
 #if RELEASE2013||RELEASE2014
                         Parameter pullParameter = doorInstance.get_Parameter(pullParamName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         Parameter pullParameter = doorInstance.LookupParameter(pullParamName);
 #endif
 
@@ -235,7 +236,7 @@ namespace HOK.MissionControl.Tools.CADoor
 
 #if RELEASE2013||RELEASE2014
                         Parameter caParameter = doorInstance.get_Parameter(stateCAParamName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         Parameter caParameter = doorInstance.LookupParameter(stateCAParamName);
 #endif
                         if (null != caParameter)
@@ -267,7 +268,7 @@ namespace HOK.MissionControl.Tools.CADoor
                     {
 #if RELEASE2013||RELEASE2014
                         Parameter caParameter = doorInstance.get_Parameter(stateCAParamName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         Parameter caParameter = doorInstance.LookupParameter(stateCAParamName);
 #endif
                         if (null != caParameter)

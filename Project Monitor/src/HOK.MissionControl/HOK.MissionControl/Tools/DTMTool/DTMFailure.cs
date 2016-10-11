@@ -26,6 +26,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             {
                 if (isElementModified && null!=currentDoc)
                 {
+                    FailureProcessor.IsFailureProcessing = true;
                     FailuresAccessor fa = args.GetFailuresAccessor();
 
                     DTMWindow dtmWindow = new DTMWindow(currentDoc, elementModified);
@@ -37,6 +38,7 @@ namespace HOK.MissionControl.Tools.DTMTool
                         fa.SetFailureHandlingOptions(option);
                     }
                     isElementModified = false;
+                    FailureProcessor.IsFailureProcessing = false;
                 }
             }
             catch (Exception ex)

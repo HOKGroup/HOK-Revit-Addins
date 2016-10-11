@@ -14,9 +14,11 @@ namespace HOK.MissionControl.Tools.CADoor
     {
         private static bool isDoorFailed = false;
         private static ElementId failingDoorId = ElementId.InvalidElementId;
+        private static Document currentDoc = null;
 
         public static bool IsDoorFailed { get { return isDoorFailed; } set { isDoorFailed = value; } }
         public static ElementId FailingDoorId { get { return failingDoorId; } set { failingDoorId = value; } }
+        public static Document CurrentDoc { get {  return currentDoc; } set { currentDoc = value; } }
 
         public static void ProcessFailure(object sender, FailuresProcessingEventArgs args)
         {
@@ -24,6 +26,7 @@ namespace HOK.MissionControl.Tools.CADoor
             {
                 if (isDoorFailed)
                 {
+                    FailureProcessor.IsFailureProcessing = true;
                     FailuresAccessor fa = args.GetFailuresAccessor();
                     IList<FailureMessageAccessor> failList = new List<FailureMessageAccessor>();
                     failList = fa.GetFailureMessages();
@@ -44,7 +47,7 @@ namespace HOK.MissionControl.Tools.CADoor
                     }
 
                     isDoorFailed = false;
-                    
+                    FailureProcessor.IsFailureProcessing = false;
                 }
             }
             catch (Exception ex)

@@ -13,9 +13,13 @@ namespace HOK.MissionControl.Utils
     public static class FailureProcessor
     {
         public static bool IsFailureFound = false;
+        public static bool IsSynchronizing = false;
+        public static bool IsFailureProcessing = false;
 
         public static void CheckFailure(object sender, FailuresProcessingEventArgs args)
         {
+            if (IsFailureProcessing) { return; }
+            if (IsSynchronizing) { return; }
             if (IsFailureFound)
             {
                 if (DoorFailure.IsDoorFailed)

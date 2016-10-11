@@ -46,6 +46,8 @@ namespace HOK.MissionControl
             application.ControlledApplication.DocumentOpened -= RegisterUpdatersOnOpen;
             application.ControlledApplication.FailuresProcessing -= FailureProcessor.CheckFailure;
             application.ControlledApplication.DocumentClosing -= UnregisterUpdaterOnClosing;
+            application.ControlledApplication.DocumentSynchronizingWithCentral -= DocumentSynchronizing;
+            application.ControlledApplication.DocumentSynchronizedWithCentral -= DocumentSynchronized;
 
             return Result.Succeeded;
         }
@@ -72,6 +74,8 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentOpened += RegisterUpdatersOnOpen;
                 application.ControlledApplication.FailuresProcessing += FailureProcessor.CheckFailure;
                 application.ControlledApplication.DocumentClosing += UnregisterUpdaterOnClosing;
+                application.ControlledApplication.DocumentSynchronizingWithCentral += DocumentSynchronizing;
+                application.ControlledApplication.DocumentSynchronizedWithCentral += DocumentSynchronized;
             }
             catch (Exception ex)
             {
@@ -252,6 +256,30 @@ namespace HOK.MissionControl
             catch (Exception ex)
             {
                 LogUtil.AppendLog("UnregisterUpdaterOnClosing:" + ex.Message);
+            }
+        }
+
+        private void DocumentSynchronizing(object source, DocumentSynchronizingWithCentralEventArgs args)
+        {
+            try
+            {
+                FailureProcessor.IsSynchronizing = true;
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
+            }
+        }
+
+        private void DocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
+        {
+            try
+            {
+                FailureProcessor.IsSynchronizing = false;
+            }
+            catch (Exception ex)
+            {
+                string message = ex.Message;
             }
         }
     }

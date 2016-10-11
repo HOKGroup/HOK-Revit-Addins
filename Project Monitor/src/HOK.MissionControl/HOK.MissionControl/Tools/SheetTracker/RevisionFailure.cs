@@ -14,14 +14,18 @@ namespace HOK.MissionControl.Tools.RevisionTracker
     {
         private static bool isRevisionModified = false;
         private static ElementId failingRevisionId = ElementId.InvalidElementId;
+        private static Document currentDoc = null;
 
         public static bool IsRevisionModified { get { return isRevisionModified; } set { isRevisionModified = value; } }
         public static ElementId FailingRevisionId { get { return failingRevisionId; } set { failingRevisionId = value; } }
+        public static Document CurrentDoc { get { return currentDoc; } set { currentDoc = value; } }
 
         public static void ProcessFailure(object sender, FailuresProcessingEventArgs args)
         {
             try
             {
+                FailureProcessor.IsFailureProcessing = true;
+                FailureProcessor.IsFailureProcessing = false;
             }
             catch (Exception ex)
             {
