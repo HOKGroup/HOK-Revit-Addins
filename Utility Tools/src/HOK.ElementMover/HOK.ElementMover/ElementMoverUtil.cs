@@ -30,6 +30,7 @@ namespace HOK.ElementMover
 
                 progressBar.Visibility = System.Windows.Visibility.Visible;
                 List<CategoryProperties> categories = lip.Categories.Values.ToList();
+                //categories = categories.OrderBy(o => o.Priority).ToList();
                 foreach (CategoryProperties cp in categories)
                 {
                     if (cp.Selected)

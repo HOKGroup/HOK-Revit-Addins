@@ -64,7 +64,7 @@ namespace HOK.ElementMover
                     transformValue = m_instance.GetTotalTransform();
                 }
 
-#if RELEASE2014||RELEASE2015||RELEASE2016
+#if RELEASE2014||RELEASE2015||RELEASE2016 || RELEASE2017
                 linkedDocument = m_instance.GetLinkDocument();
                 if (null != linkedDocument)
                 {
@@ -92,7 +92,7 @@ namespace HOK.ElementMover
                 var elementCategories = from element in elements where null != element.Category select element.Category;
 #if RELEASE2014
                 var modelCategories = from category in elementCategories where category.HasMaterialQuantities select category;
-#elif RELEASE2015|| RELEASE2016
+#elif RELEASE2015|| RELEASE2016 || RELEASE2017
                 var modelCategories = from category in elementCategories where  category.HasMaterialQuantities && category.CategoryType == CategoryType.Model select category;
 #endif
 
@@ -152,6 +152,9 @@ namespace HOK.ElementMover
 
                 foreach (BuiltInCategory bltCategory in customCategories)
                 {
+                    int catPriority = 0;
+                    if (bltCategory == BuiltInCategory.OST_Rooms) { catPriority = 2; }
+
                     collector = new FilteredElementCollector(linkedDocument);
                     ICollection<ElementId> customCatElements = collector.OfCategory(bltCategory).ToElementIds();
                     if (customCatElements.Count > 0)
@@ -160,6 +163,7 @@ namespace HOK.ElementMover
                         if (null != category)
                         {
                             CategoryProperties catProperties = new CategoryProperties(category);
+                            catProperties.Priority = catPriority;
                             catProperties.ItemCount = customCatElements.Count;
                             if (!categories.ContainsKey(catProperties.CategoryId))
                             {
@@ -271,11 +275,18 @@ namespace HOK.ElementMover
         private ElementId categoryId = ElementId.InvalidElementId;
         private string categoryName = "";
         private int itemCount = 0;
+        private int priority = 1;
+        //priority 0: Levels, Grids, Scope Boxes
+        //priority 1: Floors, Walls
+        //priority 2: Ceilings, Roofs, Stairs
+        //priority 4: Family Instances
+        //priority 5: Rooms
 
         public bool Selected { get { return selected; } set { selected = value; } }
         public ElementId CategoryId { get { return categoryId; } set { categoryId = value; } }
         public string CategoryName { get { return categoryName; } set { categoryName = value; } }
         public int ItemCount { get { return itemCount; } set { itemCount = value; } }
+        public int Priority { get { return priority; } set { priority = value; } }
 
         public CategoryProperties(Category category)
         {
@@ -511,7 +522,7 @@ namespace HOK.ElementMover
             {
                 familyName = param.AsString();
             }
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
             familyName = elementType.FamilyName;
 #endif
             if (null != elementType.Category)

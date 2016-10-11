@@ -461,7 +461,7 @@ namespace HOK.ElementMover
 
                         uidoc.Selection.Elements = selElements;
                     }
-#elif RELEASE2015||RELEASE2016
+#elif RELEASE2015||RELEASE2016 || RELEASE2017
                     List<ElementId> selectedIds = new List<ElementId>();
                     selectedIds.Add(selectedLinkedInfo.LinkedElementId);
                     uidoc.Selection.SetElementIds(selectedIds);
