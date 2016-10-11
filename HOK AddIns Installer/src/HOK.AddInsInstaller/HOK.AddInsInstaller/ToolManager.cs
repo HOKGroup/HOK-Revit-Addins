@@ -14,10 +14,10 @@ namespace HOK.AddInsInstaller
     public static class ToolManager
     {
         public static ToolNames[] tools2013 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor};
-        public static ToolNames[] tools2014 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.MissionControl, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
-        public static ToolNames[] tools2015 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager, ToolNames.MissionControl, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
-        public static ToolNames[] tools2016 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.SheetManager, ToolNames.MissionControl, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
-        public static ToolNames[] tools2017 = new ToolNames[] { ToolNames.SmartBCF};
+        public static ToolNames[] tools2014 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
+        public static ToolNames[] tools2015 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator, ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
+        public static ToolNames[] tools2016 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.FileMonitor, ToolNames.ProjectMonitor, ToolNames.ElementMover, ToolNames.ProjectReplicator,  ToolNames.CaseIssueTracker, ToolNames.ArupIssueTracker };
+        public static ToolNames[] tools2017 = new ToolNames[] { ToolNames.SmartBCF, ToolNames.ElementMover, ToolNames.SheetManager, ToolNames.ProjectReplicator, ToolNames.ProjectMonitor };
 
         public static Dictionary<string/*versionNumber*/, ToolPackageInfo> GetToolPackageInfo()
         {
