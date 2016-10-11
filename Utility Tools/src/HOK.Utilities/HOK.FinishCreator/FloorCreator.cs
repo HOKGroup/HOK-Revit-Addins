@@ -14,6 +14,7 @@ namespace HOK.FinishCreator
         private Autodesk.Revit.UI.UIApplication m_app;
         private Document m_doc;
         private List<Element> selectedRooms = new List<Element>();
+        private List<LinkedRoomProperties> selectedLinkedRooms = new List<LinkedRoomProperties>();
         private List<Floor> createdFloors = new List<Floor>();
 
         public List<Floor> CreatedFloors { get { return createdFloors; } set { createdFloors = value; } }
@@ -26,74 +27,162 @@ namespace HOK.FinishCreator
             selectedRooms = selectedElements;
         }
 
-        public void CreateFloor()
+        public FloorCreator(UIApplication application, List<LinkedRoomProperties> selectedLinkedElements)
         {
-            try
+            m_app = application;
+            m_doc = m_app.ActiveUIDocument.Document;
+
+            selectedLinkedRooms = selectedLinkedElements;
+        }
+
+        public void CreateFloorFromRoom()
+        {
+            using (TransactionGroup tg = new TransactionGroup(m_doc, "Create Floors"))
             {
-                foreach (Element element in selectedRooms)
+                tg.Start();
+                try
                 {
-                    Room room = element as Room;
-                    EdgeArrayArray edgeArrayArray = GetRoomBoundaries(room);
-                    List<CurveArray> curveArrayList = CreateProfiles(edgeArrayArray);
-                    FloorType floorType = FindFloorType(room);
-                    Floor newFloor = null;
+                    foreach (Element element in selectedRooms)
+                    {
+                        Room room = element as Room;
+                        EdgeArrayArray edgeArrayArray = GetRoomBoundaries(room, Transform.Identity);
+                        List<CurveArray> curveArrayList = CreateProfiles(edgeArrayArray);
+                        FloorType floorType = FindFloorType(room);
+                        Floor newFloor = CreateNewFloor(room, curveArrayList, floorType);
 
-                    Transaction trans = new Transaction(m_doc);
-                    trans.Start("Create Floor");
-
-#if RELEASE2013
-                    if (null != floorType && null != room.Level)
-                    {
-                        newFloor = m_doc.Create.NewFloor(curveArrayList[0], floorType, room.Level, false);
-                    }
-#else
-                    if (null != floorType && ElementId.InvalidElementId != room.LevelId)
-                    {
-                        Level roomLevel = m_doc.GetElement(room.LevelId) as Level;
-                        newFloor = m_doc.Create.NewFloor(curveArrayList[0], floorType, roomLevel, false);
-                    }
-#endif
-                    else
-                    {
-                        newFloor = m_doc.Create.NewFloor(curveArrayList[0], false);
-                    }
-                    trans.Commit();
-
-                    trans = new Transaction(m_doc);
-                    trans.Start("Create Openings");
-                    if (null != newFloor && curveArrayList.Count > 1)
-                    {
-                        for (int i = 1; i < curveArrayList.Count; i++)
+                        if (null != newFloor)
                         {
-                            Opening opening = m_doc.Create.NewOpening(newFloor, curveArrayList[i], false);
+                            createdFloors.Add(newFloor);
                         }
                     }
-                    trans.Commit();
 
-                    trans = new Transaction(m_doc);
-                    trans.Start("Move Floors");
-                    if (null != newFloor)
+                    tg.Assimilate();
+                }
+                catch (Exception ex)
+                {
+                    tg.RollBack();
+                    MessageBox.Show("Cannot create floors from the selected room.\n" + ex.Message, "Create Floors", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
+
+        public void CreateFloorFromLink()
+        {
+            using (TransactionGroup tg = new TransactionGroup(m_doc))
+            {
+                tg.Start("Create Floors");
+                try
+                {
+                    foreach (LinkedRoomProperties lrp in selectedLinkedRooms)
                     {
-                        Location location = newFloor.Location;
-                        double thickness = GetFloorThickness(newFloor);
-                        XYZ translationVec = new XYZ(0, 0, thickness);
-                        bool moved = location.Move(translationVec);
+                        Room room = lrp.LinkedRoom;
+                        EdgeArrayArray edgeArrayArray = GetRoomBoundaries(room, lrp.TransformValue);
+                        List<CurveArray> curveArrayList = CreateProfiles(edgeArrayArray);
+                        FloorType floorType = FindFloorType(room);
+                        Floor newFloor = CreateNewFloor(room, curveArrayList, floorType);
+
+                        
+                        if (null != newFloor)
+                        {
+                            createdFloors.Add(newFloor);
+                        }
                     }
-                    trans.Commit();
+                    tg.Assimilate();
+                }
+                catch (Exception ex)
+                {
+                    tg.RollBack();
+                    MessageBox.Show("Cannot create floors from the selected linked room.\n" + ex.Message, "Create Floors from Linked Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+        }
 
-                    if (null != newFloor)
+        private Floor CreateNewFloor(Room room, List<CurveArray> curveArrayList, FloorType floorType)
+        {
+            Floor newFloor = null;
+            try
+            {
+                using (Transaction trans = new Transaction(m_doc))
+                {
+                    trans.Start("Create Floor");
+                    try
                     {
-                        createdFloors.Add(newFloor);
+#if RELEASE2013
+                                if (null != floorType && null != room.Level)
+                                {
+                                    newFloor = m_doc.Create.NewFloor(curveArrayList[0], floorType, room.Level, false);
+                                }
+                   
+#else
+                        if (null != floorType && ElementId.InvalidElementId != room.LevelId)
+                        {
+                            Level roomLevel = m_doc.GetElement(room.LevelId) as Level;
+                            newFloor = m_doc.Create.NewFloor(curveArrayList[0], floorType, roomLevel, false);
+                        }
+#endif
+                        else
+                        {
+                            newFloor = m_doc.Create.NewFloor(curveArrayList[0], false);
+                        }
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.RollBack();
+                        MessageBox.Show("Cannot create floor from a room.\nRoom ElementId:" + room.Id.IntegerValue + "\n\n" + ex.Message, "Create Floor", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+
+                using (Transaction trans = new Transaction(m_doc))
+                {
+                    trans.Start("Create Openings");
+                    try
+                    {
+                        if (null != newFloor && curveArrayList.Count > 1)
+                        {
+                            for (int i = 1; i < curveArrayList.Count; i++)
+                            {
+                                Opening opening = m_doc.Create.NewOpening(newFloor, curveArrayList[i], false);
+                            }
+                        }
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.RollBack();
+                        MessageBox.Show("Cannot create openings.\nRoom ElementId:" + room.Id.IntegerValue + "\n\n" + ex.Message, "Create Openings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+
+                using (Transaction trans = new Transaction(m_doc))
+                {
+                    trans.Start("Move Floors");
+                    try
+                    {
+                        if (null != newFloor)
+                        {
+                            Location location = newFloor.Location;
+                            double thickness = GetFloorThickness(newFloor);
+                            XYZ translationVec = new XYZ(0, 0, thickness);
+                            bool moved = location.Move(translationVec);
+                        }
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.RollBack();
+                        MessageBox.Show("Cannot move floors.\nRoom ElementId:" + room.Id.IntegerValue + "\n\n" + ex.Message, "Move Floors", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot create floors from the selected room.\n" + ex.Message, "Create Floors", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                string message = ex.Message;
             }
+            return newFloor;
         }
 
-        private EdgeArrayArray GetRoomBoundaries(Room room)
+        private EdgeArrayArray GetRoomBoundaries(Room room, Transform transformValue)
         {
             EdgeArrayArray edgeArrayArray = new EdgeArrayArray();
             try
@@ -101,6 +190,7 @@ namespace HOK.FinishCreator
                 GeometryElement geomElem = room.ClosedShell;
                 if (geomElem != null)
                 {
+                    geomElem = geomElem.GetTransformed(transformValue);
                     foreach (GeometryObject geomObj in geomElem)
                     {
                         Solid solid = geomObj as Solid;
@@ -213,7 +303,6 @@ namespace HOK.FinishCreator
             return curveArrayList;
         }
 
-
         private FloorType FindFloorType(Room room)
         {
             FloorType floorType = null;
@@ -249,71 +338,76 @@ namespace HOK.FinishCreator
         private FloorType CreateFloorType(Room room, string typeName)
         {
             FloorType newFloorType = null;
-            Transaction trans = new Transaction(m_doc);
-            try
+            using (Transaction trans = new Transaction(m_doc))
             {
-                trans.Start("Create a Floor Type");
-
-                if (string.IsNullOrEmpty(typeName))
+                trans.Start("Create Floor Type");
+                try
                 {
-                    typeName = "Floor Finish";
-                    Parameter param = room.get_Parameter(BuiltInParameter.ROOM_FINISH_FLOOR);
-                    param.Set(typeName);
-                }
 
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                ElementClassFilter classFilter = new ElementClassFilter(typeof(FloorType));
-                collector.WherePasses(classFilter);
-
-                List<FloorType> floorTypes = collector.Cast<FloorType>().ToList<FloorType>();
-
-                var query = from floorType in floorTypes
-                            where floorType.Name == typeName
-                            select floorType;
-
-                List<FloorType> existingFloorTypes = query.Cast<FloorType>().ToList();
-                if (existingFloorTypes.Count > 0)
-                {
-                    newFloorType = existingFloorTypes[0];
-                }
-                else
-                {
-                    if (floorTypes.Count > 0)
+                    if (string.IsNullOrEmpty(typeName))
                     {
-                        foreach (FloorType floorType in floorTypes)
+                        typeName = "Floor Finish";
+                        if (!room.Document.IsLinked)
                         {
-                            if (floorType.IsFoundationSlab) { continue; }
-                            newFloorType = floorType.Duplicate(typeName) as FloorType;
-                            break;
+                            Parameter param = room.get_Parameter(BuiltInParameter.ROOM_FINISH_FLOOR);
+                            param.Set(typeName);
                         }
                     }
 
-                    if (null != newFloorType)
-                    {
-                        CompoundStructure compoundStructure = newFloorType.GetCompoundStructure();
-                        double layerThickness = 0.020833;
-                        int layerIndex = compoundStructure.GetFirstCoreLayerIndex();
-                        compoundStructure.SetLayerFunction(layerIndex, MaterialFunctionAssignment.Finish1);
-                        compoundStructure.SetLayerWidth(layerIndex, layerThickness);
+                    FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+                    ElementClassFilter classFilter = new ElementClassFilter(typeof(FloorType));
+                    collector.WherePasses(classFilter);
 
-                        for (int i = compoundStructure.LayerCount - 1; i > -1; i--)
+                    List<FloorType> floorTypes = collector.Cast<FloorType>().ToList<FloorType>();
+
+                    var query = from floorType in floorTypes
+                                where floorType.Name == typeName
+                                select floorType;
+
+                    List<FloorType> existingFloorTypes = query.Cast<FloorType>().ToList();
+                    if (existingFloorTypes.Count > 0)
+                    {
+                        newFloorType = existingFloorTypes[0];
+                    }
+                    else
+                    {
+                        if (floorTypes.Count > 0)
                         {
-                            if (i == layerIndex) { continue; }
-                            else
+                            foreach (FloorType floorType in floorTypes)
                             {
-                                compoundStructure.DeleteLayer(i);
+                                if (floorType.IsFoundationSlab) { continue; }
+                                newFloorType = floorType.Duplicate(typeName) as FloorType;
+                                break;
                             }
                         }
-                        compoundStructure.StructuralMaterialIndex = 0; //only single layer is remained
-                        newFloorType.SetCompoundStructure(compoundStructure);
+
+                        if (null != newFloorType)
+                        {
+                            CompoundStructure compoundStructure = newFloorType.GetCompoundStructure();
+                            double layerThickness = 0.020833;
+                            int layerIndex = compoundStructure.GetFirstCoreLayerIndex();
+                            compoundStructure.SetLayerFunction(layerIndex, MaterialFunctionAssignment.Finish1);
+                            compoundStructure.SetLayerWidth(layerIndex, layerThickness);
+
+                            for (int i = compoundStructure.LayerCount - 1; i > -1; i--)
+                            {
+                                if (i == layerIndex) { continue; }
+                                else
+                                {
+                                    compoundStructure.DeleteLayer(i);
+                                }
+                            }
+                            compoundStructure.StructuralMaterialIndex = 0; //only single layer is remained
+                            newFloorType.SetCompoundStructure(compoundStructure);
+                        }
                     }
+                    trans.Commit();
                 }
-                trans.Commit();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Cannot create a floor type.\n" + ex.Message, "CreateFloorType", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                trans.RollBack();
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Cannot create a floor type.\n" + ex.Message, "Create Floor Type", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    trans.RollBack();
+                }
             }
             return newFloorType;
         }

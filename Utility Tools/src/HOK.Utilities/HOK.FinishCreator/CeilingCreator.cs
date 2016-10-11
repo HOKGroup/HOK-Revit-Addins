@@ -15,6 +15,7 @@ namespace HOK.FinishCreator
         private Autodesk.Revit.UI.UIApplication m_app;
         private Document m_doc;
         private List<Room> selectedRooms = new List<Room>();
+        private List<LinkedRoomProperties> selectedLinkedRooms = new List<LinkedRoomProperties>();
         private List<CeilingType> ceilingTypes = new List<CeilingType>();
         private Dictionary<int/*roomId*/, List<Ceiling>> createdCeilings = new Dictionary<int, List<Ceiling>>();
 
@@ -31,27 +32,38 @@ namespace HOK.FinishCreator
             ceilingTypes = collector.OfClass(typeof(CeilingType)).ToElements().Cast<CeilingType>().ToList();
         }
 
-        public bool CreateCeiling()
+
+        public CeilingCreator(UIApplication application, List<LinkedRoomProperties> rooms)
+        {
+            m_app = application;
+            m_doc = m_app.ActiveUIDocument.Document;
+
+            selectedLinkedRooms = rooms;
+
+            FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+            ceilingTypes = collector.OfClass(typeof(CeilingType)).ToElements().Cast<CeilingType>().ToList();
+        }
+
+        public bool CreateCeilingFromRoom()
         {
             bool created = false;
-            try
+            using (TransactionGroup tg = new TransactionGroup(m_doc))
             {
+                tg.Start("Create Ceilings");
                 StringBuilder failureMessages = new StringBuilder();
-              
-                using (TransactionGroup tg = new TransactionGroup(m_doc))
+                try
                 {
-                    tg.Start("Create Ceilings");
                     foreach (Room room in selectedRooms)
                     {
                         List<Ceiling> ceilingsFound = new List<Ceiling>();
                         CeilingType ceilingType = null;
-                        
+
                         using (Transaction trans = new Transaction(m_doc))
                         {
                             trans.Start("Create a Ceiling");
                             try
                             {
-                                ceilingsFound = FindCeilings(room);
+                                ceilingsFound = FindCeilings(room, Transform.Identity);
                                 if (ceilingsFound.Count > 0)
                                 {
                                     ceilingType = FindCeilingType(room);
@@ -61,54 +73,13 @@ namespace HOK.FinishCreator
                             catch (Exception ex)
                             {
                                 trans.RollBack();
-                                failureMessages.AppendLine(room.Name + ": "+ex.Message);
+                                failureMessages.AppendLine(room.Name + ": " + ex.Message);
                             }
                         }
 
-                        if(ceilingsFound.Count>0 && null!= ceilingType)
+                        if (ceilingsFound.Count > 0 && null != ceilingType)
                         {
-                            List<Ceiling> copiedCeilings = new List<Ceiling>();
-                            foreach (Ceiling ceiling in ceilingsFound)
-                            {
-                                using (Transaction trans = new Transaction(m_doc))
-                                {
-                                    trans.Start("Copy Ceiling");
-                                    try
-                                    {
-                                        double finishThickness = 0;
-                                        Parameter param = ceilingType.get_Parameter(BuiltInParameter.CEILING_THICKNESS);
-                                        if (null != param)
-                                        {
-                                            if (param.HasValue)
-                                            {
-                                                finishThickness = param.AsDouble();
-                                            }
-                                        }
-
-                                        ICollection<ElementId> copiedIds = ElementTransformUtils.CopyElement(m_doc, ceiling.Id, new XYZ(0, 0, -finishThickness));
-                                        trans.Commit();
-
-                                        trans.Start("Change Ceiling Type");
-                                        if (copiedIds.Count > 0)
-                                        {
-                                            ElementId copiedCeilingId = copiedIds.First();
-                                            Ceiling copiedCeiling = m_doc.GetElement(copiedCeilingId) as Ceiling;
-                                            if (null != copiedCeiling)
-                                            {
-                                                ElementId changedTypeId = copiedCeiling.ChangeTypeId(ceilingType.Id);
-                                                copiedCeilings.Add(copiedCeiling);
-                                            }
-                                        }
-                                        trans.Commit();
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        failureMessages.AppendLine(ceiling.Name + " [" + ceiling.Id.IntegerValue + "]: cannot be copied\n"+ex.Message);
-                                        trans.RollBack();
-                                    }
-                                }
-                            }
-
+                            List<Ceiling> copiedCeilings = CreateCeilings(room, ceilingsFound, ceilingType, ref failureMessages);
                             if (copiedCeilings.Count > 0 && !createdCeilings.ContainsKey(room.Id.IntegerValue))
                             {
                                 createdCeilings.Add(room.Id.IntegerValue, copiedCeilings);
@@ -118,33 +89,135 @@ namespace HOK.FinishCreator
                     }
                     tg.Assimilate();
                 }
-
-                if (failureMessages.Length > 0)
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Following items were failed to create ceilings.\n"+failureMessages.ToString(), "Failure Messages - Create Ceilings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    tg.RollBack();
+                    MessageBox.Show("Cannot create ceilings from the selected rooms.\n" + ex.Message, "Create Ceilings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
-
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Cannot create ceilings from the selected rooms.\n"+ex.Message, "Create Ceilings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             return created;
         }
 
-        private List<Ceiling> FindCeilings(Room room)
+        public bool CreateCeilingFromLink()
+        {
+            bool created = false;
+            using (TransactionGroup tg = new TransactionGroup(m_doc))
+            {
+                tg.Start("Create Ceilings");
+                StringBuilder failureMessages = new StringBuilder();
+                try
+                {
+                    foreach (LinkedRoomProperties lrp in selectedLinkedRooms)
+                    {
+                        Room room = lrp.LinkedRoom;
+                        List<Ceiling> ceilingsFound = new List<Ceiling>();
+                        CeilingType ceilingType = null;
+
+                        using (Transaction trans = new Transaction(m_doc))
+                        {
+                            trans.Start("Create a Ceiling");
+                            try
+                            {
+                                ceilingsFound = FindCeilings(room, lrp.TransformValue);
+                                if (ceilingsFound.Count > 0)
+                                {
+                                    ceilingType = FindCeilingType(room);
+                                }
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.RollBack();
+                                failureMessages.AppendLine(room.Name + ": " + ex.Message);
+                            }
+                        }
+
+                        if (ceilingsFound.Count > 0 && null != ceilingType)
+                        {
+                            List<Ceiling> copiedCeilings = CreateCeilings(room, ceilingsFound, ceilingType, ref failureMessages);
+                            if (copiedCeilings.Count > 0 && !createdCeilings.ContainsKey(room.Id.IntegerValue))
+                            {
+                                createdCeilings.Add(room.Id.IntegerValue, copiedCeilings);
+                                created = true;
+                            }
+                        }
+                    }
+                    tg.Assimilate();
+                }
+                catch (Exception ex)
+                {
+                    tg.RollBack();
+                    MessageBox.Show("Cannot create ceilings from the selected rooms.\n" + ex.Message, "Create Ceilings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            return created;
+        }
+
+        private List<Ceiling> CreateCeilings(Room room, List<Ceiling> ceilingsFound, CeilingType ceilingType, ref StringBuilder msgBuilder)
+        {
+            List<Ceiling> copiedCeilings = new List<Ceiling>();
+            try
+            {
+                foreach (Ceiling ceiling in ceilingsFound)
+                {
+                    using (Transaction trans = new Transaction(m_doc))
+                    {
+                        trans.Start("Copy Ceiling");
+                        try
+                        {
+                            double finishThickness = 0;
+                            Parameter param = ceilingType.get_Parameter(BuiltInParameter.CEILING_THICKNESS);
+                            if (null != param)
+                            {
+                                if (param.HasValue)
+                                {
+                                    finishThickness = param.AsDouble();
+                                }
+                            }
+
+                            ICollection<ElementId> copiedIds = ElementTransformUtils.CopyElement(m_doc, ceiling.Id, new XYZ(0, 0, -finishThickness));
+                            trans.Commit();
+
+                            trans.Start("Change Ceiling Type");
+                            if (copiedIds.Count > 0)
+                            {
+                                ElementId copiedCeilingId = copiedIds.First();
+                                Ceiling copiedCeiling = m_doc.GetElement(copiedCeilingId) as Ceiling;
+                                if (null != copiedCeiling)
+                                {
+                                    ElementId changedTypeId = copiedCeiling.ChangeTypeId(ceilingType.Id);
+                                    copiedCeilings.Add(copiedCeiling);
+                                }
+                            }
+                            trans.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            msgBuilder.AppendLine(ceiling.Name + " [" + ceiling.Id.IntegerValue + "]: cannot be copied\n" + ex.Message);
+                            trans.RollBack();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Cannot create ceilings from the selected rooms.\nRoom Id:"+room.Id.IntegerValue+"\n\n" + ex.Message, "Create Ceilings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return copiedCeilings;
+        }
+
+        private List<Ceiling> FindCeilings(Room room, Transform transformValue)
         {
             List<Ceiling> ceilings = new List<Ceiling>();
             try
             {
-                Solid roomSolid = FindRoomSolid(room);
+                Solid roomSolid = FindRoomSolid(room, transformValue);
                 if (null != roomSolid)
                 {
                     FilteredElementCollector collector = new FilteredElementCollector(m_doc);
                     ElementIntersectsSolidFilter solidFilter = new ElementIntersectsSolidFilter(roomSolid);
                     ceilings = collector.OfClass(typeof(Ceiling)).WherePasses(solidFilter).WhereElementIsNotElementType().ToElements().Cast<Ceiling>().ToList();
                 }
-
             }
             catch (Exception ex)
             {
@@ -153,12 +226,13 @@ namespace HOK.FinishCreator
             return ceilings;
         }
 
-        private Solid FindRoomSolid(Room room)
+        private Solid FindRoomSolid(Room room, Transform transformValue)
         {
             Solid roomSolid = null;
             try
             {
                 GeometryElement geomElem = room.ClosedShell;
+                geomElem = geomElem.GetTransformed(transformValue);
                 foreach (GeometryObject geoObj in geomElem)
                 {
                     Solid solid = geoObj as Solid;
@@ -184,12 +258,15 @@ namespace HOK.FinishCreator
             try
             {
                 string typeName = "Ceiling Finish";
-                Parameter param = room.get_Parameter(BuiltInParameter.ROOM_FINISH_CEILING);
-                if (null != param)
+                if (!room.Document.IsLinked)
                 {
-                    if (param.HasValue)
+                    Parameter param = room.get_Parameter(BuiltInParameter.ROOM_FINISH_CEILING);
+                    if (null != param)
                     {
-                        typeName = param.AsString();
+                        if (param.HasValue)
+                        {
+                            typeName = param.AsString();
+                        }
                     }
                 }
 
@@ -205,7 +282,7 @@ namespace HOK.FinishCreator
                     ElementId materialId = ElementId.InvalidElementId;
                     foreach (CeilingType cType in ceilingTypes)
                     {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                         if (!cType.CanBeCopied) { continue; }
 #endif
                         if (null != cType.GetCompoundStructure())
