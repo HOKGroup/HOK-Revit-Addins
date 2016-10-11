@@ -34,7 +34,7 @@ namespace HOK.RoomUpdater
                 {
                     if (category.HasMaterialQuantities)
                     {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                         if (category.CategoryType == CategoryType.Model)
                         {
                             categoryList.Add(category);

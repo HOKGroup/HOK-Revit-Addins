@@ -98,7 +98,7 @@ namespace HOK.RoomUpdater
 
                             if (category.HasMaterialQuantities)
                             {
-#if RELEASE2015 || RELEASE2016
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
                                 if (category.CategoryType == CategoryType.Model)
                                 {
                                     CategoryProperties cp = new CategoryProperties(category);
@@ -174,7 +174,7 @@ namespace HOK.RoomUpdater
                         ParameterProperties pp = null;
 #if RELEASE2013 ||RELEASE2014
                         Parameter param = firstElement.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         Parameter param = firstElement.LookupParameter(paramName);
 #endif
                         
@@ -189,7 +189,7 @@ namespace HOK.RoomUpdater
                         {
 #if RELEASE2013 ||RELEASE2014
                             param = firstTypeElement.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                             param = firstTypeElement.LookupParameter(paramName);
 #endif
 
@@ -216,8 +216,8 @@ namespace HOK.RoomUpdater
                         {
 #if RELEASE2013||RELEASE2014
                             Parameter param = firstElement.get_Parameter(property.ParameterName);
-#elif RELEASE2015 || RELEASE2016
-                             Parameter param = firstElement.LookupParameter(property.ParameterName);
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
+                            Parameter param = firstElement.LookupParameter(property.ParameterName);
 #endif
 
                             if (null != param)
@@ -232,7 +232,7 @@ namespace HOK.RoomUpdater
                         {
 #if RELEASE2013||RELEASE2014
                             Parameter param = firstTypeElement.get_Parameter(property.ParameterName);
-#elif RELEASE2015 ||RELEASE2016
+#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                             Parameter param = firstTypeElement.LookupParameter(property.ParameterName);
 #endif
 
@@ -728,7 +728,7 @@ namespace HOK.RoomUpdater
 #if RELEASE2013
                                 XYZ firstPt = curve.get_EndPoint(0);
                                 XYZ secondPt = curve.get_EndPoint(1);
-#elif RELEASE2014||RELEASE2015||RELEASE2016
+#elif RELEASE2014||RELEASE2015||RELEASE2016 || RELEASE2017
                                     XYZ firstPt = curve.GetEndPoint(0);
                                     XYZ secondPt = curve.GetEndPoint(1);
 #endif
@@ -785,7 +785,7 @@ namespace HOK.RoomUpdater
                 {
 #if RELEASE2013 || RELEASE2014
                     Parameter sParam = spatialElement.get_Parameter(pmp.SpatialParamName);
-#elif RELEASE2015 ||RELEASE2016
+#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                     Parameter sParam = spatialElement.LookupParameter(pmp.SpatialParamName);
 #endif
 
@@ -801,14 +801,14 @@ namespace HOK.RoomUpdater
                                     
 #if RELEASE2013
                                     if (null!=re.Group) { groupExist = true; continue; } //elements in group
-#elif RELEASE2014 || RELEASE2015 || RELEASE2016
+#elif RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
                                     if (re.GroupId != ElementId.InvalidElementId) { groupExist = true; continue; } //elements in group
 #endif
                                     
 
 #if RELEASE2013 || RELEASE2014
                                     Parameter rParam = re.get_Parameter(pmp.RevitParamName);
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                                     Parameter rParam = re.LookupParameter(pmp.RevitParamName);
 #endif
 
@@ -821,7 +821,7 @@ namespace HOK.RoomUpdater
 #if RELEASE2013 || RELEASE2014
                                             rParam = elementType.get_Parameter(pmp.RevitParamName);
 
-#elif RELEASE2015 || RELEASE2016
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                                             rParam = elementType.LookupParameter(pmp.RevitParamName);
 #endif
 
@@ -1057,7 +1057,7 @@ namespace HOK.RoomUpdater
             instanceId = instance.Id.IntegerValue;
 #if RELEASE2013
             linkedDocument = instance.Document;
-#elif RELEASE2014 || RELEASE2015 || RELEASE2016
+#elif RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
             linkedDocument = instance.GetLinkDocument();
 #endif
             if (null != linkedDocument)
