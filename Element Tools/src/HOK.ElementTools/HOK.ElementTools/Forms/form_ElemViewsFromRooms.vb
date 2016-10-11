@@ -614,7 +614,7 @@ Public Class form_ElemViewsFromRooms
 
 #If RELEASE2013 Or RELEASE2014 Then
                                     parameter = view2d.Parameter("Title on Sheet")
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                                     parameter = view2d.LookupParameter("Title on Sheet")
 #End If
 
@@ -656,7 +656,7 @@ Public Class form_ElemViewsFromRooms
                                             viewElevation.Name = viewNameComposite & surfix(index)
 #If RELEASE2013 Or RELEASE2014 Then
                                             parameter = viewElevation.Parameter("Title on Sheet")
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                                             parameter = viewElevation.LookupParameter("Title on Sheet")
 #End If
                                             If parameter IsNot Nothing Then
@@ -733,7 +733,7 @@ Public Class form_ElemViewsFromRooms
                                                 viewElevation.Name = viewNameComposite & surfix(index)
 #If RELEASE2013 Or RELEASE2014 Then
                                                 parameter = viewElevation.Parameter("Title on Sheet")
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                                                 parameter = viewElevation.LookupParameter("Title on Sheet")
 #End If
                                                 If parameter IsNot Nothing Then
@@ -765,7 +765,7 @@ Public Class form_ElemViewsFromRooms
                                                 viewElevation.Name = viewNameComposite & surfix(index)
 #If RELEASE2013 Or RELEASE2014 Then
                                                 parameter = viewElevation.Parameter("Title on Sheet")
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                                                 parameter = viewElevation.LookupParameter("Title on Sheet")
 #End If
                                                 If parameter IsNot Nothing Then
@@ -935,7 +935,7 @@ Public Class form_ElemViewsFromRooms
 #If RELEASE2013 Then
                         view3d.SectionBox.Enabled = True
                         view3d.SectionBox = boundingBoxBox
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                                         view3d.IsSectionBoxActive = True
                                         view3d.SetSectionBox(boundingBoxBox)
 #End If
@@ -990,7 +990,7 @@ Public Class form_ElemViewsFromRooms
 #If RELEASE2013 Then
                             view3d.SectionBox.Enabled = True
                             view3d.SectionBox = boundingBoxBox
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                                             view3d.IsSectionBoxActive = True
                                             view3d.SetSectionBox(boundingBoxBox)
 #End If
@@ -1378,7 +1378,7 @@ Public Class form_ElemViewsFromRooms
                 'Only include properly placed and bounded rooms
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter("Area")
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                 parameter = RmElement.LookupParameter("Area")
 #End If
 
@@ -1393,7 +1393,7 @@ Public Class form_ElemViewsFromRooms
                 'In case of blank view name skip the room
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter(textBoxParameterViewName.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                 parameter = RmElement.LookupParameter(textBoxParameterViewName.Text)
 #End If
 
@@ -1563,7 +1563,7 @@ Public Class form_ElemViewsFromRooms
                 'Get the room name value (we are assuming it is a string
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter(textBoxParameterRoomName.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                 parameter = RmElement.LookupParameter(textBoxParameterRoomName.Text)
 #End If
 
@@ -1576,7 +1576,7 @@ Public Class form_ElemViewsFromRooms
                 'Get list values
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter(textBoxParameterList1.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                 parameter = RmElement.LookupParameter(textBoxParameterList1.Text)
 #End If
 
@@ -1603,7 +1603,7 @@ Public Class form_ElemViewsFromRooms
                 End If
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter(textBoxParameterList2.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                 parameter = RmElement.LookupParameter(textBoxParameterList2.Text)
 #End If
 
@@ -1685,7 +1685,7 @@ Public Class form_ElemViewsFromRooms
 
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = element.Parameter(parameterNameGroupBy)
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                 parameter = element.LookupParameter(parameterNameGroupBy)
 #End If
                 If parameter Is Nothing Then
@@ -1703,7 +1703,7 @@ Public Class form_ElemViewsFromRooms
                 'allowing blank is trouble; user should have a value like "<none>".
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = element.Parameter("Area")
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                 parameter = element.LookupParameter("Area")
 #End If
 

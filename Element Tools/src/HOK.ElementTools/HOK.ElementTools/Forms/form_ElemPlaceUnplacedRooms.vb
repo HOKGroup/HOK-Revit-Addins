@@ -130,7 +130,7 @@ Public Class form_ElemPlaceUnplacedRooms
             Dim roomToPlace As Architecture.Room = DirectCast(m_Settings.Document.GetElement(elemId), Architecture.Room)
 #If RELEASE2013 Or RELEASE2014 Then
             Dim parameterArea As Parameter = roomToPlace.Parameter(textBoxParameterRequiredArea.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
             Dim parameterArea As Parameter = roomToPlace.LookupParameter(textBoxParameterRequiredArea.Text)
 #End If
 
@@ -157,7 +157,7 @@ Public Class form_ElemPlaceUnplacedRooms
             Dim line2 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox2, ptCurrentBox3, True)
             Dim line3 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox3, ptCurrentBox4, True)
             Dim line4 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox4, ptCurrentBox1, True)
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
             Dim line1 As Curve = Line.CreateBound(ptCurrentBox1, ptCurrentBox2)
             Dim line2 As Curve = Line.CreateBound(ptCurrentBox2, ptCurrentBox3)
             Dim line3 As Curve = Line.CreateBound(ptCurrentBox3, ptCurrentBox4)
@@ -282,7 +282,7 @@ Public Class form_ElemPlaceUnplacedRooms
             'Tag the new room
 #If RELEASE2013 Then
             Dim roomTag As Architecture.RoomTag = m_Settings.Document.Create.NewRoomTag(roomNew, ptCurrentInsert, m_Settings.ActiveView)
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
             Dim roomId As LinkElementId = New LinkElementId(roomNew.Id)
             Dim roomTag As Architecture.RoomTag = m_Settings.Document.Create.NewRoomTag(roomId, ptCurrentInsert, m_Settings.ActiveView.Id)
 #End If
@@ -385,26 +385,40 @@ Public Class form_ElemPlaceUnplacedRooms
     ''' <remarks></remarks>
     Public Function CreateSketchPlane(ByVal normal As XYZ, ByVal origin As XYZ) As SketchPlane
         Try
-            ' First create a Geometry.Plane which need in NewSketchPlane() method
+           
+#If RELEASE2013 Then
+             ' First create a Geometry.Plane which need in NewSketchPlane() method
             Dim geometryPlane As Plane = m_Settings.Application.Application.Create.NewPlane(normal, origin)
             If geometryPlane Is Nothing Then
                 ' assert the creation is successful
                 Throw New Exception("Create the geometry plane failed.")
             End If
             ' Then create a sketch plane using the Geometry.Plane
-#If RELEASE2013 Then
-            Dim plane As SketchPlane = m_Settings.Document.Create.NewSketchPlane(geometryPlane)
+            Dim sPlane As SketchPlane = m_Settings.Document.Create.NewSketchPlane(geometryPlane)
 #ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
-            Dim plane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
+             ' First create a Geometry.Plane which need in NewSketchPlane() method
+            Dim geometryPlane As Plane = m_Settings.Application.Application.Create.NewPlane(normal, origin)
+            If geometryPlane Is Nothing Then
+                ' assert the creation is successful
+                Throw New Exception("Create the geometry plane failed.")
+            End If
+            ' Then create a sketch plane using the Geometry.Plane
+            Dim sPlane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
+#ElseIf RELEASE2017 Then
+            Dim geometryPlane As Plane = Plane.CreateByNormalAndOrigin(normal, origin)
+            If geometryPlane Is Nothing Then
+                Throw New Exception("Create the geometry plane failed.")
+            End If
+            Dim sPlane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
 #End If
 
-            If plane Is Nothing Then
+            If sPlane Is Nothing Then
                 ' assert the creation is successful
                 Throw New Exception("Create the sketch plane failed.")
             End If
 
             ' Return the sketch plane array
-            Return plane
+            Return sPlane
 
         Catch ex As Exception
             Throw New Exception("Can not create the sketch plane, message: " + ex.Message)
@@ -420,16 +434,34 @@ Public Class form_ElemPlaceUnplacedRooms
     Public Function CreateSketchPlaneByCurve(ByVal curve As CurveArray) As SketchPlane
         Try
             ' First create a Geometry.Plane which need in NewSketchPlane() method
-            Dim geometryPlane As Plane = m_Settings.Application.Application.Create.NewPlane(curve)
+#If RELEASE2017 Then
+            Dim curveList As List(Of Curve) = New List(Of Curve)
+            Dim curveIterator As CurveArrayIterator = curve.ForwardIterator
+            While (curveIterator.MoveNext())
+                Dim aCurve As Curve = curveIterator.Current
+                curveList.Add(aCurve)
+            End While
+
+            Dim cloop As CurveLoop = CurveLoop.Create(curveList)
+            Dim geometryPlane As Plane = cloop.GetPlane()
             If geometryPlane Is Nothing Then
                 ' assert the creation is successful
                 Throw New Exception("Create the geometry plane failed.")
             End If
             ' Then create a sketch plane using the Geometry.Plane
+#Else
+             Dim geometryPlane As Plane = m_Settings.Application.Application.Create.NewPlane(curve)
+            If geometryPlane Is Nothing Then
+                ' assert the creation is successful
+                Throw New Exception("Create the geometry plane failed.")
+            End If
+            ' Then create a sketch plane using the Geometry.Plane
+#End If
+
 #If RELEASE2013 Then
             Dim plane As SketchPlane = m_Settings.Document.Create.NewSketchPlane(geometryPlane)
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
-             Dim plane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+            Dim plane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
 #End If
 
             If plane Is Nothing Then

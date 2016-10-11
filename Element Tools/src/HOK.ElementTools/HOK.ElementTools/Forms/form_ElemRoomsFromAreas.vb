@@ -386,7 +386,7 @@ Public Class form_ElemRoomsFromAreas
             'Tag the new room
 #If RELEASE2013 Then
             roomTag = m_Settings.Document.Create.NewRoomTag(roomNew, ptCurrentInsert, m_Settings.ActiveView)
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
             Dim linkRoomId As LinkElementId = New LinkElementId(roomNew.Id)
             roomTag = m_Settings.Document.Create.NewRoomTag(linkRoomId, ptCurrentInsert, m_Settings.ActiveView.Id)
 #End If

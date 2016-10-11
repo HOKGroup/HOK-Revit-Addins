@@ -297,7 +297,7 @@ Public Class form_ElemPlaceUnplacedAreas
                 areaToPlace = DirectCast(m_Settings.Document.GetElement(elemId), DB.Area)
 #If RELEASE2013 Or RELEASE2014 Then
                 parameterArea = areaToPlace.Parameter(textBoxParameterRequiredArea.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                 parameterArea = areaToPlace.LookupParameter(textBoxParameterRequiredArea.Text)
 #End If
 
@@ -345,6 +345,19 @@ Public Class form_ElemPlaceUnplacedAreas
                 curves.Add(line)
 
                 Dim plane As DB.Plane = m_Settings.Document.Application.Create.NewPlane(norm, origin)
+                Dim sketchPlane As DB.SketchPlane = sketchPlane.Create(m_Settings.Document, plane)
+#ElseIf RELEASE2017 Then
+                curves.Clear()
+                line = DB.Line.CreateBound(ptCurrentBox1, ptCurrentBox2)
+                curves.Add(line)
+                line = DB.Line.CreateBound(ptCurrentBox2, ptCurrentBox3)
+                curves.Add(line)
+                line = DB.Line.CreateBound(ptCurrentBox3, ptCurrentBox4)
+                curves.Add(line)
+                line = DB.Line.CreateBound(ptCurrentBox4, ptCurrentBox1)
+                curves.Add(line)
+
+                Dim plane As DB.Plane = Plane.CreateByNormalAndOrigin(norm, origin)
                 Dim sketchPlane As DB.SketchPlane = sketchPlane.Create(m_Settings.Document, plane)
 #End If
                 
