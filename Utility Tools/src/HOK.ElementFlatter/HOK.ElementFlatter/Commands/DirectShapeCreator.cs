@@ -110,7 +110,12 @@ namespace HOK.ElementFlatter.Commands
                         
                         if (shapeGeometries.Count > 0)
                         {
+#if RELEASE2017
+                            directShape = DirectShape.CreateElement(doc, element.Category.Id);
+#else
                             directShape = DirectShape.CreateElement(doc, element.Category.Id, appGUID, appDataGUID);
+#endif
+
                             //shapeLibrary.AddDefinition(element.UniqueId, shapeGeometries);
                             directShape.SetShape(shapeGeometries);
                         }
@@ -118,7 +123,7 @@ namespace HOK.ElementFlatter.Commands
                         if (null != directShape)
                         {
                             directShape.SetName(element.Name);
-#if RELEASE2016
+#if RELEASE2016 || RELEASE2017
                             DirectShapeOptions dsOptions = directShape.GetOptions();
                             dsOptions.ReferencingOption = DirectShapeReferencingOption.Referenceable;
                             directShape.SetOptions(dsOptions);
