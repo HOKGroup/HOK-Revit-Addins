@@ -121,7 +121,7 @@ namespace HOK.DoorMonitor
                     {
                         doorUpdater.Register(doc, projectSetup);
                     }
-#elif RELEASE2014||RELEASE2015 || RELEASE2016
+#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                      if (!UpdaterRegistry.IsUpdaterRegistered(doorUpdater.GetUpdaterId(), doc))
                     {
                         doorUpdater.Register(doc, projectSetup);
@@ -142,7 +142,7 @@ namespace HOK.DoorMonitor
                 {
                     UpdaterRegistry.UnregisterUpdater(doorUpdater.GetUpdaterId());
                 }
-#elif RELEASE2014||RELEASE2015 || RELEASE2016
+#elif RELEASE2014||RELEASE2015 || RELEASE2016 ||RELEASE2017
                 if (UpdaterRegistry.IsUpdaterRegistered(doorUpdater.GetUpdaterId(), doc))
                 {
                     UpdaterRegistry.UnregisterUpdater(doorUpdater.GetUpdaterId(), doc);
@@ -163,7 +163,7 @@ namespace HOK.DoorMonitor
                         doorUpdater.Register(doc, projectSetup);
                         doc.DocumentClosing += UnregisterDoorUpdaterOnClose;
                     }
-#elif RELEASE2014||RELEASE2015 || RELEASE2016
+#elif RELEASE2014||RELEASE2015 || RELEASE2016 ||RELEASE2017
                     if (!UpdaterRegistry.IsUpdaterRegistered(doorUpdater.GetUpdaterId(), doc))
                     {
                         doorUpdater.Register(doc, projectSetup);
@@ -178,7 +178,7 @@ namespace HOK.DoorMonitor
                     {
                         UpdaterRegistry.UnregisterUpdater(doorUpdater.GetUpdaterId());
                     }
-#elif RELEASE2014||RELEASE2015 || RELEASE2016
+#elif RELEASE2014||RELEASE2015 || RELEASE2016 ||RELEASE2017
                     if (UpdaterRegistry.IsUpdaterRegistered(doorUpdater.GetUpdaterId(), doc))
                     {
                         UpdaterRegistry.UnregisterUpdater(doorUpdater.GetUpdaterId(), doc);
