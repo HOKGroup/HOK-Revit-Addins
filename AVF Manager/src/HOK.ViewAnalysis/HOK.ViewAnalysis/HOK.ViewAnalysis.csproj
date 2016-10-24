@@ -158,13 +158,14 @@
     <Content Include="Resources\Addins Shared Parameters.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="B:\Revit Projects\AVF\2015\ViewAnalysis\xfMap_ViewAnalysis.xml">
-      <SubType>Designer</SubType>
-      <Link>Resources\xfMap_ViewAnalysis.xml</Link>
+    <Content Include="Resources\xfMap_ViewAnalysis.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
