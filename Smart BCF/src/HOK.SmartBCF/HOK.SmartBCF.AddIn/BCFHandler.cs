@@ -772,9 +772,10 @@ namespace HOK.SmartBCF.AddIn
             View3D view3D = null;
             try
             {
+                string viewName = "SmartBCF - Orthogonal - " + Environment.UserName;
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
                 List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
-                var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.ViewName.Contains("SmartBCF - Orthogonal") select view;
+                var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.ViewName == viewName select view;
                 if (viewfound.Count() > 0)
                 {
                     view3D = viewfound.First();
@@ -790,7 +791,7 @@ namespace HOK.SmartBCF.AddIn
                             try
                             {
                                 view3D = View3D.CreateIsometric(m_doc, viewFamilyTypeId);
-                                view3D.Name = "SmartBCF - Orthogonal";
+                                view3D.Name = viewName;
                                 trans.Commit();
                             }
                             catch (Exception ex)
@@ -814,10 +815,11 @@ namespace HOK.SmartBCF.AddIn
             View3D view3D = null;
             try
             {
+                string viewName = "SmartBCF - Perspective - " + Environment.UserName;
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
                 List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                 //by the limitation of perspective view, create isometric instead
-                var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == true && view.ViewName.Contains("SmartBCF - Perspective") select view;
+                var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == true && view.ViewName == viewName select view;
                 if (viewfound.Count() > 0)
                 {
                     view3D = viewfound.First();
@@ -833,7 +835,7 @@ namespace HOK.SmartBCF.AddIn
                             try
                             {
                                 view3D = View3D.CreatePerspective(m_doc, viewFamilyTypeId);
-                                view3D.Name = "SmartBCF - Perspective";
+                                view3D.Name = viewName;
                                 trans.Commit();
                             }
                             catch (Exception ex)
