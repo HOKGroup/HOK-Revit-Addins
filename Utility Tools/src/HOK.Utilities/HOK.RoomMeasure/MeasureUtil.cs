@@ -79,12 +79,16 @@ namespace HOK.RoomMeasure
                 {
                     geoList = solidGeometries.ToList();
                 }
-#if RELEASE2017
-                roomShape = DirectShape.CreateElement(room.Document, room.Category.Id);
-#else
-                roomShape = DirectShape.CreateElement(room.Document, room.Category.Id, "Measure", room.UniqueId);
-#endif
 
+                ElementId categoryId = new ElementId((int)BuiltInCategory.OST_Mass);
+                if (DirectShape.IsValidCategoryId(categoryId, room.Document))
+                {
+#if RELEASE2017
+                    roomShape = DirectShape.CreateElement(room.Document, categoryId);
+#else
+                    roomShape = DirectShape.CreateElement(room.Document, categoryId, "Measure", room.UniqueId);
+#endif
+                }
                 roomShape.SetShape(geoList);
             }
             catch (Exception ex)

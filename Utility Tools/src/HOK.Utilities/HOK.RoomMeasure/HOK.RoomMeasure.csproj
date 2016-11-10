@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.RoomMeasure</RootNamespace>
-    <AssemblyName>HOK.RoomMeasure_v.2017.0.1.0</AssemblyName>
+    <AssemblyName>HOK.RoomMeasure</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
