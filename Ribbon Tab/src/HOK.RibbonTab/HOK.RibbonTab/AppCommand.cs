@@ -290,10 +290,12 @@ namespace HOK.RibbonTab
                     pb8.ToolTipImage = LoadBitmapImage(assembly, "tooltip.png");
                     AddToolTips(pb8);
 
+#if RELEASE2014
                     PushButton pb9 = splitButton.AddPushButton(new PushButtonData("Update Data", "Update Data", currentDirectory + "/HOK.RoomsToMass.dll", "HOK.RoomsToMass.DataCommand"));
                     pb9.LargeImage = LoadBitmapImage(assembly, "refresh.png");
                     pb9.ToolTip = "Transfer parameters values between Rooms, Areas, Floors and Masses";
                     AddToolTips(pb9);
+#endif
 
                     PushButton pb10 = splitButton.AddPushButton(new PushButtonData("Mass Commands", "Mass Commands", currentDirectory + "/HOK.RoomsToMass.dll", "HOK.RoomsToMass.AssignerCommand"));
                     pb10.LargeImage = LoadBitmapImage(assembly, "shape.png");

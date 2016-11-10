@@ -253,7 +253,7 @@ namespace HOK.BetaToolsManager
                             tp.InstallPath = installDirectory + tp.DllName;
                             tp.InstallExist = File.Exists(tp.InstallPath);
                             if (tp.InstallExist) { tp.TempAssemblyPath = GetTempInstallPath(tp.InstallPath); }
-                            tp.ToolIcon = ImageUtil.LoadBitmapImage("height.png");
+                            tp.ToolIcon = ImageUtil.LoadBitmapImage("toolbox.png");
 
                             dictionary.Add(tool, tp);
                             break;
@@ -469,7 +469,7 @@ namespace HOK.BetaToolsManager
 
                 image.BeginInit();
                 image.StreamSource = stream;
-               
+
                 image.EndInit();
             }
             catch (Exception ex)
