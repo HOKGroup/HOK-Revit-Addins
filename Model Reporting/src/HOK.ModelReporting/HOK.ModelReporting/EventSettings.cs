@@ -119,6 +119,7 @@ namespace HOK.ModelReporting
             prefixes.Add("E-CAD", "E-CAD");
             prefixes.Add("E-BIM", "E-BIM");
             prefixes.Add("REVIT", "REVIT");
+            prefixes.Add("E-Design", "E-Design");
 
             //Get ProjectName and ProjectNumber
             if (!string.IsNullOrEmpty(docCentralPath))
@@ -234,20 +235,6 @@ namespace HOK.ModelReporting
                 return "";
             }
             return name;
-        }
-
-        private void GetProjectInfoOnRevitServer(string path, out string pNumber, out string pName)
-        {
-            pNumber = "00.00000.00";
-            pName = "";
-            try
-            {
-
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
         }
 
         public long GetFileSize()
