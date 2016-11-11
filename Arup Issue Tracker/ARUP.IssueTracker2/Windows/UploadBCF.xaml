@@ -1,0 +1,85 @@
+﻿<Window x:Class="ARUP.IssueTracker.Windows.UploadBCF"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Upload Issues" SizeToContent="WidthAndHeight" Icon="/ARUP.IssueTracker;component/Assets/icon.ico">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Label Name="description" Content="You are about to send X Issues to Jira." Margin="5" />
+        <StackPanel Orientation="Horizontal"  Grid.Row="1" Margin="5">
+
+            <Label Content="Project:" VerticalAlignment="Center" Width="75"/>
+            <ComboBox  x:Name="projCombo" Width="300" SelectionChanged="projCombo_SelectionChanged">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Content="{Binding formattedname}"  Grid.Column="0"  />
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal"  Grid.Row="2" Margin="5">
+            <Label Content="Issue Type:" VerticalAlignment="Center" Width="75"/>
+            <ComboBox Name="issueTypeCombo" ItemsSource="{Binding ElementName=projCombo, Path=SelectedItem.issuetypes}" SelectedIndex="0"   Width="300">
+
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label Content="{Binding name}"  Grid.Column="0"  />
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+        <!--<StackPanel Orientation="Horizontal" Grid.Row="3"  Margin="5" >
+            <Label FontSize="11"   VerticalAlignment="Bottom" Content="Priority:" Width="75" />
+            <ComboBox Name="priorityCombo"  SelectedIndex="0" Width="300">
+
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <TextBlock Text="{Binding name}"  Grid.Column="0"  />
+                        </Grid>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            --><!--<Button Click="ChangePriority_OnClick" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" x:Name="ChangePriority" FontSize="11" FontWeight="Bold"
+                   Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Content="default" />--><!--
+
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="4" Margin="5">
+            <Label FontSize="11"   VerticalAlignment="Bottom" Content="Assignee:" Width="75" />
+            <Button Click="ChangeAssign_OnClick" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" x:Name="ChangeAssign" FontSize="11" FontWeight="Bold"
+                   Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Content="none" />
+
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="5" Margin="5">
+            <Label FontSize="11"  Grid.Row="3" VerticalAlignment="Bottom" Name="ChangeComponentsLabel" Content="Components:" Width="75" />
+            <Button Click="ChangeComponents_OnClick" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Name="ChangeComponents" FontSize="11" FontWeight="Bold"
+                   Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Content="none" />
+
+        </StackPanel>-->
+        <StackPanel Orientation="Horizontal" Grid.Row="6" HorizontalAlignment="Right" Margin="5" >
+            <Button Content="Upload" IsDefault="True"  Margin="5" Width="75" Click="OKBtnClick"/>
+            <Button Content="Cancel"   Margin="5" Width="75" Click="CancelBtnClick" Background="Transparent" BorderBrush="Transparent"/>
+        </StackPanel>
+
+    </Grid>
+</Window>

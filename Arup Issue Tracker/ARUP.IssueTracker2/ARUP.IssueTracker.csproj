@@ -1,0 +1,335 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1B969AD1-C7E6-40FB-B3B0-20E7EB735876}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ARUP.IssueTracker</RootNamespace>
+    <AssemblyName>ARUP.IssueTracker</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+    <!--<SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>-->
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ManualObfuscation|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ManualObfuscation\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Arup.RestSharp">
+      <HintPath>.\Arup.RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Ionic.Zip">
+      <HintPath>..\..\..\..\..\Downloads\DotNetZipLib-DevKit-v1.9\zip-v1.9\Debug\Ionic.Zip.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Classes\BackgroundJira.cs" />
+    <Compile Include="Classes\BcfAdapter.cs" />
+    <Compile Include="Classes\BCF2\BcfContainer.cs" />
+    <Compile Include="Classes\BCF2\BcfFile.cs" />
+    <Compile Include="Classes\BCF2\Markup.cs" />
+    <Compile Include="Classes\BCF2\Project.cs" />
+    <Compile Include="Classes\BCF2\Utils.cs" />
+    <Compile Include="Classes\BCF2\Version.cs" />
+    <Compile Include="Classes\BCF2\ViewComment.cs" />
+    <Compile Include="Classes\BCF2\ViewPointExtended.cs" />
+    <Compile Include="Classes\BCF2\Visinfo.cs" />
+    <Compile Include="Classes\BCF\BCF.cs" />
+    <Compile Include="Classes\DataProtector.cs" />
+    <Compile Include="Classes\IndexByName.cs" />
+    <Compile Include="Classes\JiraClient.cs" />
+    <Compile Include="Classes\JiraUploader.cs" />
+    <Compile Include="Classes\JiraUtils.cs" />
+    <Compile Include="Classes\JIRA\AutoCompleteQuery.cs" />
+    <Compile Include="Classes\JIRA\AutoCompleteQueryResult.cs" />
+    <Compile Include="Classes\JIRA\Lead.cs" />
+    <Compile Include="Classes\JIRA\ErrorMsg.cs" />
+    <Compile Include="Classes\JIRA\Issues.cs" />
+    <Compile Include="Classes\JIRA\IssueTransitions.cs" />
+    <Compile Include="Classes\JIRA\Login.cs" />
+    <Compile Include="Classes\BCF\markup.cs" />
+    <Compile Include="Classes\JIRA\Projects.cs" />
+    <Compile Include="Classes\JIRA\ProjectStatuses.cs" />
+    <Compile Include="Classes\JIRA\Self.cs" />
+    <Compile Include="Classes\BCF\visinfo.cs" />
+    <Compile Include="Classes\EventArgs.cs" />
+    <Compile Include="Classes\JIRA\Transition.cs" />
+    <Compile Include="Classes\MetadataTables.cs" />
+    <Compile Include="Classes\MySettings.cs" />
+    <Compile Include="Classes\RestCallback.cs" />
+    <Compile Include="Converters\AssigneeConverter.cs" />
+    <Compile Include="Converters\BoolStarConv.cs" />
+    <Compile Include="Converters\CommConverter.cs" />
+    <Compile Include="Converters\ExtensionToResourceConverter.cs" />
+    <Compile Include="Converters\StringEnabConverter.cs" />
+    <Compile Include="Converters\ExpanderConverter.cs" />
+    <Compile Include="Converters\IntEnabConverter2.cs" />
+    <Compile Include="Converters\IntEnabConverter.cs" />
+    <Compile Include="Converters\IntEnabConverter3.cs" />
+    <Compile Include="Converters\IntVisibConverter.cs" />
+    <Compile Include="Converters\IssueConverter.cs" />
+    <Compile Include="Converters\ListConverter.cs" />
+    <Compile Include="Converters\PathToImageConv.cs" />
+    <Compile Include="Converters\SendIssueConverter.cs" />
+    <Compile Include="Converters\StringVisibConverter.cs" />
+    <Compile Include="Converters\UriToImageConv.cs" />
+    <Compile Include="Classes\IfcGuid.cs" />
+    <Compile Include="UserControls\BCFPanel.xaml.cs">
+      <DependentUpon>BCFPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\CircularProgressBar.xaml.cs">
+      <DependentUpon>CircularProgressBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\FilterGroup.xaml.cs">
+      <DependentUpon>FilterGroup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\JiraPanel.xaml.cs">
+      <DependentUpon>JiraPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\JIRA\Attachment.cs" />
+    <Compile Include="Classes\JIRA\Author.cs" />
+    <Compile Include="Classes\JIRA\AvatarUrls.cs" />
+    <Compile Include="Classes\JIRA\Comment.cs" />
+    <Compile Include="Classes\JIRA\Comment2.cs" />
+    <Compile Include="Classes\JIRA\Component.cs" />
+    <Compile Include="Classes\JIRA\Fields.cs" />
+    <Compile Include="Classes\JIRA\Filter.cs" />
+    <Compile Include="Classes\JIRA\Issue.cs" />
+    <Compile Include="Classes\BCF\IssueBCF.cs" />
+    <Compile Include="Classes\JIRA\Issuetype.cs" />
+    <Compile Include="Classes\Jira.cs" />
+    <Compile Include="Classes\JIRA\Owner.cs" />
+    <Compile Include="Classes\JIRA\Priority.cs" />
+    <Compile Include="Classes\JIRA\Project.cs" />
+    <Compile Include="Classes\JIRA\RelativeDate.cs" />
+    <Compile Include="Classes\JIRA\Reporter.cs" />
+    <Compile Include="Classes\JIRA\Resolution.cs" />
+    <Compile Include="Classes\JIRA\Status.cs" />
+    <Compile Include="Classes\JIRA\StatusCategory.cs" />
+    <Compile Include="Classes\JIRA\UpdateAuthor.cs" />
+    <Compile Include="Classes\JIRA\User.cs" />
+    <Compile Include="UserControls\MainPanel.xaml.cs">
+      <DependentUpon>MainPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Placeholder.cs" />
+    <Compile Include="UserControls\Waiter.xaml.cs">
+      <DependentUpon>Waiter.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\AddComment.xaml.cs">
+      <DependentUpon>AddComment.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ChangeAssignee.xaml.cs">
+      <DependentUpon>ChangeAssignee.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ChangeValue.xaml.cs">
+      <DependentUpon>ChangeValue.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ComponentsList.xaml.cs">
+      <DependentUpon>ComponentsList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\IComponentController.cs" />
+    <Compile Include="Windows\ICommentController.cs" />
+    <Compile Include="Windows\ProgressWin.xaml.cs">
+      <DependentUpon>ProgressWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SnapWin.xaml.cs">
+      <DependentUpon>SnapWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\UploadBCF.xaml.cs">
+      <DependentUpon>UploadBCF.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Assets\files.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\CommentListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\IssueListGridView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\IssueListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\BCFPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\CircularProgressBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\FilterGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\JiraPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\MainPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\Waiter.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\AddComment.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ChangeAssignee.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ChangeValue.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\ComponentsList.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\ProgressWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\Settings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\SnapWin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\UploadBCF.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Classes\BCF2\ExtensionSchema.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\ARUPIssueTrackerIcon16x16.png" />
+    <EmbeddedResource Include="Assets\ARUPIssueTrackerIcon32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\snapshot.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!--<Import Project="$(SolutionDir)\.nuget\nuget.targets" />-->
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

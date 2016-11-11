@@ -1,0 +1,16 @@
+﻿<Window x:Class="ARUP.IssueTracker.Windows.ProgressWin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Progress"  Width="400" SizeToContent="Height" Closing="Window_Closing" Icon="/ARUP.IssueTracker;component/Assets/icon.ico"
+        >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Label Name="taskProgress" Content="Issue 1/12..." Margin="5"/>
+        <ProgressBar Name="progress" Grid.Row="1" Height="30" Margin="5"/>
+        <Button HorizontalAlignment="Center" Name="cancelBtn" Click="cancelBtn_Click" Grid.Row="2" Content="Cancel" Margin="5" Width="75"/>
+    </Grid>
+</Window>

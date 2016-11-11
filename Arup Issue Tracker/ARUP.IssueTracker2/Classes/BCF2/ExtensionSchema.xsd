@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Draft Lars Bjørkhaug, Klaus Linhard -->
+<!--Based on recommendations from the following site: http://www.ibm.com/developerworks/library/x-xtendschema/-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<!--Sample of a redefinition for the topic type-->
+	<xs:redefine schemaLocation="markup.xsd">
+		<xs:simpleType name="TopicType">
+			<xs:restriction base="TopicType">
+				<xs:enumeration value="Comment"/>
+				<xs:enumeration value="Issue"/>
+				<xs:enumeration value="Request"/>
+				<xs:enumeration value="Solution"/>
+			</xs:restriction>
+		</xs:simpleType>
+		<!--Sample of a redefinition for the topic status-->
+		<xs:simpleType name="TopicStatus">
+			<xs:restriction base="TopicStatus">
+				<xs:enumeration value="Open"/>
+				<xs:enumeration value="In Progress"/>
+				<xs:enumeration value="Closed"/>
+				<xs:enumeration value="ReOpened"/>
+			</xs:restriction>
+		</xs:simpleType>	
+	</xs:redefine>
+	<xs:element name="ExtendedTopicType" type="TopicType"/>
+	<xs:element name="ExtendedTopicStatus" type="TopicStatus"/>
+</xs:schema>

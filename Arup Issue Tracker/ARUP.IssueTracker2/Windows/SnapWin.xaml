@@ -1,0 +1,17 @@
+﻿<Window x:Class="ARUP.IssueTracker.Windows.SnapWin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+         xmlns:ctr="clr-namespace:ARUP.IssueTracker.UserControls"
+        xmlns:src="clr-namespace:ARUP.IssueTracker.Converters"
+        Title="snapshot.png" SizeToContent="WidthAndHeight" MaxHeight="800" Icon="/ARUP.IssueTracker;component/Assets/icon.ico">
+    <Window.Resources>
+        <src:UriToImageConv x:Key="uriToImageConv"/>
+        <src:PathToImageConv x:Key="pathToImageConv"/>
+        </Window.Resources>
+            <Grid>
+        <ctr:CircularProgressBar  Height="50" Width="50"  x:Name="Loader"   />
+        <Image Name="snap" HorizontalAlignment="Stretch"    VerticalAlignment="Stretch" Source="{Binding  Converter={StaticResource uriToImageConv}, IsAsync=true}"  />
+        <Image Name="snap2" HorizontalAlignment="Stretch"    VerticalAlignment="Stretch" Source="{Binding Converter={StaticResource pathToImageConv}}"  />
+   
+    </Grid>
+</Window>

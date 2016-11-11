@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+<AddIn Type="Application">
+	<Name>ARUP Issue tracker</Name>
+	<Assembly>Arup.IssueTracker.Revit\ARUP.IssueTracker.Revit.dll</Assembly>
+	<AddInId>146CA843-6541-4271-9C2B-1418FBC89B8E</AddInId>
+	<FullClassName>ARUP.IssueTracker.Revit.Entry.AppMain</FullClassName>
+	<VendorId>CASE</VendorId>
+	<VendorDescription>CASE Design Inc., www.case-inc.com</VendorDescription> 
+</AddIn>
+</RevitAddIns>

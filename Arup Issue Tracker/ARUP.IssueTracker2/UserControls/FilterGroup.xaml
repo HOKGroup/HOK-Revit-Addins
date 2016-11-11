@@ -1,0 +1,13 @@
+﻿<UserControl x:Class="ARUP.IssueTracker.UserControls.FilterGroup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" MaxHeight="88" 
+             >
+    <GroupBox Name="groupb"  Margin="10,0,0,0">
+        <WrapPanel   Orientation="Vertical" Name="statuspanel">
+            <!--<CheckBox Name="all" Content="ANY" IsChecked="True" Checked="all_Checked" Unchecked="all_Unchecked"/>-->
+        </WrapPanel>
+    </GroupBox>
+</UserControl>

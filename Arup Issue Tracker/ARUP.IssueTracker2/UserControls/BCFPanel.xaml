@@ -1,0 +1,433 @@
+﻿<UserControl x:Class="ARUP.IssueTracker.UserControls.BCFPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:src="clr-namespace:ARUP.IssueTracker.Converters"
+             mc:Ignorable="d" MinHeight="300" MinWidth="600" Background="White" >
+
+    <UserControl.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../Themes/IssueListView.xaml" />
+                <ResourceDictionary Source="../Themes/CommentListView.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <src:StringVisinConverter x:Key="stringVisibConverter"/>
+            <src:UriToImageConv x:Key="uriToImageConv"/>
+            <src:CommConverter x:Key="commConverter"/>
+            <src:IssueConverter x:Key="issueConverter"/>
+            <src:IntVisibConverter x:Key="intVisibConverter"/>
+            <src:IntEnabConverter x:Key="intEnabConverter"/>
+            <src:IntEnabConverter2 x:Key="intEnabConverter2"/>
+            <src:ExpandedConverter x:Key="expandedConverter"/>
+            <src:AssigneeConverter x:Key="assigneeConverter"/>
+            <src:PathToImageConv x:Key="pathToImageConv"/>
+            <src:BoolStarConv x:Key="boolStarConv"/>
+
+        </ResourceDictionary>
+
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="3"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="1*" MinHeight="50"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50*"/>
+            <ColumnDefinition Width="3"/>
+            <ColumnDefinition Width="50*"/>
+        </Grid.ColumnDefinitions>
+        <!-- MENU        ******************************************************************************************************************************-->
+        <DockPanel  Grid.ColumnSpan="3">
+            <DockPanel.Resources>
+                <Style TargetType="{x:Type Popup}">
+                    <Setter Property="StaysOpen" Value="False" />
+                    <EventSetter Event="Button.Click" Handler="popup_Click" />
+                </Style>
+            </DockPanel.Resources>
+            <Button ToolTip="New BCF Report" DockPanel.Dock="Left" Name="NewBCFBtn" Margin="5"  >
+                <StackPanel Orientation="Horizontal">
+                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="#FF2E94D3"  Data="M43.8,0H0v100h75V31.2L43.8,0z M37.2,37.5v-25l25,25H37.2z" UseLayoutRounding="False"/>
+                    <TextBlock Margin="5,2" Text="New BCF" />
+                </StackPanel>
+            </Button>
+            <Button ToolTip="Save BCF Report as..." DockPanel.Dock="Left" Name="SaveBCFBtn" Margin="5,5,0,5" >
+                <StackPanel Orientation="Horizontal">
+                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="#FF2E94D3"  Data="M91,100.3h9.1v-82L81.9,0L18.2,0L0,0l0,100.3H91z M18.2,9.1h27.3v27.3h18.2V9.1h9.1v36.5H18.2V9.1z" UseLayoutRounding="False"/>
+                    <TextBlock Margin="5,2" Text="Save..." />
+                </StackPanel>
+            </Button>
+            <!-- Print Toggle Button -->
+            <ToggleButton x:Name="btnBcfOption" Margin="0,5,5,5" ToolTip="Export selected to BCF (BIM Collaboration Format)">
+                <StackPanel Orientation="Horizontal">
+                    <Path Width="5" Height="5" Margin="0" Canvas.Left="23.6016" Canvas.Top="24.9375" Stretch="Fill" Fill="#FF2E94D3" Data="F1 M 37.8516,39.5833L 52.1016,24.9375L 52.1016,35.2292L 37.8516,50.2708L 23.6016,35.2292L 23.6016,24.9375L 37.8516,39.5833 Z "/>
+                </StackPanel>
+            </ToggleButton>
+
+            <!-- Print Toggle Button Popup -->
+            <Popup x:Name="popupExportBCF" x:FieldModifier="public" PlacementTarget="{Binding ElementName=btnBcfOption}">
+                <Border>
+                    <StackPanel>
+                        <!-- Print to local -->
+                        <Button x:Name="SaveBcf2" ToolTip="Export to BCF 2.0">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Width="15" Height="15" Canvas.Left="20" Canvas.Top="17" Stretch="Fill" Fill="#FF2E94D3" Data="F1 M 21.3,17L 46.7,17C 47.418,17 48,17.5821 48,18.3L 48,24.7C 48,25.418 47.418,26 46.7,26L 31.3,26C 30.0298,26 29,27.0298 29,28.3L 29,49.7C 29,50.418 28.418,51 27.7,51L 21.3,51C 20.582,51 20,50.418 20,49.7L 20,18.3C 20,17.582 20.582,17 21.3,17 Z M 33.3,29L 54.7,29C 55.418,29 56,29.582 56,30.3L 56,57.7C 56,58.418 55.418,59 54.7,59L 33.3,59C 32.582,59 32,58.418 32,57.7L 32,30.3C 32,29.582 32.582,29 33.3,29 Z M 49.506,52L 49.506,49.5379L 41.5022,49.5379L 41.5022,49.4746C 41.5022,49.121 41.6197,48.7687 41.8545,48.4177C 42.0894,48.0667 42.3968,47.7164 42.7768,47.3668L 44.0573,46.2921L 45.4843,45.16L 47.032,43.7865C 47.4938,43.3405 47.8877,42.8701 48.2136,42.3753C 48.5395,41.8805 48.7908,41.3468 48.9677,40.7742C 49.1445,40.2015 49.2329,39.5563 49.2329,38.8385C 49.2329,38.0469 49.1069,37.3456 48.8548,36.7347C 48.6028,36.1238 48.2459,35.6145 47.7841,35.2068C 47.3223,34.7991 46.7662,34.4903 46.1157,34.2805C 45.4652,34.0707 44.7402,33.9658 43.9406,33.9658L 42.5413,34.0648L 41.2924,34.3676L 40.1426,34.8743L 39.0402,35.5848L 39.0402,38.3438C 39.7342,37.6682 40.4559,37.1609 41.2054,36.8218C 41.9548,36.4827 42.6924,36.3131 43.4181,36.3131C 43.8403,36.3131 44.2282,36.3732 44.5818,36.4932C 44.9354,36.6133 45.2422,36.7908 45.5021,37.0256C 45.7621,37.2605 45.9646,37.5534 46.1097,37.9044C 46.2549,38.2554 46.3274,38.6657 46.3274,39.1354C 46.3274,39.5629 46.2654,39.9607 46.1414,40.3289C 46.0174,40.697 45.8439,41.046 45.6209,41.3758L 44.8173,42.3338L 43.7783,43.2798L 42.5413,44.2872L 41.3043,45.3263L 40.1663,46.4405C 39.8114,46.8245 39.502,47.2329 39.2381,47.6656C 38.9742,48.0984 38.7637,48.5602 38.6067,49.051C 38.4497,49.5419 38.3712,50.067 38.3712,50.6265L 38.3712,52L 49.506,52 Z "/>
+                                <TextBlock Text="BCF 2.0" Margin="5,0"/>
+                            </StackPanel>
+                        </Button>
+                        <!-- Print to network -->
+                        <Button x:Name="SaveBcf1" ToolTip="Export to BCF 1.0">
+                            <StackPanel Orientation="Horizontal">
+                                <Path Width="15" Height="15" Canvas.Left="20" Canvas.Top="17" Stretch="Fill" Fill="#FF2E94D3" Data="F1 M 21.3,17L 46.7,17C 47.418,17 48,17.5821 48,18.3L 48,24.7C 48,25.418 47.418,26 46.7,26L 31.3,26C 30.0298,26 29,27.0298 29,28.3L 29,49.7C 29,50.418 28.418,51 27.7,51L 21.3,51C 20.582,51 20,50.418 20,49.7L 20,18.3C 20,17.582 20.582,17 21.3,17 Z M 33.3,29L 54.7,29C 55.418,29 56,29.5821 56,30.3L 56,57.7C 56,58.418 55.418,59 54.7,59L 33.3,59C 32.582,59 32,58.418 32,57.7L 32,30.3C 32,29.5821 32.582,29 33.3,29 Z M 46.8012,33.8669L 45.59,33.8669L 44.2224,34.7694L 42.9102,35.4858L 41.5941,36.0677L 40.2067,36.5625L 40.2067,39.0127C 40.9746,38.8148 41.6574,38.5859 42.2551,38.3259C 42.8528,38.066 43.4116,37.75 43.9314,37.3779L 43.9314,52L 46.8012,52L 46.8012,33.8669 Z "/>
+                                <TextBlock Text="BCF 1.0" Margin="5,0"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </Popup>
+            <Button ToolTip="Open BCF..." DockPanel.Dock="Left" Name="OpenBCFBtn" Margin="5" >
+                <StackPanel Orientation="Horizontal">
+                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="#FF2E94D3"  Data="M0.5,86.5h72.5l27.2-53.2H27.6L0.5,86.5z M-0.2,73.5l23.4-47.1l49.7-0.1V10.6H35.5V0.8H9.5l-9.1,9.8L-0.2,73.5z" UseLayoutRounding="False"/>
+                    <TextBlock Margin="5,2" Text="Open..." />
+                </StackPanel>
+            </Button>
+
+            <Label Content="File name:" VerticalAlignment="Center" FontWeight="Bold"/>
+            <TextBlock Text="{Binding Bcf.Filename}" Name="filenameField" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Bcf.HasBeenSaved, Converter={StaticResource boolStarConv}}" Name="savedField" VerticalAlignment="Center"/>
+
+            <!--<Button ToolTip="Settings..." DockPanel.Dock="Right" Name="SettingsBtn" Margin="5" HorizontalAlignment="Right" >
+                <StackPanel Orientation="Horizontal">
+                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="Gray"  Data="F1 M 37.6289,-0.000976563L 49.6289,-0.000976563L 52.8506,10.8311C 55.3838,11.5439 57.7979,12.542 60.0557,13.79L 70.0654,8.37012L 78.5518,16.8545L 73.1934,26.749C 74.4844,29.0117 75.5234,31.4365 76.2725,33.9863L 87.251,37.252L 87.251,49.252L 76.4746,52.457C 75.7588,55.1113 74.7295,57.6377 73.4297,59.9932L 78.8838,70.0645L 70.3994,78.5518L 60.4404,73.1582C 58.0811,74.5029 55.5439,75.5732 52.875,76.3252L 49.624,87.2549L 37.624,87.2549L 34.373,76.3232C 31.7061,75.5713 29.1729,74.501 26.8145,73.1572L 16.8574,78.5488L 8.37207,70.0635L 13.8262,59.9912C 12.5264,57.6357 11.498,55.1113 10.7822,52.458L 0,49.251L 0,37.251L 10.9854,33.9834C 11.7334,31.4365 12.7715,29.0137 14.0615,26.7529L 8.70313,16.8564L 17.1885,8.37012L 27.1982,13.791C 29.4561,12.542 31.8721,11.543 34.4072,10.8311L 37.6289,-0.000976563 Z M 43.9824,59.5264C 52.9834,59.5264 60.2803,52.2275 60.2803,43.2275C 60.2803,34.2266 52.9834,26.9277 43.9824,26.9277C 34.9824,26.9277 27.6826,34.2266 27.6826,43.2275C 27.6826,52.2275 34.9824,59.5264 43.9824,59.5264 Z " UseLayoutRounding="False"/>
+                    <TextBlock Margin="5,2" Text="Settings" />
+                </StackPanel>
+            </Button>-->
+        </DockPanel>
+
+        <!-- DOCK PANELS ******************************************************************************************************************************-->
+        <DockPanel  HorizontalAlignment="Stretch" Grid.Row="5" Grid.Column="0" Background="WhiteSmoke"  >
+            <Button ToolTip="Add Issue" DockPanel.Dock="Left" Name="AddIssueBtn" x:FieldModifier="public"  Margin="5" >
+                <StackPanel Orientation="Horizontal">
+                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="Green"  Data="M50,100C22.4,100,0,77.6,0,50S22.4,0,50,0s50,22.4,50,50S77.6,100,50,100z M24.4,55.7h19.2V75H56V55.7h19.2
+	V43.5H56V24.2H43.6v19.2H24.4V55.7z" UseLayoutRounding="False"/>
+                    <TextBlock Name="AddIssueBtnText" x:FieldModifier="public" Margin="5,2" Text="Add Issue" />
+                </StackPanel>
+            </Button>
+            <Button ToolTip="Delete selected" DockPanel.Dock="Left" Margin="5"  Name="DelIssueBtn"
+                    IsEnabled="{Binding  ElementName=issueList, Path=SelectedItems.Count, Converter={StaticResource intEnabConverter}}" >
+                <StackPanel Orientation="Horizontal">
+                    <Path  Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="Red"  Data="M50,100C22.4,100,0,77.6,0,50S22.4,0,50,0s50,22.4,50,50S77.6,100,50,100z M24.4,55.7h19.2l0,0H56l0,0h19.2
+	V43.5H56l0,0H43.6l0,0H24.4V55.7z" UseLayoutRounding="False"/>
+                    <TextBlock Text="Delete" Margin="5,2"/>
+                </StackPanel>
+            </Button>
+
+            <Button ToolTip="Upload selected to Jira" DockPanel.Dock="Left"  Margin="5" Name="UpIssueBtn"
+                    IsEnabled="{Binding  ElementName=issueList, Path=SelectedItems.Count, Converter={StaticResource intEnabConverter}}" HorizontalAlignment="Left">
+                <StackPanel Orientation="Horizontal">
+                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="Navy"  Data="M444.3,318.2c-34.4,0-62.4,28-62.4,62.4c0,34.4,28,62.4,62.4,62.4s62.4-28,62.4-62.4
+	C506.7,346.2,478.7,318.2,444.3,318.2z M472.2,386.1h-28l20.5,26.3h-12.3v17.8H436v-17.8h-12.3l20.5-26.3h-38.7
+	c-6.2,0-11.3-5.1-11.3-11.3c0-5.3,3.6-9.7,8.5-10.9c2.2-5.5,7.2-9.4,13.1-10.1c0.6-12.7,11.1-22.8,24-22.8c9.4,0,17.8,5.5,21.7,13.8
+	c3.2-1.8,6.8-2.7,10.5-2.7c12.2,0,22,9.9,22,22S484.4,386.1,472.2,386.1z" UseLayoutRounding="False"/>
+                    <TextBlock Text="Upload to JIRA" Margin="5,2"/>
+                </StackPanel>
+            </Button>
+
+            <Button ToolTip="Create Saved Viewpoint" DockPanel.Dock="Left" Margin="5"  Name="CreateSavedViewpointBtn" x:FieldModifier="public" HorizontalAlignment="Left" Visibility="Collapsed"
+                    IsEnabled="{Binding  ElementName=issueList, Path=SelectedItems.Count, Converter={StaticResource intEnabConverter}}" >
+                <StackPanel Orientation="Horizontal">
+                    <Path Margin="5,0,0,0" Width="18" Height="15" Canvas.Left="20" Canvas.Top="22" Stretch="Fill" Fill="Navy"  Data="F1 M 30,27C 30,24.3766 32.3767,22 35,22L 41,22C 43.6234,22 46,24.3766 46,27L 50.9999,27.0001C 53.7613,27.0001 55.9999,29.2387 55.9999,32.0001L 55.9999,46.0001C 55.9999,48.7615 53.7613,51.0001 50.9999,51.0001L 25,51.0001C 22.2385,51.0001 20,48.7615 20,46.0001L 20,32.0001C 20,29.2387 22.2385,27.0001 25,27.0001L 30,27 Z M 25.5,30C 24.6716,30 24,30.8954 24,32C 24,33.1046 24.6716,34 25.5,34C 26.3284,34 27,33.1046 27,32C 27,30.8954 26.3284,30 25.5,30 Z M 38,32C 34.134,32 31,35.134 31,39C 31,42.866 34.134,46 38,46C 41.866,46 45,42.866 45,39C 45,35.134 41.866,32 38,32 Z M 38,34.5C 40.4853,34.5 42.5,36.5147 42.5,39C 42.5,41.4853 40.4853,43.5 38,43.5C 35.5147,43.5 33.5,41.4853 33.5,39C 33.5,36.5147 35.5147,34.5 38,34.5 Z "/>
+                    <TextBlock Text="Save Viewpoint" Margin="5,2"/>
+                </StackPanel>
+            </Button>
+
+        </DockPanel>
+        <DockPanel   HorizontalAlignment="Stretch" Grid.Row="5" Grid.Column="2" Background="WhiteSmoke" >
+            <Button ToolTip="Add Comment" DockPanel.Dock="Left" Name="AddCommBtn" x:FieldModifier="public"  Margin="5" IsEnabled="{Binding  ElementName=issueList, Path=SelectedItems.Count, Converter={StaticResource intEnabConverter}}">
+                <StackPanel Orientation="Horizontal">
+                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="Green"  Data="M50,100C22.4,100,0,77.6,0,50S22.4,0,50,0s50,22.4,50,50S77.6,100,50,100z M24.4,55.7h19.2V75H56V55.7h19.2
+	V43.5H56V24.2H43.6v19.2H24.4V55.7z" UseLayoutRounding="False"/>
+                    <TextBlock Margin="5,2" Text="Add Comment" />
+                </StackPanel>
+            </Button>
+            <Button ToolTip="Delete selected comment/s" DockPanel.Dock="Left" Margin="5"  Name="DelCommBtn" HorizontalAlignment="Left"
+                    IsEnabled="{Binding  ElementName=issueList, Path=SelectedItems.Count, Converter={StaticResource intEnabConverter}}" >
+                <StackPanel Orientation="Horizontal">
+                    <Path  Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="Red"  Data="M50,100C22.4,100,0,77.6,0,50S22.4,0,50,0s50,22.4,50,50S77.6,100,50,100z M24.4,55.7h19.2l0,0H56l0,0h19.2
+	V43.5H56l0,0H43.6l0,0H24.4V55.7z" UseLayoutRounding="False"/>
+                    <TextBlock Text="Delete" Margin="5,2"/>
+                </StackPanel>
+            </Button>
+            
+        </DockPanel>
+        <!-- ROW 2 ***************************************************************************************** -->
+
+        <!-- ROW 3 ************************************************************************************ -->
+        <ListView  ItemsSource="{Binding Bcf.Issues}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemContainerStyle="{StaticResource ListViewItemStyle}" SelectedIndex="0"
+                  AlternationCount="2"  IsSynchronizedWithCurrentItem="True" Grid.Row="1" Grid.RowSpan="4"  x:Name="issueList" x:FieldModifier="public" Margin="0"  BorderThickness="0"  SelectionMode="Extended">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+
+                    <Grid MaxWidth="{Binding (FrameworkElement.ActualWidth),  RelativeSource={RelativeSource AncestorType=ScrollContentPresenter}}">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image Grid.RowSpan="2" Width="60" Margin="0,0,5,0" Stretch="Uniform" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Source="{Binding Viewpoints[0].SnapshotPath, Converter={StaticResource pathToImageConv}}"  />
+
+                        <StackPanel Orientation="Horizontal"  Grid.Row="0" Grid.Column="1" >
+                            <TextBlock FontWeight="Bold" Text="{Binding Topic.Title}" VerticalAlignment="Bottom"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal"  Grid.Row="1" Grid.Column="1" >
+                            <Label FontSize="11" VerticalAlignment="Bottom" Content="{Binding Header[0].formatteddate2}" ToolTip="{Binding Header[0].formatteddate2}" />
+                            <Label FontSize="11" VerticalAlignment="Bottom" Content="·"/>
+                            <Label FontSize="11" VerticalAlignment="Bottom" Content="{Binding Comment.Count, Converter={StaticResource commConverter}}"  />
+                        </StackPanel>
+                        <!-- INNER HIDDEN PART ********************************************************************************-->
+
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+
+        </ListView>
+
+        <!--SECOND COLUMN   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+        <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.RowSpan="7" />
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled"  VerticalScrollBarVisibility="Auto"  Grid.Row="2" Grid.RowSpan="3" Grid.Column="2"  >
+            <StackPanel>
+                <Grid Grid.Row="1" Grid.Column="2"  DataContext="{Binding ElementName=issueList, Path=SelectedItem}" IsEnabled="{Binding  ElementName=issueList, Path=SelectedItems.Count, Converter={StaticResource intEnabConverter}}" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Vertical"  Grid.Row="0" Grid.ColumnSpan="4" Margin="3,5,0,0">
+                        <Label FontWeight="Bold" Content="{Binding Topic.Title}" VerticalAlignment="Bottom" FontSize="14" />
+                        <Label FontSize="11" VerticalAlignment="Bottom" Content="{Binding Header[0].formatteddate2}" ToolTip="{Binding Header[0].formatteddate2}" FontStyle="Italic" />
+                        <Label FontSize="11" VerticalAlignment="Bottom" Content="{Binding Topic.formattedguid}" Visibility="{Binding Topic.formattedguid, Converter={StaticResource stringVisibConverter}}"/>
+                    </StackPanel>
+                    <Label FontSize="11" Grid.Row="1" Content="Created by:" VerticalAlignment="Bottom" />
+                    <Label Visibility="{Binding Topic.CreationAuthor, Converter={StaticResource stringVisibConverter}}"
+                   Grid.Row="1" Grid.Column="1" Content="{Binding Topic.CreationAuthor}" VerticalAlignment="Bottom" />
+
+                    <Label FontSize="11"  Grid.Row="2" VerticalAlignment="Bottom" Content="Assigned to:" />
+                    <Button MinWidth="60" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" x:Name="ChangeAssign" FontSize="11" FontWeight="Bold"
+                   Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left" Click="ChangeAssign_Click">
+                        <StackPanel Orientation="Horizontal" >
+                            <TextBlock x:Name="assignedToTextBlock" Text="{Binding Topic.AssignedTo}"/>
+                            <TextBox x:Name="assignedToTextBox" Visibility="Collapsed" KeyUp="assignedToTextBox_KeyUp"  LostFocus="assignedToTextBox_LostFocus"  Text="{Binding Topic.AssignedTo}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Label FontSize="11" Grid.Column="2" Grid.Row="1" VerticalAlignment="Bottom" Content="Issue Type:" />
+
+                    <Button MinWidth="60" Grid.Row="1" Grid.Column="3" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" x:Name="ChangeType" FontSize="11" FontWeight="Bold"
+                   HorizontalAlignment="Left" Click="ChangeType_Click" >
+                        <StackPanel Orientation="Horizontal" >
+                            <TextBlock x:Name="typeTextBlock" Text="{Binding Topic.TopicType}"/>
+                            <TextBox x:Name="typeTextBox" Visibility="Collapsed" KeyUp="typeTextBox_KeyUp" LostFocus="typeTextBox_LostFocus" Text="{Binding Topic.TopicType}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Label FontSize="11" Grid.Column="2" Grid.Row="2" VerticalAlignment="Bottom" Content="Priority:" />
+                    <Button MinWidth="60" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" x:Name="ChangePriority"  FontSize="11" FontWeight="Bold"
+                   Grid.Row="2" Grid.Column="3"  HorizontalAlignment="Left" Click="ChangePriority_Click">
+                        <StackPanel Orientation="Horizontal" >
+                            <TextBlock x:Name="priorityTextBlock" Text="{Binding Topic.Priority}"/>
+                            <TextBox x:Name="priorityTextBox" Visibility="Collapsed" KeyUp="priorityTextBox_KeyUp" LostFocus="priorityTextBox_LostFocus" Text="{Binding Topic.Priority}"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Label FontSize="11" Grid.Column="0" Grid.Row="3" VerticalAlignment="Bottom" Content="Status:" />
+                    <Button MinWidth="60" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" x:Name="ChangeStatus" FontSize="11" FontWeight="Bold"
+                   Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Click="ChangeStatus_Click">
+                        <StackPanel Orientation="Horizontal" >
+                            <TextBlock x:Name="statusTextBlock" Text="{Binding Topic.TopicStatus}"/>
+                            <TextBox x:Name="statusTextBox" KeyUp="statusTextBox_KeyUp" LostFocus="statusTextBox_LostFocus" Visibility="Collapsed" Text="{Binding Topic.TopicStatus}"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Label FontSize="11" Grid.Column="2" Grid.Row="3" VerticalAlignment="Bottom" Name="referenceLinkLabel" Content="Reference Link:" />
+                    <Button Grid.Column="3" Grid.Row="3" ToolTip="{Binding Topic.ReferenceLink}" Visibility="{Binding Topic.ReferenceLink, Converter={StaticResource stringVisibConverter}}" Tag="{Binding Topic.ReferenceLink}" HorizontalAlignment="Left"
+                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Margin="10,0,0,0" Name="OpenLinkProjBtn" Click="OpenLinkProjBtn_Click">
+                        <Path Margin="0" Height="15" Width="15" Stretch="Uniform" Fill="Gray" 
+                       Data="M86,15L78.5,15L62.1,15L69.6,22.3L54.9,37L63.8,45.9L78.5,31.1L86,38.9M64,73L27,73L27,37L45.7,37L60.3,22L14,22L14,86L77,86L77,40.1L64,55.4" UseLayoutRounding="False"/>
+                    </Button>
+                    <Label Content="Labels:"  Grid.Row="4" Grid.Column="0" Visibility="{Binding Topic.labelCount, Converter={StaticResource intVisibConverter}}"/>
+                    <ListView Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="3"   ItemsSource="{Binding Topic.Labels}" 
+                                    x:Name="labelList" Margin="0" BorderThickness="0" 
+                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListView.Template>
+                            <ControlTemplate>
+                                <ItemsPresenter></ItemsPresenter>
+                            </ControlTemplate>
+                        </ListView.Template>
+                        <ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel IsItemsHost="True" />
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Button x:Name="labelButton" Visibility="{Binding Converter={StaticResource stringVisibConverter}}" FontWeight="Bold" BorderBrush="White" BorderThickness="2" Background="PowderBlue">
+                                    <TextBlock Margin="3" Text="{Binding}"/>
+                                </Button>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                    <!--<StackPanel Orientation="Horizontal" Grid.Row="1"  >
+
+                        <Button Margin="5" Cursor="Hand" ToolTip="Click to open Snapshot"  Visibility="{Binding  ElementName=issueList, Path=SelectedItems.Count, Converter={StaticResource intVisibConverter}}" HorizontalAlignment="Stretch"   Grid.Row="0" VerticalAlignment="Stretch"  
+                                             Height="60"  Name="OpenImageBtn" Tag="{Binding Viewpoints[0].SnapshotPath}"
+                                      
+                                                  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                            <Grid>
+                                <Image Height="60" Width="100" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Source="{Binding Viewpoints[0].SnapshotPath, Converter={StaticResource pathToImageConv}}" />
+
+                            </Grid>
+                        </Button>
+                        <StackPanel Orientation="Vertical">
+                            <Button ToolTip="Click to Open 3D View »"  Name="Open3dViewBtn" Margin="5" HorizontalAlignment="Stretch" Tag="{Binding Viewpoints[0]}" x:FieldModifier="public" Visibility="{Binding  ElementName=issueList, Path=SelectedItems.Count, Converter={StaticResource intVisibConverter}}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="Gray"  Data="M86,32L59,45.5L59,32L14,32L14,68L59,68L59,54.5L86,68" UseLayoutRounding="False"/>
+                                    <TextBlock Margin="5,2" Text="Open 3D View »" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button ToolTip="Show information about the components in the viewpoint" Click="ComponentsShow"  Name="ComponentsShowBtn" Margin="5" HorizontalAlignment="Stretch" Tag="{Binding Viewpoints[0]}" x:FieldModifier="public" Visibility="{Binding  ElementName=issueList, Path=SelectedItems.Count, Converter={StaticResource intVisibConverter}}" >
+                                <StackPanel Orientation="Horizontal">
+                                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="Gray"  Data="M71.1,23H28.9C24,23,20,27,20,31.9v36.1c0,4.9,4,8.9,8.9,8.9h42.1c4.9,0,8.9-4,8.9-8.9V31.9C80,27,76,23,71.1,23zM74,68.1c0,1.6-1.3,2.9-2.9,2.9H28.9c-1.6,0-2.9-1.3-2.9-2.9V31.9c0-1.6,1.3-2.9,2.9-2.9h42.1c1.6,0,2.9,1.3,2.9,2.9V68.1zM35,38L42.8,38L54.4,38L65,38L65,44L35,44M35,47L50.6,47L65,47L65,53L35,53M35,56L49.8,56L65,56L65,62L35,62" UseLayoutRounding="False"/>
+                                    <TextBlock Margin="5,2" Text="Attached elements" />
+                                </StackPanel>
+                            </Button>
+
+                        </StackPanel>
+                    </StackPanel>-->
+
+                </Grid>
+                <Label Content="Description:"  Grid.Row="4" Grid.Column="2" FontWeight="Bold" Visibility="{Binding ElementName=issueList, Path=SelectedItem.Topic.Description, Converter={StaticResource stringVisibConverter}}"/>
+                <StackPanel Orientation="Vertical" Background="White" >
+                    <TextBlock Padding="5" Margin="5" TextWrapping="Wrap" Background="WhiteSmoke" DataContext="{Binding ElementName=issueList, Path=SelectedItem}">
+                                            <Run Text="{Binding Topic.Description}" />
+                                            <LineBreak/>
+                                            <InlineUIContainer>                                                
+                                                <Button Margin="5" Cursor="Hand" ToolTip="Click to open snapshot"  Visibility="Collapsed"  HorizontalAlignment="Stretch"   
+                                                        VerticalAlignment="Stretch"   Height="60"  x:Name="OpenImageBtn"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="OpenImageBtn_Click">
+                                                    <Grid>
+                                                        <Image x:Name="firstSnapshot" MaxHeight="270" MaxWidth="480" Stretch="Uniform" Visibility="Collapsed"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                                                    </Grid>
+                                                </Button>
+                                            </InlineUIContainer>
+                                            <InlineUIContainer> 
+                                                <StackPanel Orientation="Vertical">
+                                                    <Button Name="open3dView" x:FieldModifier="public" ToolTip="Open this viewpoint in 3D view" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Visibility="Collapsed"  Click="open3dView_Click">
+                                                        <Path  Margin="0" Height="15" Width="15" Stretch="Uniform" Fill="Gray"  Data="F1 M 42.5,22C 49.4036,22 55,27.5964 55,34.5C 55,41.4036 49.4036,47 42.5,47C 40.1356,47 37.9245,46.3435 36,45.2426L 26.9749,54.2678C 25.8033,55.4393 23.9038,55.4393 22.7322,54.2678C 21.5607,53.0962 21.5607,51.1967 22.7322,50.0251L 31.7971,40.961C 30.6565,39.0755 30,36.8644 30,34.5C 30,27.5964 35.5964,22 42.5,22 Z M 42.5,26C 37.8056,26 34,29.8056 34,34.5C 34,39.1944 37.8056,43 42.5,43C 47.1944,43 51,39.1944 51,34.5C 51,29.8056 47.1944,26 42.5,26 Z M 41,29L 44,29L 44,33L 48,33L 48,36L 44,36L 44,40L 41,40L 41,36L 37,36L 37,33L 41,33L 41,29 Z " UseLayoutRounding="False"/>
+                                                    </Button>
+                                                    <Button Name="showComponents" x:FieldModifier="public" ToolTip="Show attached elements in the viewpoint" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Visibility="Collapsed" Click="showComponents_Click">
+                                                        <Path  Margin="0" Height="15" Width="15" Stretch="Uniform" Fill="Gray"  Data="M71.1,23H28.9C24,23,20,27,20,31.9v36.1c0,4.9,4,8.9,8.9,8.9h42.1c4.9,0,8.9-4,8.9-8.9V31.9C80,27,76,23,71.1,23zM74,68.1c0,1.6-1.3,2.9-2.9,2.9H28.9c-1.6,0-2.9-1.3-2.9-2.9V31.9c0-1.6,1.3-2.9,2.9-2.9h42.1c1.6,0,2.9,1.3,2.9,2.9V68.1zM35,38L42.8,38L54.4,38L65,38L65,44L35,44M35,47L50.6,47L65,47L65,53L35,53M35,56L49.8,56L65,56L65,62L35,62" UseLayoutRounding="False"/>
+                                                    </Button>
+                                                </StackPanel>                                                
+                                            </InlineUIContainer>
+                    </TextBlock>
+                </StackPanel>
+                <!--<GridSplitter Grid.Column="2" Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.RowSpan="1" />-->
+                <!-- COMMENTS *********************************************************************************************************************************-->
+                <Label Content="Comments:" Grid.Row="3" Grid.Column="2" FontWeight="Bold"/>
+                <ListView  ItemsSource="{Binding ElementName=issueList, Path=SelectedItem.Comment}" ItemContainerStyle="{StaticResource ListViewItemStyle2}"
+                                SelectionMode="Multiple"
+                           Grid.Row="4" Grid.RowSpan="1" Grid.Column="2" x:Name="commentList" Margin="0" BorderThickness="0" 
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                           ScrollViewer.CanContentScroll="False">
+                    <ListView.Template>
+                        <ControlTemplate>
+                            <ItemsPresenter></ItemsPresenter>
+                        </ControlTemplate>
+                    </ListView.Template>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Expander IsExpanded="True" BorderThickness="3" Background="WhiteSmoke">
+                                <Expander.HeaderTemplate>
+
+                                    <DataTemplate >
+                                        <StackPanel VerticalAlignment="Top"   Orientation="Horizontal"  DataContext="{Binding Path=DataContext, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}}" >
+                                            <Label  FontWeight="Bold" Content="{Binding Author}" VerticalAlignment="Bottom"   />
+                                            <Label   FontSize="11" VerticalAlignment="Bottom"  Content="{Binding formatteddate2}"   ToolTip="{Binding formatteddate2}" />
+                                            <!--<Label  FontWeight="Bold" FontSize="11" VerticalAlignment="Bottom"  Content="{Binding Status}"  />-->
+                                            <Label  FontWeight="Bold" FontSize="11" VerticalAlignment="Bottom"  Content="{Binding VerbalStatus}"  />
+                                            <Label FontSize="11"  Content="{Binding expTitle}" Visibility="{Binding Path=IsExpanded, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Expander}}, Converter={StaticResource expandedConverter}}" />
+
+                                        </StackPanel>
+
+                                    </DataTemplate>
+                                </Expander.HeaderTemplate>
+                                <StackPanel>
+                                    <TextBlock Padding="5" HorizontalAlignment="Stretch" TextWrapping="Wrap">
+                                        <Run Text="{Binding Comment1}" />
+                                        <LineBreak/>
+                                        <InlineUIContainer>                                                
+                                            <Button Margin="5" Cursor="Hand" ToolTip="Click to open snapshot"  Visibility="{Binding snapshotFullUrl, Converter={StaticResource stringVisibConverter}}"  HorizontalAlignment="Stretch"   
+                                                    VerticalAlignment="Stretch"   Height="60"  x:Name="OpenImageBtn"  Tag="{Binding snapshotFullUrl}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="OpenImageBtn_Click">
+                                                <Grid>
+                                                    <Image Visibility="{Binding snapshotFullUrl, Converter={StaticResource stringVisibConverter}}" MaxHeight="270" MaxWidth="480" Stretch="Uniform"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                                                                    Source="{Binding snapshotImageSource}" />
+                                                </Grid>
+                                            </Button>
+                                        </InlineUIContainer>
+                                        <InlineUIContainer> 
+                                            <StackPanel Orientation="Vertical">
+                                                <Button Name="open3dView" ToolTip="Open this viewpoint in 3D view" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Tag="{Binding visInfo}" Visibility="{Binding snapshotFullUrl, Converter={StaticResource stringVisibConverter}}" Click="open3dView_Click">
+                                                    <Path  Margin="0" Height="15" Width="15" Stretch="Uniform" Fill="Gray"  Data="F1 M 42.5,22C 49.4036,22 55,27.5964 55,34.5C 55,41.4036 49.4036,47 42.5,47C 40.1356,47 37.9245,46.3435 36,45.2426L 26.9749,54.2678C 25.8033,55.4393 23.9038,55.4393 22.7322,54.2678C 21.5607,53.0962 21.5607,51.1967 22.7322,50.0251L 31.7971,40.961C 30.6565,39.0755 30,36.8644 30,34.5C 30,27.5964 35.5964,22 42.5,22 Z M 42.5,26C 37.8056,26 34,29.8056 34,34.5C 34,39.1944 37.8056,43 42.5,43C 47.1944,43 51,39.1944 51,34.5C 51,29.8056 47.1944,26 42.5,26 Z M 41,29L 44,29L 44,33L 48,33L 48,36L 44,36L 44,40L 41,40L 41,36L 37,36L 37,33L 41,33L 41,29 Z " UseLayoutRounding="False"/>
+                                                </Button>
+                                                <Button Name="showComponents" ToolTip="Show attached elements in the viewpoint" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Tag="{Binding visInfo}" Visibility="{Binding snapshotFullUrl, Converter={StaticResource stringVisibConverter}}" Click="showComponents_Click">
+                                                    <Path  Margin="0" Height="15" Width="15" Stretch="Uniform" Fill="Gray"  Data="M71.1,23H28.9C24,23,20,27,20,31.9v36.1c0,4.9,4,8.9,8.9,8.9h42.1c4.9,0,8.9-4,8.9-8.9V31.9C80,27,76,23,71.1,23zM74,68.1c0,1.6-1.3,2.9-2.9,2.9H28.9c-1.6,0-2.9-1.3-2.9-2.9V31.9c0-1.6,1.3-2.9,2.9-2.9h42.1c1.6,0,2.9,1.3,2.9,2.9V68.1zM35,38L42.8,38L54.4,38L65,38L65,44L35,44M35,47L50.6,47L65,47L65,53L35,53M35,56L49.8,56L65,56L65,62L35,62" UseLayoutRounding="False"/>
+                                                </Button>
+                                            </StackPanel>                                                
+                                        </InlineUIContainer>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Expander>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+
+                </ListView>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- BOTTOM *****************************************************************************************************-->
+        <DockPanel Height="30"  HorizontalAlignment="Stretch" Grid.Row="6" Grid.Column="0" Background="WhiteSmoke"  >
+            <Label DockPanel.Dock="Left" HorizontalAlignment="Left" Content="{Binding ElementName=issueList, Path=Items.Count, Converter={StaticResource issueConverter}}"  Margin="5,0" FontStyle="Italic" />
+            <Label  DockPanel.Dock="Left" Content="{Binding ElementName=issueList, Path=SelectedItems.Count}" HorizontalAlignment="Left"  Margin="0" FontStyle="Italic" />
+            <Label DockPanel.Dock="Left" Content="Selected" HorizontalAlignment="Left"  Margin="0" FontStyle="Italic" />
+        </DockPanel>
+        <DockPanel Height="30"  HorizontalAlignment="Stretch" Grid.Row="6" Grid.Column="3" Background="WhiteSmoke"  >
+            <Label   Content="{Binding ElementName=commentList, Path=Items.Count, Converter={StaticResource commConverter}}"  Margin="5,0" FontStyle="Italic" />
+            <Label  DockPanel.Dock="Left" Content="{Binding ElementName=commentList, Path=SelectedItems.Count}" HorizontalAlignment="Left"  Margin="0" FontStyle="Italic" />
+            <Label DockPanel.Dock="Left" Content="Selected" HorizontalAlignment="Left"  Margin="0" FontStyle="Italic" />
+        </DockPanel>
+
+
+    </Grid>
+</UserControl>

@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="ARUP.IssueTracker.UserControls.MainPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+              xmlns:ctr="clr-namespace:ARUP.IssueTracker.UserControls"
+             mc:Ignorable="d"   d:DesignHeight="500" d:DesignWidth="800" DragEnter="Window_DragEnter" Name="mainWin"
+        DragLeave="Window_DragLeave" AllowDrop="True" Drop="Window_Drop" DragOver="Window_DragOver">
+    <Grid>
+        <Canvas Grid.ColumnSpan="3" Name="whitespace" Grid.RowSpan="3" Background="WhiteSmoke" Opacity=".70" Panel.ZIndex="100" Visibility="Hidden" />
+  
+       
+        <TabControl Name="tabControl" Padding="0,2,0,0">
+            <TabItem  Padding="5">
+                <TabItem.Header>
+                    <TextBlock Text="JIRA" Padding="3" FontWeight="Bold"/>
+                </TabItem.Header>
+                <ctr:JiraPanel  x:Name="jiraPan" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:FieldModifier="public"/>
+            </TabItem>
+            <TabItem  Padding="5" >
+                <TabItem.Header>
+                    <TextBlock Text="BCF" Padding="3" FontWeight="Bold"/>
+                </TabItem.Header>
+                <ctr:BCFPanel x:Name="bcfPan" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:FieldModifier="public"/>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" >
+            <Label Name="version" Content="Arup Issue Tracker v0.0.1 by CASE" HorizontalAlignment="Right" Foreground="Gray" VerticalAlignment="Center" FontSize="10"/>
+            <Button Name="helpBtn" Click="HelpBtn_OnClick" Cursor="Hand" Content="Help" Foreground="#FF2E94D3" Margin="5" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+            <Button ToolTip="Settings..."  Name="SettingsBtn" Margin="5" Click="SettingsClick">
+                <StackPanel Orientation="Horizontal">
+                    <Path   Margin="5,0,0,0" Height="15" Width="15" Stretch="Uniform" Fill="Gray"  Data="F1 M 37.6289,-0.000976563L 49.6289,-0.000976563L 52.8506,10.8311C 55.3838,11.5439 57.7979,12.542 60.0557,13.79L 70.0654,8.37012L 78.5518,16.8545L 73.1934,26.749C 74.4844,29.0117 75.5234,31.4365 76.2725,33.9863L 87.251,37.252L 87.251,49.252L 76.4746,52.457C 75.7588,55.1113 74.7295,57.6377 73.4297,59.9932L 78.8838,70.0645L 70.3994,78.5518L 60.4404,73.1582C 58.0811,74.5029 55.5439,75.5732 52.875,76.3252L 49.624,87.2549L 37.624,87.2549L 34.373,76.3232C 31.7061,75.5713 29.1729,74.501 26.8145,73.1572L 16.8574,78.5488L 8.37207,70.0635L 13.8262,59.9912C 12.5264,57.6357 11.498,55.1113 10.7822,52.458L 0,49.251L 0,37.251L 10.9854,33.9834C 11.7334,31.4365 12.7715,29.0137 14.0615,26.7529L 8.70313,16.8564L 17.1885,8.37012L 27.1982,13.791C 29.4561,12.542 31.8721,11.543 34.4072,10.8311L 37.6289,-0.000976563 Z M 43.9824,59.5264C 52.9834,59.5264 60.2803,52.2275 60.2803,43.2275C 60.2803,34.2266 52.9834,26.9277 43.9824,26.9277C 34.9824,26.9277 27.6826,34.2266 27.6826,43.2275C 27.6826,52.2275 34.9824,59.5264 43.9824,59.5264 Z " UseLayoutRounding="False"/>
+                    <TextBlock Margin="5,2" Text="Settings" />
+                </StackPanel>
+            </Button>
+
+        </StackPanel>
+    </Grid>
+</UserControl>
