@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI.Events;
@@ -9,43 +9,39 @@ using Autodesk.Revit.DB;
 
 namespace HOK.ModelReporting
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    public class AppCommand:IExternalApplication
+    [Transaction(TransactionMode.Manual)]
+    public class AppCommand : IExternalApplication
     {
-        private Dictionary<string/*docPath*/, EventSettings> syncSettingsDictionary = new Dictionary<string, EventSettings>();
-        private Dictionary<string/*docPath*/, EventSettings> openSettingsDictionary = new Dictionary<string, EventSettings>();
-        private Dictionary<string/*docPath*/, EventSettings> purgeSettingsDictionary = new Dictionary<string, EventSettings>();
+        private readonly Dictionary<string/*docPath*/, EventSettings> _syncSettingsDictionary = new Dictionary<string, EventSettings>();
+        private readonly Dictionary<string/*docPath*/, EventSettings> _openSettingsDictionary = new Dictionary<string, EventSettings>();
+        private readonly Dictionary<string/*docPath*/, EventSettings> _purgeSettingsDictionary = new Dictionary<string, EventSettings>();
 
-        private EventSettings syncSettings;
-        private EventSettings openSettings;
-        private EventSettings purgeSettings;
-        static private RevitCommandId commandId;
-        private AddInCommandBinding binding = null;
-        private bool purgeStarted = false;
+        private EventSettings _syncSettings;
+        private EventSettings _openSettings;
+        private EventSettings _purgeSettings;
+        private static RevitCommandId _commandId;
+        private AddInCommandBinding _binding;
+        private bool _purgeStarted;
 
         public Result OnStartup(UIControlledApplication application)
         {
             try
             {
-                application.ControlledApplication.DocumentOpened += new EventHandler<DocumentOpenedEventArgs>(EventDocOpen);
-                application.ControlledApplication.DocumentClosing += new EventHandler<DocumentClosingEventArgs>(EventDocClose);
-                application.ControlledApplication.DocumentSynchronizingWithCentral += new EventHandler<DocumentSynchronizingWithCentralEventArgs>(EventSwcStart);
-                application.ControlledApplication.DocumentSynchronizedWithCentral += new EventHandler<DocumentSynchronizedWithCentralEventArgs>(EventSwcStop);
+                application.ControlledApplication.DocumentOpened += EventDocOpen;
+                application.ControlledApplication.DocumentClosing += EventDocClose;
+                application.ControlledApplication.DocumentSynchronizingWithCentral += EventSwcStart;
+                application.ControlledApplication.DocumentSynchronizedWithCentral += EventSwcStop;
 
 #if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
-                application.ControlledApplication.DocumentChanged += new EventHandler<DocumentChangedEventArgs>(EventCommandFinished);
+                application.ControlledApplication.DocumentChanged += EventCommandFinished;
 
-                if (binding == null)
-                {
-                    commandId = RevitCommandId.LookupPostableCommandId(PostableCommand.PurgeUnused);
-                    if (commandId.CanHaveBinding)
-                    {
-                        binding = application.CreateAddInCommandBinding(commandId);
-                        binding.BeforeExecuted +=EventCommandStart;
-                    }
-                }
+                if (_binding != null) return Result.Succeeded;
+                _commandId = RevitCommandId.LookupPostableCommandId(PostableCommand.PurgeUnused);
+
+                if (!_commandId.CanHaveBinding) return Result.Succeeded;
+                _binding = application.CreateAddInCommandBinding(_commandId);
+                _binding.BeforeExecuted +=EventCommandStart;
 #endif
-
                 return Result.Succeeded;
             }
             catch
@@ -58,17 +54,17 @@ namespace HOK.ModelReporting
         {
             try
             {
-                application.ControlledApplication.DocumentOpened -= new EventHandler<DocumentOpenedEventArgs>(EventDocOpen);
-                application.ControlledApplication.DocumentClosing -= new EventHandler<DocumentClosingEventArgs>(EventDocClose);
-                application.ControlledApplication.DocumentSynchronizingWithCentral -= new EventHandler<DocumentSynchronizingWithCentralEventArgs>(EventSwcStart);
-                application.ControlledApplication.DocumentSynchronizedWithCentral -= new EventHandler<DocumentSynchronizedWithCentralEventArgs>(EventSwcStop);
+                application.ControlledApplication.DocumentOpened -= EventDocOpen;
+                application.ControlledApplication.DocumentClosing -= EventDocClose;
+                application.ControlledApplication.DocumentSynchronizingWithCentral -= EventSwcStart;
+                application.ControlledApplication.DocumentSynchronizedWithCentral -= EventSwcStop;
 
 #if RELEASE2014 || RELEASE2015 ||RELEASE2016 || RELEASE2017
-                application.ControlledApplication.DocumentChanged -= new EventHandler<DocumentChangedEventArgs>(EventCommandFinished);
+                application.ControlledApplication.DocumentChanged -= EventCommandFinished;
                
-                if (commandId.HasBinding)
+                if (_commandId.HasBinding)
                 {
-                    application.RemoveAddInCommandBinding(commandId);
+                    application.RemoveAddInCommandBinding(_commandId);
                 }
 #endif
                 return Result.Succeeded;
@@ -83,103 +79,97 @@ namespace HOK.ModelReporting
         {
             try
             {
-                if (!e.Document.IsFamilyDocument)
-                {
-                    syncSettings = new EventSettings(e.Document);
-                    syncSettings.SizeStart = syncSettings.GetFileSize();
-                    syncSettings.StartTime = DateTime.Now;
+                if (e.Document.IsFamilyDocument) return;
 
-                    if (!string.IsNullOrEmpty(syncSettings.DocCentralPath))
-                    {
-                        if (syncSettingsDictionary.ContainsKey(syncSettings.DocCentralPath))
-                        {
-                            syncSettingsDictionary.Remove(syncSettings.DocCentralPath);
-                        }
-                        syncSettingsDictionary.Add(syncSettings.DocCentralPath, syncSettings);
-                    }
+                _syncSettings = new EventSettings(e.Document);
+                _syncSettings.SizeStart = _syncSettings.GetFileSize();
+                _syncSettings.StartTime = DateTime.Now;
+
+                if (string.IsNullOrEmpty(_syncSettings.DocCentralPath)) return;
+
+                if (_syncSettingsDictionary.ContainsKey(_syncSettings.DocCentralPath))
+                {
+                    _syncSettingsDictionary.Remove(_syncSettings.DocCentralPath);
                 }
-                
+                _syncSettingsDictionary.Add(_syncSettings.DocCentralPath, _syncSettings);
             }
-            catch { }
+            catch
+            {
+                //ignored
+            }
         }
 
         private void EventSwcStop(object sender, DocumentSynchronizedWithCentralEventArgs e)
         {
             try
             {
-                if (!e.Document.IsFamilyDocument)
-                {
-                    string docPath = GetCentralPath(e.Document);
-                    if (syncSettingsDictionary.ContainsKey(docPath))
-                    {
-                        EventSettings eventSettings = syncSettingsDictionary[docPath];
-                        eventSettings.SizeEnd = eventSettings.GetFileSize();
-                        eventSettings.EndTime = DateTime.Now;
-                        WriteRecord(eventSettings, "SYNC-FILE");
-                    }
-                }
+                if (e.Document.IsFamilyDocument) return;
+                var docPath = GetCentralPath(e.Document);
+
+                if (!_syncSettingsDictionary.ContainsKey(docPath)) return;
+                var eventSettings = _syncSettingsDictionary[docPath];
+                eventSettings.SizeEnd = eventSettings.GetFileSize();
+                eventSettings.EndTime = DateTime.Now;
+                WriteRecord(eventSettings, "SYNC-FILE");
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
 
         private void EventDocOpen(object sender, DocumentOpenedEventArgs e)
         {
             try
             {
-                if (!e.Document.IsFamilyDocument)
+                if (e.Document.IsFamilyDocument) return;
+                _openSettings = new EventSettings(e.Document);
+                _openSettings.SizeStart = _openSettings.GetFileSize();
+                _openSettings.StartTime = DateTime.Now;
+
+                if (_openSettings.OpenDetached)
                 {
-                    openSettings = new EventSettings(e.Document);
-                    openSettings.SizeStart = openSettings.GetFileSize();
-                    openSettings.StartTime = DateTime.Now;
+                    _openSettings.SizeEnd = _openSettings.SizeStart;
+                    _openSettings.EndTime = DateTime.Now;
+                    WriteRecord(_openSettings, "OPEN-DETACHED");
+                }
+                else if (!string.IsNullOrEmpty(_openSettings.DocCentralPath))
+                {
+                    if (_openSettingsDictionary.ContainsKey(_openSettings.DocCentralPath))
+                    {
+                        _openSettingsDictionary.Remove(_openSettings.DocCentralPath);
+                    }
+                    _openSettingsDictionary.Add(_openSettings.DocCentralPath, _openSettings);
+                }
 
-                    if (openSettings.OpenDetached)
-                    {
-                        openSettings.SizeEnd = openSettings.SizeStart;
-                        openSettings.EndTime = DateTime.Now;
-                        WriteRecord(openSettings, "OPEN-DETACHED");
-                    }
-                    else if(!string.IsNullOrEmpty(openSettings.DocCentralPath))
-                    {
-                        if (openSettingsDictionary.ContainsKey(openSettings.DocCentralPath))
-                        {
-                            openSettingsDictionary.Remove(openSettings.DocCentralPath);
-                        }
-                        openSettingsDictionary.Add(openSettings.DocCentralPath, openSettings);
-                    }
-
-                    if (!openSettings.IsRecordable)
-                    {
-                        //warning message
-                    }
+                if (!_openSettings.IsRecordable)
+                {
+                    //warning message
                 }
             }
-            catch { }
+            catch
+            {
+                //ignored
+            }
         }
 
         private void EventDocClose(object sender, DocumentClosingEventArgs e)
         {
             try
             {
-                if (!e.Document.IsFamilyDocument)
-                {
-                    string docPath = GetCentralPath(e.Document);
-                    if (openSettingsDictionary.ContainsKey(docPath))
-                    {
-                        EventSettings eventSettings = openSettingsDictionary[docPath];
-                        eventSettings.SizeEnd = eventSettings.GetFileSize();
-                        eventSettings.EndTime = DateTime.Now;
-                        if (eventSettings.OpenCentral)
-                        {
-                            WriteRecord(eventSettings, "OPEN-CENTRAL");
-                        }
-                        else
-                        {
-                            WriteRecord(eventSettings, "OPEN-FILE");
-                        }
-                    }
-                }
+                if (e.Document.IsFamilyDocument) return;
+                var docPath = GetCentralPath(e.Document);
+
+                if (!_openSettingsDictionary.ContainsKey(docPath)) return;
+                var eventSettings = _openSettingsDictionary[docPath];
+                eventSettings.SizeEnd = eventSettings.GetFileSize();
+                eventSettings.EndTime = DateTime.Now;
+                WriteRecord(eventSettings, eventSettings.OpenCentral ? "OPEN-CENTRAL" : "OPEN-FILE");
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
 
 #if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
@@ -187,65 +177,64 @@ namespace HOK.ModelReporting
         {
             try
             {
-                UIApplication uiapp = (UIApplication)sender;
-                Document activeDoc = uiapp.ActiveUIDocument.Document;
+                var uiapp = (UIApplication) sender;
+                var activeDoc = uiapp.ActiveUIDocument.Document;
 
-                if (!activeDoc.IsFamilyDocument)
+                if (activeDoc.IsFamilyDocument) return;
+                _purgeSettings = new EventSettings(activeDoc);
+                _purgeSettings.SizeStart = _purgeSettings.GetFileSize();
+                _purgeSettings.StartTime = DateTime.Now;
+                _purgeStarted = true;
+
+                if (string.IsNullOrEmpty(_purgeSettings.DocCentralPath)) return;
+                if (_purgeSettingsDictionary.ContainsKey(_purgeSettings.DocCentralPath))
                 {
-                    purgeSettings = new EventSettings(activeDoc);
-                    purgeSettings.SizeStart = purgeSettings.GetFileSize();
-                    purgeSettings.StartTime = DateTime.Now;
-                    purgeStarted = true;
-
-                    if (!string.IsNullOrEmpty(purgeSettings.DocCentralPath))
-                    {
-                        if (purgeSettingsDictionary.ContainsKey(purgeSettings.DocCentralPath))
-                        {
-                            purgeSettingsDictionary.Remove(purgeSettings.DocCentralPath);
-                        }
-                        purgeSettingsDictionary.Add(purgeSettings.DocCentralPath, purgeSettings);
-                    }
+                    _purgeSettingsDictionary.Remove(_purgeSettings.DocCentralPath);
                 }
-
+                _purgeSettingsDictionary.Add(_purgeSettings.DocCentralPath, _purgeSettings);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
 
         private void EventCommandFinished(object sender, DocumentChangedEventArgs e)
         {
             try
             {
-                if (purgeStarted)
+                if (!_purgeStarted) return;
+                var deletedIds = e.GetDeletedElementIds().ToList();
+                if (deletedIds.Count > 0)
                 {
-                    List<ElementId> deletedIds = e.GetDeletedElementIds().ToList();
-                    if (deletedIds.Count > 0)
+                    var doc = e.GetDocument();
+                    if (!doc.IsFamilyDocument)
                     {
-                        Document doc = e.GetDocument();
-                        if (!doc.IsFamilyDocument)
+                        var docPath = GetCentralPath(doc);
+                        if (_purgeSettingsDictionary.ContainsKey(docPath))
                         {
-                            string docPath = GetCentralPath(doc);
-                            if (purgeSettingsDictionary.ContainsKey(docPath))
-                            {
-                                EventSettings eventSettings = purgeSettingsDictionary[docPath];
-                                eventSettings.SizeEnd = eventSettings.GetFileSize();
-                                eventSettings.EndTime = DateTime.Now;
-                                WriteRecord(eventSettings, "PURGE-UNUSED");
-                            } 
+                            var eventSettings = _purgeSettingsDictionary[docPath];
+                            eventSettings.SizeEnd = eventSettings.GetFileSize();
+                            eventSettings.EndTime = DateTime.Now;
+                            WriteRecord(eventSettings, "PURGE-UNUSED");
                         }
                     }
-                    purgeStarted = false;
                 }
+                _purgeStarted = false;
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
 #endif
 
-        private bool WriteRecord(EventSettings settings, string eventTypeName)
+        private void WriteRecord(EventSettings settings, string eventTypeName)
         {
-            bool result = false;
             try
             {
-                var entities = new KNetBIMDataServiceReference.KNetBIMDataCollectionEntities(new Uri("http://bimservices.hok.com/BIM/HOK.BIM.Services/KNetBIMDataService.svc/"));
+                var entities = new KNetBIMDataServiceReference.KNetBIMDataCollectionEntities(
+                    new Uri("http://bimservices.hok.com/BIM/HOK.BIM.Services/KNetBIMDataService.svc/"));
                 var dataPointEntity = new KNetBIMDataServiceReference.RevitEvent();
                 {
                     dataPointEntity.ID = Guid.NewGuid();
@@ -258,58 +247,47 @@ namespace HOK.ModelReporting
                     dataPointEntity.LocalFileName = settings.DocLocalPath;
                     dataPointEntity.FileLocation = settings.FileLocation;
                     dataPointEntity.LocalFileLocation = settings.LocalFileLocation;
-                    dataPointEntity.PreEventFileSize = (int)settings.SizeStart;
-                    dataPointEntity.PostEventFileSize = (int)settings.SizeEnd;
+                    dataPointEntity.PreEventFileSize = (int) settings.SizeStart;
+                    dataPointEntity.PostEventFileSize = (int) settings.SizeEnd;
                     dataPointEntity.EventStart = settings.StartTime;
                     dataPointEntity.EventFinish = settings.EndTime;
                     dataPointEntity.UserName = Environment.UserName;
                     dataPointEntity.UserLocation = settings.UserLocation;
-                    dataPointEntity.UserIPAddress = settings.IPAddress;
+                    dataPointEntity.UserIPAddress = settings.IpAddress;
                     dataPointEntity.ComputerName = Environment.MachineName;
                     dataPointEntity.SoftwareVersion = settings.VersionNumber;
                 }
 
                 entities.AddToRevitEvents(dataPointEntity);
                 entities.SaveChanges();
-
-                result = true;
             }
-            catch { result = false; }
-            return result;
+            catch
+            {
+                // ignored
+            }
         }
 
-        private string GetCentralPath(Document doc)
+        private static string GetCentralPath(Document doc)
         {
-            string docCentralPath = "";
+            string docCentralPath;
             try
             {
                 if (doc.IsWorkshared)
                 {
-                    ModelPath modelPath = doc.GetWorksharingCentralModelPath();
-                    string centralPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
-                    if (!string.IsNullOrEmpty(centralPath))
-                    {
-                        docCentralPath = centralPath;
-                    }
-                    else
-                    {
-                        //detached
-                        docCentralPath = doc.PathName;
-                    }
+                    var modelPath = doc.GetWorksharingCentralModelPath();
+                    var centralPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
+                    docCentralPath = !string.IsNullOrEmpty(centralPath) ? centralPath : doc.PathName;
                 }
                 else
                 {
                     docCentralPath = doc.PathName;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
                 docCentralPath = doc.PathName;
             }
             return docCentralPath;
         }
-
-        
     }
 }

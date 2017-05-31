@@ -1,43 +1,44 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using Autodesk.Revit.DB;
 using HOK.MissionControl.Core.Classes;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.DTMTool.DTMUtils;
 using HOK.MissionControl.Utils;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace HOK.MissionControl.Tools.DTMTool
 {
-    public class DTMUpdater : IUpdater
+    public class DtmUpdater : IUpdater
     {
-        private UpdaterId updaterId = null;
-        private Dictionary<string, BuiltInCategory> catDictionary = new Dictionary<string, BuiltInCategory>();
-        private ObservableCollection<ReportingElementInfo> reportingElements = new ObservableCollection<ReportingElementInfo>();
+        private readonly UpdaterId _updaterId;
+        private readonly Dictionary<string, BuiltInCategory> _catDictionary = new Dictionary<string, BuiltInCategory>();
+        private readonly ObservableCollection<ReportingElementInfo> _reportingElements = new ObservableCollection<ReportingElementInfo>();
+        public Guid UpdaterGuid { get; set; } = new Guid("A7483418-F1FF-4DBE-BB71-C6C8CEAE0FD4");
 
-        private Guid updaterGuid = new Guid("A7483418-F1FF-4DBE-BB71-C6C8CEAE0FD4");
-        public Guid UpdaterGuid { get { return updaterGuid; } set { updaterGuid = value; } }
-        
-        public DTMUpdater(AddInId addinId)
+        public DtmUpdater(AddInId addinId)
         {
-            updaterId = new UpdaterId(addinId, updaterGuid);
-            catDictionary.Add("Grids", BuiltInCategory.OST_Grids);
-            catDictionary.Add("Levels", BuiltInCategory.OST_Levels);
-            catDictionary.Add("Views", BuiltInCategory.OST_Views);
-            catDictionary.Add("Scope Boxes", BuiltInCategory.OST_VolumeOfInterest);
-            catDictionary.Add("RVT Links", BuiltInCategory.OST_RvtLinks);
+            _updaterId = new UpdaterId(addinId, UpdaterGuid);
+            _catDictionary.Add("Grids", BuiltInCategory.OST_Grids);
+            _catDictionary.Add("Levels", BuiltInCategory.OST_Levels);
+            _catDictionary.Add("Views", BuiltInCategory.OST_Views);
+            _catDictionary.Add("Scope Boxes", BuiltInCategory.OST_VolumeOfInterest);
+            _catDictionary.Add("RVT Links", BuiltInCategory.OST_RvtLinks);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="pUpdater"></param>
+        /// <returns></returns>
         public bool Register(Document doc, ProjectUpdater pUpdater)
         {
-            bool registered = false;
+            var registered = false;
             try
             {
-                if (!UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
+                if (!UpdaterRegistry.IsUpdaterRegistered(_updaterId, doc))
                 {
                     UpdaterRegistry.RegisterUpdater(this, doc);
                     RefreshTriggers(doc, pUpdater);
@@ -47,160 +48,184 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DTMUpdater-Register:" + ex.Message);
             }
             return registered;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
         public void Unregister(Document doc)
         {
             try
             {
-                if (UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
-                {
-                    UpdaterRegistry.UnregisterUpdater(updaterId, doc);
-                    LogUtil.AppendLog("DTM Updater Removed.");
-                }
+                if (!UpdaterRegistry.IsUpdaterRegistered(_updaterId, doc)) return;
+
+                UpdaterRegistry.UnregisterUpdater(_updaterId, doc);
+                LogUtil.AppendLog("DTM Updater Removed.");
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DTMUpdater-Unregister:" + ex.Message);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="pUpdater"></param>
         public void RefreshTriggers(Document doc, ProjectUpdater pUpdater)
         {
             try
             {
-                string centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                string configId = "";
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                var configId = "";
                 if (AppCommand.Instance.ConfigDictionary.ContainsKey(centralPath))
                 {
-                    configId = AppCommand.Instance.ConfigDictionary[centralPath]._id;
+                    configId = AppCommand.Instance.ConfigDictionary[centralPath].Id;
                 }
 
-                UpdaterRegistry.RemoveDocumentTriggers(updaterId, doc);
-
-                var elementsToDelete = from eInfo in reportingElements where eInfo.CentralPath == centralPath select eInfo;
-                if (elementsToDelete.Count() > 0)
+                UpdaterRegistry.RemoveDocumentTriggers(_updaterId, doc);
+                var elementsToDelete = _reportingElements.Where(x => x.CentralPath == centralPath).ToList();
+                if (elementsToDelete.Any())
                 {
-                    List<ReportingElementInfo> elementsInfo = elementsToDelete.ToList();
-                    foreach (ReportingElementInfo eInfo in elementsInfo)
+                    var elementsInfo = elementsToDelete.ToList();
+                    foreach (var eInfo in elementsInfo)
                     {
-                        reportingElements.Remove(eInfo);
+                        _reportingElements.Remove(eInfo);
                     }
                 }
 
-                foreach (CategoryTrigger trigger in pUpdater.CategoryTriggers)
+                foreach (var trigger in pUpdater.CategoryTriggers)
                 {
-                    if (trigger.isEnabled)
-                    {
-                        ElementCategoryFilter catFilter = new ElementCategoryFilter(catDictionary[trigger.categoryName]);
-                        UpdaterRegistry.AddTrigger(updaterId, catFilter, Element.GetChangeTypeAny());
-                        UpdaterRegistry.AddTrigger(updaterId, catFilter, Element.GetChangeTypeElementAddition());
-                        UpdaterRegistry.AddTrigger(updaterId, catFilter, Element.GetChangeTypeElementDeletion());
+                    if (!trigger.isEnabled) continue;
+
+                    var catFilter = new ElementCategoryFilter(_catDictionary[trigger.categoryName]);
+                    UpdaterRegistry.AddTrigger(_updaterId, catFilter, Element.GetChangeTypeAny());
+                    UpdaterRegistry.AddTrigger(_updaterId, catFilter, Element.GetChangeTypeElementAddition());
+                    UpdaterRegistry.AddTrigger(_updaterId, catFilter, Element.GetChangeTypeElementDeletion());
  
-                        if (trigger.categoryName == "Grids")
+                    switch (trigger.categoryName)
+                    {
+                        case "Grids":
                         {
                             GridUtils.CollectGridExtents(doc, centralPath);
                             if (GridUtils.gridParameters.ContainsKey(centralPath))
                             {
-                                foreach (ElementId paramId in GridUtils.gridParameters[centralPath])
+                                foreach (var paramId in GridUtils.gridParameters[centralPath])
                                 {
-                                    UpdaterRegistry.AddTrigger(updaterId, catFilter, Element.GetChangeTypeParameter(paramId));
+                                    UpdaterRegistry.AddTrigger(_updaterId, catFilter, Element.GetChangeTypeParameter(paramId));
                                 }
                             }
 
-                            FilteredElementCollector collector = new FilteredElementCollector(doc);
-                            List<Element> elements = collector.WherePasses(catFilter).WhereElementIsNotElementType().ToElements().ToList();
-                            foreach (Element element in elements)
+                            var elements = new FilteredElementCollector(doc)
+                                    .WherePasses(catFilter)
+                                    .WhereElementIsNotElementType()
+                                    .ToElements()
+                                    .ToList();
+                            foreach (var element in elements)
                             {
-                                ReportingElementInfo reportingInfo = new ReportingElementInfo(configId, updaterGuid.ToString(), centralPath, trigger.categoryName, trigger.description, element.Id, element.UniqueId);
-                                reportingElements.Add(reportingInfo);
+                                var reportingInfo = new ReportingElementInfo(configId, UpdaterGuid.ToString(), centralPath, trigger.categoryName, trigger.description, element.Id, element.UniqueId);
+                                _reportingElements.Add(reportingInfo);
                             }
                         }
-                        else if (trigger.categoryName == "Views")
+                            break;
+                        case "Views":
                         {
-                            FilteredElementCollector collector = new FilteredElementCollector(doc);
-                            List<View> views = collector.WherePasses(catFilter).WhereElementIsNotElementType().ToElements().Cast<View>().ToList();
-                            var viewTemplates = from view in views where view.IsTemplate select view;
-                            if (viewTemplates.Count() > 0)
+                            var viewTemplates = new FilteredElementCollector(doc)
+                                .WherePasses(catFilter)
+                                .WhereElementIsNotElementType()
+                                .Cast<View>()
+                                .Where(x => x.IsTemplate)
+                                .ToList();
+
+                            if (viewTemplates.Any())
                             {
-                                foreach (Element view in viewTemplates)
+                                foreach (var view in viewTemplates)
                                 {
-                                    ReportingElementInfo reportingInfo = new ReportingElementInfo(configId, updaterGuid.ToString(), centralPath, trigger.categoryName, trigger.description, view.Id, view.UniqueId);
-                                    reportingElements.Add(reportingInfo);
+                                    var reportingInfo = new ReportingElementInfo(configId, UpdaterGuid.ToString(), centralPath, trigger.categoryName, trigger.description, view.Id, view.UniqueId);
+                                    _reportingElements.Add(reportingInfo);
                                 }
                             }
                         }
-                        else
+                            break;
+                        default:
                         {
-                            FilteredElementCollector collector = new FilteredElementCollector(doc);
-                            List<Element> elements = collector.WherePasses(catFilter).WhereElementIsNotElementType().ToElements().ToList();
-                            foreach (Element element in elements)
+                            var elements = new FilteredElementCollector(doc)
+                                    .WherePasses(catFilter)
+                                    .WhereElementIsNotElementType()
+                                    .ToElements()
+                                    .ToList();
+                            foreach (var element in elements)
                             {
-                                ReportingElementInfo reportingInfo = new ReportingElementInfo(configId, updaterGuid.ToString(), centralPath, trigger.categoryName, trigger.description, element.Id, element.UniqueId);
-                                reportingElements.Add(reportingInfo);
+                                var reportingInfo = new ReportingElementInfo(configId, UpdaterGuid.ToString(), centralPath, trigger.categoryName, trigger.description, element.Id, element.UniqueId);
+                                _reportingElements.Add(reportingInfo);
                             }
                         }
+                            break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DTMUpdater-RefreshTriggers:" + ex.Message);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
         public void Execute(UpdaterData data)
         {
             try
             {
-                Document doc = data.GetDocument();
-                string centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                string configId = "";
+                var doc = data.GetDocument();
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                var configId = "";
                 if (AppCommand.Instance.ConfigDictionary.ContainsKey(centralPath))
                 {
-                    configId = AppCommand.Instance.ConfigDictionary[centralPath]._id;
+                    configId = AppCommand.Instance.ConfigDictionary[centralPath].Id;
                 }
 
-                List<ElementId> addedElementIds = data.GetAddedElementIds().ToList();
-                foreach (ElementId id in addedElementIds)
+                var addedElementIds = data.GetAddedElementIds().ToList();
+                foreach (var id in addedElementIds)
                 {
-                    Element element = doc.GetElement(id);
-                    if (null != element)
+                    var element = doc.GetElement(id);
+                    if (null == element) continue;
+
+                    var bltCategory = (BuiltInCategory)element.Category.Id.IntegerValue;
+                    if (bltCategory == BuiltInCategory.OST_RvtLinks)
                     {
-                        BuiltInCategory bltCategory = (BuiltInCategory)element.Category.Id.IntegerValue;
-                        if (bltCategory == BuiltInCategory.OST_RvtLinks)
-                        {
-                            RunCategoryActionItems(centralPath, data, element);
-                        }
-                        else
-                        {
-                            AddCategoryCache(configId, centralPath, element);
-                        }
+                        RunCategoryActionItems(centralPath, data, element);
+                    }
+                    else
+                    {
+                        AddCategoryCache(configId, centralPath, element);
                     }
                 }
 
-                List<ElementId> modifiedElementIds = data.GetModifiedElementIds().ToList();
-                foreach (ElementId id in modifiedElementIds)
+                var modifiedElementIds = data.GetModifiedElementIds().ToList();
+                foreach (var id in modifiedElementIds)
                 {
-                    Element element = doc.GetElement(id);
+                    var element = doc.GetElement(id);
                     if (null != element)
                     {
                         RunCategoryActionItems(centralPath, data, element);
                     }
                 }
 
-                List<ElementId> deletedElementIds = data.GetDeletedElementIds().ToList();
-                foreach (ElementId id in deletedElementIds)
+                var deletedElementIds = data.GetDeletedElementIds().ToList();
+                foreach (var id in deletedElementIds)
                 {
                     //Process Failure
-                    var infoFound = from info in reportingElements where info.CentralPath == centralPath && info.ReportingElementId == id select info;
-                    if (infoFound.Count() > 0)
+                    var infoFound = _reportingElements
+                        .Where(x => x.CentralPath == centralPath && x.ReportingElementId == id)
+                        .ToList();
+                    if (infoFound.Any())
                     {
                         ReportFailure(doc, infoFound.First());
                     }
@@ -209,80 +234,99 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DTMUpdater-Execute:" + ex.Message);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configId"></param>
+        /// <param name="centralPath"></param>
+        /// <param name="element"></param>
         private void AddCategoryCache(string configId, string centralPath, Element element)
         {
             try
             {
-                if (element.Category.Name == "Grids")
+                switch (element.Category.Name)
                 {
-                    Grid grid = element as Grid;
-                    if (!GridUtils.gridExtents.ContainsKey(centralPath))
-                    {
-                        Dictionary<ElementId, Outline> extents = new Dictionary<ElementId, Outline>();
-                        extents.Add(grid.Id, grid.GetExtents());
-                        GridUtils.gridExtents.Add(centralPath, extents);
-                    }
-                    else
-                    {
-                        GridUtils.gridExtents[centralPath].Add(grid.Id, grid.GetExtents());
-                    }
-                    AddElementToStorage(configId, centralPath, element);
-                }
-                else if (element.Category.Name == "Views")
-                {
-                    View view = element as View;
-                    if (view.IsTemplate)
-                    {
+                    case "Grids":
+                        var grid = (Grid)element;
+                        if (!GridUtils.gridExtents.ContainsKey(centralPath))
+                        {
+                            var extents = new Dictionary<ElementId, Outline> {{grid.Id, grid.GetExtents()}};
+                            GridUtils.gridExtents.Add(centralPath, extents);
+                        }
+                        else
+                        {
+                            GridUtils.gridExtents[centralPath].Add(grid.Id, grid.GetExtents());
+                        }
                         AddElementToStorage(configId, centralPath, element);
-                    }
-                }
-                else
-                {
-                    AddElementToStorage(configId, centralPath, element);
+                        break;
+                    case "Views":
+                        var view = (View)element;
+                        if (view.IsTemplate)
+                        {
+                            AddElementToStorage(configId, centralPath, element);
+                        }
+                        break;
+                    default:
+                        AddElementToStorage(configId, centralPath, element);
+                        break;
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DTMUpdater-AddCategoryCache:" + ex.Message);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configId"></param>
+        /// <param name="centralPath"></param>
+        /// <param name="element"></param>
         private void AddElementToStorage(string configId, string centralPath, Element element)
         {
             try
             {
-                string categoryName = element.Category.Name;
-                string triggerMessage = GetTriggerMessage(configId, centralPath, element);
-                ReportingElementInfo eInfo = new ReportingElementInfo(configId, updaterGuid.ToString(), centralPath, categoryName, triggerMessage, element.Id, element.UniqueId);
-                reportingElements.Add(eInfo);
+                var categoryName = element.Category.Name;
+                var triggerMessage = GetTriggerMessage(configId, element);
+                var eInfo = new ReportingElementInfo(configId, UpdaterGuid.ToString(), centralPath, categoryName, triggerMessage, element.Id, element.UniqueId);
+                _reportingElements.Add(eInfo);
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DTMUpdater-AddElementToStorage:" + ex.Message);
             }
         }
 
-        private string GetTriggerMessage(string configId, string centralPath, Element element)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configId"></param>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private string GetTriggerMessage(string configId, Element element)
         {
-            string triggerMsg = "";
+            var triggerMsg = "";
             try
             {
                 if (AppCommand.Instance.ConfigDictionary.ContainsKey(configId))
                 {
-                    Configuration configFound = AppCommand.Instance.ConfigDictionary[configId];
-                    var updaterFound = from updater in configFound.updaters where updater.updaterId.ToLower() == updaterGuid.ToString().ToLower() select updater;
-                    if (updaterFound.Count() > 0)
+                    var configFound = AppCommand.Instance.ConfigDictionary[configId];
+
+                    var updaterFound = configFound.updaters
+                        .Where(x => string.Equals(x.updaterId.ToLower(), UpdaterGuid.ToString().ToLower()))
+                        .ToList();
+                    if (updaterFound.Any())
                     {
-                        ProjectUpdater dtmUpdater = updaterFound.First();
-                        var triggerFound = from trigger in dtmUpdater.CategoryTriggers where trigger.categoryName == element.Category.Name select trigger;
-                        if (triggerFound.Count() > 0)
+                        var dtmUpdater = updaterFound.First();
+                        var triggerFound = dtmUpdater.CategoryTriggers
+                            .Where(x => x.categoryName == element.Category.Name)
+                            .ToList();
+                        if (triggerFound.Any())
                         {
                             triggerMsg = triggerFound.First().description;
                         }
@@ -291,29 +335,36 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DTMUpdater-GetTriggerMessage:" + ex.Message);
             }
             return triggerMsg;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="centralPath"></param>
+        /// <param name="data"></param>
+        /// <param name="element"></param>
         private void RunCategoryActionItems(string centralPath, UpdaterData data, Element element)
         {
             try
             {
                 ReportingElementInfo reportingInfo = null;
-                Document doc = data.GetDocument();
-                var infoFound = from info in reportingElements where info.CentralPath == centralPath && info.ReportingUniqueId == element.UniqueId select info;
-                if (infoFound.Count() > 0)
+                var doc = data.GetDocument();
+                var infoFound = _reportingElements
+                    .Where(x => x.CentralPath == centralPath && x.ReportingUniqueId == element.UniqueId)
+                    .ToList();
+                if (infoFound.Any())
                 {
                     reportingInfo = infoFound.First();
                 }
 
-                BuiltInCategory bltCategory = (BuiltInCategory)element.Category.Id.IntegerValue;
+                var bltCategory = (BuiltInCategory)element.Category.Id.IntegerValue;
                 switch (bltCategory)
                 {
                     case BuiltInCategory.OST_Grids:
-                        Grid grid = element as Grid;
+                        var grid = (Grid)element;
                         if (GridUtils.ExtentGeometryChanged(centralPath, grid.Id, grid.GetExtents()))
                         {
                             if (null != reportingInfo)
@@ -324,14 +375,13 @@ namespace HOK.MissionControl.Tools.DTMTool
                         else if (GridUtils.gridParameters.ContainsKey(centralPath))
                         {
                             //parameter changed
-                            foreach (ElementId paramId in GridUtils.gridParameters[centralPath])
+                            foreach (var paramId in GridUtils.gridParameters[centralPath])
                             {
-                                if (data.IsChangeTriggered(grid.Id, Element.GetChangeTypeParameter(paramId)))
+                                if (!data.IsChangeTriggered(grid.Id, Element.GetChangeTypeParameter(paramId))) continue;
+
+                                if (null != reportingInfo)
                                 {
-                                    if (null != reportingInfo)
-                                    {
-                                        ReportFailure(doc, reportingInfo);
-                                    }
+                                    ReportFailure(doc, reportingInfo);
                                 }
                             }
                         }
@@ -346,12 +396,16 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DTMUpdater-RunCategoryActionItems:" + ex.Message);
             }
         }
 
-        private void ReportFailure(Document doc, ReportingElementInfo eInfo)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="eInfo"></param>
+        private static void ReportFailure(Document doc, ReportingElementInfo eInfo)
         {
             try
             {
@@ -362,7 +416,6 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DTMUpdater-ReportFailure:" + ex.Message);
             }
         }
@@ -379,7 +432,7 @@ namespace HOK.MissionControl.Tools.DTMTool
 
         public UpdaterId GetUpdaterId()
         {
-            return updaterId;
+            return _updaterId;
         }
 
         public string GetUpdaterName()

@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace HOK.MissionControl.Core.Classes
 {
     public class RvtFile
     {
-        private string idVal = "";
-        private string centralPathVal = "";
-
-        public string _id { get { return idVal; } set { idVal = value; } }
-        public string centralPath { get { return centralPathVal; } set { centralPathVal = value; } }
-
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+        public string centralPath { get; set; } = "";
     }
 }

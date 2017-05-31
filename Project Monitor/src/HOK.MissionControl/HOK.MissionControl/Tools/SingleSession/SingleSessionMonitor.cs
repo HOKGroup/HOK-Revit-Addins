@@ -1,81 +1,79 @@
-﻿
-using HOK.MissionControl.Core.Classes;
-using HOK.MissionControl.Core.Utils;
-using HOK.MissionControl.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HOK.MissionControl.Core.Classes;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.SingleSession
 {
     public static class SingleSessionMonitor
     {
-        private static Guid updaterGuid = new Guid("90391154-67BB-452E-A1A7-A07A98B94F86");
-        private static string singleFile = "";
-        private static List<string> openedDocuments = new List<string>();
-        private static bool singleSessionActivated = false;
+        public static Guid UpdaterGuid { get; set; } = new Guid("90391154-67BB-452E-A1A7-A07A98B94F86");
+        public static string SingleFile { get; set; } = "";
+        public static List<string> OpenedDocuments { get; set; } = new List<string>();
+        public static bool SingleSessionActivated { get; set; }
 
-        public static Guid UpdaterGuid { get { return updaterGuid; } set { updaterGuid = value; } }
-        public static string SingleFile { get { return singleFile; } set { singleFile = value; } }
-        public static List<string> OpenedDocuments { get { return openedDocuments; } set { openedDocuments = value; } }
-        public static bool SingleSessionActivated { get { return singleSessionActivated; } set { singleSessionActivated = value; } }
-
+        /// <summary>
+        /// Checks if there is a Single Session updater turned on for this session and if document opening should be cancelled.
+        /// </summary>
+        /// <param name="centralFile">Path to the central file.</param>
+        /// <param name="config">Configuration for the current Revit model.</param>
+        /// <returns>True if opening of file should be cancelled.</returns>
         public static bool CancelOpening(string centralFile, Configuration config)
         {
-            bool cancel = false;
+            var cancel = false;
             try
             {
-                if (singleSessionActivated && openedDocuments.Count > 0) { return true; }
+                if (SingleSessionActivated && OpenedDocuments.Count > 0) { return true; }
 
-                var updaterFound = from updater in config.updaters where updater.updaterId.ToLower() == updaterGuid.ToString().ToLower() select updater;
-                if (updaterFound.Count() > 0)
+                var updaterFound = config.updaters
+                    .Where(x => string.Equals(x.updaterId.ToLower(), UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    .ToList();
+                if (updaterFound.Any())
                 {
-                    ProjectUpdater ssUpdater = updaterFound.First();
+                    var ssUpdater = updaterFound.First();
                     if (ssUpdater.isUpdaterOn)
                     {
-                        if (openedDocuments.Count > 0)
+                        if (OpenedDocuments.Count > 0)
                         {
                             cancel = true;
                         }
                         else
                         {
                             //first opening single file that will activate the single session
-                            singleFile = centralFile;
-                            singleSessionActivated = true;
+                            SingleFile = centralFile;
+                            SingleSessionActivated = true;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("CancelOpening:" + ex.Message);
             }
             return cancel;
         }
 
+        /// <summary>
+        /// Closes file that user attempted to open.
+        /// </summary>
+        /// <param name="centralFile">Path to central file.</param>
         public static void CloseFile(string centralFile)
         {
             try
             {
-                if (openedDocuments.Contains(centralFile))
+                if (OpenedDocuments.Contains(centralFile))
                 {
-                    openedDocuments.Remove(centralFile);
+                    OpenedDocuments.Remove(centralFile);
                 }
-                if (singleFile == centralFile)
-                {
-                    singleFile = "";
-                    singleSessionActivated = false;
-                }
+                if (SingleFile != centralFile) return;
+                SingleFile = "";
+                SingleSessionActivated = false;
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("CloseFile:" + ex.Message);
             }
         }
-
     }
 }

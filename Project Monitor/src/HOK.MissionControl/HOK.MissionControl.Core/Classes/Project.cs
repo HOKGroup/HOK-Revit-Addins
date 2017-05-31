@@ -1,27 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace HOK.MissionControl.Core.Classes
 {
     public class Project
     {
-        private string idVal = "";
-        private string numberVal = "";
-        private string nameVal = "";
-        private string officeVal = "";
-        private ProjectAddress addressVal = new ProjectAddress();
-        private List<string> configurationsVal = new List<string>();
-
-
-        public string _id { get { return idVal; } set { idVal = value; } }
-        public string number { get { return numberVal; } set { numberVal = value; } }
-        public string name { get { return nameVal; } set { nameVal = value; } }
-        public string office { get { return officeVal; } set { officeVal = value; } }
-        public ProjectAddress address { get { return addressVal; } set { addressVal = value; } }
-        public List<string> configurations { get { return configurationsVal; } set { configurationsVal = value; } }
-
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+        public string number { get; set; } = "";
+        public string name { get; set; } = "";
+        public string office { get; set; } = "";
+        public ProjectAddress address { get; set; } = new ProjectAddress();
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public List<string> configurations { get; set; } = new List<string>();
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public List<string> worksets { get; set; } = new List<string>();
     }
 }

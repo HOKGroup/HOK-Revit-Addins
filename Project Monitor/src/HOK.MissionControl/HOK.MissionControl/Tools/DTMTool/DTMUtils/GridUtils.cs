@@ -18,12 +18,12 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
         {
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(doc);
-                List<Grid> grids = collector.OfCategory(BuiltInCategory.OST_Grids).WhereElementIsNotElementType().ToElements().Cast<Grid>().ToList();
-                List<ElementId> paramIds = new List<ElementId>();
+                var collector = new FilteredElementCollector(doc);
+                var grids = collector.OfCategory(BuiltInCategory.OST_Grids).WhereElementIsNotElementType().ToElements().Cast<Grid>().ToList();
+                var paramIds = new List<ElementId>();
                 if (grids.Count > 0)
                 {
-                    Grid firstGrid = grids.First();
+                    var firstGrid = grids.First();
                     foreach (Parameter param in firstGrid.Parameters)
                     {
                         paramIds.Add(param.Id);
@@ -35,8 +35,8 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
                 }
                 gridParameters.Add(centralPath, paramIds);
 
-                Dictionary<ElementId, Outline> extents = new Dictionary<ElementId, Outline>();
-                foreach (Grid grid in grids)
+                var extents = new Dictionary<ElementId, Outline>();
+                foreach (var grid in grids)
                 {
                     if (!extents.ContainsKey(grid.Id))
                     {
@@ -51,26 +51,26 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
                 LogUtil.AppendLog("GridUtils-CollectGridExtents:" + ex.Message);
             }
         }
 
         public static bool ExtentGeometryChanged(string centralPath, ElementId currentGridId, Outline currentOutline)
         {
-            bool changed = false;
+            var changed = false;
             try
             {
                 if (gridExtents.ContainsKey(centralPath))
                 {
                     if (gridExtents[centralPath].ContainsKey(currentGridId))
                     {
-                        Outline oldOutline = gridExtents[centralPath][currentGridId];
-                        XYZ oldMin = oldOutline.MinimumPoint;
-                        XYZ oldMax = oldOutline.MaximumPoint;
+                        var oldOutline = gridExtents[centralPath][currentGridId];
+                        var oldMin = oldOutline.MinimumPoint;
+                        var oldMax = oldOutline.MaximumPoint;
 
-                        XYZ curMin = currentOutline.MinimumPoint;
-                        XYZ curMax = currentOutline.MaximumPoint;
+                        var curMin = currentOutline.MinimumPoint;
+                        var curMax = currentOutline.MaximumPoint;
 
                         if (!oldMin.IsAlmostEqualTo(curMin) || !oldMax.IsAlmostEqualTo(curMax))
                         {
@@ -81,7 +81,7 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
                 LogUtil.AppendLog("GridUtils-ExtentGeometryChanged:" + ex.Message);
             }
             return changed;

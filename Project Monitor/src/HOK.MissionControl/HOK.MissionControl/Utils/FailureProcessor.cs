@@ -2,17 +2,12 @@
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.RevisionTracker;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HOK.MissionControl.Utils
 {
     public static class FailureProcessor
     {
-        public static bool IsFailureFound = false;
+        public static bool IsFailureFound;
         public static bool IsSynchronizing = false;
         public static bool IsFailureProcessing = false;
 

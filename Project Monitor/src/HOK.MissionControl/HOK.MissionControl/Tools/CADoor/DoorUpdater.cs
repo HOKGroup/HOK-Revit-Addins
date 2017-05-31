@@ -5,34 +5,36 @@ using HOK.MissionControl.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace HOK.MissionControl.Tools.CADoor
 {
     public class DoorUpdater : IUpdater
     {
-        private UpdaterId updaterId = null;
+        private UpdaterId updaterId;
         private List<Parameter> pullParameters = new List<Parameter>();
         private List<Parameter> pushParameters = new List<Parameter>();
         private List<Parameter> stateCAParameters = new List<Parameter>();
-
         private string pullParamName = "Approach @ Pull Side";
         private string pushParamName = "Approach @ Push Side";
         private string stateCAParamName = "StateCA";
+        private Guid _updaterGuid = new Guid("C2C658D7-EC43-4721-8D2C-2B8C10C340E2");
+        public Guid UpdaterGuid { get { return _updaterGuid; } set { _updaterGuid = value; } }
 
-        private Guid updaterGuid = new Guid("C2C658D7-EC43-4721-8D2C-2B8C10C340E2");
-        public Guid UpdaterGuid { get { return updaterGuid; } set { updaterGuid = value; } }
-        //private DoorFailureProcessor doorFailure = null;
         public DoorUpdater(AddInId addinId)
         {
-            updaterId = new UpdaterId(addinId,updaterGuid);
+            updaterId = new UpdaterId(addinId,_updaterGuid);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="pUpdater"></param>
+        /// <returns></returns>
         public bool Register(Document doc, ProjectUpdater pUpdater)
         {
-            bool registered = false;
+            var registered = false;
             try
             {
                 if (!UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
@@ -45,12 +47,15 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DoorUpdater-Register:" + ex.Message);
             }
             return registered;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
         public void Unregister(Document doc)
         {
             try
@@ -63,37 +68,42 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
                 LogUtil.AppendLog("DoorUpdater-Unregister:" + ex.Message);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="pUpdater"></param>
+        /// <returns></returns>
         public bool RefreshTriggers(Document doc, ProjectUpdater pUpdater)
         {
-            bool refreshed = false;
+            var refreshed = false;
             try
             {
                 UpdaterRegistry.RemoveDocumentTriggers(updaterId, doc);
                 ElementFilter catFilter = new ElementCategoryFilter(BuiltInCategory.OST_Doors);
-                FilteredElementCollector collector = new FilteredElementCollector(doc);
-                List<FamilyInstance> doorInstances = collector.WherePasses(catFilter).WhereElementIsNotElementType().Cast<FamilyInstance>().ToList();
+                var collector = new FilteredElementCollector(doc);
+                var doorInstances = collector.WherePasses(catFilter).WhereElementIsNotElementType().Cast<FamilyInstance>().ToList();
 
                 collector = new FilteredElementCollector(doc);
-                List<Family> doorFamilies = collector.OfClass(typeof(Family)).Cast<Family>().ToList();
+                var doorFamilies = collector.OfClass(typeof(Family)).Cast<Family>().ToList();
 
-                bool existParam = FindClearanceParameter(doorInstances, doorFamilies);
+                var existParam = FindClearanceParameter(doorInstances, doorFamilies);
                 if (existParam)
                 {
                     if (pullParameters.Count > 0)
                     {
-                        foreach (Parameter param in pullParameters)
+                        foreach (var param in pullParameters)
                         {
                             UpdaterRegistry.AddTrigger(updaterId, doc, catFilter, Element.GetChangeTypeParameter(param));
                         }
                     }
                     if (pushParameters.Count > 0)
                     {
-                        foreach (Parameter param in pushParameters)
+                        foreach (var param in pushParameters)
                         {
                             UpdaterRegistry.AddTrigger(updaterId, doc, catFilter, Element.GetChangeTypeParameter(param));
                         }
@@ -102,7 +112,7 @@ namespace HOK.MissionControl.Tools.CADoor
                     if (stateCAParameters.Count > 0)
                     {
                         UpdaterRegistry.AddTrigger(updaterId, doc, catFilter, Element.GetChangeTypeElementAddition());
-                        foreach (Parameter param in stateCAParameters)
+                        foreach (var param in stateCAParameters)
                         {
                             UpdaterRegistry.AddTrigger(updaterId, doc, catFilter, Element.GetChangeTypeParameter(param));
                         }
@@ -111,33 +121,39 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
                 LogUtil.AppendLog("DoorUpdater-RefreshTriggers:" + ex.Message);
             }
             return refreshed;
         }
     
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doorInstances"></param>
+        /// <param name="doorFamilies"></param>
+        /// <returns></returns>
         private bool FindClearanceParameter(List<FamilyInstance> doorInstances, List<Family> doorFamilies)
         {
-            bool exist = false;
+            var exist = false;
             try
             {
-                foreach (Family doorFamily in doorFamilies)
+                foreach (var doorFamily in doorFamilies)
                 {
 #if RELEASE2013 ||RELEASE2014
                     var doors = from door in doorInstances where door.Symbol.Family.Name == doorFamily.Name select door;
 #elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                    var doors = from door in doorInstances where door.Symbol.FamilyName == doorFamily.Name select door;
+                    var doors = doorInstances.Where(x => x.Symbol.FamilyName == doorFamily.Name).ToList();
+                    //var doors = from door in doorInstances where door.Symbol.FamilyName == doorFamily.Name select door;
 #endif
 
-                    if (doors.Count() > 0)
+                    if (doors.Any())
                     {
-                        FamilyInstance doorInstance = doors.First();
+                        var doorInstance = doors.First();
 #if RELEASE2013 || RELEASE2014
                         Parameter pullParam = doorInstance.get_Parameter(pullParamName);
 #elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                        Parameter pullParam = doorInstance.LookupParameter(pullParamName);
+                        var pullParam = doorInstance.LookupParameter(pullParamName);
 #endif
                         if (null != pullParam)
                         {
@@ -147,7 +163,7 @@ namespace HOK.MissionControl.Tools.CADoor
 #if RELEASE2013||RELEASE2014
                         Parameter pushParam = doorInstance.get_Parameter(pushParamName);
 #elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                        Parameter pushParam = doorInstance.LookupParameter(pushParamName);
+                        var pushParam = doorInstance.LookupParameter(pushParamName);
 #endif
                         if (null != pushParam)
                         {
@@ -157,7 +173,7 @@ namespace HOK.MissionControl.Tools.CADoor
 #if RELEASE2013||RELEASE2014
                         Parameter caParam = doorInstance.get_Parameter(stateCAParamName);
 #elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                        Parameter caParam = doorInstance.LookupParameter(stateCAParamName);
+                        var caParam = doorInstance.LookupParameter(stateCAParamName);
 #endif
                         if (null != caParam)
                         {
@@ -178,28 +194,32 @@ namespace HOK.MissionControl.Tools.CADoor
             return exist;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
         public void Execute(UpdaterData data)
         {
             try
             {
-                Document doc = data.GetDocument();
+                var doc = data.GetDocument();
                 if (data.GetModifiedElementIds().Count > 0)
                 {
-                    ElementId doorId = data.GetModifiedElementIds().First();
-                    FamilyInstance doorInstance = doc.GetElement(doorId) as FamilyInstance;
+                    var doorId = data.GetModifiedElementIds().First();
+                    var doorInstance = doc.GetElement(doorId) as FamilyInstance;
                     if (null != doorInstance)
                     {
 #if RELEASE2013||RELEASE2014
                         Parameter pushParameter = doorInstance.get_Parameter(pushParamName);
 #elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                        Parameter pushParameter = doorInstance.LookupParameter(pushParamName);
+                        var pushParameter = doorInstance.LookupParameter(pushParamName);
 #endif
 
                         if (null != pushParameter)
                         {
                             if (data.IsChangeTriggered(doorId, Element.GetChangeTypeParameter(pushParameter)))
                             {
-                                string pushValue = pushParameter.AsValueString();
+                                var pushValue = pushParameter.AsValueString();
                                 if (!pushValue.Contains("Approach"))
                                 {
                                     DoorFailure.IsDoorFailed = true;
@@ -207,14 +227,14 @@ namespace HOK.MissionControl.Tools.CADoor
                                     DoorFailure.CurrentDoc = doc;
                                     FailureProcessor.IsFailureFound = true;
 
-                                    MessageBoxResult dr = MessageBox.Show(pushValue + " is not a correct value for the parameter " + pushParamName, "Invalid Door Parameter.", MessageBoxButton.OK, MessageBoxImage.Information);
+                                    var dr = MessageBox.Show(pushValue + " is not a correct value for the parameter " + pushParamName, "Invalid Door Parameter.", MessageBoxButton.OK, MessageBoxImage.Information);
                                 }
                             }
                         }
 #if RELEASE2013||RELEASE2014
                         Parameter pullParameter = doorInstance.get_Parameter(pullParamName);
 #elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                        Parameter pullParameter = doorInstance.LookupParameter(pullParamName);
+                        var pullParameter = doorInstance.LookupParameter(pullParamName);
 #endif
 
 
@@ -222,14 +242,14 @@ namespace HOK.MissionControl.Tools.CADoor
                         {
                             if (data.IsChangeTriggered(doorId, Element.GetChangeTypeParameter(pullParameter)))
                             {
-                                string pullValue = pullParameter.AsValueString();
+                                var pullValue = pullParameter.AsValueString();
                                 if (!pullValue.Contains("Approach"))
                                 {
                                     DoorFailure.IsDoorFailed = true;
                                     DoorFailure.FailingDoorId = doorId;
                                     FailureProcessor.IsFailureFound = true;
 
-                                    MessageBoxResult dr = MessageBox.Show(pullValue + " is not a correct value for the parameter " + pullParamName, "Invalid Door Parameter.", MessageBoxButton.OK, MessageBoxImage.Information);
+                                    var dr = MessageBox.Show(pullValue + " is not a correct value for the parameter " + pullParamName, "Invalid Door Parameter.", MessageBoxButton.OK, MessageBoxImage.Information);
                                 }
                             }
                         }
@@ -237,16 +257,16 @@ namespace HOK.MissionControl.Tools.CADoor
 #if RELEASE2013||RELEASE2014
                         Parameter caParameter = doorInstance.get_Parameter(stateCAParamName);
 #elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                        Parameter caParameter = doorInstance.LookupParameter(stateCAParamName);
+                        var caParameter = doorInstance.LookupParameter(stateCAParamName);
 #endif
                         if (null != caParameter)
                         {
                             if (data.IsChangeTriggered(doorId, Element.GetChangeTypeParameter(caParameter)))
                             {
-                                string centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                                 if (AppCommand.Instance.ProjectDictionary.ContainsKey(centralPath))
                                 {
-                                    Project project = AppCommand.Instance.ProjectDictionary[centralPath];
+                                    var project = AppCommand.Instance.ProjectDictionary[centralPath];
                                     if (project.address.state == "CA")
                                     {
                                         caParameter.Set(1);
@@ -262,21 +282,21 @@ namespace HOK.MissionControl.Tools.CADoor
                 }
                 else if (data.GetAddedElementIds().Count > 0)
                 {
-                    ElementId doorId = data.GetAddedElementIds().First();
-                    FamilyInstance doorInstance = doc.GetElement(doorId) as FamilyInstance;
+                    var doorId = data.GetAddedElementIds().First();
+                    var doorInstance = doc.GetElement(doorId) as FamilyInstance;
                     if (null != doorInstance)
                     {
 #if RELEASE2013||RELEASE2014
                         Parameter caParameter = doorInstance.get_Parameter(stateCAParamName);
 #elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                        Parameter caParameter = doorInstance.LookupParameter(stateCAParamName);
+                        var caParameter = doorInstance.LookupParameter(stateCAParamName);
 #endif
                         if (null != caParameter)
                         {
-                            string centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                            var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                             if (AppCommand.Instance.ProjectDictionary.ContainsKey(centralPath))
                             {
-                                Project project = AppCommand.Instance.ProjectDictionary[centralPath];
+                                var project = AppCommand.Instance.ProjectDictionary[centralPath];
                                 if (project.address.state == "CA")
                                 {
                                     caParameter.Set(1);
@@ -296,21 +316,37 @@ namespace HOK.MissionControl.Tools.CADoor
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public string GetAdditionalInformation()
         {
             return "Monitor changes on door parameter values.";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ChangePriority GetChangePriority()
         {
             return ChangePriority.DoorsOpeningsWindows;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public UpdaterId GetUpdaterId()
         {
             return updaterId;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public string GetUpdaterName()
         {
             return "Door Parameter Updater";

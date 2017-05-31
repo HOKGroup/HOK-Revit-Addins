@@ -1,10 +1,5 @@
 ﻿using Autodesk.Revit.DB;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HOK.MissionControl.Tools.DTMTool
 {
@@ -45,10 +40,7 @@ namespace HOK.MissionControl.Tools.DTMTool
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string info)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(info));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
     }
 }

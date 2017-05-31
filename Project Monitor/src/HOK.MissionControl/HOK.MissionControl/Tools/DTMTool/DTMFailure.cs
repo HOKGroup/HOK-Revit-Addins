@@ -27,13 +27,13 @@ namespace HOK.MissionControl.Tools.DTMTool
                 if (isElementModified && null!=currentDoc)
                 {
                     FailureProcessor.IsFailureProcessing = true;
-                    FailuresAccessor fa = args.GetFailuresAccessor();
+                    var fa = args.GetFailuresAccessor();
 
-                    DTMWindow dtmWindow = new DTMWindow(currentDoc, elementModified);
+                    var dtmWindow = new DTMWindow(currentDoc, elementModified);
                     if ((bool)dtmWindow.ShowDialog())
                     {
                         args.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
-                        FailureHandlingOptions option = fa.GetFailureHandlingOptions();
+                        var option = fa.GetFailureHandlingOptions();
                         option.SetClearAfterRollback(true);
                         fa.SetFailureHandlingOptions(option);
                     }
@@ -43,7 +43,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
                 LogUtil.AppendLog("DTMFailure-ProcessFailure:" + ex.Message);
             }
         }
