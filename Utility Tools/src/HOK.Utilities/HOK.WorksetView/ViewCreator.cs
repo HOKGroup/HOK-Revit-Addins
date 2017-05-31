@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Autodesk.Revit.DB;
 using System.Windows.Forms;
 
@@ -9,7 +8,6 @@ namespace HOK.WorksetView
 {
     public static class ViewCreator
     {
-
         public static View3D Create3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite)
         {
             View3D view3D = null;
@@ -52,7 +50,7 @@ namespace HOK.WorksetView
                         FilteredElementCollector collector = new FilteredElementCollector(doc);
                         List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                         var views = from view in view3ds where view.Name == viewName select view;
-                        if (views.Count() > 0)
+                        if (views.Any())
                         {
                             if (overwrite)
                             {
@@ -172,7 +170,7 @@ namespace HOK.WorksetView
                     FilteredElementCollector collector = new FilteredElementCollector(doc);
                     List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                     var views = from view in view3ds where view.Name == viewName select view;
-                    if (views.Count() > 0)
+                    if (views.Any())
                     {
                         if (overwrite)
                         {
@@ -213,34 +211,6 @@ namespace HOK.WorksetView
                         }
 
                     }
-
-                    /*
-                    trans.Start("Set Phase");
-                    BuiltInParameter bip = BuiltInParameter.PHASE_CREATED;
-                    FilterRule filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(new ElementId(bip), phaseInfo.PhaseId);
-                    ElementParameterFilter filter = new ElementParameterFilter(filterRule);
-                    FilteredElementCollector viewCollector = new FilteredElementCollector(doc, view3D.Id);
-                    List<Element> elements = viewCollector.WherePasses(filter).ToElements().ToList();
-                    if (elements.Count > 0)
-                    {
-                        progressBar.Value = 0;
-                        progressBar.Maximum = elements.Count;
-
-                        foreach (Element element in elements)
-                        {
-                            progressBar.PerformStep();
-                            Parameter param = element.get_Parameter(bip);
-                            if (null != param)
-                            {
-                                if (!param.IsReadOnly)
-                                {
-                                    param.Set(phaseInfo.PhaseId);
-                                }
-                            }
-                        }
-                    }
-                    trans.Commit();
-                    */
                 }
             }
             catch (Exception ex)
@@ -264,7 +234,7 @@ namespace HOK.WorksetView
                         FilteredElementCollector collector = new FilteredElementCollector(doc);
                         List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                         var views = from view in view3ds where view.Name == viewName select view;
-                        if (views.Count() > 0)
+                        if (views.Any())
                         {
                             if (overwrite)
                             {
@@ -316,7 +286,7 @@ namespace HOK.WorksetView
                         FilteredElementCollector collector = new FilteredElementCollector(doc);
                         List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                         var views = from view in view3ds where view.Name == viewName select view;
-                        if (views.Count() > 0)
+                        if (views.Any())
                         {
                             if (overwrite)
                             {
@@ -359,7 +329,7 @@ namespace HOK.WorksetView
                                 collector = new FilteredElementCollector(doc);
                                 List<Element> linkInstances = collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().ToElements().ToList();
                                 var selectedLinks = from link in linkInstances where link.Name.Contains(itemInfo.ItemName) && null!=link.Location select link;
-                                if (selectedLinks.Count() > 0)
+                                if (selectedLinks.Any())
                                 {
                                     BoundingBoxXYZ boundingBox = GetBoundingBox(selectedLinks.ToList());
                                     if (null != boundingBox)
@@ -495,7 +465,7 @@ namespace HOK.WorksetView
                     FilteredElementCollector collector = new FilteredElementCollector(doc);
                     List<ViewPlan> viewPlans = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
                     var views = from view in viewPlans where view.Name == viewName select view;
-                    if (views.Count() > 0)
+                    if (views.Any())
                     {
                         if (overwrite)
                         {
@@ -581,7 +551,7 @@ namespace HOK.WorksetView
                         FilteredElementCollector collector = new FilteredElementCollector(doc);
                         List<ViewPlan> viewPlans = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
                         var views = from view in viewPlans where view.Name == viewName select view;
-                        if (views.Count() > 0)
+                        if (views.Any())
                         {
                             if (overwrite)
                             {
@@ -608,34 +578,6 @@ namespace HOK.WorksetView
                             }
                             trans.Commit();
                         }
-                        /*
-                        trans.Start("Set Phase");
-                        BuiltInParameter bip = BuiltInParameter.PHASE_CREATED;
-                        FilterRule filterRule = ParameterFilterRuleFactory.CreateNotEqualsRule(new ElementId(bip), phaseInfo.PhaseId);
-                        ElementParameterFilter filter = new ElementParameterFilter(filterRule);
-                        FilteredElementCollector viewCollector = new FilteredElementCollector(doc, viewPlan.Id);
-                        List<Element> elements = viewCollector.WherePasses(filter).ToElements().ToList();
-                        if (elements.Count > 0)
-                        {
-                            progressBar.Value = 0;
-                            progressBar.Maximum = elements.Count;
-
-                            foreach (Element element in elements)
-                            {
-                                progressBar.PerformStep();
-
-                                Parameter param = element.get_Parameter(bip);
-                                if (null != param)
-                                {
-                                    if (!param.IsReadOnly)
-                                    {
-                                        param.Set(phaseInfo.PhaseId);
-                                    }
-                                }
-                            }
-                        }
-                        trans.Commit();
-                         */
                     }
                     catch (Exception ex)
                     {
@@ -664,7 +606,7 @@ namespace HOK.WorksetView
                         FilteredElementCollector collector = new FilteredElementCollector(doc);
                         List<ViewPlan> viewPlans = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
                         var views = from view in viewPlans where view.Name == viewName select view;
-                        if (views.Count() > 0)
+                        if (views.Any())
                         {
                             if (overwrite)
                             {
