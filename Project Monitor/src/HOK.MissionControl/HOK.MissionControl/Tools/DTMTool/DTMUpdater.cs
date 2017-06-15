@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Autodesk.Revit.DB;
-using HOK.MissionControl.Core.Classes;
+using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.DTMTool.DTMUtils;
 using HOK.MissionControl.Utils;

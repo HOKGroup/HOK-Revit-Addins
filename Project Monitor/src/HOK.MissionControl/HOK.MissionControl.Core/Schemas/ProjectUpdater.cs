@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace HOK.MissionControl.Core.Classes
+namespace HOK.MissionControl.Core.Schemas
 {
     public class ProjectUpdater
     {

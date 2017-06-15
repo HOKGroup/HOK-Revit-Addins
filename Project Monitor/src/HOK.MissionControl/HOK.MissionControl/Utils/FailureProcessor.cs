@@ -13,24 +13,23 @@ namespace HOK.MissionControl.Utils
 
         public static void CheckFailure(object sender, FailuresProcessingEventArgs args)
         {
-            if (IsFailureProcessing) { return; }
-            if (IsSynchronizing) { return; }
-            if (IsFailureFound)
+            if (IsFailureProcessing) return;
+            if (IsSynchronizing) return;
+            if (!IsFailureFound) return;
+
+            if (DoorFailure.IsDoorFailed)
             {
-                if (DoorFailure.IsDoorFailed)
-                {
-                    DoorFailure.ProcessFailure(sender, args);
-                }
-                else if (DTMFailure.IsElementModified)
-                {
-                    DTMFailure.ProcessFailure(sender, args);
-                }
-                else if (RevisionFailure.IsRevisionModified)
-                {
-                    RevisionFailure.ProcessFailure(sender, args);
-                }
-                IsFailureFound = false;
+                DoorFailure.ProcessFailure(sender, args);
             }
+            else if (DTMFailure.IsElementModified)
+            {
+                DTMFailure.ProcessFailure(sender, args);
+            }
+            else if (RevisionFailure.IsRevisionModified)
+            {
+                RevisionFailure.ProcessFailure(sender, args);
+            }
+            IsFailureFound = false;
         }
     }
 }

@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
-using HOK.MissionControl.Core.Classes;
+using Autodesk.Revit.UI.Events;
+using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.DTMTool;
+using HOK.MissionControl.Tools.HealthReport.ObjectTrackers;
 using HOK.MissionControl.Tools.RevisionTracker;
 using HOK.MissionControl.Tools.SingleSession;
-using HOK.MissionControl.Tools.WorksetMonitor;
 using HOK.MissionControl.Utils;
 
 namespace HOK.MissionControl
@@ -17,11 +20,12 @@ namespace HOK.MissionControl
     public class AppCommand : IExternalApplication
     {
         public static AppCommand Instance { get; private set; }
-        public Dictionary<string/*centralPath*/, Configuration> ConfigDictionary { get; set; } = new Dictionary<string, Configuration>();
-        public Dictionary<string/*centralPath*/, Project> ProjectDictionary { get; set; } = new Dictionary<string, Project>();
+        public Dictionary<string, Configuration> ConfigDictionary { get; set; } = new Dictionary<string, Configuration>();
+        public Dictionary<string, Project> ProjectDictionary { get; set; } = new Dictionary<string, Project>();
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
         public RevisionUpdater RevisionUpdaterInstance { get; set; }
+        public static bool RunExport { get; set; }
 
         /// <summary>
         /// Registers all event handlers during startup.
@@ -39,12 +43,13 @@ namespace HOK.MissionControl
                 LogUtil.InitializeLog();
                 LogUtil.AppendLog("Mission Control AddIn Started");
 
-                application.ControlledApplication.DocumentOpening += CollectConfigurationOnOpening;
-                application.ControlledApplication.DocumentOpened += RegisterUpdatersOnOpen;
+                application.ControlledApplication.DocumentOpening += OnDocumentOpening;
+                application.ControlledApplication.DocumentOpened += OnDocumentOpened;
                 application.ControlledApplication.FailuresProcessing += FailureProcessor.CheckFailure;
-                application.ControlledApplication.DocumentClosing += UnregisterUpdaterOnClosing;
-                application.ControlledApplication.DocumentSynchronizingWithCentral += DocumentSynchronizing;
-                application.ControlledApplication.DocumentSynchronizedWithCentral += DocumentSynchronized;
+                application.ControlledApplication.DocumentClosing += OnDocumentClosing;
+                application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
+                application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
+                application.Idling += OnIdling;
             }
             catch (Exception ex)
             {
@@ -60,12 +65,13 @@ namespace HOK.MissionControl
         {
             LogUtil.WriteLog();
 
-            application.ControlledApplication.DocumentOpening -= CollectConfigurationOnOpening;
-            application.ControlledApplication.DocumentOpened -= RegisterUpdatersOnOpen;
+            application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
+            application.ControlledApplication.DocumentOpened -= OnDocumentOpened;
             application.ControlledApplication.FailuresProcessing -= FailureProcessor.CheckFailure;
-            application.ControlledApplication.DocumentClosing -= UnregisterUpdaterOnClosing;
-            application.ControlledApplication.DocumentSynchronizingWithCentral -= DocumentSynchronizing;
-            application.ControlledApplication.DocumentSynchronizedWithCentral -= DocumentSynchronized;
+            application.ControlledApplication.DocumentClosing -= OnDocumentClosing;
+            application.ControlledApplication.DocumentSynchronizingWithCentral -= OnDocumentSynchronizing;
+            application.ControlledApplication.DocumentSynchronizedWithCentral -= OnDocumentSynchronized;
+            application.Idling -= OnIdling;
 
             return Result.Succeeded;
         }
@@ -73,18 +79,18 @@ namespace HOK.MissionControl
         /// <summary>
         /// Retrieves the configuration from Database.
         /// </summary>
-        private void CollectConfigurationOnOpening(object source, DocumentOpeningEventArgs args)
+        private void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
         {
             try
             {
                 var pathName = args.PathName;
-                if (string.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
+                if (String.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
 
                 var fileInfo = BasicFileInfo.Extract(pathName);
                 if (!fileInfo.IsWorkshared) return;
 
                 var centralPath = fileInfo.CentralPath;
-                if (string.IsNullOrEmpty(centralPath)) return;
+                if (String.IsNullOrEmpty(centralPath)) return;
 
                 //serch for config
                 LogUtil.AppendLog(centralPath + " Opening.");
@@ -146,7 +152,7 @@ namespace HOK.MissionControl
         /// <summary>
         /// Registers IUpdaters
         /// </summary>
-        private void RegisterUpdatersOnOpen(object source, DocumentOpenedEventArgs args)
+        private void OnDocumentOpened(object source, DocumentOpenedEventArgs args)
         {
             try
             {
@@ -156,7 +162,7 @@ namespace HOK.MissionControl
                 if (!doc.IsWorkshared) return;
 
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (string.IsNullOrEmpty(centralPath)) return;
+                if (String.IsNullOrEmpty(centralPath)) return;
 
                 // (Konrad) Register Updaters that are in the config file.
                 SingleSessionMonitor.OpenedDocuments.Add(centralPath);
@@ -189,9 +195,22 @@ namespace HOK.MissionControl
         }
 
         /// <summary>
+        /// Publishes FamilyMonitor data.
+        /// </summary>
+        private void OnIdling(object sender, IdlingEventArgs e)
+        {
+            if (!RunExport) return;
+
+            var uiApp = sender as UIApplication;
+            var doc = uiApp?.ActiveUIDocument.Document;
+            var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+            FamilyMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
+        }
+
+        /// <summary>
         /// Unregisters all IUpdaters that were registered onDocumentOpening
         /// </summary>
-        private void UnregisterUpdaterOnClosing(object source, DocumentClosingEventArgs args)
+        private void OnDocumentClosing(object source, DocumentClosingEventArgs args)
         {
             try
             {
@@ -199,46 +218,26 @@ namespace HOK.MissionControl
                 if (!doc.IsWorkshared) return;
 
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (string.IsNullOrEmpty(centralPath)) return;
+                var response = ServerUtil.GetFamilyStats(ProjectDictionary[centralPath].worksets.FirstOrDefault(), "familystats");
+                var lastWeek = DateTime.Now.AddDays(-7);
+                var alreadyPosted = response.familyStats.FirstOrDefault(x => x.createdOn > lastWeek && x.createdBy == Environment.UserName);
 
-                SingleSessionMonitor.CloseFile(centralPath);
-                if (!ConfigDictionary.ContainsKey(centralPath)) return;
-
-                var configFound = ConfigDictionary[centralPath];
-                foreach (var updater in configFound.updaters)
+                if (alreadyPosted == null)
                 {
-                    if (!updater.isUpdaterOn) { continue; }
-                    if (string.Equals(updater.updaterId.ToLower(), 
-                        DoorUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    var dialogResult = MessageBox.Show("Want to export family info?", "Mission Control", MessageBoxButtons.YesNo);
+                    if (dialogResult == DialogResult.Yes)
                     {
-                        DoorUpdaterInstance.Unregister(doc);
+                        if (args.Cancellable) args.Cancel();
+                        RunExport = !RunExport;
                     }
-                    else if (string.Equals(updater.updaterId.ToLower(), 
-                        DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    else
                     {
-                        DtmUpdaterInstance.Unregister(doc);
-                    }
-                    else if (string.Equals(updater.updaterId.ToLower(),
-                        RevisionUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        RevisionUpdaterInstance.Unregister(doc);
+                        UnregisterUpdaters(doc);
                     }
                 }
-
-                // (Konrad) Setup Workset Item count.
-                if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return;
-
-                bool refreshProject;
-                WorksetItemCount.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], centralPath, out refreshProject);
-
-                if (!refreshProject) return;
-
-                var projectFound = ServerUtil.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
-                if (null == projectFound) return;
-
-                if (ProjectDictionary.ContainsKey(centralPath))
+                else
                 {
-                    ProjectDictionary[centralPath] = projectFound;
+                    UnregisterUpdaters(doc);
                 }
             }
             catch (Exception ex)
@@ -250,7 +249,7 @@ namespace HOK.MissionControl
         /// <summary>
         /// Handler for Document Synchronizing event.
         /// </summary>
-        private void DocumentSynchronizing(object source, DocumentSynchronizingWithCentralEventArgs args)
+        private void OnDocumentSynchronizing(object source, DocumentSynchronizingWithCentralEventArgs args)
         {
             try
             {
@@ -260,7 +259,7 @@ namespace HOK.MissionControl
 
                 var doc = args.Document;
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (string.IsNullOrEmpty(centralPath)) return;
+                if (String.IsNullOrEmpty(centralPath)) return;
 
                 // (Konrad) Setup Workset Open Monitor
                 if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return;
@@ -287,7 +286,7 @@ namespace HOK.MissionControl
         /// <summary>
         /// Document Synchronized handler.
         /// </summary>
-        private static void DocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
+        private static void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
         {
             try
             {
@@ -312,17 +311,17 @@ namespace HOK.MissionControl
                 {
                     if (!updater.isUpdaterOn) continue;
 
-                    if (string.Equals(updater.updaterId.ToLower(),
+                    if (String.Equals(updater.updaterId.ToLower(),
                         DoorUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         DoorUpdaterInstance.Register(doc, updater);
                     }
-                    else if (string.Equals(updater.updaterId.ToLower(),
+                    else if (String.Equals(updater.updaterId.ToLower(),
                         DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         DtmUpdaterInstance.Register(doc, updater);
                     }
-                    else if (string.Equals(updater.updaterId.ToLower(),
+                    else if (String.Equals(updater.updaterId.ToLower(),
                         RevisionUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         RevisionUpdaterInstance.Register(doc, updater);
@@ -332,6 +331,58 @@ namespace HOK.MissionControl
             catch (Exception ex)
             {
                 LogUtil.AppendLog("ApplyConfiguration:" + ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Unregisters all updaters as well as posts data.
+        /// </summary>
+        /// <param name="doc">Revit Document</param>
+        private void UnregisterUpdaters(Document doc)
+        {
+            var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+            if (string.IsNullOrEmpty(centralPath)) return;
+
+            SingleSessionMonitor.CloseFile(centralPath);
+            if (!ConfigDictionary.ContainsKey(centralPath)) return;
+
+            var configFound = ConfigDictionary[centralPath];
+            foreach (var updater in configFound.updaters)
+            {
+                if (!updater.isUpdaterOn) { continue; }
+                if (string.Equals(updater.updaterId.ToLower(),
+                    DoorUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                {
+                    DoorUpdaterInstance.Unregister(doc);
+                }
+                else if (string.Equals(updater.updaterId.ToLower(),
+                    DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                {
+                    DtmUpdaterInstance.Unregister(doc);
+                }
+                else if (string.Equals(updater.updaterId.ToLower(),
+                    RevisionUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                {
+                    RevisionUpdaterInstance.Unregister(doc);
+                }
+            }
+
+            // (Konrad) Setup Workset Item count.
+            if (!ProjectDictionary.ContainsKey(centralPath)) return;
+
+            bool refreshProject;
+            WorksetItemCount.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], centralPath, out refreshProject);
+            ViewMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
+            LinkMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
+
+            if (!refreshProject) return;
+
+            var projectFound = ServerUtil.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
+            if (null == projectFound) return;
+
+            if (ProjectDictionary.ContainsKey(centralPath))
+            {
+                ProjectDictionary[centralPath] = projectFound;
             }
         }
     }

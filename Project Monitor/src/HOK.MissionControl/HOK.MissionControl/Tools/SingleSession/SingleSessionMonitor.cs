@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using HOK.MissionControl.Core.Classes;
+using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.SingleSession

@@ -1,5 +1,4 @@
-﻿
-namespace HOK.MissionControl.Core.Classes
+﻿namespace HOK.MissionControl.Core.Schemas
 {
     public class ProjectAddress
     {

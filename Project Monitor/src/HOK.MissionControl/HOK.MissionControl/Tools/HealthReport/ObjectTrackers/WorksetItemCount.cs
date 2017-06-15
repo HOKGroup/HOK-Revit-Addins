@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Autodesk.Revit.DB;
-using HOK.MissionControl.Core.Classes;
+using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Utils;
 
-namespace HOK.MissionControl.Tools.WorksetMonitor
+namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
 {
     public class WorksetItemCount
     {
-        public static Guid UpdaterGuid { get; set; } = new Guid("56603be6-aeb2-45d0-9ebc-2830fad6368b");
+        public static Guid UpdaterGuid { get; set; } = new Guid(Properties.Resources.HealthReportTrackerGuid);
 
         /// <summary>
         /// Publishes Workset Item Count data when Document is closed.
@@ -25,13 +26,7 @@ namespace HOK.MissionControl.Tools.WorksetMonitor
             refreshProject = false;
             try
             {
-                var worksetDocumentId = project.worksets.FirstOrDefault();
-                var updaterFound = config.updaters
-                    .Where(x => string.Equals(x.updaterId.ToLower(), UpdaterGuid.ToString().ToLower(),
-                        StringComparison.Ordinal))
-                    .ToList();
-
-                if (!updaterFound.Any() || !updaterFound.First().isUpdaterOn) return;
+                if (!MonitorUntilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
 
                 var worksets = new FilteredWorksetCollector(doc)
                     .OfKind(WorksetKind.UserWorkset)
@@ -43,22 +38,19 @@ namespace HOK.MissionControl.Tools.WorksetMonitor
                     var worksetFilter = new ElementWorksetFilter(w.Id, false);
                     var count = new FilteredElementCollector(doc)
                         .WherePasses(worksetFilter)
-                        .Count();
+                        .GetElementCount();
 
                     worksetInfo.Add(new Item {name = w.Name, count = count});
                 }
 
                 // (Konrad) It's possible that Workset Document doesn't exist in database yet.
                 // Create it and set the reference to it in Project if that's the case.
+                var worksetDocumentId = project.worksets.FirstOrDefault();
                 if (string.IsNullOrEmpty(worksetDocumentId))
                 {
                     worksetDocumentId = ServerUtil.PostWorksetData();
                     var status = ServerUtil.AddWorksetToProject(project, worksetDocumentId);
-
-                    if (status == HttpStatusCode.Created)
-                    {
-                        refreshProject = true;
-                    }
+                    if (status == HttpStatusCode.Created) refreshProject = true;
                 }
 
                 // (Konrad) Publish information about workset counts in the model.

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using HOK.MissionControl.Core.Classes;
+using HOK.MissionControl.Core.Schemas;
 using RestSharp;
 
 namespace HOK.MissionControl.Core.Utils
@@ -160,6 +160,32 @@ namespace HOK.MissionControl.Core.Utils
             return configFound;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="worksetDocumentId"></param>
+        /// <param name="route"></param>
+        /// <returns></returns>
+        public static FamilyResponse GetFamilyStats(string worksetDocumentId, string route)
+        {
+            var items = new FamilyResponse();
+            try
+            {
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + route, Method.GET);
+                var response = client.Execute<FamilyResponse>(request);
+                if (null != response.Data)
+                {
+                    items = response.Data;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUtil.AppendLog("ServerUtil-GetFamilyStats:" + ex.Message);
+            }
+            return items;
+        }
+
         //public static List<TriggerRecord> GetTriggerRecords(string query)
         //{
         //    List<TriggerRecord> items = new List<TriggerRecord>();
@@ -305,9 +331,9 @@ namespace HOK.MissionControl.Core.Utils
                 var request = new RestRequest(ApiVersion + "/worksets", Method.POST);
                 request.AddHeader("Content-type", "application/json");
                 request.RequestFormat = DataFormat.Json;
-                request.AddBody(new WorksetData());
+                request.AddBody(new HealthReportData());
 
-                var resresponse = client.Execute<WorksetData>(request);
+                var resresponse = client.Execute<HealthReportData>(request);
                 response = resresponse.Data.Id;
             }
             catch (Exception ex)
@@ -352,6 +378,31 @@ namespace HOK.MissionControl.Core.Utils
             catch (Exception e)
             {
                 LogUtil.AppendLog("ServerUtil-PostWorksetInfo: " + e.Message);
+            }
+            return status;
+        }
+
+        /// <summary>
+        /// POST Statistics for Model Info functionality
+        /// </summary>
+        /// <param name="worksetInfo">Worksets document class.</param>
+        /// <param name="worksetDocumentId">Worksets document _id.</param>
+        /// <param name="route">MongoDB route string.</param>
+        /// <returns>Response status.</returns>
+        public static HttpStatusCode PostStats<T>(T worksetInfo, string worksetDocumentId, string route)
+        {
+            var status = HttpStatusCode.Unused;
+            try
+            {
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + route, Method.POST) { RequestFormat = DataFormat.Json };
+                request.AddBody(worksetInfo);
+                var response = client.Execute(request);
+                status = response.StatusCode;
+            }
+            catch (Exception e)
+            {
+                LogUtil.AppendLog("ServerUtil-PostStats: " + e.Message);
             }
             return status;
         }
