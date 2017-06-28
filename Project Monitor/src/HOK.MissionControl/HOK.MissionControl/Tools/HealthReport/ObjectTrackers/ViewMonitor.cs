@@ -22,7 +22,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
         {
             try
             {
-                if (!MonitorUntilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
+                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
                 var worksetDocumentId = project.worksets.FirstOrDefault();
                 if (string.IsNullOrEmpty(worksetDocumentId)) return;
 
@@ -52,11 +52,11 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                     {
                         case ViewType.DrawingSheet:
                             sheetTotalCount++;
-                            var viewIds = ((ViewSheet) v).GetAllPlacedViews();
+                            var viewIds = ((ViewSheet)v).GetAllPlacedViews();
                             foreach (var id in viewIds)
                             {
                                 viewsOnSheet++;
-                                var view = (View) doc.GetElement(id);
+                                var view = (View)doc.GetElement(id);
                                 if (view.ViewTemplateId != ElementId.InvalidElementId) viewsOnSheetWithTemplate++;
                             }
                             break;

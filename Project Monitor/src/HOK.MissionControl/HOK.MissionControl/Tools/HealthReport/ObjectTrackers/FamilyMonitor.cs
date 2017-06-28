@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
@@ -27,7 +25,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
         {
             try
             {
-                if (!MonitorUntilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
+                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
                 var worksetDocumentId = project.worksets.FirstOrDefault();
                 if (string.IsNullOrEmpty(worksetDocumentId)) return;
 
@@ -40,12 +38,19 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                 var inPlaceFamilies = 0;
                 foreach (var family in new FilteredElementCollector(doc).OfClass(typeof(Family)).Cast<Family>())
                 {
+                    var sizeCheck = false;
+                    var instanceCheck = false;
+                    var nameCheck = false;
+
                     totalFamilies++;
                     var instances = CountFamilyInstances(family);
-                    if (instances == 0) unusedFamilies++;
-                    if(family.FamilyCategory.Name == "Mass") inPlaceFamilies++ ;
+                    if (instances == 0)
+                    {
+                        unusedFamilies++;
+                        instanceCheck = true;
+                    }
 
-
+                    if (family.FamilyCategory.Name == "Mass") inPlaceFamilies++;
                     if (!family.IsEditable) continue;
 
                     try
@@ -57,24 +62,34 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
 
                         var size = new FileInfo(path).Length;
                         var sizeStr = BytesToString(size);
-                        if (size > 1000000) oversizedFamilies++; // >1MB
-
-                        var famItem = new FamilyItem
+                        if (size > 1000000)
                         {
-                            name = family.Name,
-                            elementId = family.Id.IntegerValue,
-                            size = sizeStr,
-                            sizeValue = size,
-                            instances = instances
-                        };
+                            oversizedFamilies++; // >1MB
+                            sizeCheck = true;
+                        }
 
-                        suspectFamilies.Add(famItem);
+                        if (!family.Name.Contains("_HOK_I") && !family.Name.Contains("_HOK_M")) nameCheck = true;
+
+                        // (Konrad) We only want to export families that don't have proper name, are oversized or unplaced.
+                        if (nameCheck || sizeCheck || instanceCheck)
+                        {
+                            var famItem = new FamilyItem
+                            {
+                                name = family.Name,
+                                elementId = family.Id.IntegerValue,
+                                size = sizeStr,
+                                sizeValue = size,
+                                instances = instances
+                            };
+
+                            suspectFamilies.Add(famItem);
+                        }
                         famDoc.Close(false);
                         TryToDelete(path);
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        // ignored
+                        LogUtil.AppendLog("FamilyMonitor-PublishData: " + e.Message);
                     }
                 }
 
@@ -89,34 +104,11 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                 };
 
                 ServerUtil.PostStats(familyStats, worksetDocumentId, "familystats");
-
                 AppCommand.RunExport = false;
-
-                var dialogResult = MessageBox.Show("Thank you for exporting!", "Mission Control", MessageBoxButtons.OK);
-                if (dialogResult == DialogResult.Yes)
-                {
-                    ThreadPool.QueueUserWorkItem(CloseDocument);
-                }
             }
             catch (Exception e)
             {
-                LogUtil.AppendLog("LinkMonitor-PublishData: " + e.Message);
-            }
-        }
-
-        /// <summary>
-        /// Since Revit doesn't allow for closing of ActiveDocument we need to mimic it with "CTRL + F4"
-        /// </summary>
-        /// <param name="stateInfo"></param>
-        private static void CloseDocument(object stateInfo)
-        {
-            try
-            {
-                SendKeys.SendWait("^{F4}");
-            }
-            catch
-            {
-                // ignored
+                LogUtil.AppendLog("FamilyMonitor-PublishData: " + e.Message);
             }
         }
 
@@ -146,9 +138,9 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
             {
                 File.Delete(path);
             }
-            catch (IOException)
+            catch (IOException e)
             {
-                // ignored
+                LogUtil.AppendLog("FamilyMonitor-PublishData: " + e.Message);
             }
         }
 
@@ -165,7 +157,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
             {
                 foreach (var id in famSymbolIds)
                 {
-                    var famSymbol = (FamilySymbol) f.Document.GetElement(id);
+                    var famSymbol = (FamilySymbol)f.Document.GetElement(id);
                     var filter = new FamilyInstanceFilter(Doc, famSymbol.Id);
                     count = count + new FilteredElementCollector(Doc).WherePasses(filter).GetElementCount();
                 }

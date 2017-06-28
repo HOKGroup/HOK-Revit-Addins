@@ -26,7 +26,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
             refreshProject = false;
             try
             {
-                if (!MonitorUntilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
+                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
 
                 var worksets = new FilteredWorksetCollector(doc)
                     .OfKind(WorksetKind.UserWorkset)
@@ -78,4 +78,3 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
         }
     }
 }
-

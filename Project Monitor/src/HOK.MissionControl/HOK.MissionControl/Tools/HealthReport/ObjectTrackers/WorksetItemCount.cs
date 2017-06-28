@@ -26,7 +26,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
             refreshProject = false;
             try
             {
-                if (!MonitorUntilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
+                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
 
                 var worksets = new FilteredWorksetCollector(doc)
                     .OfKind(WorksetKind.UserWorkset)
@@ -40,7 +40,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                         .WherePasses(worksetFilter)
                         .GetElementCount();
 
-                    worksetInfo.Add(new Item {name = w.Name, count = count});
+                    worksetInfo.Add(new Item { name = w.Name, count = count });
                 }
 
                 // (Konrad) It's possible that Workset Document doesn't exist in database yet.
@@ -54,7 +54,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                 }
 
                 // (Konrad) Publish information about workset counts in the model.
-                ServerUtil.PostWorksetCounts(new WorksetItem{worksets = worksetInfo}, worksetDocumentId);
+                ServerUtil.PostWorksetCounts(new WorksetItem { worksets = worksetInfo }, worksetDocumentId);
             }
             catch (Exception e)
             {

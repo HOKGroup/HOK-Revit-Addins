@@ -21,7 +21,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
         {
             try
             {
-                if (!MonitorUntilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
+                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
                 var worksetDocumentId = project.worksets.FirstOrDefault();
                 if (string.IsNullOrEmpty(worksetDocumentId)) return;
 
@@ -60,7 +60,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
 
                 var cadLinksDic = new FilteredElementCollector(doc)
                     .OfClass(typeof(CADLinkType))
-                    .Select(x => new DwgFileInfo {name = x.Name, elementId = x.Id.IntegerValue})
+                    .Select(x => new DwgFileInfo { name = x.Name, elementId = x.Id.IntegerValue })
                     .ToDictionary(key => key.elementId, value => value);
                 var totalImportInstance = 0;
                 foreach (var ii in new FilteredElementCollector(doc).OfClass(typeof(ImportInstance)).Cast<ImportInstance>())
@@ -70,7 +70,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                     if (cadLinksDic[id].instances == 0)
                     {
                         cadLinksDic[id].isViewSpecific = ii.ViewSpecific;
-                        cadLinksDic[id].isLinked = ii.IsLinked; 
+                        cadLinksDic[id].isLinked = ii.IsLinked;
                     }
                     cadLinksDic[id].instances = cadLinksDic[id].instances + 1;
                 }
@@ -81,7 +81,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                     importedDwgFiles = cadLinksDic.Values.ToList(),
                     unusedLinkedImages = totalUnusedImages,
                     totalDwgStyles = totalDwgStyles,
-                    totalImportedStyles = totalImportedStyles, 
+                    totalImportedStyles = totalImportedStyles,
                     totalLinkedModels = totalLinkedCad + totalLinkedRvt,
                     totalLinkedDwg = totalLinkedCad
                 };

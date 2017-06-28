@@ -4,7 +4,7 @@ using HOK.MissionControl.Core.Schemas;
 
 namespace HOK.MissionControl.Utils
 {
-    public static class MonitorUntilities
+    public static class MonitorUtilities
     {
         /// <summary>
         /// Checks if given updater is present and is turned on.

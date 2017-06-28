@@ -129,6 +129,11 @@
     </Compile>
     <Compile Include="Tools\DTMTool\ReportingElementInfo.cs" />
     <Compile Include="Tools\HealthReport\ObjectTrackers\FamilyMonitor.cs" />
+    <Compile Include="Tools\HealthReport\ObjectTrackers\FamilyMonitorView.xaml.cs">
+      <DependentUpon>FamilyMonitorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\HealthReport\ObjectTrackers\FamilyMonitorViewModel.cs" />
+    <Compile Include="Tools\HealthReport\ObjectTrackers\ModelMonitor.cs" />
     <Compile Include="Tools\SheetTracker\RevisionFailure.cs" />
     <Compile Include="Tools\SheetTracker\RevisionUpdater.cs" />
     <Compile Include="Tools\SingleSession\SingleSessionMonitor.cs" />
@@ -151,6 +156,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Tools\DTMTool\DTMWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\HealthReport\ObjectTrackers\FamilyMonitorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -179,6 +188,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Tools\HealthReport\ObjectTrackers\Images\familyMonitorDialog_300.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

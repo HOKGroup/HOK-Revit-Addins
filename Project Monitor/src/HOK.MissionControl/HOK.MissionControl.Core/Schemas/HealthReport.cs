@@ -120,6 +120,27 @@ namespace HOK.MissionControl.Core.Schemas
 
     }
 
+    public class EventTime
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+        public double value { get; set; }
+        public DateTime createdOn { get; set; } = DateTime.Now;
+    }
+
+    public class SessionInfo
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+        public string user { get; set; }
+        public DateTime from { get; set; } = DateTime.Now;
+        public DateTime to { get; set; } = DateTime.Now;
+        public List<DateTime> synched { get; set; } = new List<DateTime>();
+        public DateTime createdOn { get; set; } = DateTime.Now;
+    }
+
     /// <summary>
     /// Main MongoDB Collection for Health Report Data.
     /// </summary>
@@ -134,6 +155,10 @@ namespace HOK.MissionControl.Core.Schemas
         public List<ViewStat> viewStats { get; set; } = new List<ViewStat>();
         public List<LinkStat> linkStats { get; set; } = new List<LinkStat>();
         public List<FamilyStat> familyStats { get; set; } = new List<FamilyStat>();
+        public List<EventTime> openTimes { get; set; } = new List<EventTime>();
+        public List<EventTime> synchTimes { get; set; } = new List<EventTime>();
+        public List<EventTime> modelSizes { get; set; } = new List<EventTime>();
+        public List<SessionInfo> sessionLogs { get; set; } = new List<SessionInfo>();
     }
 
     #region GET

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
@@ -20,12 +19,16 @@ namespace HOK.MissionControl
     public class AppCommand : IExternalApplication
     {
         public static AppCommand Instance { get; private set; }
+        public static bool RunExport { get; set; }
+        public static SessionInfo SessionInfo { get; set; }
+        public static Dictionary<string, DateTime> SynchTime { get; set; }
+        public static Dictionary<string, DateTime> OpenTime { get; set; }
+
         public Dictionary<string, Configuration> ConfigDictionary { get; set; } = new Dictionary<string, Configuration>();
         public Dictionary<string, Project> ProjectDictionary { get; set; } = new Dictionary<string, Project>();
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
         public RevisionUpdater RevisionUpdaterInstance { get; set; }
-        public static bool RunExport { get; set; }
 
         /// <summary>
         /// Registers all event handlers during startup.
@@ -84,16 +87,16 @@ namespace HOK.MissionControl
             try
             {
                 var pathName = args.PathName;
-                if (String.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
+                if (string.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
 
                 var fileInfo = BasicFileInfo.Extract(pathName);
                 if (!fileInfo.IsWorkshared) return;
 
                 var centralPath = fileInfo.CentralPath;
-                if (String.IsNullOrEmpty(centralPath)) return;
+                if (string.IsNullOrEmpty(centralPath)) return;
 
                 //serch for config
-                LogUtil.AppendLog(centralPath + " Opening.");
+                LogUtil.AppendLog(centralPath + " Opening...");
                 var configFound = ServerUtil.GetConfigurationByCentralPath(centralPath);
                 if (null != configFound)
                 {
@@ -128,6 +131,8 @@ namespace HOK.MissionControl
                         ProjectDictionary.Add(centralPath, projectFound);
                     }
 
+                    OpenTime["from"] = DateTime.Now;
+
                     LogUtil.AppendLog("Configuration Found: " + configFound.Id);
                 }
                 else
@@ -145,7 +150,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                LogUtil.AppendLog("CollectConfigurationOnOpening:" + ex.Message);
+                LogUtil.AppendLog("OnDocumentOpening:" + ex.Message);
             }
         }
 
@@ -162,7 +167,7 @@ namespace HOK.MissionControl
                 if (!doc.IsWorkshared) return;
 
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (String.IsNullOrEmpty(centralPath)) return;
+                if (string.IsNullOrEmpty(centralPath)) return;
 
                 // (Konrad) Register Updaters that are in the config file.
                 SingleSessionMonitor.OpenedDocuments.Add(centralPath);
@@ -177,16 +182,15 @@ namespace HOK.MissionControl
 
                 bool refreshProject;
                 WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onOpen, centralPath, out refreshProject);
+                ModelMonitor.PublishModelSize(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], centralPath);
+                ModelMonitor.PublishOpenTime(ProjectDictionary[centralPath].worksets.First());
+                ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.First(), SessionEvent.documentOpened);
 
                 if (!refreshProject) return;
 
                 var projectFound = ServerUtil.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
                 if (null == projectFound) return;
-
-                if (ProjectDictionary.ContainsKey(centralPath))
-                {
-                    ProjectDictionary[centralPath] = projectFound;
-                }
+                ProjectDictionary[centralPath] = projectFound; // this won't be null since we checked before.
             }
             catch (Exception ex)
             {
@@ -222,10 +226,13 @@ namespace HOK.MissionControl
                 var lastWeek = DateTime.Now.AddDays(-7);
                 var alreadyPosted = response.familyStats.FirstOrDefault(x => x.createdOn > lastWeek && x.createdBy == Environment.UserName);
 
-                if (alreadyPosted == null)
+                // TODO: Change to == when done with testing!
+                if (alreadyPosted != null)
                 {
-                    var dialogResult = MessageBox.Show("Want to export family info?", "Mission Control", MessageBoxButtons.YesNo);
-                    if (dialogResult == DialogResult.Yes)
+                    var famViewModel = new FamilyMonitorViewModel();
+                    var famWindow = new FamilyMonitorView { DataContext = famViewModel };
+                    var showDialog = famWindow.ShowDialog();
+                    if (showDialog != null && (bool)showDialog)
                     {
                         if (args.Cancellable) args.Cancel();
                         RunExport = !RunExport;
@@ -259,13 +266,14 @@ namespace HOK.MissionControl
 
                 var doc = args.Document;
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (String.IsNullOrEmpty(centralPath)) return;
+                if (string.IsNullOrEmpty(centralPath)) return;
 
                 // (Konrad) Setup Workset Open Monitor
                 if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return;
 
                 bool refreshProject;
                 WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onSynch, centralPath, out refreshProject);
+                SynchTime["from"] = DateTime.Now;
 
                 if (!refreshProject) return;
 
@@ -286,15 +294,22 @@ namespace HOK.MissionControl
         /// <summary>
         /// Document Synchronized handler.
         /// </summary>
-        private static void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
+        private void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
         {
             try
             {
+                if (args.Document == null) return;
+
+                var doc = args.Document;
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                ModelMonitor.PublishSynchTime(ProjectDictionary[centralPath].worksets.First());
+                ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.First(), SessionEvent.documentSynched);
+
                 FailureProcessor.IsSynchronizing = false;
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                LogUtil.AppendLog("OnDocumentSynchronized:" + ex.Message);
             }
         }
 
@@ -311,17 +326,17 @@ namespace HOK.MissionControl
                 {
                     if (!updater.isUpdaterOn) continue;
 
-                    if (String.Equals(updater.updaterId.ToLower(),
+                    if (string.Equals(updater.updaterId.ToLower(),
                         DoorUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         DoorUpdaterInstance.Register(doc, updater);
                     }
-                    else if (String.Equals(updater.updaterId.ToLower(),
+                    else if (string.Equals(updater.updaterId.ToLower(),
                         DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         DtmUpdaterInstance.Register(doc, updater);
                     }
-                    else if (String.Equals(updater.updaterId.ToLower(),
+                    else if (string.Equals(updater.updaterId.ToLower(),
                         RevisionUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         RevisionUpdaterInstance.Register(doc, updater);
@@ -374,7 +389,9 @@ namespace HOK.MissionControl
             WorksetItemCount.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], centralPath, out refreshProject);
             ViewMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
             LinkMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
+            ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.First(), SessionEvent.documentClosed);
 
+            // TODO: Do we need this?
             if (!refreshProject) return;
 
             var projectFound = ServerUtil.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);

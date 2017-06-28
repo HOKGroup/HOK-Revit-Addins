@@ -276,7 +276,7 @@ namespace HOK.MissionControl.Core.Utils
             {
                 var client = new RestClient(RestApiBaseUrl);
                 var request =
-                    new RestRequest(ApiVersion + "/triggerrecords", Method.POST) {RequestFormat = DataFormat.Json};
+                    new RestRequest(ApiVersion + "/triggerrecords", Method.POST) { RequestFormat = DataFormat.Json };
                 request.AddBody(record);
 
                 var response = client.Execute<TriggerRecord>(request);
@@ -343,6 +343,51 @@ namespace HOK.MissionControl.Core.Utils
             return response;
         }
 
+        public static string PostSessionInfo(SessionInfo sessionInfo, string worksetDocumentId, string path)
+        {
+            var id = string.Empty;
+            try
+            {
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + path, Method.POST);
+                request.AddHeader("Content-type", "application/json");
+                request.RequestFormat = DataFormat.Json;
+                request.AddBody(sessionInfo);
+
+                var response = client.Execute<SessionInfo>(request);
+                if (response != null) id = response.Data.Id;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.AppendLog("ServerUtil-PostSessionInfo:" + ex.Message);
+            }
+            return id;
+        }
+
+        //public static HttpStatusCode UpdateSessionInfo(string worksetDocumentId, string objectId, string action)
+        //{
+            //var status = HttpStatusCode.Unused;
+            //try
+            //{
+            //    var client = new RestClient(RestApiBaseUrl);
+            //    var request = new RestRequest(apiVersion + "/configurations/" + config._id, Method.PUT);
+            //    request.RequestFormat = RestSharp.DataFormat.Json;
+            //    request.AddBody(config);
+
+            //    IRestResponse response = client.Execute(request);
+
+            //    content = response.Content;
+            //    errorMessage = response.ErrorMessage;
+            //    status = response.StatusCode;
+            //}
+            //catch (Exception ex)
+            //{
+            //    string message = ex.Message;
+            //    LogUtil.AppendLog("ServerUtil-UpdateConfiguration:" + ex.Message);
+            //}
+            //return status;
+        //}
+
         /// <summary>
         /// POST Worksets info for onOpened and onSynched events.
         /// </summary>
@@ -360,11 +405,11 @@ namespace HOK.MissionControl.Core.Utils
                 switch (state)
                 {
                     case WorksetMonitorState.onOpen:
-                        request = 
+                        request =
                             new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/onopened", Method.POST) { RequestFormat = DataFormat.Json };
                         break;
                     case WorksetMonitorState.onSynch:
-                        request = 
+                        request =
                             new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/onsynched", Method.POST) { RequestFormat = DataFormat.Json };
                         break;
                     default:
