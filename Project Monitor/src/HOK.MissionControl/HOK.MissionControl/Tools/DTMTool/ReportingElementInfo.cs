@@ -1,30 +1,58 @@
 ﻿using Autodesk.Revit.DB;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HOK.MissionControl.Tools.DTMTool
 {
     public class ReportingElementInfo : INotifyPropertyChanged
     {
         private string configId = "";
-        private string updaterId = "";
-        private string centralPath = "";
-        private string categoryName = "";
-        private string description = "";
-        private ElementId reportingElementId = ElementId.InvalidElementId;
-        private string reportingUniqueId = "";
+        public string ConfigId
+        {
+            get => configId;
+            set { configId = value; NotifyPropertyChanged("ConfigId"); }
+        }
 
-        public string ConfigId { get { return configId; } set { configId = value; NotifyPropertyChanged("ConfigId"); } }
-        public string UpdaterId { get { return updaterId; } set { updaterId = value; NotifyPropertyChanged("UpdaterId"); } }
-        public string CentralPath { get { return centralPath; } set { centralPath = value; NotifyPropertyChanged("CentralPath"); } }
-        public string CategoryName { get { return categoryName; } set { categoryName = value; NotifyPropertyChanged("CategoryName"); } }
-        public string Description { get { return description; } set { description = value; NotifyPropertyChanged("Description"); } }
-        public ElementId ReportingElementId { get { return reportingElementId; } set { reportingElementId = value; NotifyPropertyChanged("ReportingElementId"); } }
-        public string ReportingUniqueId { get { return reportingUniqueId; } set { reportingUniqueId = value; NotifyPropertyChanged("ReportingUniqueId"); } }
+        private string updaterId = "";
+        public string UpdaterId
+        {
+            get => updaterId;
+            set { updaterId = value; NotifyPropertyChanged("UpdaterId"); }
+        }
+
+        private string centralPath = "";
+        public string CentralPath
+        {
+            get => centralPath;
+            set { centralPath = value; NotifyPropertyChanged("CentralPath"); }
+        }
+
+        private string categoryName = "";
+        public string CategoryName
+        {
+            get => categoryName;
+            set { categoryName = value; NotifyPropertyChanged("CategoryName"); }
+        }
+
+        private string description = "";
+        public string Description
+        {
+            get => description;
+            set { description = value; NotifyPropertyChanged("Description"); }
+        }
+
+        private ElementId reportingElementId = ElementId.InvalidElementId;
+        public ElementId ReportingElementId
+        {
+            get => reportingElementId;
+            set { reportingElementId = value; NotifyPropertyChanged("ReportingElementId"); }
+        }
+
+        private string reportingUniqueId = "";
+        public string ReportingUniqueId
+        {
+            get => reportingUniqueId;
+            set { reportingUniqueId = value; NotifyPropertyChanged("ReportingUniqueId"); }
+        }
 
         public ReportingElementInfo()
         {
@@ -45,10 +73,7 @@ namespace HOK.MissionControl.Tools.DTMTool
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged(string info)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(info));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
     }
 }

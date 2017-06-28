@@ -1,5 +1,4 @@
 ﻿using Autodesk.Revit.DB;
-using HOK.MissionControl.Core.Classes;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
 using System;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HOK.MissionControl.Core.Schemas;
 
 namespace HOK.MissionControl.Tools.RevisionTracker
 {
@@ -44,7 +44,7 @@ namespace HOK.MissionControl.Tools.RevisionTracker
 
         public bool Register(Document doc, ProjectUpdater pUpdater)
         {
-            bool registered = false;
+            var registered = false;
             try
             {
                 if (!UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
@@ -56,7 +56,7 @@ namespace HOK.MissionControl.Tools.RevisionTracker
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
                 LogUtil.AppendLog("DoorUpdater-Register:" + ex.Message);
             }
             return registered;
@@ -74,7 +74,7 @@ namespace HOK.MissionControl.Tools.RevisionTracker
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
                 LogUtil.AppendLog("DoorUpdater-Unregister:" + ex.Message);
             }
         }
@@ -83,16 +83,16 @@ namespace HOK.MissionControl.Tools.RevisionTracker
         {
             try
             {
-                foreach (BuiltInParameter bltParam in bltParameters)
+                foreach (var bltParam in bltParameters)
                 {
-                    ElementId paramId = new ElementId((int)bltParam);
-                    string paramName = LabelUtils.GetLabelFor(bltParam);
+                    var paramId = new ElementId((int)bltParam);
+                    var paramName = LabelUtils.GetLabelFor(bltParam);
                     revisionParameters.Add(paramId, paramName);
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
         }
 
@@ -100,13 +100,13 @@ namespace HOK.MissionControl.Tools.RevisionTracker
         {
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(doc);
-                List<Element> sheets = collector.OfCategory(BuiltInCategory.OST_Revisions).WhereElementIsNotElementType().ToList();
+                var collector = new FilteredElementCollector(doc);
+                var sheets = collector.OfCategory(BuiltInCategory.OST_Revisions).WhereElementIsNotElementType().ToList();
                 idMaps = sheets.ToDictionary(o => o.Id, o => o.UniqueId);
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
         }
 
@@ -118,7 +118,7 @@ namespace HOK.MissionControl.Tools.RevisionTracker
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
         }
 
