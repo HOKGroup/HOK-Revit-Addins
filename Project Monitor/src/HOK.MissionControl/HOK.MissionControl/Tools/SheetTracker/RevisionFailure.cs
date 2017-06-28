@@ -29,7 +29,7 @@ namespace HOK.MissionControl.Tools.RevisionTracker
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
                 LogUtil.AppendLog("RevisionFailure-ProcessFailure:" + ex.Message);
             }
         }
