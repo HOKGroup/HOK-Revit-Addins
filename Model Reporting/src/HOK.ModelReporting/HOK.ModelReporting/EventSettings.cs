@@ -1,43 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Autodesk.Revit.DB;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Net;
 
+
+
 namespace HOK.ModelReporting
 {
     public class EventSettings
     {
-        private readonly Dictionary<string, string> _prefixes = new Dictionary<string, string>();
-        public Document Doc { get; set; }
-        public string DocCentralPath { get; set; } = "";
-        public string DocLocalPath { get; set; } = "";
-        public string ProjectName { get; set; } = "";
-        public string ProjectNumber { get; set; } = "";
-        public double ProjectLatitude { get; set; }
-        public double ProjectLongitude { get; set; }
-        public string FileLocation { get; set; } = "";
-        public string LocalFileLocation { get; set; } = "";
-        public string Version { get; set; } = "";
-        public string VersionNumber { get; set; } = "";
-        public bool ValidCentral { get; set; }
-        public bool OpenDetached { get; set; }
-        public bool OpenCentral { get; set; }
-        public long SizeStart { get; set; } = 0;
-        public long SizeEnd { get; set; } = 0;
-        public DateTime StartTime { get; set; } = DateTime.Now;
-        public DateTime EndTime { get; set; } = DateTime.Now;
-        public string UserLocation { get; set; } = "";
-        public string IpAddress { get; set; } = "";
-        public bool IsRecordable { get; set; } = true;
+        private Document m_doc;
+        private Dictionary<string, string> prefixes = new Dictionary<string, string>();
+        private string docCentralPath = "";
+        private string docLocalPath = "";
+        private string projectName = "";
+        private string projectNumber = "";
+        private double projectLatitude = 0;
+        private double projectLongititude = 0;
+        private string fileLocation = "";
+        private string localFileLocation = "";
+        private string version = "";
+        private string versionNumber = "";
+        private bool validCentral = false;
+        private bool openDetached = false;
+        private bool openCentral = false;
+        private long sizeStart = 0;
+        private long sizeEnd = 0;
+        private DateTime startTime = DateTime.Now;
+        private DateTime endTime = DateTime.Now;
+        private string userLocation = "";
+        private string ipAddress = "";
+        private bool isRecordable = true;
+
+        public Document Doc { get { return m_doc; } set { m_doc = value; } }
+        public string DocCentralPath { get { return docCentralPath; } set { docCentralPath = value; } }
+        public string DocLocalPath { get { return docLocalPath; } set { docLocalPath = value; } }
+        public string ProjectName { get { return projectName; } set { projectName = value; } }
+        public string ProjectNumber { get { return projectNumber; } set { projectNumber = value; } }
+        public double ProjectLatitude { get { return projectLatitude; } set { projectLatitude = value; } }
+        public double ProjectLongitude { get { return projectLongititude; } set { projectLongititude = value; } }
+        public string FileLocation { get { return fileLocation; } set { fileLocation = value; } }
+        public string LocalFileLocation { get { return localFileLocation; } set { localFileLocation = value; } }
+        public string Version { get { return version; } set { version = value; } }
+        public string VersionNumber { get { return versionNumber; } set { versionNumber = value; } }
+        public bool ValidCentral { get { return validCentral; } set { validCentral = value; } }
+        public bool OpenDetached { get { return openDetached; } set { openDetached = value; } }
+        public bool OpenCentral { get { return openCentral; } set { openCentral = value; } }
+        public long SizeStart { get { return sizeStart; } set { sizeStart = value; } }
+        public long SizeEnd { get { return sizeEnd; } set { sizeEnd = value; } }
+        public DateTime StartTime { get { return startTime; } set { startTime = value; } }
+        public DateTime EndTime { get { return endTime; } set { endTime = value; } }
+        public string UserLocation { get { return userLocation; } set { userLocation = value; } }
+        public string IPAddress { get { return ipAddress; } set { ipAddress = value; } }
+        public bool IsRecordable { get { return isRecordable; } set { isRecordable = value; } }
 
         public EventSettings(Document doc)
         {
-            Doc = doc;
+            m_doc = doc;
             GetCentralPath();
             DoSetup();
-            GetIpAddress();
+            GetIPAddress();
             GetUserLocation();
         }
 
@@ -45,86 +71,85 @@ namespace HOK.ModelReporting
         {
             try
             {
-                if (Doc.IsWorkshared)
+                if (m_doc.IsWorkshared)
                 {
-                    var modelPath = Doc.GetWorksharingCentralModelPath();
-                    var centralPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
+                    ModelPath modelPath = m_doc.GetWorksharingCentralModelPath();
+                    string centralPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
                     if (!string.IsNullOrEmpty(centralPath))
                     {
-                        ValidCentral = true;
-                        OpenDetached = false;
-                        DocCentralPath = centralPath;
+                        validCentral = true;
+                        openDetached = false;
+                        docCentralPath = centralPath;
                     }
                     else
                     {
                         //detached
-                        ValidCentral = false;
-                        OpenDetached = true;
-                        DocCentralPath = Doc.PathName;
+                        validCentral = false;
+                        openDetached = true;
+                        docCentralPath = m_doc.PathName;
                     }
                 }
                 else
                 {
-                    ValidCentral = false;
-                    OpenDetached = false;
-                    DocCentralPath = Doc.PathName;
+                    validCentral = false;
+                    openDetached = false;
+                    docCentralPath = m_doc.PathName;
                 }
-                DocLocalPath = Doc.PathName;
+                docLocalPath = m_doc.PathName;
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                ValidCentral = false;
-                DocCentralPath = Doc.PathName;
-                DocLocalPath = Doc.PathName;
+                string message = ex.Message;
+                validCentral = false;
+                docCentralPath = m_doc.PathName;
+                docLocalPath = m_doc.PathName;
             }
             finally
             {
-                if (ValidCentral && (DocCentralPath == DocLocalPath))
+                if (validCentral && (docCentralPath == docLocalPath))
                 {
-                    OpenCentral = true;
+                    openCentral = true;
                 }
             }
         }
 
         private void DoSetup()
         {
-            _prefixes.Add("E-CAD", "E-CAD");
-            _prefixes.Add("E-BIM", "E-BIM");
-            _prefixes.Add("REVIT", "REVIT");
-            _prefixes.Add("E-Design", "E-Design");
+            prefixes.Add("E-CAD", "E-CAD");
+            prefixes.Add("E-BIM", "E-BIM");
+            prefixes.Add("REVIT", "REVIT");
+            prefixes.Add("E-Design", "E-Design");
 
-            // Get ProjectName and ProjectNumber
-            if (!string.IsNullOrEmpty(DocCentralPath))
+            //Get ProjectName and ProjectNumber
+            if (!string.IsNullOrEmpty(docCentralPath))
             {
                 try
                 {
-                    const string regPattern = @"[\\|/](\d{2}\.\d{5}\.\d{2})\s+(.+?(?=[\\|/]))";
-                    var regex = new Regex(regPattern, RegexOptions.IgnoreCase);
-                    var match = regex.Match(DocCentralPath);
+                    //string regPattern = @"\\([0-9]{2}[\.|\-][0-9]{4,5}[\.|\-][0-9]{2})(.*?)\\";
+                    string regPattern = @"[\\|/](\d{2}\.\d{5}\.\d{2})\s+(.+?(?=[\\|/]))";
+                    Regex regex = new Regex(regPattern, RegexOptions.IgnoreCase);
+                    Match match = regex.Match(docCentralPath);
                     if (match.Success)
                     {
-                        ProjectNumber = match.Groups[1].Value;
-                        ProjectName = match.Groups[2].Value;
+                        projectNumber = match.Groups[1].Value;
+                        projectName = match.Groups[2].Value;
                     }
                 }
-                catch
-                {
-                    // ignored
-                }
+                catch { }
 
-                if(string.IsNullOrEmpty(ProjectNumber))
+                if(string.IsNullOrEmpty(projectNumber))
                 {
-                    ProjectName=GetProjectName(DocCentralPath);
-                    ProjectNumber = "00.00000.00";
+                    projectName=GetProjectName(docCentralPath);
+                    projectNumber = "00.00000.00";
 
-                    if (DocCentralPath.StartsWith(@"\\GROUP\HOK") || DocCentralPath.StartsWith("RSN:") || DocCentralPath.StartsWith("A360:"))
+                    if (docCentralPath.StartsWith(@"\\GROUP\HOK") || docCentralPath.StartsWith("RSN:") || docCentralPath.StartsWith("A360:"))
                     {
-                        IsRecordable = true;
+                        isRecordable = true;
                     }
                     else
                     {
-                        IsRecordable = false;
+                        isRecordable = false;
                     }
                 }
             }
@@ -132,56 +157,45 @@ namespace HOK.ModelReporting
             //Get Project Location: Longitude, Latitude
             try
             {
-                var projectLocation = Doc.ActiveProjectLocation;
-                var site = projectLocation.SiteLocation;
+                ProjectLocation projectLocation = m_doc.ActiveProjectLocation;
+                SiteLocation site = projectLocation.SiteLocation;
                 const double angleRatio = Math.PI / 180;
 
-                ProjectLatitude = site.Latitude / angleRatio;
-                ProjectLongitude = site.Longitude / angleRatio;
+                projectLatitude = site.Latitude / angleRatio;
+                projectLongititude = site.Longitude / angleRatio;
             }
-            catch
-            {
-                // ignored
-            }
+            catch { }
 
             //Get File Location
             try
             {
-                FileLocation = GetFileLocation(DocCentralPath);
-                LocalFileLocation = GetFileLocation(DocLocalPath);
+                fileLocation = GetFileLocation(docCentralPath);
+                localFileLocation = GetFileLocation(docLocalPath);
             }
-            catch
-            {
-                // ignored
-            }
+            catch { }
 
             //Get Version Number
             try
             {
-                VersionNumber = Doc.Application.VersionNumber;
+                versionNumber = m_doc.Application.VersionNumber;
             }
-            catch
-            {
-                // ignored
-            }
+            catch { }
            
         }
 
-        private static string GetFileLocation(string path)
+        private string GetFileLocation(string path)
         {
-            var fileLocation = "";
+            string fileLocation = "";
             try
             {
                 if (!string.IsNullOrEmpty(path))
                 {
-                    var regServer =
-                        new Regex(
-                            @"^\\\\group\\hok\\(.+?(?=\\))|[\\|/](\w{2,3})-\d{2}svr(\.group\.hok\.com)?[\\|/]|^[rR]:\\(\w{2,3})\\",
-                            RegexOptions.IgnoreCase);
-                    var regMatch = regServer.Match(path);
+                    //Regex regServer = new Regex(@"^\\\\group\\hok\\(.+?(?=\\))|^\\\\(.{2,3})-\d{2}svr(\.group\.hok\.com)?\\", RegexOptions.IgnoreCase);
+                    Regex regServer = new Regex(@"^\\\\group\\hok\\(.+?(?=\\))|[\\|/](\w{2,3})-\d{2}svr(\.group\.hok\.com)?[\\|/]|^[rR]:\\(\w{2,3})\\", RegexOptions.IgnoreCase);
+                    Match regMatch = regServer.Match(path);
                     if (regMatch.Success)
                     {
-                        if (!string.IsNullOrEmpty(regMatch.Groups[4].ToString()))
+                        if(!string.IsNullOrEmpty(regMatch.Groups[4].ToString()))
                         {
                             fileLocation = regMatch.Groups[4].Value;
                         }
@@ -196,24 +210,21 @@ namespace HOK.ModelReporting
                     }
                 }
             }
-            catch
-            {
-                // ignored
-            }
+            catch { }
             return fileLocation;
         }
 
         private string GetProjectName(string path)
         {
-            const string name = "";
+            string name = "";
             try
             {
-                var paths = path.Split('\\');
+                string[] paths = path.Split('\\');
 
                 //Find E-BIM or E-CAD and get preceding values
-                for (var i = 0; i < paths.Length; i++)
+                for (int i = 0; i < paths.Length; i++)
                 {
-                    if(_prefixes.ContainsKey(paths[i]))
+                    if(prefixes.ContainsKey(paths[i]))
                     {
                         return paths[i - 1];
                     }
@@ -221,7 +232,7 @@ namespace HOK.ModelReporting
             }
             catch
             {
-                // ignored
+                return "";
             }
             return name;
         }
@@ -231,13 +242,14 @@ namespace HOK.ModelReporting
             long fileSize = 0;
             try
             {
-                if (DocCentralPath.StartsWith("C:")) { return fileSize; }
+                if (docCentralPath.StartsWith("C:")) { return fileSize; }
 
-                if (!string.IsNullOrEmpty(DocLocalPath))
+                if (!string.IsNullOrEmpty(docLocalPath))
                 {
-                    var fileInfo = new FileInfo(DocLocalPath);
+                    FileInfo fileInfo = new FileInfo(docLocalPath);
                     fileSize = fileInfo.Length / 1024;
                 }
+                
             }
             catch
             {
@@ -246,16 +258,16 @@ namespace HOK.ModelReporting
             return fileSize;
         }
 
-        private void GetIpAddress()
+        private void GetIPAddress()
         {
             try
             {
-                var hostEntry = Dns.GetHostEntry(Dns.GetHostName());
-                IpAddress = hostEntry.AddressList[1].ToString();
+                IPHostEntry hostEntry = Dns.GetHostEntry(Dns.GetHostName());
+                ipAddress = hostEntry.AddressList[1].ToString();
             }
             catch
             {
-                IpAddress = "UNKNOWN";
+                ipAddress = "UNKNOWN";
             }
         }
 
@@ -263,13 +275,21 @@ namespace HOK.ModelReporting
         {
             try
             {
-                var systemInfo = new ActiveDs.ADSystemInfo();
-                var siteName = systemInfo.SiteName;
-                UserLocation = !string.IsNullOrEmpty(siteName) ? siteName : "UNKNOWN";
+                ActiveDs.ADSystemInfo systemInfo = new ActiveDs.ADSystemInfo();
+                string siteName = systemInfo.SiteName;
+
+                if (!string.IsNullOrEmpty(siteName))
+                {
+                    userLocation = siteName;
+                }
+                else
+                {
+                    userLocation = "UNKNOWN";
+                }
             }
             catch
             {
-                UserLocation = "UNKNOWN";
+                userLocation = "UNKNOWN";
             }
         }
     }

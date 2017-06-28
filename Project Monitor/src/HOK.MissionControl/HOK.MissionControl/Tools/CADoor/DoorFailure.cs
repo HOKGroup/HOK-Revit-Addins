@@ -27,13 +27,13 @@ namespace HOK.MissionControl.Tools.CADoor
                 if (isDoorFailed)
                 {
                     FailureProcessor.IsFailureProcessing = true;
-                    var fa = args.GetFailuresAccessor();
+                    FailuresAccessor fa = args.GetFailuresAccessor();
                     IList<FailureMessageAccessor> failList = new List<FailureMessageAccessor>();
                     failList = fa.GetFailureMessages();
-                    var foundFailingElement = false;
-                    foreach (var failure in failList)
+                    bool foundFailingElement = false;
+                    foreach (FailureMessageAccessor failure in failList)
                     {
-                        foreach (var id in failure.GetFailingElementIds())
+                        foreach (ElementId id in failure.GetFailingElementIds())
                         {
                             if (failingDoorId.IntegerValue == id.IntegerValue) { foundFailingElement = true; }
                         }
@@ -41,7 +41,7 @@ namespace HOK.MissionControl.Tools.CADoor
                     if (foundFailingElement)
                     {
                         args.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
-                        var option = fa.GetFailureHandlingOptions();
+                        FailureHandlingOptions option = fa.GetFailureHandlingOptions();
                         option.SetClearAfterRollback(true);
                         fa.SetFailureHandlingOptions(option);
                     }
@@ -52,7 +52,7 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
+                string message = ex.Message;
                 LogUtil.AppendLog("DoorFailure-ProcessFailure:" + ex.Message);
             }
         }
