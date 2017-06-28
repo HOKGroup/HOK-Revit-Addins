@@ -1,43 +1,52 @@
-﻿using System;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace HOK.MissionControl.Tools.DTMTool
 {
     public static class DTMFailure
     {
-        public static bool IsElementModified { get; set; }
-        public static ReportingElementInfo ElementModified { get; set; }
-        public static Document CurrentDoc { get; set; }
+        private static bool isElementModified = false;
+        private static ReportingElementInfo elementModified = null;
+        private static Document currentDoc = null;
+
+        public static bool IsElementModified { get { return isElementModified; } set { isElementModified = value; } }
+        public static ReportingElementInfo ElementModified { get { return elementModified; } set { elementModified = value; } }
+        public static Document CurrentDoc { get { return currentDoc; } set { currentDoc = value; } }
 
         public static void ProcessFailure(object sender, FailuresProcessingEventArgs args)
         {
             try
             {
-                if (!IsElementModified || CurrentDoc == null) return;
-
-                FailureProcessor.IsFailureProcessing = true;
-                var fa = args.GetFailuresAccessor();
-
-                var dtmViewModel = new DTMViewModel(CurrentDoc, ElementModified);
-                var dtmWindow = new DTMWindow { DataContext = dtmViewModel };
-                var showDialog = dtmWindow.ShowDialog();
-                if (showDialog != null && (bool)showDialog)
+                if (isElementModified && null!=currentDoc)
                 {
-                    args.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
-                    var option = fa.GetFailureHandlingOptions();
-                    option.SetClearAfterRollback(true);
-                    fa.SetFailureHandlingOptions(option);
+                    FailureProcessor.IsFailureProcessing = true;
+                    FailuresAccessor fa = args.GetFailuresAccessor();
+
+                    DTMWindow dtmWindow = new DTMWindow(currentDoc, elementModified);
+                    if ((bool)dtmWindow.ShowDialog())
+                    {
+                        args.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
+                        FailureHandlingOptions option = fa.GetFailureHandlingOptions();
+                        option.SetClearAfterRollback(true);
+                        fa.SetFailureHandlingOptions(option);
+                    }
+                    isElementModified = false;
+                    FailureProcessor.IsFailureProcessing = false;
                 }
-                IsElementModified = false;
-                FailureProcessor.IsFailureProcessing = false;
             }
             catch (Exception ex)
             {
+                string message = ex.Message;
                 LogUtil.AppendLog("DTMFailure-ProcessFailure:" + ex.Message);
             }
         }
+
     }
 }

@@ -1,52 +1,63 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace HOK.MissionControl.Core.Utils
 {
     public static class LogUtil
     {
-        public static bool Initialized { get; set; }
-        public static string LogDirectory { get; set; } = "";
-        public static string LogFilePath { get; set; } = "";
-        public static StringBuilder LogBuilder { get; set; } = new StringBuilder();
+        private static bool initialized = false;
+        private static string logDirectory = "";
+        private static string logFilePath = "";
+        private static StringBuilder logBuilder = new StringBuilder();
+
+        public static bool Initialized { get { return initialized; } set { initialized = value; } }
+        public static string LogDirectory { get { return logDirectory; } set { logDirectory = value; } }
+        public static string LogFilePath { get { return logFilePath; } set { logFilePath = value; } }
+        public static StringBuilder LogBuilder { get { return logBuilder; } set { logBuilder = value; } }
 
         public static void InitializeLog()
         {
             try
             {
-                LogBuilder.Clear();
-                var tempFolder = Path.GetTempPath();
-                var hokLogFolder = Path.Combine(tempFolder, "HOKReivtAddInLogs");
-                LogDirectory = Path.Combine(hokLogFolder, "MissionControl");
+                logBuilder.Clear();
+                //AppData/Local/Temp/HOKReivtAddInLogs/MissionControl
+                string tempFolder = Path.GetTempPath();
+                string hokLogFolder = Path.Combine(tempFolder, "HOKReivtAddInLogs");
+                logDirectory = Path.Combine(hokLogFolder, "MissionControl");
 
                 if (!Directory.Exists(hokLogFolder))
                 {
                     Directory.CreateDirectory(hokLogFolder);
                 }
 
-                if (Directory.Exists(hokLogFolder) && !Directory.Exists(LogDirectory))
+                if (Directory.Exists(hokLogFolder) && !Directory.Exists(logDirectory))
                 {
-                    Directory.CreateDirectory(LogDirectory);
+                    Directory.CreateDirectory(logDirectory);
                 }
 
-                if (!Directory.Exists(LogDirectory)) return;
-
-                var dateStr = DateTime.Now.ToString("yyyy-MM-dd");
-                LogFilePath = "log-" + dateStr + ".log";
-                LogFilePath = Path.Combine(LogDirectory, LogFilePath);
-
-                if (!File.Exists(LogFilePath))
+                if (Directory.Exists(logDirectory))
                 {
-                    File.Create(LogFilePath);
+                    string dateStr = DateTime.Now.ToString("yyyy-MM-dd");
+                    logFilePath = "log-" + dateStr + ".log";
+                    logFilePath = Path.Combine(logDirectory, logFilePath);
+
+                    if (!File.Exists(logFilePath))
+                    {
+                        File.Create(logFilePath);
+                    }
+
+                    logBuilder.AppendLine("====================================================================================");
+                    initialized = true;
                 }
 
-                LogBuilder.AppendLine("====================================================================================");
-                Initialized = true;
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                string message = ex.Message;
             }
         }
 
@@ -54,11 +65,11 @@ namespace HOK.MissionControl.Core.Utils
         {
             try
             {
-                LogBuilder.AppendLine(DateTime.Now + "\t" + str);
+                logBuilder.AppendLine(DateTime.Now.ToString() + "\t" + str);
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                string message = ex.Message;
             }
         }
 
@@ -66,17 +77,18 @@ namespace HOK.MissionControl.Core.Utils
         {
             try
             {
-                if (!Initialized) return;
+                if (initialized)
+                {
+                    logBuilder.AppendLine("");
+                    string oldText = File.ReadAllText(logFilePath);
+                    string logText = logBuilder.ToString() + oldText;
 
-                LogBuilder.AppendLine("");
-                var oldText = File.ReadAllText(LogFilePath);
-                var logText = LogBuilder + oldText;
-
-                File.WriteAllText(LogFilePath, logText);
+                    File.WriteAllText(logFilePath, logText);
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                string message = ex.Message;
             }
         }
     }

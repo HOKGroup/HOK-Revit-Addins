@@ -304,7 +304,7 @@ namespace HOK.ModelReporting.KNetBIMDataServiceReference
         [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         public static ProjectStartupInfo CreateProjectStartupInfo(string office, string projectNumber, global::System.DateTime timestamp)
         {
-            var projectStartupInfo = new ProjectStartupInfo();
+            ProjectStartupInfo projectStartupInfo = new ProjectStartupInfo();
             projectStartupInfo.Office = office;
             projectStartupInfo.ProjectNumber = projectNumber;
             projectStartupInfo.Timestamp = timestamp;
@@ -500,7 +500,7 @@ namespace HOK.ModelReporting.KNetBIMDataServiceReference
         [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         public static RevitSyncToCentralEvent CreateRevitSyncToCentralEvent(global::System.Guid ID, string projectNumber, string projectName, string fileName, int preSyncFileSize, int postSyncFileSize, global::System.DateTime syncStart, global::System.DateTime syncFinish, string userName)
         {
-            var revitSyncToCentralEvent = new RevitSyncToCentralEvent();
+            RevitSyncToCentralEvent revitSyncToCentralEvent = new RevitSyncToCentralEvent();
             revitSyncToCentralEvent.ID = ID;
             revitSyncToCentralEvent.ProjectNumber = projectNumber;
             revitSyncToCentralEvent.ProjectName = projectName;
@@ -792,7 +792,7 @@ namespace HOK.ModelReporting.KNetBIMDataServiceReference
         [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         public static ViewOfficeProjectUserDailySyncTime CreateViewOfficeProjectUserDailySyncTime(string userLocation, string projectNumber, string userName, int syncYear, int syncMonth, int syncDay)
         {
-            var viewOfficeProjectUserDailySyncTime = new ViewOfficeProjectUserDailySyncTime();
+            ViewOfficeProjectUserDailySyncTime viewOfficeProjectUserDailySyncTime = new ViewOfficeProjectUserDailySyncTime();
             viewOfficeProjectUserDailySyncTime.UserLocation = userLocation;
             viewOfficeProjectUserDailySyncTime.ProjectNumber = projectNumber;
             viewOfficeProjectUserDailySyncTime.UserName = userName;
@@ -1083,7 +1083,7 @@ namespace HOK.ModelReporting.KNetBIMDataServiceReference
         [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         public static ViewOfficeProjectUserHourlySyncTime CreateViewOfficeProjectUserHourlySyncTime(string userLocation, string projectNumber, string userName, int syncYear, int syncMonth, int syncDay, int syncHour)
         {
-            var viewOfficeProjectUserHourlySyncTime = new ViewOfficeProjectUserHourlySyncTime();
+            ViewOfficeProjectUserHourlySyncTime viewOfficeProjectUserHourlySyncTime = new ViewOfficeProjectUserHourlySyncTime();
             viewOfficeProjectUserHourlySyncTime.UserLocation = userLocation;
             viewOfficeProjectUserHourlySyncTime.ProjectNumber = projectNumber;
             viewOfficeProjectUserHourlySyncTime.UserName = userName;
@@ -1393,7 +1393,7 @@ namespace HOK.ModelReporting.KNetBIMDataServiceReference
         [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         public static ViewOfficeProjectUserMonthlySyncTime CreateViewOfficeProjectUserMonthlySyncTime(string userLocation, string projectNumber, string userName, int syncYear, int syncMonth)
         {
-            var viewOfficeProjectUserMonthlySyncTime = new ViewOfficeProjectUserMonthlySyncTime();
+            ViewOfficeProjectUserMonthlySyncTime viewOfficeProjectUserMonthlySyncTime = new ViewOfficeProjectUserMonthlySyncTime();
             viewOfficeProjectUserMonthlySyncTime.UserLocation = userLocation;
             viewOfficeProjectUserMonthlySyncTime.ProjectNumber = projectNumber;
             viewOfficeProjectUserMonthlySyncTime.UserName = userName;
@@ -1661,7 +1661,7 @@ namespace HOK.ModelReporting.KNetBIMDataServiceReference
         [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         public static ViewProjectUserOfficeHourlySyncData CreateViewProjectUserOfficeHourlySyncData(string projectNumber, string userName, string userLocation, int syncYear, int syncMonth, int syncDay, int syncHour)
         {
-            var viewProjectUserOfficeHourlySyncData = new ViewProjectUserOfficeHourlySyncData();
+            ViewProjectUserOfficeHourlySyncData viewProjectUserOfficeHourlySyncData = new ViewProjectUserOfficeHourlySyncData();
             viewProjectUserOfficeHourlySyncData.ProjectNumber = projectNumber;
             viewProjectUserOfficeHourlySyncData.UserName = userName;
             viewProjectUserOfficeHourlySyncData.UserLocation = userLocation;
@@ -1971,7 +1971,7 @@ namespace HOK.ModelReporting.KNetBIMDataServiceReference
         [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         public static ViewRevitSyncToCentralData CreateViewRevitSyncToCentralData(global::System.Guid ID, string projectNumber, string projectName, string fileName, int preSyncFileSize, int postSyncFileSize, global::System.DateTime syncStart, global::System.DateTime syncFinish, string userName)
         {
-            var viewRevitSyncToCentralData = new ViewRevitSyncToCentralData();
+            ViewRevitSyncToCentralData viewRevitSyncToCentralData = new ViewRevitSyncToCentralData();
             viewRevitSyncToCentralData.ID = ID;
             viewRevitSyncToCentralData.ProjectNumber = projectNumber;
             viewRevitSyncToCentralData.ProjectName = projectName;
@@ -2397,7 +2397,7 @@ namespace HOK.ModelReporting.KNetBIMDataServiceReference
         [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         public static ViewUserProjectOfficeHourlySyncData CreateViewUserProjectOfficeHourlySyncData(string userName, string projectNumber, string userLocation, int syncYear, int syncMonth, int syncDay, int syncHour)
         {
-            var viewUserProjectOfficeHourlySyncData = new ViewUserProjectOfficeHourlySyncData();
+            ViewUserProjectOfficeHourlySyncData viewUserProjectOfficeHourlySyncData = new ViewUserProjectOfficeHourlySyncData();
             viewUserProjectOfficeHourlySyncData.UserName = userName;
             viewUserProjectOfficeHourlySyncData.ProjectNumber = projectNumber;
             viewUserProjectOfficeHourlySyncData.UserLocation = userLocation;
@@ -2711,7 +2711,7 @@ namespace HOK.ModelReporting.KNetBIMDataServiceReference
         [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Services.Design", "1.0.0")]
         public static RevitEvent CreateRevitEvent(global::System.Guid ID, string eventType, string projectNumber, string projectName, double projectLatitude, double projectLongitude, string fileName, string fileLocation, int preEventFileSize, int postEventFileSize, global::System.DateTime eventStart, global::System.DateTime eventFinish, string userName)
         {
-            var revitEvent = new RevitEvent();
+            RevitEvent revitEvent = new RevitEvent();
             revitEvent.ID = ID;
             revitEvent.EventType = eventType;
             revitEvent.ProjectNumber = projectNumber;

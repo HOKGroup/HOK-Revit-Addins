@@ -1,191 +1,186 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Events;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Classes;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.DTMTool;
-using HOK.MissionControl.Tools.HealthReport.ObjectTrackers;
 using HOK.MissionControl.Tools.RevisionTracker;
 using HOK.MissionControl.Tools.SingleSession;
 using HOK.MissionControl.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace HOK.MissionControl
 {
     public class AppCommand : IExternalApplication
     {
-        public static AppCommand Instance { get; private set; }
-        public Dictionary<string, Configuration> ConfigDictionary { get; set; } = new Dictionary<string, Configuration>();
-        public Dictionary<string, Project> ProjectDictionary { get; set; } = new Dictionary<string, Project>();
-        public DoorUpdater DoorUpdaterInstance { get; set; }
-        public DtmUpdater DtmUpdaterInstance { get; set; }
-        public RevisionUpdater RevisionUpdaterInstance { get; set; }
-        public static bool RunExport { get; set; }
+        private static AppCommand appCommand = null;
+        private UIControlledApplication m_app;
+        private Guid addInGuid = Guid.Empty;
+        private string addInName = "";
+        
+        private Dictionary<string/*centralPath*/, Configuration> configDictionary = new Dictionary<string, Configuration>();
+        private Dictionary<string/*centralPath*/, Project> projectDictionary = new Dictionary<string, Project>();
+        //updaters
+        private DoorUpdater doorUpdater = null;
+        private DTMUpdater dtmUpdater = null;
+        private RevisionUpdater revisionUpdater = null;
 
-        /// <summary>
-        /// Registers all event handlers during startup.
-        /// </summary>
+        public static AppCommand Instance { get { return appCommand; } }
+        public Dictionary<string/*centralPath*/, Configuration> ConfigDictionary { get { return configDictionary; } set { configDictionary = value; } }
+        public Dictionary<string/*centralPath*/, Project> ProjectDictionary { get { return projectDictionary; } set { projectDictionary = value; } }
+        public DoorUpdater DoorUpdaterInstance { get { return doorUpdater; } set { doorUpdater = value; } }
+        public DTMUpdater DTMUpdaterInstance { get { return dtmUpdater; } set { dtmUpdater = value; } }
+        public RevisionUpdater RevisionUpdaterInstance { get { return revisionUpdater; } set { revisionUpdater = value; } }
+
+        public Result OnShutdown(UIControlledApplication application)
+        {
+            LogUtil.WriteLog();
+
+            application.ControlledApplication.DocumentOpening -= CollectConfigurationOnOpening;
+            application.ControlledApplication.DocumentOpened -= RegisterUpdatersOnOpen;
+            application.ControlledApplication.FailuresProcessing -= FailureProcessor.CheckFailure;
+            application.ControlledApplication.DocumentClosing -= UnregisterUpdaterOnClosing;
+            application.ControlledApplication.DocumentSynchronizingWithCentral -= DocumentSynchronizing;
+            application.ControlledApplication.DocumentSynchronizedWithCentral -= DocumentSynchronized;
+
+            return Result.Succeeded;
+        }
+
         public Result OnStartup(UIControlledApplication application)
         {
             try
             {
-                Instance = this;
-                var appId = application.ActiveAddInId;
-                DoorUpdaterInstance = new DoorUpdater(appId);
-                DtmUpdaterInstance = new DtmUpdater(appId);
-                RevisionUpdaterInstance = new RevisionUpdater(appId);
+                appCommand = this;
+                m_app = application;
+               
+                AddInId appId = m_app.ActiveAddInId;
+                addInGuid = appId.GetGUID();
+                addInName = appId.GetAddInName();
+
+                doorUpdater = new DoorUpdater(appId);
+                dtmUpdater = new DTMUpdater(appId);
+                revisionUpdater = new RevisionUpdater(appId);
 
                 LogUtil.InitializeLog();
                 LogUtil.AppendLog("Mission Control AddIn Started");
 
-                application.ControlledApplication.DocumentOpening += OnDocumentOpening;
-                application.ControlledApplication.DocumentOpened += OnDocumentOpened;
+                application.ControlledApplication.DocumentOpening += CollectConfigurationOnOpening;
+                application.ControlledApplication.DocumentOpened += RegisterUpdatersOnOpen;
                 application.ControlledApplication.FailuresProcessing += FailureProcessor.CheckFailure;
-                application.ControlledApplication.DocumentClosing += OnDocumentClosing;
-                application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
-                application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
-                application.Idling += OnIdling;
+                application.ControlledApplication.DocumentClosing += UnregisterUpdaterOnClosing;
+                application.ControlledApplication.DocumentSynchronizingWithCentral += DocumentSynchronizing;
+                application.ControlledApplication.DocumentSynchronizedWithCentral += DocumentSynchronized;
             }
             catch (Exception ex)
             {
+                string message = ex.Message;
                 LogUtil.AppendLog("OnStartup:" + ex.Message);
             }
             return Result.Succeeded;
         }
 
-        /// <summary>
-        /// Un-registers all event handlers that were registered at startup.
-        /// </summary>
-        public Result OnShutdown(UIControlledApplication application)
-        {
-            LogUtil.WriteLog();
-
-            application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
-            application.ControlledApplication.DocumentOpened -= OnDocumentOpened;
-            application.ControlledApplication.FailuresProcessing -= FailureProcessor.CheckFailure;
-            application.ControlledApplication.DocumentClosing -= OnDocumentClosing;
-            application.ControlledApplication.DocumentSynchronizingWithCentral -= OnDocumentSynchronizing;
-            application.ControlledApplication.DocumentSynchronizedWithCentral -= OnDocumentSynchronized;
-            application.Idling -= OnIdling;
-
-            return Result.Succeeded;
-        }
-
-        /// <summary>
-        /// Retrieves the configuration from Database.
-        /// </summary>
-        private void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
+        private void CollectConfigurationOnOpening(object source, DocumentOpeningEventArgs args)
         {
             try
             {
-                var pathName = args.PathName;
-                if (String.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
-
-                var fileInfo = BasicFileInfo.Extract(pathName);
-                if (!fileInfo.IsWorkshared) return;
-
-                var centralPath = fileInfo.CentralPath;
-                if (String.IsNullOrEmpty(centralPath)) return;
-
-                //serch for config
-                LogUtil.AppendLog(centralPath + " Opening.");
-                var configFound = ServerUtil.GetConfigurationByCentralPath(centralPath);
-                if (null != configFound)
+                string pathName = args.PathName;
+                if (!string.IsNullOrEmpty(pathName) && args.DocumentType == DocumentType.Project)
                 {
-                    //check if the single session should be activated
-                    if (SingleSessionMonitor.CancelOpening(centralPath, configFound))
+                    BasicFileInfo fileInfo = BasicFileInfo.Extract(pathName);
+                    if (fileInfo.IsWorkshared)
                     {
-                        if (args.Cancellable)
+                        string centralPath = fileInfo.CentralPath;
+                        if (!string.IsNullOrEmpty(centralPath))
                         {
-                            var ssWindow = new SingleSessionWindow(centralPath);
-                            var o = ssWindow.ShowDialog();
-                            if (o != null && (bool)o)
+                            //serch for config
+                            LogUtil.AppendLog(centralPath + " Opening.");
+                            Configuration configFound = ServerUtil.GetConfigurationByCentralPath(centralPath);
+                            if (null != configFound)
                             {
-                                args.Cancel();
-                                return;
+                                //check if the single session should be activated
+                                if (SingleSessionMonitor.CancelOpening(centralPath, configFound))
+                                {
+                                    if (args.Cancellable)
+                                    {
+                                        SingleSessionWindow ssWindow = new SingleSessionWindow(centralPath);
+                                        if ((bool)ssWindow.ShowDialog())
+                                        {
+                                            args.Cancel();
+                                            return;
+                                        }
+                                    }
+                                }
+
+                                if (configDictionary.ContainsKey(centralPath))
+                                {
+                                    configDictionary.Remove(centralPath);
+                                }
+                                configDictionary.Add(centralPath, configFound);
+
+                                Project projectFound = ServerUtil.GetProjectByConfigurationId(configFound._id);
+                                if (null != projectFound)
+                                {
+                                    if (projectDictionary.ContainsKey(centralPath))
+                                    {
+                                        projectDictionary.Remove(centralPath);
+                                    }
+                                    projectDictionary.Add(centralPath, projectFound);
+                                }
+
+                                LogUtil.AppendLog("Configuration Found: " + configFound._id);
+                            }
+                            else
+                            {
+                                //not a seed file, just check if the single session is activated
+                                if (SingleSessionMonitor.SingleSessionActivated)
+                                {
+                                    SingleSessionWindow ssWindow = new SingleSessionWindow(centralPath);
+                                    if ((bool)ssWindow.ShowDialog())
+                                    {
+                                        args.Cancel();
+                                        return;
+                                    }
+                                }
                             }
                         }
-                    }
-
-                    if (ConfigDictionary.ContainsKey(centralPath))
-                    {
-                        ConfigDictionary.Remove(centralPath);
-                    }
-                    ConfigDictionary.Add(centralPath, configFound);
-
-                    var projectFound = ServerUtil.GetProjectByConfigurationId(configFound.Id);
-                    if (null != projectFound)
-                    {
-                        if (ProjectDictionary.ContainsKey(centralPath))
-                        {
-                            ProjectDictionary.Remove(centralPath);
-                        }
-                        ProjectDictionary.Add(centralPath, projectFound);
-                    }
-
-                    LogUtil.AppendLog("Configuration Found: " + configFound.Id);
-                }
-                else
-                {
-                    //not a seed file, just check if the single session is activated
-                    if (!SingleSessionMonitor.SingleSessionActivated) return;
-
-                    var ssWindow = new SingleSessionWindow(centralPath);
-                    var o = ssWindow.ShowDialog();
-                    if (o != null && (bool)o)
-                    {
-                        args.Cancel();
                     }
                 }
             }
             catch (Exception ex)
             {
+                string message = ex.Message;
                 LogUtil.AppendLog("CollectConfigurationOnOpening:" + ex.Message);
             }
         }
 
-        /// <summary>
-        /// Registers IUpdaters
-        /// </summary>
-        private void OnDocumentOpened(object source, DocumentOpenedEventArgs args)
+        private void RegisterUpdatersOnOpen(object source, DocumentOpenedEventArgs args)
         {
             try
             {
-                if (null == args.Document || args.IsCancelled()) return;
-
-                var doc = args.Document;
-                if (!doc.IsWorkshared) return;
-
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (String.IsNullOrEmpty(centralPath)) return;
-
-                // (Konrad) Register Updaters that are in the config file.
-                SingleSessionMonitor.OpenedDocuments.Add(centralPath);
-                LogUtil.AppendLog(centralPath + " Opened.");
-                if (ConfigDictionary.ContainsKey(centralPath))
+                if (null != args.Document && !args.IsCancelled())
                 {
-                    ApplyConfiguration(doc, ConfigDictionary[centralPath]);
-                }
+                    Document doc = args.Document;
+                    if (doc.IsWorkshared)
+                    {
+                        string centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                        if (!string.IsNullOrEmpty(centralPath))
+                        {
+                            //serch for config
+                            SingleSessionMonitor.OpenedDocuments.Add(centralPath);
 
-                // (Konrad) Setup Workset Open Monitor
-                if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return;
-
-                bool refreshProject;
-                WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onOpen, centralPath, out refreshProject);
-
-                if (!refreshProject) return;
-
-                var projectFound = ServerUtil.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
-                if (null == projectFound) return;
-
-                if (ProjectDictionary.ContainsKey(centralPath))
-                {
-                    ProjectDictionary[centralPath] = projectFound;
+                            LogUtil.AppendLog(centralPath + " Opned.");
+                            if (configDictionary.ContainsKey(centralPath))
+                            {
+                                bool applied = ApplyConfiguration(doc, configDictionary[centralPath]);
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -194,50 +189,68 @@ namespace HOK.MissionControl
             }
         }
 
-        /// <summary>
-        /// Publishes FamilyMonitor data.
-        /// </summary>
-        private void OnIdling(object sender, IdlingEventArgs e)
+        private bool ApplyConfiguration(Document doc, Configuration config)
         {
-            if (!RunExport) return;
-
-            var uiApp = sender as UIApplication;
-            var doc = uiApp?.ActiveUIDocument.Document;
-            var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-            FamilyMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
+            bool applied = false;
+            try
+            {
+                foreach (ProjectUpdater updater in config.updaters)
+                {
+                    if (!updater.isUpdaterOn) { continue; }
+                    if (updater.updaterId.ToLower() == doorUpdater.UpdaterGuid.ToString().ToLower())
+                    {
+                        doorUpdater.Register(doc, updater);
+                    }
+                    else if (updater.updaterId.ToLower() == dtmUpdater.UpdaterGuid.ToString().ToLower())
+                    {
+                        dtmUpdater.Register(doc, updater);
+                    }
+                    else if (updater.updaterId.ToLower() == revisionUpdater.UpdaterGuid.ToString().ToLower())
+                    {
+                        revisionUpdater.Register(doc, updater);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUtil.AppendLog("ApplyConfiguration:" + ex.Message);
+            }
+            return applied;
         }
 
-        /// <summary>
-        /// Unregisters all IUpdaters that were registered onDocumentOpening
-        /// </summary>
-        private void OnDocumentClosing(object source, DocumentClosingEventArgs args)
+        private void UnregisterUpdaterOnClosing(object source, DocumentClosingEventArgs args)
         {
             try
             {
-                var doc = args.Document;
-                if (!doc.IsWorkshared) return;
-
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                var response = ServerUtil.GetFamilyStats(ProjectDictionary[centralPath].worksets.FirstOrDefault(), "familystats");
-                var lastWeek = DateTime.Now.AddDays(-7);
-                var alreadyPosted = response.familyStats.FirstOrDefault(x => x.createdOn > lastWeek && x.createdBy == Environment.UserName);
-
-                if (alreadyPosted == null)
+                Document doc = args.Document;
+                if (doc.IsWorkshared)
                 {
-                    var dialogResult = MessageBox.Show("Want to export family info?", "Mission Control", MessageBoxButtons.YesNo);
-                    if (dialogResult == DialogResult.Yes)
+                    string centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                    if (!string.IsNullOrEmpty(centralPath))
                     {
-                        if (args.Cancellable) args.Cancel();
-                        RunExport = !RunExport;
+                        SingleSessionMonitor.CloseFile(centralPath);
+
+                        if (configDictionary.ContainsKey(centralPath))
+                        {
+                            Configuration configFound = configDictionary[centralPath];
+                            foreach (ProjectUpdater updater in configFound.updaters)
+                            {
+                                if (!updater.isUpdaterOn) { continue; }
+                                if (updater.updaterId.ToLower() == doorUpdater.UpdaterGuid.ToString().ToLower())
+                                {
+                                    doorUpdater.Unregister(doc);
+                                }
+                                else if (updater.updaterId.ToLower() == dtmUpdater.UpdaterGuid.ToString().ToLower())
+                                {
+                                    dtmUpdater.Unregister(doc);
+                                }
+                                else if (updater.updaterId.ToLower() == revisionUpdater.UpdaterGuid.ToString().ToLower())
+                                {
+                                    revisionUpdater.Unregister(doc);
+                                }
+                            }
+                        }
                     }
-                    else
-                    {
-                        UnregisterUpdaters(doc);
-                    }
-                }
-                else
-                {
-                    UnregisterUpdaters(doc);
                 }
             }
             catch (Exception ex)
@@ -246,143 +259,27 @@ namespace HOK.MissionControl
             }
         }
 
-        /// <summary>
-        /// Handler for Document Synchronizing event.
-        /// </summary>
-        private void OnDocumentSynchronizing(object source, DocumentSynchronizingWithCentralEventArgs args)
+        private void DocumentSynchronizing(object source, DocumentSynchronizingWithCentralEventArgs args)
         {
             try
             {
                 FailureProcessor.IsSynchronizing = true;
-
-                if (args.Document == null) return;
-
-                var doc = args.Document;
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (String.IsNullOrEmpty(centralPath)) return;
-
-                // (Konrad) Setup Workset Open Monitor
-                if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return;
-
-                bool refreshProject;
-                WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onSynch, centralPath, out refreshProject);
-
-                if (!refreshProject) return;
-
-                var projectFound = ServerUtil.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
-                if (null == projectFound) return;
-
-                if (ProjectDictionary.ContainsKey(centralPath))
-                {
-                    ProjectDictionary[centralPath] = projectFound;
-                }
             }
             catch (Exception ex)
             {
-                LogUtil.AppendLog("DocumentSynchronizing:" + ex.Message);
+                string message = ex.Message;
             }
         }
 
-        /// <summary>
-        /// Document Synchronized handler.
-        /// </summary>
-        private static void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
+        private void DocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
         {
             try
             {
                 FailureProcessor.IsSynchronizing = false;
             }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        /// <summary>
-        /// Registers availble configuration based on Central Model path match.
-        /// </summary>
-        /// <param name="doc">Revit Document</param>
-        /// <param name="config">Mission Control Configuration</param>
-        private void ApplyConfiguration(Document doc, Configuration config)
-        {
-            try
-            {
-                foreach (var updater in config.updaters)
-                {
-                    if (!updater.isUpdaterOn) continue;
-
-                    if (String.Equals(updater.updaterId.ToLower(),
-                        DoorUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        DoorUpdaterInstance.Register(doc, updater);
-                    }
-                    else if (String.Equals(updater.updaterId.ToLower(),
-                        DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        DtmUpdaterInstance.Register(doc, updater);
-                    }
-                    else if (String.Equals(updater.updaterId.ToLower(),
-                        RevisionUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        RevisionUpdaterInstance.Register(doc, updater);
-                    }
-                }
-            }
             catch (Exception ex)
             {
-                LogUtil.AppendLog("ApplyConfiguration:" + ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Unregisters all updaters as well as posts data.
-        /// </summary>
-        /// <param name="doc">Revit Document</param>
-        private void UnregisterUpdaters(Document doc)
-        {
-            var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-            if (string.IsNullOrEmpty(centralPath)) return;
-
-            SingleSessionMonitor.CloseFile(centralPath);
-            if (!ConfigDictionary.ContainsKey(centralPath)) return;
-
-            var configFound = ConfigDictionary[centralPath];
-            foreach (var updater in configFound.updaters)
-            {
-                if (!updater.isUpdaterOn) { continue; }
-                if (string.Equals(updater.updaterId.ToLower(),
-                    DoorUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                {
-                    DoorUpdaterInstance.Unregister(doc);
-                }
-                else if (string.Equals(updater.updaterId.ToLower(),
-                    DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                {
-                    DtmUpdaterInstance.Unregister(doc);
-                }
-                else if (string.Equals(updater.updaterId.ToLower(),
-                    RevisionUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                {
-                    RevisionUpdaterInstance.Unregister(doc);
-                }
-            }
-
-            // (Konrad) Setup Workset Item count.
-            if (!ProjectDictionary.ContainsKey(centralPath)) return;
-
-            bool refreshProject;
-            WorksetItemCount.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], centralPath, out refreshProject);
-            ViewMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
-            LinkMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
-
-            if (!refreshProject) return;
-
-            var projectFound = ServerUtil.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
-            if (null == projectFound) return;
-
-            if (ProjectDictionary.ContainsKey(centralPath))
-            {
-                ProjectDictionary[centralPath] = projectFound;
+                string message = ex.Message;
             }
         }
     }
