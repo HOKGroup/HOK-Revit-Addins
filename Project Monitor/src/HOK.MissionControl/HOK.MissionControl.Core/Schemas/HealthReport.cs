@@ -135,8 +135,8 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string user { get; set; }
-        public DateTime from { get; set; } = DateTime.Now;
-        public DateTime to { get; set; } = DateTime.Now;
+        public DateTime? from { get; set; }
+        public DateTime? to { get; set; }
         public List<DateTime> synched { get; set; } = new List<DateTime>();
         public DateTime createdOn { get; set; } = DateTime.Now;
     }

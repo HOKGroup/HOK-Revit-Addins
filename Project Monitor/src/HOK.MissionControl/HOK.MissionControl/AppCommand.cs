@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
@@ -21,8 +22,8 @@ namespace HOK.MissionControl
         public static AppCommand Instance { get; private set; }
         public static bool RunExport { get; set; }
         public static SessionInfo SessionInfo { get; set; }
-        public static Dictionary<string, DateTime> SynchTime { get; set; }
-        public static Dictionary<string, DateTime> OpenTime { get; set; }
+        public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
+        public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
 
         public Dictionary<string, Configuration> ConfigDictionary { get; set; } = new Dictionary<string, Configuration>();
         public Dictionary<string, Project> ProjectDictionary { get; set; } = new Dictionary<string, Project>();
@@ -53,6 +54,33 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
                 application.Idling += OnIdling;
+
+                /* (Konrad) Since it's possible that Family data will never get exported due to the fact that
+                 * one cannot cancel ApplicationClosing event, hence user can just click on "X", and there will
+                 * never be an Idling Event to process the export; we need to create a button for manual trigger.
+                */
+                // TODO: It would be nice to automatically prompt user once a week, to run this export.
+                const string tabName = "   HOK   ";
+                try
+                {
+                    application.CreateRibbonTab(tabName);
+                }
+                catch
+                {
+                    // ignored
+                }
+                var missionControlPanel = application.CreateRibbonPanel(tabName, "Mission Control");
+                var pb1 = new PushButtonData(
+                    "PublishFamilyDataCommand",
+                    "Publish Family Data",
+                    Assembly.GetExecutingAssembly().Location,
+                    "HOK.MissionControl.FamilyPublishCommand")
+                {
+                    LargeImage = ButtonUtilities.LoadBitmapImage("health-04.png_32x32.png"),
+                    ToolTip = "Mission Control Family Export Tool."
+                };
+
+                missionControlPanel.AddItem(pb1);
             }
             catch (Exception ex)
             {
@@ -183,9 +211,12 @@ namespace HOK.MissionControl
                 bool refreshProject;
                 WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onOpen, centralPath, out refreshProject);
                 ModelMonitor.PublishModelSize(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], centralPath);
-                ModelMonitor.PublishOpenTime(ProjectDictionary[centralPath].worksets.First());
-                ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.First(), SessionEvent.documentOpened);
-
+                ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.FirstOrDefault(), SessionEvent.documentOpened);
+                if (OpenTime.ContainsKey("from"))
+                {
+                    ModelMonitor.PublishOpenTime(ProjectDictionary[centralPath].worksets.FirstOrDefault());
+                }
+                
                 if (!refreshProject) return;
 
                 var projectFound = ServerUtil.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
@@ -221,13 +252,15 @@ namespace HOK.MissionControl
                 var doc = args.Document;
                 if (!doc.IsWorkshared) return;
 
+                // (Konrad) Only prompt user once a week if they are willing to post Family stats to MongoDB.
+                // This usually takes some time so it's best to minimize the annoyance factor. Getting data
+                // from every user on the project once a week should be more than enough.
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 var response = ServerUtil.GetFamilyStats(ProjectDictionary[centralPath].worksets.FirstOrDefault(), "familystats");
                 var lastWeek = DateTime.Now.AddDays(-7);
                 var alreadyPosted = response.familyStats.FirstOrDefault(x => x.createdOn > lastWeek && x.createdBy == Environment.UserName);
 
-                // TODO: Change to == when done with testing!
-                if (alreadyPosted != null)
+                if (alreadyPosted == null)
                 {
                     var famViewModel = new FamilyMonitorViewModel();
                     var famWindow = new FamilyMonitorView { DataContext = famViewModel };
@@ -300,12 +333,15 @@ namespace HOK.MissionControl
             {
                 if (args.Document == null) return;
 
-                var doc = args.Document;
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                ModelMonitor.PublishSynchTime(ProjectDictionary[centralPath].worksets.First());
-                ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.First(), SessionEvent.documentSynched);
+                var centralPath = FileInfoUtil.GetCentralFilePath(args.Document);
+                if (string.IsNullOrEmpty(centralPath)) return;
 
                 FailureProcessor.IsSynchronizing = false;
+                if (SynchTime.ContainsKey("from"))
+                {
+                    ModelMonitor.PublishSynchTime(ProjectDictionary[centralPath].worksets.FirstOrDefault());
+                }
+                ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.First(), SessionEvent.documentSynched);
             }
             catch (Exception ex)
             {

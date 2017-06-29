@@ -140,41 +140,21 @@ namespace HOK.MissionControl.Tools.CADoor
             {
                 foreach (var doorFamily in doorFamilies)
                 {
-#if RELEASE2013 ||RELEASE2014
-                    var doors = from door in doorInstances where door.Symbol.Family.Name == doorFamily.Name select door;
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                     var doors = doorInstances.Where(x => x.Symbol.FamilyName == doorFamily.Name).ToList();
-                    //var doors = from door in doorInstances where door.Symbol.FamilyName == doorFamily.Name select door;
-#endif
-
                     if (doors.Any())
                     {
                         var doorInstance = doors.First();
-#if RELEASE2013 || RELEASE2014
-                        Parameter pullParam = doorInstance.get_Parameter(pullParamName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         var pullParam = doorInstance.LookupParameter(pullParamName);
-#endif
                         if (null != pullParam)
                         {
                             pullParameters.Add(pullParam);
                         }
-
-#if RELEASE2013||RELEASE2014
-                        Parameter pushParam = doorInstance.get_Parameter(pushParamName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         var pushParam = doorInstance.LookupParameter(pushParamName);
-#endif
                         if (null != pushParam)
                         {
                             pushParameters.Add(pushParam);
                         }
-
-#if RELEASE2013||RELEASE2014
-                        Parameter caParam = doorInstance.get_Parameter(stateCAParamName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         var caParam = doorInstance.LookupParameter(stateCAParamName);
-#endif
                         if (null != caParam)
                         {
                             stateCAParameters.Add(caParam);
@@ -209,11 +189,7 @@ namespace HOK.MissionControl.Tools.CADoor
                     var doorInstance = doc.GetElement(doorId) as FamilyInstance;
                     if (null != doorInstance)
                     {
-#if RELEASE2013||RELEASE2014
-                        Parameter pushParameter = doorInstance.get_Parameter(pushParamName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         var pushParameter = doorInstance.LookupParameter(pushParamName);
-#endif
 
                         if (null != pushParameter)
                         {
@@ -231,13 +207,7 @@ namespace HOK.MissionControl.Tools.CADoor
                                 }
                             }
                         }
-#if RELEASE2013||RELEASE2014
-                        Parameter pullParameter = doorInstance.get_Parameter(pullParamName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         var pullParameter = doorInstance.LookupParameter(pullParamName);
-#endif
-
-
                         if (null != pullParameter)
                         {
                             if (data.IsChangeTriggered(doorId, Element.GetChangeTypeParameter(pullParameter)))
@@ -253,12 +223,7 @@ namespace HOK.MissionControl.Tools.CADoor
                                 }
                             }
                         }
-
-#if RELEASE2013||RELEASE2014
-                        Parameter caParameter = doorInstance.get_Parameter(stateCAParamName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         var caParameter = doorInstance.LookupParameter(stateCAParamName);
-#endif
                         if (null != caParameter)
                         {
                             if (data.IsChangeTriggered(doorId, Element.GetChangeTypeParameter(caParameter)))
@@ -286,11 +251,7 @@ namespace HOK.MissionControl.Tools.CADoor
                     var doorInstance = doc.GetElement(doorId) as FamilyInstance;
                     if (null != doorInstance)
                     {
-#if RELEASE2013||RELEASE2014
-                        Parameter caParameter = doorInstance.get_Parameter(stateCAParamName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         var caParameter = doorInstance.LookupParameter(stateCAParamName);
-#endif
                         if (null != caParameter)
                         {
                             var centralPath = FileInfoUtil.GetCentralFilePath(doc);

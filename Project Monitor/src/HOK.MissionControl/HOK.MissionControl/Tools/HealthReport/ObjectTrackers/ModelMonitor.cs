@@ -46,14 +46,14 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                         if (AppCommand.SessionInfo != null)
                         {
                             var objectId = AppCommand.SessionInfo.Id;
-                            //ServerUtil.UpdateSessionInfo(worksetDocumentId, objectId, "putSynchTime");
+                            ServerUtil.UpdateSessionInfo(worksetDocumentId, objectId, "putSynchTime");
                         }
                         break;
                     case SessionEvent.documentClosed:
                         if (AppCommand.SessionInfo != null)
                         {
                             var objectId = AppCommand.SessionInfo.Id;
-                            //ServerUtil.UpdateSessionInfo(worksetDocumentId, objectId, "putToTime");
+                            ServerUtil.UpdateSessionInfo(worksetDocumentId, objectId, "putToTime");
                         }
                         break;
                     default:

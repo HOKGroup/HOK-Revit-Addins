@@ -343,49 +343,92 @@ namespace HOK.MissionControl.Core.Utils
             return response;
         }
 
-        public static string PostSessionInfo(SessionInfo sessionInfo, string worksetDocumentId, string path)
+        public static HttpStatusCode UpdateSessionInfo(string worksetDocumentId, string objectId, string action)
         {
-            var id = string.Empty;
+            var httpStatusCode = HttpStatusCode.Unused;
             try
             {
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + path, Method.POST);
-                request.AddHeader("Content-type", "application/json");
-                request.RequestFormat = DataFormat.Json;
-                request.AddBody(sessionInfo);
-
-                var response = client.Execute<SessionInfo>(request);
-                if (response != null) id = response.Data.Id;
+                var restClient = new RestClient(RestApiBaseUrl);
+                var restRequest = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/sessioninfo/" + objectId, Method.PUT)
+                {
+                    RequestFormat = DataFormat.Json
+                };
+                restRequest.AddQueryParameter("action", action);
+                httpStatusCode = restClient.Execute(restRequest).StatusCode;
             }
             catch (Exception ex)
             {
-                LogUtil.AppendLog("ServerUtil-PostSessionInfo:" + ex.Message);
+                LogUtil.AppendLog("ServerUtil-UpdateSessionSynchTime:" + ex.Message);
             }
-            return id;
+            return httpStatusCode;
         }
+
+
+        public static string PostSessionInfo<T>(T worksetInfo, string worksetDocumentId, string route)
+        {
+            var str = string.Empty;
+            try
+            {
+                var restClient = new RestClient(RestApiBaseUrl);
+                var restRequest = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + route, Method.POST)
+                {
+                    RequestFormat = DataFormat.Json
+                };
+                restRequest.AddBody(worksetInfo);
+                var restResponse = restClient.Execute<SessionInfo>(restRequest);
+                if (restResponse != null)
+                    str = restResponse.Data.Id;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.AppendLog("ServerUtil-PostSessionInfo: " + ex.Message);
+            }
+            return str;
+        }
+
+        //public static string PostSessionInfo(SessionInfo sessionInfo, string worksetDocumentId, string path)
+        //{
+        //    var id = string.Empty;
+        //    try
+        //    {
+        //        var client = new RestClient(RestApiBaseUrl);
+        //        var request = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + path, Method.POST);
+        //        request.AddHeader("Content-type", "application/json");
+        //        request.RequestFormat = DataFormat.Json;
+        //        request.AddBody(sessionInfo);
+
+        //        var response = client.Execute<SessionInfo>(request);
+        //        if (response != null) id = response.Data.Id;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogUtil.AppendLog("ServerUtil-PostSessionInfo:" + ex.Message);
+        //    }
+        //    return id;
+        //}
 
         //public static HttpStatusCode UpdateSessionInfo(string worksetDocumentId, string objectId, string action)
         //{
-            //var status = HttpStatusCode.Unused;
-            //try
-            //{
-            //    var client = new RestClient(RestApiBaseUrl);
-            //    var request = new RestRequest(apiVersion + "/configurations/" + config._id, Method.PUT);
-            //    request.RequestFormat = RestSharp.DataFormat.Json;
-            //    request.AddBody(config);
+        //var status = HttpStatusCode.Unused;
+        //try
+        //{
+        //    var client = new RestClient(RestApiBaseUrl);
+        //    var request = new RestRequest(apiVersion + "/configurations/" + config._id, Method.PUT);
+        //    request.RequestFormat = RestSharp.DataFormat.Json;
+        //    request.AddBody(config);
 
-            //    IRestResponse response = client.Execute(request);
+        //    IRestResponse response = client.Execute(request);
 
-            //    content = response.Content;
-            //    errorMessage = response.ErrorMessage;
-            //    status = response.StatusCode;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = ex.Message;
-            //    LogUtil.AppendLog("ServerUtil-UpdateConfiguration:" + ex.Message);
-            //}
-            //return status;
+        //    content = response.Content;
+        //    errorMessage = response.ErrorMessage;
+        //    status = response.StatusCode;
+        //}
+        //catch (Exception ex)
+        //{
+        //    string message = ex.Message;
+        //    LogUtil.AppendLog("ServerUtil-UpdateConfiguration:" + ex.Message);
+        //}
+        //return status;
         //}
 
         /// <summary>
