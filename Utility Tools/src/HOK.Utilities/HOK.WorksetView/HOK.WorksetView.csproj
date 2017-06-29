@@ -69,49 +69,50 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2018\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2017</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2017'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2017'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2014'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPI.dll</HintPath>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2014'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2013'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2013'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -152,7 +153,7 @@
     <PostBuildEvent>echo Signing...
 "C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

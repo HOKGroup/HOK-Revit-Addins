@@ -105,7 +105,6 @@ namespace HOK.Arrowhead
                         foreach (var family in families)
                         {
                             value += 1;
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
                             var symbolIds = family.GetFamilySymbolIds().ToList();
                             foreach (var eId in symbolIds)
                             {
@@ -123,24 +122,6 @@ namespace HOK.Arrowhead
                                     catch { t.RollBack(); }
                                 }
                             }
-#else
-                            foreach (FamilySymbol fs in family.Symbols)
-                            {
-                                var param = fs.get_Parameter(BuiltInParameter.LEADER_ARROWHEAD);
-                                if (null != param)
-                                {
-                                    t.Start("Update Leaders");
-                                    try
-                                    {
-                                        param.Set(selectedId);
-                                        i++;
-                                        t.Commit();
-                                    }
-                                    catch { t.RollBack(); }
-                                }
-                            }
-#endif
-
                             Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
                         }
                     }

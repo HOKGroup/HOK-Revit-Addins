@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -9,19 +8,14 @@ using System.Windows.Forms;
 
 namespace HOK.LevelManager
 {
-#if RELEASE2013
-#else
     public class RoomManager
     {
-        private Autodesk.Revit.UI.UIApplication m_app;
-        private Document m_doc;
-        private List<Room> roomElements = new List<Room>();
-        private List<ElementId> newRooms = new List<ElementId>();
-        private Dictionary<int/*roomId*/, RoomProperties> roomDictionary = new Dictionary<int, RoomProperties>();
+        private readonly UIApplication m_app;
+        private readonly Document m_doc;
 
-        public List<Room> RoomElements { get { return roomElements; } set { roomElements = value; } }
-        public Dictionary<int, RoomProperties> RoomDictionary { get { return roomDictionary; } set { roomDictionary = value; } }
-        public List<ElementId> NewRooms { get { return newRooms; } set { newRooms = value; } }
+        public List<Room> RoomElements { get; set; } = new List<Room>();
+        public Dictionary<int, RoomProperties> RoomDictionary { get; set; } = new Dictionary<int, RoomProperties>();
+        public List<ElementId> NewRooms { get; set; } = new List<ElementId>();
 
         public RoomManager(UIApplication application)
         {
@@ -33,41 +27,40 @@ namespace HOK.LevelManager
         {
             try
             {
-                foreach (Room room in roomElements)
+                foreach (var room in RoomElements)
                 {
-                    RoomProperties rp = new RoomProperties();
+                    var rp = new RoomProperties();
                     rp.RoomObject = room;
                     rp.RoomId = room.Id.IntegerValue;
                     rp.RoomName = room.Name;
                     rp.RoomNumber = room.Number;
                     rp.SourceView = FindViewSource(room);
 
-                    LocationPoint locationPoint = room.Location as LocationPoint;
+                    var locationPoint = room.Location as LocationPoint;
                     rp.RoomLocation = locationPoint.Point;
 
-                    List<ModelCurve> roomSeparations = new List<ModelCurve>();
-                    List<ElementId> roomSeparationIds = new List<ElementId>();
-                    SpatialElementBoundaryOptions opt = new SpatialElementBoundaryOptions();
-                    IList<IList<Autodesk.Revit.DB.BoundarySegment>> boundaryListList = room.GetBoundarySegments(opt);
+                    var roomSeparations = new List<ModelCurve>();
+                    var roomSeparationIds = new List<ElementId>();
+                    var opt = new SpatialElementBoundaryOptions();
+                    var boundaryListList = room.GetBoundarySegments(opt);
                     if (null != boundaryListList)
                     {
                         if (boundaryListList.Count > 0)
                         {
-                            foreach ( IList<Autodesk.Revit.DB.BoundarySegment> boundaryList in boundaryListList)
+                            foreach ( var boundaryList in boundaryListList)
                             {
-                                foreach (Autodesk.Revit.DB.BoundarySegment segment in boundaryList)
+                                foreach (var segment in boundaryList)
                                 {
-#if RELEASE2017
-                                    Element element = m_doc.GetElement(segment.ElementId);
+#if  RELEASE2015
+                                    var element = segment.Element;
 #else
-                                    Element element = segment.Element;
+                                    var element = m_doc.GetElement(segment.ElementId);
 #endif
-
                                     if (null != element)
                                     {
                                         if (element.Category.Id.IntegerValue == (int)BuiltInCategory.OST_RoomSeparationLines)
                                         {
-                                            ModelCurve modelCurve = element as ModelCurve;
+                                            var modelCurve = element as ModelCurve;
                                             roomSeparations.Add(modelCurve);
                                             roomSeparationIds.Add(modelCurve.Id);
                                         }
@@ -78,7 +71,7 @@ namespace HOK.LevelManager
                     }
                     rp.RoomSeparationLines = roomSeparations;
                     rp.RoomSeparationLinesIds = roomSeparationIds;
-                    roomDictionary.Add(rp.RoomId, rp);
+                    RoomDictionary.Add(rp.RoomId, rp);
                 }
             }
             catch (Exception ex)
@@ -91,24 +84,24 @@ namespace HOK.LevelManager
         {
             try
             {
-                List<ElementId> roomIds = new List<ElementId>();
-                List<ElementId> curveIds = new List<ElementId>();
-                foreach (int roomId in roomDictionary.Keys)
+                var roomIds = new List<ElementId>();
+                var curveIds = new List<ElementId>();
+                foreach (var roomId in RoomDictionary.Keys)
                 {
-                    ElementId eId = new ElementId(roomId);
+                    var eId = new ElementId(roomId);
                     roomIds.Add(eId);
 
-                    RoomProperties rp = roomDictionary[roomId];
+                    var rp = RoomDictionary[roomId];
                     if (rp.RoomSeparationLines.Count > 0)
                     {
-                        foreach (ModelCurve curve in rp.RoomSeparationLines)
+                        foreach (var curve in rp.RoomSeparationLines)
                         {
                             curveIds.Add(curve.Id);
                         }
                     }
                 }
 
-                List<ElementId> deletedIds = new List<ElementId>();
+                var deletedIds = new List<ElementId>();
                 if (roomIds.Count > 0)
                 {
                     deletedIds = m_doc.Delete(roomIds).ToList();
@@ -126,23 +119,23 @@ namespace HOK.LevelManager
 
         public bool CopyRooms(Level toLevel)
         {
-            bool succeed = false;
+            var succeed = false;
             try
             {
-                ViewPlan destinationView = FindViewPlan(toLevel);
-                Transform transform = Transform.Identity;
-                CopyPasteOptions opt = new CopyPasteOptions();
-                List<ElementId> boundaryIds = new List<ElementId>();
+                var destinationView = FindViewPlan(toLevel);
+                var transform = Transform.Identity;
+                var opt = new CopyPasteOptions();
+                var boundaryIds = new List<ElementId>();
 
-                foreach (int roomId in roomDictionary.Keys)
+                foreach (var roomId in RoomDictionary.Keys)
                 {
-                    RoomProperties rp = roomDictionary[roomId];
-                    ViewPlan sourceView = rp.SourceView;
+                    var rp = RoomDictionary[roomId];
+                    var sourceView = rp.SourceView;
                     
                     if(rp.RoomSeparationLinesIds.Count>0)
                     {
-                        List<ElementId> boundariesToCopy = new List<ElementId>();
-                        foreach (ElementId eId in rp.RoomSeparationLinesIds)
+                        var boundariesToCopy = new List<ElementId>();
+                        foreach (var eId in rp.RoomSeparationLinesIds)
                         {
                             if (!boundaryIds.Contains(eId))
                             {
@@ -156,18 +149,18 @@ namespace HOK.LevelManager
                         }
                     }
 
-                    List<ElementId> elementsToCopy = new List<ElementId>();
+                    var elementsToCopy = new List<ElementId>();
                     elementsToCopy.Add(rp.RoomObject.Id);
-                    List<ElementId> copiedRooms=ElementTransformUtils.CopyElements(sourceView, elementsToCopy, destinationView, transform, opt).ToList();
-                    newRooms.AddRange(copiedRooms);
-                    Element element = m_doc.GetElement(copiedRooms.First());
+                    var copiedRooms=ElementTransformUtils.CopyElements(sourceView, elementsToCopy, destinationView, transform, opt).ToList();
+                    NewRooms.AddRange(copiedRooms);
+                    var element = m_doc.GetElement(copiedRooms.First());
                     if (null != element)
                     {
-                        Room newRoom = element as Room;
+                        var newRoom = element as Room;
                         newRoom.Number = rp.RoomNumber;
                     }
                 }
-                if (newRooms.Count > 0)
+                if (NewRooms.Count > 0)
                 {
                     succeed = true;
                 }
@@ -185,15 +178,15 @@ namespace HOK.LevelManager
             ViewPlan viewPlan = null;
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<ViewPlan> elements = collector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().ToElements().Cast<ViewPlan>().ToList();
+                var collector = new FilteredElementCollector(m_doc);
+                var elements = collector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().ToElements().Cast<ViewPlan>().ToList();
 
                 var views = from aview in elements where aview.ViewType == ViewType.FloorPlan select aview;
-                foreach (ViewPlan vp in views)
+                foreach (var vp in views)
                 {
                     if (null != vp.GenLevel)
                     {
-                        Level genLevel = vp.GenLevel;
+                        var genLevel = vp.GenLevel;
                         if (genLevel.Id == toLevel.Id)
                         {
                             viewPlan = vp;
@@ -214,17 +207,17 @@ namespace HOK.LevelManager
             ViewPlan viewPlan = null;
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<ViewPlan> viewPlans = collector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().ToElements().Cast<ViewPlan>().ToList();
+                var collector = new FilteredElementCollector(m_doc);
+                var viewPlans = collector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().ToElements().Cast<ViewPlan>().ToList();
                 var floorPlans = from plan in viewPlans where plan.ViewType == ViewType.FloorPlan select plan;
-                foreach (ViewPlan vp in floorPlans)
+                foreach (var vp in floorPlans)
                 {
                     if (null != vp.GenLevel && !vp.IsTemplate)
                     {
                         if (vp.GenLevel.Id == room.LevelId)
                         {
-                            FilteredElementCollector eCollector = new FilteredElementCollector(m_doc, vp.Id);
-                            List<ElementId> elementList = eCollector.WhereElementIsNotElementType().ToElementIds().ToList();
+                            var eCollector = new FilteredElementCollector(m_doc, vp.Id);
+                            var elementList = eCollector.WhereElementIsNotElementType().ToElementIds().ToList();
                             if (elementList.Contains(room.Id))
                             {
                                 viewPlan = vp;
@@ -241,7 +234,6 @@ namespace HOK.LevelManager
             return viewPlan;
         }
     }
-#endif
 
     public class RoomProperties
     {

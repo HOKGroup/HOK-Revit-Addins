@@ -650,14 +650,12 @@ namespace HOK.CeilingHeight
                         Definition definition = group.Definitions.get_Item(paramName);
                         if (definition == null)
                         {
-                           
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
-                            ExternalDefinitionCreationOptions options = new ExternalDefinitionCreationOptions(paramName, paramType);
-                            definition = group.Definitions.Create(options);
-#else
+#if RELEASE2015
                             definition = group.Definitions.Create(paramName, paramType);
+#else
+                            var options = new ExternalDefinitionCreationOptions(paramName, paramType);
+                            definition = group.Definitions.Create(options);
 #endif
-
                         }
 
                         CategorySet categorySet = m_app.Application.Create.NewCategorySet();
