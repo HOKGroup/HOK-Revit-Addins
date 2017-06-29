@@ -65,14 +65,14 @@ namespace HOK.MissionControl
                 {
                     application.CreateRibbonTab(tabName);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // ignored
+                    LogUtil.AppendLog("OnStartup-CreateRibbonTab:" + ex.Message);
                 }
                 var missionControlPanel = application.CreateRibbonPanel(tabName, "Mission Control");
                 var pb1 = new PushButtonData(
                     "PublishFamilyDataCommand",
-                    "Publish Family Data",
+                    "Publish Family" + Environment.NewLine + "Data",
                     Assembly.GetExecutingAssembly().Location,
                     "HOK.MissionControl.FamilyPublishCommand")
                 {

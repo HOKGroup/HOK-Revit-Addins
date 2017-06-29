@@ -48,7 +48,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                 var worksetDocumentId = project.worksets.FirstOrDefault();
                 if (string.IsNullOrEmpty(worksetDocumentId))
                 {
-                    worksetDocumentId = ServerUtil.PostWorksetData();
+                    worksetDocumentId = ServerUtil.PostDataScheme(new HealthReportData(), "worksets").Id;
                     var status = ServerUtil.AddWorksetToProject(project, worksetDocumentId);
                     if (status == HttpStatusCode.Created) refreshProject = true;
                 }

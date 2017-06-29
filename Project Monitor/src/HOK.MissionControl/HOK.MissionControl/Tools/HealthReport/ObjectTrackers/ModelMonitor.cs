@@ -39,7 +39,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                             user = Environment.UserName,
                             from = DateTime.Now
                         };
-                        var guid = ServerUtil.PostSessionInfo(AppCommand.SessionInfo, worksetDocumentId, "sessioninfo");
+                        var guid = ServerUtil.PostToMongoDB(AppCommand.SessionInfo, "worksets", worksetDocumentId, "sessioninfo").Id;
                         AppCommand.SessionInfo.Id = guid;
                         break;
                     case SessionEvent.documentSynched:

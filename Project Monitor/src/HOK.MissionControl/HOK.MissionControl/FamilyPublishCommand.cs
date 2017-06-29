@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -14,9 +13,6 @@ namespace HOK.MissionControl
     [Journaling(JournalingMode.NoCommandData)]
     public class FamilyPublishCommand : IExternalCommand
     {
-        public Dictionary<string, Configuration> ConfigDictionary { get; set; } = new Dictionary<string, Configuration>();
-        public Dictionary<string, Project> ProjectDictionary { get; set; } = new Dictionary<string, Project>();
-
         public Result Execute(
             ExternalCommandData commandData,
             ref string message,
@@ -27,42 +23,31 @@ namespace HOK.MissionControl
 
             try
             {
-                // TODO: There is potential here to optimize this part and wrap it into utility code.
                 var pathName = doc.PathName;
                 if (string.IsNullOrEmpty(pathName)) return Result.Failed;
 
-                var fileInfo = BasicFileInfo.Extract(pathName);
-                if (!fileInfo.IsWorkshared) return Result.Failed;
-
-                var centralPath = fileInfo.CentralPath;
+                var centralPath = BasicFileInfo.Extract(pathName).CentralPath;
                 if (string.IsNullOrEmpty(centralPath)) return Result.Failed;
 
-                var configFound = ServerUtil.GetConfigurationByCentralPath(centralPath);
-                if (configFound != null)
+                var appCommand = AppCommand.Instance;
+                if (!appCommand.ProjectDictionary.ContainsKey(centralPath) || !appCommand.ConfigDictionary.ContainsKey(centralPath)) return Result.Failed;
+
+                FamilyMonitor.PublishData(doc, appCommand.ConfigDictionary[centralPath], appCommand.ProjectDictionary[centralPath]);
+
+                // (Konrad) We are gathering information about the addin use. This allows us to
+                // better maintain the most used plug-ins or discontiue the unused ones.
+                var addinInfo = new AddinLog
                 {
-                    if (ConfigDictionary.ContainsKey(centralPath))
-                    {
-                        ConfigDictionary.Remove(centralPath);
-                    }
-                    ConfigDictionary.Add(centralPath, configFound);
+                    pluginName = "MissionControl-PublishFamilyData",
+                    user = Environment.UserName,
+                    revitVersion = BasicFileInfo.Extract(doc.PathName).SavedInVersion,
+                };
 
-                    var projectFound = ServerUtil.GetProjectByConfigurationId(configFound.Id);
-                    if (projectFound != null)
-                    {
-                        if (ProjectDictionary.ContainsKey(centralPath))
-                        {
-                            ProjectDictionary.Remove(centralPath);
-                        }
-                        ProjectDictionary.Add(centralPath, projectFound);
-                    }
-
-                    FamilyMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
-                }
+                AddinUtilities.PublishAddinLog(addinInfo);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                LogUtil.AppendLog("FamilyPublishCommand:" + e.Message);
             }
             return Result.Succeeded;
         }
