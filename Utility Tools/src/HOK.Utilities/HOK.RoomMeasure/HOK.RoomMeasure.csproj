@@ -82,6 +82,9 @@
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="RevitAPIIFC">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIIFC.dll</HintPath>
+    </Reference>
     <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2013'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
@@ -92,10 +95,6 @@
     </Reference>
     <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2014'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIIFC" Condition=" '$(Configuration)' == '2014'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIIFC.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
@@ -151,7 +150,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>echo Signing...
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

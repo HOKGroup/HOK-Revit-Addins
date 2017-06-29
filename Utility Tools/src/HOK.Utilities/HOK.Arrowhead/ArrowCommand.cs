@@ -1,26 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.Revit.UI;
-
+﻿using Autodesk.Revit.UI;
+using Autodesk.Revit.Attributes;
 
 namespace HOK.Arrowhead
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
     public class ArrowCommand : IExternalCommand
     {
-        private Autodesk.Revit.UI.UIApplication m_app;
+        private UIApplication m_app;
 
         public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
         {
             m_app = commandData.Application;
 
-            HeadAssignerWindow assignerWindow = new HeadAssignerWindow(m_app);
+            var assignerWindow = new HeadAssignerWindow(m_app);
             if (assignerWindow.ShowDialog() == true)
             {
                 assignerWindow.Close();
