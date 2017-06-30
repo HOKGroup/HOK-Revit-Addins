@@ -24,6 +24,7 @@ namespace HOK.CeilingHeight
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
+            
             try
             {
                 UIDocument uidoc = m_app.ActiveUIDocument;
