@@ -472,7 +472,7 @@ namespace HOK.ColorSchemeEditor.BCFUtils
                             {
                                 if (category.get_AllowsVisibilityControl(view3d))
                                 {
-#if RELEASE2017
+#if RELEASE2017 || RELEASE2018
                                     view3d.SetCategoryHidden(category.Id, false);
 #else
                                     view3d.SetVisibility(category, true);

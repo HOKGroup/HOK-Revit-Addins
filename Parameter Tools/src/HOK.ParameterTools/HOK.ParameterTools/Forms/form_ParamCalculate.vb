@@ -126,7 +126,7 @@ Public Class form_ParamCalculate
         Return True
     End Function
 
-    Private Function ValidateOneParameter(ByVal element As Element, ByVal control As Windows.Forms.Control) As Boolean
+    Private Function ValidateOneParameter(ByVal element As Element, ByVal control As System.Windows.Forms.Control) As Boolean
         'Checks that parameter exists and is a numerical type.
         If control.Text = "" Then
             Return True
@@ -557,7 +557,7 @@ Public Class form_ParamCalculate
 
         'Read radio buttons and get the formula we are going to use
         '!!!!Note that we are using a rigid convention for encoding the function in the radio button name
-        For Each controlTest As Windows.Forms.Control In groupBox.Controls
+        For Each controlTest As System.Windows.Forms.Control In groupBox.Controls
             If controlTest.Name.Substring(0, 11) = "radioButton" Then
                 radioButton = DirectCast(controlTest, RadioButton)
                 If radioButton.Checked Then
@@ -992,7 +992,7 @@ Public Class form_ParamCalculate
 
     Private Function GetRadioButton(ByVal groupBox As GroupBox) As String
         Dim radioButton As RadioButton
-        For Each controlTest As Windows.Forms.Control In groupBox.Controls
+        For Each controlTest As System.Windows.Forms.Control In groupBox.Controls
             If controlTest.[GetType]() Is GetType(RadioButton) Then
                 radioButton = DirectCast(controlTest, RadioButton)
                 If radioButton.Checked Then
@@ -1005,7 +1005,7 @@ Public Class form_ParamCalculate
 
     Private Sub SetRadioButton(ByVal groupBox As GroupBox, ByVal nameRadioButton As String)
         Dim radioButton As RadioButton
-        For Each controlTest As Windows.Forms.Control In groupBox.Controls
+        For Each controlTest As System.Windows.Forms.Control In groupBox.Controls
             If controlTest.[GetType]() Is GetType(RadioButton) Then
                 radioButton = DirectCast(controlTest, RadioButton)
                 If radioButton.Name = nameRadioButton Then

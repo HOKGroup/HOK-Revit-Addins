@@ -24,7 +24,7 @@ namespace HOK.ColorSchemeEditor
 
             Assembly assembly = Assembly.GetExecutingAssembly();
             PushButton pushButton = rp.AddItem(new PushButtonData("Color Editor", "Color Editor", currentAssembly, "HOK.ColorSchemeEditor.Command")) as PushButton;
-            pushButton.LargeImage = LoadBitmapImage(assembly, "color32.png"); ;
+            pushButton.LargeImage = LoadBitmapImage(assembly, "color32.png");
             
             return Result.Succeeded;
         }

@@ -1,0 +1,9 @@
+This was part of a nuget package. You can safely remove this file from your project and delete it.
+
+Why this file ?
+-------------------
+Nuget packages are of 2 possible levels, solution and project, predetermined by the content of the nuget package.
+At the actual state of nuget's development, there is no way to create a project level package that does not have any content or library.
+This file was added to a nuget package to make it recognized as an project level package, and not a solution level package.
+
+You can remove this file once the package is installed.
