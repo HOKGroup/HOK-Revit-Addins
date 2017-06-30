@@ -13,6 +13,7 @@ namespace HOK.MissionControl.Core.Schemas
         public string pluginName { get; set; }
         public string user { get; set; }
         public string revitVersion { get; set; }
+        public int executionTime { get; set; }
         public DateTime createdOn { get; set; } = new DateTime();
     }
 

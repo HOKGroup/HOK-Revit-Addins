@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>HOK Ribbon Tab</Name>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.RibbonTab.dll</Assembly>
+    <AddInId>3A05AE7E-6097-4138-A466-703AB614020F</AddInId>
+    <FullClassName>HOK.RibbonTab.AppCommand</FullClassName>
+    <VendorId>BuildingSMART</VendorId>
+    <VendorDescription>Konrad K Sobon</VendorDescription>
+  </AddIn>
+</RevitAddIns>
