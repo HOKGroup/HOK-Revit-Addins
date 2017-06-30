@@ -4,7 +4,6 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using System.Windows.Forms;
 using System.Reflection;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
 namespace HOK.RibbonTab
@@ -59,7 +58,7 @@ namespace HOK.RibbonTab
                 var utilityExist = false;
                 var utilPanel = m_app.CreateRibbonPanel(tabName, "Utilities");
                 //HOK Utilities
-                if (/*File.Exists(currentDirectory + "/HOK.Utilities.dll") || */File.Exists(currentDirectory + "/HOK.ElementTools.dll") || File.Exists(currentDirectory + "/HOK.ParameterTools.dll") || File.Exists(currentDirectory + "/HOK.ColorSchemeEditor.dll"))
+                if (File.Exists(currentDirectory + "/HOK.ElementTools.dll") || File.Exists(currentDirectory + "/HOK.ParameterTools.dll") || File.Exists(currentDirectory + "/HOK.ColorSchemeEditor.dll"))
                 {
                     var splitButtonData = new SplitButtonData("HOKUtilities", "HOK Utilities");
                     var splitButton = (SplitButton)utilPanel.AddItem(splitButtonData);
