@@ -10,8 +10,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.Arrowhead")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2016")]
-[assembly: AssemblyTrademark("Jinsol Kim")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2017")]
+[assembly: AssemblyTrademark("Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

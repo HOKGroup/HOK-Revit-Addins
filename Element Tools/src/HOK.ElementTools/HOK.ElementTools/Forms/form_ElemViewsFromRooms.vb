@@ -1901,7 +1901,7 @@ Public Class form_ElemViewsFromRooms
     End Sub
     Private Sub buttonClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonClose.Click
         SaveSettings()
-        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.DialogResult = DialogResult.OK
     End Sub
     Private Sub checkBoxIncludeExisting_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles checkBoxListExisting.CheckedChanged
         If Not initializing Then

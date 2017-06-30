@@ -597,7 +597,7 @@ Public Class form_ElemPlaceUnplacedRooms
     ''' <param name="e"></param>
     ''' <remarks></remarks>
     Private Sub ButtonPickPoint_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonPickPoint.Click
-        Me.DialogResult = Windows.Forms.DialogResult.Retry
+        Me.DialogResult = DialogResult.Retry
 
         'Me.Hide()
         'Try
@@ -622,7 +622,7 @@ Public Class form_ElemPlaceUnplacedRooms
     ''' <remarks></remarks>
     Private Sub buttonClose_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonClose.Click
         SaveSettings()
-        Me.DialogResult = Windows.Forms.DialogResult.OK
+        Me.DialogResult = DialogResult.OK
     End Sub
 
     ''' <summary>
