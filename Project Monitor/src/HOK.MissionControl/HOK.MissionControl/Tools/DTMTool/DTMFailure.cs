@@ -1,6 +1,7 @@
 ﻿using System;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
+using HOK.Core;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
 
@@ -36,7 +37,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtil.AppendLog("DTMFailure-ProcessFailure:" + ex.Message);
+                LogUtilities.AppendLog("DTMFailure-ProcessFailure:" + ex.Message);
             }
         }
     }

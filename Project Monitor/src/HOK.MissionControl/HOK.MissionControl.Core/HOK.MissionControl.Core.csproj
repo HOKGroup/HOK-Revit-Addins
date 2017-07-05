@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.MissionControl.Core</RootNamespace>
     <AssemblyName>HOK.MissionControl.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,10 +30,28 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2015|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2015\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2015</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2016|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2016\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2016</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2017|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2017\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;RELEASE2017</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -41,13 +60,53 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2018\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;RELEASE2018</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2017\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="MongoDB.Bson, Version=2.3.0.157, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MongoDB.Bson.2.3.0\lib\net45\MongoDB.Bson.dll</HintPath>
     </Reference>
@@ -75,8 +134,8 @@
     <Compile Include="Schemas\HealthReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\AddinUtilities.cs" />
-    <Compile Include="Utils\LogUtil.cs" />
-    <Compile Include="Utils\ServerUtil.cs" />
+    <Compile Include="Utils\MonitorUtilities.cs" />
+    <Compile Include="Utils\ServerUtilities.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -126,7 +185,7 @@ goto exit
 
 :exit</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

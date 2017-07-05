@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HOK.Core;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
@@ -49,7 +50,7 @@ namespace HOK.MissionControl.Tools.SingleSession
             }
             catch (Exception ex)
             {
-                LogUtil.AppendLog("CancelOpening:" + ex.Message);
+                LogUtilities.AppendLog("CancelOpening:" + ex.Message);
             }
             return cancel;
         }
@@ -72,7 +73,7 @@ namespace HOK.MissionControl.Tools.SingleSession
             }
             catch (Exception ex)
             {
-                LogUtil.AppendLog("CloseFile:" + ex.Message);
+                LogUtilities.AppendLog("CloseFile:" + ex.Message);
             }
         }
     }

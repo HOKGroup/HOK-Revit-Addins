@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using HOK.Core;
 
 namespace HOK.MissionControl.Tools.CADoor
 {
@@ -52,8 +53,7 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
-                LogUtil.AppendLog("DoorFailure-ProcessFailure:" + ex.Message);
+                LogUtilities.AppendLog("DoorFailure-ProcessFailure:" + ex.Message);
             }
         }
     }

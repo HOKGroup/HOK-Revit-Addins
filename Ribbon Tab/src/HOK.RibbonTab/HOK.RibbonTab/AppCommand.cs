@@ -5,6 +5,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Forms;
 using System.Reflection;
 using Autodesk.Revit.UI;
+using HOK.Core;
 
 namespace HOK.RibbonTab
 {
@@ -25,6 +26,8 @@ namespace HOK.RibbonTab
 
         Result IExternalApplication.OnStartup(UIControlledApplication application)
         {
+            LogUtilities.Initialize("HOK_Tools");
+
             m_app = application;
 
             tabName = "   HOK   ";
@@ -32,9 +35,9 @@ namespace HOK.RibbonTab
             {
                 m_app.CreateRibbonTab(tabName);
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                LogUtilities.AppendLog("HOK.RibbonTab.AppCommand.OnStartup: " + ex.Message);
             }
 
             currentAssembly = Assembly.GetAssembly(GetType()).Location;
@@ -46,9 +49,41 @@ namespace HOK.RibbonTab
             CreateHOKPushButtons();
             CreateCustomPushButtons();
             CreateDataPushButtons();
-            //CreateAVFPushButtons();
+            CreateAVFPushButtons();
+            CreateMissionControlPushButtons();
 
             return Result.Succeeded;
+        }
+
+        private void CreateMissionControlPushButtons()
+        {
+            try
+            {
+                /* (Konrad) Since it's possible that Family data will never get exported due to the fact that
+                 * one cannot cancel ApplicationClosing event, hence user can just click on "X", and there will
+                 * never be an Idling Event to process the export; we need to create a button for manual trigger.
+                */
+                // TODO: It would be nice to automatically prompt user once a week, to run this export.
+                var missionControlPanel = m_app.CreateRibbonPanel(tabName, "Mission Control");
+                var assemblyPath = currentDirectory + "/HOK.MissionControl.FamilyPublish.dll";
+
+                var pb1 = new PushButtonData(
+                    "PublishFamilyDataCommand",
+                    "Publish Family" + Environment.NewLine + "Data",
+                    assemblyPath,
+                    "HOK.MissionControl.FamilyPublish.FamilyPublishCommand")
+                {
+                    ToolTip = "Mission Control Family Export Tool."
+                };
+                var fpAssembly = Assembly.LoadFrom(assemblyPath);
+                pb1.LargeImage = ButtonUtilities.LoadBitmapImage(fpAssembly, "HOK.MissionControl.FamilyPublish", "publishFamily_32x32.png");
+
+                missionControlPanel.AddItem(pb1);
+            }
+            catch (Exception ex)
+            {
+                LogUtilities.AppendLog("HOK.RibbonTab.AppCommand.CreateMissionControlPushButtons: " + ex.Message);
+            }
         }
 
         private void CreateHOKPushButtons()
@@ -57,7 +92,7 @@ namespace HOK.RibbonTab
             {
                 var utilityExist = false;
                 var utilPanel = m_app.CreateRibbonPanel(tabName, "Utilities");
-                //HOK Utilities
+
                 if (File.Exists(currentDirectory + "/HOK.ElementTools.dll") || File.Exists(currentDirectory + "/HOK.ParameterTools.dll"))
                 {
                     var splitButtonData = new SplitButtonData("HOKUtilities", "HOK Utilities");
@@ -65,7 +100,6 @@ namespace HOK.RibbonTab
                     var contextualHelp = new ContextualHelp(ContextualHelpType.Url, @"V:\RVT-Data\HOK Program\Documentation\HOK Utilities_Instruction.pdf");
                     splitButton.SetContextualHelp(contextualHelp);
 
-                    //ElementTools
                     if (File.Exists(currentDirectory + "/HOK.ElementTools.dll"))
                     {
                         var pb1 = splitButton.AddPushButton(new PushButtonData("Element Tools", "Element Tools", currentDirectory + "/HOK.ElementTools.dll", "HOK.ElementTools.cmdElementTools"));
@@ -75,7 +109,6 @@ namespace HOK.RibbonTab
                         utilityExist = true;
                     }
 
-                    //ParameterTools
                     if (File.Exists(currentDirectory + "/HOK.ParameterTools.dll"))
                     {
                         var pb2 = splitButton.AddPushButton(new PushButtonData("Parameter Tools", "Parameter Tools", currentDirectory + "/HOK.ParameterTools.dll", "HOK.ParameterTools.cmdParameterTools"));
@@ -139,15 +172,6 @@ namespace HOK.RibbonTab
                         AddToolTips(pb19);
                         utilityExist = true;
                     }
-
-                    //if (File.Exists(currentDirectory + "/HOK.ColorSchemeEditor.dll"))
-                    //{
-                    //    var pb20 = splitButton.AddPushButton(new PushButtonData("Color Editor", "Color Editor", currentDirectory + "/HOK.ColorSchemeEditor.dll", "HOK.ColorSchemeEditor.Command"));
-                    //    pb20.LargeImage = LoadBitmapImage(assembly, "color32.png");
-                    //    pb20.ToolTip = "Create color schemes by categories and parameter values.";
-                    //    AddToolTips(pb20);
-                    //    utilityExist = true;
-                    //}
 
                     if (File.Exists(currentDirectory + "/HOK.DoorRoom.dll"))
                     {
@@ -220,7 +244,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create the Utilities Panel.\n" + ex.Message, "Create Utilites Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                LogUtilities.AppendLog("HOK.RibbonTab.AppCommand.CreateHOKPushButtons: " + ex.Message);
             }
         }
 
@@ -233,7 +257,6 @@ namespace HOK.RibbonTab
 
                 if (File.Exists(currentDirectory + "/HOK.SheetManager.dll"))
                 {
-                    //SheetManager
                     var pb6 = (PushButton)hokPanel.AddItem(new PushButtonData("Sheet Manager", "Sheet Manager", currentDirectory + "/HOK.SheetManager.dll", "HOK.SheetManager.cmdSheetManager"));
                     pb6.LargeImage = LoadBitmapImage(assembly, "sheet.ico");
                     pb6.ToolTip = "Sheet Manager";
@@ -242,28 +265,17 @@ namespace HOK.RibbonTab
                     fileExist = true;
                 }
 
-                if (File.Exists(currentDirectory + "/HOK.ModelManager.dll"))
-                {
-                    //ModelManager
-                    var splitButtonData = new SplitButtonData("ModelManager", "Model Manager");
-                    var splitButton = (SplitButton)hokPanel.AddItem(splitButtonData);
-                    var contextualHelp = new ContextualHelp(ContextualHelpType.Url, @"V:\RVT-Data\HOK Program\Documentation\ModelManager_Instruction.pdf");
-                    splitButton.SetContextualHelp(contextualHelp);
-
-                    var pb16 = splitButton.AddPushButton(new PushButtonData("Project Replication", "Project Replication", currentDirectory + "/HOK.ModelManager.dll", "HOK.ModelManager.ProjectCommand"));
-                    pb16.LargeImage = LoadBitmapImage(assembly, "project.png");
-                    pb16.ToolTip = "Model Manager - Project Replication";
-                    AddToolTips(pb16);
-                    hokPanel.AddSeparator();
-                    fileExist = true;
-                }
-
-                //if (File.Exists(currentDirectory + "/HOK.BCFReader.dll"))
+                //if (File.Exists(currentDirectory + "/HOK.ModelManager.dll"))
                 //{
-                //    var pb7 = (PushButton)hokPanel.AddItem(new PushButtonData("BCF Reader", "BCF Reader", currentDirectory + "/HOK.BCFReader.dll", "HOK.BCFReader.Command"));
-                //    pb7.LargeImage = LoadBitmapImage(assembly, "comment.ico");
-                //    pb7.ToolTip = "BIM Collaboration Format (BCF) Reader";
-                //    AddToolTips(pb7);
+                //    var splitButtonData = new SplitButtonData("ModelManager", "Model Manager");
+                //    var splitButton = (SplitButton)hokPanel.AddItem(splitButtonData);
+                //    var contextualHelp = new ContextualHelp(ContextualHelpType.Url, @"V:\RVT-Data\HOK Program\Documentation\ModelManager_Instruction.pdf");
+                //    splitButton.SetContextualHelp(contextualHelp);
+
+                //    var pb16 = splitButton.AddPushButton(new PushButtonData("Project Replication", "Project Replication", currentDirectory + "/HOK.ModelManager.dll", "HOK.ModelManager.ProjectCommand"));
+                //    pb16.LargeImage = LoadBitmapImage(assembly, "project.png");
+                //    pb16.ToolTip = "Model Manager - Project Replication";
+                //    AddToolTips(pb16);
                 //    hokPanel.AddSeparator();
                 //    fileExist = true;
                 //}
@@ -311,19 +323,16 @@ namespace HOK.RibbonTab
 
                 var dataPanel = m_app.CreateRibbonPanel(tabName, "Revit Data");
 
-                //DBManager_Sychronize
                 var pb11 = (PushButton)dataPanel.AddItem(new PushButtonData("Data Sync", "Data Sync", currentDirectory + "/HOK.RevitDBManager.dll", "RevitDBManager.Command"));
                 pb11.LargeImage = LoadBitmapImage(assembly, "sync.ico");
                 pb11.ToolTip = "Data Sync";
                 AddToolTips(pb11);
 
-                //DBManager_Setup
                 var pb12 = (PushButton)dataPanel.AddItem(new PushButtonData("Setup", "  Setup  ", currentDirectory + "/HOK.RevitDBManager.dll", "RevitDBManager.EditorCommand"));
                 pb12.LargeImage = LoadBitmapImage(assembly, "editor.ico");
                 pb12.ToolTip = "Setup";
                 AddToolTips(pb12);
 
-                //DBManager_Data Editor
                 var pb13 = (PushButton)dataPanel.AddItem(new PushButtonData("Data Editor", "Data Editor", currentDirectory + "/HOK.RevitDBManager.dll", "RevitDBManager.ViewerCommand"));
                 pb13.LargeImage = LoadBitmapImage(assembly, "view.ico");
                 pb13.ToolTip = "Data Editor";
@@ -335,48 +344,48 @@ namespace HOK.RibbonTab
             }
         }
 
-        //private void CreateAVFPushButtons()
-        //{
-        //    try
-        //    {
-        //        if (!File.Exists(currentDirectory + "/HOK.AVFManager.dll") &&
-        //            !File.Exists(currentDirectory + "/HOK.LPDCalculator.dll") &&
-        //            !File.Exists(currentDirectory + "/HOK.ViewAnalysis.dll")) return;
-        //        var avfPanel = m_app.CreateRibbonPanel(tabName, "Analysis");
+        private void CreateAVFPushButtons()
+        {
+            try
+            {
+                if (!File.Exists(currentDirectory + "/HOK.AVFManager.dll") &&
+                    !File.Exists(currentDirectory + "/HOK.LPDCalculator.dll") &&
+                    !File.Exists(currentDirectory + "/HOK.ViewAnalysis.dll")) return;
+                var avfPanel = m_app.CreateRibbonPanel(tabName, "Analysis");
 
-        //        var splitButtonData = new SplitButtonData("HOKAnalysis", "HOK Analysis");
-        //        var splitButton = (SplitButton)avfPanel.AddItem(splitButtonData);
-        //        splitButton.IsSynchronizedWithCurrentItem = true;
+                var splitButtonData = new SplitButtonData("HOKAnalysis", "HOK Analysis");
+                var splitButton = (SplitButton)avfPanel.AddItem(splitButtonData);
+                splitButton.IsSynchronizedWithCurrentItem = true;
 
-        //        if (File.Exists(currentDirectory + "/HOK.AVFManager.dll"))
-        //        {
-        //            var pb14 = splitButton.AddPushButton(new PushButtonData("AVF", "  AVF  ", currentDirectory + "/HOK.AVFManager.dll", "HOK.AVFManager.Command"));
-        //            pb14.LargeImage = LoadBitmapImage(assembly, "chart.ico");
-        //            pb14.ToolTip = "Analysis Visualization Framework";
-        //            AddToolTips(pb14);
+                if (File.Exists(currentDirectory + "/HOK.AVFManager.dll"))
+                {
+                    var pb14 = splitButton.AddPushButton(new PushButtonData("AVF", "  AVF  ", currentDirectory + "/HOK.AVFManager.dll", "HOK.AVFManager.Command"));
+                    pb14.LargeImage = LoadBitmapImage(assembly, "chart.ico");
+                    pb14.ToolTip = "Analysis Visualization Framework";
+                    AddToolTips(pb14);
 
-        //        }
+                }
 
-        //        if (!File.Exists(currentDirectory + "/HOK.LPDCalculator.dll")) return;
+                if (!File.Exists(currentDirectory + "/HOK.LPDCalculator.dll")) return;
 
-        //        var pb15 = splitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", currentDirectory + "/HOK.LPDCalculator.dll", "HOK.LPDCalculator.Command"));
-        //        pb15.LargeImage = LoadBitmapImage(assembly, "bulb.png");
-        //        pb15.ToolTip = "Calculating Lighting Power Density";
-        //        AddToolTips(pb15);
+                var pb15 = splitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", currentDirectory + "/HOK.LPDCalculator.dll", "HOK.LPDCalculator.Command"));
+                pb15.LargeImage = LoadBitmapImage(assembly, "bulb.png");
+                pb15.ToolTip = "Calculating Lighting Power Density";
+                AddToolTips(pb15);
 
-        //        if (!File.Exists(currentDirectory + "/HOK.ViewAnalysis.dll")) return;
+                if (!File.Exists(currentDirectory + "/HOK.ViewAnalysis.dll")) return;
 
-        //        var pb24 = splitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", currentDirectory + "/HOK.ViewAnalysis.dll", "HOK.ViewAnalysis.Command"));
-        //        pb24.LargeImage = LoadBitmapImage(assembly, "eq.ico");
-        //        pb24.ToolTip = "Calculating Area with Views for LEED IEQc 8.2";
-        //        AddToolTips(pb24);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show("Failed to create Analysis panel.\n" + ex.Message, "Create Analysis Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        //    }
+                var pb24 = splitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", currentDirectory + "/HOK.ViewAnalysis.dll", "HOK.ViewAnalysis.Command"));
+                pb24.LargeImage = LoadBitmapImage(assembly, "eq.ico");
+                pb24.ToolTip = "Calculating Area with Views for LEED IEQc 8.2";
+                AddToolTips(pb24);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create Analysis panel.\n" + ex.Message, "Create Analysis Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
 
-        //}
+        }
 
         private void ReadToolTips(string txtfile)
         {

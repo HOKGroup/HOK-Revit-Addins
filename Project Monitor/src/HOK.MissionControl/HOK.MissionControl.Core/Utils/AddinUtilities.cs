@@ -7,7 +7,7 @@ namespace HOK.MissionControl.Core.Utils
     {
         public static void PublishAddinLog<T>(T addinLog) where T: new()
         {
-            var collections = ServerUtil.GetCollection(new AddinData(), "addins");
+            var collections = ServerUtilities.GetCollection(new AddinData(), "addins");
             var c = collections.FirstOrDefault();
             var collectionId = "";
             if (c != null)
@@ -16,10 +16,10 @@ namespace HOK.MissionControl.Core.Utils
             }
             if (collections.Count == 0)
             {
-                collectionId = ServerUtil.PostDataScheme(new AddinData(), "addins").Id;
+                collectionId = ServerUtilities.PostDataScheme(new AddinData(), "addins").Id;
             }
 
-            ServerUtil.PostToMongoDB(addinLog, "addins", collectionId, "addlog");
+            ServerUtilities.PostToMongoDB(addinLog, "addins", collectionId, "addlog");
         }
     }
 }

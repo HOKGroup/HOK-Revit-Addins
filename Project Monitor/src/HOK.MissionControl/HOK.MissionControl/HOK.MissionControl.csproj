@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.MissionControl</RootNamespace>
     <AssemblyName>HOK.MissionControl</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -29,24 +29,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2013|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\2013\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2013</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2014|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\2014\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2014</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2015|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -87,6 +69,22 @@
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2017\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
@@ -150,24 +148,17 @@
       <DependentUpon>DTMWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\DTMTool\ReportingElementInfo.cs" />
-    <Compile Include="Tools\HealthReport\ObjectTrackers\FamilyMonitor.cs" />
-    <Compile Include="Tools\HealthReport\ObjectTrackers\FamilyMonitorView.xaml.cs">
-      <DependentUpon>FamilyMonitorView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Tools\HealthReport\ObjectTrackers\FamilyMonitorViewModel.cs" />
-    <Compile Include="Tools\HealthReport\ObjectTrackers\ModelMonitor.cs" />
+    <Compile Include="Tools\HealthReport\ModelMonitor.cs" />
     <Compile Include="Tools\SheetTracker\RevisionFailure.cs" />
     <Compile Include="Tools\SheetTracker\RevisionUpdater.cs" />
     <Compile Include="Tools\SingleSession\SingleSessionMonitor.cs" />
     <Compile Include="Tools\SingleSession\SingleSessionWindow.xaml.cs">
       <DependentUpon>SingleSessionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\HealthReport\ObjectTrackers\LinkMonitor.cs" />
-    <Compile Include="Utils\ButtonUtilities.cs" />
-    <Compile Include="Utils\MonitorUtilities.cs" />
-    <Compile Include="Tools\HealthReport\ObjectTrackers\ViewMonitor.cs" />
-    <Compile Include="Tools\HealthReport\ObjectTrackers\WorksetItemCount.cs" />
-    <Compile Include="Tools\HealthReport\ObjectTrackers\WorksetOpenSynch.cs" />
+    <Compile Include="Tools\HealthReport\LinkMonitor.cs" />
+    <Compile Include="Tools\HealthReport\ViewMonitor.cs" />
+    <Compile Include="Tools\HealthReport\WorksetItemCount.cs" />
+    <Compile Include="Tools\HealthReport\WorksetOpenSynch.cs" />
     <Compile Include="Utils\FailureProcessor.cs" />
     <Compile Include="Utils\FileInfoUtil.cs" />
   </ItemGroup>
@@ -179,10 +170,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Tools\DTMTool\DTMWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Tools\HealthReport\ObjectTrackers\FamilyMonitorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -206,17 +193,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tools\HealthReport\Views\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Tools\HealthReport\ObjectTrackers\Images\familyMonitorDialog_300.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\health-04.png_32x32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

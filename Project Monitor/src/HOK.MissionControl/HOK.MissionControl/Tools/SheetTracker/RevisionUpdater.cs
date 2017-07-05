@@ -1,14 +1,12 @@
-﻿using Autodesk.Revit.DB;
-using HOK.MissionControl.Core.Utils;
-using HOK.MissionControl.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Autodesk.Revit.DB;
+using HOK.Core;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
-namespace HOK.MissionControl.Tools.RevisionTracker
+namespace HOK.MissionControl.Tools.SheetTracker
 {
     public class RevisionUpdater : IUpdater
     {
@@ -50,14 +48,13 @@ namespace HOK.MissionControl.Tools.RevisionTracker
                 if (!UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
                 {
                     UpdaterRegistry.RegisterUpdater(this, doc);
-                    LogUtil.AppendLog("Revision Updater Registered.");
+                    LogUtilities.AppendLog("Revision Updater Registered.");
                     registered = true;
                 }
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
-                LogUtil.AppendLog("DoorUpdater-Register:" + ex.Message);
+                LogUtilities.AppendLog("DoorUpdater-Register:" + ex.Message);
             }
             return registered;
         }
@@ -69,13 +66,12 @@ namespace HOK.MissionControl.Tools.RevisionTracker
                 if (UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
                 {
                     UpdaterRegistry.UnregisterUpdater(updaterId, doc);
-                    LogUtil.AppendLog("Revision Updater Removed.");
+                    LogUtilities.AppendLog("Revision Updater Removed.");
                 }
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
-                LogUtil.AppendLog("DoorUpdater-Unregister:" + ex.Message);
+                LogUtilities.AppendLog("DoorUpdater-Unregister:" + ex.Message);
             }
         }
 

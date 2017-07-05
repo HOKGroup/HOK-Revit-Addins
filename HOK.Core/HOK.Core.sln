@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.Core", "HOK.Core\HOK.Core.csproj", "{A57DF876-56B5-4F48-87D6-7006CFA68FC6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		2015|Any CPU = 2015|Any CPU
+		2016|Any CPU = 2016|Any CPU
+		2017|Any CPU = 2017|Any CPU
+		2018|Any CPU = 2018|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.2015|Any CPU.ActiveCfg = 2015|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.2015|Any CPU.Build.0 = 2015|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.2016|Any CPU.ActiveCfg = 2016|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.2016|Any CPU.Build.0 = 2016|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.2017|Any CPU.ActiveCfg = 2017|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.2017|Any CPU.Build.0 = 2017|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.2018|Any CPU.ActiveCfg = 2018|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.2018|Any CPU.Build.0 = 2018|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

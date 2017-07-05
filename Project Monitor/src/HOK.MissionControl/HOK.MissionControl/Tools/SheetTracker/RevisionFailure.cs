@@ -1,24 +1,17 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
+using HOK.Core;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HOK.MissionControl.Tools.RevisionTracker
+namespace HOK.MissionControl.Tools.SheetTracker
 {
     public static class RevisionFailure
     {
-        private static bool isRevisionModified = false;
-        private static ElementId failingRevisionId = ElementId.InvalidElementId;
-        private static Document currentDoc = null;
-
-        public static bool IsRevisionModified { get { return isRevisionModified; } set { isRevisionModified = value; } }
-        public static ElementId FailingRevisionId { get { return failingRevisionId; } set { failingRevisionId = value; } }
-        public static Document CurrentDoc { get { return currentDoc; } set { currentDoc = value; } }
+        public static bool IsRevisionModified { get; set; } = false;
+        public static ElementId FailingRevisionId { get; set; } = ElementId.InvalidElementId;
+        public static Document CurrentDoc { get; set; } = null;
 
         public static void ProcessFailure(object sender, FailuresProcessingEventArgs args)
         {
@@ -29,8 +22,7 @@ namespace HOK.MissionControl.Tools.RevisionTracker
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
-                LogUtil.AppendLog("RevisionFailure-ProcessFailure:" + ex.Message);
+                LogUtilities.AppendLog("RevisionFailure-ProcessFailure:" + ex.Message);
             }
         }
     }
