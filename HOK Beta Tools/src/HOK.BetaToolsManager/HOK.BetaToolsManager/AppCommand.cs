@@ -25,15 +25,15 @@ namespace HOK.BetaToolsManager
         ElementFlatter
     }
 
-    public class AppCommand:IExternalApplication
+    public class AppCommand : IExternalApplication
     {
         private UIControlledApplication m_app;
         internal static AppCommand thisApp;
         private const string tabName = "  HOK - Beta";
         private string versionNumber = "";
         private ToolManager toolManager;
-        private Dictionary<ToolEnum, ToolProperties> toolInfoDictionary = new Dictionary<ToolEnum, ToolProperties>();
-        private readonly Dictionary<string, ButtonData> buttonDictionary = new Dictionary<string, ButtonData>();
+        private Dictionary<ToolEnum, ToolProperties> ToolInfoDictionary = new Dictionary<ToolEnum, ToolProperties>();
+        private readonly Dictionary<string, ButtonData> ButtonDictionary = new Dictionary<string, ButtonData>();
         private string currentDirectory = "";
         private string currentAssembly = "";
         private const string tooltipFileName = "HOK.Tooltip.txt";
@@ -59,7 +59,7 @@ namespace HOK.BetaToolsManager
             m_app = application;
             versionNumber = m_app.ControlledApplication.VersionNumber;
             toolManager = new ToolManager(versionNumber);
-            toolInfoDictionary = toolManager.ToolInfoDictionary;
+            ToolInfoDictionary = toolManager.ToolInfoDictionary;
 
             try
             {
@@ -76,7 +76,7 @@ namespace HOK.BetaToolsManager
             ReadToolTips(tooltipTxt);
 
             CreateInstallerPanel();
-            if (!toolInfoDictionary.Any()) return Result.Succeeded;
+            if (!ToolInfoDictionary.Any()) return Result.Succeeded;
 
             CreateUtilitiesPanel();
             CreateCustomPanel();
@@ -89,10 +89,10 @@ namespace HOK.BetaToolsManager
 
         public void ShowInstaller(UIApplication uiapp)
         {
-            var installerWindow = new BetaInstallerWindow(versionNumber, toolInfoDictionary);
+            var installerWindow = new BetaInstallerWindow(versionNumber, ToolInfoDictionary);
             if (installerWindow.ShowDialog() != true) return;
 
-            toolInfoDictionary = installerWindow.ToolInfoDictionary;
+            ToolInfoDictionary = installerWindow.ToolInfoDictionary;
             CreateUtilitiesPanel();
             CreateCustomPanel();
             CreateDataPanel();
@@ -172,12 +172,12 @@ namespace HOK.BetaToolsManager
                 ToolProperties parameterTP = null; // Parameter Tools Properties
                 ToolProperties colorTP = null; //color editor properties
                 
-                if (toolInfoDictionary.ContainsKey(ToolEnum.Utility) && toolInfoDictionary.ContainsKey(ToolEnum.ElementTools) && toolInfoDictionary.ContainsKey(ToolEnum.ParameterTools) && toolInfoDictionary.ContainsKey(ToolEnum.ColorEditor))
+                if (ToolInfoDictionary.ContainsKey(ToolEnum.Utility) && ToolInfoDictionary.ContainsKey(ToolEnum.ElementTools) && ToolInfoDictionary.ContainsKey(ToolEnum.ParameterTools) && ToolInfoDictionary.ContainsKey(ToolEnum.ColorEditor))
                 {
-                    utilitiesTP = toolInfoDictionary[ToolEnum.Utility];
-                    elementTP = toolInfoDictionary[ToolEnum.ElementTools];
-                    parameterTP = toolInfoDictionary[ToolEnum.ParameterTools];
-                    colorTP = toolInfoDictionary[ToolEnum.ColorEditor];
+                    utilitiesTP = ToolInfoDictionary[ToolEnum.Utility];
+                    elementTP = ToolInfoDictionary[ToolEnum.ElementTools];
+                    parameterTP = ToolInfoDictionary[ToolEnum.ParameterTools];
+                    colorTP = ToolInfoDictionary[ToolEnum.ColorEditor];
                 }
 
                 if (null != utilitiesTP && null != elementTP && null != parameterTP && null != colorTP)
@@ -615,11 +615,11 @@ namespace HOK.BetaToolsManager
                 ToolProperties bcfTP = null; // BCF Reader Properties
                 ToolProperties massTP = null; //color editor properties
 
-                if (toolInfoDictionary.ContainsKey(ToolEnum.SheetManager) && toolInfoDictionary.ContainsKey(ToolEnum.BCFReader) && toolInfoDictionary.ContainsKey(ToolEnum.MassTool))
+                if (ToolInfoDictionary.ContainsKey(ToolEnum.SheetManager) && ToolInfoDictionary.ContainsKey(ToolEnum.BCFReader) && ToolInfoDictionary.ContainsKey(ToolEnum.MassTool))
                 {
-                    sheetTP = toolInfoDictionary[ToolEnum.SheetManager];
-                    bcfTP = toolInfoDictionary[ToolEnum.BCFReader];
-                    massTP = toolInfoDictionary[ToolEnum.MassTool];
+                    sheetTP = ToolInfoDictionary[ToolEnum.SheetManager];
+                    bcfTP = ToolInfoDictionary[ToolEnum.BCFReader];
+                    massTP = ToolInfoDictionary[ToolEnum.MassTool];
                 }
                 if (null != sheetTP  && null != bcfTP && null != massTP)
                 {
@@ -770,9 +770,9 @@ namespace HOK.BetaToolsManager
             {
                 ToolProperties dataTP = null; //sheet manager properties
                 
-                if (toolInfoDictionary.ContainsKey(ToolEnum.RevitData))
+                if (ToolInfoDictionary.ContainsKey(ToolEnum.RevitData))
                 {
-                    dataTP = toolInfoDictionary[ToolEnum.RevitData];
+                    dataTP = ToolInfoDictionary[ToolEnum.RevitData];
                 }
                 if (null != dataTP)
                 {
@@ -864,11 +864,11 @@ namespace HOK.BetaToolsManager
                 ToolProperties lpdTP = null; //LPD analysis properties
                 ToolProperties leedTP = null; //LEED view analysis properties
 
-                if (toolInfoDictionary.ContainsKey(ToolEnum.AVF) && toolInfoDictionary.ContainsKey(ToolEnum.LPDAnalysis) && toolInfoDictionary.ContainsKey(ToolEnum.LEEDView))
+                if (ToolInfoDictionary.ContainsKey(ToolEnum.AVF) && ToolInfoDictionary.ContainsKey(ToolEnum.LPDAnalysis) && ToolInfoDictionary.ContainsKey(ToolEnum.LEEDView))
                 {
-                    avfTP = toolInfoDictionary[ToolEnum.AVF];
-                    lpdTP = toolInfoDictionary[ToolEnum.LPDAnalysis];
-                    leedTP = toolInfoDictionary[ToolEnum.LEEDView];
+                    avfTP = ToolInfoDictionary[ToolEnum.AVF];
+                    lpdTP = ToolInfoDictionary[ToolEnum.LPDAnalysis];
+                    leedTP = ToolInfoDictionary[ToolEnum.LEEDView];
                 }
 
                 if (null != avfTP && null != lpdTP && null != leedTP)
@@ -974,9 +974,9 @@ namespace HOK.BetaToolsManager
             {
                 ToolProperties flatterTP = null; //element flatter properties
 
-                if (toolInfoDictionary.ContainsKey(ToolEnum.ElementFlatter))
+                if (ToolInfoDictionary.ContainsKey(ToolEnum.ElementFlatter))
                 {
-                    flatterTP = toolInfoDictionary[ToolEnum.ElementFlatter];
+                    flatterTP = ToolInfoDictionary[ToolEnum.ElementFlatter];
                 }
                 if (null != flatterTP)
                 {
@@ -1065,7 +1065,7 @@ namespace HOK.BetaToolsManager
                                 break;
                             case 2:
                                 buttonData.HelpUrl = line;
-                                buttonDictionary.Add(buttonData.ButtonName, buttonData);
+                                ButtonDictionary.Add(buttonData.ButtonName, buttonData);
                                 index = 0;
                                 break;
                         }
@@ -1082,9 +1082,9 @@ namespace HOK.BetaToolsManager
         {
             try
             {
-                if (buttonDictionary.ContainsKey(button.Name))
+                if (ButtonDictionary.ContainsKey(button.Name))
                 {
-                    var buttonData = buttonDictionary[button.Name];
+                    var buttonData = ButtonDictionary[button.Name];
                     button.LongDescription = buttonData.Description;
                     var contextualHelp = new ContextualHelp(ContextualHelpType.Url, buttonData.HelpUrl);
                     button.SetContextualHelp(contextualHelp);

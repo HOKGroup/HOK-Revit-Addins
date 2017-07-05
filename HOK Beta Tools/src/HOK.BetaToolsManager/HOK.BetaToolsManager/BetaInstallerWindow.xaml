@@ -11,7 +11,6 @@
             <Setter Property="AutoGenerateColumns" Value="False"/>
             <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
             <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
             <Setter Property="SelectionMode" Value="Single"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>

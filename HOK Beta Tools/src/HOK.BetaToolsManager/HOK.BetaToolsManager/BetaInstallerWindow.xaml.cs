@@ -3,60 +3,46 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace HOK.BetaToolsManager
 {
     /// <summary>
     /// Interaction logic for BetaInstallerWindow.xaml
     /// </summary>
-    public partial class BetaInstallerWindow : Window
+    public partial class BetaInstallerWindow
     {
-        private string versionNumber = "";
-        private string betaDirectory = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
-        private string installDirectory = "";
-        private string tempInstallDirectory = "";
-        
-        private Dictionary<ToolEnum, ToolProperties> toolInfoDictionary = new Dictionary<ToolEnum, ToolProperties>();
+        private readonly string versionNumber;
+        private readonly string betaDirectory = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
+        private readonly string installDirectory;
+        private readonly string tempInstallDirectory;
         private List<ToolProperties> betaToolList = new List<ToolProperties>();
-
-        public Dictionary<ToolEnum, ToolProperties> ToolInfoDictionary { get { return toolInfoDictionary; } set { toolInfoDictionary = value; } }
+        public Dictionary<ToolEnum, ToolProperties> ToolInfoDictionary { get; set; }
 
         public BetaInstallerWindow(string version, Dictionary<ToolEnum, ToolProperties> dictionary)
         {
             versionNumber = version;
             betaDirectory = betaDirectory + versionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
             installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\" + versionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
-            tempInstallDirectory = System.IO.Path.Combine(installDirectory, "Temp")+"\\";
+            tempInstallDirectory = Path.Combine(installDirectory, "Temp")+"\\";
 
-            toolInfoDictionary = dictionary;
+            ToolInfoDictionary = dictionary;
             InitializeComponent();
-            this.Title = "HOK Beta Tools Installer v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Title = "HOK Beta Tools Installer v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 
-            foreach (var tp in toolInfoDictionary.Values)
+            foreach (var tp in ToolInfoDictionary.Values)
             {
-                if (tp.BetaExist ||tp.InstallExist)
-                {
-                    var tool = GetToolVersion(tp);
-                    betaToolList.Add(tool);
-                }
+                if (!tp.BetaExist && !tp.InstallExist) continue;
+
+                var tool = GetToolVersion(tp);
+                betaToolList.Add(tool);
             }
 
             dataGridTools.ItemsSource = null;
             dataGridTools.ItemsSource = betaToolList;
         }
 
-        private ToolProperties GetToolVersion(ToolProperties tool)
+        private static ToolProperties GetToolVersion(ToolProperties tool)
         {
             var tp = new ToolProperties(tool);
             try
@@ -83,7 +69,7 @@ namespace HOK.BetaToolsManager
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void buttonInstall_Click(object sender, RoutedEventArgs e)
@@ -91,68 +77,62 @@ namespace HOK.BetaToolsManager
             try
             {
                 var numOfTools = 0;
-                if (null != dataGridTools.ItemsSource)
+                if (dataGridTools.ItemsSource == null) return;
+
+                betaToolList = (List<ToolProperties>)dataGridTools.ItemsSource;
+                foreach (var tool in betaToolList)
                 {
-                    betaToolList = (List<ToolProperties>)dataGridTools.ItemsSource;
-                    foreach (var tool in betaToolList)
+                    if (!tool.IsSelected) continue;
+   
+                    foreach (var fileName in tool.InstallingFiles)
                     {
-                        if (tool.IsSelected)
+                        try
                         {
-                            var fileNames = tool.InstallingFiles;
-                           
-                            foreach (var fileName in fileNames)
+                            var installedFiles = Directory.GetFiles(installDirectory, fileName + "*");
+                            if (installedFiles.Any())
                             {
-                                try
+                                foreach (var installedFile in installedFiles)
                                 {
-                                    var installedFiles = Directory.GetFiles(installDirectory, fileName + "*");
-                                    if (installedFiles.Length > 0)
+                                    try
                                     {
-                                        foreach (var installedFile in installedFiles)
-                                        {
-                                            try
-                                            {
-                                                File.Delete(installedFile);
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                var message = ex.Message;
-                                            }
-                                        }
+                                        File.Delete(installedFile);
                                     }
-                                    File.Copy(betaDirectory + fileName, installDirectory + fileName, true);
-                                    //make copies of the files for the push button data
-                                    File.Copy(betaDirectory + fileName, tempInstallDirectory + fileName, true);
-                                }
-                                catch (Exception ex)
-                                {
-                                    var message = ex.Message;
+                                    catch (Exception ex)
+                                    {
+                                        var message = ex.Message;
+                                    }
                                 }
                             }
-                            var installPath = System.IO.Path.Combine(installDirectory, System.IO.Path.GetFileName(tool.BetaPath));
-                            //update tool info dictionary
-                            if (File.Exists(installPath))
-                            {
-                                tool.InstallPath = installPath;
-                                tool.TempAssemblyPath = GetTempInstallPath(tool.InstallPath);
-                                tool.InstallExist = true;
-                                tool.InstalledVersionInfo = FileVersionInfo.GetVersionInfo(tool.InstallPath);
-                                tool.InstallVersionNumber = "v." + tool.InstalledVersionInfo.FileVersion;
-                                tool.IsSelected = false;
-                            }
-                          
-                            toolInfoDictionary.Remove(tool.ToolEnumVal);
-                            toolInfoDictionary.Add(tool.ToolEnumVal, tool);
-                            numOfTools++;
+                            File.Copy(betaDirectory + fileName, installDirectory + fileName, true);
+                            //make copies of the files for the push button data
+                            File.Copy(betaDirectory + fileName, tempInstallDirectory + fileName, true);
+                        }
+                        catch (Exception ex)
+                        {
+                            var message = ex.Message;
                         }
                     }
-
-                    if (numOfTools > 0)
+                    var installPath = Path.Combine(installDirectory, Path.GetFileName(tool.BetaPath));
+                    //update tool info dictionary
+                    if (File.Exists(installPath))
                     {
-                        MessageBox.Show(numOfTools.ToString()+" tools are successfully installed in the beta directory.", "Beta Installation", MessageBoxButton.OK, MessageBoxImage.Information);
-                        this.DialogResult = true;
+                        tool.InstallPath = installPath;
+                        tool.TempAssemblyPath = GetTempInstallPath(tool.InstallPath);
+                        tool.InstallExist = true;
+                        tool.InstalledVersionInfo = FileVersionInfo.GetVersionInfo(tool.InstallPath);
+                        tool.InstallVersionNumber = "v." + tool.InstalledVersionInfo.FileVersion;
+                        tool.IsSelected = false;
                     }
-
+                          
+                    ToolInfoDictionary.Remove(tool.ToolEnumVal);
+                    ToolInfoDictionary.Add(tool.ToolEnumVal, tool);
+                    numOfTools++;
                 }
+
+                if (numOfTools == 0) return;
+
+                MessageBox.Show(numOfTools + " tools are successfully installed in the beta directory.", "Beta Installation", MessageBoxButton.OK, MessageBoxImage.Information);
+                DialogResult = true;
             }
             catch (Exception ex)
             {
@@ -165,7 +145,7 @@ namespace HOK.BetaToolsManager
             var tempPath = "";
             try
             {
-                var fileName = System.IO.Path.GetFileName(installPath);
+                var fileName = Path.GetFileName(installPath);
                 tempPath = tempInstallDirectory + fileName;
                 if (!File.Exists(tempPath))
                 {
@@ -215,16 +195,16 @@ namespace HOK.BetaToolsManager
                                 tool.IsSelected = false;
                             }
 
-                            toolInfoDictionary.Remove(tool.ToolEnumVal);
-                            toolInfoDictionary.Add(tool.ToolEnumVal, tool);
+                            ToolInfoDictionary.Remove(tool.ToolEnumVal);
+                            ToolInfoDictionary.Add(tool.ToolEnumVal, tool);
                             numOfTool++;
                         }
                     }
 
                     if (numOfTool > 0)
                     {
-                        MessageBox.Show(numOfTool.ToString()+" tools are removed successfully.", "Beta Uninstallation", MessageBoxButton.OK, MessageBoxImage.Information);
-                        this.DialogResult = true;
+                        MessageBox.Show(numOfTool + " tools are removed successfully.", "Beta Uninstallation", MessageBoxButton.OK, MessageBoxImage.Information);
+                        DialogResult = true;
                     }
                 }
             }
