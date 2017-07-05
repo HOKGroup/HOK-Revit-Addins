@@ -4,6 +4,7 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
@@ -24,7 +25,7 @@ namespace HOK.MissionControl.FamilyPublish
         {
             var uiApp = commandData.Application;
             var doc = uiApp.ActiveUIDocument.Document;
-            LogUtilities.AppendLog("FamilyPublishCommand: Started...");
+            Log.AppendLog("FamilyPublishCommand: Started...");
 
             try
             {
@@ -76,9 +77,9 @@ namespace HOK.MissionControl.FamilyPublish
             }
             catch (Exception e)
             {
-                LogUtilities.AppendLog("FamilyPublishCommand: " + e.Message);
+                Log.AppendLog("FamilyPublishCommand: " + e.Message);
             }
-            LogUtilities.AppendLog("FamilyPublishCommand: Ended.");
+            Log.AppendLog("FamilyPublishCommand: Ended.");
             return Result.Succeeded;
         }
     }

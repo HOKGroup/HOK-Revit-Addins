@@ -2,9 +2,9 @@
 using System.IO;
 using System.Text;
 
-namespace HOK.Core
+namespace HOK.Core.Utilities
 {
-    public static class LogUtilities
+    public static class Log
     {
         public static bool Initialized { get; set; }
         public static string LogDirectory { get; set; } = "";

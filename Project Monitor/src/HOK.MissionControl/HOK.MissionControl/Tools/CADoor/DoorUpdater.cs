@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 
 namespace HOK.MissionControl.Tools.CADoor
@@ -42,13 +43,13 @@ namespace HOK.MissionControl.Tools.CADoor
                 {
                     UpdaterRegistry.RegisterUpdater(this, doc);
                     RefreshTriggers(doc, pUpdater);
-                    LogUtilities.AppendLog("Door Updater Registered.");
+                    Log.AppendLog("Door Updater Registered.");
                     registered = true;
                 }
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DoorUpdater-Register:" + ex.Message);
+                Log.AppendLog("DoorUpdater-Register:" + ex.Message);
             }
             return registered;
         }
@@ -64,12 +65,12 @@ namespace HOK.MissionControl.Tools.CADoor
                 if (UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
                 {
                     UpdaterRegistry.UnregisterUpdater(updaterId, doc);
-                    LogUtilities.AppendLog("Door Updater Removed.");
+                    Log.AppendLog("Door Updater Removed.");
                 }
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DoorUpdater-Unregister:" + ex.Message);
+                Log.AppendLog("DoorUpdater-Unregister:" + ex.Message);
             }
         }
 
@@ -122,7 +123,7 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DoorUpdater-RefreshTriggers:" + ex.Message);
+                Log.AppendLog("DoorUpdater-RefreshTriggers:" + ex.Message);
             }
             return refreshed;
         }
@@ -169,7 +170,7 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DoorUpdater-FindClearanceParameter:" + ex.Message);
+                Log.AppendLog("DoorUpdater-FindClearanceParameter:" + ex.Message);
             }
             return exist;
         }
@@ -273,7 +274,7 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DoorUpdater-Execute:" + ex.Message);
+                Log.AppendLog("DoorUpdater-Execute:" + ex.Message);
             }
         }
 

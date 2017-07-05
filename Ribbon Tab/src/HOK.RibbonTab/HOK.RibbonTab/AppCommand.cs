@@ -5,7 +5,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Forms;
 using System.Reflection;
 using Autodesk.Revit.UI;
-using HOK.Core;
+using HOK.Core.Utilities;
 
 namespace HOK.RibbonTab
 {
@@ -26,7 +26,7 @@ namespace HOK.RibbonTab
 
         Result IExternalApplication.OnStartup(UIControlledApplication application)
         {
-            LogUtilities.Initialize("HOK_Tools");
+            Log.Initialize("HOK_Tools");
 
             m_app = application;
 
@@ -37,7 +37,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("HOK.RibbonTab.AppCommand.OnStartup: " + ex.Message);
+                Log.AppendLog("HOK.RibbonTab.AppCommand.OnStartup: " + ex.Message);
             }
 
             currentAssembly = Assembly.GetAssembly(GetType()).Location;
@@ -76,13 +76,13 @@ namespace HOK.RibbonTab
                     ToolTip = "Mission Control Family Export Tool."
                 };
                 var fpAssembly = Assembly.LoadFrom(assemblyPath);
-                pb1.LargeImage = ButtonUtilities.LoadBitmapImage(fpAssembly, "HOK.MissionControl.FamilyPublish", "publishFamily_32x32.png");
+                pb1.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl.FamilyPublish", "publishFamily_32x32.png");
 
                 missionControlPanel.AddItem(pb1);
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("HOK.RibbonTab.AppCommand.CreateMissionControlPushButtons: " + ex.Message);
+                Log.AppendLog("HOK.RibbonTab.AppCommand.CreateMissionControlPushButtons: " + ex.Message);
             }
         }
 
@@ -244,7 +244,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("HOK.RibbonTab.AppCommand.CreateHOKPushButtons: " + ex.Message);
+                Log.AppendLog("HOK.RibbonTab.AppCommand.CreateHOKPushButtons: " + ex.Message);
             }
         }
 

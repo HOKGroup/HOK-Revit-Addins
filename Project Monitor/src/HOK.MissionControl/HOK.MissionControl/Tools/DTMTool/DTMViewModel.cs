@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
@@ -94,7 +95,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMWindow-buttonEdit_Click:" + ex.Message);
+                Log.AppendLog("DTMWindow-buttonEdit_Click:" + ex.Message);
             }
         }
 
@@ -112,7 +113,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMWindow-buttonPlay_Click:" + ex.Message);
+                Log.AppendLog("DTMWindow-buttonPlay_Click:" + ex.Message);
             }
         }
     }

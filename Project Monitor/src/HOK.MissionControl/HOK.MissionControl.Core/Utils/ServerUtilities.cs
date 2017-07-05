@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using HOK.MissionControl.Core.Schemas;
 using RestSharp;
-using HOK.Core;
+using HOK.Core.Utilities;
 
 namespace HOK.MissionControl.Core.Utils
 {
@@ -305,11 +305,11 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddBody(worksetInfo);
                 var response = client.Execute<WorksetEvent>(request);
 
-                if(response.StatusCode == HttpStatusCode.OK) LogUtilities.AppendLog("PostWorksetInfo: " + state + " succeeded.");
+                if(response.StatusCode == HttpStatusCode.OK) Log.AppendLog("HOK.MissionControl.Core.Utils.ServerUtilities.PostWorksetInfo: " + state + " succeeded.");
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("PostWorksetInfo: " + ex.Message );
+                Log.AppendLog("HOK.MissionControl.Core.Utils.ServerUtilities.PostWorksetInfo: " + ex.Message );
             }
         }
 

@@ -79,8 +79,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ButtonUtilities.cs" />
-    <Compile Include="LogUtilities.cs" />
+    <Compile Include="Utilities\Button.cs" />
+    <Compile Include="Utilities\Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

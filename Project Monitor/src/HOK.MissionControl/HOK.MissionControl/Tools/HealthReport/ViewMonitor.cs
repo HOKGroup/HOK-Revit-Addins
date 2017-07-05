@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
@@ -102,7 +103,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception e)
             {
-                LogUtilities.AppendLog("ViewMonitor-PublishData: " + e.Message);
+                Log.AppendLog("ViewMonitor-PublishData: " + e.Message);
             }
         }
     }

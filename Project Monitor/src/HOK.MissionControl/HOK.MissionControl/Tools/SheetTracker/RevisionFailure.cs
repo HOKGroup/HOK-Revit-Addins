@@ -2,6 +2,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
 
@@ -22,7 +23,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("RevisionFailure-ProcessFailure:" + ex.Message);
+                Log.AppendLog("RevisionFailure-ProcessFailure:" + ex.Message);
             }
         }
     }

@@ -1,9 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Windows.Media.Imaging;
 
-namespace HOK.Core
+namespace HOK.Core.Utilities
 {
-    public static class ButtonUtilities
+    public static class ButtonUtil
     {
         /// <summary>
         /// Retrieves the BitmapImage from given assembly by its name and namespace. 
@@ -25,9 +26,9 @@ namespace HOK.Core
                 image.StreamSource = stream;
                 image.EndInit();
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                Log.AppendLog("HOK.Core.ButtonUtilities.LoadBitmapImage: " + ex.Message);
             }
             return image;
         }

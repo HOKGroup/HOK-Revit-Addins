@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 using HOK.Core;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.Core.Utilities;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -62,7 +63,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception e)
             {
-                LogUtilities.AppendLog("ModelMonitor-PublishSessionInfo: " + e.Message);
+                Log.AppendLog("ModelMonitor-PublishSessionInfo: " + e.Message);
             }
         }
 
@@ -88,7 +89,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception e)
             {
-                LogUtilities.AppendLog("ModelMonitor-PublishOpenTime: " + e.Message);
+                Log.AppendLog("ModelMonitor-PublishOpenTime: " + e.Message);
             }
         }
 
@@ -114,7 +115,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception e)
             {
-                LogUtilities.AppendLog("ModelMonitor-PublishOpenTime: " + e.Message);
+                Log.AppendLog("ModelMonitor-PublishOpenTime: " + e.Message);
             }
         }
 
@@ -145,7 +146,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 catch (Exception e)
                 {
                     fileSize = 0;
-                    LogUtilities.AppendLog("ModelMonitor-PublishModelSize-GetFileInfo: " + e.Message);
+                    Log.AppendLog("ModelMonitor-PublishModelSize-GetFileInfo: " + e.Message);
                 }
 
                 var eventItem = new EventTime
@@ -157,7 +158,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception e)
             {
-                LogUtilities.AppendLog("ModelMonitor-PublishModelSize: " + e.Message);
+                Log.AppendLog("ModelMonitor-PublishModelSize: " + e.Message);
             }
         }
     }

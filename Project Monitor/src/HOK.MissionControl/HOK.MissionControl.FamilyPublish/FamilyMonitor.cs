@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.FamilyPublish.Properties;
@@ -89,7 +90,7 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                     catch (Exception e)
                     {
-                        LogUtilities.AppendLog("FamilyMonitor-PublishData-SaveAndDelete: " + e.Message);
+                        Log.AppendLog("FamilyMonitor-PublishData-SaveAndDelete: " + e.Message);
                     }
                 }
 
@@ -107,7 +108,7 @@ namespace HOK.MissionControl.FamilyPublish
             }
             catch (Exception e)
             {
-                LogUtilities.AppendLog("FamilyMonitor-PublishData: " + e.Message);
+                Log.AppendLog("FamilyMonitor-PublishData: " + e.Message);
             }
         }
 
@@ -139,7 +140,7 @@ namespace HOK.MissionControl.FamilyPublish
             }
             catch (IOException e)
             {
-                LogUtilities.AppendLog("FamilyMonitor-TryToDelete: " + e.Message);
+                Log.AppendLog("FamilyMonitor-TryToDelete: " + e.Message);
             }
         }
 

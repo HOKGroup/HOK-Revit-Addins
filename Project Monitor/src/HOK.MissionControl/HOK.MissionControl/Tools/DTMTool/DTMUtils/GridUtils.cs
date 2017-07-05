@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
@@ -56,7 +57,7 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("GridUtils-CollectGridExtents:" + ex.Message);
+                Log.AppendLog("GridUtils-CollectGridExtents:" + ex.Message);
             }
         }
 
@@ -92,7 +93,7 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("GridUtils-ExtentGeometryChanged:" + ex.Message);
+                Log.AppendLog("GridUtils-ExtentGeometryChanged:" + ex.Message);
             }
             return changed;
         }

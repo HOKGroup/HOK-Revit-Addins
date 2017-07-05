@@ -4,8 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
-using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.DTMTool.DTMUtils;
 using HOK.MissionControl.Utils;
 
@@ -43,13 +43,13 @@ namespace HOK.MissionControl.Tools.DTMTool
                 {
                     UpdaterRegistry.RegisterUpdater(this, doc);
                     RefreshTriggers(doc, pUpdater);
-                    LogUtilities.AppendLog("DTM Updater Registered.");
+                    Log.AppendLog("HOK.MissionControl.Tools.DTMTool.DtmUpdater.Register: Registered.");
                     registered = true;
                 }
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMUpdater-Register:" + ex.Message);
+                Log.AppendLog("HOK.MissionControl.Tools.DTMTool.DtmUpdater.Register: " + ex.Message);
             }
             return registered;
         }
@@ -65,11 +65,11 @@ namespace HOK.MissionControl.Tools.DTMTool
                 if (!UpdaterRegistry.IsUpdaterRegistered(_updaterId, doc)) return;
 
                 UpdaterRegistry.UnregisterUpdater(_updaterId, doc);
-                LogUtilities.AppendLog("DTM Updater Removed.");
+                Log.AppendLog("DTM Updater Removed.");
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMUpdater-Unregister:" + ex.Message);
+                Log.AppendLog("DTMUpdater-Unregister:" + ex.Message);
             }
         }
 
@@ -172,7 +172,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMUpdater-RefreshTriggers:" + ex.Message);
+                Log.AppendLog("DTMUpdater-RefreshTriggers:" + ex.Message);
             }
         }
 
@@ -235,7 +235,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMUpdater-Execute:" + ex.Message);
+                Log.AppendLog("DTMUpdater-Execute:" + ex.Message);
             }
         }
 
@@ -278,7 +278,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMUpdater-AddCategoryCache:" + ex.Message);
+                Log.AppendLog("DTMUpdater-AddCategoryCache:" + ex.Message);
             }
         }
 
@@ -299,7 +299,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMUpdater-AddElementToStorage:" + ex.Message);
+                Log.AppendLog("DTMUpdater-AddElementToStorage:" + ex.Message);
             }
         }
 
@@ -336,7 +336,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMUpdater-GetTriggerMessage:" + ex.Message);
+                Log.AppendLog("DTMUpdater-GetTriggerMessage:" + ex.Message);
             }
             return triggerMsg;
         }
@@ -397,7 +397,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMUpdater-RunCategoryActionItems:" + ex.Message);
+                Log.AppendLog("DTMUpdater-RunCategoryActionItems:" + ex.Message);
             }
         }
 
@@ -417,7 +417,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DTMUpdater-ReportFailure:" + ex.Message);
+                Log.AppendLog("DTMUpdater-ReportFailure:" + ex.Message);
             }
         }
 

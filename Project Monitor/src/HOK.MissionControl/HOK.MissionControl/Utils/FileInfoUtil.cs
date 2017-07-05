@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Autodesk.Revit.DB;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
@@ -32,7 +33,7 @@ namespace HOK.MissionControl.Utils
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("FileInfoUtil-GetCentralFilePath:" + ex.Message);
+                Log.AppendLog("FileInfoUtil-GetCentralFilePath:" + ex.Message);
             }
             return centralPath;
         }
@@ -61,7 +62,7 @@ namespace HOK.MissionControl.Utils
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("FileInfoUtil-GetProjectInfo:" + ex.Message);
+                Log.AppendLog("FileInfoUtil-GetProjectInfo:" + ex.Message);
             }
             return projectInfo;
         }
@@ -85,7 +86,7 @@ namespace HOK.MissionControl.Utils
             }
             catch(Exception ex)
             {
-                LogUtilities.AppendLog("FileInfoUtil-GetProjectName:" + ex.Message);
+                Log.AppendLog("FileInfoUtil-GetProjectName:" + ex.Message);
                 return "";
             }
             return name;
@@ -108,7 +109,7 @@ namespace HOK.MissionControl.Utils
             }
             catch(Exception ex) 
             {
-                LogUtilities.AppendLog("FileInfoUtil-GetFileLocation:" + ex.Message);
+                Log.AppendLog("FileInfoUtil-GetFileLocation:" + ex.Message);
             }
             return fileLocation;
         }

@@ -2,6 +2,7 @@
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
@@ -90,7 +91,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
             }
             catch (Exception e)
             {
-                LogUtilities.AppendLog("LinkMonitor-PublishData: " + e.Message);
+                Log.AppendLog("LinkMonitor-PublishData: " + e.Message);
             }
         }
     }

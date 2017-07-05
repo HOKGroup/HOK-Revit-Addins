@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using HOK.Core;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.Core.Utilities;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -58,7 +59,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception e)
             {
-                LogUtilities.AppendLog("WorksetOpenMonitor-PublishData: " + e.Message);
+                Log.AppendLog("WorksetOpenMonitor-PublishData: " + e.Message);
             }
         }
     }

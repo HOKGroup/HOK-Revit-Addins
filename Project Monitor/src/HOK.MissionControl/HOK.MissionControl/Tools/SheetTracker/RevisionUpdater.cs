@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
@@ -48,13 +49,13 @@ namespace HOK.MissionControl.Tools.SheetTracker
                 if (!UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
                 {
                     UpdaterRegistry.RegisterUpdater(this, doc);
-                    LogUtilities.AppendLog("Revision Updater Registered.");
+                    Log.AppendLog("Revision Updater Registered.");
                     registered = true;
                 }
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DoorUpdater-Register:" + ex.Message);
+                Log.AppendLog("DoorUpdater-Register:" + ex.Message);
             }
             return registered;
         }
@@ -66,12 +67,12 @@ namespace HOK.MissionControl.Tools.SheetTracker
                 if (UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
                 {
                     UpdaterRegistry.UnregisterUpdater(updaterId, doc);
-                    LogUtilities.AppendLog("Revision Updater Removed.");
+                    Log.AppendLog("Revision Updater Removed.");
                 }
             }
             catch (Exception ex)
             {
-                LogUtilities.AppendLog("DoorUpdater-Unregister:" + ex.Message);
+                Log.AppendLog("DoorUpdater-Unregister:" + ex.Message);
             }
         }
 
