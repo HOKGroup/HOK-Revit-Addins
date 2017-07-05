@@ -58,7 +58,7 @@ namespace HOK.RibbonTab
                 var utilityExist = false;
                 var utilPanel = m_app.CreateRibbonPanel(tabName, "Utilities");
                 //HOK Utilities
-                if (File.Exists(currentDirectory + "/HOK.ElementTools.dll") || File.Exists(currentDirectory + "/HOK.ParameterTools.dll") || File.Exists(currentDirectory + "/HOK.ColorSchemeEditor.dll"))
+                if (File.Exists(currentDirectory + "/HOK.ElementTools.dll") || File.Exists(currentDirectory + "/HOK.ParameterTools.dll"))
                 {
                     var splitButtonData = new SplitButtonData("HOKUtilities", "HOK Utilities");
                     var splitButton = (SplitButton)utilPanel.AddItem(splitButtonData);
@@ -140,14 +140,14 @@ namespace HOK.RibbonTab
                         utilityExist = true;
                     }
 
-                    if (File.Exists(currentDirectory + "/HOK.ColorSchemeEditor.dll"))
-                    {
-                        var pb20 = splitButton.AddPushButton(new PushButtonData("Color Editor", "Color Editor", currentDirectory + "/HOK.ColorSchemeEditor.dll", "HOK.ColorSchemeEditor.Command"));
-                        pb20.LargeImage = LoadBitmapImage(assembly, "color32.png");
-                        pb20.ToolTip = "Create color schemes by categories and parameter values.";
-                        AddToolTips(pb20);
-                        utilityExist = true;
-                    }
+                    //if (File.Exists(currentDirectory + "/HOK.ColorSchemeEditor.dll"))
+                    //{
+                    //    var pb20 = splitButton.AddPushButton(new PushButtonData("Color Editor", "Color Editor", currentDirectory + "/HOK.ColorSchemeEditor.dll", "HOK.ColorSchemeEditor.Command"));
+                    //    pb20.LargeImage = LoadBitmapImage(assembly, "color32.png");
+                    //    pb20.ToolTip = "Create color schemes by categories and parameter values.";
+                    //    AddToolTips(pb20);
+                    //    utilityExist = true;
+                    //}
 
                     if (File.Exists(currentDirectory + "/HOK.DoorRoom.dll"))
                     {
