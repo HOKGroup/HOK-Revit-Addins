@@ -40,7 +40,7 @@ namespace HOK.BetaToolsManager
 
         private bool ExistBetaContentFolder()
         {
-            bool exist = false;
+            var exist = false;
             try
             {
                 if (!Directory.Exists(installDirectory))
@@ -53,7 +53,7 @@ namespace HOK.BetaToolsManager
                     Directory.Delete(tempInstallDirectory, true);
                 }
 
-                string resourceFolder = Path.Combine(installDirectory, "Resources");
+                var resourceFolder = Path.Combine(installDirectory, "Resources");
                 if (Directory.Exists(installDirectory) && !Directory.Exists(resourceFolder))
                 {
                     Directory.CreateDirectory(resourceFolder);
@@ -61,32 +61,32 @@ namespace HOK.BetaToolsManager
                 if (Directory.Exists(installDirectory) && !Directory.Exists(tempInstallDirectory))
                 {
                     //copy files from install directory to temp directory.
-                    string[] installedFiles = Directory.GetFiles(installDirectory);
+                    var installedFiles = Directory.GetFiles(installDirectory);
 
                     Directory.CreateDirectory(tempInstallDirectory);
                     if (Directory.Exists(tempInstallDirectory))
                     {
-                        foreach (string filePath in installedFiles)
+                        foreach (var filePath in installedFiles)
                         {
-                            string fileName = Path.GetFileName(filePath);
-                            string tempFile = Path.Combine(tempInstallDirectory, fileName);
+                            var fileName = Path.GetFileName(filePath);
+                            var tempFile = Path.Combine(tempInstallDirectory, fileName);
                             try { File.Copy(filePath, tempFile, true); }
                             catch { }
                         }
                     }
 
-                    string tempResourceFolder = Path.Combine(tempInstallDirectory, "Resources");
+                    var tempResourceFolder = Path.Combine(tempInstallDirectory, "Resources");
                     if (!Directory.Exists(tempResourceFolder))
                     {
                         Directory.CreateDirectory(tempResourceFolder);
                     }
                     if (Directory.Exists(tempResourceFolder))
                     {
-                        string[] installedResources = Directory.GetFiles(resourceFolder);
-                        foreach (string filePath in installedResources)
+                        var installedResources = Directory.GetFiles(resourceFolder);
+                        foreach (var filePath in installedResources)
                         {
-                            string fileName = Path.GetFileName(filePath);
-                            string tempFile = Path.Combine(tempResourceFolder, fileName);
+                            var fileName = Path.GetFileName(filePath);
+                            var tempFile = Path.Combine(tempResourceFolder, fileName);
                             try { File.Copy(filePath, tempFile, true); }
                             catch { }
                         }
@@ -109,14 +109,14 @@ namespace HOK.BetaToolsManager
 
         private Dictionary<ToolEnum, ToolProperties> GetToolInfo()
         {
-            Dictionary<ToolEnum, ToolProperties> dictionary = new Dictionary<ToolEnum, ToolProperties>();
+            var dictionary = new Dictionary<ToolEnum, ToolProperties>();
             try
             {
-                Array toolArray = Enum.GetValues(typeof(ToolEnum));
+                var toolArray = Enum.GetValues(typeof(ToolEnum));
                 
                 foreach (ToolEnum tool in toolArray)
                 {
-                    ToolProperties tp = new ToolProperties();
+                    var tp = new ToolProperties();
                     tp.ToolEnumVal = tool;
                     tp.InstallingFiles = GetFiles(tool);
 
@@ -281,10 +281,10 @@ namespace HOK.BetaToolsManager
 
         private string GetTempInstallPath(string installPath)
         {
-            string tempPath="";
+            var tempPath="";
             try
             {
-                string fileName = Path.GetFileName(installPath);
+                var fileName = Path.GetFileName(installPath);
                 tempPath = Path.Combine(tempInstallDirectory, fileName);
                 if (!File.Exists(tempPath))
                 {
@@ -293,14 +293,14 @@ namespace HOK.BetaToolsManager
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return tempPath;
         }
 
         private List<string> GetFiles(ToolEnum toolName)
         {
-            List<string> fileNames = new List<string>();
+            var fileNames = new List<string>();
             try
             {
                 switch (toolName)
@@ -385,7 +385,7 @@ namespace HOK.BetaToolsManager
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return fileNames;
         }
@@ -401,16 +401,16 @@ namespace HOK.BetaToolsManager
         private string installPath = "";
         private string betaPath = "";
         private string tempAssemblyPath = "";
-        private FileVersionInfo betaVersionInfo = null;
-        private FileVersionInfo installedVersionInfo = null;
+        private FileVersionInfo betaVersionInfo;
+        private FileVersionInfo installedVersionInfo;
         private string betaVersionNumber = "Not Exist";
         private string betaReleasedDate = "";
         private string installVersionNumber = "Not Installed";
-        private bool betaExist = false;
-        private bool installExist = false;
-        private bool isEnabled = false;
-        private bool isSelected = false;
-        private BitmapImage toolIcon = null;
+        private bool betaExist;
+        private bool installExist;
+        private bool isEnabled;
+        private bool isSelected;
+        private BitmapImage toolIcon;
         private List<string> installingFiles = new List<string>();
 
         public ToolEnum ToolEnumVal { get { return toolEnumVal; } set { toolEnumVal = value; } }
@@ -461,11 +461,11 @@ namespace HOK.BetaToolsManager
     {
         public static BitmapImage LoadBitmapImage(string imageName)
         {
-            BitmapImage image = new BitmapImage();
+            var image = new BitmapImage();
             try
             {
-                string prefix = typeof(AppCommand).Namespace + ".Resources.";
-                Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(prefix + imageName);
+                var prefix = typeof(AppCommand).Namespace + ".Resources.";
+                var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(prefix + imageName);
 
                 image.BeginInit();
                 image.StreamSource = stream;

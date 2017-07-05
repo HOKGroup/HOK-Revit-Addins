@@ -43,11 +43,11 @@ namespace HOK.BetaToolsManager
             InitializeComponent();
             this.Title = "HOK Beta Tools Installer v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
-            foreach (ToolProperties tp in toolInfoDictionary.Values)
+            foreach (var tp in toolInfoDictionary.Values)
             {
                 if (tp.BetaExist ||tp.InstallExist)
                 {
-                    ToolProperties tool = GetToolVersion(tp);
+                    var tool = GetToolVersion(tp);
                     betaToolList.Add(tool);
                 }
             }
@@ -58,14 +58,14 @@ namespace HOK.BetaToolsManager
 
         private ToolProperties GetToolVersion(ToolProperties tool)
         {
-            ToolProperties tp = new ToolProperties(tool);
+            var tp = new ToolProperties(tool);
             try
             {
                 if (tp.BetaExist)
                 {
                     tp.BetaVersionInfo = FileVersionInfo.GetVersionInfo(tp.BetaPath);
                     tp.BetaVersionNumber = "v." + tp.BetaVersionInfo.FileVersion;
-                    FileInfo fileInfo = new FileInfo(tp.BetaPath);
+                    var fileInfo = new FileInfo(tp.BetaPath);
                     tp.BetaReleasedDate = fileInfo.LastWriteTime.Date.ToString("d");
                 }
                 if (tp.InstallExist)
@@ -90,24 +90,24 @@ namespace HOK.BetaToolsManager
         {
             try
             {
-                int numOfTools = 0;
+                var numOfTools = 0;
                 if (null != dataGridTools.ItemsSource)
                 {
                     betaToolList = (List<ToolProperties>)dataGridTools.ItemsSource;
-                    foreach (ToolProperties tool in betaToolList)
+                    foreach (var tool in betaToolList)
                     {
                         if (tool.IsSelected)
                         {
-                            List<string> fileNames = tool.InstallingFiles;
+                            var fileNames = tool.InstallingFiles;
                            
-                            foreach (string fileName in fileNames)
+                            foreach (var fileName in fileNames)
                             {
                                 try
                                 {
-                                    string[] installedFiles = Directory.GetFiles(installDirectory, fileName + "*");
+                                    var installedFiles = Directory.GetFiles(installDirectory, fileName + "*");
                                     if (installedFiles.Length > 0)
                                     {
-                                        foreach (string installedFile in installedFiles)
+                                        foreach (var installedFile in installedFiles)
                                         {
                                             try
                                             {
@@ -115,7 +115,7 @@ namespace HOK.BetaToolsManager
                                             }
                                             catch (Exception ex)
                                             {
-                                                string message = ex.Message;
+                                                var message = ex.Message;
                                             }
                                         }
                                     }
@@ -125,10 +125,10 @@ namespace HOK.BetaToolsManager
                                 }
                                 catch (Exception ex)
                                 {
-                                    string message = ex.Message;
+                                    var message = ex.Message;
                                 }
                             }
-                            string installPath = System.IO.Path.Combine(installDirectory, System.IO.Path.GetFileName(tool.BetaPath));
+                            var installPath = System.IO.Path.Combine(installDirectory, System.IO.Path.GetFileName(tool.BetaPath));
                             //update tool info dictionary
                             if (File.Exists(installPath))
                             {
@@ -162,10 +162,10 @@ namespace HOK.BetaToolsManager
 
         private string GetTempInstallPath(string installPath)
         {
-            string tempPath = "";
+            var tempPath = "";
             try
             {
-                string fileName = System.IO.Path.GetFileName(installPath);
+                var fileName = System.IO.Path.GetFileName(installPath);
                 tempPath = tempInstallDirectory + fileName;
                 if (!File.Exists(tempPath))
                 {
@@ -174,7 +174,7 @@ namespace HOK.BetaToolsManager
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return tempPath;
         }
@@ -187,15 +187,15 @@ namespace HOK.BetaToolsManager
             {
                 if (null != dataGridTools.ItemsSource)
                 {
-                    int numOfTool = 0;
+                    var numOfTool = 0;
 
                     betaToolList = (List<ToolProperties>)dataGridTools.ItemsSource;
-                    foreach (ToolProperties tool in betaToolList)
+                    foreach (var tool in betaToolList)
                     {
                         if (tool.IsSelected)
                         {
-                            List<string> fileNames = tool.InstallingFiles;
-                            foreach (string fileName in fileNames)
+                            var fileNames = tool.InstallingFiles;
+                            foreach (var fileName in fileNames)
                             {
                                 try
                                 {
@@ -203,7 +203,7 @@ namespace HOK.BetaToolsManager
                                 }
                                 catch (Exception ex)
                                 {
-                                    string message = ex.Message;
+                                    var message = ex.Message;
                                 }
                             }
                             //update tool info dictionary

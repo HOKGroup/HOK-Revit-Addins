@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>HOK Beta Tools Manager</Name>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.BetaToolsManager.dll</Assembly>
+    <AddInId>AD4E6C2C-286D-48A4-B11F-F9F4A5A5C802</AddInId>
+    <FullClassName>HOK.BetaToolsManager.AppCommand</FullClassName>
+    <VendorId>JKIM</VendorId>
+    <VendorDescription>JKIM</VendorDescription>
+  </AddIn>
+</RevitAddIns>

@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media.Imaging;
 using Autodesk.Revit.UI;
 
 namespace HOK.BetaToolsManager
@@ -33,24 +28,24 @@ namespace HOK.BetaToolsManager
     public class AppCommand:IExternalApplication
     {
         private UIControlledApplication m_app;
-        internal static AppCommand thisApp = null;
-        private string tabName = "  HOK - Beta";
+        internal static AppCommand thisApp;
+        private const string tabName = "  HOK - Beta";
         private string versionNumber = "";
-        private ToolManager toolManager = null;
+        private ToolManager toolManager;
         private Dictionary<ToolEnum, ToolProperties> toolInfoDictionary = new Dictionary<ToolEnum, ToolProperties>();
-        private Dictionary<string, ButtonData> buttonDictionary = new Dictionary<string, ButtonData>();
+        private readonly Dictionary<string, ButtonData> buttonDictionary = new Dictionary<string, ButtonData>();
         private string currentDirectory = "";
         private string currentAssembly = "";
-        private string tooltipFileName = "HOK.Tooltip.txt";
+        private const string tooltipFileName = "HOK.Tooltip.txt";
 
-        private RibbonPanel utilityPanel = null;
-        private SplitButton utilitySplitButton = null;
-        private RibbonPanel customizePanel = null;
-        private SplitButton massSplitButton = null;
-        private RibbonPanel dataPanel = null;
-        private RibbonPanel analysisPanel = null;
-        private SplitButton analysisSplitButton = null;
-        private RibbonPanel shapePanel = null;
+        private RibbonPanel utilityPanel;
+        private SplitButton utilitySplitButton;
+        private RibbonPanel customizePanel;
+        private SplitButton massSplitButton;
+        private RibbonPanel dataPanel;
+        private RibbonPanel analysisPanel;
+        private SplitButton analysisSplitButton;
+        private RibbonPanel shapePanel;
 
         Result IExternalApplication.OnShutdown(UIControlledApplication application)
         {
@@ -66,48 +61,52 @@ namespace HOK.BetaToolsManager
             toolManager = new ToolManager(versionNumber);
             toolInfoDictionary = toolManager.ToolInfoDictionary;
 
-            try { m_app.CreateRibbonTab(tabName); }
-            catch { }
-          
-            currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
+            try
+            {
+                m_app.CreateRibbonTab(tabName);
+            }
+            catch
+            {
+                // ignored
+            }
+
+            currentAssembly = System.Reflection.Assembly.GetAssembly(GetType()).Location;
             currentDirectory = Path.GetDirectoryName(currentAssembly);
-            string tooltipTxt = currentDirectory + "/Resources/" + tooltipFileName;
+            var tooltipTxt = currentDirectory + "/Resources/" + tooltipFileName;
             ReadToolTips(tooltipTxt);
 
             CreateInstallerPanel();
-            if (toolInfoDictionary.Count > 0)
-            {
-                CreateUtilitiesPanel();
-                CreateCustomPanel();
-                CreateDataPanel();
-                CreateAnalysisPanel();
-                CreateDirectShapePanel();
-            }
+            if (!toolInfoDictionary.Any()) return Result.Succeeded;
+
+            CreateUtilitiesPanel();
+            CreateCustomPanel();
+            CreateDataPanel();
+            CreateAnalysisPanel();
+            CreateDirectShapePanel();
 
             return Result.Succeeded;
         }
 
         public void ShowInstaller(UIApplication uiapp)
         {
-            BetaInstallerWindow installerWindow = new BetaInstallerWindow(versionNumber, toolInfoDictionary);
-            if (installerWindow.ShowDialog() == true)
-            {
-                toolInfoDictionary = installerWindow.ToolInfoDictionary;
-                CreateUtilitiesPanel();
-                CreateCustomPanel();
-                CreateDataPanel();
-                CreateAnalysisPanel();
-                CreateDirectShapePanel();
-            }
+            var installerWindow = new BetaInstallerWindow(versionNumber, toolInfoDictionary);
+            if (installerWindow.ShowDialog() != true) return;
+
+            toolInfoDictionary = installerWindow.ToolInfoDictionary;
+            CreateUtilitiesPanel();
+            CreateCustomPanel();
+            CreateDataPanel();
+            CreateAnalysisPanel();
+            CreateDirectShapePanel();
         }
 
-        private Dictionary<string, PushButton> CheckExistingButtons(SplitButton splitButton)
+        private static Dictionary<string, PushButton> CheckExistingButtons(SplitButton splitButton)
         {
-            Dictionary<string, PushButton> pushButtons = new Dictionary<string, PushButton>();
+            var pushButtons = new Dictionary<string, PushButton>();
             try
             {
-                List<PushButton> buttons = splitButton.GetItems().ToList();
-                foreach (PushButton bttn in buttons)
+                var buttons = splitButton.GetItems().ToList();
+                foreach (var bttn in buttons)
                 {
                     if (!pushButtons.ContainsKey(bttn.Name))
                     {
@@ -123,15 +122,15 @@ namespace HOK.BetaToolsManager
             return pushButtons;
         }
 
-        private Dictionary<string, PushButton> CheckExistingButtons(RibbonPanel ribbonPanel)
+        private static Dictionary<string, PushButton> CheckExistingButtons(RibbonPanel ribbonPanel)
         {
-            Dictionary<string, PushButton> pushButtons = new Dictionary<string, PushButton>();
+            var pushButtons = new Dictionary<string, PushButton>();
             try
             {
-                List<RibbonItem> ribbonItems = ribbonPanel.GetItems().ToList();
-                foreach (RibbonItem item in ribbonItems)
+                var ribbonItems = ribbonPanel.GetItems().ToList();
+                foreach (var item in ribbonItems)
                 {
-                    PushButton button = item as PushButton;
+                    var button = item as PushButton;
                     if (null != button)
                     {
                         button.Enabled = true; //set true as default
@@ -150,9 +149,9 @@ namespace HOK.BetaToolsManager
         {
             try
             {
-                RibbonPanel installerPanel = m_app.CreateRibbonPanel(tabName, "Installer");
+                var installerPanel = m_app.CreateRibbonPanel(tabName, "Installer");
 
-                PushButton installerButton = installerPanel.AddItem(new PushButtonData("Beta Installer", "Beta Installer", currentAssembly, "HOK.BetaToolsManager.InstallerCommand")) as PushButton;
+                var installerButton = (PushButton)installerPanel.AddItem(new PushButtonData("Beta Installer", "Beta Installer", currentAssembly, "HOK.BetaToolsManager.InstallerCommand"));
                 installerButton.LargeImage = ImageUtil.LoadBitmapImage("settings.png");
                 installerButton.Image = installerButton.LargeImage;
                 installerButton.ToolTip = "HOK Beta Tools Installer";
@@ -189,15 +188,15 @@ namespace HOK.BetaToolsManager
                         {
                             utilityPanel = m_app.CreateRibbonPanel(tabName, "Utilities");
 
-                            SplitButtonData splitButtonData = new SplitButtonData("HOKUtilities", "HOK Utilities");
-                            utilitySplitButton = utilityPanel.AddItem(splitButtonData) as SplitButton;
-                            ContextualHelp contextualHelp = new ContextualHelp(ContextualHelpType.Url, @"V:\RVT-Data\HOK Program\Documentation\HOK Utilities_Instruction.pdf");
+                            var splitButtonData = new SplitButtonData("HOKUtilities", "HOK Utilities");
+                            utilitySplitButton = (SplitButton)utilityPanel.AddItem(splitButtonData);
+                            var contextualHelp = new ContextualHelp(ContextualHelpType.Url, @"V:\RVT-Data\HOK Program\Documentation\HOK Utilities_Instruction.pdf");
                             utilitySplitButton.SetContextualHelp(contextualHelp);
                         }
                     }
                     if (null != utilityPanel && null != utilitySplitButton)
                     {
-                        Dictionary<string, PushButton> utilityButtons = CheckExistingButtons(utilitySplitButton);
+                        var utilityButtons = CheckExistingButtons(utilitySplitButton);
 
                         if (elementTP.InstallExist)
                         {
@@ -205,7 +204,7 @@ namespace HOK.BetaToolsManager
                             if (!utilityButtons.ContainsKey("Element Tools"))
                             {
                                 //install
-                                PushButton elementButton = utilitySplitButton.AddPushButton(new PushButtonData("Element Tools", "Element Tools", elementTP.TempAssemblyPath, "HOK.ElementTools.cmdElementTools")) as PushButton;
+                                var elementButton = utilitySplitButton.AddPushButton(new PushButtonData("Element Tools", "Element Tools", elementTP.TempAssemblyPath, "HOK.ElementTools.cmdElementTools"));
                                 elementButton.LargeImage = ImageUtil.LoadBitmapImage("element.ico");
                                 elementButton.ToolTip = "Room and Area Elements Tools";
                                 AddToolTips(elementButton);
@@ -213,7 +212,7 @@ namespace HOK.BetaToolsManager
                             else
                             {
                                 //update
-                                PushButton elementButton = utilityButtons["Element Tools"];
+                                var elementButton = utilityButtons["Element Tools"];
                                 elementButton.AssemblyName = elementTP.TempAssemblyPath;
                             }
                             
@@ -221,7 +220,7 @@ namespace HOK.BetaToolsManager
                         else if (!elementTP.InstallExist && utilityButtons.ContainsKey("Element Tools"))
                         {
                             //removed tools by beta installer
-                            PushButton elementButton = utilityButtons["Element Tools"];
+                            var elementButton = utilityButtons["Element Tools"];
                             elementButton.Enabled = false;
                         }
 
@@ -230,7 +229,7 @@ namespace HOK.BetaToolsManager
                             if (!utilityButtons.ContainsKey("Parameter Tools"))
                             {
                                 //install
-                                PushButton parameterButton = utilitySplitButton.AddPushButton(new PushButtonData("Parameter Tools", "Parameter Tools", parameterTP.TempAssemblyPath, "HOK.ParameterTools.cmdParameterTools")) as PushButton;
+                                var parameterButton = utilitySplitButton.AddPushButton(new PushButtonData("Parameter Tools", "Parameter Tools", parameterTP.TempAssemblyPath, "HOK.ParameterTools.cmdParameterTools"));
                                 parameterButton.LargeImage = ImageUtil.LoadBitmapImage("parameter.ico");
                                 parameterButton.ToolTip = "Parameter Tools";
                                 AddToolTips(parameterButton);
@@ -238,28 +237,28 @@ namespace HOK.BetaToolsManager
                             else
                             {
                                 //update
-                                PushButton parameterButton = utilityButtons["Parameter Tools"];
+                                var parameterButton = utilityButtons["Parameter Tools"];
                                 parameterButton.AssemblyName = parameterTP.TempAssemblyPath;
                             }
                             
                         }
                         else if (!parameterTP.InstallExist && utilityButtons.ContainsKey("Parameter Tools"))
                         {
-                            PushButton parameterButton = utilityButtons["Parameter Tools"];
+                            var parameterButton = utilityButtons["Parameter Tools"];
                             parameterButton.Enabled = false;
                         }
 
                         if (utilitiesTP.InstallExist)
                         {
-                            string directoryName = Path.GetDirectoryName(utilitiesTP.InstallPath);
-                            string finishPath = Path.Combine(directoryName, "HOK.FinishCreator.dll");
+                            var directoryName = Path.GetDirectoryName(utilitiesTP.InstallPath);
+                            var finishPath = Path.Combine(directoryName, "HOK.FinishCreator.dll");
                             finishPath = GetTempInstallPath(finishPath);
                             if (File.Exists(finishPath))
                             {
                                 if (!utilityButtons.ContainsKey("Finish Creator"))
                                 {
                                     //install
-                                    PushButton finishButton = utilitySplitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", finishPath, "HOK.FinishCreator.FinishCommand")) as PushButton;
+                                    var finishButton = utilitySplitButton.AddPushButton(new PushButtonData("Finish Creator", "Finish Creator", finishPath, "HOK.FinishCreator.FinishCommand"));
                                     finishButton.LargeImage = ImageUtil.LoadBitmapImage("finish.png");
                                     finishButton.ToolTip = "Create floor finishes from the selected rooms.";
                                     AddToolTips(finishButton);
@@ -267,18 +266,18 @@ namespace HOK.BetaToolsManager
                                 else
                                 {
                                     //update
-                                    PushButton finishButton = utilityButtons["Finish Creator"];
+                                    var finishButton = utilityButtons["Finish Creator"];
                                     finishButton.AssemblyName = finishPath;
                                 }
                             }
 
-                            string ceilingPath =Path.Combine(directoryName, "HOK.CeilingHeight.dll");
+                            var ceilingPath =Path.Combine(directoryName, "HOK.CeilingHeight.dll");
                             ceilingPath = GetTempInstallPath(ceilingPath);
                             if (File.Exists(ceilingPath))
                             {
                                 if (!utilityButtons.ContainsKey("Ceiling Height"))
                                 {
-                                    PushButton ceilingButton = utilitySplitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", ceilingPath, "HOK.CeilingHeight.CeilingCommand")) as PushButton;
+                                    var ceilingButton = utilitySplitButton.AddPushButton(new PushButtonData("Ceiling Height", "Ceiling Heights", ceilingPath, "HOK.CeilingHeight.CeilingCommand"));
                                     ceilingButton.LargeImage = ImageUtil.LoadBitmapImage("height.png");
                                     ceilingButton.ToolTip = "Select rooms to measure the height from floors to ceilings.";
                                     AddToolTips(ceilingButton);
@@ -287,38 +286,38 @@ namespace HOK.BetaToolsManager
                                 else
                                 {
                                     //update
-                                    PushButton ceilingButton = utilityButtons["Ceiling Height"];
+                                    var ceilingButton = utilityButtons["Ceiling Height"];
                                     ceilingButton.AssemblyName = ceilingPath;
                                 }
                             }
 
-                            string levelPath = Path.Combine(directoryName, "HOK.LevelManager.dll");
+                            var levelPath = Path.Combine(directoryName, "HOK.LevelManager.dll");
                             levelPath = GetTempInstallPath(levelPath);
                             if (File.Exists(levelPath))
                             {
                                 if (!utilityButtons.ContainsKey("Level Manager"))
                                 {
-                                    PushButton levelButton = utilitySplitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", levelPath, "HOK.LevelManager.LevelCommand")) as PushButton;
+                                    var levelButton = utilitySplitButton.AddPushButton(new PushButtonData("Level Manager", "Level Manager", levelPath, "HOK.LevelManager.LevelCommand"));
                                     levelButton.LargeImage = ImageUtil.LoadBitmapImage("level.png");
                                     levelButton.ToolTip = "Rehost elements from one level to anather. ";
                                     AddToolTips(levelButton);
                                 }
                                 else
                                 {
-                                    PushButton levelButton = utilityButtons["Level Manager"];
+                                    var levelButton = utilityButtons["Level Manager"];
                                     levelButton.AssemblyName = levelPath;
                                 }
                             }
 #if RELEASE2013
 #else
-                            string viewPath = Path.Combine(directoryName, "HOK.ViewDepth.dll");
+                            var viewPath = Path.Combine(directoryName, "HOK.ViewDepth.dll");
                             viewPath = GetTempInstallPath(viewPath);
                             if (File.Exists(viewPath))
                             {
                                 if (!utilityButtons.ContainsKey("View Depth"))
                                 {
                                     //install
-                                    PushButton viewButton = utilitySplitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", viewPath, "HOK.ViewDepth.ViewCommand")) as PushButton;
+                                    var viewButton = utilitySplitButton.AddPushButton(new PushButtonData("View Depth", "View Depth", viewPath, "HOK.ViewDepth.ViewCommand"));
                                     viewButton.LargeImage = ImageUtil.LoadBitmapImage("camera.ico");
                                     viewButton.ToolTip = "Override the graphics of the element based on the distance";
                                     viewButton.ToolTipImage = ImageUtil.LoadBitmapImage("viewTooltip.png");
@@ -327,20 +326,20 @@ namespace HOK.BetaToolsManager
                                 else
                                 {
                                     //update
-                                    PushButton viewButton = utilityButtons["View Depth"];
+                                    var viewButton = utilityButtons["View Depth"];
                                     viewButton.AssemblyName = viewPath;
                                 }
                             }
 #endif
 
-                            string arrowPath = Path.Combine( directoryName, "HOK.Arrowhead.dll"); 
+                            var arrowPath = Path.Combine( directoryName, "HOK.Arrowhead.dll"); 
                             arrowPath = GetTempInstallPath(arrowPath);
                             if (File.Exists(arrowPath))
                             {
                                 if (!utilityButtons.ContainsKey("Leader Arrowhead"))
                                 {
                                     //install
-                                    PushButton leaderButton = utilitySplitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", arrowPath, "HOK.Arrowhead.ArrowCommand")) as PushButton;
+                                    var leaderButton = utilitySplitButton.AddPushButton(new PushButtonData("Leader Arrowhead", "Leader Arrowhead", arrowPath, "HOK.Arrowhead.ArrowCommand"));
                                     leaderButton.LargeImage = ImageUtil.LoadBitmapImage("arrowhead.png");
                                     leaderButton.ToolTip = "Assign a leader arrowhead style to all tag types.";
                                     AddToolTips(leaderButton);
@@ -348,19 +347,19 @@ namespace HOK.BetaToolsManager
                                 else
                                 {
                                     //update
-                                    PushButton leaderButton = utilityButtons["Leader Arrowhead"];
+                                    var leaderButton = utilityButtons["Leader Arrowhead"];
                                     leaderButton.AssemblyName = arrowPath;
                                 }
                             }
 
-                            string worksetPath = Path.Combine(directoryName, "HOK.WorksetView.dll"); 
+                            var worksetPath = Path.Combine(directoryName, "HOK.WorksetView.dll"); 
                             worksetPath = GetTempInstallPath(worksetPath);
                             if (File.Exists(worksetPath))
                             {
                                 if (!utilityButtons.ContainsKey("View Creator"))
                                 {
                                     //install
-                                    PushButton worksetButton = utilitySplitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", worksetPath, "HOK.WorksetView.WorksetCommand")) as PushButton;
+                                    var worksetButton = utilitySplitButton.AddPushButton(new PushButtonData("View Creator", "View Creator", worksetPath, "HOK.WorksetView.WorksetCommand"));
                                     worksetButton.LargeImage = ImageUtil.LoadBitmapImage("workset.png");
                                     worksetButton.ToolTip = "Create 3D Views for each workset.";
                                     AddToolTips(worksetButton);
@@ -368,19 +367,19 @@ namespace HOK.BetaToolsManager
                                 else
                                 {
                                     //update
-                                    PushButton worksetButton = utilityButtons["View Creator"];
+                                    var worksetButton = utilityButtons["View Creator"];
                                     worksetButton.AssemblyName = worksetPath;
                                 }
                             }
 
-                            string doorPath = Path.Combine(directoryName, "HOK.DoorRoom.dll"); 
+                            var doorPath = Path.Combine(directoryName, "HOK.DoorRoom.dll"); 
                             doorPath = GetTempInstallPath(doorPath);
                             if (File.Exists(doorPath))
                             {
                                 if (!utilityButtons.ContainsKey("Door Link"))
                                 {
                                     //install
-                                    PushButton doorButton = utilitySplitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", doorPath, "HOK.DoorRoom.DoorCommand")) as PushButton;
+                                    var doorButton = utilitySplitButton.AddPushButton(new PushButtonData("Door Link", "Door Link", doorPath, "HOK.DoorRoom.DoorCommand"));
                                     doorButton.LargeImage = ImageUtil.LoadBitmapImage("door.png");
                                     doorButton.ToolTip = "Set shared parameters with To and From room data.";
                                     AddToolTips(doorButton);
@@ -388,19 +387,19 @@ namespace HOK.BetaToolsManager
                                 else
                                 {
                                     //update
-                                    PushButton doorButton = utilityButtons["Door Link"];
+                                    var doorButton = utilityButtons["Door Link"];
                                     doorButton.AssemblyName = doorPath;
                                 }
                             }
 
-                            string roomPath = Path.Combine(directoryName, "HOK.RoomUpdater.dll");
+                            var roomPath = Path.Combine(directoryName, "HOK.RoomUpdater.dll");
                             roomPath = GetTempInstallPath(roomPath);
                             if (File.Exists(roomPath))
                             {
                                 if (!utilityButtons.ContainsKey("Room Updater"))
                                 {
                                     //install
-                                    PushButton roomButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", roomPath, "HOK.RoomUpdater.RoomCommand")) as PushButton;
+                                    var roomButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Updater", "Room Updater", roomPath, "HOK.RoomUpdater.RoomCommand"));
                                     roomButton.LargeImage = ImageUtil.LoadBitmapImage("container.png");
                                     roomButton.ToolTip = "Populate room parameters values into enclosed elements.";
                                     AddToolTips(roomButton);
@@ -408,25 +407,25 @@ namespace HOK.BetaToolsManager
                                 else
                                 {
                                     //update
-                                    PushButton roomButton = utilityButtons["Room Updater"];
+                                    var roomButton = utilityButtons["Room Updater"];
                                     roomButton.AssemblyName = roomPath;
                                 }
                             }
 
-                            string elevationPath =Path.Combine (directoryName , "HOK.RoomElevation.dll"); 
+                            var elevationPath =Path.Combine (directoryName , "HOK.RoomElevation.dll"); 
                             elevationPath = GetTempInstallPath(elevationPath);
                             if (File.Exists(elevationPath))
                             {
                                 if (!utilityButtons.ContainsKey("Room Elevation"))
                                 {
-                                    PushButton elevationButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Elevation", "Room Elevation", elevationPath, "HOK.RoomElevation.ElevationCommand")) as PushButton;
+                                    var elevationButton = utilitySplitButton.AddPushButton(new PushButtonData("Room Elevation", "Room Elevation", elevationPath, "HOK.RoomElevation.ElevationCommand"));
                                     elevationButton.LargeImage = ImageUtil.LoadBitmapImage("elevation.png");
                                     elevationButton.ToolTip = "Create elevation views by selecting rooms and walls to be faced.";
                                     AddToolTips(elevationButton);
                                 }
                                 else
                                 {
-                                    PushButton elevationButton = utilityButtons["Room Elevation"];
+                                    var elevationButton = utilityButtons["Room Elevation"];
                                     elevationButton.AssemblyName = elevationPath;
                                 }
                             }
@@ -451,38 +450,38 @@ namespace HOK.BetaToolsManager
                                 }
                             }
 #endif
-                            string renamePath = Path.Combine(directoryName, "HOK.RenameFamily.dll");
+                            var renamePath = Path.Combine(directoryName, "HOK.RenameFamily.dll");
                             renamePath = GetTempInstallPath(renamePath);
                             if (File.Exists(renamePath))
                             {
                                 if (!utilityButtons.ContainsKey("Rename Family"))
                                 {
-                                    PushButton renameButton = utilitySplitButton.AddPushButton(new PushButtonData("Rename Family", "Rename Family", renamePath, "HOK.RenameFamily.RenameCommand")) as PushButton;
+                                    var renameButton = utilitySplitButton.AddPushButton(new PushButtonData("Rename Family", "Rename Family", renamePath, "HOK.RenameFamily.RenameCommand"));
                                     renameButton.LargeImage = ImageUtil.LoadBitmapImage("update.png");
                                     renameButton.ToolTip = "Rename families and types as assigned in .csv file.";
                                     AddToolTips(renameButton);
                                 }
                                 else
                                 {
-                                    PushButton renameButton = utilityButtons["Rename Family"];
+                                    var renameButton = utilityButtons["Rename Family"];
                                     renameButton.AssemblyName = renamePath;
                                 }
                             }
 
-                            string xyzPath = Path.Combine(directoryName, "HOK.XYZLocator.dll");
+                            var xyzPath = Path.Combine(directoryName, "HOK.XYZLocator.dll");
                             xyzPath = GetTempInstallPath(xyzPath);
                             if (File.Exists(xyzPath))
                             {
                                 if (!utilityButtons.ContainsKey("XYZ Locator"))
                                 {
-                                    PushButton xyzButton = utilitySplitButton.AddPushButton(new PushButtonData("XYZ Locator", "XYZ Locator", xyzPath, "HOK.XYZLocator.XYZCommand")) as PushButton;
+                                    var xyzButton = utilitySplitButton.AddPushButton(new PushButtonData("XYZ Locator", "XYZ Locator", xyzPath, "HOK.XYZLocator.XYZCommand"));
                                     xyzButton.LargeImage = ImageUtil.LoadBitmapImage("location.ico");
                                     xyzButton.ToolTip = "Report location of a 3D family using shared coordinates";
                                     AddToolTips(xyzButton);
                                 }
                                 else
                                 {
-                                    PushButton xyzButton = utilityButtons["XYZ Locator"];
+                                    var xyzButton = utilityButtons["XYZ Locator"];
                                     xyzButton.AssemblyName = xyzPath;
                                 }
                             }
@@ -511,67 +510,67 @@ namespace HOK.BetaToolsManager
                         {
                             if (utilityButtons.ContainsKey("Finish Creator"))
                             {
-                                PushButton finishButton = utilityButtons["Finish Creator"];
+                                var finishButton = utilityButtons["Finish Creator"];
                                 finishButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("Ceiling Height"))
                             {
-                                PushButton ceilingButton = utilityButtons["Ceiling Height"];
+                                var ceilingButton = utilityButtons["Ceiling Height"];
                                 ceilingButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("Level Manager"))
                             {
-                                PushButton levelButton = utilityButtons["Level Manager"];
+                                var levelButton = utilityButtons["Level Manager"];
                                 levelButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("View Depth"))
                             {
-                                PushButton viewButton = utilityButtons["View Depth"];
+                                var viewButton = utilityButtons["View Depth"];
                                 viewButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("Leader Arrowhead"))
                             {
-                                PushButton leaderButton = utilityButtons["Leader Arrowhead"];
+                                var leaderButton = utilityButtons["Leader Arrowhead"];
                                 leaderButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("View Creator"))
                             {
-                                PushButton worksetButton = utilityButtons["View Creator"];
+                                var worksetButton = utilityButtons["View Creator"];
                                 worksetButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("Door Link"))
                             {
-                                PushButton doorButton = utilityButtons["Door Link"];
+                                var doorButton = utilityButtons["Door Link"];
                                 doorButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("Room Updater"))
                             {
-                                PushButton roomButton = utilityButtons["Room Updater"];
+                                var roomButton = utilityButtons["Room Updater"];
                                 roomButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("Room Elevation"))
                             {
-                                PushButton elevationButton = utilityButtons["Room Elevation"];
+                                var elevationButton = utilityButtons["Room Elevation"];
                                 elevationButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("View Mover"))
                             {
-                                PushButton cameraButton = utilityButtons["View Mover"];
+                                var cameraButton = utilityButtons["View Mover"];
                                 cameraButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("Rename Family"))
                             {
-                                PushButton renameButton = utilityButtons["Rename Family"];
+                                var renameButton = utilityButtons["Rename Family"];
                                 renameButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("Room W X L"))
                             {
-                                PushButton measureButton = utilityButtons["Room W X L"];
+                                var measureButton = utilityButtons["Room W X L"];
                                 measureButton.Enabled = false;
                             }
                             if (utilityButtons.ContainsKey("XYZ Locator"))
                             {
-                                PushButton xyzButton = utilityButtons["XYZ Locator"];
+                                var xyzButton = utilityButtons["XYZ Locator"];
                                 xyzButton.Enabled = false;
                             }
                         }
@@ -633,13 +632,13 @@ namespace HOK.BetaToolsManager
                     }
                     if (null != customizePanel)
                     {
-                        Dictionary<string, PushButton> customButtons = CheckExistingButtons(customizePanel);
+                        var customButtons = CheckExistingButtons(customizePanel);
 
                         if (sheetTP.InstallExist)
                         {
                             if (!customButtons.ContainsKey("Sheet Manager"))
                             {
-                                PushButton sheetButton = customizePanel.AddItem(new PushButtonData("Sheet Manager", "Sheet Manager", sheetTP.TempAssemblyPath, "HOK.SheetManager.cmdSheetManager")) as PushButton;
+                                var sheetButton = (PushButton)customizePanel.AddItem(new PushButtonData("Sheet Manager", "Sheet Manager", sheetTP.TempAssemblyPath, "HOK.SheetManager.cmdSheetManager"));
                                 sheetButton.LargeImage = ImageUtil.LoadBitmapImage("sheet.ico");
                                 sheetButton.ToolTip = "Sheet Manager";
                                 AddToolTips(sheetButton);
@@ -647,13 +646,13 @@ namespace HOK.BetaToolsManager
                             }
                             else
                             {
-                                PushButton sheetButton = customButtons["Sheet Manager"];
+                                var sheetButton = customButtons["Sheet Manager"];
                                 sheetButton.AssemblyName = sheetTP.TempAssemblyPath;
                             }
                         }
                         else if (!sheetTP.InstallExist && customButtons.ContainsKey("Sheet Manager"))
                         {
-                            PushButton sheetButton = customButtons["Sheet Manager"];
+                            var sheetButton = customButtons["Sheet Manager"];
                             sheetButton.Enabled = false;
                         }
 
@@ -662,7 +661,7 @@ namespace HOK.BetaToolsManager
                         {
                             if (!customButtons.ContainsKey("BCF Reader"))
                             {
-                                PushButton bcfButton = customizePanel.AddItem(new PushButtonData("BCF Reader", "BCF Reader", bcfTP.TempAssemblyPath, "HOK.BCFReader.Command")) as PushButton;
+                                var bcfButton = (PushButton)customizePanel.AddItem(new PushButtonData("BCF Reader", "BCF Reader", bcfTP.TempAssemblyPath, "HOK.BCFReader.Command"));
                                 bcfButton.LargeImage = ImageUtil.LoadBitmapImage("comment.ico");
                                 bcfButton.ToolTip = "BIM Collaboration Format (BCF) Reader";
                                 AddToolTips(bcfButton);
@@ -670,13 +669,13 @@ namespace HOK.BetaToolsManager
                             }
                             else
                             {
-                                PushButton bcfButton = customButtons["BCF Reader"];
+                                var bcfButton = customButtons["BCF Reader"];
                                 bcfButton.AssemblyName = bcfTP.TempAssemblyPath;
                             }
                         }
                         else if (!bcfTP.InstallExist && customButtons.ContainsKey("BCF Reader"))
                         {
-                            PushButton bcfButton = customButtons["BCF Reader"];
+                            var bcfButton = customButtons["BCF Reader"];
                             bcfButton.Enabled = false;
                         }
 
@@ -684,19 +683,19 @@ namespace HOK.BetaToolsManager
                         {
                             if (null == massSplitButton)
                             {
-                                SplitButtonData splitButtonData = new SplitButtonData("MassTool", "3D Mass");
-                                massSplitButton = customizePanel.AddItem(splitButtonData) as SplitButton;
+                                var splitButtonData = new SplitButtonData("MassTool", "3D Mass");
+                                massSplitButton = (SplitButton)customizePanel.AddItem(splitButtonData);
                                 massSplitButton.IsSynchronizedWithCurrentItem = true;
-                                ContextualHelp contextualHelp = new ContextualHelp(ContextualHelpType.Url, @"V:\RVT-Data\HOK Program\Documentation\Mass Tool_Instruction.pdf");
+                                var contextualHelp = new ContextualHelp(ContextualHelpType.Url, @"V:\RVT-Data\HOK Program\Documentation\Mass Tool_Instruction.pdf");
                                 massSplitButton.SetContextualHelp(contextualHelp);
                             }
                             if (null != massSplitButton)
                             {
-                                Dictionary<string, PushButton> massButtons = CheckExistingButtons(massSplitButton);
+                                var massButtons = CheckExistingButtons(massSplitButton);
 
                                 if (!massButtons.ContainsKey("Create Mass"))
                                 {
-                                    PushButton createButton = massSplitButton.AddPushButton(new PushButtonData("Create Mass", "Create Mass", massTP.TempAssemblyPath, "HOK.RoomsToMass.Command"));
+                                    var createButton = massSplitButton.AddPushButton(new PushButtonData("Create Mass", "Create Mass", massTP.TempAssemblyPath, "HOK.RoomsToMass.Command"));
                                     createButton.LargeImage = ImageUtil.LoadBitmapImage("cube.png");
                                     createButton.ToolTip = "Creates 3D Mass from rooms, areas and floors.";
                                     createButton.ToolTipImage = ImageUtil.LoadBitmapImage("tooltip.png");
@@ -704,7 +703,7 @@ namespace HOK.BetaToolsManager
                                 }
                                 else
                                 {
-                                    PushButton createButton = massButtons["Create Mass"];
+                                    var createButton = massButtons["Create Mass"];
                                     createButton.AssemblyName = massTP.TempAssemblyPath;
                                 }
 #if RELEASE2013 || RELEASE2014
@@ -723,24 +722,24 @@ namespace HOK.BetaToolsManager
 #endif
                                 if (!massButtons.ContainsKey("Mass Commands"))
                                 {
-                                    PushButton commandButton = massSplitButton.AddPushButton(new PushButtonData("Mass Commands", "Mass Commands", massTP.TempAssemblyPath, "HOK.RoomsToMass.AssignerCommand"));
+                                    var commandButton = massSplitButton.AddPushButton(new PushButtonData("Mass Commands", "Mass Commands", massTP.TempAssemblyPath, "HOK.RoomsToMass.AssignerCommand"));
                                     commandButton.LargeImage = ImageUtil.LoadBitmapImage("shape.png");
                                     commandButton.ToolTip = "Assign parameters or split elements";
                                     AddToolTips(commandButton);
                                 }
                                 else
                                 {
-                                    PushButton commandButton = massButtons["Mass Commands"];
+                                    var commandButton = massButtons["Mass Commands"];
                                     commandButton.AssemblyName = massTP.TempAssemblyPath;
                                 }
                             }
                         }
                         else if (!massTP.InstallExist && null != massSplitButton)
                         {
-                            Dictionary<string, PushButton> massButtons = CheckExistingButtons(massSplitButton);
+                            var massButtons = CheckExistingButtons(massSplitButton);
                             if (massButtons.ContainsKey("Create Mass"))
                             {
-                                PushButton createButton = massButtons["Create Mass"];
+                                var createButton = massButtons["Create Mass"];
                                 createButton.Enabled = false;
                             }
 #if RELEASE2013|| RELEASE2014
@@ -752,7 +751,7 @@ namespace HOK.BetaToolsManager
 #endif
                             if (massButtons.ContainsKey("Mass Commands"))
                             {
-                                PushButton commandButton = massButtons["Mass Commands"];
+                                var commandButton = massButtons["Mass Commands"];
                                 commandButton.Enabled = false;
                             }
                         }
@@ -785,46 +784,46 @@ namespace HOK.BetaToolsManager
                         }
                         if (null != dataPanel)
                         {
-                            Dictionary<string, PushButton> dataButtons = CheckExistingButtons(dataPanel);
+                            var dataButtons = CheckExistingButtons(dataPanel);
 
                             if (!dataButtons.ContainsKey("Data Sync"))
                             {
-                                PushButton syncButton = dataPanel.AddItem(new PushButtonData("Data Sync", "Data Sync", dataTP.TempAssemblyPath, "RevitDBManager.Command")) as PushButton;
+                                var syncButton = (PushButton)dataPanel.AddItem(new PushButtonData("Data Sync", "Data Sync", dataTP.TempAssemblyPath, "RevitDBManager.Command"));
                                 syncButton.LargeImage = ImageUtil.LoadBitmapImage("sync.ico");
                                 syncButton.ToolTip = "Data Sync";
                                 AddToolTips(syncButton);
                             }
                             else
                             {
-                                PushButton syncButton = dataButtons["Data Sync"];
+                                var syncButton = dataButtons["Data Sync"];
                                 syncButton.AssemblyName = dataTP.TempAssemblyPath;
                             }
 
                             if (!dataButtons.ContainsKey("Setup"))
                             {
                                 //DBManager_Setup
-                                PushButton setupButton = dataPanel.AddItem(new PushButtonData("Setup", "  Setup  ", dataTP.TempAssemblyPath, "RevitDBManager.EditorCommand")) as PushButton;
+                                var setupButton = (PushButton)dataPanel.AddItem(new PushButtonData("Setup", "  Setup  ", dataTP.TempAssemblyPath, "RevitDBManager.EditorCommand"));
                                 setupButton.LargeImage = ImageUtil.LoadBitmapImage("editor.ico");
                                 setupButton.ToolTip = "Setup";
                                 AddToolTips(setupButton);
                             }
                             else
                             {
-                                PushButton setupButton = dataButtons["Setup"];
+                                var setupButton = dataButtons["Setup"];
                                 setupButton.AssemblyName = dataTP.TempAssemblyPath;
                             }
 
                             if (!dataButtons.ContainsKey("Data Editor"))
                             {
                                 //DBManager_Data Editor
-                                PushButton editorButton = dataPanel.AddItem(new PushButtonData("Data Editor", "Data Editor", dataTP.TempAssemblyPath, "RevitDBManager.ViewerCommand")) as PushButton;
+                                var editorButton = (PushButton)dataPanel.AddItem(new PushButtonData("Data Editor", "Data Editor", dataTP.TempAssemblyPath, "RevitDBManager.ViewerCommand"));
                                 editorButton.LargeImage = ImageUtil.LoadBitmapImage("view.ico");
                                 editorButton.ToolTip = "Data Editor";
                                 AddToolTips(editorButton);
                             }
                             else
                             {
-                                PushButton editorButton = dataButtons["Data Editor"];
+                                var editorButton = dataButtons["Data Editor"];
                                 editorButton.AssemblyName = dataTP.TempAssemblyPath;
                             }
 
@@ -832,20 +831,20 @@ namespace HOK.BetaToolsManager
                     }
                     else if(!dataTP.InstallExist && null != dataPanel)
                     {
-                        Dictionary<string, PushButton> dataButtons = CheckExistingButtons(dataPanel);
+                        var dataButtons = CheckExistingButtons(dataPanel);
                         if (dataButtons.ContainsKey("Data Sync"))
                         {
-                            PushButton syncButton = dataButtons["Data Sync"];
+                            var syncButton = dataButtons["Data Sync"];
                             syncButton.Enabled = false;
                         }
                         if (dataButtons.ContainsKey("Setup"))
                         {
-                            PushButton setupButton = dataButtons["Setup"];
+                            var setupButton = dataButtons["Setup"];
                             setupButton.Enabled = false;
                         }
                         if (dataButtons.ContainsKey("Data Editor"))
                         {
-                            PushButton editorButton = dataButtons["Data Editor"];
+                            var editorButton = dataButtons["Data Editor"];
                             editorButton.Enabled = false;
                         }
                     }
@@ -880,20 +879,20 @@ namespace HOK.BetaToolsManager
                         {
                             analysisPanel = m_app.CreateRibbonPanel(tabName, "Analysis");
 
-                            SplitButtonData splitButtonData = new SplitButtonData("HOKAnalysis", "HOK Analysis");
-                            analysisSplitButton = analysisPanel.AddItem(splitButtonData) as SplitButton;
+                            var splitButtonData = new SplitButtonData("HOKAnalysis", "HOK Analysis");
+                            analysisSplitButton = (SplitButton)analysisPanel.AddItem(splitButtonData);
                             analysisSplitButton.IsSynchronizedWithCurrentItem = true;
                         }
                     }
                     if (null != analysisPanel && null != analysisSplitButton)
                     {
-                        Dictionary<string, PushButton> analysisButtons = CheckExistingButtons(analysisSplitButton);
+                        var analysisButtons = CheckExistingButtons(analysisSplitButton);
                         if (avfTP.InstallExist)
                         {
                             if (!analysisButtons.ContainsKey("AVF"))
                             {
                                 //install
-                                PushButton avfButton = analysisSplitButton.AddPushButton(new PushButtonData("AVF", "  AVF  ", avfTP.TempAssemblyPath, "HOK.AVFManager.Command")) as PushButton;
+                                var avfButton = analysisSplitButton.AddPushButton(new PushButtonData("AVF", "  AVF  ", avfTP.TempAssemblyPath, "HOK.AVFManager.Command"));
                                 avfButton.LargeImage = ImageUtil.LoadBitmapImage("chart.ico");
                                 avfButton.ToolTip = "Analysis Visualization Framework";
                                 AddToolTips(avfButton);
@@ -901,7 +900,7 @@ namespace HOK.BetaToolsManager
                             else
                             {
                                 //update
-                                PushButton avfButton = analysisButtons["AVF"];
+                                var avfButton = analysisButtons["AVF"];
                                 avfButton.AssemblyName = avfTP.TempAssemblyPath;
                             }
 
@@ -909,7 +908,7 @@ namespace HOK.BetaToolsManager
                         else if (!avfTP.InstallExist && analysisButtons.ContainsKey("AVF"))
                         {
                             //remove tools by beta installer
-                            PushButton avfButton = analysisButtons["AVF"];
+                            var avfButton = analysisButtons["AVF"];
                             avfButton.Enabled = false;
                         }
 
@@ -918,7 +917,7 @@ namespace HOK.BetaToolsManager
                             if (!analysisButtons.ContainsKey("LPD Analysis"))
                             {
                                 //install
-                                PushButton lpdButton = analysisSplitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", lpdTP.TempAssemblyPath, "HOK.LPDCalculator.Command")) as PushButton;
+                                var lpdButton = analysisSplitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", lpdTP.TempAssemblyPath, "HOK.LPDCalculator.Command"));
                                 lpdButton.LargeImage = ImageUtil.LoadBitmapImage("bulb.png");
                                 lpdButton.ToolTip = "Calculating Lighting Power Density";
                                 AddToolTips(lpdButton);
@@ -926,14 +925,14 @@ namespace HOK.BetaToolsManager
                             else
                             {
                                 //update
-                                PushButton lpdButton = analysisButtons["LPD Analysis"];
+                                var lpdButton = analysisButtons["LPD Analysis"];
                                 lpdButton.AssemblyName = lpdTP.TempAssemblyPath;
                             }
                         }
                         else if (!lpdTP.InstallExist && analysisButtons.ContainsKey("LPD Analysis"))
                         {
                             //remove tools by beta installer
-                            PushButton lpdButton = analysisButtons["LPD Analysis"];
+                            var lpdButton = analysisButtons["LPD Analysis"];
                             lpdButton.Enabled = false;
                         }
 
@@ -942,7 +941,7 @@ namespace HOK.BetaToolsManager
                             if (!analysisButtons.ContainsKey("LEED View Analysis"))
                             {
                                 //install
-                                PushButton leedButton = analysisSplitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", leedTP.TempAssemblyPath, "HOK.ViewAnalysis.Command")) as PushButton;
+                                var leedButton = analysisSplitButton.AddPushButton(new PushButtonData("LEED View Analysis", "LEED View Analysis", leedTP.TempAssemblyPath, "HOK.ViewAnalysis.Command"));
                                 leedButton.LargeImage = ImageUtil.LoadBitmapImage("eq.ico");
                                 leedButton.ToolTip = "Calculating Area with Views for LEED IEQc 8.2";
                                 AddToolTips(leedButton);
@@ -950,14 +949,14 @@ namespace HOK.BetaToolsManager
                             else
                             {
                                 //update
-                                PushButton leedButton = analysisButtons["LEED View Analysis"];
+                                var leedButton = analysisButtons["LEED View Analysis"];
                                 leedButton.AssemblyName = leedTP.TempAssemblyPath;
                             }
                         }
                         else if (!leedTP.InstallExist && analysisButtons.ContainsKey("LEED View Analysis"))
                         {
                             //remove tools by beta installer
-                            PushButton leedButton = analysisButtons["LEED View Analysis"];
+                            var leedButton = analysisButtons["LEED View Analysis"];
                             leedButton.Enabled = false;
                         }
                     }
@@ -989,28 +988,28 @@ namespace HOK.BetaToolsManager
                         }
                         if (null != shapePanel)
                         {
-                            Dictionary<string, PushButton> shapeButtons = CheckExistingButtons(shapePanel);
+                            var shapeButtons = CheckExistingButtons(shapePanel);
 
                             if (!shapeButtons.ContainsKey("Element Flatter"))
                             {
-                                PushButton flatterButton = shapePanel.AddItem(new PushButtonData("Element Flatter", "Element Flatter", flatterTP.TempAssemblyPath, "HOK.ElementFlatter.Command")) as PushButton;
+                                var flatterButton = (PushButton)shapePanel.AddItem(new PushButtonData("Element Flatter", "Element Flatter", flatterTP.TempAssemblyPath, "HOK.ElementFlatter.Command"));
                                 flatterButton.LargeImage = ImageUtil.LoadBitmapImage("create.ico");
                                 flatterButton.ToolTip = "Flatten elements as direct shapes";
                                 AddToolTips(flatterButton);
                             }
                             else
                             {
-                                PushButton flatterButton = shapeButtons["Element Flatter"];
+                                var flatterButton = shapeButtons["Element Flatter"];
                                 flatterButton.AssemblyName = flatterTP.TempAssemblyPath;
                             }
                         }
                     }
                     else if (!flatterTP.InstallExist && null != shapePanel)
                     {
-                        Dictionary<string, PushButton> shapeButtons = CheckExistingButtons(shapePanel);
+                        var shapeButtons = CheckExistingButtons(shapePanel);
                         if (shapeButtons.ContainsKey("Element Flatter"))
                         {
-                            PushButton flatterButton = shapeButtons["Element Flatter"];
+                            var flatterButton = shapeButtons["Element Flatter"];
                             flatterButton.Enabled = false;
                         }
                     }
@@ -1024,10 +1023,10 @@ namespace HOK.BetaToolsManager
 
         private string GetTempInstallPath(string installPath)
         {
-            string tempPath = "";
+            var tempPath = "";
             try
             {
-                string fileName = Path.GetFileName(installPath);
+                var fileName = Path.GetFileName(installPath);
                 tempPath = Path.Combine(toolManager.TempInstallDirectory, fileName);
                 if (!File.Exists(tempPath))
                 {
@@ -1036,7 +1035,7 @@ namespace HOK.BetaToolsManager
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return tempPath;
         }
@@ -1045,11 +1044,11 @@ namespace HOK.BetaToolsManager
         {
             try
             {
-                using (StreamReader reader = File.OpenText(txtfile))
+                using (var reader = File.OpenText(txtfile))
                 {
                     string line;
-                    int index = 0;
-                    ButtonData buttonData = new ButtonData();
+                    var index = 0;
+                    var buttonData = new ButtonData();
                     while ((line = reader.ReadLine()) != null)
                     {
                         if (line.Contains("------------------")) { buttonData = new ButtonData(); continue; }
@@ -1085,9 +1084,9 @@ namespace HOK.BetaToolsManager
             {
                 if (buttonDictionary.ContainsKey(button.Name))
                 {
-                    ButtonData buttonData = buttonDictionary[button.Name];
+                    var buttonData = buttonDictionary[button.Name];
                     button.LongDescription = buttonData.Description;
-                    ContextualHelp contextualHelp = new ContextualHelp(ContextualHelpType.Url, buttonData.HelpUrl);
+                    var contextualHelp = new ContextualHelp(ContextualHelpType.Url, buttonData.HelpUrl);
                     button.SetContextualHelp(contextualHelp);
                 }
             }

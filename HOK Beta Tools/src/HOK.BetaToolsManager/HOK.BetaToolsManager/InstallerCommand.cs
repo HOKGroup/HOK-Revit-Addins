@@ -15,7 +15,7 @@ namespace HOK.BetaToolsManager
 
     public class InstallerCommand:IExternalCommand
     {
-        private UIApplication m_app = null;
+        private UIApplication m_app;
 
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
         {
