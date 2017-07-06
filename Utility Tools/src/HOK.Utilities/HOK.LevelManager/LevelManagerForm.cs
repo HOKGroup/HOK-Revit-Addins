@@ -431,8 +431,6 @@ namespace HOK.LevelManager
                 var rooms = new List<Room>();
                 var familyInstances = new List<Element>();
 
-#if RELEASE2013
-#else
                 var roomManager = new RoomManager(m_app);
                 if (checkBoxRoom.Checked)
                 {
@@ -442,7 +440,6 @@ namespace HOK.LevelManager
                     roomManager.RoomElements = rooms;
                     roomManager.CollectRooms();
                 }
-#endif
                 if (elementIds.Count > 0)
                 {
                     collector = new FilteredElementCollector(m_doc, selElementIds);
@@ -474,8 +471,6 @@ namespace HOK.LevelManager
 
                     RehostSystemFamily(levelTo, systemFamilies);
                 }
-#if RELEASE2013
-#else
                 if (checkBoxRoom.Checked)
                 {
                     if (roomManager.CopyRooms(levelTo))
@@ -483,7 +478,6 @@ namespace HOK.LevelManager
                         roomManager.DeleteRooms();
                     }
                 }
-#endif
                 trans.Commit();
 
                 //Determine whether delete the level or not
@@ -690,8 +684,6 @@ namespace HOK.LevelManager
                 var systemFamilies = new List<Element>();
                 var rooms = new List<Room>();
                 var familyInstances = new List<Element>();
-#if RELEASE2013
-#else
                 var roomManager = new RoomManager(m_app);
                 if (checkBoxRoom.Checked)
                 {
@@ -709,7 +701,6 @@ namespace HOK.LevelManager
                         roomManager.CollectRooms();
                     }
                 }
-#endif
                 if (elementIds.Count > 0) //when familiy instances exist
                 {
 
@@ -748,8 +739,6 @@ namespace HOK.LevelManager
 
                     RehostSystemFamily(levelTo, systemFamilies);
                 }
-#if RELEASE2013
-#else
                 if (checkBoxRoom.Checked)
                 {
                     if (roomManager.CopyRooms(levelTo))
@@ -757,7 +746,6 @@ namespace HOK.LevelManager
                         roomManager.DeleteRooms();
                     }
                 }
-#endif
                 trans.Commit();
 
                 //Determine whether delete the level or not

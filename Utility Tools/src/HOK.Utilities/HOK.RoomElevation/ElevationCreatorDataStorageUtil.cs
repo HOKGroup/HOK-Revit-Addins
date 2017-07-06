@@ -22,8 +22,6 @@ namespace HOK.RoomElevation
         private static string s_RvtInstanceId = "RvtInstanceId";
         private static string s_Elevations = "Elevations";
         private static string s_KeyMarkId = "KeyMarkId";
-        //private static string s_elevationMarkId = "ElevationMarkId";
-        //private static string s_ElevationIds = "ElevationId";
 
 
         public static Dictionary<int, RoomElevationProperties> GetRoomElevationProperties(Document doc, Dictionary<int, LinkedInstanceProperties> linkedDocs)
@@ -383,9 +381,6 @@ namespace HOK.RoomElevation
             }
 
             document = m_room.Document;
-#if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
-            isLinked = document.IsLinked;
-#endif
             documentTitle = document.Title;
 
         }
@@ -410,9 +405,7 @@ namespace HOK.RoomElevation
             }
 
             document = m_room.Document;
-#if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
             isLinked = document.IsLinked;
-#endif
             documentTitle = document.Title;
             rvtLinkId = rvtInstanceId;
         }

@@ -107,19 +107,11 @@ namespace HOK.FinishCreator
                     trans.Start("Create Floor");
                     try
                     {
-#if RELEASE2013
-                                if (null != floorType && null != room.Level)
-                                {
-                                    newFloor = m_doc.Create.NewFloor(curveArrayList[0], floorType, room.Level, false);
-                                }
-                   
-#else
                         if (null != floorType && ElementId.InvalidElementId != room.LevelId)
                         {
                             Level roomLevel = m_doc.GetElement(room.LevelId) as Level;
                             newFloor = m_doc.Create.NewFloor(curveArrayList[0], floorType, roomLevel, false);
                         }
-#endif
                         else
                         {
                             newFloor = m_doc.Create.NewFloor(curveArrayList[0], false);
@@ -247,11 +239,7 @@ namespace HOK.FinishCreator
                         else if (pointCount == 2)
                         {
                             curve = edge.AsCurve();
-#if RELEASE2013
-                            XYZ point = curve.get_EndPoint(0);
-#else
                             XYZ point = curve.GetEndPoint(0);
-#endif
 
                             if (first)
                             {
@@ -274,19 +262,11 @@ namespace HOK.FinishCreator
                         {
                             if (i == num - 1)
                             {
-#if RELEASE2013
-                                curve = m_doc.Application.Create.NewLineBound(pointList[i], pointList[0]);
-#else
                                 curve = Line.CreateBound(pointList[i], pointList[0]);
-#endif
                             }
                             else
                             {
-#if RELEASE2013
-                                curve = m_doc.Application.Create.NewLineBound(pointList[i], pointList[i + 1]);
-#else
                                 curve = Line.CreateBound(pointList[i], pointList[i + 1]);
-#endif
                             }
                             curveArray.Append(curve);
                         }

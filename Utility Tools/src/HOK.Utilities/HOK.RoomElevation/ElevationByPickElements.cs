@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using HOK.Core.Utilities;
 
 namespace HOK.RoomElevation
 {
     public class ElevationByPickElements
     {
-        private UIApplication m_app = null;
-        private UIDocument uidoc = null;
-        private Document m_doc = null;
-        private ElevationCreatorSettings toolSettings = null;
+        private UIApplication m_app;
+        private UIDocument uidoc;
+        private Document m_doc;
+        private ElevationCreatorSettings toolSettings;
         private Dictionary<int, LinkedInstanceProperties> linkedDocuments = new Dictionary<int, LinkedInstanceProperties>();
         private Dictionary<int, RoomElevationProperties> roomDictionary = new Dictionary<int, RoomElevationProperties>();
 
@@ -55,13 +53,12 @@ namespace HOK.RoomElevation
                 XYZ pickPoint = null;
                 if (hostRoom)
                 {
-                    selectedRoom = uidoc.Selection.PickObject(ObjectType.Element, new RoomSelectionFilter(), "Select a room from the host model to create an elevation view.");
+                    selectedRoom = uidoc.Selection.PickObject(ObjectType.Element, new RoomElementFilter(), "Select a room from the host model to create an elevation view.");
                     if (null != selectedRoom)
                     {
                         roomElement = m_doc.GetElement(selectedRoom.ElementId) as Room;
                     }
                 }
-#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                 else
                 {
                     selectedRoom = uidoc.Selection.PickObject(ObjectType.LinkedElement, "Select a room from linked models to create an elevation view.");
@@ -77,7 +74,6 @@ namespace HOK.RoomElevation
                         }
                     }
                 }
-#endif
 
                 if (null != selectedRoom)
                 {
@@ -94,7 +90,6 @@ namespace HOK.RoomElevation
                                 wallElement = m_doc.GetElement(selectedWall.ElementId) as Wall;
                             }
                         }
-#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                         else
                         {
                             selectedWall = uidoc.Selection.PickObject(ObjectType.LinkedElement, "Select a wall from linked models to rotate an elevation view perpendicular to the wall.");
@@ -110,7 +105,6 @@ namespace HOK.RoomElevation
                                 }
                             }
                         }
-#endif
 
                         if (null != roomElement && null != wallElement && null != pickPoint)
                         {
@@ -144,61 +138,6 @@ namespace HOK.RoomElevation
             {
                 MessageBox.Show("Errors occured while selecting rooms and walls.\n" + ex.Message, "Select Rooms and Walls", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-        }
-
-    }
-
-    public class WallSelectionFilter : ISelectionFilter
-    {
-        public bool AllowElement(Element elem)
-        {
-            if (null != elem.Category)
-            {
-                if (elem.Category.Name == "Walls")
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public bool AllowReference(Reference reference, XYZ position)
-        {
-            return true;
-        }
-    }
-
-    public class RoomSelectionFilter : ISelectionFilter
-    {
-        public bool AllowElement(Element elem)
-        {
-            if (null != elem.Category)
-            {
-                if (elem.Category.Name == "Rooms")
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public bool AllowReference(Reference reference, XYZ position)
-        {
-            return true;
         }
     }
 }

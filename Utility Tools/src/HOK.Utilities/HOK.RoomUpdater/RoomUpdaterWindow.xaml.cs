@@ -98,7 +98,6 @@ namespace HOK.RoomUpdater
 
                             if (category.HasMaterialQuantities)
                             {
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
                                 if (category.CategoryType == CategoryType.Model)
                                 {
                                     CategoryProperties cp = new CategoryProperties(category);
@@ -108,15 +107,6 @@ namespace HOK.RoomUpdater
                                         elementCategoryList.Add(cp);
                                     }
                                 }
-#else
-                                CategoryProperties cp = new CategoryProperties(category);
-                                cp.ParamDictionary = GetParameterProperties(category);
-                                if (cp.ParamDictionary.Count > 0)
-                                {
-                                    elementCategoryList.Add(cp);
-                                }
-                                
-#endif
                             }
                         }
                     }
@@ -172,11 +162,7 @@ namespace HOK.RoomUpdater
                         if (paramName.Contains("Extensions.")) { continue; }
 
                         ParameterProperties pp = null;
-#if RELEASE2013 ||RELEASE2014
-                        Parameter param = firstElement.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                         Parameter param = firstElement.LookupParameter(paramName);
-#endif
                         
                         if (null != param)
                         {
@@ -187,11 +173,7 @@ namespace HOK.RoomUpdater
                         }
                         else if (null != firstTypeElement)
                         {
-#if RELEASE2013 ||RELEASE2014
-                            param = firstTypeElement.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                             param = firstTypeElement.LookupParameter(paramName);
-#endif
 
                             if (null != param)
                             {
@@ -214,11 +196,7 @@ namespace HOK.RoomUpdater
                         ParameterProperties property = dictionary[paramName];
                         if (property.IsInstance && null != firstTypeElement)
                         {
-#if RELEASE2013||RELEASE2014
-                            Parameter param = firstElement.get_Parameter(property.ParameterName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                             Parameter param = firstElement.LookupParameter(property.ParameterName);
-#endif
 
                             if (null != param)
                             {
@@ -230,11 +208,7 @@ namespace HOK.RoomUpdater
                         }
                         else if (null != firstTypeElement)
                         {
-#if RELEASE2013||RELEASE2014
-                            Parameter param = firstTypeElement.get_Parameter(property.ParameterName);
-#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                             Parameter param = firstTypeElement.LookupParameter(property.ParameterName);
-#endif
 
                             if (null != param)
                             {
@@ -725,13 +699,8 @@ namespace HOK.RoomUpdater
                                 if (null != locationCurve)
                                 {
                                     Curve curve = locationCurve.Curve;
-#if RELEASE2013
-                                XYZ firstPt = curve.get_EndPoint(0);
-                                XYZ secondPt = curve.get_EndPoint(1);
-#elif RELEASE2014||RELEASE2015||RELEASE2016 || RELEASE2017
                                     XYZ firstPt = curve.GetEndPoint(0);
                                     XYZ secondPt = curve.GetEndPoint(1);
-#endif
                                     XYZ centerPt = curve.Evaluate(0.5, true);
 
                                     if (sep.IsLinked && null != sep.LinkProperties)
@@ -783,11 +752,7 @@ namespace HOK.RoomUpdater
                 SpatialElement spatialElement = sep.ElementObj;
                 if (null != spatialElement)
                 {
-#if RELEASE2013 || RELEASE2014
-                    Parameter sParam = spatialElement.get_Parameter(pmp.SpatialParamName);
-#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                     Parameter sParam = spatialElement.LookupParameter(pmp.SpatialParamName);
-#endif
 
                     if (null != sParam)
                     {
@@ -798,33 +763,14 @@ namespace HOK.RoomUpdater
                             {
                                 foreach (Element re in revitElements)
                                 {
-                                    
-#if RELEASE2013
-                                    if (null!=re.Group) { groupExist = true; continue; } //elements in group
-#elif RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
                                     if (re.GroupId != ElementId.InvalidElementId) { groupExist = true; continue; } //elements in group
-#endif
-                                    
-
-#if RELEASE2013 || RELEASE2014
-                                    Parameter rParam = re.get_Parameter(pmp.RevitParamName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                                     Parameter rParam = re.LookupParameter(pmp.RevitParamName);
-#endif
-
-
                                     if (null == rParam)
                                     {
                                         ElementType elementType = m_doc.GetElement(re.GetTypeId()) as ElementType;
                                         if (null != elementType)
                                         {
-#if RELEASE2013 || RELEASE2014
-                                            rParam = elementType.get_Parameter(pmp.RevitParamName);
-
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
                                             rParam = elementType.LookupParameter(pmp.RevitParamName);
-#endif
-
                                         }
                                     }
                                     
@@ -1055,11 +1001,7 @@ namespace HOK.RoomUpdater
         {
             m_instance = instance;
             instanceId = instance.Id.IntegerValue;
-#if RELEASE2013
-            linkedDocument = instance.Document;
-#elif RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
             linkedDocument = instance.GetLinkDocument();
-#endif
             if (null != linkedDocument)
             {
                 if (!string.IsNullOrEmpty(linkedDocument.Title))

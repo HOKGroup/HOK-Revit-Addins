@@ -2,61 +2,67 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using Autodesk.Revit.Attributes;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 
 namespace HOK.RoomMeasure
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-
-    public class MeasureCommand:IExternalCommand
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
+    public class MeasureCommand : IExternalCommand
     {
-        private Autodesk.Revit.UI.UIApplication m_app;
+        private UIApplication m_app;
         private Document m_doc;
 
         public const string roomWidthParamName = "Room Width";
         public const string roomLengthParamName = "Room Length";
 
 
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
+            Log.AppendLog("HOK.RoomMeasure.MeasureCommand: Started.");
+
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-RoomMeasure", m_doc));
+
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<Room> rooms = collector.OfCategory(BuiltInCategory.OST_Rooms).ToElements().Cast<Room>().ToList();
+                var collector = new FilteredElementCollector(m_doc);
+                var rooms = collector.OfCategory(BuiltInCategory.OST_Rooms).ToElements().Cast<Room>().ToList();
                 if (rooms.Count > 0)
                 {
-                    Room sampleRoom = rooms.First();
+                    var sampleRoom = rooms.First();
                     if (MeasureUtil.ExistRoomParameter(sampleRoom))
                     {
-                        using (TransactionGroup tg = new TransactionGroup(m_doc))
+                        using (var tg = new TransactionGroup(m_doc))
                         {
                             tg.Start("Calculate Rooms");
                             try
                             {
-                                int roomCount = 0;
-                                foreach (Room room in rooms)
+                                var roomCount = 0;
+                                foreach (var room in rooms)
                                 {
                                     if (room.Area == 0) { continue; }
-                                    using (Transaction trans = new Transaction(m_doc))
+                                    using (var trans = new Transaction(m_doc))
                                     {
                                         double width = 0;
                                         double length = 0;
 
-                                        ElementId directShapeId = ElementId.InvalidElementId;
-                                        bool perpendicularSwitch = false;
+                                        var directShapeId = ElementId.InvalidElementId;
+                                        var perpendicularSwitch = false;
                                         trans.Start("Create Room DirecShape");
                                         try
                                         {
-                                            DirectShape directShape = MeasureUtil.CreateRoomDirectShape(room);
+                                            var directShape = MeasureUtil.CreateRoomDirectShape(room);
                                             if (null != directShape)
                                             {
                                                 directShapeId = directShape.Id;
@@ -67,13 +73,13 @@ namespace HOK.RoomMeasure
                                         catch (Exception ex)
                                         {
                                             trans.RollBack();
-                                            string exMsg = ex.Message;
+                                            var exMsg = ex.Message;
                                         }
 
                                         trans.Start("Calculate Dimension");
                                         try
                                         {
-                                            DirectShape directShape = m_doc.GetElement(directShapeId) as DirectShape;
+                                            var directShape = m_doc.GetElement(directShapeId) as DirectShape;
                                             if (null != directShape)
                                             {
                                                 MeasureUtil.CalculateWidthAndLength(directShape, out width, out length);
@@ -84,7 +90,7 @@ namespace HOK.RoomMeasure
                                         catch (Exception ex)
                                         {
                                             trans.RollBack();
-                                            string exMsg = ex.Message;
+                                            var exMsg = ex.Message;
                                         }
 
                                         trans.Start("Set Parameter");
@@ -92,20 +98,14 @@ namespace HOK.RoomMeasure
                                         {
                                             if (perpendicularSwitch)
                                             {
-                                                double tempVal = width;
+                                                var tempVal = width;
                                                 width = length;
                                                 length = tempVal;
                                             }
-                                            Parameter param = room.LookupParameter(roomWidthParamName);
-                                            if (null != param)
-                                            {
-                                                param.Set(width);
-                                            }
+                                            var param = room.LookupParameter(roomWidthParamName);
+                                            param?.Set(width);
                                             param = room.LookupParameter(roomLengthParamName);
-                                            if (null != param)
-                                            {
-                                                param.Set(length);
-                                            }
+                                            param?.Set(length);
 
 
                                             trans.Commit();
@@ -113,7 +113,7 @@ namespace HOK.RoomMeasure
                                         catch (Exception ex)
                                         {
                                             trans.RollBack();
-                                            string exMsg = ex.Message;
+                                            var exMsg = ex.Message;
                                         }
                                         roomCount++;
                                     }
@@ -138,8 +138,10 @@ namespace HOK.RoomMeasure
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to measure the width and length of rooms.\n"+ex.Message, "Measuring Rooms", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog("HOK.RoomMeasure.MeasureCommand: " + ex.Message);
             }
+
+            Log.AppendLog("HOK.RoomMeasure.MeasureCommand: Ended.");
             return Result.Succeeded;
         }
 

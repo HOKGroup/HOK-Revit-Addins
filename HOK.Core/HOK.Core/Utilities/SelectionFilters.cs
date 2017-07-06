@@ -19,4 +19,21 @@ namespace HOK.Core.Utilities
             return true;
         }
     }
+
+    public class WallSelectionFilter : ISelectionFilter
+    {
+        public bool AllowElement(Element elem)
+        {
+            if (null != elem.Category)
+            {
+                return elem.Category.Name == "Walls";
+            }
+            return false;
+        }
+
+        public bool AllowReference(Reference reference, XYZ position)
+        {
+            return true;
+        }
+    }
 }

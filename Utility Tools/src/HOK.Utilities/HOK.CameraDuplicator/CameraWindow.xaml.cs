@@ -97,9 +97,7 @@ namespace HOK.CameraDuplicator
             foreach (Document doc in m_app.Application.Documents)
             {
                 if (doc.IsFamilyDocument) { continue; }
-#if RELEASE204 ||RELEASE2015 || RELEASE2016 || RELEASE2017
                 if (doc.IsLinked) { continue; }
-#endif
                 string modelId = ModelDataStorageUtil.GetModelId(doc);
                 if (!infoDictionary.ContainsKey(modelId))
                 {
@@ -404,24 +402,15 @@ namespace HOK.CameraDuplicator
                         createdView.SetOrientation(cameraInfo.Orientation);
                         createdView.CropBoxActive = cameraInfo.IsCropBoxOn;
                         createdView.CropBox = cameraInfo.CropBox;
-#if RELEASE2013
-                        createdView.SectionBox = cameraInfo.SectionBox;
-#elif RELEASE2014 ||RELEASE2015 || RELEASE2016 || RELEASE2017
                         createdView.IsSectionBoxActive = cameraInfo.IsSectionBoxOn;
                         createdView.SetSectionBox(cameraInfo.SectionBox);
-#endif
-
                         createdView.DisplayStyle = cameraInfo.Display;
                         //createdView.SetRenderingSettings(cameraInfo.Rendering);
 
                         foreach (string paramName in cameraInfo.ViewParameters.Keys)
                         {
                             Parameter sourceParam = cameraInfo.ViewParameters[paramName];
-#if RELEASE2013||RELEASE2014
-                            Parameter recipientParam = createdView.get_Parameter(paramName);
-#elif RELEASE2015||RELEASE2016 || RELEASE2017
-                             Parameter recipientParam = createdView.LookupParameter(paramName);
-#endif
+                            Parameter recipientParam = createdView.LookupParameter(paramName);
                             if (parametersToSkip.Contains(sourceParam.Id.IntegerValue)) { continue; }
 
                             if (null != recipientParam && sourceParam.HasValue)
@@ -658,11 +647,7 @@ namespace HOK.CameraDuplicator
                                 foreach (string paramName in planInfo.ViewParameters.Keys)
                                 {
                                     Parameter sourceParam = planInfo.ViewParameters[paramName];
-#if RELEASE2013||RELEASE2014
-                                    Parameter recipientParam = createdView.get_Parameter(paramName);
-#elif RELEASE2015||RELEASE2016 || RELEASE2017
                                     Parameter recipientParam = createdView.LookupParameter(paramName);
-#endif
                                     if (parametersToSkip.Contains(sourceParam.Id.IntegerValue)) { continue; }
 
                                     if (null != recipientParam && sourceParam.HasValue)

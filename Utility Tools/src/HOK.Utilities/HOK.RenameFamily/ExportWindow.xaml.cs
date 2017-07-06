@@ -103,15 +103,7 @@ namespace HOK.RenameFamily
                             foreach (ElementType eType in elementTypeFound)
                             {
                                 string familyName = "";
-#if RELEASE2013 || RELEASE2014
-                                Parameter param = eType.get_Parameter(BuiltInParameter.ALL_MODEL_FAMILY_NAME);
-                                if (null != param)
-                                {
-                                    familyName = param.AsString();
-                                }
-#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
-            familyName = eType.FamilyName;
-#endif
+                                familyName = eType.FamilyName;
                                 FamilyTypeProperties ftp = new FamilyTypeProperties(modelName, eType.Id.IntegerValue, familyName, eType.Name);
                                 ftp.SetCurrentFamily(eType);
                                 typeProperties.Add(ftp);

@@ -123,18 +123,16 @@ namespace HOK.RoomElevation
 
                         //LocationPoint locationPoint = m_room.Location as LocationPoint;
                         //markerLocation = locationPoint.Point;
-#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                         if (m_room.Document.IsLinked)
                         {
                             var documents = from doc in linkedDocuments.Values where doc.DocumentTitle == m_room.Document.Title select doc;
-                            if (documents.Count() > 0)
+                            if (documents.Any())
                             {
                                 LinkedInstanceProperties lip = documents.First();
                                 roomLink = lip;
                                 markerLocation = lip.TransformValue.OfPoint(markerLocation);
                             }
                         }
-#endif
 
                         marker = ElevationMarker.CreateElevationMarker(m_doc, m_viewFamilyTypeId, markerLocation, toolSettings.CustomScale);
                         trans.Commit();
@@ -251,11 +249,6 @@ namespace HOK.RoomElevation
                     {
                         BoundingBoxXYZ bbBox = m_room.get_BoundingBox(null);
                         markerLocation = new XYZ(pickPoint.X, pickPoint.Y, bbBox.Min.Z);
-                        //markerLocation = new XYZ((bbBox.Max.X + bbBox.Min.X) / 2, (bbBox.Max.Y + bbBox.Min.Y) / 2, bbBox.Min.Z);
-                        
-                        //LocationPoint locationPoint = m_room.Location as LocationPoint;
-                        //markerLocation = locationPoint.Point;
-#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                         if (m_room.Document.IsLinked)
                         {
                             var documents = from doc in linkedDocuments.Values where doc.DocumentTitle == m_room.Document.Title select doc;
@@ -266,7 +259,6 @@ namespace HOK.RoomElevation
                                 markerLocation = lip.TransformValue.OfPoint(markerLocation);
                             }
                         }
-#endif
                         
                         marker = ElevationMarker.CreateElevationMarker(m_doc, m_viewFamilyTypeId, markerLocation, toolSettings.CustomScale);
                         trans.Commit();
@@ -546,7 +538,6 @@ namespace HOK.RoomElevation
             {
                 LocationCurve locationCurve = m_wall.Location as LocationCurve;
                 Curve curve = locationCurve.Curve;
-#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                 if (m_wall.Document.IsLinked)
                 {
                     var documents = from doc in linkedDocuments.Values where doc.DocumentTitle == m_wall.Document.Title select doc;
@@ -557,9 +548,6 @@ namespace HOK.RoomElevation
                         curve = curve.CreateTransformed(wallLink.TransformValue);
                     }
                 }
-#elif   RELEASE2013
-                
-#endif
 
                 IntersectionResult intersectionResult = curve.Project(markerPoint);
                 XYZ intersectionPoint = intersectionResult.XYZPoint;
@@ -654,12 +642,10 @@ namespace HOK.RoomElevation
                 GeometryElement geomElement = m_room.ClosedShell;
                 if (null != geomElement)
                 {
-#if RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017
                     if (null != roomLink)
                     {
                         geomElement = geomElement.GetTransformed(roomLink.TransformValue);
                     }
-#endif
                     foreach (GeometryObject geomObject in geomElement)
                     {
                         if (geomObject is Solid)
@@ -668,13 +654,8 @@ namespace HOK.RoomElevation
                             foreach (Edge edge in solid.Edges)
                             {
                                 Curve curve = edge.AsCurve();
-#if RELEASE2013
-                                vertices.Add(curve.get_EndPoint(0));
-                                vertices.Add(curve.get_EndPoint(1));
-#else
                                 vertices.Add(curve.GetEndPoint(0));
                                 vertices.Add(curve.GetEndPoint(1));
-#endif
                             }
                         }
                     }

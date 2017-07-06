@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-
-using System.Collections;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Windows.Forms;
@@ -12,8 +9,6 @@ using System.Windows.Forms;
 
 namespace HOK.ViewDepth
 {
-#if RELEASE2013
-#else
     public class OverrideViewDepth
     {
         private Autodesk.Revit.UI.UIApplication m_app;
@@ -402,5 +397,4 @@ namespace HOK.ViewDepth
             return min;
         }
     }
-#endif
 }

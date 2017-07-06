@@ -20,26 +20,6 @@ namespace HOK.RoomMeasure
             bool exist = false;
             try
             {
-                
-#if RELEASE2013||RELEASE2014
-                Parameter parameter = room.get_Parameter(roomWidthParamName);
-                if (null != parameter)
-                {
-                    parameter = room.get_Parameter(roomLengthParamName);
-                    if (null != parameter)
-                    {
-                        exist = true;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Room Parameter [" + roomLengthParamName + "] doesn't exist.\n Please add room parameters before running this tool.", "Room Parameter Missing", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Room Parameter [" + roomWidthParamName + "] doesn't exist.\n Please add room parameters before running this tool.", "Room Parameter Missing", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-#elif RELEASE2015||RELEASE2016 || RELEASE2017
                 Parameter parameter = room.LookupParameter(roomWidthParamName);
                 if (null != parameter)
                 {
@@ -57,7 +37,6 @@ namespace HOK.RoomMeasure
                 {
                     MessageBox.Show("Room Parameter [" + roomWidthParamName + "] doesn't exist.\n Please add room parameters before running this tool.", "Room Parameter Missing", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
-#endif
             }
             catch (Exception ex)
             {
@@ -75,7 +54,7 @@ namespace HOK.RoomMeasure
                 var solidGeometries = from geoObj in room.ClosedShell
                                       where geoObj.GetType() == typeof(Solid) && (geoObj as Solid).Volume != 0
                                       select geoObj;
-                if (solidGeometries.Count() > 0)
+                if (solidGeometries.Any())
                 {
                     geoList = solidGeometries.ToList();
                 }
@@ -83,7 +62,7 @@ namespace HOK.RoomMeasure
                 ElementId categoryId = new ElementId((int)BuiltInCategory.OST_Mass);
                 if (DirectShape.IsValidCategoryId(categoryId, room.Document))
                 {
-#if RELEASE2017
+#if RELEASE2017 || RELEASE2018
                     roomShape = DirectShape.CreateElement(room.Document, categoryId);
 #else
                     roomShape = DirectShape.CreateElement(room.Document, categoryId, "Measure", room.UniqueId);
