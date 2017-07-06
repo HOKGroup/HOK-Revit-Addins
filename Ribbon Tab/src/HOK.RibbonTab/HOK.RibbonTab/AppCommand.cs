@@ -341,6 +341,9 @@ namespace HOK.RibbonTab
             }
         }
 
+        /// <summary>
+        /// Creates all Analysis related buttons.
+        /// </summary>
         private void CreateAVFPushButtons()
         {
             try
@@ -379,7 +382,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create Analysis panel.\n" + ex.Message, "Create Analysis Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.AppendLog("HOK.RibbonTab.AppCommand.CreateAVFPushButtons: " + ex.Message);
             }
         }
 
