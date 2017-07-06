@@ -21,6 +21,7 @@ namespace HOK.RibbonTab
 
         Result IExternalApplication.OnShutdown(UIControlledApplication application)
         {
+            Log.WriteLog();
             return Result.Succeeded;
         }
 
@@ -59,10 +60,6 @@ namespace HOK.RibbonTab
         {
             try
             {
-                /* (Konrad) Since it's possible that Family data will never get exported due to the fact that
-                 * one cannot cancel ApplicationClosing event, hence user can just click on "X", and there will
-                 * never be an Idling Event to process the export; we need to create a button for manual trigger.
-                */
                 // TODO: It would be nice to automatically prompt user once a week, to run this export.
                 var missionControlPanel = m_app.CreateRibbonPanel(tabName, "Mission Control");
                 var assemblyPath = currentDirectory + "/HOK.MissionControl.FamilyPublish.dll";

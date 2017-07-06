@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using HOK.Core;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
@@ -25,7 +24,7 @@ namespace HOK.MissionControl.FamilyPublish
         {
             var uiApp = commandData.Application;
             var doc = uiApp.ActiveUIDocument.Document;
-            Log.AppendLog("FamilyPublishCommand: Started...");
+            Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyPublishCommand: Started.");
 
             try
             {
@@ -34,10 +33,6 @@ namespace HOK.MissionControl.FamilyPublish
 
                 var centralPath = BasicFileInfo.Extract(pathName).CentralPath;
                 if (string.IsNullOrEmpty(centralPath)) return Result.Failed;
-
-
-
-
 
                 var configFound = ServerUtilities.GetConfigurationByCentralPath(centralPath);
                 if (configFound != null)
@@ -59,7 +54,6 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                 }
 
-
                 if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return Result.Failed;
 
                 FamilyMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
@@ -77,9 +71,9 @@ namespace HOK.MissionControl.FamilyPublish
             }
             catch (Exception e)
             {
-                Log.AppendLog("FamilyPublishCommand: " + e.Message);
+                Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyPublishCommand: " + e.Message);
             }
-            Log.AppendLog("FamilyPublishCommand: Ended.");
+            Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyPublishCommand: Ended.");
             return Result.Succeeded;
         }
     }

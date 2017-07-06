@@ -48,11 +48,12 @@ namespace HOK.MissionControl.Core.Utils
                 {
                     var items = response.Data;
                     projectFound = items.First();
+                    Log.AppendLog("HOK.MissionControl.Core.Utils.GetProjectByConfigurationId: Project Found.");
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog("HOK.MissionControl.Core.Utils.GetProjectByConfigurationId: " + ex.Message);
             }
             return projectFound;
         }
@@ -73,7 +74,7 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddUrlSegment("uri", fileName);
 
                 var response = client.Execute<List<Configuration>>(request);
-                if (null != response.Data)
+                if (response.Data != null)
                 {
                     var items = response.Data;
                     foreach (var config in items)
@@ -83,14 +84,15 @@ namespace HOK.MissionControl.Core.Utils
                             if (!string.Equals(file.centralPath.ToLower(), centralPath.ToLower(),
                                 StringComparison.Ordinal)) continue;
                             configFound = config;
+                            Log.AppendLog("HOK.MissionControl.Core.Utils.GetConfigurationByCentralPath: Configuration Found.");
                             break;
                         }
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog("HOK.MissionControl.Core.Utils.GetConfigurationByCentralPath: " + ex.Message);
             }
             return configFound;
         }
@@ -122,11 +124,11 @@ namespace HOK.MissionControl.Core.Utils
         }
 
         /// <summary>
-        /// 
+        /// Retrieves a Collection from MongoDB.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="responseType"></param>
-        /// <param name="route"></param>
+        /// <typeparam name="T">Type of response class.</typeparam>
+        /// <param name="responseType">Response object type.</param>
+        /// <param name="route">Route to post request to.</param>
         /// <returns></returns>
         public static List<T> GetCollection<T>(T responseType, string route) where T : new()
         {
@@ -139,11 +141,12 @@ namespace HOK.MissionControl.Core.Utils
                 if (response.Data != null)
                 {
                     items = response.Data;
+                    Log.AppendLog("HOK.MissionControl.Core.Utils.GetCollection: " + response.ResponseStatus);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog("HOK.MissionControl.Core.Utils.GetCollection: " + ex.Message);
             }
             return items;
         }
@@ -218,10 +221,11 @@ namespace HOK.MissionControl.Core.Utils
 
                 var response = client.Execute<T>(request);
                 resresponse = response.Data;
+                Log.AppendLog("HOK.MissionControl.Core.Utils.PostDataScheme: " + response.ResponseStatus);
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog("HOK.MissionControl.Core.Utils.PostDataScheme: " + ex.Message);
             }
             return resresponse;
         }
@@ -267,11 +271,15 @@ namespace HOK.MissionControl.Core.Utils
                 };
                 restRequest.AddBody(dataSchema);
                 var restResponse = restClient.Execute<T>(restRequest);
-                if (restResponse.Data != null) output = restResponse.Data;
+                if (restResponse.Data != null)
+                {
+                    output = restResponse.Data;
+                    Log.AppendLog("HOK.MissionControl.Core.Utils.PostToMongoDB: " + collectionName + "/" + route);
+                }
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog("HOK.MissionControl.Core.Utils.PostToMongoDB: " + ex.Message);
             }
             return output;
         }

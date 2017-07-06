@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Autodesk.Revit.DB;
-using HOK.Core;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
@@ -90,7 +89,7 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                     catch (Exception e)
                     {
-                        Log.AppendLog("FamilyMonitor-PublishData-SaveAndDelete: " + e.Message);
+                        Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyMonitor.PublishData-SaveAndDelete: " + e.Message);
                     }
                 }
 
@@ -108,14 +107,14 @@ namespace HOK.MissionControl.FamilyPublish
             }
             catch (Exception e)
             {
-                Log.AppendLog("FamilyMonitor-PublishData: " + e.Message);
+                Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyMonitor.PublishData: " + e.Message);
             }
         }
 
         /// <summary>
         /// Converts byte size to human readable size ex. kB, MB etc.
         /// </summary>
-        /// <param name="byteCount"></param>
+        /// <param name="byteCount">Size of the file in bytes.</param>
         /// <returns></returns>
         private static string BytesToString(long byteCount)
         {
@@ -131,7 +130,7 @@ namespace HOK.MissionControl.FamilyPublish
         /// <summary>
         /// Deletes created temp file.
         /// </summary>
-        /// <param name="path"></param>
+        /// <param name="path">File to be deleted.</param>
         private static void TryToDelete(string path)
         {
             try
@@ -140,10 +139,15 @@ namespace HOK.MissionControl.FamilyPublish
             }
             catch (IOException e)
             {
-                Log.AppendLog("FamilyMonitor-TryToDelete: " + e.Message);
+                Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyMonitor.TryToDelete: " + e.Message);
             }
         }
 
+        /// <summary>
+        /// Returns number of placed Family Instances of given Family.
+        /// </summary>
+        /// <param name="f">Family.</param>
+        /// <returns></returns>
         private static int CountFamilyInstances(Family f)
         {
             var count = 0;

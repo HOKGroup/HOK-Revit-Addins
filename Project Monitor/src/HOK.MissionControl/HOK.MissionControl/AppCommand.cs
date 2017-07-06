@@ -20,7 +20,6 @@ namespace HOK.MissionControl
     public class AppCommand : IExternalApplication
     {
         public static AppCommand Instance { get; private set; }
-        public static bool RunExport { get; set; }
         public static SessionInfo SessionInfo { get; set; }
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
@@ -50,7 +49,6 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentClosing += OnDocumentClosing;
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
-                //application.Idling += OnIdling;
             }
             catch (Exception ex)
             {
@@ -64,15 +62,12 @@ namespace HOK.MissionControl
         /// </summary>
         public Result OnShutdown(UIControlledApplication application)
         {
-            Log.WriteLog();
-
             application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
             application.ControlledApplication.DocumentOpened -= OnDocumentOpened;
             application.ControlledApplication.FailuresProcessing -= FailureProcessor.CheckFailure;
             application.ControlledApplication.DocumentClosing -= OnDocumentClosing;
             application.ControlledApplication.DocumentSynchronizingWithCentral -= OnDocumentSynchronizing;
             application.ControlledApplication.DocumentSynchronizedWithCentral -= OnDocumentSynchronized;
-            //application.Idling -= OnIdling;
 
             return Result.Succeeded;
         }
@@ -130,8 +125,6 @@ namespace HOK.MissionControl
                     }
 
                     OpenTime["from"] = DateTime.Now;
-
-                    Log.AppendLog("HOK.MissionControl.AppCommand.OnDocumentOpening: " + "Configuration Found: " + configFound.Id);
                 }
                 else
                 {
