@@ -1,5 +1,9 @@
 ﻿using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
+using Autodesk.Revit.DB;
+using HOK.Core.Utilities;
 
 namespace HOK.Arrowhead
 {
@@ -9,10 +13,13 @@ namespace HOK.Arrowhead
     public class ArrowCommand : IExternalCommand
     {
         private UIApplication m_app;
+        private Document m_doc;
 
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             m_app = commandData.Application;
+            m_doc = m_app.ActiveUIDocument.Document;
+            Log.AppendLog("HOK.Arrowhead.ArrowCommand: Started.");
 
             var assignerWindow = new HeadAssignerWindow(m_app);
             if (assignerWindow.ShowDialog() == true)
@@ -20,6 +27,11 @@ namespace HOK.Arrowhead
                 assignerWindow.Close();
             }
 
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-Arrowhead", m_doc));
+
+            Log.AppendLog("HOK.Arrowhead.ArrowCommand: Ended.");
             return Result.Succeeded;
         }
     }

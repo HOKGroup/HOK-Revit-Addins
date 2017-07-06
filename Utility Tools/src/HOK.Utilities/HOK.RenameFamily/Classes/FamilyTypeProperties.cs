@@ -1,27 +1,22 @@
 ﻿using Autodesk.Revit.DB;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HOK.RenameFamily.Classes
 {
     public class FamilyTypeProperties : INotifyPropertyChanged
     {
         private ElementId familyTypeId = ElementId.InvalidElementId;
-        private int familyTypeIdInt = -1;
-        private string modelName = "";
+        private int familyTypeIdInt;
+        private string modelName;
         private string categoryName = "";
-        private string familyName = ""; //from Excel
-        private string typeName = ""; //from Excel
+        private string familyName; //from Excel
+        private string typeName; //from Excel
         private string currentFamilyName = ""; //from Revit
         private string currentTypeName = ""; // from Revit
         private string toolTip = "";
 
-        private bool isSelected = false;
-        private bool isLinked = false;
+        private bool isSelected;
+        private bool isLinked;
 
         public ElementId FamilyTypeId { get { return familyTypeId; } set { familyTypeId = value; NotifyPropertyChanged("FamilyTypeId"); } }
         public int FamilyTypeIdInt { get { return familyTypeIdInt; } set { familyTypeIdInt = value; NotifyPropertyChanged("FamilyTypeIdInt"); } }
@@ -51,15 +46,7 @@ namespace HOK.RenameFamily.Classes
             {
                 categoryName = eType.Category.Name;
             }
-#if RELEASE2013 || RELEASE2014
-            Parameter param = eType.get_Parameter(BuiltInParameter.ALL_MODEL_FAMILY_NAME);
-            if (null != param)
-            {
-                currentFamilyName = param.AsString();
-            }
-#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
             currentFamilyName = eType.FamilyName;
-#endif
             currentTypeName = eType.Name;
 
             if (familyName == currentFamilyName && typeName == currentTypeName)
@@ -72,12 +59,9 @@ namespace HOK.RenameFamily.Classes
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String info)
+        private void NotifyPropertyChanged(string info)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
     }
 }

@@ -181,11 +181,8 @@ namespace HOK.RoomElevation
                                     viewElevation.ViewTemplateId = new ElementId(toolSettings.ViewTemplateId);
                                 }
 
-#if RELEASE2013 || RELEASE2014
-                                Parameter param = viewElevation.get_Parameter("Title on Sheet");
-#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                                 Parameter param = viewElevation.LookupParameter("Title on Sheet");
-#endif
+
                                 if (null != param)
                                 {
                                     param.Set(m_room.Name);
@@ -298,11 +295,7 @@ namespace HOK.RoomElevation
                                         viewElevation.ViewTemplateId = new ElementId(toolSettings.ViewTemplateId);
                                     }
 
-#if RELEASE2013 || RELEASE2014
-                                    Parameter param = viewElevation.get_Parameter("Title on Sheet");
-#elif RELEASE2015 ||RELEASE2016|| RELEASE2017
                                     Parameter param = viewElevation.LookupParameter("Title on Sheet");
-#endif
                                     if (null != param)
                                     {
                                         param.Set(m_room.Name);
@@ -423,11 +416,8 @@ namespace HOK.RoomElevation
             string parameterValue = parameterName;
             try
             {
-#if RELEASE2013 || RELEASE2014
-                Parameter param = room.get_Parameter(parameterName);
-#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                 Parameter param = room.LookupParameter(parameterName);
-#endif
+
                 if (null != param)
                 {
                     if (param.StorageType == StorageType.String)
@@ -641,11 +631,8 @@ namespace HOK.RoomElevation
             {
                 XYZ point1 = markerPoint;
                 XYZ point2 = new XYZ(markerPoint.X, markerPoint.Y, markerPoint.Z + 10);
-#if RELEASE2013
-                Line axis = m_app.Application.Create.NewLineBound(point1, point2);
-#elif RELEASE2014 || RELEASE2015 ||RELEASE2016 || RELEASE2017
+
                 Line axis = Line.CreateBound(point1, point2);
-#endif
 
                 ElementTransformUtils.RotateElement(m_doc, marker.Id, axis, angle);
                 rotated = true;

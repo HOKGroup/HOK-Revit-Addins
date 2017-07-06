@@ -1,24 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 using Autodesk.Revit.DB.Architecture;
-
-
 
 namespace HOK.LevelManager
 {
     public partial class LevelManagerForm : System.Windows.Forms.Form
     {
-        private Autodesk.Revit.UI.UIApplication m_app;
+        private UIApplication m_app;
         private Document m_doc;
         private Dictionary<string, Level> levels = new Dictionary<string, Level>();
         private Dictionary<string, Level> selectedLevels = new Dictionary<string, Level>();
@@ -38,45 +32,38 @@ namespace HOK.LevelManager
             InitializeComponent();
             CollectLevels();
 
-            Selection selection = m_app.ActiveUIDocument.Selection;
-#if RELEASE2015||RELEASE2016 || RELEASE2017
+            var selection = m_app.ActiveUIDocument.Selection;
+
             IList<ElementId> selectedIds = selection.GetElementIds().ToList();
-            foreach (ElementId eId in selectedIds)
+            foreach (var eId in selectedIds)
             {
-                Element element = m_doc.GetElement(eId);
+                var element = m_doc.GetElement(eId);
                 if (null != element)
                 {
                     selectedElement.Insert(element);
                 }
             }
-#else
-            selectedElement = selection.Elements;
-#endif
-
             if (selectedElement.IsEmpty)
             {
                 radioButtonSelected.Enabled = false;
             }
             else
             {
-                labelSelElements.Text = selectedElement.Size.ToString() + " Elements Selected";
+                labelSelElements.Text = selectedElement.Size + " Elements Selected";
                 CollectSelectedLevels();
                 radioButtonSelected.Checked = true;
             }
-#if RELEASE2013
-            checkBoxRoom.Enabled = false;
-#endif
         }
 
         public void CollectLevels()
         {
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+                var collector = new FilteredElementCollector(m_doc);
                 IList<Level> levelList = collector.OfClass(typeof(Level)).WhereElementIsNotElementType().ToElements().Cast<Level>().ToList();
                 if (levelList.Count > 0)
                 {
-                    foreach (Level level in levelList)
+                    foreach (var level in levelList)
                     {
                         if (!levels.ContainsKey(level.Name))
                         {
@@ -99,24 +86,14 @@ namespace HOK.LevelManager
             {
                 foreach (Element element in selectedElement)
                 {
-#if RELEASE2013
-                    if (null != element.Level)
-                    {
-                        if (!selectedLevels.ContainsKey(element.Level.Name))
-                        {
-                            selectedLevels.Add(element.Level.Name, element.Level);
-                        }
-                    }
-#else
                     if (ElementId.InvalidElementId != element.LevelId)
                     {
-                        Level eLevel = m_doc.GetElement(element.LevelId) as Level;
+                        var eLevel = m_doc.GetElement(element.LevelId) as Level;
                         if (!selectedLevels.ContainsKey(eLevel.Name))
                         {
                             selectedLevels.Add(eLevel.Name, eLevel);
                         }
                     }
-#endif
                 }
             }
             catch (Exception ex)
@@ -127,7 +104,7 @@ namespace HOK.LevelManager
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
@@ -139,7 +116,7 @@ namespace HOK.LevelManager
 
                 if (RehostLevel())
                 {
-                    this.Close();
+                    Close();
                 }
             }
             catch (Exception ex)
@@ -150,14 +127,14 @@ namespace HOK.LevelManager
 
         private bool RehostLevel()
         {
-            bool result=false;
+            var result=false;
             try
             {
                 Level levelFrom = null; 
                 Level levelTo = null;
                 if (comboBoxFrom.SelectedIndex > -1)
                 {
-                    string levelName = comboBoxFrom.SelectedItem.ToString();
+                    var levelName = comboBoxFrom.SelectedItem.ToString();
                     if (levels.ContainsKey(levelName))
                     {
                         levelFrom = levels[levelName];
@@ -171,7 +148,7 @@ namespace HOK.LevelManager
 
                 if (comboBoxTo.SelectedIndex > -1)
                 {
-                    string levelName = comboBoxTo.SelectedItem.ToString();
+                    var levelName = comboBoxTo.SelectedItem.ToString();
                     if (levels.ContainsKey(levelName))
                     {
                         levelTo = levels[levelName];
@@ -185,7 +162,7 @@ namespace HOK.LevelManager
 
                 logCreated = LogFileManager.CreateLogFile(m_doc);
                 LogFileManager.ClearLogFile();
-                LogFileManager.AppendLog(DateTime.Now.ToString() + ": Started Rehosting Elements to a new level, " + levelTo.Name);
+                LogFileManager.AppendLog(DateTime.Now + ": Started Rehosting Elements to a new level, " + levelTo.Name);
 
 
                 if (radioButtonAll.Checked)
@@ -212,44 +189,42 @@ namespace HOK.LevelManager
 
         private bool RehostAllElement(Level levelFrom, Level levelTo)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                Transaction trans = new Transaction(m_doc);
+                var trans = new Transaction(m_doc);
                 trans.Start("Rehost All");
 
-                ElementLevelFilter levelFilter = new ElementLevelFilter(levelFrom.Id);
+                var levelFilter = new ElementLevelFilter(levelFrom.Id);
 
-                ParameterValueProvider pvp = new ParameterValueProvider(new ElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
+                var pvp = new ParameterValueProvider(new ElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
                 FilterNumericRuleEvaluator fnrv = new FilterNumericEquals();
-                ElementId rulevalId = levelFrom.Id;
+                var rulevalId = levelFrom.Id;
                 FilterRule paramFr = new FilterElementIdRule(pvp, fnrv, rulevalId);
-                ElementParameterFilter epf = new ElementParameterFilter(paramFr);
+                var epf = new ElementParameterFilter(paramFr);
 
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+                var collector = new FilteredElementCollector(m_doc);
                 IList<ElementId> elementIds = collector.OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().WherePasses(levelFilter).ToElementIds().ToList();
 
-                List<Element> systemFamilies = new List<Element>();
-                List<Autodesk.Revit.DB.Architecture.Room> rooms = new List<Autodesk.Revit.DB.Architecture.Room>();
-                List<Element> familyInstances = new List<Element>();
-#if RELEASE2013
-#else
-                RoomManager roomManager = new RoomManager(m_app);
+                var systemFamilies = new List<Element>();
+                var rooms = new List<Room>();
+                var familyInstances = new List<Element>();
+
+                var roomManager = new RoomManager(m_app);
                 if (checkBoxRoom.Checked)
                 {
-                    FilteredElementCollector roomCollector = new FilteredElementCollector(m_doc);
+                    var roomCollector = new FilteredElementCollector(m_doc);
                     rooms = roomCollector.OfCategory(BuiltInCategory.OST_Rooms).WherePasses(levelFilter).WhereElementIsNotElementType().ToElements().Cast<Room>().ToList();
                     
                     roomManager.RoomElements = rooms;
                     roomManager.CollectRooms();
                 }
-#endif
                 if (elementIds.Count > 0)
                 {
                     collector = new FilteredElementCollector(m_doc);
-                    LogicalOrFilter orFilter = new LogicalOrFilter(epf, levelFilter);
-                    ExclusionFilter exclusionFilter = new ExclusionFilter(elementIds);
-                    LogicalAndFilter andFilter = new LogicalAndFilter(orFilter, exclusionFilter);
+                    var orFilter = new LogicalOrFilter(epf, levelFilter);
+                    var exclusionFilter = new ExclusionFilter(elementIds);
+                    var andFilter = new LogicalAndFilter(orFilter, exclusionFilter);
                     systemFamilies = collector.WherePasses(andFilter).WhereElementIsNotElementType().ToElements().ToList();
 
                     toolStripProgressBar.Maximum = systemFamilies.Count;
@@ -270,7 +245,7 @@ namespace HOK.LevelManager
                 else
                 {
                     collector = new FilteredElementCollector(m_doc);
-                    LogicalOrFilter orFilter = new LogicalOrFilter(epf, levelFilter);
+                    var orFilter = new LogicalOrFilter(epf, levelFilter);
                     systemFamilies = collector.WherePasses(orFilter).WhereElementIsNotElementType().ToElements().ToList();
 
                     toolStripProgressBar.Maximum = systemFamilies.Count;
@@ -279,8 +254,6 @@ namespace HOK.LevelManager
 
                     RehostSystemFamily(levelTo, systemFamilies);
                 }
-#if RELEASE2013
-#else
                 if (checkBoxRoom.Checked)
                 {
                     if (roomManager.CopyRooms(levelTo))
@@ -288,14 +261,13 @@ namespace HOK.LevelManager
                         roomManager.DeleteRooms();
                     }
                 }
-#endif
                 trans.Commit();
                 
                 //Determine whether delete the level or not
                 if (checkBoxDelete.Checked)
                 {
-                    FilteredElementCollector elementCollector = new FilteredElementCollector(m_doc);
-                    LogicalOrFilter orFilter = new LogicalOrFilter(epf, levelFilter);
+                    var elementCollector = new FilteredElementCollector(m_doc);
+                    var orFilter = new LogicalOrFilter(epf, levelFilter);
                     IList<Element> elementList = elementCollector.WherePasses(orFilter).WhereElementIsNotElementType().ToElements().ToList();
                     if (elementList.Count > 0)
                     {
@@ -303,7 +275,7 @@ namespace HOK.LevelManager
                         try
                         {
                             trans.Start("Make Selection");
-#if RELEASE2015||RELEASE2016 || RELEASE2017
+
                             List<ElementId> elementsToShow = new List<ElementId>();
                             foreach (Element element in elementList)
                             {
@@ -311,18 +283,7 @@ namespace HOK.LevelManager
                             }
                             m_app.ActiveUIDocument.ShowElements(elementsToShow);
                             m_app.ActiveUIDocument.Selection.SetElementIds(elementsToShow);
-#else
-                            SelElementSet selElementSet = SelElementSet.Create();
 
-                            List<ElementId> elementsToShow = new List<ElementId>();
-                            foreach (Element element in elementList)
-                            {
-                                selElementSet.Add(element);
-                                elementsToShow.Add(element.Id);
-                            }
-                            m_app.ActiveUIDocument.ShowElements(elementsToShow);
-                            m_app.ActiveUIDocument.Selection.Elements = selElementSet;
-#endif
                             trans.Commit();
                             MessageBox.Show("Selected elements cannot be hosted to a new level.\nPlease identify the problems.", "Failure Message: Rehosting Elements", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             result = true;
@@ -342,13 +303,13 @@ namespace HOK.LevelManager
                         {
                             trans.Start("Delete Element");
 
-                            List<ViewPlan> associatedViews = new List<ViewPlan>();
-                            FilteredElementCollector viewCollector = new FilteredElementCollector(m_doc);
-                            List<ViewPlan> planViews = viewCollector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().Cast<ViewPlan>().ToList();
+                            var associatedViews = new List<ViewPlan>();
+                            var viewCollector = new FilteredElementCollector(m_doc);
+                            var planViews = viewCollector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().Cast<ViewPlan>().ToList();
                             var query = from element in planViews where null!=element.GenLevel select element;
-                            List<ViewPlan> views = query.ToList<ViewPlan>();
+                            var views = query.ToList<ViewPlan>();
                             
-                            foreach (ViewPlan viewPlan in views)
+                            foreach (var viewPlan in views)
                             {
                                 if (viewPlan.GenLevel.Id == levelFrom.Id)
                                 {
@@ -358,16 +319,16 @@ namespace HOK.LevelManager
 
                             if (associatedViews.Count > 0)
                             {
-                                StringBuilder strBuilder = new StringBuilder();
+                                var strBuilder = new StringBuilder();
                                 strBuilder.AppendLine("Elements have been migrated to "+levelTo.Name+".\nIf you want to retain annotation from any of the following views, click Cancel so you can make copies before deleting "+levelFrom.Name+" and associated views. Proceed?");
                                 strBuilder.AppendLine("");
 
-                                foreach (ViewPlan viewplan in associatedViews)
+                                foreach (var viewplan in associatedViews)
                                 {
                                     strBuilder.AppendLine("view "+viewplan.Name+" will be deleted");
                                 }
 
-                                DialogResult dr = MessageBox.Show(strBuilder.ToString(),"Warning Message : Plan Views", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                                var dr = MessageBox.Show(strBuilder.ToString(),"Warning Message : Plan Views", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                                 if (dr == DialogResult.OK)
                                 {
                                     m_doc.Delete(levelFrom.Id);
@@ -380,7 +341,7 @@ namespace HOK.LevelManager
                             
                             trans.Commit();
                             MessageBox.Show("All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.", "Successfully Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            LogFileManager.AppendLog(DateTime.Now.ToString() + ": All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.");
+                            LogFileManager.AppendLog(DateTime.Now + ": All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.");
                             if (logCreated) { LogFileManager.WriteLogFile(); }
                             result = true;
                         }
@@ -400,10 +361,10 @@ namespace HOK.LevelManager
 
                     try
                     {
-                        StringBuilder strBuilder = new StringBuilder();
+                        var strBuilder = new StringBuilder();
                         strBuilder.AppendLine("Following model groups are hosted to a new level.\nAll members of the groups should be migrated manually.");
                         strBuilder.AppendLine("");
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
+
                         List<ElementId> elementsToShow = new List<ElementId>();
                         foreach (int eId in modelGroups.Keys)
                         {
@@ -423,30 +384,6 @@ namespace HOK.LevelManager
                             m_app.ActiveUIDocument.ShowElements(elementsToShow);
                             m_app.ActiveUIDocument.Selection.SetElementIds(elementsToShow);
                         }
-#else
-                        SelElementSet selElementSet = SelElementSet.Create();
-                        List<ElementId> elementsToShow = new List<ElementId>();
-                        foreach (int eId in modelGroups.Keys)
-                        {
-                            Element modelGroup = modelGroups[eId];
-                            selElementSet.Add(modelGroup);
-                            elementsToShow.Add(modelGroup.Id);
-                            strBuilder.AppendLine("Element Id: " + eId + "\tModel Group: " + modelGroup.Name);
-                        }
-
-                        LogFileManager.AppendLog(strBuilder.ToString());
-                        if (logCreated) { LogFileManager.WriteLogFile(); }
-
-                        MessageBoxForm msgForm = new MessageBoxForm("Model Groups", strBuilder.ToString(), LogFileManager.logFullName, true);
-                        DialogResult dr = msgForm.ShowDialog();
-                        if (dr == DialogResult.OK)
-                        {
-
-                            m_app.ActiveUIDocument.ShowElements(elementsToShow);
-                            m_app.ActiveUIDocument.Selection.Elements = selElementSet;
-
-                        }
-#endif
 
                         trans.Commit();
                     }
@@ -459,7 +396,7 @@ namespace HOK.LevelManager
                 else
                 {
                     MessageBox.Show("All elements hosted by the old level were successfully migrated to the new level.", "Successfully Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LogFileManager.AppendLog(DateTime.Now.ToString() + ": All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.");
+                    LogFileManager.AppendLog(DateTime.Now + ": All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.");
                     if (logCreated) { LogFileManager.WriteLogFile(); }
                     result = true;
                 }
@@ -473,33 +410,33 @@ namespace HOK.LevelManager
 
         private bool RehostSelected(ElementSet elementSet, Level levelTo)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                Transaction trans = new Transaction(m_doc);
+                var trans = new Transaction(m_doc);
                 trans.Start("Rehost Selected");
 
-                List<ElementId> selElementIds = new List<ElementId>();
-                List<Element> elements = new List<Element>();
+                var selElementIds = new List<ElementId>();
+                var elements = new List<Element>();
                 foreach (Element element in elementSet)
                 {
                     selElementIds.Add(element.Id);
                     elements.Add(element);
                 }
 
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc, selElementIds);
+                var collector = new FilteredElementCollector(m_doc, selElementIds);
                 IList<ElementId> elementIds = collector.OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().ToElementIds().ToList();
 
-                List<Element> systemFamilies = new List<Element>();
-                List<Room> rooms = new List<Room>();
-                List<Element> familyInstances = new List<Element>();
+                var systemFamilies = new List<Element>();
+                var rooms = new List<Room>();
+                var familyInstances = new List<Element>();
 
 #if RELEASE2013
 #else
-                RoomManager roomManager = new RoomManager(m_app);
+                var roomManager = new RoomManager(m_app);
                 if (checkBoxRoom.Checked)
                 {
-                    FilteredElementCollector roomCollector = new FilteredElementCollector(m_doc,selElementIds);
+                    var roomCollector = new FilteredElementCollector(m_doc,selElementIds);
                     rooms = roomCollector.OfCategory(BuiltInCategory.OST_Rooms).WhereElementIsNotElementType().ToElements().Cast<Room>().ToList();
 
                     roomManager.RoomElements = rooms;
@@ -509,7 +446,7 @@ namespace HOK.LevelManager
                 if (elementIds.Count > 0)
                 {
                     collector = new FilteredElementCollector(m_doc, selElementIds);
-                    ExclusionFilter exclusionFilter = new ExclusionFilter(elementIds);
+                    var exclusionFilter = new ExclusionFilter(elementIds);
                     systemFamilies = collector.WherePasses(exclusionFilter).WhereElementIsNotElementType().ToElements().ToList();
 
                     toolStripProgressBar.Maximum = systemFamilies.Count;
@@ -552,24 +489,24 @@ namespace HOK.LevelManager
                 //Determine whether delete the level or not
                 if (checkBoxDelete.Checked)
                 {
-                    List<Element> elementsToDelete = new List<Element>();
-                    List<ElementId> levelIds = new List<ElementId>();
+                    var elementsToDelete = new List<Element>();
+                    var levelIds = new List<ElementId>();
 
-                    foreach (string levelName in selectedLevels.Keys)
+                    foreach (var levelName in selectedLevels.Keys)
                     {
-                        Level levelFrom = selectedLevels[levelName];
+                        var levelFrom = selectedLevels[levelName];
                         levelIds.Add(levelFrom.Id);
 
-                        ElementLevelFilter levelFilter = new ElementLevelFilter(levelFrom.Id);
+                        var levelFilter = new ElementLevelFilter(levelFrom.Id);
 
-                        ParameterValueProvider pvp = new ParameterValueProvider(new ElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
+                        var pvp = new ParameterValueProvider(new ElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
                         FilterNumericRuleEvaluator fnrv = new FilterNumericEquals();
-                        ElementId rulevalId = levelFrom.Id;
+                        var rulevalId = levelFrom.Id;
                         FilterRule paramFr = new FilterElementIdRule(pvp, fnrv, rulevalId);
-                        ElementParameterFilter epf = new ElementParameterFilter(paramFr);
+                        var epf = new ElementParameterFilter(paramFr);
 
-                        FilteredElementCollector elementCollector = new FilteredElementCollector(m_doc);
-                        LogicalOrFilter orFilter = new LogicalOrFilter(epf, levelFilter);
+                        var elementCollector = new FilteredElementCollector(m_doc);
+                        var orFilter = new LogicalOrFilter(epf, levelFilter);
                         IList<Element> elementList = elementCollector.WherePasses(orFilter).WhereElementIsNotElementType().ToElements().ToList();
                         elementsToDelete.AddRange(elementList);
                     }
@@ -580,7 +517,7 @@ namespace HOK.LevelManager
                         try
                         {
                             trans.Start("Make Selection");
-#if RELEASE2015 ||RELEASE2016 ||RELEASE2017
+
                             List<ElementId> elementsToShow = new List<ElementId>();
                             foreach (Element element in elementsToDelete)
                             {
@@ -588,17 +525,6 @@ namespace HOK.LevelManager
                             }
                             m_app.ActiveUIDocument.ShowElements(elementsToShow);
                             m_app.ActiveUIDocument.Selection.SetElementIds(elementsToShow);
-#else
-                            SelElementSet selElementSet = SelElementSet.Create();
-                            List<ElementId> elementsToShow = new List<ElementId>();
-                            foreach (Element element in elementsToDelete)
-                            {
-                                selElementSet.Add(element);
-                                elementsToShow.Add(element.Id);
-                            }
-                            m_app.ActiveUIDocument.ShowElements(elementsToShow);
-                            m_app.ActiveUIDocument.Selection.Elements = selElementSet;
-#endif
 
 
                             trans.Commit();
@@ -619,17 +545,17 @@ namespace HOK.LevelManager
                         try
                         {
                             trans.Start("Delete Element");
-                            List<ViewPlan> associatedViews = new List<ViewPlan>();
-                            string levelNames = "";
-                            foreach (string levelName in selectedLevels.Keys)
+                            var associatedViews = new List<ViewPlan>();
+                            var levelNames = "";
+                            foreach (var levelName in selectedLevels.Keys)
                             {
                                 levelNames += levelName + ", ";
-                                Level levelFrom = selectedLevels[levelName];
-                                FilteredElementCollector viewCollector = new FilteredElementCollector(m_doc);
-                                List<ViewPlan> planViews = viewCollector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().Cast<ViewPlan>().ToList();
+                                var levelFrom = selectedLevels[levelName];
+                                var viewCollector = new FilteredElementCollector(m_doc);
+                                var planViews = viewCollector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().Cast<ViewPlan>().ToList();
                                 var query = from element in planViews where null!=element.GenLevel select element;
                                 IList<ViewPlan> views = query.ToList<ViewPlan>();
-                                foreach (ViewPlan viewPlan in views)
+                                foreach (var viewPlan in views)
                                 {
                                     if (viewPlan.GenLevel.Id == levelFrom.Id)
                                     {
@@ -640,16 +566,16 @@ namespace HOK.LevelManager
 
                             if (associatedViews.Count > 0)
                             {
-                                StringBuilder strBuilder = new StringBuilder();
+                                var strBuilder = new StringBuilder();
                                 strBuilder.AppendLine("Elements have been migrated to " + levelTo.Name + ".\nIf you want to retain annotation from any of the following views, click Cancel so you can make copies before deleting "+levelNames+" and associated views. Proceed?");
                                 strBuilder.AppendLine("");
 
-                                foreach (ViewPlan viewplan in associatedViews)
+                                foreach (var viewplan in associatedViews)
                                 {
                                     strBuilder.AppendLine("view " + viewplan.Name + " will be deleted");
                                 }
 
-                                DialogResult dr = MessageBox.Show(strBuilder.ToString(), "Warning Message : Plan Views", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                                var dr = MessageBox.Show(strBuilder.ToString(), "Warning Message : Plan Views", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                                 if (dr == DialogResult.OK)
                                 {
                                     m_doc.Delete(levelIds);
@@ -662,7 +588,7 @@ namespace HOK.LevelManager
 
                             trans.Commit();
                             MessageBox.Show("All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.", "Successfully Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            LogFileManager.AppendLog(DateTime.Now.ToString() + ": All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.");
+                            LogFileManager.AppendLog(DateTime.Now + ": All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.");
                             if (logCreated) { LogFileManager.WriteLogFile(); }
                             result = true;
                         }
@@ -682,11 +608,10 @@ namespace HOK.LevelManager
                     {
                         trans.Start("Make Selection");
 
-                        StringBuilder strBuilder = new StringBuilder();
+                        var strBuilder = new StringBuilder();
                         strBuilder.AppendLine("Following model groups are hosted to a new level.\nAll members of the groups should be migrated manually.");
                         strBuilder.AppendLine("");
 
-#if RELEASE2015 ||RELEASE2016 || RELEASE2017
                         List<ElementId> elementsToShow = new List<ElementId>();
                         foreach (int eId in modelGroups.Keys)
                         {
@@ -705,28 +630,6 @@ namespace HOK.LevelManager
                             m_app.ActiveUIDocument.ShowElements(elementsToShow);
                             m_app.ActiveUIDocument.Selection.SetElementIds(elementsToShow);
                         }
-#else
-                        SelElementSet selElementSet = SelElementSet.Create();
-                        List<ElementId> elementsToShow = new List<ElementId>();
-                        foreach (int eId in modelGroups.Keys)
-                        {
-                            Element modelGroup = modelGroups[eId];
-                            selElementSet.Add(modelGroup);
-                            elementsToShow.Add(modelGroup.Id);
-                            strBuilder.AppendLine("Element Id: " + eId + "\tModel Group: " + modelGroup.Name);
-                        }
-
-                        LogFileManager.AppendLog(strBuilder.ToString());
-                        if (logCreated) { LogFileManager.WriteLogFile(); }
-
-                        MessageBoxForm msgForm = new MessageBoxForm("Model Groups", strBuilder.ToString(), LogFileManager.logFullName, true);
-                        DialogResult dr = msgForm.ShowDialog();
-                        if (dr == DialogResult.OK)
-                        {
-                            m_app.ActiveUIDocument.ShowElements(elementsToShow);
-                            m_app.ActiveUIDocument.Selection.Elements = selElementSet;
-                        }
-#endif
 
                         trans.Commit();
                     }
@@ -739,7 +642,7 @@ namespace HOK.LevelManager
                 else
                 {
                     MessageBox.Show("All elements hosted by the old level were successfully migrated to the new level.", "Successfully Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LogFileManager.AppendLog(DateTime.Now.ToString() + ": All elements hosted by the old level were successfully migrated to the new level.");
+                    LogFileManager.AppendLog(DateTime.Now + ": All elements hosted by the old level were successfully migrated to the new level.");
                     if (logCreated) { LogFileManager.WriteLogFile(); }
                     result = true;
                 }
@@ -755,52 +658,52 @@ namespace HOK.LevelManager
 
         private bool RehostCategories(Level levelFrom, Level levelTo)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                Transaction trans = new Transaction(m_doc);
+                var trans = new Transaction(m_doc);
                 trans.Start("Rehost Selected Categories");
 
-                List<ElementId> selElementIds = new List<ElementId>();
-                foreach (string categoryName in selectedElements.Keys)
+                var selElementIds = new List<ElementId>();
+                foreach (var categoryName in selectedElements.Keys)
                 {
                     if (categoryName == "Rooms") { continue; }
 
-                    List<Element> elements = selectedElements[categoryName];
-                    foreach (Element element in elements)
+                    var elements = selectedElements[categoryName];
+                    foreach (var element in elements)
                     {
                         selElementIds.Add(element.Id);
                     }
                 }
 
-                ElementLevelFilter levelFilter = new ElementLevelFilter(levelFrom.Id);
+                var levelFilter = new ElementLevelFilter(levelFrom.Id);
 
-                ParameterValueProvider pvp = new ParameterValueProvider(new ElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
+                var pvp = new ParameterValueProvider(new ElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
                 FilterNumericRuleEvaluator fnrv = new FilterNumericEquals();
-                ElementId rulevalId = levelFrom.Id;
+                var rulevalId = levelFrom.Id;
                 FilterRule paramFr = new FilterElementIdRule(pvp, fnrv, rulevalId);
-                ElementParameterFilter epf = new ElementParameterFilter(paramFr);
+                var epf = new ElementParameterFilter(paramFr);
 
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc, selElementIds);
+                var collector = new FilteredElementCollector(m_doc, selElementIds);
                 IList<ElementId> elementIds = collector.OfClass(typeof(FamilyInstance)).WhereElementIsNotElementType().WherePasses(levelFilter).ToElementIds().ToList();
 
-                List<Element> systemFamilies = new List<Element>();
-                List<Room> rooms = new List<Room>();
-                List<Element> familyInstances = new List<Element>();
+                var systemFamilies = new List<Element>();
+                var rooms = new List<Room>();
+                var familyInstances = new List<Element>();
 #if RELEASE2013
 #else
-                RoomManager roomManager = new RoomManager(m_app);
+                var roomManager = new RoomManager(m_app);
                 if (checkBoxRoom.Checked)
                 {
                     if (selectedElements.ContainsKey("Rooms"))
                     {
-                        List<ElementId> roomIds = new List<ElementId>();
-                        foreach (Element room in selectedElements["Rooms"])
+                        var roomIds = new List<ElementId>();
+                        foreach (var room in selectedElements["Rooms"])
                         {
                             roomIds.Add(room.Id);
                         }
 
-                        FilteredElementCollector roomCollector = new FilteredElementCollector(m_doc, roomIds);
+                        var roomCollector = new FilteredElementCollector(m_doc, roomIds);
                         rooms = roomCollector.WherePasses(levelFilter).WhereElementIsNotElementType().ToElements().Cast<Room>().ToList();
                         roomManager.RoomElements = rooms;
                         roomManager.CollectRooms();
@@ -811,9 +714,9 @@ namespace HOK.LevelManager
                 {
 
                     collector = new FilteredElementCollector(m_doc, selElementIds);
-                    LogicalOrFilter orFilter = new LogicalOrFilter(epf, levelFilter);
-                    ExclusionFilter exclusionFilter = new ExclusionFilter(elementIds);
-                    LogicalAndFilter andFilter = new LogicalAndFilter(orFilter, exclusionFilter);
+                    var orFilter = new LogicalOrFilter(epf, levelFilter);
+                    var exclusionFilter = new ExclusionFilter(elementIds);
+                    var andFilter = new LogicalAndFilter(orFilter, exclusionFilter);
                     systemFamilies = collector.WherePasses(andFilter).WhereElementIsNotElementType().ToElements().ToList();
 
                     toolStripProgressBar.Maximum = systemFamilies.Count;
@@ -836,7 +739,7 @@ namespace HOK.LevelManager
                 else
                 {
                     collector = new FilteredElementCollector(m_doc, selElementIds);
-                    LogicalOrFilter orFilter = new LogicalOrFilter(epf, levelFilter);
+                    var orFilter = new LogicalOrFilter(epf, levelFilter);
                     systemFamilies = collector.WherePasses(orFilter).WhereElementIsNotElementType().ToElements().ToList();
 
                     toolStripProgressBar.Maximum = systemFamilies.Count;
@@ -860,8 +763,8 @@ namespace HOK.LevelManager
                 //Determine whether delete the level or not
                 if (checkBoxDelete.Checked)
                 {
-                    FilteredElementCollector elementCollector = new FilteredElementCollector(m_doc, selElementIds);
-                    LogicalOrFilter orFilter = new LogicalOrFilter(epf, levelFilter);
+                    var elementCollector = new FilteredElementCollector(m_doc, selElementIds);
+                    var orFilter = new LogicalOrFilter(epf, levelFilter);
                     IList<Element> elementList = elementCollector.WherePasses(orFilter).WhereElementIsNotElementType().ToElements().ToList();
                     if (elementList.Count > 0)
                     {
@@ -870,7 +773,6 @@ namespace HOK.LevelManager
                         {
                             trans.Start("Make Selection");
 
-#if RELEASE2015 ||RELEASE2016 || RELEASE2017
                             List<ElementId> elementsToShow = new List<ElementId>();
                             foreach (Element element in elementList)
                             {
@@ -878,17 +780,6 @@ namespace HOK.LevelManager
                             }
                             m_app.ActiveUIDocument.ShowElements(elementsToShow);
                             m_app.ActiveUIDocument.Selection.SetElementIds(elementsToShow);
-#else
-                            SelElementSet selElementSet = SelElementSet.Create();
-                            List<ElementId> elementsToShow = new List<ElementId>();
-                            foreach (Element element in elementList)
-                            {
-                                selElementSet.Add(element);
-                                elementsToShow.Add(element.Id);
-                            }
-                            m_app.ActiveUIDocument.ShowElements(elementsToShow);
-                            m_app.ActiveUIDocument.Selection.Elements = selElementSet;
-#endif
 
                             MessageBox.Show("Selected elements cannot be hosted to a new level.\nPlease identify the problems.", "Failure Message: Rehosting Elements", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             result = true;
@@ -907,13 +798,13 @@ namespace HOK.LevelManager
                         try
                         {
                             trans.Start("Delete Element");
-                            List<ViewPlan> associatedViews = new List<ViewPlan>();
-                            FilteredElementCollector viewCollector = new FilteredElementCollector(m_doc);
-                            List<ViewPlan> planViews = viewCollector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().Cast<ViewPlan>().ToList();
+                            var associatedViews = new List<ViewPlan>();
+                            var viewCollector = new FilteredElementCollector(m_doc);
+                            var planViews = viewCollector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().Cast<ViewPlan>().ToList();
                             var query = from element in planViews where null!=element.GenLevel select element;
                             IList<ViewPlan> views = query.ToList<ViewPlan>();
 
-                            foreach (ViewPlan viewPlan in views)
+                            foreach (var viewPlan in views)
                             {
                                 if (viewPlan.GenLevel.Id == levelFrom.Id)
                                 {
@@ -923,16 +814,16 @@ namespace HOK.LevelManager
 
                             if (associatedViews.Count > 0)
                             {
-                                StringBuilder strBuilder = new StringBuilder();
+                                var strBuilder = new StringBuilder();
                                 strBuilder.AppendLine("Elements have been migrated to " + levelTo.Name + ".\nIf you want to retain annotation from any of the following views, click Cancel so you can make copies before deleting " + levelFrom.Name + " and associated views. Proceed?");
                                 strBuilder.AppendLine("");
 
-                                foreach (ViewPlan viewplan in associatedViews)
+                                foreach (var viewplan in associatedViews)
                                 {
                                     strBuilder.AppendLine("view " + viewplan.Name + " will be deleted");
                                 }
 
-                                DialogResult dr = MessageBox.Show(strBuilder.ToString(), "Warning Message : Plan Views", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                                var dr = MessageBox.Show(strBuilder.ToString(), "Warning Message : Plan Views", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                                 if (dr == DialogResult.OK)
                                 {
                                     m_doc.Delete(levelFrom.Id);
@@ -944,7 +835,7 @@ namespace HOK.LevelManager
                             }
                             trans.Commit();
                             MessageBox.Show("All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.", "Successfully Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            LogFileManager.AppendLog(DateTime.Now.ToString() + ": All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.");
+                            LogFileManager.AppendLog(DateTime.Now + ": All elements hosted by the old level were successfully migrated to the new level.\nThe deprecated level was removed.");
                             if (logCreated) { LogFileManager.WriteLogFile(); }
                             result = true;
                         }
@@ -963,11 +854,10 @@ namespace HOK.LevelManager
                     try
                     {
                         trans.Start("Make Selection");
-                        StringBuilder strBuilder = new StringBuilder();
+                        var strBuilder = new StringBuilder();
                         strBuilder.AppendLine("Following model groups are hosted to a new level.\nAll members of the groups should be migrated manually.");
                         strBuilder.AppendLine("");
 
-#if RELEASE2015 ||RELEASE2016 || RELEASE2017
                         List<ElementId> elementsToShow = new List<ElementId>();
                         foreach (int eId in modelGroups.Keys)
                         {
@@ -986,28 +876,6 @@ namespace HOK.LevelManager
                             m_app.ActiveUIDocument.ShowElements(elementsToShow);
                             m_app.ActiveUIDocument.Selection.SetElementIds(elementsToShow);
                         }
-#else
-                         SelElementSet selElementSet = SelElementSet.Create();
-                        List<ElementId> elementsToShow = new List<ElementId>();
-                        foreach (int eId in modelGroups.Keys)
-                        {
-                            Element modelGroup = modelGroups[eId];
-                            selElementSet.Add(modelGroup);
-                            elementsToShow.Add(modelGroup.Id);
-                            strBuilder.AppendLine("Element Id: " + eId + "\tModel Group: " + modelGroup.Name);
-                        }
-
-                        LogFileManager.AppendLog(strBuilder.ToString());
-                        if (logCreated) { LogFileManager.WriteLogFile(); }
-
-                        MessageBoxForm msgForm = new MessageBoxForm("Model Groups", strBuilder.ToString(), LogFileManager.logFullName, true);
-                        DialogResult dr = msgForm.ShowDialog();
-                        if (dr == DialogResult.OK)
-                        {
-                            m_app.ActiveUIDocument.ShowElements(elementsToShow);
-                            m_app.ActiveUIDocument.Selection.Elements = selElementSet;
-                        }
-#endif
 
                         trans.Commit();
                     }
@@ -1020,7 +888,7 @@ namespace HOK.LevelManager
                 else
                 {
                     MessageBox.Show("All elements hosted by the old level were successfully migrated to the new level.", "Successfully Completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LogFileManager.AppendLog(DateTime.Now.ToString() + ": All elements hosted by the old level were successfully migrated to the new level.");
+                    LogFileManager.AppendLog(DateTime.Now + ": All elements hosted by the old level were successfully migrated to the new level.");
                     if (logCreated) { LogFileManager.WriteLogFile(); }
                     result = true;
                 }
@@ -1036,33 +904,25 @@ namespace HOK.LevelManager
         {
             try
             {
-                foreach (Element element in elementList)
+                foreach (var element in elementList)
                 {
                     toolStripProgressBar.PerformStep();
-                    FamilyInstance fi = element as FamilyInstance;
+                    var fi = element as FamilyInstance;
                     if (null != fi)
                     {
-#if RELEASE2013
-                        if (null != fi.SuperComponent || null != fi.Group)
-                        {
-                            continue; //sub component should be ignored.
-                        }
-#else
                          if (null != fi.SuperComponent || fi.GroupId!=ElementId.InvalidElementId)
                         {
                             continue; //sub component should be ignored.
                         }
-#endif
-                       
                     }
 
-                    Parameter levelparam = element.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM);
-                    Parameter baseLevelParam = element.get_Parameter(BuiltInParameter.FAMILY_BASE_LEVEL_PARAM);
+                    var levelparam = element.get_Parameter(BuiltInParameter.FAMILY_LEVEL_PARAM);
+                    var baseLevelParam = element.get_Parameter(BuiltInParameter.FAMILY_BASE_LEVEL_PARAM);
 
-                    bool moved = false;
+                    var moved = false;
                     if (null != levelparam && !levelparam.IsReadOnly)
                     {
-                        ElementId eLevelId = levelparam.AsElementId();
+                        var eLevelId = levelparam.AsElementId();
                         levelparam.Set(toLevel.Id);
                         if (maintain)
                         {
@@ -1076,8 +936,8 @@ namespace HOK.LevelManager
                                 {
                                     if (null != element.Location)
                                     {
-                                        Level eLevel = m_doc.GetElement(eLevelId) as Level;
-                                        XYZ direction = new XYZ(0, 0, eLevel.Elevation - toLevel.Elevation);
+                                        var eLevel = m_doc.GetElement(eLevelId) as Level;
+                                        var direction = new XYZ(0, 0, eLevel.Elevation - toLevel.Elevation);
                                         moved = element.Location.Move(direction);
                                     }
                                 }
@@ -1102,13 +962,9 @@ namespace HOK.LevelManager
             {
                 try
                 {
-                    foreach (Element element in elementList)
+                    foreach (var element in elementList)
                     {
-#if RELEASE2013
-                        if (element.Group != null) { continue; } //if parent group exists, this should be ignored
-#else
                         if (element.GroupId != ElementId.InvalidElementId) { continue; } //if parent group exists, this should be ignored
-#endif
 
                         toolStripProgressBar.PerformStep();
                         if (null != element.Category)
@@ -1140,7 +996,7 @@ namespace HOK.LevelManager
                                     LevelManager.MovePads(m_doc, element, toLevel, maintain);
                                     break;
                                 case "Model Groups":
-                                    bool writable = LevelManager.MoveGroups(m_doc, element, toLevel, maintain);
+                                    var writable = LevelManager.MoveGroups(m_doc, element, toLevel, maintain);
                                     if (writable)
                                     {
                                         if (!modelGroups.ContainsKey(element.Id.IntegerValue))
@@ -1170,11 +1026,11 @@ namespace HOK.LevelManager
         {
             try
             {
-                CategoryForm categoryForm = new CategoryForm(m_app);
+                var categoryForm = new CategoryForm(m_app);
                 if (DialogResult.OK == categoryForm.ShowDialog())
                 {
                     selectedElements = categoryForm.SelectedElements;
-                    labelCategory.Text = selectedElements.Count.ToString() + " Categories Selected";
+                    labelCategory.Text = selectedElements.Count + " Categories Selected";
                 }
             }
             catch (Exception ex)

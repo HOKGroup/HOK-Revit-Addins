@@ -1,28 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.CameraDuplicator
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-
-    public class CameraCommand:IExternalCommand
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
+    public class CameraCommand : IExternalCommand
     {
-        private UIApplication m_app = null;
+        private UIApplication m_app;
+        private Document m_doc;
 
-        Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             m_app = commandData.Application;
+            m_doc = m_app.ActiveUIDocument.Document;
+            Log.AppendLog("HOK.CameraDuplicator.CameraCommand: Started.");
+
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-CameraDuplicator", m_doc));
+
             if (m_app.Application.Documents.Size > 1)
             {
-                CameraWindow cameraWindow = new CameraWindow(m_app);
+                var cameraWindow = new CameraWindow(m_app);
                 if (true == cameraWindow.ShowDialog())
                 {
                     cameraWindow.Close();
@@ -30,8 +39,13 @@ namespace HOK.CameraDuplicator
             }
             else
             {
-                MessageBox.Show("Please open more than two Revit documents before running this tool.\n A source model and a recipient model are required.", "Opened Revit Documents Required!", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Please open more than two Revit documents before running this tool.\n A source model and a recipient model are required.", 
+                    "Opened Revit Documents Required!", 
+                    MessageBoxButton.OK, 
+                    MessageBoxImage.Information);
             }
+
+            Log.AppendLog("HOK.CameraDuplicator.CameraCommand: Ended.");
             return Result.Succeeded;
         }
     }
@@ -100,18 +114,18 @@ namespace HOK.CameraDuplicator
 
         public CameraViewInfo(CameraViewInfo vInfo)
         {
-            this.ViewId = vInfo.ViewId;
-            this.ViewName = vInfo.ViewName;
-            this.LinkedViewId = vInfo.LinkedViewId;
-            this.Linked = vInfo.Linked;
-            this.ViewTemplateId = vInfo.ViewTemplateId;
-            this.PhaseId = vInfo.PhaseId;
-            this.WorksetVisibilities = vInfo.WorksetVisibilities;
-            this.Orientation = vInfo.Orientation;
-            this.CropBox = vInfo.CropBox;
-            this.Display = vInfo.Display;
-            this.ViewParameters = vInfo.ViewParameters;
-            this.IsSelected = vInfo.IsSelected;
+            ViewId = vInfo.ViewId;
+            ViewName = vInfo.ViewName;
+            LinkedViewId = vInfo.LinkedViewId;
+            Linked = vInfo.Linked;
+            ViewTemplateId = vInfo.ViewTemplateId;
+            PhaseId = vInfo.PhaseId;
+            WorksetVisibilities = vInfo.WorksetVisibilities;
+            Orientation = vInfo.Orientation;
+            CropBox = vInfo.CropBox;
+            Display = vInfo.Display;
+            ViewParameters = vInfo.ViewParameters;
+            IsSelected = vInfo.IsSelected;
         }
 
         private void GetParameters(ParameterSet parameters)
@@ -120,7 +134,7 @@ namespace HOK.CameraDuplicator
             {
                 foreach (Parameter param in parameters)
                 {
-                    string paramName = param.Definition.Name;
+                    var paramName = param.Definition.Name;
                     if (paramName.Contains(".Extensions")) { continue; }
                     if (param.Id.IntegerValue == (int)BuiltInParameter.VIEW_PHASE) { phaseId = param.AsElementId(); }
                     if (param.StorageType == StorageType.None || param.StorageType  == StorageType.ElementId) { continue; }
@@ -133,7 +147,7 @@ namespace HOK.CameraDuplicator
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
         }
 
@@ -141,7 +155,7 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                foreach (WorksetId wsId in worksetIds)
+                foreach (var wsId in worksetIds)
                 {
                     if (!worksetVisibilities.ContainsKey(wsId))
                     {
@@ -151,7 +165,7 @@ namespace HOK.CameraDuplicator
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
         }
     }
@@ -231,22 +245,22 @@ namespace HOK.CameraDuplicator
 
         public PlanViewInfo(PlanViewInfo info)
         {
-            this.ViewId = info.ViewId;
-            this.ViewName = info.ViewName;
-            this.PlanViewType = info.PlanViewType;
-            this.LinkedViewId = info.LinkedViewId;
-            this.Linked = info.Linked;
-            this.LevelId = info.LevelId;
-            this.LevelName = info.LevelName;
-            this.ViewTemplateId = info.ViewTemplateId;
-            this.ScopeBoxId = info.ScopeBoxId;
-            this.PhaseId = info.PhaseId;
-            this.AreaSchemeId = info.AreaSchemeId; 
-            this.IsCropBoxOn = info.IsCropBoxOn;
-            this.CropBox = info.CropBox;
-            this.Display = info.Display;
-            this.viewParameters = info.ViewParameters;
-            this.IsSelected = info.IsSelected;
+            ViewId = info.ViewId;
+            ViewName = info.ViewName;
+            PlanViewType = info.PlanViewType;
+            LinkedViewId = info.LinkedViewId;
+            Linked = info.Linked;
+            LevelId = info.LevelId;
+            LevelName = info.LevelName;
+            ViewTemplateId = info.ViewTemplateId;
+            ScopeBoxId = info.ScopeBoxId;
+            PhaseId = info.PhaseId;
+            AreaSchemeId = info.AreaSchemeId; 
+            IsCropBoxOn = info.IsCropBoxOn;
+            CropBox = info.CropBox;
+            Display = info.Display;
+            viewParameters = info.ViewParameters;
+            IsSelected = info.IsSelected;
         }
 
         private void GetParameters(ParameterSet parameters)
@@ -255,7 +269,7 @@ namespace HOK.CameraDuplicator
             {
                 foreach (Parameter param in parameters)
                 {
-                    string paramName = param.Definition.Name;
+                    var paramName = param.Definition.Name;
                     if (paramName.Contains(".Extensions")) { continue; }
                     if (param.Id.IntegerValue == (int)BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP) { scopeBoxId = param.AsElementId(); continue; }
                     if (param.Id.IntegerValue == (int)BuiltInParameter.VIEW_PHASE) { phaseId = param.AsElementId(); continue; }
@@ -268,7 +282,7 @@ namespace HOK.CameraDuplicator
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
         }
 
@@ -276,7 +290,7 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                foreach (WorksetId wsId in worksetIds)
+                foreach (var wsId in worksetIds)
                 {
                     if (!worksetVisibilities.ContainsKey(wsId))
                     {
@@ -286,7 +300,7 @@ namespace HOK.CameraDuplicator
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
         }
     }
@@ -324,8 +338,8 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                FilteredWorksetCollector wsCollector = new FilteredWorksetCollector(modelDoc);
-                WorksetKindFilter wsFilter = new WorksetKindFilter(WorksetKind.UserWorkset);
+                var wsCollector = new FilteredWorksetCollector(modelDoc);
+                var wsFilter = new WorksetKindFilter(WorksetKind.UserWorkset);
                 worksetIds = wsCollector.WherePasses(wsFilter).ToWorksetIds().ToList();
             }
             catch (Exception ex)
@@ -338,15 +352,15 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(modelDoc);
-                List<View3D> threeDViews = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
-                foreach (View3D view in threeDViews)
+                var collector = new FilteredElementCollector(modelDoc);
+                var threeDViews = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
+                foreach (var view in threeDViews)
                 {
                     if (view.ViewType != ViewType.ThreeD) { continue; }
                     if (view.IsTemplate) { continue; }
                     if (view.IsPerspective)
                     {
-                        CameraViewInfo viewInfo = new CameraViewInfo(view);
+                        var viewInfo = new CameraViewInfo(view);
                         if (worksetIds.Count > 0)
                         {
                             viewInfo.GetWorksetVisibilities(view, worksetIds);
@@ -368,12 +382,12 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(modelDoc);
-                List<ViewPlan> viewPlans = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
-                foreach (ViewPlan pView in viewPlans)
+                var collector = new FilteredElementCollector(modelDoc);
+                var viewPlans = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
+                foreach (var pView in viewPlans)
                 {
                     if (pView.IsTemplate) { continue; }
-                    Parameter parentParam = pView.get_Parameter(BuiltInParameter.SECTION_PARENT_VIEW_NAME);
+                    var parentParam = pView.get_Parameter(BuiltInParameter.SECTION_PARENT_VIEW_NAME);
                     if (null != parentParam)
                     {
                         if (parentParam.HasValue) { continue; }
@@ -381,7 +395,7 @@ namespace HOK.CameraDuplicator
 
                     if (!planViews.ContainsKey(pView.Id.IntegerValue))
                     {
-                        PlanViewInfo pvi = new PlanViewInfo(pView);
+                        var pvi = new PlanViewInfo(pView);
                         if (worksetIds.Count > 0)
                         {
                             pvi.GetWorksetVisibilities(pView, worksetIds);

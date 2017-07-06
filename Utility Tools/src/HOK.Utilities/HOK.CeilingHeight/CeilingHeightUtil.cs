@@ -15,10 +15,8 @@ namespace HOK.CeilingHeight
         private Document m_doc;
         private List<Element> selectedRooms = new List<Element>();
         private Dictionary<Level, double/*elevation*/> levels = new Dictionary<Level, double>();
-        private Dictionary<int/*roomId*/, RoomProperties> roomDictionary = new Dictionary<int, RoomProperties>();
         private List<ViewPlan> viewPlans = new List<ViewPlan>();
-
-        public Dictionary<int, RoomProperties> RoomDictionary { get { return roomDictionary; } set { roomDictionary = value; } }
+        public Dictionary<int, RoomProperties> RoomDictionary { get; set; } = new Dictionary<int, RoomProperties>();
 
         public CeilingHeightUtil(UIApplication uiapp, List<Element> rooms)
         {
@@ -33,12 +31,12 @@ namespace HOK.CeilingHeight
         {
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
+                var collector = new FilteredElementCollector(m_doc);
                 IList<Element> levelList = collector.OfClass(typeof(Level)).WhereElementIsNotElementType().ToElements().ToList();
-                Dictionary<Level, double> levelDictionary = new Dictionary<Level, double>();
-                foreach (Element element in levelList)
+                var levelDictionary = new Dictionary<Level, double>();
+                foreach (var element in levelList)
                 {
-                    Level level = element as Level;
+                    var level = element as Level;
                     if (!levelDictionary.ContainsKey(level))
                     {
                         levelDictionary.Add(level, level.Elevation);
@@ -58,8 +56,8 @@ namespace HOK.CeilingHeight
         {
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<ViewPlan> elementList = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
+                var collector = new FilteredElementCollector(m_doc);
+                var elementList = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
                 var planViews = from view in elementList where view.ViewType == ViewType.CeilingPlan select view;
                 viewPlans = planViews.ToList();
             }
@@ -71,28 +69,30 @@ namespace HOK.CeilingHeight
 
         public void MeasureHeight()
         {
-            StringBuilder strBuilder = new StringBuilder();
-            foreach (Element element in selectedRooms)
+            var strBuilder = new StringBuilder();
+            foreach (var element in selectedRooms)
             {
                 try
                 {
-                    Room room = element as Room;
-                    Ceiling mainCeiling = null;
-                    List<Element> ceilings = FindIntersectsCeiling(room, out mainCeiling);
+                    var room = element as Room;
+                    Ceiling mainCeiling;
+                    var ceilings = FindIntersectsCeiling(room, out mainCeiling);
                     if (ceilings.Count > 0 && null != mainCeiling)
                     {
-                        RoomProperties rp = new RoomProperties();
-                        rp.RoomId = room.Id.IntegerValue;
-                        rp.RoomName = room.Name;
-                        rp.RoomObj = room;
-                        rp.MainCeiling = mainCeiling;
+                        var rp = new RoomProperties
+                        {
+                            RoomId = room.Id.IntegerValue,
+                            RoomName = room.Name,
+                            RoomObj = room,
+                            MainCeiling = mainCeiling
+                        };
                         rp.CeilingHeight = GetCeilingHeight(rp.MainCeiling, room);
                         rp.MainCeilingPlan = FindCeilingPlan(rp.MainCeiling);
 
-                        Dictionary<int, CeilingProperties> ceilingProperties = new Dictionary<int, CeilingProperties>();
-                        foreach (Element elem in ceilings)
+                        var ceilingProperties = new Dictionary<int, CeilingProperties>();
+                        foreach (var elem in ceilings)
                         {
-                            CeilingProperties cp = new CeilingProperties();
+                            var cp = new CeilingProperties();
                             cp.CeilingId = elem.Id.IntegerValue;
                             cp.CeilingObj = elem;
                             cp.HeightOffsetFromLevel = elem.get_Parameter(BuiltInParameter.CEILING_HEIGHTABOVELEVEL_PARAM).AsDouble();
@@ -114,7 +114,7 @@ namespace HOK.CeilingHeight
                         SetCeilingPlan(room, rp);
                         SetCeilingType(room, rp);
 
-                        roomDictionary.Add(rp.RoomId, rp);
+                        RoomDictionary.Add(rp.RoomId, rp);
                     }
                 }
                 catch (Exception ex)
@@ -133,48 +133,44 @@ namespace HOK.CeilingHeight
 
         private List<Element> FindIntersectsCeiling(Room room, out Ceiling mainCeiling)
         {
-            List<Element> intersectsCeilings = new List<Element>();
+            var intersectsCeilings = new List<Element>();
             mainCeiling = null;
-            Level originUpperLimit = room.UpperLimit;
+            var originUpperLimit = room.UpperLimit;
 
             try
             {
-                int roomLevelIndex = FindRoomLevelIndex(room);
-                int index = roomLevelIndex + 1;
+                var roomLevelIndex = FindRoomLevelIndex(room);
+                var index = roomLevelIndex + 1;
                 double maxVol = 0;
-                int indexUpperLimit = (index + 3) > levels.Count - 1 ? levels.Count - 1 : index + 3;
+                var indexUpperLimit = (index + 3) > levels.Count - 1 ? levels.Count - 1 : index + 3;
 
-                Level level = levels.ElementAt(indexUpperLimit).Key;
-                using (Transaction trans = new Transaction(m_doc))
+                var level = levels.ElementAt(indexUpperLimit).Key;
+                using (var trans = new Transaction(m_doc))
                 {
                     trans.Start("Set Upper Limit");
                     room.UpperLimit = level;
                     trans.Commit();
                 }
                 
-                Solid roomSolid = FindRoomSolid(room);
-                FilteredElementCollector elementCollector = new FilteredElementCollector(m_doc);
+                var roomSolid = FindRoomSolid(room);
+                var elementCollector = new FilteredElementCollector(m_doc);
                 elementCollector.OfClass(typeof(Ceiling)).WherePasses(new ElementIntersectsSolidFilter(roomSolid)).WhereElementIsNotElementType();
                 IList<Element> elementList = elementCollector.ToElements().ToList();
 
                 if (elementList.Count > 0)
                 {
-#if RELEASE2013
-                    var ceilings = from validCeiling in elementList where validCeiling.Level.Id.IntegerValue == room.Level.Id.IntegerValue select validCeiling;
-#else
                     var ceilings = from validCeiling in elementList where validCeiling.LevelId.IntegerValue == room.LevelId.IntegerValue select validCeiling;
-#endif
                     intersectsCeilings = ceilings.ToList();
 
                     if (intersectsCeilings.Count > 0)
                     {
 
-                        foreach (Element element in intersectsCeilings)
+                        foreach (var element in intersectsCeilings)
                         {
-                            Solid ceilingSolid = FindCeilingSolid(element);
+                            var ceilingSolid = FindCeilingSolid(element);
                             if (null != ceilingSolid)
                             {
-                                Solid intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation(roomSolid, ceilingSolid, BooleanOperationsType.Intersect);
+                                var intersectSolid = BooleanOperationsUtils.ExecuteBooleanOperation(roomSolid, ceilingSolid, BooleanOperationsType.Intersect);
                                 if (null != intersectSolid)
                                 {
                                     if (maxVol < intersectSolid.Volume)
@@ -194,7 +190,7 @@ namespace HOK.CeilingHeight
             }
             finally
             {
-                using (Transaction transaction = new Transaction(m_doc))
+                using (var transaction = new Transaction(m_doc))
                 {
                     transaction.Start("Set Original Upper Limit");
                     room.UpperLimit = originUpperLimit;
@@ -209,10 +205,10 @@ namespace HOK.CeilingHeight
             Solid roomSolid = null;
             try
             {
-                GeometryElement geomElem = room.ClosedShell;
-                foreach (GeometryObject geoObj in geomElem)
+                var geomElem = room.ClosedShell;
+                foreach (var geoObj in geomElem)
                 {
-                    Solid solid = geoObj as Solid;
+                    var solid = geoObj as Solid;
                     if (null != solid)
                     {
                         if (solid.Volume > 0)
@@ -234,14 +230,14 @@ namespace HOK.CeilingHeight
             Solid ceilingSolid = null;
             try
             {
-                Options opt = m_app.Application.Create.NewGeometryOptions();
+                var opt = m_app.Application.Create.NewGeometryOptions();
                 opt.ComputeReferences = true;
                 opt.IncludeNonVisibleObjects = true;
 
-                GeometryElement geomElem = ceiling.get_Geometry(opt);
-                foreach (GeometryObject obj in geomElem)
+                var geomElem = ceiling.get_Geometry(opt);
+                foreach (var obj in geomElem)
                 {
-                    Solid solid = obj as Solid;
+                    var solid = obj as Solid;
                     if (null != solid)
                     {
                         if (solid.Volume > 0)
@@ -251,7 +247,7 @@ namespace HOK.CeilingHeight
                         }
                         else
                         {
-                            List<CurveLoop> curveLoopList = new List<CurveLoop>();
+                            var curveLoopList = new List<CurveLoop>();
                             XYZ normal = null;
                             foreach (Face face in solid.Faces)
                             {
@@ -260,7 +256,7 @@ namespace HOK.CeilingHeight
                                     normal = face.ComputeNormal(new UV(0, 0));
                                     foreach (EdgeArray edgeArray in face.EdgeLoops)
                                     {
-                                        CurveLoop curveLoop = new CurveLoop();
+                                        var curveLoop = new CurveLoop();
                                         foreach (Edge edge in edgeArray)
                                         {
                                             curveLoop.Append(edge.AsCurve());
@@ -269,7 +265,7 @@ namespace HOK.CeilingHeight
                                     }
                                 }
                             }
-                            Solid extrusion = GeometryCreationUtilities.CreateExtrusionGeometry(curveLoopList, normal, 1);
+                            var extrusion = GeometryCreationUtilities.CreateExtrusionGeometry(curveLoopList, normal, 1);
                             if (extrusion.Volume > 0)
                             {
                                 ceilingSolid = extrusion;
@@ -289,16 +285,11 @@ namespace HOK.CeilingHeight
 
         private int FindRoomLevelIndex(Room room)
         {
-            int index = 0;
+            var index = 0;
             try
             {
-#if RELEASE2013
-                Level roomLevel = room.Level;
-#else
-                Level roomLevel = m_doc.GetElement(room.LevelId) as Level;
-#endif
-
-                foreach (Level level in levels.Keys)
+                var roomLevel = m_doc.GetElement(room.LevelId) as Level;
+                foreach (var level in levels.Keys)
                 {
                     if (level.Id.IntegerValue == roomLevel.Id.IntegerValue)
                     {
@@ -316,17 +307,17 @@ namespace HOK.CeilingHeight
 
         private string FindCeilingPlan(Element ceiling)
         {
-            string ceilingPlan = "";
+            var ceilingPlan = "";
             try
             {
-                foreach (ViewPlan view in viewPlans)
+                foreach (var view in viewPlans)
                 {
                     if (!view.IsTemplate)
                     {
-                        FilteredElementCollector collector = new FilteredElementCollector(m_doc, view.Id);
-                        List<ElementId> elementIds = collector.OfClass(typeof(Ceiling)).ToElementIds().ToList();
+                        var collector = new FilteredElementCollector(m_doc, view.Id);
+                        var elementIds = collector.OfClass(typeof(Ceiling)).ToElementIds().ToList();
                         var ceilingIds = from ceilingId in elementIds where ceilingId.IntegerValue == ceiling.Id.IntegerValue select ceilingId;
-                        List<ElementId> results = ceilingIds.ToList();
+                        var results = ceilingIds.ToList();
                         if (results.Count > 0)
                         {
                             ceilingPlan = view.ViewName;
@@ -347,16 +338,10 @@ namespace HOK.CeilingHeight
             double height = 0;
             try
             {
-#if RELEASE2013
-                int ceilingLevelId = ceiling.Level.Id.IntegerValue;
-                int roomLevelId = room.Level.Id.IntegerValue;
-#else
-                int ceilingLevelId = ceiling.LevelId.IntegerValue;
-                int roomLevelId = room.LevelId.IntegerValue;
-#endif
-                
-                double roomBaseOffset = room.get_Parameter(BuiltInParameter.ROOM_LOWER_OFFSET).AsDouble();
-                double ceilingHeightOffset = ceiling.get_Parameter(BuiltInParameter.CEILING_HEIGHTABOVELEVEL_PARAM).AsDouble();
+                var ceilingLevelId = ceiling.LevelId.IntegerValue;
+                var roomLevelId = room.LevelId.IntegerValue;
+                var roomBaseOffset = room.get_Parameter(BuiltInParameter.ROOM_LOWER_OFFSET).AsDouble();
+                var ceilingHeightOffset = ceiling.get_Parameter(BuiltInParameter.CEILING_HEIGHTABOVELEVEL_PARAM).AsDouble();
                 height = ceilingHeightOffset - roomBaseOffset;
             }
             catch (Exception ex)
@@ -368,13 +353,13 @@ namespace HOK.CeilingHeight
 
         private string GetCeilingType(Element ceiling)
         {
-            string typeMark = "";
+            var typeMark = "";
             try
             {
-                ElementId typeId = ceiling.GetTypeId();
-                ElementType ceilingType = m_doc.GetElement(typeId) as ElementType;
+                var typeId = ceiling.GetTypeId();
+                var ceilingType = m_doc.GetElement(typeId) as ElementType;
 
-                Parameter param = ceilingType.get_Parameter(BuiltInParameter.ALL_MODEL_TYPE_MARK);
+                var param = ceilingType.get_Parameter(BuiltInParameter.ALL_MODEL_TYPE_MARK);
                 if (null != param)
                 {
                     typeMark = param.AsString();
@@ -389,17 +374,12 @@ namespace HOK.CeilingHeight
 
         private void SetCeilingHeight(Element room, RoomProperties rp)
         {
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(m_doc))
             {
                 try
                 {
-                    string paramName = "Ceiling Height";
-#if RELEASE2015||RELEASE2016 || RELEASE2017
-                    Parameter parameter = room.LookupParameter(paramName);
-#else
-                    Parameter parameter = room.get_Parameter(paramName);
-#endif
-
+                    var paramName = "Ceiling Height";
+                    var parameter = room.LookupParameter(paramName);
                     if (null != parameter)
                     {
                         trans.Start("Set Ceiling Height");
@@ -408,12 +388,7 @@ namespace HOK.CeilingHeight
                     }
                     else if (CreateSharedParameter(paramName, ParameterType.Length, BuiltInParameterGroup.PG_GEOMETRY))
                     {
-#if RELEASE2015||RELEASE2016 || RELEASE2017
                         parameter = room.LookupParameter(paramName);
-#else
-                        parameter = room.get_Parameter(paramName);
-#endif
-
                         if (null != parameter)
                         {
                             trans.Start("Set Ceiling Height2");
@@ -436,23 +411,17 @@ namespace HOK.CeilingHeight
 
         private void SetSecondaryCeilingHeight(Element room, RoomProperties rp)
         {
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(m_doc))
             {
                 try
                 {
-                    string paramName = "Secondary Ceiling Heights";
-                    List<double> ceilingHeightList = new List<double>();
-
-#if RELEASE2015||RELEASE2016 || RELEASE2017
-                    Parameter tempParam = room.LookupParameter("Ceiling Height");
-#else
-                    Parameter tempParam = room.get_Parameter("Ceiling Height");
-#endif
-
-                    string ceilingHeights = "";
-                    foreach (int ceilingId in rp.IntersectCeilings.Keys)
+                    var paramName = "Secondary Ceiling Heights";
+                    var ceilingHeightList = new List<double>();
+                    var tempParam = room.LookupParameter("Ceiling Height");
+                    var ceilingHeights = "";
+                    foreach (var ceilingId in rp.IntersectCeilings.Keys)
                     {
-                        CeilingProperties cp = rp.IntersectCeilings[ceilingId];
+                        var cp = rp.IntersectCeilings[ceilingId];
 
                         if (null != tempParam && !ceilingHeightList.Contains(cp.CeilingHeight) && cp.CeilingHeight != rp.CeilingHeight)
                         {
@@ -465,12 +434,7 @@ namespace HOK.CeilingHeight
                         }
                     }
 
-#if RELEASE2015||RELEASE2016 || RELEASE2017
-                    Parameter parameter = room.LookupParameter(paramName);
-#else
-                    Parameter parameter = room.get_Parameter(paramName);
-#endif
-
+                    var parameter = room.LookupParameter(paramName);
                     if (null != parameter)
                     {
                         trans.Start("Set Secondary Ceiling Height");
@@ -479,12 +443,7 @@ namespace HOK.CeilingHeight
                     }
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.PG_GEOMETRY))
                     {
-#if RELEASE2015||RELEASE2016 || RELEASE2017
                         parameter = room.LookupParameter(paramName);
-#else
-                        parameter = room.get_Parameter(paramName);
-#endif
-
                         if (null != parameter)
                         {
                             trans.Start("Set Ceiling Height");
@@ -494,7 +453,10 @@ namespace HOK.CeilingHeight
                     }
                     else
                     {
-                        trans.RollBack();
+                        if (trans.HasStarted())
+                        {
+                            trans.RollBack();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -507,17 +469,12 @@ namespace HOK.CeilingHeight
 
         private void SetCeilingPlan(Element room, RoomProperties rp)
         {
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(m_doc))
             {
                 try
                 {
-                    string paramName = "Ceiling Plan";
-
-#if RELEASE2015||RELEASE2016 || RELEASE2017
-                    Parameter parameter = room.LookupParameter(paramName);
-#else
-                    Parameter parameter = room.get_Parameter(paramName);
-#endif
+                    var paramName = "Ceiling Plan";
+                    var parameter = room.LookupParameter(paramName);
                     if (null != parameter)
                     {
                         try
@@ -533,11 +490,7 @@ namespace HOK.CeilingHeight
                     }
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.INVALID))
                     {
-#if RELEASE2015||RELEASE2016 || RELEASE2017
                         parameter = room.LookupParameter(paramName);
-#else
-                        parameter = room.get_Parameter(paramName);
-#endif
                         if (null != parameter)
                         {
                             try
@@ -564,17 +517,17 @@ namespace HOK.CeilingHeight
 
         private void SetCeilingType(Element room, RoomProperties rp)
         {
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(m_doc))
             {
                 try
                 {
-                    string paramName = "Ceiling Type";
-                    List<string> ceilingTypeList = new List<string>();
+                    var paramName = "Ceiling Type";
+                    var ceilingTypeList = new List<string>();
 
-                    string ceilingTypes = "";
-                    foreach (int ceilingId in rp.IntersectCeilings.Keys)
+                    var ceilingTypes = "";
+                    foreach (var ceilingId in rp.IntersectCeilings.Keys)
                     {
-                        CeilingProperties cp = rp.IntersectCeilings[ceilingId];
+                        var cp = rp.IntersectCeilings[ceilingId];
 
                         if (!ceilingTypeList.Contains(cp.CeilingType))
                         {
@@ -582,12 +535,7 @@ namespace HOK.CeilingHeight
                             ceilingTypes += cp.CeilingType + ", ";
                         }
                     }
-
-#if RELEASE2015||RELEASE2016 || RELEASE2017
-                    Parameter parameter = room.LookupParameter(paramName);
-#else
-                    Parameter parameter = room.get_Parameter(paramName);
-#endif
+                    var parameter = room.LookupParameter(paramName);
                     if (null != parameter)
                     {
                         try
@@ -603,11 +551,7 @@ namespace HOK.CeilingHeight
                     }
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.INVALID))
                     {
-#if RELEASE2015||RELEASE2016 || RELEASE2017
                         parameter = room.LookupParameter(paramName);
-#else
-                        parameter = room.get_Parameter(paramName);
-#endif
                         if (null != parameter)
                         {
                             try
@@ -632,22 +576,22 @@ namespace HOK.CeilingHeight
 
         private bool CreateSharedParameter(string paramName, ParameterType paramType, BuiltInParameterGroup pramGroup)
         {
-            bool created = false;
-            using (Transaction trans = new Transaction(m_doc))
+            var created = false;
+            using (var trans = new Transaction(m_doc))
             {
                 try
                 {
-                    DefinitionFile definitionFile = m_app.Application.OpenSharedParameterFile();
+                    var definitionFile = m_app.Application.OpenSharedParameterFile();
                     if (null != definitionFile)
                     {
                         trans.Start("Create a shared parameter");
-                        DefinitionGroups groups = definitionFile.Groups;
-                        DefinitionGroup group = groups.get_Item("HOK Tools");
+                        var groups = definitionFile.Groups;
+                        var group = groups.get_Item("HOK Tools");
                         if (null == group)
                         {
                             group = groups.Create("HOK Tools");
                         }
-                        Definition definition = group.Definitions.get_Item(paramName);
+                        var definition = group.Definitions.get_Item(paramName);
                         if (definition == null)
                         {
 #if RELEASE2015
@@ -658,13 +602,13 @@ namespace HOK.CeilingHeight
 #endif
                         }
 
-                        CategorySet categorySet = m_app.Application.Create.NewCategorySet();
-                        Category roomCategory = m_doc.Settings.Categories.get_Item(BuiltInCategory.OST_Rooms);
+                        var categorySet = m_app.Application.Create.NewCategorySet();
+                        var roomCategory = m_doc.Settings.Categories.get_Item(BuiltInCategory.OST_Rooms);
                         categorySet.Insert(roomCategory);
 
-                        InstanceBinding instanceBinding = m_app.Application.Create.NewInstanceBinding(categorySet);
-                        BindingMap bindingMap = m_doc.ParameterBindings;
-                        bool instanceBindOK = bindingMap.Insert(definition, instanceBinding, pramGroup);
+                        var instanceBinding = m_app.Application.Create.NewInstanceBinding(categorySet);
+                        var bindingMap = m_doc.ParameterBindings;
+                        var instanceBindOK = bindingMap.Insert(definition, instanceBinding, pramGroup);
                         trans.Commit();
                         created = true;
                     }

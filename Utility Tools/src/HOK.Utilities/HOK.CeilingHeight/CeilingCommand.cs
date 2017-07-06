@@ -1,66 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.CeilingHeight
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
     public class CeilingCommand : IExternalCommand
     {
-        private Autodesk.Revit.UI.UIApplication m_app;
+        private UIApplication m_app;
         private Document m_doc;
 
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
-            
+            Log.AppendLog("HOK.CeilingHeight.CeilingCommand: Started.");
+
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-CeilingHeight", m_doc));
+
             try
             {
-                UIDocument uidoc = m_app.ActiveUIDocument;
-
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                Room room = collector.OfCategory(BuiltInCategory.OST_Rooms).ToElements().ToList().First() as Room;
-
-                Dictionary<string, ParameterType> parameterRequirements = new Dictionary<string, ParameterType>();
-                parameterRequirements.Add("Ceiling Height", ParameterType.Length);
-                parameterRequirements.Add("Secondary Ceiling Heights", ParameterType.Text);
-                parameterRequirements.Add("Ceiling Plan", ParameterType.Text);
-                parameterRequirements.Add("Ceiling Type", ParameterType.Text);
-
-                StringBuilder notFoundParams = new StringBuilder();
-                foreach (string paramName in parameterRequirements.Keys)
+                var uidoc = m_app.ActiveUIDocument;
+                var room = new FilteredElementCollector(m_doc).OfCategory(BuiltInCategory.OST_Rooms).FirstElement() as Room;
+                var parameterRequirements = new Dictionary<string, ParameterType>
                 {
-                    ParameterType paramType = parameterRequirements[paramName];
+                    {"Ceiling Height", ParameterType.Length},
+                    {"Secondary Ceiling Heights", ParameterType.Text},
+                    {"Ceiling Plan", ParameterType.Text},
+                    {"Ceiling Type", ParameterType.Text}
+                };
+
+                var notFoundParams = new StringBuilder();
+                foreach (var paramName in parameterRequirements.Keys)
+                {
+                    var paramType = parameterRequirements[paramName];
                     if (!FindParameter(room, paramName, paramType))
                     {
-                        notFoundParams.AppendLine("[" + paramName + " : " + paramType.ToString() + "] ");
+                        notFoundParams.AppendLine("[" + paramName + " : " + paramType + "] ");
                     }
                 }
 
                 if (notFoundParams.Length > 0)
                 {
-                    DialogResult dresult = MessageBox.Show("The following parameters are required in Room elements.\n" + notFoundParams.ToString() + "\nThe tool will create the parameters in your current shared parameter file.  Would you like to proceed?", "Parameters Required", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    var dresult = MessageBox.Show("The following parameters are required in Room elements.\n" + notFoundParams + "\nThe tool will create the parameters in your current shared parameter file.  Would you like to proceed?",
+                        "Parameters Required", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Question);
+
                     if (dresult == DialogResult.Yes)
                     {
-                        DialogResult dr = MessageBox.Show("Start selecting rooms to create floors and click Finish on the options bar.The windowed area will filter out Room category only.", "Select Rooms", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        var dr = MessageBox.Show("Start selecting rooms to create floors and click Finish on the options bar.The windowed area will filter out Room category only.", 
+                            "Select Rooms",
+                            MessageBoxButtons.OK, 
+                            MessageBoxIcon.Information);
+
                         if (dr == DialogResult.OK)
                         {
-                            IList<Reference> selectedElement = uidoc.Selection.PickObjects(ObjectType.Element, new RoomElementFilter(), "Select rooms to measure the height from floors to ceiling.");
-                            List<Element> selectedRooms = new List<Element>();
-                            foreach (Reference reference in selectedElement)
+                            var selectedElement = uidoc.Selection.PickObjects(ObjectType.Element, new RoomElementFilter(), "Select rooms to measure the height from floors to ceiling.");
+                            var selectedRooms = new List<Element>();
+                            foreach (var reference in selectedElement)
                             {
-                                Element element = m_doc.GetElement(reference.ElementId);
+                                var element = m_doc.GetElement(reference.ElementId);
                                 if (null != element)
                                 {
                                     selectedRooms.Add(element);
@@ -69,7 +82,7 @@ namespace HOK.CeilingHeight
 
                             if (selectedRooms.Count > 0)
                             {
-                                CeilingHeightUtil util = new CeilingHeightUtil(m_app, selectedRooms);
+                                var util = new CeilingHeightUtil(m_app, selectedRooms);
                                 util.MeasureHeight();
                             }
                         }
@@ -77,14 +90,18 @@ namespace HOK.CeilingHeight
                 }
                 else
                 {
-                    DialogResult dr = MessageBox.Show("Start selecting rooms to create floors and click Finish on the options bar.The windowed area will filter out Room category only.", "Select Rooms", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    var dr = MessageBox.Show("Start selecting rooms to create floors and click Finish on the options bar.The windowed area will filter out Room category only.", 
+                        "Select Rooms", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Information);
+
                     if (dr == DialogResult.OK)
                     {
-                        IList<Reference> selectedElement = uidoc.Selection.PickObjects(ObjectType.Element, new RoomElementFilter(), "Select rooms to measure the height from floors to ceiling.");
-                        List<Element> selectedRooms = new List<Element>();
-                        foreach (Reference reference in selectedElement)
+                        var selectedElement = uidoc.Selection.PickObjects(ObjectType.Element, new RoomElementFilter(), "Select rooms to measure the height from floors to ceiling.");
+                        var selectedRooms = new List<Element>();
+                        foreach (var reference in selectedElement)
                         {
-                            Element element = m_doc.GetElement(reference.ElementId);
+                            var element = m_doc.GetElement(reference.ElementId);
                             if (null != element)
                             {
                                 selectedRooms.Add(element);
@@ -93,7 +110,7 @@ namespace HOK.CeilingHeight
 
                         if (selectedRooms.Count > 0)
                         {
-                            CeilingHeightUtil util = new CeilingHeightUtil(m_app, selectedRooms);
+                            var util = new CeilingHeightUtil(m_app, selectedRooms);
                             util.MeasureHeight();
                         }
                     }
@@ -102,71 +119,26 @@ namespace HOK.CeilingHeight
             }
             catch (Exception ex)
             {
-                string exMessage = ex.Message;
+                Log.AppendLog("HOK.CeilingHeight.CeilingCommand: " + ex.Message);
                 return Result.Failed;
             }
+
+            Log.AppendLog("HOK.CeilingHeight.CeilingCommand: Ended.");
             return Result.Succeeded;
         }
 
-        private bool FindParameter(Room room, string paramName, ParameterType paramType)
+        private static bool FindParameter(Room room, string paramName, ParameterType paramType)
         {
-            bool result = false;
             try
             {
-#if RELEASE2015||RELEASE2016 || RELEASE2017
-                Parameter param = room.LookupParameter(paramName);
-#else
-                Parameter param = room.get_Parameter(paramName);
-#endif
-
-                if (null != param)
-                {
-                    if (param.Definition.ParameterType == paramType)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    return false;
-                }
+                var param = room.LookupParameter(paramName);
+                return param?.Definition.ParameterType == paramType;
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to find parameters.\n" + ex.Message, "Find Parameters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            return result;
-        }
-    }
-
-    public class RoomElementFilter : ISelectionFilter
-    {
-        public bool AllowElement(Element elem)
-        {
-            if (null != elem.Category)
-            {
-                if (elem.Category.Name == "Rooms")
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public bool AllowReference(Reference reference, XYZ position)
-        {
-            return true;
+            return false;
         }
     }
 }

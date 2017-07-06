@@ -312,11 +312,7 @@ namespace HOK.RoomElevation
 
                 if (null != sampleRoom)
                 {
-#if RELEASE2013||RELEASE2014
-                    Parameter parameter = sampleRoom.get_Parameter(toolSettings.IntermediateText);
-#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                     Parameter parameter = sampleRoom.LookupParameter(toolSettings.IntermediateText);
-#endif
                     if (null != parameter)
                     {
                         if (parameter.StorageType == StorageType.String)
@@ -329,11 +325,8 @@ namespace HOK.RoomElevation
                         }
                     }
 
-#if RELEASE2013||RELEASE2014
-                    parameter = sampleRoom.get_Parameter(toolSettings.SuffixText);
-#elif RELEASE2015 ||RELEASE2016 || RELEASE2017
                     parameter = sampleRoom.LookupParameter(toolSettings.SuffixText);
-#endif
+
                     if (null != parameter)
                     {
                         if (parameter.StorageType == StorageType.String)

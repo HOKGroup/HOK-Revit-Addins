@@ -1,57 +1,61 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.DoorRoom
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
     public class DoorCommand : IExternalCommand
     {
         private UIApplication m_app;
         private Document m_doc;
 
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
+            Log.AppendLog("HOK.DoorRoom.DoorCommand: Started.");
 
-            bool toNumberFound = false;
-            bool toNameFound = false;
-            bool fromNumberFound = false;
-            bool fromNameFound = false;
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-DoorRoom", m_doc));
 
-            FindSharedParameters(out toNumberFound, out toNameFound, out fromNumberFound, out fromNameFound);
+            FindSharedParameters(out bool toNumberFound, out bool toNameFound, out bool fromNumberFound, out bool fromNameFound);
 
             if (toNumberFound && toNameFound && fromNumberFound && fromNameFound)
             {
-                TaskDialog taskDialog = new TaskDialog("Door Link Command");
-                taskDialog.MainInstruction = "Select a mode for the Door Link Command";
-                taskDialog.MainContent = "The shared parameters can be propagated with values from either pre-defined system room data or retrieved room data from linked models.";
-                taskDialog.AllowCancellation = true;
+                var taskDialog =
+                    new TaskDialog("Door Link Command")
+                    {
+                        MainInstruction = "Select a mode for the Door Link Command",
+                        MainContent =
+                            "The shared parameters can be propagated with values from either pre-defined system room data or retrieved room data from linked models.",
+                        AllowCancellation = true
+                    };
                 taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Copy To and From values to Shared Parameters.");
                 taskDialog.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Retrieve room data from linked models.");
 
-                TaskDialogResult tResult = taskDialog.Show();
+                var tResult = taskDialog.Show();
                 if (tResult == TaskDialogResult.CommandLink1)
                 {
-                    DoorLinkManager doorLinkManager = new DoorLinkManager(m_app, DoorLinkType.CopyFromHost);
+                    var doorLinkManager = new DoorLinkManager(m_app, DoorLinkType.CopyFromHost);
                 }
                 else if (tResult == TaskDialogResult.CommandLink2)
                 {
-                    DoorLinkManager doorLinkManager = new DoorLinkManager(m_app, DoorLinkType.FindFromLink);
+                    var doorLinkManager = new DoorLinkManager(m_app, DoorLinkType.FindFromLink);
                 }
             }
             else
             {
-                StringBuilder strBuilder = new StringBuilder();
+                var strBuilder = new StringBuilder();
                 strBuilder.AppendLine("The following parameters are required in door elements to run the Door Link command.\n");
                 if (!toNumberFound)
                 {
@@ -72,6 +76,8 @@ namespace HOK.DoorRoom
 
                 MessageBox.Show(strBuilder.ToString(), "Parameter Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
+
+            Log.AppendLog("HOK.DoorRoom.DoorCommand: Ended.");
             return Result.Succeeded;
         }
 
@@ -84,11 +90,10 @@ namespace HOK.DoorRoom
 
             try
             {
-
-                DefinitionBindingMapIterator iter = m_doc.ParameterBindings.ForwardIterator();
+                var iter = m_doc.ParameterBindings.ForwardIterator();
                 while (iter.MoveNext())
                 {
-                    Definition definition = iter.Key;
+                    var definition = iter.Key;
                     switch (definition.Name)
                     {
                         case "ToRoomNumber":

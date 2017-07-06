@@ -1,35 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.Attributes;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
+using Autodesk.Revit.DB;
 
 namespace HOK.LevelManager
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
     public class LevelCommand : IExternalCommand
     {
-        private Autodesk.Revit.UI.UIApplication m_app;
+        private UIApplication m_app;
+        private Document m_doc;
 
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             try
             {
                 m_app = commandData.Application;
+                m_doc = m_app.ActiveUIDocument.Document;
+                Log.AppendLog("HOK.LevelManager.LevelCommand: Started.");
 
-                LevelManagerForm managerForm = new LevelManagerForm(m_app);
+                // (Konrad) We are gathering information about the addin use. This allows us to
+                // better maintain the most used plug-ins or discontiue the unused ones.
+                AddinUtilities.PublishAddinLog(new AddinLog("Utilities-LevelManager", m_doc));
+
+                var managerForm = new LevelManagerForm(m_app);
                 managerForm.ShowDialog();
 
+                Log.AppendLog("HOK.LevelManager.LevelCommand: Ended.");
                 return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Could not run Level Manager.\n" + ex.Message, "Error: Level Manager", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.AppendLog("HOK.LevelManager.LevelCommand: " + ex.Message);
                 return Result.Cancelled;
             }
         }
