@@ -360,15 +360,15 @@ namespace HOK.RibbonTab
                     pb14.LargeImage = LoadBitmapImage(assembly, "chart.ico");
                     pb14.ToolTip = "Analysis Visualization Framework";
                     AddToolTips(pb14);
-
                 }
 
-                if (!File.Exists(currentDirectory + "/HOK.LPDCalculator.dll")) return;
-
-                var pb15 = splitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", currentDirectory + "/HOK.LPDCalculator.dll", "HOK.LPDCalculator.Command"));
-                pb15.LargeImage = LoadBitmapImage(assembly, "bulb.png");
-                pb15.ToolTip = "Calculating Lighting Power Density";
-                AddToolTips(pb15);
+                if (File.Exists(currentDirectory + "/HOK.LPDCalculator.dll"))
+                {
+                    var pb15 = splitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", currentDirectory + "/HOK.LPDCalculator.dll", "HOK.LPDCalculator.Command"));
+                    pb15.LargeImage = LoadBitmapImage(assembly, "bulb.png");
+                    pb15.ToolTip = "Calculating Lighting Power Density";
+                    AddToolTips(pb15);
+                }
 
                 if (!File.Exists(currentDirectory + "/HOK.ViewAnalysis.dll")) return;
 
@@ -381,7 +381,6 @@ namespace HOK.RibbonTab
             {
                 MessageBox.Show("Failed to create Analysis panel.\n" + ex.Message, "Create Analysis Panel", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-
         }
 
         private void ReadToolTips(string txtfile)

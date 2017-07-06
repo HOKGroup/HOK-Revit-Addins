@@ -274,12 +274,12 @@ namespace HOK.MissionControl.Core.Utils
                 if (restResponse.Data != null)
                 {
                     output = restResponse.Data;
-                    Log.AppendLog("HOK.MissionControl.Core.Utils.PostToMongoDB: " + collectionName + "/" + route);
+                    Log.AppendLog("HOK.MissionControl.Core.Utils.ServerUtilities.PostToMongoDB: " + collectionName + "/" + route);
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.Core.Utils.PostToMongoDB: " + ex.Message);
+                Log.AppendLog("HOK.MissionControl.Core.Utils.ServerUtilities.PostToMongoDB: " + ex.Message);
             }
             return output;
         }

@@ -64,7 +64,7 @@ namespace HOK.MissionControl.FamilyPublish
                 {
                     pluginName = "MissionControl-PublishFamilyData",
                     user = Environment.UserName,
-                    revitVersion = BasicFileInfo.Extract(doc.PathName).SavedInVersion,
+                    revitVersion = BasicFileInfo.Extract(doc.PathName).SavedInVersion
                 };
 
                 AddinUtilities.PublishAddinLog(addinInfo);
