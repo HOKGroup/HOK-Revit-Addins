@@ -57,9 +57,9 @@ namespace HOK.MissionControl.Tools.HealthReport
                 // (Konrad) Publish information about workset counts in the model.
                 ServerUtilities.PostWorksetCounts(new WorksetItem { worksets = worksetInfo }, worksetDocumentId);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("WorksetOpenMonitor-PublishData: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

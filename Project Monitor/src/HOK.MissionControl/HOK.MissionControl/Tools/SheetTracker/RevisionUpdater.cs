@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
-using HOK.Core;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
-using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.SheetTracker
 {
@@ -55,7 +53,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DoorUpdater-Register:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return registered;
         }
@@ -72,7 +70,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DoorUpdater-Unregister:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 

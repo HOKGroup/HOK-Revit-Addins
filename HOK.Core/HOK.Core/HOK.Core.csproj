@@ -89,6 +89,8 @@
     <Compile Include="Utilities\Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\SelectionFilters.cs" />
+    <Compile Include="WpfUtilities\DataGrid.cs" />
+    <Compile Include="WpfUtilities\RelayCommand.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

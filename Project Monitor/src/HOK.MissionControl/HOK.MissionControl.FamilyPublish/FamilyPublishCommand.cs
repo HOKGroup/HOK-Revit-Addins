@@ -24,15 +24,29 @@ namespace HOK.MissionControl.FamilyPublish
         {
             var uiApp = commandData.Application;
             var doc = uiApp.ActiveUIDocument.Document;
-            Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyPublishCommand: Started.");
+            Log.AppendLog("Started");
 
             try
             {
+                // (Konrad) We are gathering information about the addin use. This allows us to
+                // better maintain the most used plug-ins or discontiue the unused ones.
+                AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-PublishFamilyData", doc));
+
                 var pathName = doc.PathName;
-                if (string.IsNullOrEmpty(pathName)) return Result.Failed;
+                if (string.IsNullOrEmpty(pathName))
+                {
+                    Log.AppendLog("Path is Null or Empty.");
+                    return Result.Failed;
+                }
+                
 
                 var centralPath = BasicFileInfo.Extract(pathName).CentralPath;
-                if (string.IsNullOrEmpty(centralPath)) return Result.Failed;
+                if (string.IsNullOrEmpty(centralPath))
+                {
+                    Log.AppendLog("Could not get Central Path.");
+                    return Result.Failed;
+                }
+                
 
                 var configFound = ServerUtilities.GetConfigurationByCentralPath(centralPath);
                 if (configFound != null)
@@ -54,26 +68,21 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                 }
 
-                if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return Result.Failed;
+                if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath))
+                {
+                    Log.AppendLog("No Config Found.");
+                    return Result.Failed;
+                }
+                
 
                 FamilyMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
-
-                // (Konrad) We are gathering information about the addin use. This allows us to
-                // better maintain the most used plug-ins or discontiue the unused ones.
-                var addinInfo = new AddinLog
-                {
-                    pluginName = "MissionControl-PublishFamilyData",
-                    user = Environment.UserName,
-                    revitVersion = BasicFileInfo.Extract(doc.PathName).SavedInVersion
-                };
-
-                AddinUtilities.PublishAddinLog(addinInfo);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyPublishCommand: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
-            Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyPublishCommand: Ended.");
+
+            Log.AppendLog("Ended.");
             return Result.Succeeded;
         }
     }

@@ -6,7 +6,7 @@
              xmlns:uc ="clr-namespace:HOK.AddInManager.UserControls"
              mc:Ignorable="d" 
              Height="700" Width="500" Loaded="Window_Loaded" Icon="Resources/hoklogo.ico"
-        Title="HOK Addin Manager" WindowStartupLocation="CenterScreen">
+            Title="HOK Addin Manager" WindowStartupLocation="CenterScreen" BorderThickness="0,5,0,0" BorderBrush="#C45C44">
     <Window.Resources>
         <Style x:Key="commentButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="FocusVisualStyle" Value="{x:Null}"/>

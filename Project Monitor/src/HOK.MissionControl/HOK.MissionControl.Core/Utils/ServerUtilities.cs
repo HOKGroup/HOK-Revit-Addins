@@ -48,12 +48,12 @@ namespace HOK.MissionControl.Core.Utils
                 {
                     var items = response.Data;
                     projectFound = items.First();
-                    Log.AppendLog("HOK.MissionControl.Core.Utils.GetProjectByConfigurationId: Project Found.");
+                    Log.AppendLog("Project Found.");
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.Core.Utils.GetProjectByConfigurationId: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return projectFound;
         }
@@ -84,7 +84,7 @@ namespace HOK.MissionControl.Core.Utils
                             if (!string.Equals(file.centralPath.ToLower(), centralPath.ToLower(),
                                 StringComparison.Ordinal)) continue;
                             configFound = config;
-                            Log.AppendLog("HOK.MissionControl.Core.Utils.GetConfigurationByCentralPath: Configuration Found.");
+                            Log.AppendLog("Configuration Found.");
                             break;
                         }
                     }
@@ -92,7 +92,7 @@ namespace HOK.MissionControl.Core.Utils
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.Core.Utils.GetConfigurationByCentralPath: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return configFound;
         }
@@ -141,12 +141,12 @@ namespace HOK.MissionControl.Core.Utils
                 if (response.Data != null)
                 {
                     items = response.Data;
-                    Log.AppendLog("HOK.MissionControl.Core.Utils.GetCollection: " + response.ResponseStatus);
+                    Log.AppendLog(response.ResponseStatus.ToString());
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.Core.Utils.GetCollection: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return items;
         }
@@ -221,11 +221,11 @@ namespace HOK.MissionControl.Core.Utils
 
                 var response = client.Execute<T>(request);
                 resresponse = response.Data;
-                Log.AppendLog("HOK.MissionControl.Core.Utils.PostDataScheme: " + response.ResponseStatus);
+                Log.AppendLog(response.ResponseStatus.ToString());
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.Core.Utils.PostDataScheme: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return resresponse;
         }
@@ -274,12 +274,12 @@ namespace HOK.MissionControl.Core.Utils
                 if (restResponse.Data != null)
                 {
                     output = restResponse.Data;
-                    Log.AppendLog("HOK.MissionControl.Core.Utils.ServerUtilities.PostToMongoDB: " + collectionName + "/" + route);
+                    Log.AppendLog(collectionName + "/" + route);
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.Core.Utils.ServerUtilities.PostToMongoDB: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return output;
         }
@@ -313,11 +313,11 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddBody(worksetInfo);
                 var response = client.Execute<WorksetEvent>(request);
 
-                if(response.StatusCode == HttpStatusCode.OK) Log.AppendLog("HOK.MissionControl.Core.Utils.ServerUtilities.PostWorksetInfo: " + state + " succeeded.");
+                if(response.StatusCode == HttpStatusCode.OK) Log.AppendLog(state + " succeeded.");
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.Core.Utils.ServerUtilities.PostWorksetInfo: " + ex.Message );
+                Log.AppendLog(ex.Message );
             }
         }
 

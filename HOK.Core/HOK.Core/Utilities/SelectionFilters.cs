@@ -3,6 +3,9 @@ using Autodesk.Revit.UI.Selection;
 
 namespace HOK.Core.Utilities
 {
+    /// <summary>
+    /// Filters selection for Rooms only.
+    /// </summary>
     public class RoomElementFilter : ISelectionFilter
     {
         public bool AllowElement(Element elem)
@@ -20,6 +23,9 @@ namespace HOK.Core.Utilities
         }
     }
 
+    /// <summary>
+    /// Filters selection for Walls only.
+    /// </summary>
     public class WallSelectionFilter : ISelectionFilter
     {
         public bool AllowElement(Element elem)

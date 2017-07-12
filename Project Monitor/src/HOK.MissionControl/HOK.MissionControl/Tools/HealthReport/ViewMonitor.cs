@@ -101,9 +101,9 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 ServerUtilities.PostStats(viewStats, worksetDocumentId, "viewstats");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("ViewMonitor-PublishData: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

@@ -51,7 +51,7 @@ namespace HOK.MissionControl.Tools.SingleSession
             }
             catch (Exception ex)
             {
-                Log.AppendLog("CancelOpening:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return cancel;
         }
@@ -74,7 +74,7 @@ namespace HOK.MissionControl.Tools.SingleSession
             }
             catch (Exception ex)
             {
-                Log.AppendLog("CloseFile:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

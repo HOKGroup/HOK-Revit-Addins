@@ -61,9 +61,9 @@ namespace HOK.MissionControl.Tools.HealthReport
                         throw new ArgumentOutOfRangeException(nameof(state), state, null);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("ModelMonitor-PublishSessionInfo: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -87,9 +87,9 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 ServerUtilities.PostStats(eventItem, worksetDocumentId, "modelsynchtime");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("ModelMonitor-PublishOpenTime: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -113,9 +113,9 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 ServerUtilities.PostStats(eventItem, worksetDocumentId, "modelopentime");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("ModelMonitor-PublishOpenTime: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -143,10 +143,10 @@ namespace HOK.MissionControl.Tools.HealthReport
                         fileSize = fileInfo.Length;
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     fileSize = 0;
-                    Log.AppendLog("ModelMonitor-PublishModelSize-GetFileInfo: " + e.Message);
+                    Log.AppendLog(ex.Message);
                 }
 
                 var eventItem = new EventTime
@@ -156,9 +156,9 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 ServerUtilities.PostStats(eventItem, worksetDocumentId, "modelsize");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("ModelMonitor-PublishModelSize: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

@@ -38,7 +38,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMFailure-ProcessFailure:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

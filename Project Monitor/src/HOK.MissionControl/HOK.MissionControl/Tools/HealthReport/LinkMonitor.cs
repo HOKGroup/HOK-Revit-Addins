@@ -89,9 +89,9 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
 
                 ServerUtilities.PostStats(linkStats, worksetDocumentId, "linkstats");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("LinkMonitor-PublishData: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

@@ -1,37 +1,39 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Autodesk.Revit.UI;
 using HOK.AddInManager.Classes;
 using HOK.AddInManager.UserControls;
-using HOK.AddInManager.Utils;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Autodesk.Revit.Attributes;
+using HOK.Core.Utilities;
+using Autodesk.Revit.DB;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.AddInManager
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-    public class Command:IExternalCommand
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
+    public class Command : IExternalCommand
     {
         private UIApplication m_app;
-        private Dictionary<string/*toolName*/, LoadType> tempSettings = new Dictionary<string, LoadType>();
+        private Document m_doc;
+        private readonly Dictionary<string/*toolName*/, LoadType> tempSettings = new Dictionary<string, LoadType>();
 
         public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
         {
             m_app = commandData.Application;
-           
+            m_doc = m_app.ActiveUIDocument.Document;
+            Log.AppendLog("HOK.AddInManager.Command.Execute: Started.");
+
             try
             {
-                Addins addins = AppCommand.thisApp.addins;
+                var addins = AppCommand.thisApp.addins;
                 StoreTempCollection(addins.AddinCollection);
-                AddInViewModel viewModel = new AddInViewModel(addins);
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.DataContext = viewModel;
+                var viewModel = new AddInViewModel(addins);
+                var mainWindow = new MainWindow {DataContext = viewModel};
                 if (true == mainWindow.ShowDialog())
                 {
                     //write setting
@@ -49,8 +51,14 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                string exMessage = ex.Message;
+                Log.AppendLog("HOK.AddInManager.Command.Execute: " + ex.Message);
             }
+
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", m_doc));
+
+            Log.AppendLog("HOK.AddInManager.Command.Execute: Ended.");
             return Result.Succeeded;
         }
 
@@ -59,14 +67,14 @@ namespace HOK.AddInManager
             try
             {
                 tempSettings.Clear();
-                foreach (AddinInfo addin in origCollection)
+                foreach (var addin in origCollection)
                 {
                     tempSettings.Add(addin.ToolName, addin.ToolLoadType);
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog("HOK.AddInManager.Command.StoreTempCollection: " + ex.Message);
             }
         }
 
@@ -74,19 +82,20 @@ namespace HOK.AddInManager
         {
             try
             {
-                foreach (string addinName in tempSettings.Keys)
+                foreach (var addinName in tempSettings.Keys)
                 {
-                    var addinFound = from info in AppCommand.thisApp.addins.AddinCollection where info.ToolName == addinName select info;
-                    if (addinFound.Count() > 0)
-                    {
-                        int index = AppCommand.thisApp.addins.AddinCollection.IndexOf(addinFound.First());
-                        AppCommand.thisApp.addins.AddinCollection[index].ToolLoadType = tempSettings[addinName];
-                    }
+                    var addinFound = AppCommand.thisApp.addins.AddinCollection
+                        .Where(x => x.ToolName == addinName)
+                        .ToList();
+                    if (!addinFound.Any()) continue;
+
+                    var index = AppCommand.thisApp.addins.AddinCollection.IndexOf(addinFound.First());
+                    AppCommand.thisApp.addins.AddinCollection[index].ToolLoadType = tempSettings[addinName];
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog("HOK.AddInManager.Command.OverrideTempSettings: " + ex.Message);
             }
         }
     }

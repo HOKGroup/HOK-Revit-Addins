@@ -1,37 +1,43 @@
-﻿using HOK.AddInManager.Classes;
-using HOK.AddInManager.Utils;
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using HOK.AddInManager.Classes;
+using HOK.Core.Utilities;
+using HOK.Core.WpfUtilities;
 
 namespace HOK.AddInManager.UserControls
 {
-    public class AddInViewModel:INotifyPropertyChanged
+    public class AddInViewModel : INotifyPropertyChanged
     {
-        private Addins addins = new Addins();
-        private ObservableCollection<AddinInfo> selectedAddins = new ObservableCollection<AddinInfo>();
-
-        private RelayCommand openUrlCommand;
-        private RelayCommand loadTypeCommand;
+        private Addins addins;
         private bool userChanged = true;
 
-        public Addins AddinsObj { get { return addins; } set { addins = value; NotifyPropertyChanged("AddinsObj"); } }
-        public ObservableCollection<AddinInfo> SelectedAddins { get { return selectedAddins; } set { selectedAddins = value; NotifyPropertyChanged("SelectedAddins"); } }
+        public Addins AddinsObj
+        {
+            get => addins;
+            set { addins = value; NotifyPropertyChanged("AddinsObj"); }
+        }
 
-        public ICommand OpenUrlCommand { get { return openUrlCommand; } }
-        public ICommand LoadTypeCommand { get { return loadTypeCommand; } }
+        private ObservableCollection<AddinInfo> selectedAddins = new ObservableCollection<AddinInfo>();
+        public ObservableCollection<AddinInfo> SelectedAddins
+        {
+            get => selectedAddins;
+            set { selectedAddins = value; NotifyPropertyChanged("SelectedAddins"); }
+        }
+
+        private readonly RelayCommand openUrlCommand;
+        public ICommand OpenUrlCommand => openUrlCommand;
+
+        private readonly RelayCommand loadTypeCommand;
+        public ICommand LoadTypeCommand => loadTypeCommand;
 
         public AddInViewModel(Addins addinsObj)
         {
             addins = addinsObj;
-            openUrlCommand = new RelayCommand(param => this.OpenUrlExecuted(param));
-            loadTypeCommand = new RelayCommand(param => this.LoadTypeExecuted(param));
+            openUrlCommand = new RelayCommand(OpenUrlExecuted);
+            loadTypeCommand = new RelayCommand(LoadTypeExecuted);
         }
 
         public void OpenUrlExecuted(object param)
@@ -45,7 +51,7 @@ namespace HOK.AddInManager.UserControls
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog("HOK.AddInManager.UserControls.AddInViewModel.OpenUrlExecuted: " + ex.Message);
             }
         }
 
@@ -53,49 +59,41 @@ namespace HOK.AddInManager.UserControls
         {
             try
             {
-                if (null != param && userChanged)
+                if (param == null || !userChanged) return;
+
+                var parameters = param as DataGridParameters;
+                if (parameters == null || parameters.SelectedCollection.Count <= 1) return;
+
+                userChanged = false;
+                foreach (var obj in parameters.SelectedCollection)
                 {
-                    DataGridParameters parameters = param as DataGridParameters;
-                    if (null != parameters)
-                    {  
-                        if (parameters.SelectedCollection.Count > 1)
-                        {
-                            userChanged = false;
-                            foreach (object obj in parameters.SelectedCollection)
-                            {
-                                AddinInfo info = obj as AddinInfo;
-                                if (null != info)
-                                {
-                                    var addinFound = from addin in addins.AddinCollection where addin.ToolName == info.ToolName select addin;
-                                    if (addinFound.Count() > 0)
-                                    {
-                                        int addinIndex = addins.AddinCollection.IndexOf(addinFound.First());
-                                        if (addinIndex > -1)
-                                        {
-                                            addins.AddinCollection[addinIndex].ToolLoadType = parameters.SelectedLoadType;
-                                        }
-                                    }
-                                }
-                            }
-                            userChanged = true;
-                        }                     
+                    var info = obj as AddinInfo;
+                    if (info == null) continue;
+
+                    var addinFound = addins.AddinCollection
+                        .Where(x => x.ToolName == info.ToolName)
+                        .ToList();
+                    if (!addinFound.Any()) continue;
+
+                    var addinIndex = addins.AddinCollection.IndexOf(addinFound.First());
+                    if (addinIndex > -1)
+                    {
+                        addins.AddinCollection[addinIndex].ToolLoadType = parameters.SelectedLoadType;
                     }
                 }
+                userChanged = true;
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog("HOK.AddInManager.UserControls.AddInViewModel.LoadTypeExecuted: " + ex.Message);
             }
         }
 
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String info)
+        private void NotifyPropertyChanged(string info)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
     }
 

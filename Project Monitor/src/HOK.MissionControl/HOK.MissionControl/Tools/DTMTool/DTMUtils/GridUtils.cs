@@ -57,7 +57,7 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
             }
             catch (Exception ex)
             {
-                Log.AppendLog("GridUtils-CollectGridExtents:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -93,7 +93,7 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
             }
             catch (Exception ex)
             {
-                Log.AppendLog("GridUtils-ExtentGeometryChanged:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return changed;
         }

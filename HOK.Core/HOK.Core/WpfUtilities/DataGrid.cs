@@ -1,38 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 
-namespace HOK.AddInManager.Utils
+namespace HOK.Core.WpfUtilities
 {
-    public static class DataGridUtils
+    public static class DataGrid
     {
         public static T FindVisualChild<T>(Visual parent) where T : Visual
         {
-            T child = default(T);
+            var child = default(T);
             try
             {
-                int numVisuals = VisualTreeHelper.GetChildrenCount(parent);
-                for (int i = 0; i < numVisuals; i++)
+                var numVisuals = VisualTreeHelper.GetChildrenCount(parent);
+                for (var i = 0; i < numVisuals; i++)
                 {
-                    Visual v = (Visual)VisualTreeHelper.GetChild(parent, i);
-                    child = v as T;
-                    if (child == null)
-                    {
-                        child = FindVisualChild<T>(v);
-                    }
+                    var v = (Visual)VisualTreeHelper.GetChild(parent, i);
+                    child = v as T ?? FindVisualChild<T>(v);
                     if (child != null)
                     {
                         break;
                     }
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                string message = ex.Message;
+                // ignored
             }
             return child;
         }
@@ -41,10 +32,10 @@ namespace HOK.AddInManager.Utils
         {
             try
             {
-                UIElement parent = element;
+                var parent = element;
                 while (parent != null)
                 {
-                    T correctlyTyped = parent as T;
+                    var correctlyTyped = parent as T;
                     if (correctlyTyped != null)
                     {
                         return correctlyTyped;
@@ -53,9 +44,9 @@ namespace HOK.AddInManager.Utils
                     parent = VisualTreeHelper.GetParent(parent) as UIElement;
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                string message = ex.Message;
+                // ignored
             }
             return null;
         }

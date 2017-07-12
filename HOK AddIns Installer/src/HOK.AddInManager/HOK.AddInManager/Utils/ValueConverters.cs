@@ -1,13 +1,7 @@
-﻿using HOK.AddInManager.Classes;
-using HOK.AddInManager.UserControls;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows.Data;
 using System.Windows.Media;
+using HOK.AddInManager.Classes;
 
 namespace HOK.AddInManager.Utils
 {
@@ -15,21 +9,20 @@ namespace HOK.AddInManager.Utils
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            SolidColorBrush color = new SolidColorBrush(Colors.Black);
-            if (null != value)
+            var color = new SolidColorBrush(Colors.Black);
+            if (null == value) return color;
+
+            var loadType = (LoadType)value;
+            switch (loadType)
             {
-                LoadType loadType = (LoadType)value;
-                switch (loadType)
-                {
-                    case LoadType.Always:
-                        color = new SolidColorBrush(Colors.Red);
-                        break;
-                    case LoadType.ThisSessionOnly:
-                        color = new SolidColorBrush(Colors.Blue);
-                        break;
-                    case LoadType.Never:
-                        break;
-                }
+                case LoadType.Always:
+                    color = new SolidColorBrush(Colors.Red);
+                    break;
+                case LoadType.ThisSessionOnly:
+                    color = new SolidColorBrush(Colors.Blue);
+                    break;
+                case LoadType.Never:
+                    break;
             }
             return color;
         }

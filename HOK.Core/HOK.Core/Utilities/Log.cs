@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -41,11 +42,15 @@ namespace HOK.Core.Utilities
             Initialized = true;
         }
 
-        public static void AppendLog(string str)
+        public static void AppendLog(string msg)
         {
             try
             {
-                LogBuilder.AppendLine(DateTime.Now + "\t" + str);
+                var method = new StackFrame(1).GetMethod();
+                if (method.ReflectedType != null)
+                {
+                    LogBuilder.AppendLine($"{DateTime.Now} \t {method.ReflectedType.FullName}.{method.Name}: {msg}");
+                }
             }
             catch
             {
@@ -53,7 +58,10 @@ namespace HOK.Core.Utilities
             }
         }
 
-        public static void WriteLog()
+    /// <summary>
+    /// Writes out the combined log string into file.
+    /// </summary>
+    public static void WriteLog()
         {
             try
             {

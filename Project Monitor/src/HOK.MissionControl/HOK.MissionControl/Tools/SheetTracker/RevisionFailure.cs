@@ -23,7 +23,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
             }
             catch (Exception ex)
             {
-                Log.AppendLog("RevisionFailure-ProcessFailure:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

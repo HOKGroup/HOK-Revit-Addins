@@ -43,13 +43,13 @@ namespace HOK.MissionControl.Tools.DTMTool
                 {
                     UpdaterRegistry.RegisterUpdater(this, doc);
                     RefreshTriggers(doc, pUpdater);
-                    Log.AppendLog("HOK.MissionControl.Tools.DTMTool.DtmUpdater.Register: Registered.");
+                    Log.AppendLog("Registered.");
                     registered = true;
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.Tools.DTMTool.DtmUpdater.Register: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return registered;
         }
@@ -69,7 +69,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMUpdater-Unregister:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -172,7 +172,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMUpdater-RefreshTriggers:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -235,7 +235,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMUpdater-Execute:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -278,7 +278,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMUpdater-AddCategoryCache:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -299,7 +299,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMUpdater-AddElementToStorage:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -336,7 +336,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMUpdater-GetTriggerMessage:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return triggerMsg;
         }
@@ -397,7 +397,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMUpdater-RunCategoryActionItems:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -417,7 +417,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMUpdater-ReportFailure:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 

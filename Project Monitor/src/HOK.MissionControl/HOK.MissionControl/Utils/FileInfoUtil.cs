@@ -31,7 +31,7 @@ namespace HOK.MissionControl.Utils
             }
             catch (Exception ex)
             {
-                Log.AppendLog("FileInfoUtil-GetCentralFilePath:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return centralPath;
         }
@@ -60,7 +60,7 @@ namespace HOK.MissionControl.Utils
             }
             catch (Exception ex)
             {
-                Log.AppendLog("FileInfoUtil-GetProjectInfo:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return projectInfo;
         }
@@ -84,7 +84,7 @@ namespace HOK.MissionControl.Utils
             }
             catch(Exception ex)
             {
-                Log.AppendLog("FileInfoUtil-GetProjectName:" + ex.Message);
+                Log.AppendLog(ex.Message);
                 return "";
             }
             return name;
@@ -107,7 +107,7 @@ namespace HOK.MissionControl.Utils
             }
             catch(Exception ex) 
             {
-                Log.AppendLog("FileInfoUtil-GetFileLocation:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return fileLocation;
         }

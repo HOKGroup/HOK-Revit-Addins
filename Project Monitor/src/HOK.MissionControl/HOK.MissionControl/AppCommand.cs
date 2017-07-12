@@ -52,7 +52,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog("OnStartup:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return Result.Succeeded;
         }
@@ -89,7 +89,7 @@ namespace HOK.MissionControl
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 //serch for config
-                Log.AppendLog("HOK.MissionControl.AppCommand.OnDocumentOpening: " + centralPath + " opening...");
+                Log.AppendLog(centralPath + " opening...");
                 var configFound = ServerUtilities.GetConfigurationByCentralPath(centralPath);
                 if (null != configFound)
                 {
@@ -141,7 +141,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.AppCommand.OnDocumentOpening: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -162,7 +162,7 @@ namespace HOK.MissionControl
 
                 // (Konrad) Register Updaters that are in the config file.
                 SingleSessionMonitor.OpenedDocuments.Add(centralPath);
-                Log.AppendLog("HOK.MissionControl.AppCommand.OnDocumentOpened: " + centralPath + " opened.");
+                Log.AppendLog(centralPath + " opened.");
                 if (ConfigDictionary.ContainsKey(centralPath))
                 {
                     ApplyConfiguration(doc, ConfigDictionary[centralPath]);
@@ -188,7 +188,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.AppCommand.OnDocumentOpened: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -234,7 +234,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog("UnregisterUpdaterOnClosing:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -272,7 +272,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DocumentSynchronizing:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -297,7 +297,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog("OnDocumentSynchronized:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -333,7 +333,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog("ApplyConfiguration:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 

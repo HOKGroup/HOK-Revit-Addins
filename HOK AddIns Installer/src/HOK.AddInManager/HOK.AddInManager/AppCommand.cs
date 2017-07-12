@@ -1,35 +1,76 @@
-﻿using Autodesk.Revit.DB.Events;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 using HOK.AddInManager.Classes;
-using HOK.AddInManager.Properties;
 using HOK.AddInManager.Utils;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
+using HOK.Core.Utilities;
 
 namespace HOK.AddInManager
 {
-    public class AppCommand:IExternalApplication
+    public class AppCommand : IExternalApplication
     {
-        internal static AppCommand thisApp = null;
+        internal static AppCommand thisApp;
         private UIControlledApplication m_app;
-        private string tabName = "   HOK   ";
+        private const string tabName = "   HOK   ";
         private string versionNumber = "";
         private string sourceDirectory = "";
         private string installDirectory = "";
         private string addinResources = "";
         public ToolTipProperties addinManagerToolTip = new ToolTipProperties();
 
-
         public Addins addins = new Addins();
         private string csvFileName = "";
-        private string settingFile = "HOKAddinSettings.xml";
+        private const string settingFile = "HOKAddinSettings.xml";
         public string settingPath = "";
+
+        public Result OnStartup(UIControlledApplication application)
+        {
+            thisApp = this;
+            m_app = application;
+            try
+            {
+                try
+                {
+                    m_app.CreateRibbonTab(tabName);
+                }
+                catch (Exception ex)
+                {
+                    Log.AppendLog("HOK.AddInManager.AppCommand.OnStartup: " + ex.Message);
+                }
+
+                versionNumber = m_app.ControlledApplication.VersionNumber;
+                sourceDirectory = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber + "\\_HOK";
+                installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber;
+                addinResources = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber + "\\HOK-Addin.bundle\\Contents\\Resources";
+
+                application.ControlledApplication.ApplicationInitialized += ReadAddinSettingsOnInitialized;
+                application.ApplicationClosing += ApplicationOnClosing;
+
+                //ribbon panel
+                 var toolTipText = Path.Combine(addinResources, "HOK.Tooltip.txt");
+                 addinManagerToolTip = ToolTipReader.ReadToolTip(toolTipText, "Addin Manager");
+                    
+                var panel = m_app.CreateRibbonPanel(tabName, " Addins ");
+                var currentAssembly = Assembly.GetExecutingAssembly();
+
+                var installerButton = (PushButton)panel.AddItem(new PushButtonData("Addin Manager", "Addin Manager", currentAssembly.Location, "HOK.AddInManager.Command"));
+                var pluginImage = ButtonUtil.LoadBitmapImage(currentAssembly, typeof(AppCommand).Namespace, "pluginManager_32.png");
+                installerButton.LargeImage = pluginImage;
+                installerButton.ToolTip = addinManagerToolTip.Description;
+                installerButton.AvailabilityClassName = "HOK.AddInManager.Availability";
+                var contextualHelp = new ContextualHelp(ContextualHelpType.Url, addinManagerToolTip.HelpUrl);
+                installerButton.SetContextualHelp(contextualHelp);
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog("HOK.AddInManager.AppCommand.OnStartup: " + ex.Message);
+            }
+            return Result.Succeeded;
+        }
 
         public Result OnShutdown(UIControlledApplication application)
         {
@@ -38,47 +79,11 @@ namespace HOK.AddInManager
             return Result.Succeeded;
         }
 
-        public Result OnStartup(UIControlledApplication application)
-        {
-            thisApp = this;
-            m_app = application;
-            try
-            {
-                try { m_app.CreateRibbonTab(tabName); }
-                catch { }
-
-                versionNumber = m_app.ControlledApplication.VersionNumber;
-                sourceDirectory = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber + "\\_HOK";
-                installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber;
-                addinResources = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber +
-                           "\\HOK-Addin.bundle\\Contents\\Resources";
-
-                application.ControlledApplication.ApplicationInitialized += ReadAddinSettingsOnInitialized;
-                application.ApplicationClosing += ApplicationOnClosing;
-
-                //ribbon panel
-                 string toolTipText = System.IO.Path.Combine(addinResources, "HOK.Tooltip.txt");
-                 addinManagerToolTip = ToolTipReader.ReadToolTip(toolTipText, "Addin Manager");
-                    
-                RibbonPanel panel = m_app.CreateRibbonPanel(tabName, "Add-Ins");
-                string currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
-
-                PushButton installerButton = panel.AddItem(new PushButtonData("Addin Manager", "Addin Manager", currentAssembly, "HOK.AddInManager.Command")) as PushButton;
-                installerButton.AvailabilityClassName = "HOK.AddInManager.Availability";
-                BitmapSource pluginImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(Resources.plugin.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty,
-                    BitmapSizeOptions.FromEmptyOptions());
-                installerButton.LargeImage = pluginImage;
-                installerButton.ToolTip = addinManagerToolTip.Description;
-                ContextualHelp contextualHelp = new ContextualHelp(ContextualHelpType.Url, addinManagerToolTip.HelpUrl);
-                installerButton.SetContextualHelp(contextualHelp);
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-            return Result.Succeeded;
-        }
-
+        /// <summary>
+        /// Reads in the XML Settings file.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="args"></param>
         private void ReadAddinSettingsOnInitialized(object source, ApplicationInitializedEventArgs args)
         {
             try
@@ -97,12 +102,10 @@ namespace HOK.AddInManager
 
                 //add addins
                 AddToolsBySettings();
-
-
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog("HOK.AddInManager.AppCommand.ReadAddinSettingsOnInitialized: " + ex.Message);
             }
         }
 
@@ -110,24 +113,23 @@ namespace HOK.AddInManager
         {
             try
             {
-                var toolsFound = from addin in addins.AddinCollection where addin.ToolLoadType == LoadType.Never select addin;
-                if (toolsFound.Count() > 0)
+                var toolsFound = addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Never).ToList();
+                if (!toolsFound.Any()) return;
+
+                foreach (var addin in toolsFound)
                 {
-                    foreach (AddinInfo addin in toolsFound)
+                    foreach (var installPath in addin.InstallPaths)
                     {
-                        foreach (string installPath in addin.InstallPaths)
+                        if (File.Exists(installPath))
                         {
-                            if (File.Exists(installPath))
-                            {
-                                File.Delete(installPath);
-                            }
+                            File.Delete(installPath);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog("HOK.AddInManager.AppCommand.ReadAddinSettingsOnInitialized: " + ex.Message);
             }
         }
 
@@ -135,24 +137,23 @@ namespace HOK.AddInManager
         {
             try
             {
-                var toolsFound = from addin in addins.AddinCollection where addin.ToolLoadType == LoadType.Always select addin;
-                if (toolsFound.Count() > 0)
+                var toolsFound = addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Always).ToList();
+                if (!toolsFound.Any()) return;
+
+                foreach (var addin in toolsFound)
                 {
-                    foreach (AddinInfo addin in toolsFound)
+                    for (var i = 0; i < addin.AddInPaths.Length; i++)
                     {
-                        for (int i = 0; i < addin.AddInPaths.Length; i++)
+                        if (File.Exists(addin.AddInPaths[i]) && !File.Exists(addin.InstallPaths[i]))
                         {
-                            if (File.Exists(addin.AddInPaths[i]) && !File.Exists(addin.InstallPaths[i]))
-                            {
-                                File.Copy(addin.AddInPaths[i], addin.InstallPaths[i], true);
-                            }
+                            File.Copy(addin.AddInPaths[i], addin.InstallPaths[i], true);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog("HOK.AddInManager.AppCommand.AddToolsBySettings: " + ex.Message);
             }
         }
 
@@ -160,25 +161,27 @@ namespace HOK.AddInManager
         {
             try
             {
-                var toolsFound = from addin in addins.AddinCollection where addin.ToolLoadType == LoadType.ThisSessionOnly select addin;
-                if (toolsFound.Count() > 0)
+                var toolsFound = addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.ThisSessionOnly).ToList();
+                if (!toolsFound.Any()) return;
+
+                foreach (var addin in toolsFound)
                 {
-                    foreach (AddinInfo addin in toolsFound)
+                    foreach (var addinPath in addin.AddInPaths)
                     {
-                        foreach (string addinPath in addin.AddInPaths)
+                        try
                         {
-                            try
-                            {
-                                m_app.LoadAddIn(addinPath);
-                            }
-                            catch { }
+                            m_app.LoadAddIn(addinPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.AppendLog("HOK.AddInManager.AppCommand.LoadToolsBySettings: " + ex.Message);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog("HOK.AddInManager.AppCommand.LoadToolsBySettings: " + ex.Message);
             }
         }
 
@@ -187,9 +190,9 @@ namespace HOK.AddInManager
             try
             {
                 //change InSessionOnly to Never
-                for (int i = 0; i < addins.AddinCollection.Count; i++)
+                for (var i = 0; i < addins.AddinCollection.Count; i++)
                 {
-                    AddinInfo addin = addins.AddinCollection[i];
+                    var addin = addins.AddinCollection[i];
                     if (addin.ToolLoadType == LoadType.ThisSessionOnly)
                     {
                         addins.AddinCollection[i].ToolLoadType = LoadType.Never;
@@ -202,12 +205,14 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog("HOK.AddInManager.AppCommand.ApplicationOnClosing: " + ex.Message);
             }
         }
-
     }
 
+    /// <summary>
+    /// Determines if Button is enabled in Zero Document state.
+    /// </summary>
     public class Availability : IExternalCommandAvailability
     {
         public bool IsCommandAvailable(UIApplication applicationData, Autodesk.Revit.DB.CategorySet selectedCategories)

@@ -71,9 +71,9 @@ namespace HOK.MissionControl.Tools.HealthReport
                         throw new ArgumentOutOfRangeException(nameof(state), state, null);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("WorksetOpenMonitor-PublishData: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

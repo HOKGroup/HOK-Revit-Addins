@@ -95,7 +95,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMWindow-buttonEdit_Click:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -113,7 +113,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DTMWindow-buttonPlay_Click:" + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }
