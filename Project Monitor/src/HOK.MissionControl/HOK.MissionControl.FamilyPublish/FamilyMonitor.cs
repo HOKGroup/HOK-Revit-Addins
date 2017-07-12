@@ -87,9 +87,9 @@ namespace HOK.MissionControl.FamilyPublish
                         famDoc.Close(false);
                         TryToDelete(path);
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyMonitor.PublishData-SaveAndDelete: " + e.Message);
+                        Log.AppendLog(ex.Message);
                     }
                 }
 
@@ -103,11 +103,11 @@ namespace HOK.MissionControl.FamilyPublish
                     createdBy = Environment.UserName
                 };
 
-                ServerUtilities.PostStats(familyStats, worksetDocumentId, "familystats");
+                ServerUtilities.PostToMongoDB(familyStats, "worksets", worksetDocumentId, "familystats");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyMonitor.PublishData: " + e.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 

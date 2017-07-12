@@ -10,10 +10,10 @@
     <ProjectGuid>{04F9F82F-782D-48B7-89D1-34F21D329352}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>HOK.SheetManager</RootNamespace>
-    <AssemblyName>HOK.SheetManager_v.2017.0.1.13</AssemblyName>
+    <AssemblyName>HOK.SheetManager</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -22,7 +22,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>HOK.SheetManager_v.2017.0.1.13.xml</DocumentationFile>
+    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files\Autodesk\Revit Architecture 2011\Program\Revit.exe</StartProgram>
@@ -34,7 +34,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>HOK.SheetManager_v.2017.0.1.13.xml</DocumentationFile>
+    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
@@ -50,20 +50,6 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2013|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <OutputPath>bin\2013\</OutputPath>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DefineConstants>RELEASE2013</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2014|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <OutputPath>bin\2014\</OutputPath>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DefineConstants>RELEASE2014</DefineConstants>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2015|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -76,7 +62,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\2016\</OutputPath>
-    <DocumentationFile>HOK.SheetManager_v.2017.0.1.13.xml</DocumentationFile>
+    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -88,65 +74,51 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\2017\</OutputPath>
-    <DocumentationFile>HOK.SheetManager_v.2017.0.1.13.xml</DocumentationFile>
+    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>RELEASE2017</DefineConstants>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\2018\</OutputPath>
+    <DefineConstants>RELEASE2017</DefineConstants>
+    <DocumentationFile>HOK.SheetManager.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Office.Interop.Access, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Office.Interop.Access, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Access.15.0.4420.1017\lib\net20\Microsoft.Office.Interop.Access.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Office.interop.access.dao, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Office.Interop.Access.Dao, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Access.Dao.15.0.4420.1017\lib\net20\Microsoft.Office.Interop.Access.Dao.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Office.Interop.Outlook, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\packages\Microsoft.Office.Interop.Outlook.15.0.4797.1003\lib\net20\Microsoft.Office.Interop.Outlook.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2013'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPI.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="RevitAPI">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
     </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2013'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2013\Program\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2014'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2014'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2014\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2017'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2017'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="RevitAPIUI">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -227,6 +199,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Reference\SheetManager_Instruction.mht" />
     <None Include="Resource\BW_MsAccess.png" />
   </ItemGroup>
@@ -282,9 +255,43 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>echo Signing...
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"
+
+echo Configuration: $(Configuration)
+
+if $(Configuration) == 2015 goto Build2015
+if $(Configuration) == 2016 goto Build2016
+if $(Configuration) == 2017 goto Build2017
+if $(Configuration) == 2018 goto Build2018
+
+:Build2015
+echo Copying results to Build2015
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2016
+echo Copying results to Build2016
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+copy "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2017
+echo Copying results to Build2017
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2018
+echo Copying results to Build2018
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+copy "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+goto exit
+
+:exit</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

@@ -87,7 +87,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                     totalLinkedDwg = totalLinkedCad
                 };
 
-                ServerUtilities.PostStats(linkStats, worksetDocumentId, "linkstats");
+                ServerUtilities.PostToMongoDB(linkStats, "worksets", worksetDocumentId, "linkstats");
             }
             catch (Exception ex)
             {

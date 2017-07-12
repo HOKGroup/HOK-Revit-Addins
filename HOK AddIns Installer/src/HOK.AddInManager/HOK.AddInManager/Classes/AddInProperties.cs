@@ -155,7 +155,7 @@ namespace HOK.AddInManager.Classes
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.Classes.AddinInfo.GetDetailInfo: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     

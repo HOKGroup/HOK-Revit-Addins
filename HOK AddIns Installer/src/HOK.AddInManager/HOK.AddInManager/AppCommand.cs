@@ -39,7 +39,7 @@ namespace HOK.AddInManager
                 }
                 catch (Exception ex)
                 {
-                    Log.AppendLog("HOK.AddInManager.AppCommand.OnStartup: " + ex.Message);
+                    Log.AppendLog(ex.Message);
                 }
 
                 versionNumber = m_app.ControlledApplication.VersionNumber;
@@ -67,7 +67,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.AppCommand.OnStartup: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return Result.Succeeded;
         }
@@ -105,7 +105,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.AppCommand.ReadAddinSettingsOnInitialized: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -129,7 +129,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.AppCommand.ReadAddinSettingsOnInitialized: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -153,7 +153,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.AppCommand.AddToolsBySettings: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -174,14 +174,14 @@ namespace HOK.AddInManager
                         }
                         catch (Exception ex)
                         {
-                            Log.AppendLog("HOK.AddInManager.AppCommand.LoadToolsBySettings: " + ex.Message);
+                            Log.AppendLog(ex.Message);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.AppCommand.LoadToolsBySettings: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -205,13 +205,13 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.AppCommand.ApplicationOnClosing: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }
 
     /// <summary>
-    /// Determines if Button is enabled in Zero Document state.
+    /// Determines if Button is enabled in ZeroDocument state.
     /// </summary>
     public class Availability : IExternalCommandAvailability
     {

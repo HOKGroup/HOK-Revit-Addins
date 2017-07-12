@@ -1870,7 +1870,7 @@ UpdateExistingElement:
 
     End Sub
 
-    Private Sub form_SheetManager_FormClosing(sender As Object, e As Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
+    Private Sub form_SheetManager_FormClosing(sender As Object, e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
         m_UtilityInterop.ShutDownAccess()
         m_UtilityInterop.ShutDownExcel()
     End Sub

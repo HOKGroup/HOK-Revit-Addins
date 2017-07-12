@@ -19,7 +19,11 @@ namespace HOK.Arrowhead
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
-            Log.AppendLog("HOK.Arrowhead.ArrowCommand: Started.");
+            Log.AppendLog("Started.");
+
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-Arrowhead", m_doc));
 
             var assignerWindow = new HeadAssignerWindow(m_app);
             if (assignerWindow.ShowDialog() == true)
@@ -27,11 +31,7 @@ namespace HOK.Arrowhead
                 assignerWindow.Close();
             }
 
-            // (Konrad) We are gathering information about the addin use. This allows us to
-            // better maintain the most used plug-ins or discontiue the unused ones.
-            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-Arrowhead", m_doc));
-
-            Log.AppendLog("HOK.Arrowhead.ArrowCommand: Ended.");
+            Log.AppendLog("Ended.");
             return Result.Succeeded;
         }
     }

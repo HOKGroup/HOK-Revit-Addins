@@ -46,7 +46,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.MainWindow.hyperlinkHelp_Click: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

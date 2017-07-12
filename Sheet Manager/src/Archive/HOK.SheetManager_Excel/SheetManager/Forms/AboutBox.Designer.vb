@@ -42,10 +42,10 @@ Partial Class AboutBox
         Me.OKButton = New System.Windows.Forms.Button()
         Me.linkContact = New System.Windows.Forms.LinkLabel()
         Me.pictureBox2 = New System.Windows.Forms.PictureBox()
-        Me.TableLayoutPanel.SuspendLayout()
-        CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.pictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.SuspendLayout()
+        Me.TableLayoutPanel.SuspendLayout
+        CType(Me.LogoPictureBox,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.pictureBox2,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.SuspendLayout
         '
         'TableLayoutPanel
         '
@@ -66,20 +66,20 @@ Partial Class AboutBox
         Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.11111!))
         Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.11111!))
         Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 55.55556!))
-        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20.0!))
+        Me.TableLayoutPanel.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20!))
         Me.TableLayoutPanel.Size = New System.Drawing.Size(396, 227)
         Me.TableLayoutPanel.TabIndex = 0
         '
         'LogoPictureBox
         '
-        Me.LogoPictureBox.Image = CType(resources.GetObject("LogoPictureBox.Image"), System.Drawing.Image)
+        Me.LogoPictureBox.Image = CType(resources.GetObject("LogoPictureBox.Image"),System.Drawing.Image)
         Me.LogoPictureBox.Location = New System.Drawing.Point(3, 3)
         Me.LogoPictureBox.Name = "LogoPictureBox"
         Me.TableLayoutPanel.SetRowSpan(Me.LogoPictureBox, 5)
         Me.LogoPictureBox.Size = New System.Drawing.Size(59, 64)
         Me.LogoPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage
         Me.LogoPictureBox.TabIndex = 0
-        Me.LogoPictureBox.TabStop = False
+        Me.LogoPictureBox.TabStop = false
         '
         'LabelProductName
         '
@@ -134,18 +134,18 @@ Partial Class AboutBox
         Me.TextBoxDescription.Dock = System.Windows.Forms.DockStyle.Fill
         Me.TextBoxDescription.Location = New System.Drawing.Point(72, 103)
         Me.TextBoxDescription.Margin = New System.Windows.Forms.Padding(6, 3, 3, 3)
-        Me.TextBoxDescription.Multiline = True
+        Me.TextBoxDescription.Multiline = true
         Me.TextBoxDescription.Name = "TextBoxDescription"
-        Me.TextBoxDescription.ReadOnly = True
+        Me.TextBoxDescription.ReadOnly = true
         Me.TextBoxDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both
         Me.TextBoxDescription.Size = New System.Drawing.Size(321, 121)
         Me.TextBoxDescription.TabIndex = 0
-        Me.TextBoxDescription.TabStop = False
+        Me.TextBoxDescription.TabStop = false
         Me.TextBoxDescription.Text = resources.GetString("TextBoxDescription.Text")
         '
         'OKButton
         '
-        Me.OKButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.OKButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.OKButton.DialogResult = System.Windows.Forms.DialogResult.Cancel
         Me.OKButton.Location = New System.Drawing.Point(327, 242)
         Me.OKButton.Name = "OKButton"
@@ -155,30 +155,30 @@ Partial Class AboutBox
         '
         'linkContact
         '
-        Me.linkContact.AutoSize = True
+        Me.linkContact.AutoSize = true
         Me.linkContact.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.linkContact.Location = New System.Drawing.Point(29, 247)
         Me.linkContact.Margin = New System.Windows.Forms.Padding(0)
         Me.linkContact.Name = "linkContact"
         Me.linkContact.Size = New System.Drawing.Size(196, 13)
         Me.linkContact.TabIndex = 27
-        Me.linkContact.TabStop = True
+        Me.linkContact.TabStop = true
         Me.linkContact.Text = "Troubleshooting: Contact the Developer"
         Me.linkContact.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'pictureBox2
         '
-        Me.pictureBox2.Image = CType(resources.GetObject("pictureBox2.Image"), System.Drawing.Image)
+        Me.pictureBox2.Image = CType(resources.GetObject("pictureBox2.Image"),System.Drawing.Image)
         Me.pictureBox2.Location = New System.Drawing.Point(13, 247)
         Me.pictureBox2.Margin = New System.Windows.Forms.Padding(0)
         Me.pictureBox2.Name = "pictureBox2"
         Me.pictureBox2.Size = New System.Drawing.Size(16, 16)
         Me.pictureBox2.TabIndex = 28
-        Me.pictureBox2.TabStop = False
+        Me.pictureBox2.TabStop = false
         '
         'AboutBox
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6!, 13!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.OKButton
         Me.ClientSize = New System.Drawing.Size(414, 276)
@@ -187,22 +187,22 @@ Partial Class AboutBox
         Me.Controls.Add(Me.TableLayoutPanel)
         Me.Controls.Add(Me.OKButton)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.MaximizeBox = False
-        Me.MinimizeBox = False
+        Me.Icon = CType(resources.GetObject("$this.Icon"),System.Drawing.Icon)
+        Me.MaximizeBox = false
+        Me.MinimizeBox = false
         Me.Name = "AboutBox"
         Me.Padding = New System.Windows.Forms.Padding(9)
-        Me.ShowInTaskbar = False
+        Me.ShowInTaskbar = false
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "About Sheet Manager"
-        Me.TableLayoutPanel.ResumeLayout(False)
-        Me.TableLayoutPanel.PerformLayout()
-        CType(Me.LogoPictureBox, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.pictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ResumeLayout(False)
-        Me.PerformLayout()
+        Me.TableLayoutPanel.ResumeLayout(false)
+        Me.TableLayoutPanel.PerformLayout
+        CType(Me.LogoPictureBox,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.pictureBox2,System.ComponentModel.ISupportInitialize).EndInit
+        Me.ResumeLayout(false)
+        Me.PerformLayout
 
-    End Sub
+End Sub
     Private WithEvents pictureBox2 As System.Windows.Forms.PictureBox
     Private WithEvents linkContact As System.Windows.Forms.LinkLabel
 

@@ -77,7 +77,7 @@ namespace HOK.AddInManager.Utils
                 }
                 catch (Exception ex)
                 {
-                    Log.AppendLog("HOK.AddInManager.Utils.CsvUtil.ReadAddInList: " + ex.Message);
+                    Log.AppendLog(ex.Message);
                 }
             }
             return addinCollection;

@@ -43,7 +43,7 @@ namespace HOK.AddInManager.Utils
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.Utils.SettingUtil.ReadConfig: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -65,7 +65,7 @@ namespace HOK.AddInManager.Utils
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.Utils.SettingUtil.WriteConfig: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
+using Visibility = System.Windows.Visibility;
 
 namespace HOK.Arrowhead
 {
@@ -26,6 +28,24 @@ namespace HOK.Arrowhead
             CollectArrowheads();
         }
 
+        private void buttonApply_Click(object sender, RoutedEventArgs e)
+        {
+            if (UpdateLeaders())
+            {
+                DialogResult = true;
+            }
+        }
+
+        private delegate void UpdateProgressBarDelegate(DependencyProperty dp, object value);
+
+        private void buttonCancel_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        /// <summary>
+        /// Collects all available Arrowhead Styles in the project.
+        /// </summary>
         private void CollectArrowheads()
         {
             try
@@ -54,27 +74,22 @@ namespace HOK.Arrowhead
                 comboBoxArrow.ItemsSource = arrowheadList;
                 comboBoxArrow.DisplayMemberPath = "ArrowName";
                 comboBoxArrow.SelectedValuePath = "ArrowElementId";
-                
+
                 if (arrowheadList.Count > 0)
                 {
                     comboBoxArrow.SelectedIndex = 0;
                 }
-                
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect the Arrowhead types.\n" + ex.Message, "Collect Arrowheads", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(ex.Message);
             }
         }
 
-        private void buttonApply_Click(object sender, RoutedEventArgs e)
-        {
-            if (UpdateLeaders())
-            {
-                DialogResult = true;
-            }
-        }
-
+        /// <summary>
+        /// Updates all Leader Arrowheads.
+        /// </summary>
         private bool UpdateLeaders()
         {
             var result = false;
@@ -83,18 +98,26 @@ namespace HOK.Arrowhead
                 var i = 0;
                 if (null != comboBoxArrow.SelectedValue)
                 {
-                    var arrowhead = comboBoxArrow.SelectedItem as Arrowhead;
-                    var selectedId=comboBoxArrow.SelectedValue as ElementId;
+                    var arrowhead = (Arrowhead)comboBoxArrow.SelectedItem;
+                    var selectedId = (ElementId)comboBoxArrow.SelectedValue;
 
-                    var collector = new FilteredElementCollector(m_doc);
-                    var families = collector.OfClass(typeof(Family)).Cast<Family>().ToList();
+                    // (Konrad) Updates Leader Arrowheads for all FamilySymbols and TextNotes
+                    // We need a combined class filter here since TextNotes don't have Families.
+                    var symbols = new FilteredElementCollector(m_doc).WherePasses(
+                        new LogicalOrFilter(
+                            new List<ElementFilter>
+                            {
+                                new ElementClassFilter(typeof(FamilySymbol)),
+                                new ElementClassFilter(typeof(TextNoteType))
+                            }))
+                            .ToList();
 
-                    progressBar.Visibility = System.Windows.Visibility.Visible;
-                    statusLable.Visibility = System.Windows.Visibility.Visible;
+                    progressBar.Visibility = Visibility.Visible;
+                    statusLable.Visibility = Visibility.Visible;
                     statusLable.Text = "Applying Changes . .";
 
                     progressBar.Minimum = 0;
-                    progressBar.Maximum = families.Count;
+                    progressBar.Maximum = symbols.Count;
                     progressBar.Value = 0;
 
                     double value = 0;
@@ -102,31 +125,30 @@ namespace HOK.Arrowhead
 
                     using (var t = new Transaction(m_doc))
                     {
-                        foreach (var family in families)
+                        foreach (var family in symbols)
                         {
                             value += 1;
-                            var symbolIds = family.GetFamilySymbolIds().ToList();
-                            foreach (var eId in symbolIds)
+                            var param = family.get_Parameter(BuiltInParameter.LEADER_ARROWHEAD);
+                            if (param != null)
                             {
-                                var fs = m_doc.GetElement(eId) as FamilySymbol;
-                                var param = fs?.get_Parameter(BuiltInParameter.LEADER_ARROWHEAD);
-                                if (param != null)
+                                t.Start("Update Leaders");
+                                try
                                 {
-                                    t.Start("Update Leaders");
-                                    try
-                                    {
-                                        param.Set(selectedId);
-                                        i++;
-                                        t.Commit();
-                                    }
-                                    catch { t.RollBack(); }
+                                    param.Set(selectedId);
+                                    i++;
+                                    t.Commit();
+                                }
+                                catch
+                                {
+                                    Log.AppendLog("Failed to update Leader. Rolling back.");
+                                    t.RollBack();
                                 }
                             }
-                            Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
+                            Dispatcher.Invoke(updatePbDelegate, DispatcherPriority.Background, System.Windows.Controls.Primitives.RangeBase.ValueProperty, value);
                         }
                     }
 
-                    progressBar.Visibility = System.Windows.Visibility.Hidden;
+                    progressBar.Visibility = Visibility.Hidden;
                     statusLable.Text = "Done";
                     MessageBox.Show(i + " Annotation Symbol Types are updated with " + arrowhead.ArrowName, "Annotation Symbols Types", MessageBoxButton.OK, MessageBoxImage.Information);
                     result = true;
@@ -134,22 +156,15 @@ namespace HOK.Arrowhead
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to update leaders.\n"+ex.Message, "Update Leaders", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(ex.Message);
                 result = false;
             }
             return result;
         }
-
-        private delegate void UpdateProgressBarDelegate(DependencyProperty dp, object value);
-
-        private void buttonCancel_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
     }
 
     /// <summary>
-    /// 
+    /// Arrowhead wrapper class.
     /// </summary>
     public class Arrowhead
     {

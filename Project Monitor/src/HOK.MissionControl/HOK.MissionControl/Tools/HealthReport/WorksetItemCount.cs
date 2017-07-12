@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Autodesk.Revit.DB;
-using HOK.Core;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.Core.Utilities;
@@ -55,7 +54,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 }
 
                 // (Konrad) Publish information about workset counts in the model.
-                ServerUtilities.PostWorksetCounts(new WorksetItem { worksets = worksetInfo }, worksetDocumentId);
+                ServerUtilities.PostToMongoDB(new WorksetItem {worksets = worksetInfo}, "worksets", worksetDocumentId, "itemcount");
             }
             catch (Exception ex)
             {

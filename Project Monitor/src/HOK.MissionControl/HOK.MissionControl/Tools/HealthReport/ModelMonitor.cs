@@ -85,7 +85,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     value = ms
                 };
 
-                ServerUtilities.PostStats(eventItem, worksetDocumentId, "modelsynchtime");
+                ServerUtilities.PostToMongoDB(eventItem, "worksets", worksetDocumentId, "modelsynchtime");
             }
             catch (Exception ex)
             {
@@ -111,7 +111,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     value = ms
                 };
 
-                ServerUtilities.PostStats(eventItem, worksetDocumentId, "modelopentime");
+                ServerUtilities.PostToMongoDB(eventItem, "worksets", worksetDocumentId, "modelopentime");
             }
             catch (Exception ex)
             {
@@ -154,7 +154,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     value = fileSize
                 };
 
-                ServerUtilities.PostStats(eventItem, worksetDocumentId, "modelsize");
+                ServerUtilities.PostToMongoDB(eventItem, "worksets", worksetDocumentId, "modelsize");
             }
             catch (Exception ex)
             {

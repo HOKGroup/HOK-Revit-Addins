@@ -43,7 +43,7 @@ namespace HOK.AddInManager.Utils
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.Utils.ToolTipReader.ReadToolTip: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
             return ttt;
         }

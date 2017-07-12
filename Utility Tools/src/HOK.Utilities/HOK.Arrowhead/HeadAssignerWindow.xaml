@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="240" d:DesignWidth="350" SizeToContent="WidthAndHeight" Icon="Images/hoklogo.ico" Title="Arrowhead Assigner" WindowStartupLocation="CenterScreen" MinWidth="350" MinHeight="240" MaxWidth="350" MaxHeight="240">
+             d:DesignHeight="240" d:DesignWidth="350" SizeToContent="WidthAndHeight" Icon="Images/hoklogo.ico" Title="Arrowhead Assigner" 
+            WindowStartupLocation="CenterScreen" MinWidth="350" MinHeight="240" MaxWidth="350" MaxHeight="240"
+            BorderThickness="0,5,0,0" BorderBrush="#E0E0D1">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />

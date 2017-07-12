@@ -51,7 +51,7 @@ namespace HOK.AddInManager.UserControls
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.UserControls.AddInViewModel.OpenUrlExecuted: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -85,7 +85,7 @@ namespace HOK.AddInManager.UserControls
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.UserControls.AddInViewModel.LoadTypeExecuted: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 

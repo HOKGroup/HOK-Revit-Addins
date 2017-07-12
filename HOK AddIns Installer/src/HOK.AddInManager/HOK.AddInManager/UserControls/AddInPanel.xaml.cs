@@ -46,7 +46,7 @@ namespace HOK.AddInManager.UserControls
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.UserControls.AddInPanel.comboBoxLoadType_SelectionChanged: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }

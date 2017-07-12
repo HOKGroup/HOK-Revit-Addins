@@ -13,8 +13,8 @@ namespace HOK.MissionControl.Core.Utils
     /// </summary>
     public enum WorksetMonitorState
     {
-        onOpen,
-        onSynch
+        onopened,
+        onsynched
     }
 
     public static class ServerUtilities
@@ -48,7 +48,8 @@ namespace HOK.MissionControl.Core.Utils
                 {
                     var items = response.Data;
                     projectFound = items.First();
-                    Log.AppendLog("Project Found.");
+
+                    Log.AppendLog("Project Found: " + projectFound.Id);
                 }
             }
             catch (Exception ex)
@@ -84,7 +85,8 @@ namespace HOK.MissionControl.Core.Utils
                             if (!string.Equals(file.centralPath.ToLower(), centralPath.ToLower(),
                                 StringComparison.Ordinal)) continue;
                             configFound = config;
-                            Log.AppendLog("Configuration Found.");
+
+                            Log.AppendLog("Configuration Found: " + configFound.Id);
                             break;
                         }
                     }
@@ -97,31 +99,31 @@ namespace HOK.MissionControl.Core.Utils
             return configFound;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="worksetDocumentId"></param>
-        /// <param name="route"></param>
-        /// <returns></returns>
-        public static FamilyResponse GetFamilyStats(string worksetDocumentId, string route)
-        {
-            var items = new FamilyResponse();
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + route, Method.GET);
-                var response = client.Execute<FamilyResponse>(request);
-                if (null != response.Data)
-                {
-                    items = response.Data;
-                }
-            }
-            catch
-            {
-                //ignored
-            }
-            return items;
-        }
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="worksetDocumentId"></param>
+        ///// <param name="route"></param>
+        ///// <returns></returns>
+        //public static FamilyResponse GetFamilyStats(string worksetDocumentId, string route)
+        //{
+        //    var items = new FamilyResponse();
+        //    try
+        //    {
+        //        var client = new RestClient(RestApiBaseUrl);
+        //        var request = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + route, Method.GET);
+        //        var response = client.Execute<FamilyResponse>(request);
+        //        if (null != response.Data)
+        //        {
+        //            items = response.Data;
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        //ignored
+        //    }
+        //    return items;
+        //}
 
         /// <summary>
         /// Retrieves a Collection from MongoDB.
@@ -141,7 +143,8 @@ namespace HOK.MissionControl.Core.Utils
                 if (response.Data != null)
                 {
                     items = response.Data;
-                    Log.AppendLog(response.ResponseStatus.ToString());
+
+                    Log.AppendLog(response.ResponseStatus + "-" + route);
                 }
             }
             catch (Exception ex)
@@ -155,6 +158,10 @@ namespace HOK.MissionControl.Core.Utils
 
         #region POST
 
+        /// <summary>
+        /// Posts Trigger Records to MongoDB. Trigger records are created when users override DTM Tools.
+        /// </summary>
+        /// <param name="record">Record to post.</param>
         public static HttpStatusCode PostTriggerRecords(TriggerRecord record)
         {
             var status = HttpStatusCode.Unused;
@@ -167,10 +174,12 @@ namespace HOK.MissionControl.Core.Utils
 
                 var response = client.Execute<TriggerRecord>(request);
                 status = response.StatusCode;
+
+                Log.AppendLog(response.ResponseStatus + "-triggerrecords");
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog(ex.Message);
             }
             return status;
         }
@@ -196,10 +205,12 @@ namespace HOK.MissionControl.Core.Utils
 
                 var response = client.Execute(request);
                 status = response.StatusCode;
+
+                Log.AppendLog(response.ResponseStatus + "-addworkset");
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog(ex.Message);
             }
             return status;
         }
@@ -221,7 +232,8 @@ namespace HOK.MissionControl.Core.Utils
 
                 var response = client.Execute<T>(request);
                 resresponse = response.Data;
-                Log.AppendLog(response.ResponseStatus.ToString());
+
+                Log.AppendLog(response.ResponseStatus + "-" + route);
             }
             catch (Exception ex)
             {
@@ -230,6 +242,13 @@ namespace HOK.MissionControl.Core.Utils
             return resresponse;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="worksetDocumentId"></param>
+        /// <param name="objectId"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public static HttpStatusCode UpdateSessionInfo(string worksetDocumentId, string objectId, string action)
         {
             var httpStatusCode = HttpStatusCode.Unused;
@@ -242,10 +261,12 @@ namespace HOK.MissionControl.Core.Utils
                 };
                 restRequest.AddQueryParameter("action", action);
                 httpStatusCode = restClient.Execute(restRequest).StatusCode;
+
+                Log.AppendLog(httpStatusCode + "-sessioninfo-" + action);
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog(ex.Message);
             }
             return httpStatusCode;
         }
@@ -274,6 +295,7 @@ namespace HOK.MissionControl.Core.Utils
                 if (restResponse.Data != null)
                 {
                     output = restResponse.Data;
+
                     Log.AppendLog(collectionName + "/" + route);
                 }
             }
@@ -282,96 +304,6 @@ namespace HOK.MissionControl.Core.Utils
                 Log.AppendLog(ex.Message);
             }
             return output;
-        }
-
-        /// <summary>
-        /// POST Worksets info for onOpened and onSynched events.
-        /// </summary>
-        /// <param name="worksetInfo">Worksets document class.</param>
-        /// <param name="worksetDocumentId">Worksets document _id.</param>
-        /// <param name="state">State of the Revit Document ex. onOpened.</param>
-        /// <returns>Response status.</returns>
-        public static void PostWorksetInfo(WorksetEvent worksetInfo, string worksetDocumentId, WorksetMonitorState state)
-        {
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                RestRequest request;
-                switch (state)
-                {
-                    case WorksetMonitorState.onOpen:
-                        request =
-                            new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/onopened", Method.POST) { RequestFormat = DataFormat.Json };
-                        break;
-                    case WorksetMonitorState.onSynch:
-                        request =
-                            new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/onsynched", Method.POST) { RequestFormat = DataFormat.Json };
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(state), state, null);
-                }
-                request.AddBody(worksetInfo);
-                var response = client.Execute<WorksetEvent>(request);
-
-                if(response.StatusCode == HttpStatusCode.OK) Log.AppendLog(state + " succeeded.");
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(ex.Message );
-            }
-        }
-
-        /// <summary>
-        /// POST Statistics for Model Info functionality
-        /// </summary>
-        /// <param name="worksetInfo">Worksets document class.</param>
-        /// <param name="worksetDocumentId">Worksets document _id.</param>
-        /// <param name="route">MongoDB route string.</param>
-        /// <returns>Response status.</returns>
-        public static HttpStatusCode PostStats<T>(T worksetInfo, string worksetDocumentId, string route)
-        {
-            var status = HttpStatusCode.Unused;
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + route, Method.POST) { RequestFormat = DataFormat.Json };
-                request.AddBody(worksetInfo);
-                var response = client.Execute(request);
-                status = response.StatusCode;
-            }
-            catch
-            {
-                //ignored
-            }
-            return status;
-        }
-
-        /// <summary>
-        /// POST Workset counts to itemCount document.
-        /// </summary>
-        /// <param name="worksetInfo">List of Workset items.</param>
-        /// <param name="worksetDocumentId">Workset Document _id.</param>
-        /// <returns>Response status.</returns>
-        public static HttpStatusCode PostWorksetCounts(WorksetItem worksetInfo, string worksetDocumentId)
-        {
-            var status = HttpStatusCode.Unused;
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request =
-                    new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/itemcount", Method.POST);
-                request.AddHeader("Content-type", "application/json");
-                request.RequestFormat = DataFormat.Json;
-                request.AddBody(worksetInfo);
-
-                var response = client.Execute<WorksetItem>(request);
-                status = response.StatusCode;
-            }
-            catch
-            {
-                //ignored
-            }
-            return status;
         }
 
         #endregion

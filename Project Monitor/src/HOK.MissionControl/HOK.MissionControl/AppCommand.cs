@@ -172,7 +172,7 @@ namespace HOK.MissionControl
                 if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return;
 
                 bool refreshProject;
-                WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onOpen, centralPath, out refreshProject);
+                WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onopened, centralPath, out refreshProject);
                 ModelMonitor.PublishModelSize(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], centralPath);
                 ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.FirstOrDefault(), SessionEvent.documentOpened);
                 if (OpenTime.ContainsKey("from"))
@@ -257,7 +257,7 @@ namespace HOK.MissionControl
                 if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return;
 
                 bool refreshProject;
-                WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onSynch, centralPath, out refreshProject);
+                WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onsynched, centralPath, out refreshProject);
                 SynchTime["from"] = DateTime.Now;
 
                 if (!refreshProject) return;

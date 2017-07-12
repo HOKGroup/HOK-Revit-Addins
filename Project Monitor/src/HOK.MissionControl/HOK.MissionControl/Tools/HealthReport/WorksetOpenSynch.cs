@@ -59,17 +59,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 }
 
                 // (Konrad) Publish Workset information to database based on current state.
-                switch (state)
-                {
-                    case WorksetMonitorState.onOpen:
-                        ServerUtilities.PostWorksetInfo(worksetInfo, worksetDocumentId, state);
-                        break;
-                    case WorksetMonitorState.onSynch:
-                        ServerUtilities.PostWorksetInfo(worksetInfo, worksetDocumentId, state);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(state), state, null);
-                }
+                ServerUtilities.PostToMongoDB(worksetInfo, "worksets", worksetDocumentId, state.ToString());
             }
             catch (Exception ex)
             {

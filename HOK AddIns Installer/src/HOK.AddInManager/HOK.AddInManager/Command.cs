@@ -26,10 +26,14 @@ namespace HOK.AddInManager
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
-            Log.AppendLog("HOK.AddInManager.Command.Execute: Started.");
+            Log.AppendLog("Started.");
 
             try
             {
+                // (Konrad) We are gathering information about the addin use. This allows us to
+                // better maintain the most used plug-ins or discontiue the unused ones.
+                AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", m_doc));
+
                 var addins = AppCommand.thisApp.addins;
                 StoreTempCollection(addins.AddinCollection);
                 var viewModel = new AddInViewModel(addins);
@@ -51,14 +55,10 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.Command.Execute: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
 
-            // (Konrad) We are gathering information about the addin use. This allows us to
-            // better maintain the most used plug-ins or discontiue the unused ones.
-            AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", m_doc));
-
-            Log.AppendLog("HOK.AddInManager.Command.Execute: Ended.");
+            Log.AppendLog("Ended.");
             return Result.Succeeded;
         }
 
@@ -74,7 +74,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.Command.StoreTempCollection: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
 
@@ -95,7 +95,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.AddInManager.Command.OverrideTempSettings: " + ex.Message);
+                Log.AppendLog(ex.Message);
             }
         }
     }
