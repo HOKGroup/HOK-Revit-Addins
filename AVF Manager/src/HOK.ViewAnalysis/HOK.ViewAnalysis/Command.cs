@@ -33,7 +33,7 @@ namespace HOK.ViewAnalysis
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
-            Log.AppendLog("HOK.ViewAnalysis.Command: Started.");
+            Log.AppendLog(LogMessageType.INFO, "Started");
 
             if (AddSharedParameters() == false)
             {
@@ -101,7 +101,7 @@ namespace HOK.ViewAnalysis
             };
             AddinUtilities.PublishAddinLog(addinInfo);
 
-            Log.AppendLog("HOK.ViewAnalysis.Command: Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
 
@@ -153,8 +153,8 @@ namespace HOK.ViewAnalysis
                             }
                             catch (Exception ex)
                             {
+                                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                                 trans.RollBack();
-                                MessageBox.Show("Failed to create an analysis display style.\n" + ex.Message, "Analysis Display Style", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }
                         }
                     }
@@ -172,7 +172,7 @@ namespace HOK.ViewAnalysis
                             }
                             catch (Exception ex)
                             {
-                                var message = ex.Message;
+                                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                                 trans.RollBack();
                                 result = false;
                             }
@@ -288,6 +288,7 @@ namespace HOK.ViewAnalysis
                         }
                         catch (Exception ex)
                         {
+                            Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                             trans.RollBack();
                         }
                     }
@@ -295,22 +296,9 @@ namespace HOK.ViewAnalysis
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return added;
-        }
-    }
-
-    public class RoomElementFilter : ISelectionFilter
-    {
-        public bool AllowElement(Element elem)
-        {
-            return elem.Category?.Id.IntegerValue == (int)BuiltInCategory.OST_Rooms;
-        }
-
-        public bool AllowReference(Reference reference, XYZ position)
-        {
-            return true;
         }
     }
 }

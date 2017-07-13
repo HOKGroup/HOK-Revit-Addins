@@ -25,7 +25,7 @@ namespace HOK.CeilingHeight
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
-            Log.AppendLog("HOK.CeilingHeight.CeilingCommand: Started.");
+            Log.AppendLog(LogMessageType.INFO, "Started");
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
@@ -119,11 +119,11 @@ namespace HOK.CeilingHeight
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.CeilingHeight.CeilingCommand: " + ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return Result.Failed;
             }
 
-            Log.AppendLog("HOK.CeilingHeight.CeilingCommand: Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
 

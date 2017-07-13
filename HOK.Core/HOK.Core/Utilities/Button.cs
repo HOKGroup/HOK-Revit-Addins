@@ -28,7 +28,7 @@ namespace HOK.Core.Utilities
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.Core.ButtonUtilities.LoadBitmapImage: " + ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return image;
         }

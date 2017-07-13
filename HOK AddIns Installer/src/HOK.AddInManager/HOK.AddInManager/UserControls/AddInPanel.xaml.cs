@@ -46,7 +46,7 @@ namespace HOK.AddInManager.UserControls
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     }

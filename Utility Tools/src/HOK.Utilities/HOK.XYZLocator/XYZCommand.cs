@@ -27,7 +27,7 @@ namespace HOK.XYZLocator
             {
                 m_app = commandData.Application;
                 m_doc = m_app.ActiveUIDocument.Document;
-                Log.AppendLog("HOK.XYZLocator.XYZCommand: Started.");
+                Log.AppendLog(LogMessageType.INFO, "Started");
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
@@ -54,9 +54,9 @@ namespace HOK.XYZLocator
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.XYZLocator.XYZCommand: " + ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            Log.AppendLog("HOK.XYZLocator.XYZCommand: Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
 

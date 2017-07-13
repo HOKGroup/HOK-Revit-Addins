@@ -23,7 +23,7 @@ namespace HOK.RoomUpdater
             {
                 m_app = commandData.Application;
                 m_doc = m_app.ActiveUIDocument.Document;
-                Log.AppendLog("HOK.RoomUpdater.RoomCommand: Started.");
+                Log.AppendLog(LogMessageType.INFO, "Started");
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
@@ -47,9 +47,9 @@ namespace HOK.RoomUpdater
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.RoomUpdater.RoomCommand: " + ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            Log.AppendLog("HOK.RoomUpdater.RoomCommand: Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
     }

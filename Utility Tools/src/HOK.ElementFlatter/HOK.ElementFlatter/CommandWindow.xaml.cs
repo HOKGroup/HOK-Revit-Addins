@@ -1,30 +1,17 @@
-﻿using HOK.ElementFlatter.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
+using HOK.Core.WpfUtilities;
 
 namespace HOK.ElementFlatter
 {
     /// <summary>
     /// Interaction logic for CommandWindow.xaml
     /// </summary>
-    public partial class CommandWindow : Window
+    public partial class CommandWindow
     {
         public CommandWindow()
         {
             InitializeComponent();
-            this.Title = "Element Flatter v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Title = "Element Flatter v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 
             ProgressManager.progressBar = progressBar;
             ProgressManager.statusLabel = statusLable;
@@ -32,10 +19,7 @@ namespace HOK.ElementFlatter
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
-
-       
-
     }
 }

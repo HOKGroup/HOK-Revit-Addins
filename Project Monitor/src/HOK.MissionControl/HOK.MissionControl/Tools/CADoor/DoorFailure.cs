@@ -54,7 +54,7 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                Log.AppendLog("DoorFailure-ProcessFailure:" + ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     }

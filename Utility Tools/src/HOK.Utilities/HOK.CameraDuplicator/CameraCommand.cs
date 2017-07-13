@@ -23,7 +23,7 @@ namespace HOK.CameraDuplicator
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
-            Log.AppendLog("HOK.CameraDuplicator.CameraCommand: Started.");
+            Log.AppendLog(LogMessageType.INFO, "Started");
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
@@ -45,7 +45,7 @@ namespace HOK.CameraDuplicator
                     MessageBoxImage.Information);
             }
 
-            Log.AppendLog("HOK.CameraDuplicator.CameraCommand: Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
     }

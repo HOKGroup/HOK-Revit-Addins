@@ -47,13 +47,13 @@ namespace HOK.MissionControl.Tools.SheetTracker
                 if (!UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
                 {
                     UpdaterRegistry.RegisterUpdater(this, doc);
-                    Log.AppendLog("Revision Updater Registered.");
+                    Log.AppendLog(LogMessageType.INFO, "Revision Updater Registered.");
                     registered = true;
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return registered;
         }
@@ -65,12 +65,12 @@ namespace HOK.MissionControl.Tools.SheetTracker
                 if (UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
                 {
                     UpdaterRegistry.UnregisterUpdater(updaterId, doc);
-                    Log.AppendLog("Revision Updater Removed.");
+                    Log.AppendLog(LogMessageType.INFO, "Revision Updater Removed.");
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -87,7 +87,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -101,7 +101,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -113,7 +113,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 

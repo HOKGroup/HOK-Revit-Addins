@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.ElementFlatter", "HOK.ElementFlatter\HOK.ElementFlatter.csproj", "{CF99570E-6753-44D9-8926-DB4A77CE7BD1}"
 EndProject
 Global
@@ -8,6 +10,7 @@ Global
 		2015|Any CPU = 2015|Any CPU
 		2016|Any CPU = 2016|Any CPU
 		2017|Any CPU = 2017|Any CPU
+		2018|Any CPU = 2018|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
@@ -18,6 +21,8 @@ Global
 		{CF99570E-6753-44D9-8926-DB4A77CE7BD1}.2016|Any CPU.Build.0 = 2016|Any CPU
 		{CF99570E-6753-44D9-8926-DB4A77CE7BD1}.2017|Any CPU.ActiveCfg = 2017|Any CPU
 		{CF99570E-6753-44D9-8926-DB4A77CE7BD1}.2017|Any CPU.Build.0 = 2017|Any CPU
+		{CF99570E-6753-44D9-8926-DB4A77CE7BD1}.2018|Any CPU.ActiveCfg = 2018|Any CPU
+		{CF99570E-6753-44D9-8926-DB4A77CE7BD1}.2018|Any CPU.Build.0 = 2018|Any CPU
 		{CF99570E-6753-44D9-8926-DB4A77CE7BD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CF99570E-6753-44D9-8926-DB4A77CE7BD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF99570E-6753-44D9-8926-DB4A77CE7BD1}.Release|Any CPU.ActiveCfg = Release|Any CPU

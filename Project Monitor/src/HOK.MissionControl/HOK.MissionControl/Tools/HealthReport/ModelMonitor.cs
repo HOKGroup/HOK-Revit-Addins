@@ -63,7 +63,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -89,7 +89,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -115,7 +115,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -146,7 +146,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 catch (Exception ex)
                 {
                     fileSize = 0;
-                    Log.AppendLog(ex.Message);
+                    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 }
 
                 var eventItem = new EventTime
@@ -158,7 +158,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     }

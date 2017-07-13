@@ -1,39 +1,38 @@
 ﻿using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using HOK.ElementFlatter.Class;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.ElementFlatter
 {
     [Transaction(TransactionMode.Manual)]
-    public class Command:IExternalCommand
+    public class Command : IExternalCommand
     {
         private UIApplication m_app;
         private Document m_doc;
 
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
+            Log.AppendLog(LogMessageType.INFO, "Started.");
 
-            CommandViewModel viewModel = new CommandViewModel(m_app);
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("ElementFlatter", m_doc));
 
-            CommandWindow cmdWindow = new CommandWindow();
-            cmdWindow.DataContext = viewModel;
-            if ((bool)cmdWindow.ShowDialog())
+            var viewModel = new CommandViewModel(m_app);
+
+            var cmdWindow = new CommandWindow
             {
-            }
+                DataContext = viewModel
+            };
+            cmdWindow.ShowDialog();
 
+            Log.AppendLog(LogMessageType.INFO, "Ended.");
             return Result.Succeeded;
         }
-
-       
     }
 }

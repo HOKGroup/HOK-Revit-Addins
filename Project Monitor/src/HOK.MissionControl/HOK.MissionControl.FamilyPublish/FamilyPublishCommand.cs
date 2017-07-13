@@ -24,7 +24,7 @@ namespace HOK.MissionControl.FamilyPublish
         {
             var uiApp = commandData.Application;
             var doc = uiApp.ActiveUIDocument.Document;
-            Log.AppendLog("Started");
+            Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
             {
@@ -35,7 +35,7 @@ namespace HOK.MissionControl.FamilyPublish
                 var pathName = doc.PathName;
                 if (string.IsNullOrEmpty(pathName))
                 {
-                    Log.AppendLog("Path is Null or Empty.");
+                    Log.AppendLog(LogMessageType.ERROR, "Path is Null or Empty.");
                     return Result.Failed;
                 }
                 
@@ -43,7 +43,7 @@ namespace HOK.MissionControl.FamilyPublish
                 var centralPath = BasicFileInfo.Extract(pathName).CentralPath;
                 if (string.IsNullOrEmpty(centralPath))
                 {
-                    Log.AppendLog("Could not get Central Path.");
+                    Log.AppendLog(LogMessageType.ERROR, "Could not get Central Path.");
                     return Result.Failed;
                 }
                 
@@ -70,7 +70,7 @@ namespace HOK.MissionControl.FamilyPublish
 
                 if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath))
                 {
-                    Log.AppendLog("No Config Found.");
+                    Log.AppendLog(LogMessageType.ERROR, "No Config Found.");
                     return Result.Failed;
                 }
                 
@@ -79,10 +79,10 @@ namespace HOK.MissionControl.FamilyPublish
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
 
-            Log.AppendLog("Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended.");
             return Result.Succeeded;
         }
     }

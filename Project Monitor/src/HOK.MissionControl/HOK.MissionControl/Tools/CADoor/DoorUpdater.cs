@@ -43,13 +43,13 @@ namespace HOK.MissionControl.Tools.CADoor
                 {
                     UpdaterRegistry.RegisterUpdater(this, doc);
                     RefreshTriggers(doc, pUpdater);
-                    Log.AppendLog("Door Updater Registered.");
+                    Log.AppendLog(LogMessageType.INFO, "Door Updater Registered.");
                     registered = true;
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return registered;
         }
@@ -65,12 +65,12 @@ namespace HOK.MissionControl.Tools.CADoor
                 if (UpdaterRegistry.IsUpdaterRegistered(updaterId, doc))
                 {
                     UpdaterRegistry.UnregisterUpdater(updaterId, doc);
-                    Log.AppendLog("Door Updater Removed.");
+                    Log.AppendLog(LogMessageType.INFO, "Door Updater Removed.");
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -123,7 +123,7 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return refreshed;
         }
@@ -170,7 +170,7 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return exist;
         }
@@ -274,7 +274,7 @@ namespace HOK.MissionControl.Tools.CADoor
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 

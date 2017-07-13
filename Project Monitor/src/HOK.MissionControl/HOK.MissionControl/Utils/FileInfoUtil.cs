@@ -31,7 +31,7 @@ namespace HOK.MissionControl.Utils
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return centralPath;
         }
@@ -60,7 +60,7 @@ namespace HOK.MissionControl.Utils
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return projectInfo;
         }
@@ -84,7 +84,7 @@ namespace HOK.MissionControl.Utils
             }
             catch(Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return "";
             }
             return name;
@@ -107,7 +107,7 @@ namespace HOK.MissionControl.Utils
             }
             catch(Exception ex) 
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return fileLocation;
         }

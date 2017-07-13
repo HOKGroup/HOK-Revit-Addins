@@ -22,7 +22,7 @@ namespace HOK.RenameFamily
             {
                 m_app = commandData.Application;
                 m_doc = m_app.ActiveUIDocument.Document;
-                Log.AppendLog("HOK.RenameFamily.RenameCommand: Started.");
+                Log.AppendLog(LogMessageType.INFO, "Started");
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
@@ -35,11 +35,11 @@ namespace HOK.RenameFamily
                 };
                 window.ShowDialog();
 
-                Log.AppendLog("HOK.RenameFamily.RenameCommand: Ended.");
+                Log.AppendLog(LogMessageType.INFO, "Ended");
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.RenameFamily.RenameCommand: " + ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return Result.Succeeded;
         }

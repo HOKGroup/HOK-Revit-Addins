@@ -22,7 +22,7 @@ namespace HOK.LevelManager
             {
                 m_app = commandData.Application;
                 m_doc = m_app.ActiveUIDocument.Document;
-                Log.AppendLog("HOK.LevelManager.LevelCommand: Started.");
+                Log.AppendLog(LogMessageType.INFO, "Started");
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
@@ -31,12 +31,12 @@ namespace HOK.LevelManager
                 var managerForm = new LevelManagerForm(m_app);
                 managerForm.ShowDialog();
 
-                Log.AppendLog("HOK.LevelManager.LevelCommand: Ended.");
+                Log.AppendLog(LogMessageType.INFO, "Ended");
                 return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                Log.AppendLog("HOK.LevelManager.LevelCommand: " + ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return Result.Cancelled;
             }
         }

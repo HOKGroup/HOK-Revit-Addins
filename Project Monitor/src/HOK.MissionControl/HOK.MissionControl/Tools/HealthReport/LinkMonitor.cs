@@ -91,7 +91,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     }

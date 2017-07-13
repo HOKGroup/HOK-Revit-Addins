@@ -67,6 +67,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="RevitAPI">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
     </Reference>
@@ -90,6 +91,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\SelectionFilters.cs" />
     <Compile Include="WpfUtilities\DataGrid.cs" />
+    <Compile Include="WpfUtilities\ProgressManager.cs" />
     <Compile Include="WpfUtilities\RelayCommand.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

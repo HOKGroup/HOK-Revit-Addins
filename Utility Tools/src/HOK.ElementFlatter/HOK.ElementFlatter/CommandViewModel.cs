@@ -1,28 +1,25 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using HOK.ElementFlatter.Class;
-using HOK.ElementFlatter.Commands;
-using HOK.ElementFlatter.Util;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
+using HOK.Core.WpfUtilities;
+using HOK.ElementFlatter.Class;
+using HOK.ElementFlatter.Commands;
 
 namespace HOK.ElementFlatter
 {
     public class CommandViewModel : INotifyPropertyChanged
     {
-        private UIApplication m_app;
-        private Document m_doc;
+        private readonly UIApplication m_app;
+        private readonly Document m_doc;
         private string statusText = "Ready";
         private ObservableCollection<CategoryInfo> categories = new ObservableCollection<CategoryInfo>();
-        private BuiltInCategory[] categoriesToSkip = new BuiltInCategory[] 
-        {
+        private readonly BuiltInCategory[] categoriesToSkip = {
             BuiltInCategory.OST_Areas, 
             BuiltInCategory.OST_CurtainWallPanels, 
             BuiltInCategory.OST_CurtainWallMullions,
@@ -32,59 +29,68 @@ namespace HOK.ElementFlatter
             BuiltInCategory.OST_StructuralFramingSystem
         };
  
-        private RelayCommand flattenCategoryCommand;
-        private RelayCommand flattenModelCommand;
-        private RelayCommand checkAllCommand;
-        private RelayCommand uncheckAllCommand;
+        private readonly RelayCommand flattenCategoryCommand;
+        private readonly RelayCommand flattenModelCommand;
+        private readonly RelayCommand checkAllCommand;
+        private readonly RelayCommand uncheckAllCommand;
 
-        public string StatusText { get { return statusText; } set { statusText = value; NotifyPropertyChanged("StatusText"); } }
-        public ObservableCollection<CategoryInfo> Categories { get { return categories; } set { categories = value; NotifyPropertyChanged("Categories"); } }
+        public string StatusText
+        {
+            get => statusText;
+            set { statusText = value; NotifyPropertyChanged("StatusText"); }
+        }
+        public ObservableCollection<CategoryInfo> Categories
+        {
+            get => categories;
+            set { categories = value; NotifyPropertyChanged("Categories"); }
+        }
 
-        public ICommand FlattenCategoryCommand { get { return flattenCategoryCommand; } }
-        public ICommand FlattenModelCommand { get { return flattenModelCommand; } }
-        public ICommand CheckAllCommand { get { return checkAllCommand; } }
-        public ICommand UncheckAllCommand { get { return uncheckAllCommand; } }
-        
+        public ICommand FlattenCategoryCommand => flattenCategoryCommand;
+        public ICommand FlattenModelCommand => flattenModelCommand;
+        public ICommand CheckAllCommand => checkAllCommand;
+        public ICommand UncheckAllCommand => uncheckAllCommand;
+
         public CommandViewModel(UIApplication uiapp)
         {
             m_app = uiapp;
             m_doc = m_app.ActiveUIDocument.Document;
 
-            flattenCategoryCommand = new RelayCommand(param => this.FlattenCategoryExecuted(param));
-            flattenModelCommand = new RelayCommand(param => this.FlattenModelExecuted(param));
-            checkAllCommand = new RelayCommand(param => this.CheckAllExecuted(param));
-            uncheckAllCommand = new RelayCommand(param => this.UncheckAllExecuted(param));
+            flattenCategoryCommand = new RelayCommand(FlattenCategoryExecuted);
+            flattenModelCommand = new RelayCommand(FlattenModelExecuted);
+            checkAllCommand = new RelayCommand(CheckAllExecuted);
+            uncheckAllCommand = new RelayCommand(UncheckAllExecuted);
 
             CollectModelCategories();
-            LogManager.SetLogPath(m_doc);
         }
 
+        /// <summary>
+        /// Collects all model categories. Skip sub-categories and excluded categories.
+        /// </summary>
         public void CollectModelCategories()
         {
             categories.Clear();
             try
             {
-                Categories categorySet = m_doc.Settings.Categories;
+                var categorySet = m_doc.Settings.Categories;
 
-                List<ElementId> filteredCatIds = ParameterFilterUtilities.GetAllFilterableCategories().ToList();
-                foreach (ElementId id in filteredCatIds)
+                var filteredCatIds = ParameterFilterUtilities.GetAllFilterableCategories().ToList();
+                foreach (var id in filteredCatIds)
                 {
                     try
                     {
-                        BuiltInCategory bltCat = (BuiltInCategory)id.IntegerValue;
+                        var bltCat = (BuiltInCategory)id.IntegerValue;
                         if (categoriesToSkip.Contains(bltCat)) { continue; }
                         if (bltCat != BuiltInCategory.INVALID)
                         {
-                            Category category = categorySet.get_Item(bltCat);
+                            var category = categorySet.get_Item(bltCat);
                             if (null != category)
                             {
                                 if (null != category.Parent) { continue; } //skip sub-categories
                                 if (category.CategoryType != CategoryType.Model) { continue; }
-                                //if (!category.HasMaterialQuantities) { continue; }
                                 if (string.IsNullOrEmpty(category.Name)) { continue; }
                                 if (!DirectShape.IsValidCategoryId(id, m_doc)) { continue; }
 
-                                CategoryInfo catInfo = new CategoryInfo(category);
+                                var catInfo = new CategoryInfo(category);
                                 catInfo.ElementIds = catInfo.GetElementIds(m_doc);
                                 if (catInfo.ElementIds.Count > 0)
                                 {
@@ -95,235 +101,155 @@ namespace HOK.ElementFlatter
                     }
                     catch (Exception ex)
                     {
-                        string message = ex.Message;
+                        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                     }
                 }
 
-                this.Categories = new ObservableCollection<CategoryInfo>(categories.OrderBy(o => o.Name).ToList());
+                Categories = new ObservableCollection<CategoryInfo>(categories.OrderBy(o => o.Name).ToList());
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect categories.\n" + ex.Message, "Collect Categories", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
-        public void FlattenCategoryExecuted(object param)
+        private void Flatten(IEnumerable<CategoryInfo> cats)
         {
-            try
+            DirectShapeCreator.shapeLibrary = DirectShapeLibrary.GetDirectShapeLibrary(m_doc);
+            foreach (var catInfo in cats)
             {
-                StringBuilder strBuilder = new StringBuilder();
-                var selectedCategories = from cat in categories where cat.IsChecked select cat;
-                if (selectedCategories.Count() > 0)
+                using (var tg = new TransactionGroup(m_doc))
                 {
-                    LogManager.ClearLog();
-                    LogManager.AppendLog(LogMessageType.INFO,"Element Flatter Started");
-
-                    DirectShapeCreator.shapeLibrary = DirectShapeLibrary.GetDirectShapeLibrary(m_doc);
-                    foreach (CategoryInfo catInfo in selectedCategories)
-                    {
-                        using (TransactionGroup tg = new TransactionGroup(m_doc))
-                        {
-                            tg.Start("Flatten " + catInfo.Name);
-                            LogManager.AppendLog(LogMessageType.INFO, "Flatten " + catInfo.Name + " Started");
-                            try
-                            {
-                                int index = categories.IndexOf(catInfo);
-                                this.StatusText = "Flattening " + catInfo.Name + "..";
-                                ProgressManager.InitializeProgress("Flattening " + catInfo.Name + "..", catInfo.ElementIds.Count);
-                                
-                                foreach (ElementId elementId in catInfo.ElementIds)
-                                {
-                                    ProgressManager.StepForward();
-                                    using (Transaction trans = new Transaction(m_doc))
-                                    {
-                                        trans.Start("Create Shape");
-                                        FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
-                                        FailureHandler failureHandler = new FailureHandler();
-                                        failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
-                                        failureHandlingOptions.SetClearAfterRollback(true);
-                                        trans.SetFailureHandlingOptions(failureHandlingOptions);
-
-                                        try
-                                        {
-                                            DirectShapeInfo shapeInfo = DirectShapeCreator.CreateDirectShapes(m_doc, catInfo, elementId);
-                                            if (null != shapeInfo)
-                                            {
-                                                categories[index].CreatedShapes.Add(shapeInfo);
-                                            }
-                                            trans.Commit();
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            string message = ex.Message;
-                                            trans.RollBack();
-                                        }
-                                    }
-                                }
-
-                                int shapesCreated = categories[index].CreatedShapes.Count;
-                                LogManager.AppendLog(LogMessageType.INFO, shapesCreated + " elements are created as DirectShape in " + catInfo.Name);
-                                tg.Assimilate();
-                            }
-                            catch (Exception ex)
-                            {
-                                tg.RollBack();
-                                string message = ex.Message;
-                            }
-                        }
-                    }
-                    ProgressManager.FinalizeProgress();
-                    LogManager.AppendLog(LogMessageType.INFO, "Finished");
-                    LogManager.WriteLog();
-
-                    CollectModelCategories();
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
-        }
-
-        public void FlattenModelExecuted(object param)
-        {
-            try
-            {
-                LogManager.ClearLog();
-                LogManager.AppendLog(LogMessageType.INFO, "Element Flatter Started");
-                bool sequenced = MakeSequenceOfCategories();
-                using (TransactionGroup tg = new TransactionGroup(m_doc))
-                {
-                    tg.Start("Flatten Model");
+                    tg.Start("Flatten " + catInfo.Name);
+                    Log.AppendLog(LogMessageType.INFO, "Flatten " + catInfo.Name + " Started");
                     try
                     {
-                        DirectShapeCreator.shapeLibrary = DirectShapeLibrary.GetDirectShapeLibrary(m_doc);
-                        foreach (CategoryInfo catInfo in categories)
+                        var index = categories.IndexOf(catInfo);
+                        StatusText = "Flattening " + catInfo.Name + "..";
+                        ProgressManager.InitializeProgress("Flattening " + catInfo.Name + "..", catInfo.ElementIds.Count);
+
+                        foreach (var elementId in catInfo.ElementIds)
                         {
-                            LogManager.AppendLog(LogMessageType.INFO, "Flatten " + catInfo.Name + " Started");
-                            int index = categories.IndexOf(catInfo);
-                            this.StatusText = "Flattening " + catInfo.Name + "..";
-                            ProgressManager.InitializeProgress("Flattening " + catInfo.Name + "..", catInfo.ElementIds.Count);
-
-                            foreach (ElementId elementId in catInfo.ElementIds)
+                            ProgressManager.StepForward();
+                            using (var trans = new Transaction(m_doc))
                             {
-                                ProgressManager.StepForward();
-                                using (Transaction trans = new Transaction(m_doc))
-                                {
-                                    trans.Start("Create Shape");
-                                    FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
-                                    FailureHandler failureHandler = new FailureHandler();
-                                    failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
-                                    failureHandlingOptions.SetClearAfterRollback(true);
-                                    trans.SetFailureHandlingOptions(failureHandlingOptions);
+                                trans.Start("Create Shape");
+                                var failureHandlingOptions = trans.GetFailureHandlingOptions();
+                                var failureHandler = new FailureHandler();
+                                failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
+                                failureHandlingOptions.SetClearAfterRollback(true);
+                                trans.SetFailureHandlingOptions(failureHandlingOptions);
 
-                                    try
+                                try
+                                {
+                                    var shapeInfo = DirectShapeCreator.CreateDirectShapes(m_doc, catInfo, elementId);
+                                    if (null != shapeInfo)
                                     {
-                                        DirectShapeInfo shapeInfo = DirectShapeCreator.CreateDirectShapes(m_doc, catInfo, elementId);
-                                        if (null != shapeInfo)
-                                        {
-                                            categories[index].CreatedShapes.Add(shapeInfo);
-                                        }
-                                        trans.Commit();
+                                        categories[index].CreatedShapes.Add(shapeInfo);
                                     }
-                                    catch (Exception ex)
-                                    {
-                                        string message = ex.Message;
-                                        trans.RollBack();
-                                    }
+                                    trans.Commit();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                                    trans.RollBack();
                                 }
                             }
-
-                            int shapesCreated = categories[index].CreatedShapes.Count;
-                            LogManager.AppendLog(LogMessageType.INFO, shapesCreated + " elements are created as DirectShape in " + catInfo.Name);
                         }
+
+                        var shapesCreated = categories[index].CreatedShapes.Count;
+                        Log.AppendLog(LogMessageType.INFO, shapesCreated + " elements are created as DirectShape in " + catInfo.Name);
                         tg.Assimilate();
                     }
                     catch (Exception ex)
                     {
+                        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                         tg.RollBack();
-                        string message = ex.Message;
-                        LogManager.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                     }
                 }
-                
-                ProgressManager.FinalizeProgress();
-                LogManager.AppendLog(LogMessageType.INFO, "Finished");
-                LogManager.WriteLog();
+            }
+            ProgressManager.FinalizeProgress();
 
-                CollectModelCategories();
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-            }
+            CollectModelCategories();
         }
 
-        private bool MakeSequenceOfCategories()
+        /// <summary>
+        /// Flatten only selected Categories.
+        /// </summary>
+        /// <param name="param"></param>
+        public void FlattenCategoryExecuted(object param)
         {
-            bool sequenced = false;
             try
             {
-                BuiltInCategory[] prioritizedCategories = new BuiltInCategory[]
-                {
-                    BuiltInCategory.OST_Rooms, BuiltInCategory.OST_Walls, BuiltInCategory.OST_Floors, BuiltInCategory.OST_Roofs, BuiltInCategory.OST_Ceilings
-                };
+                var selectedCategories = categories.Where(x => x.IsChecked).ToList();
+                if (!selectedCategories.Any()) return;
 
-                for (int i = prioritizedCategories.Length-1; i >-1; i--)
-                {
-                    var catFound = from cat in categories where cat.BltCategory == prioritizedCategories[i] select cat;
-                    if (catFound.Count() > 0)
-                    {
-                        CategoryInfo catInfo = catFound.First();
-                        categories.Remove(catInfo);
-                        categories.Insert(0,catInfo);
-                    }
-                }
-                sequenced = true;
+                Flatten(selectedCategories);
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return sequenced;
         }
 
+        /// <summary>
+        /// Flattens entire model.
+        /// </summary>
+        /// <param name="param"></param>
+        public void FlattenModelExecuted(object param)
+        {
+            try
+            {
+                Flatten(categories);
+            }
+            catch (Exception e)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Check all Categories.
+        /// </summary>
+        /// <param name="param"></param>
         public void CheckAllExecuted(object param)
         {
             try
             {
-                for (int i = 0; i < categories.Count; i++)
+                foreach (var t in categories)
                 {
-                    categories[i].IsChecked = true;
+                    t.IsChecked = true;
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
+        /// <summary>
+        /// Uncheck all Categories.
+        /// </summary>
+        /// <param name="param"></param>
         public void UncheckAllExecuted(object param)
         {
             try
             {
-                for (int i = 0; i < categories.Count; i++)
+                foreach (var t in categories)
                 {
-                    categories[i].IsChecked = false;
+                    t.IsChecked = false;
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(String info)
+        private void NotifyPropertyChanged(string info)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
     }
 }

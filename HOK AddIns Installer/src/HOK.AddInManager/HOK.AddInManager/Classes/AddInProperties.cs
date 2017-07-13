@@ -155,7 +155,7 @@ namespace HOK.AddInManager.Classes
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     

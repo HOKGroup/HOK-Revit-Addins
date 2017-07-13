@@ -43,13 +43,13 @@ namespace HOK.MissionControl.Tools.DTMTool
                 {
                     UpdaterRegistry.RegisterUpdater(this, doc);
                     RefreshTriggers(doc, pUpdater);
-                    Log.AppendLog("Registered.");
+                    Log.AppendLog(LogMessageType.INFO, "Registered.");
                     registered = true;
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return registered;
         }
@@ -65,11 +65,11 @@ namespace HOK.MissionControl.Tools.DTMTool
                 if (!UpdaterRegistry.IsUpdaterRegistered(_updaterId, doc)) return;
 
                 UpdaterRegistry.UnregisterUpdater(_updaterId, doc);
-                Log.AppendLog("DTM Updater Removed.");
+                Log.AppendLog(LogMessageType.INFO, "DTM Updater Removed.");
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -172,7 +172,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -235,7 +235,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -278,7 +278,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -299,7 +299,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -336,7 +336,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return triggerMsg;
         }
@@ -397,7 +397,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -417,7 +417,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 

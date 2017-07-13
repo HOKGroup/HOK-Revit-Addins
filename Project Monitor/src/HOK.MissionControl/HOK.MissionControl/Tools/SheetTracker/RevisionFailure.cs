@@ -23,7 +23,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     }

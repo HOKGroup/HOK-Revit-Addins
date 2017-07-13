@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Media.Imaging;
 using System.Reflection;
+using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
+using Autodesk.Revit.DB;
 
 namespace HOK.RibbonTab
 {
@@ -18,26 +20,20 @@ namespace HOK.RibbonTab
         private const string tooltipFileName = "HOK.Tooltip.txt";
         private readonly Dictionary<string, ButtonData> buttonDictionary = new Dictionary<string, ButtonData>();
 
-        Result IExternalApplication.OnShutdown(UIControlledApplication application)
-        {
-            Log.WriteLog();
-            return Result.Succeeded;
-        }
 
         Result IExternalApplication.OnStartup(UIControlledApplication application)
         {
-            Log.Initialize("HOK_Tools");
-
+            application.ControlledApplication.DocumentOpening += OnDocumentOpening;
             m_app = application;
-
             tabName = "   HOK   ";
+
             try
             {
                 m_app.CreateRibbonTab(tabName);
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
 
             currentAssembly = Assembly.GetAssembly(GetType()).Location;
@@ -52,6 +48,31 @@ namespace HOK.RibbonTab
             CreateAVFPushButtons();
             CreateMissionControlPushButtons();
 
+            return Result.Succeeded;
+        }
+
+        private static void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
+        {
+            try
+            {
+                var pathName = args.PathName;
+                if (string.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
+
+                var fileInfo = BasicFileInfo.Extract(pathName);
+                var centralPath = fileInfo.CentralPath;
+                Log.Initialize("HOK_Tools", string.IsNullOrEmpty(centralPath) ? string.Empty : centralPath);
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+        }
+
+        Result IExternalApplication.OnShutdown(UIControlledApplication application)
+        {
+            application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
+
+            Log.WriteLog();
             return Result.Succeeded;
         }
 
@@ -78,10 +99,13 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
+        /// <summary>
+        /// Creates all of the Utilities buttons.
+        /// </summary>
         private void CreateHOKPushButtons()
         {
             try
@@ -241,7 +265,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -254,10 +278,21 @@ namespace HOK.RibbonTab
 
                 if (File.Exists(currentDirectory + "/HOK.SheetManager.dll"))
                 {
-                    var pb6 = (PushButton)hokPanel.AddItem(new PushButtonData("Sheet Manager", "Sheet Manager", currentDirectory + "/HOK.SheetManager.dll", "HOK.SheetManager.cmdSheetManager"));
+                    var pb6 = (PushButton)hokPanel.AddItem(new PushButtonData("Sheet Manager", "Sheet" + Environment.NewLine + " Manager", currentDirectory + "/HOK.SheetManager.dll", "HOK.SheetManager.cmdSheetManager"));
                     pb6.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "sheetManager_32.png");
                     pb6.ToolTip = "Sheet Manager";
                     AddToolTips(pb6);
+                    fileExist = true;
+                }
+
+                if (File.Exists(currentDirectory + "/HOK.ElementFlatter.dll"))
+                {
+                    var efAssemblyPath = currentDirectory + "/HOK.ElementFlatter.dll";
+                    var pbFlatter = (PushButton) hokPanel.AddItem(new PushButtonData("FlattenCommand", "Flatten" + Environment.NewLine + "Model", efAssemblyPath, "HOK.ElementFlatter.Command"));
+                    pbFlatter.ToolTip = "Element Flatter";
+                    var efAssembly = Assembly.LoadFrom(efAssemblyPath);
+                    pbFlatter.LargeImage = ButtonUtil.LoadBitmapImage(efAssembly, "HOK.ElementFlatter", "elementFlattener_32.png");
+                    AddToolTips(pbFlatter);
                     fileExist = true;
                 }
 
@@ -304,7 +339,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -333,7 +368,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -378,14 +413,14 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
         /// <summary>
         /// Reads TXT file containing all of the Tooltip descriptions.
         /// </summary>
-        /// <param name="txtfile"></param>
+        /// <param name="txtfile">Path to Tooltips file.</param>
         private void ReadToolTips(string txtfile)
         {
             try
@@ -420,7 +455,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -437,7 +472,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -455,7 +490,7 @@ namespace HOK.RibbonTab
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return image;
         }
@@ -476,7 +511,7 @@ namespace HOK.RibbonTab
     /// </summary>
     public class Availability : IExternalCommandAvailability
     {
-        public bool IsCommandAvailable(UIApplication applicationData, Autodesk.Revit.DB.CategorySet selectedCategories)
+        public bool IsCommandAvailable(UIApplication applicationData, CategorySet selectedCategories)
         {
             return true;
         }

@@ -26,7 +26,7 @@ namespace HOK.AddInManager
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
-            Log.AppendLog("Started.");
+            Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
             {
@@ -55,10 +55,10 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
 
-            Log.AppendLog("Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
 
@@ -74,7 +74,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -95,7 +95,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     }

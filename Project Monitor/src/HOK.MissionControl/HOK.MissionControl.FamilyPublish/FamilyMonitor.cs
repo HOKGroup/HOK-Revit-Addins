@@ -89,7 +89,7 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                     catch (Exception ex)
                     {
-                        Log.AppendLog(ex.Message);
+                        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                     }
                 }
 
@@ -107,7 +107,7 @@ namespace HOK.MissionControl.FamilyPublish
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -137,9 +137,9 @@ namespace HOK.MissionControl.FamilyPublish
             {
                 File.Delete(path);
             }
-            catch (IOException e)
+            catch (IOException ex)
             {
-                Log.AppendLog("HOK.MissionControl.FamilyPublish.FamilyMonitor.TryToDelete: " + e.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 

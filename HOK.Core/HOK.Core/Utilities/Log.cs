@@ -5,6 +5,14 @@ using System.Text;
 
 namespace HOK.Core.Utilities
 {
+    /// <summary>
+    /// Indicates message type to be posted to log.
+    /// </summary>
+    public enum LogMessageType
+    {
+        NONE, INFO, WARNING, EXCEPTION, ERROR
+    }
+
     public static class Log
     {
         public static bool Initialized { get; set; }
@@ -12,7 +20,7 @@ namespace HOK.Core.Utilities
         public static string LogFilePath { get; set; } = "";
         public static StringBuilder LogBuilder { get; set; } = new StringBuilder();
 
-        public static void Initialize(string folderName)
+        public static void Initialize(string folderName, string modelPath)
         {
             LogBuilder.Clear();
             var tempFolder = Path.GetTempPath();
@@ -39,17 +47,20 @@ namespace HOK.Core.Utilities
             }
 
             LogBuilder.AppendLine("====================================================================================");
+            LogBuilder.AppendLine("Model Path: " + modelPath);
+            LogBuilder.AppendLine("====================================================================================");
+
             Initialized = true;
         }
 
-        public static void AppendLog(string msg)
+        public static void AppendLog(LogMessageType logType, string msg)
         {
             try
             {
                 var method = new StackFrame(1).GetMethod();
                 if (method.ReflectedType != null)
                 {
-                    LogBuilder.AppendLine($"{DateTime.Now} \t {method.ReflectedType.FullName}.{method.Name}: {msg}");
+                    LogBuilder.AppendLine($"{logType} \t {DateTime.Now} \t {method.ReflectedType.FullName}.{method.Name}: {msg}");
                 }
             }
             catch
@@ -58,10 +69,10 @@ namespace HOK.Core.Utilities
             }
         }
 
-    /// <summary>
-    /// Writes out the combined log string into file.
-    /// </summary>
-    public static void WriteLog()
+        /// <summary>
+        /// Writes out the combined log string into file.
+        /// </summary>
+        public static void WriteLog()
         {
             try
             {

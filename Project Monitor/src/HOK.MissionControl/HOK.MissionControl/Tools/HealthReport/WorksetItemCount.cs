@@ -58,7 +58,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     }

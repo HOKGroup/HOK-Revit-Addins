@@ -57,7 +57,7 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -93,7 +93,7 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return changed;
         }

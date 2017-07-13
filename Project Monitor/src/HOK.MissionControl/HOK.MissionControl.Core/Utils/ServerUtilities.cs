@@ -44,17 +44,17 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddUrlSegment("configid", configId);
 
                 var response = client.Execute<List<Project>>(request);
-                if (null != response.Data)
+                if (response.Data != null)
                 {
                     var items = response.Data;
                     projectFound = items.First();
 
-                    Log.AppendLog("Project Found: " + projectFound.Id);
+                    Log.AppendLog(LogMessageType.INFO, "Project Found: " + projectFound.Id);
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return projectFound;
         }
@@ -86,7 +86,7 @@ namespace HOK.MissionControl.Core.Utils
                                 StringComparison.Ordinal)) continue;
                             configFound = config;
 
-                            Log.AppendLog("Configuration Found: " + configFound.Id);
+                            Log.AppendLog(LogMessageType.INFO, "Configuration Found: " + configFound.Id);
                             break;
                         }
                     }
@@ -94,7 +94,7 @@ namespace HOK.MissionControl.Core.Utils
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return configFound;
         }
@@ -144,12 +144,12 @@ namespace HOK.MissionControl.Core.Utils
                 {
                     items = response.Data;
 
-                    Log.AppendLog(response.ResponseStatus + "-" + route);
+                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return items;
         }
@@ -175,11 +175,11 @@ namespace HOK.MissionControl.Core.Utils
                 var response = client.Execute<TriggerRecord>(request);
                 status = response.StatusCode;
 
-                Log.AppendLog(response.ResponseStatus + "-triggerrecords");
+                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-triggerrecords");
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return status;
         }
@@ -206,11 +206,11 @@ namespace HOK.MissionControl.Core.Utils
                 var response = client.Execute(request);
                 status = response.StatusCode;
 
-                Log.AppendLog(response.ResponseStatus + "-addworkset");
+                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-addworkset");
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return status;
         }
@@ -233,11 +233,11 @@ namespace HOK.MissionControl.Core.Utils
                 var response = client.Execute<T>(request);
                 resresponse = response.Data;
 
-                Log.AppendLog(response.ResponseStatus + "-" + route);
+                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return resresponse;
         }
@@ -262,11 +262,11 @@ namespace HOK.MissionControl.Core.Utils
                 restRequest.AddQueryParameter("action", action);
                 httpStatusCode = restClient.Execute(restRequest).StatusCode;
 
-                Log.AppendLog(httpStatusCode + "-sessioninfo-" + action);
+                Log.AppendLog(LogMessageType.INFO, httpStatusCode + "-sessioninfo-" + action);
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return httpStatusCode;
         }
@@ -296,12 +296,12 @@ namespace HOK.MissionControl.Core.Utils
                 {
                     output = restResponse.Data;
 
-                    Log.AppendLog(collectionName + "/" + route);
+                    Log.AppendLog(LogMessageType.INFO, collectionName + "/" + route);
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return output;
         }

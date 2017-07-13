@@ -83,7 +83,7 @@ namespace HOK.Arrowhead
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -140,7 +140,7 @@ namespace HOK.Arrowhead
                                 }
                                 catch
                                 {
-                                    Log.AppendLog("Failed to update Leader. Rolling back.");
+                                    Log.AppendLog(LogMessageType.ERROR, "Failed to update Leader. Rolling back.");
                                     t.RollBack();
                                 }
                             }
@@ -156,7 +156,7 @@ namespace HOK.Arrowhead
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 result = false;
             }
             return result;

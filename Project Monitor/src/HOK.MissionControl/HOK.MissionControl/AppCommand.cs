@@ -52,7 +52,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return Result.Succeeded;
         }
@@ -89,7 +89,7 @@ namespace HOK.MissionControl
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 //serch for config
-                Log.AppendLog(centralPath + " opening...");
+                Log.AppendLog(LogMessageType.INFO, centralPath + " opening...");
                 var configFound = ServerUtilities.GetConfigurationByCentralPath(centralPath);
                 if (null != configFound)
                 {
@@ -141,7 +141,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -162,7 +162,6 @@ namespace HOK.MissionControl
 
                 // (Konrad) Register Updaters that are in the config file.
                 SingleSessionMonitor.OpenedDocuments.Add(centralPath);
-                Log.AppendLog(centralPath + " opened.");
                 if (ConfigDictionary.ContainsKey(centralPath))
                 {
                     ApplyConfiguration(doc, ConfigDictionary[centralPath]);
@@ -188,7 +187,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -234,7 +233,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -272,7 +271,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -297,7 +296,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -333,7 +332,7 @@ namespace HOK.MissionControl
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 

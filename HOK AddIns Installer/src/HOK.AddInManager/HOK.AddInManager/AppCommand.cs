@@ -39,7 +39,7 @@ namespace HOK.AddInManager
                 }
                 catch (Exception ex)
                 {
-                    Log.AppendLog(ex.Message);
+                    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 }
 
                 versionNumber = m_app.ControlledApplication.VersionNumber;
@@ -67,7 +67,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return Result.Succeeded;
         }
@@ -105,7 +105,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -129,7 +129,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -153,7 +153,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -174,14 +174,14 @@ namespace HOK.AddInManager
                         }
                         catch (Exception ex)
                         {
-                            Log.AppendLog(ex.Message);
+                            Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -205,7 +205,7 @@ namespace HOK.AddInManager
             }
             catch (Exception ex)
             {
-                Log.AppendLog(ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     }

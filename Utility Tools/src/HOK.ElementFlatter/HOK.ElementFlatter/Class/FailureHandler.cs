@@ -1,10 +1,7 @@
-﻿using Autodesk.Revit.DB;
-using HOK.ElementFlatter.Util;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Autodesk.Revit.DB;
+using HOK.Core.Utilities;
 
 namespace HOK.ElementFlatter.Class
 {
@@ -12,40 +9,35 @@ namespace HOK.ElementFlatter.Class
     {
         public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
         {
-            IList<FailureMessageAccessor> failureMessages = failuresAccessor.GetFailureMessages();
+            var failureMessages = failuresAccessor.GetFailureMessages();
+            var needRollBack = false;
 
-            bool needRollBack = false;
-            string transactionName = failuresAccessor.GetTransactionName();
-            foreach (FailureMessageAccessor fma in failureMessages)
+            foreach (var fma in failureMessages)
             {
-                LogMessageInfo messageInfo = new LogMessageInfo();
-                try { messageInfo.Message = fma.GetDescriptionText(); }
-                catch { messageInfo.Message = "Unknown Error"; }
-
-                FailureSeverity severity = fma.GetSeverity();
+                var severity = fma.GetSeverity();
                 try
                 {
                  
-                    messageInfo.RelatedElementIds = fma.GetFailingElementIds().ToList();
+                    var items = fma.GetFailingElementIds().ToList();
 
                     if (severity == FailureSeverity.Warning)
                     {
-                        messageInfo.MessageType = LogMessageType.WARNING;
+                        Log.AppendLog(LogMessageType.WARNING, "Deleted Warning");
                         failuresAccessor.DeleteWarning(fma);
                     }
                     else if (severity == FailureSeverity.Error) 
                     {
-                        messageInfo.MessageType = LogMessageType.ERROR;
+                        Log.AppendLog(LogMessageType.ERROR, string.Join(",", items));
                         needRollBack = true;
                     }
-
-                    LogManager.AppendLog(messageInfo);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                }
             }
 
-            if (needRollBack) { return FailureProcessingResult.ProceedWithRollBack; }
-            else { return FailureProcessingResult.Continue; }
+            return needRollBack ? FailureProcessingResult.ProceedWithRollBack : FailureProcessingResult.Continue;
         }
     }
 }

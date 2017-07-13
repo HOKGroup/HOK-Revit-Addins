@@ -19,7 +19,7 @@ namespace HOK.Arrowhead
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
-            Log.AppendLog("Started.");
+            Log.AppendLog(LogMessageType.INFO, "Started.");
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
@@ -31,7 +31,7 @@ namespace HOK.Arrowhead
                 assignerWindow.Close();
             }
 
-            Log.AppendLog("Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended.");
             return Result.Succeeded;
         }
     }
