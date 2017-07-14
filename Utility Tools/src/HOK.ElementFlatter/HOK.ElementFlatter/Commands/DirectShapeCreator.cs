@@ -12,6 +12,13 @@ namespace HOK.ElementFlatter.Commands
     {
         public static DirectShapeLibrary shapeLibrary = null;
 
+        /// <summary>
+        /// Creates a Direct Shape object.
+        /// </summary>
+        /// <param name="doc">Document.</param>
+        /// <param name="catInfo">Category Info object.</param>
+        /// <param name="elementId">Element Id of object to convert.</param>
+        /// <returns></returns>
         public static DirectShapeInfo CreateDirectShapes(Document doc, CategoryInfo catInfo, ElementId elementId)
         {
             DirectShapeInfo createdShape = null;
@@ -40,6 +47,12 @@ namespace HOK.ElementFlatter.Commands
             return createdShape;
         }
 
+        /// <summary>
+        /// Creates a Direct Shape object.
+        /// </summary>
+        /// <param name="doc">Document</param>
+        /// <param name="element">Element to convert.</param>
+        /// <returns></returns>
         private static DirectShapeInfo CreateDirectShape(Document doc, Element element)
         {
             DirectShapeInfo shapeInfo = null;
@@ -118,6 +131,11 @@ namespace HOK.ElementFlatter.Commands
             return shapeInfo;
         }
 
+        /// <summary>
+        /// Extracts geometry from Element.
+        /// </summary>
+        /// <param name="geoElement">Geometry enumerator.</param>
+        /// <returns></returns>
         private static List<GeometryObject> FindElementGeometry(GeometryElement geoElement)
         {
             var geoObjects = new List<GeometryObject>();
@@ -128,15 +146,11 @@ namespace HOK.ElementFlatter.Commands
                     .ToList();
                 geoObjects.AddRange(solidGeometries);
 
-                //var meshGeometries = 
-                //var meshGeometries = from geoObj in geoElement where geoObj.GetType() == typeof(Mesh) select geoObj;
-                //if (meshGeometries.Count() > 0)
-                //{
-                //    geoObjects.AddRange(meshGeometries);
-                //}
+                var geoInstances = geoElement
+                    .Where(x => x.GetType() == typeof(GeometryInstance))
+                    .Cast<GeometryInstance>()
+                    .ToList();
 
-                var geoInstances = geoElement.Where(x => x.GetType() == typeof(GeometryInstance)).Cast<GeometryInstance>().ToList();
-                //var geoInstances = from geoObj in geoElement where geoObj.GetType() == typeof(GeometryInstance) select geoObj as GeometryInstance;
                 if (geoInstances.Any())
                 {
                     foreach (var geoInst in geoInstances)
@@ -154,11 +168,12 @@ namespace HOK.ElementFlatter.Commands
         }
 
         /// <summary>
-        /// 
+        /// Certain Categories like Stairs contain elements of different Categories, that are hosted
+        /// to them. We need to handle these approprietely. 
         /// </summary>
-        /// <param name="doc"></param>
-        /// <param name="catInfo"></param>
-        /// <param name="element"></param>
+        /// <param name="doc">Document</param>
+        /// <param name="catInfo">Category Info object.</param>
+        /// <param name="element">Element to check.</param>
         private static void RunCategoryAction(Document doc, CategoryInfo catInfo, Element element)
         {
             try

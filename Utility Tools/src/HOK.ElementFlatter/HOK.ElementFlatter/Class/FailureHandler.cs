@@ -36,7 +36,6 @@ namespace HOK.ElementFlatter.Class
                     Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 }
             }
-
             return needRollBack ? FailureProcessingResult.ProceedWithRollBack : FailureProcessingResult.Continue;
         }
     }

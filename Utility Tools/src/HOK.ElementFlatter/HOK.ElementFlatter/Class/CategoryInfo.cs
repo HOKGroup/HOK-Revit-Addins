@@ -29,6 +29,11 @@ namespace HOK.ElementFlatter.Class
             BltCategory = (BuiltInCategory)CategoryId.IntegerValue;
         }
 
+        /// <summary>
+        /// Retrieves all Elements associated with that Category except DirectShapes.
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <returns></returns>
         public List<ElementId> GetElementIds(Document doc)
         {
             var eIds = new List<ElementId>();
