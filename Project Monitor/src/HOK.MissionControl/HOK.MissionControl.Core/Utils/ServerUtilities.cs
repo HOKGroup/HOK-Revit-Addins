@@ -221,7 +221,7 @@ namespace HOK.MissionControl.Core.Utils
         /// <returns>Newly created Collection Schema with MongoDB assigned Id.</returns>
         public static T PostDataScheme<T>(T dataSchema, string route) where T : new()
         {
-            var resresponse = new T();
+            var resresponse = default(T);
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
@@ -231,9 +231,16 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddBody(dataSchema);
 
                 var response = client.Execute<T>(request);
-                resresponse = response.Data;
-
-                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
+                if (response.Data != null)
+                {
+                    resresponse = response.Data;
+                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
+                }
+                else
+                {
+                    resresponse = default(T);
+                    Log.AppendLog(LogMessageType.ERROR, response.ResponseStatus + "-" + route);
+                }
             }
             catch (Exception ex)
             {

@@ -59,5 +59,23 @@ namespace HOK.LPDCalculator.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please save the current Revit project before running the LPD Analysis..
+        /// </summary>
+        internal static string Command_FileNotSaved {
+            get {
+                return ResourceManager.GetString("Command_FileNotSaved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Not Saved.
+        /// </summary>
+        internal static string Command_FileNotSavedHeader {
+            get {
+                return ResourceManager.GetString("Command_FileNotSavedHeader", resourceCulture);
+            }
+        }
     }
 }

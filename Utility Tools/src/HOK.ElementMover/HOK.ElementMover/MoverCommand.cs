@@ -1,31 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Collections.Generic;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.ElementMover
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-
-    public class MoverCommand:IExternalCommand
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
+    public class MoverCommand : IExternalCommand
     {
-        private UIApplication m_app = null;
-        private Document m_doc = null;
+        private UIApplication m_app;
+        private Document m_doc;
 
         private Dictionary<ElementId, LinkedInstanceProperties> linkInstances = new Dictionary<ElementId, LinkedInstanceProperties>();
 
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             m_app = commandData.Application;
-           
+            m_doc = m_app.ActiveUIDocument.Document;
+            Log.AppendLog(LogMessageType.INFO, "Started");
+
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("ElementMover", m_doc));
+
             AppCommand.thisApp.ShowMover(m_app);
 
+            Log.AppendLog(LogMessageType.INFO, "Ended.");
             return Result.Succeeded;
         }
 

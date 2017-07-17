@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace HOK.ElementMover
@@ -42,7 +40,7 @@ namespace HOK.ElementMover
 
         void Initialize()
         {
-            foreach (TreeViewElementModel child in ChildrenNodes)
+            foreach (var child in ChildrenNodes)
             {
                 child.ParentNode = this;
                 child.Initialize();
@@ -68,9 +66,9 @@ namespace HOK.ElementMover
         {
             bool? state = null;
 
-            for (int i = 0; i < ChildrenNodes.Count; ++i)
+            for (var i = 0; i < ChildrenNodes.Count; ++i)
             {
-                bool? current = ChildrenNodes[i].IsChecked;
+                var current = ChildrenNodes[i].IsChecked;
                 if (i == 0)
                 {
                     state = current;
@@ -87,18 +85,18 @@ namespace HOK.ElementMover
 
         public static List<TreeViewElementModel> SetTreeView(LinkedInstanceProperties lip)
         {
-            List<TreeViewElementModel> treeView = new List<TreeViewElementModel>();
+            var treeView = new List<TreeViewElementModel>();
             try
             {
-                string[] customCategories = new string[] { "Rooms", "Levels", "Grids", "Scope Boxes" };
+                var customCategories = new string[] { "Rooms", "Levels", "Grids", "Scope Boxes" };
 
                 var categories = from linkedElement in lip.LinkedElements.Values select linkedElement.CategoryName;
                 if (categories.Count() > 0)
                 {
-                    List<string> categoryNames = categories.Distinct().ToList(); categoryNames.Sort();
-                    foreach (string categoryName in categoryNames)
+                    var categoryNames = categories.Distinct().ToList(); categoryNames.Sort();
+                    foreach (var categoryName in categoryNames)
                     {
-                        TreeViewElementModel categoryNode = new TreeViewElementModel(categoryName);
+                        var categoryNode = new TreeViewElementModel(categoryName);
                         categoryNode.NodeType = TreeViewNodeType.Category;
                         categoryNode.ToolTipVisibility = Visibility.Hidden;
                         treeView.Add(categoryNode);
@@ -109,10 +107,10 @@ namespace HOK.ElementMover
                                         where linkedElement.CategoryName == categoryName
                                         select linkedElement;
 
-                            List<LinkedElementInfo> linkedElements = elements.OrderBy(o => o.LinkDisplayText).ToList();
-                            foreach (LinkedElementInfo linkInfo in linkedElements)
+                            var linkedElements = elements.OrderBy(o => o.LinkDisplayText).ToList();
+                            foreach (var linkInfo in linkedElements)
                             {
-                                TreeViewElementModel elementNode = new TreeViewElementModel(linkInfo.LinkDisplayText);
+                                var elementNode = new TreeViewElementModel(linkInfo.LinkDisplayText);
                                 elementNode.Tag = linkInfo;
                                 elementNode.NodeType = TreeViewNodeType.ElementMapping;
                                 elementNode.Matched = linkInfo.Matched;
@@ -129,10 +127,10 @@ namespace HOK.ElementMover
                                        select linkedElement.FamilyName;
                         if (families.Count() > 0)
                         {
-                            List<string> familyNames = families.Distinct().ToList(); familyNames.Sort();
-                            foreach (string familyName in familyNames)
+                            var familyNames = families.Distinct().ToList(); familyNames.Sort();
+                            foreach (var familyName in familyNames)
                             {
-                                TreeViewElementModel familyNode = new TreeViewElementModel(familyName);
+                                var familyNode = new TreeViewElementModel(familyName);
                                 familyNode.NodeType = TreeViewNodeType.Family;
                                 familyNode.ToolTipVisibility = Visibility.Hidden;
                                 categoryNode.ChildrenNodes.Add(familyNode);
@@ -142,10 +140,10 @@ namespace HOK.ElementMover
                                                   select linkedElement.FamilyTypeName;
                                 if (familyTypes.Count() > 0)
                                 {
-                                    List<string> familyTypeNames = familyTypes.Distinct().ToList(); familyTypeNames.Sort();
-                                    foreach (string familyTypeName in familyTypeNames)
+                                    var familyTypeNames = familyTypes.Distinct().ToList(); familyTypeNames.Sort();
+                                    foreach (var familyTypeName in familyTypeNames)
                                     {
-                                        TreeViewElementModel familyTypeNode = new TreeViewElementModel(familyTypeName);
+                                        var familyTypeNode = new TreeViewElementModel(familyTypeName);
                                         familyTypeNode.NodeType = TreeViewNodeType.FamilyType;
                                         familyTypeNode.ToolTipVisibility = Visibility.Hidden;
                                         familyNode.ChildrenNodes.Add(familyTypeNode);
@@ -155,10 +153,10 @@ namespace HOK.ElementMover
                                                        select linkedElement;
                                         if (mappings.Count() > 0)
                                         {
-                                            List<LinkedElementInfo> linkedElements = mappings.OrderBy(o => o.LinkDisplayText).ToList();
-                                            foreach (LinkedElementInfo linkInfo in linkedElements)
+                                            var linkedElements = mappings.OrderBy(o => o.LinkDisplayText).ToList();
+                                            foreach (var linkInfo in linkedElements)
                                             {
-                                                TreeViewElementModel elementNode = new TreeViewElementModel(linkInfo.LinkDisplayText);
+                                                var elementNode = new TreeViewElementModel(linkInfo.LinkDisplayText);
                                                 elementNode.Tag = linkInfo;
                                                 elementNode.NodeType = TreeViewNodeType.ElementMapping;
                                                 elementNode.Matched = linkInfo.Matched;
@@ -213,7 +211,7 @@ namespace HOK.ElementMover
 
         public void Initialize()
         {
-            foreach (TreeViewFamilyModel child in ChildrenNodes)
+            foreach (var child in ChildrenNodes)
             {
                 child.ParentNode = this;
                 child.Initialize();
@@ -239,9 +237,9 @@ namespace HOK.ElementMover
         {
             bool? state = null;
 
-            for (int i = 0; i < ChildrenNodes.Count; ++i)
+            for (var i = 0; i < ChildrenNodes.Count; ++i)
             {
-                bool? current = ChildrenNodes[i].IsChecked;
+                var current = ChildrenNodes[i].IsChecked;
                 if (i == 0)
                 {
                     state = current;
@@ -258,16 +256,16 @@ namespace HOK.ElementMover
 
         public static List<TreeViewFamilyModel> SetTreeView(LinkedInstanceProperties lip)
         {
-            List<TreeViewFamilyModel> treeView = new List<TreeViewFamilyModel>();
+            var treeView = new List<TreeViewFamilyModel>();
             try
             {
                 var categories = from linkedFamily in lip.LinkedFamilies.Values select linkedFamily.CategoryName;
                 if (categories.Count() > 0)
                 {
-                    List<string> categoryNames = categories.Distinct().ToList(); categoryNames.Sort();
-                    foreach (string categoryName in categoryNames)
+                    var categoryNames = categories.Distinct().ToList(); categoryNames.Sort();
+                    foreach (var categoryName in categoryNames)
                     {
-                        TreeViewFamilyModel categoryNode = new TreeViewFamilyModel(categoryName);
+                        var categoryNode = new TreeViewFamilyModel(categoryName);
                         categoryNode.NodeType = TreeViewNodeType.Category;
                         treeView.Add(categoryNode);
 
@@ -276,8 +274,8 @@ namespace HOK.ElementMover
                                        select linkedFamily.SourceFamilyName;
                         if (families.Count() > 0)
                         {
-                            List<string> familyNames = families.Distinct().ToList(); familyNames.Sort();
-                            foreach (string familyName in familyNames)
+                            var familyNames = families.Distinct().ToList(); familyNames.Sort();
+                            foreach (var familyName in familyNames)
                             {
                                 var linkedFamilies = from linkedFamily in lip.LinkedFamilies.Values
                                                   where linkedFamily.CategoryName == categoryName && linkedFamily.SourceFamilyName == familyName
@@ -285,16 +283,16 @@ namespace HOK.ElementMover
 
                                 if (linkedFamilies.Count() > 0)
                                 {
-                                    LinkedFamilyInfo familyInfo = linkedFamilies.First();
+                                    var familyInfo = linkedFamilies.First();
 
-                                    TreeViewFamilyModel familyNode = new TreeViewFamilyModel(familyInfo.SourceFamilyName + " : " + familyInfo.TargetFamilyName);
+                                    var familyNode = new TreeViewFamilyModel(familyInfo.SourceFamilyName + " : " + familyInfo.TargetFamilyName);
                                     familyNode.NodeType = TreeViewNodeType.Family;
                                     categoryNode.ChildrenNodes.Add(familyNode);
 
-                                    List<LinkedFamilyInfo> familyTypes = linkedFamilies.OrderBy(o => o.SourceTypeName).ToList();
-                                    foreach (LinkedFamilyInfo linkedInfo in familyTypes)
+                                    var familyTypes = linkedFamilies.OrderBy(o => o.SourceTypeName).ToList();
+                                    foreach (var linkedInfo in familyTypes)
                                     {
-                                        TreeViewFamilyModel familyTypeNode = new TreeViewFamilyModel(linkedInfo.SourceTypeName + " : " + linkedInfo.TargetTypeName);
+                                        var familyTypeNode = new TreeViewFamilyModel(linkedInfo.SourceTypeName + " : " + linkedInfo.TargetTypeName);
                                         familyTypeNode.NodeType = TreeViewNodeType.FamilyType;
                                         familyTypeNode.Tag = linkedInfo;
                                         familyNode.ChildrenNodes.Add(familyTypeNode);

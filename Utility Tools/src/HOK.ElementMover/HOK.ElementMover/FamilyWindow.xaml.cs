@@ -62,7 +62,7 @@ namespace HOK.ElementMover
 
             InitializeComponent();
 
-            List<CategoryProperties> categories = selectedLink.Categories.Values.OrderBy(o => o.CategoryName).ToList();
+            var categories = selectedLink.Categories.Values.OrderBy(o => o.CategoryName).ToList();
             comboBoxCategory.ItemsSource = null;
             comboBoxCategory.ItemsSource = categories;
             comboBoxCategory.SelectedIndex = 0;
@@ -73,23 +73,23 @@ namespace HOK.ElementMover
         {
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(linkedDoc);
-                List<ElementType> sTypes = collector.OfClass(typeof(ElementType)).ToElements().Cast<ElementType>().ToList();
+                var collector = new FilteredElementCollector(linkedDoc);
+                var sTypes = collector.OfClass(typeof(ElementType)).ToElements().Cast<ElementType>().ToList();
                 var sElementTypes = from type in sTypes where null != type.Category select type;
                 sElementTypes = from type in sElementTypes where selectedLink.Categories.ContainsKey(type.Category.Id) select type;
-                foreach (ElementType eType in sElementTypes)
+                foreach (var eType in sElementTypes)
                 {
-                    ElementTypeInfo eTypeInfo = new ElementTypeInfo(eType);
+                    var eTypeInfo = new ElementTypeInfo(eType);
                     sourceTypesInfo.Add(eTypeInfo);
                 }
 
                 collector = new FilteredElementCollector(hostDoc);
-                List<ElementType> tTypes = collector.OfClass(typeof(ElementType)).ToElements().Cast<ElementType>().ToList();
+                var tTypes = collector.OfClass(typeof(ElementType)).ToElements().Cast<ElementType>().ToList();
                 var tElementTypes = from type in tTypes where null != type.Category select type;
                 tElementTypes = from type in tElementTypes where selectedLink.Categories.ContainsKey(type.Category.Id) select type;
-                foreach (ElementType eType in tElementTypes)
+                foreach (var eType in tElementTypes)
                 {
-                    ElementTypeInfo eTypeInfo = new ElementTypeInfo(eType);
+                    var eTypeInfo = new ElementTypeInfo(eType);
                     targetTypesInfo.Add(eTypeInfo);
                 }
             }
@@ -110,11 +110,11 @@ namespace HOK.ElementMover
                     comboBoxSourceType.ItemsSource = null;
                     comboBoxTargetType.ItemsSource = null;
 
-                    CategoryProperties cp = (CategoryProperties)comboBoxCategory.SelectedItem;
+                    var cp = (CategoryProperties)comboBoxCategory.SelectedItem;
                     var sourceFamilies = from stype in sourceTypesInfo where stype.CategoryName == cp.CategoryName select stype.FamilyName;
                     if (sourceFamilies.Count() > 0)
                     {
-                        List<string> sourceFamilyNames = sourceFamilies.Distinct().OrderBy(o => o).ToList();
+                        var sourceFamilyNames = sourceFamilies.Distinct().OrderBy(o => o).ToList();
                         comboBoxSourceFamily.ItemsSource = sourceFamilyNames;
                         comboBoxSourceFamily.SelectedIndex = 0;
                     }
@@ -122,7 +122,7 @@ namespace HOK.ElementMover
                     var targetFamilies = from ttype in targetTypesInfo where ttype.CategoryName == cp.CategoryName select ttype.FamilyName;
                     if (targetFamilies.Count() > 0)
                     {
-                        List<string> targetFamilyNames = targetFamilies.Distinct().OrderBy(o => o).ToList();
+                        var targetFamilyNames = targetFamilies.Distinct().OrderBy(o => o).ToList();
                         comboBoxTargetFamily.ItemsSource = targetFamilyNames;
                         comboBoxTargetFamily.SelectedIndex = 0;
                     }
@@ -141,13 +141,13 @@ namespace HOK.ElementMover
             {
                 if (null != comboBoxSourceFamily.SelectedItem)
                 {
-                    string selectedFamily = comboBoxSourceFamily.SelectedItem.ToString();
+                    var selectedFamily = comboBoxSourceFamily.SelectedItem.ToString();
                     var elementTypes = from sType in sourceTypesInfo
                                        where sType.FamilyName == selectedFamily
                                        select sType;
                     if (elementTypes.Count() > 0)
                     {
-                        List<ElementTypeInfo> types = elementTypes.OrderBy(o => o.Name).ToList();
+                        var types = elementTypes.OrderBy(o => o.Name).ToList();
                         
                         comboBoxSourceType.ItemsSource = null;
                         comboBoxSourceType.ItemsSource = types;
@@ -167,13 +167,13 @@ namespace HOK.ElementMover
             {
                 if (null != comboBoxTargetFamily.SelectedItem)
                 {
-                    string selectedFamily = comboBoxTargetFamily.SelectedItem.ToString();
+                    var selectedFamily = comboBoxTargetFamily.SelectedItem.ToString();
                     var elementTypes = from tType in targetTypesInfo
                                        where tType.FamilyName== selectedFamily
                                        select tType;
                     if (elementTypes.Count() > 0)
                     {
-                        List<ElementTypeInfo> types = elementTypes.OrderBy(o => o.Name).ToList();
+                        var types = elementTypes.OrderBy(o => o.Name).ToList();
 
                         comboBoxTargetType.ItemsSource = null;
                         comboBoxTargetType.ItemsSource = types;
@@ -194,8 +194,8 @@ namespace HOK.ElementMover
                 if (null != comboBoxCategory.SelectedItem && null != comboBoxSourceFamily.SelectedItem && null != comboBoxTargetFamily.SelectedItem
                     && null != comboBoxSourceType.SelectedItem && null != comboBoxTargetType.SelectedItem)
                 {
-                    ElementTypeInfo sourceType = (ElementTypeInfo)comboBoxSourceType.SelectedItem;
-                    ElementTypeInfo targetType = (ElementTypeInfo)comboBoxTargetType.SelectedItem;
+                    var sourceType = (ElementTypeInfo)comboBoxSourceType.SelectedItem;
+                    var targetType = (ElementTypeInfo)comboBoxTargetType.SelectedItem;
                     if (null != sourceType && null != targetType)
                     {
                         familyInfo = new LinkedFamilyInfo(selectedLink.InstanceId, sourceType, targetType);
@@ -223,7 +223,7 @@ namespace HOK.ElementMover
 
         private void SetFocus()
         {
-            IntPtr hBefore = GetForegroundWindow();
+            var hBefore = GetForegroundWindow();
             SetForegroundWindow(ComponentManager.ApplicationWindow);
             SetForegroundWindow(hBefore);
         }

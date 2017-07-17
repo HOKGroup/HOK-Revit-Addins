@@ -89,6 +89,7 @@
     <Compile Include="Utilities\Button.cs" />
     <Compile Include="Utilities\Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\RevitDocument.cs" />
     <Compile Include="Utilities\SelectionFilters.cs" />
     <Compile Include="WpfUtilities\DataGrid.cs" />
     <Compile Include="WpfUtilities\ProgressManager.cs" />

@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.DB.Structure;
 
 namespace HOK.ElementMover
 {
@@ -17,21 +14,21 @@ namespace HOK.ElementMover
         public static TextBlock statusLabel = null;
         private static StringBuilder messageBuilder = new StringBuilder();
 
-        private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
-        private delegate void UpdateStatusLabelDelegate(System.Windows.DependencyProperty dp, Object value);
+        private delegate void UpdateProgressBarDelegate(DependencyProperty dp, object value);
+        private delegate void UpdateStatusLabelDelegate(DependencyProperty dp, object value);
 
         public static LinkedInstanceProperties DuplicateSelectedCategories(LinkedInstanceProperties lip, Document recipientDoc, UpdateMode updateMode)
         {
-            LinkedInstanceProperties updatedLIP = lip;
+            var updatedLIP = lip;
             try
             {
                 messageBuilder = new StringBuilder();
-                UpdateStatusLabelDelegate updateLabelDelegate = new UpdateStatusLabelDelegate(statusLabel.SetValue);
+                var updateLabelDelegate = new UpdateStatusLabelDelegate(statusLabel.SetValue);
 
                 progressBar.Visibility = System.Windows.Visibility.Visible;
-                List<CategoryProperties> categories = lip.Categories.Values.ToList();
+                var categories = lip.Categories.Values.ToList();
                 //categories = categories.OrderBy(o => o.Priority).ToList();
-                foreach (CategoryProperties cp in categories)
+                foreach (var cp in categories)
                 {
                     if (cp.Selected)
                     {
@@ -53,30 +50,30 @@ namespace HOK.ElementMover
 
         private static LinkedInstanceProperties DuplicateElements(Document recipientDoc, LinkedInstanceProperties lip, CategoryProperties cp, UpdateMode updateMode)
         {
-            LinkedInstanceProperties updatedLIP = lip;
+            var updatedLIP = lip;
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(updatedLIP.LinkedDocument);
-                List<Element> elementsToCopy = collector.OfCategoryId(cp.CategoryId).WhereElementIsNotElementType().ToElements().ToList();
+                var collector = new FilteredElementCollector(updatedLIP.LinkedDocument);
+                var elementsToCopy = collector.OfCategoryId(cp.CategoryId).WhereElementIsNotElementType().ToElements().ToList();
 
-                UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
+                var updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
                 progressBar.Value = 0;
                 progressBar.Maximum = elementsToCopy.Count;
 
-                int duplicated = 0;
-                using (TransactionGroup tGroup = new TransactionGroup(recipientDoc))
+                var duplicated = 0;
+                using (var tGroup = new TransactionGroup(recipientDoc))
                 {
                     tGroup.Start("Duplicate Elements");
                     tGroup.IsFailureHandlingForcedModal = false;
-                    FailureHandler failureHanlder = new FailureHandler();
+                    var failureHanlder = new FailureHandler();
 
                     try
                     {
-                        CopyPasteOptions options = new CopyPasteOptions();
+                        var options = new CopyPasteOptions();
                         options.SetDuplicateTypeNamesHandler(new HideAndAcceptDuplicateTypeNamesHandler());
 
                         double value = 0;
-                        foreach (Element sourceElement in elementsToCopy) //elements from link
+                        foreach (var sourceElement in elementsToCopy) //elements from link
                         {
                             value++;
                             System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
@@ -84,18 +81,18 @@ namespace HOK.ElementMover
                             var foundElements = from element in updatedLIP.LinkedElements.Values where element.SourceUniqueId == sourceElement.UniqueId && element.SourceLinkInstanceId == updatedLIP.InstanceId select element;
                             if (foundElements.Count() > 0)
                             {
-                                LinkedElementInfo linkInfo = foundElements.First();
-                                Element linkedElement = recipientDoc.GetElement(linkInfo.LinkedElementId);
+                                var linkInfo = foundElements.First();
+                                var linkedElement = recipientDoc.GetElement(linkInfo.LinkedElementId);
                                 if (null != linkedElement)
                                 {
                                     if (linkInfo.LinkElementType == LinkType.ByMap || updateMode == UpdateMode.UpdateLocationOnly)
                                     {
                                         if (!linkInfo.Matched)
                                         {
-                                            using (Transaction trans = new Transaction(recipientDoc))
+                                            using (var trans = new Transaction(recipientDoc))
                                             {
                                                 trans.Start("Move Element");
-                                                FailureHandlingOptions failureOption = trans.GetFailureHandlingOptions();
+                                                var failureOption = trans.GetFailureHandlingOptions();
                                                 failureOption.SetForcedModalHandling(false);
                                                 failureOption.SetFailuresPreprocessor(failureHanlder);
                                                 failureOption.SetClearAfterRollback(true);
@@ -103,7 +100,7 @@ namespace HOK.ElementMover
 
                                                 try
                                                 {
-                                                    bool moved = LinkedElementInfo.MoveLocation(sourceElement, linkedElement, updatedLIP.TransformValue);
+                                                    var moved = LinkedElementInfo.MoveLocation(sourceElement, linkedElement, updatedLIP.TransformValue);
                                                     linkInfo.Matched = moved;
                                                     if (updatedLIP.LinkedElements.ContainsKey(linkedElement.Id))
                                                     {
@@ -116,7 +113,7 @@ namespace HOK.ElementMover
                                                 catch (Exception ex)
                                                 {
                                                     trans.RollBack();
-                                                    string message = ex.Message;
+                                                    var message = ex.Message;
                                                 }
                                             }
                                         }
@@ -124,10 +121,10 @@ namespace HOK.ElementMover
                                     }
                                     else if (updateMode == UpdateMode.ReplaceElements)
                                     {
-                                        using (Transaction trans = new Transaction(recipientDoc))
+                                        using (var trans = new Transaction(recipientDoc))
                                         {
                                             trans.Start("Delete Element");
-                                            FailureHandlingOptions failureOption = trans.GetFailureHandlingOptions();
+                                            var failureOption = trans.GetFailureHandlingOptions();
                                             failureOption.SetForcedModalHandling(false);
                                             failureOption.SetFailuresPreprocessor(failureHanlder);
                                             failureOption.SetClearAfterRollback(true);
@@ -135,7 +132,7 @@ namespace HOK.ElementMover
 
                                             try
                                             {
-                                                ICollection<ElementId> deletedIds = recipientDoc.Delete(linkInfo.LinkedElementId);
+                                                var deletedIds = recipientDoc.Delete(linkInfo.LinkedElementId);
                                                 if (updatedLIP.LinkedElements.ContainsKey(linkInfo.LinkedElementId))
                                                 {
                                                     updatedLIP.LinkedElements.Remove(linkInfo.LinkedElementId);
@@ -144,7 +141,7 @@ namespace HOK.ElementMover
                                             }
                                             catch (Exception ex)
                                             {
-                                                string message = ex.Message;
+                                                var message = ex.Message;
                                                 trans.RollBack();
                                             }
                                         }
@@ -152,16 +149,16 @@ namespace HOK.ElementMover
                                 }
                             }
 
-                            List<ElementId> elementIds = new List<ElementId>();
+                            var elementIds = new List<ElementId>();
                             elementIds.Add(sourceElement.Id);
                             try
                             {
                                 Element copiedElement = null;
-                                LinkType linkType = LinkType.None;
-                                using (Transaction trans = new Transaction(recipientDoc))
+                                var linkType = LinkType.None;
+                                using (var trans = new Transaction(recipientDoc))
                                 {
                                     trans.Start("Copy Element");
-                                    FailureHandlingOptions failureOption = trans.GetFailureHandlingOptions();
+                                    var failureOption = trans.GetFailureHandlingOptions();
                                     failureOption.SetForcedModalHandling(false);
                                     failureOption.SetFailuresPreprocessor(failureHanlder);
                                     failureOption.SetClearAfterRollback(true);
@@ -177,10 +174,10 @@ namespace HOK.ElementMover
                                         else
                                         {
                                             linkType = LinkType.ByCopy;
-                                            ICollection<ElementId> copiedElementIds = ElementTransformUtils.CopyElements(updatedLIP.LinkedDocument, elementIds, recipientDoc, updatedLIP.TransformValue, options);
+                                            var copiedElementIds = ElementTransformUtils.CopyElements(updatedLIP.LinkedDocument, elementIds, recipientDoc, updatedLIP.TransformValue, options);
                                             if (copiedElementIds.Count > 0)
                                             {
-                                                ElementId copiedElementId = copiedElementIds.First();
+                                                var copiedElementId = copiedElementIds.First();
                                                 copiedElement = recipientDoc.GetElement(copiedElementId);
                                             }
                                         }
@@ -189,16 +186,16 @@ namespace HOK.ElementMover
                                     catch (Exception ex)
                                     {
                                         trans.RollBack();
-                                        string message = ex.Message;
+                                        var message = ex.Message;
                                     }
                                 }
 
                                 if (null != copiedElement)
                                 {
-                                    using (Transaction trans = new Transaction(recipientDoc))
+                                    using (var trans = new Transaction(recipientDoc))
                                     {
                                         trans.Start("Update Link Info");
-                                        FailureHandlingOptions failureOption = trans.GetFailureHandlingOptions();
+                                        var failureOption = trans.GetFailureHandlingOptions();
                                         failureOption.SetForcedModalHandling(false);
                                         failureOption.SetFailuresPreprocessor(failureHanlder);
                                         failureOption.SetClearAfterRollback(true);
@@ -206,13 +203,13 @@ namespace HOK.ElementMover
 
                                         try
                                         {
-                                            LinkedElementInfo linkInfo = new LinkedElementInfo(linkType, sourceElement, copiedElement, updatedLIP.InstanceId, updatedLIP.TransformValue);
+                                            var linkInfo = new LinkedElementInfo(linkType, sourceElement, copiedElement, updatedLIP.InstanceId, updatedLIP.TransformValue);
                                             if (!linkInfo.Matched)
                                             {
-                                                bool moved = LinkedElementInfo.MoveLocation(sourceElement, copiedElement, updatedLIP.TransformValue);
+                                                var moved = LinkedElementInfo.MoveLocation(sourceElement, copiedElement, updatedLIP.TransformValue);
                                                 linkInfo.Matched = moved;
                                             }
-                                            bool updated = MoverDataStorageUtil.UpdateLinkedElementInfo(linkInfo, copiedElement);
+                                            var updated = MoverDataStorageUtil.UpdateLinkedElementInfo(linkInfo, copiedElement);
                                             if (!updatedLIP.LinkedElements.ContainsKey(linkInfo.LinkedElementId))
                                             {
                                                 updatedLIP.LinkedElements.Add(linkInfo.LinkedElementId, linkInfo);
@@ -223,14 +220,14 @@ namespace HOK.ElementMover
                                         catch (Exception ex)
                                         {
                                             trans.RollBack();
-                                            string message = ex.Message;
+                                            var message = ex.Message;
                                         }
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                string message = ex.Message;
+                                var message = ex.Message;
                             }
                         }
 
@@ -271,17 +268,17 @@ namespace HOK.ElementMover
                                  select sType;
                 if (foundTypes.Count() > 0)
                 {
-                    LinkedFamilyInfo familyInfo = foundTypes.First();
-                    ElementType targetType = recipientDoc.GetElement(familyInfo.TargetTypeId) as ElementType;
+                    var familyInfo = foundTypes.First();
+                    var targetType = recipientDoc.GetElement(familyInfo.TargetTypeId) as ElementType;
                     if (null != targetType)
                     {
                         if (sourceElement is FamilyInstance && targetType is FamilySymbol)
                         {
-                            FamilyInstance sourceInstance = sourceElement as FamilyInstance;
-                            FamilySymbol targetSymbol = targetType as FamilySymbol;
+                            var sourceInstance = sourceElement as FamilyInstance;
+                            var targetSymbol = targetType as FamilySymbol;
                             if (!targetSymbol.IsActive) { targetSymbol.Activate(); }
 
-                            Location location = sourceInstance.Location;
+                            var location = sourceInstance.Location;
                             if (null != location)
                             {
                                 Element hostElement = null;
@@ -293,7 +290,7 @@ namespace HOK.ElementMover
 
                                     if (hostFound.Count() > 0)
                                     {
-                                        LinkedElementInfo linkedElementInfo = hostFound.First();
+                                        var linkedElementInfo = hostFound.First();
                                         hostElement = recipientDoc.GetElement(linkedElementInfo.LinkedElementId);
                                     }
                                 }
@@ -305,15 +302,15 @@ namespace HOK.ElementMover
                                                      select level;
                                     if (levelFound.Count() > 0)
                                     {
-                                        LinkedElementInfo linkedElementInfo = levelFound.First();
+                                        var linkedElementInfo = levelFound.First();
                                         hostLevel = recipientDoc.GetElement(linkedElementInfo.LinkedElementId) as Level;
                                     }
                                 }
 
                                 if (location is LocationPoint)
                                 {
-                                    LocationPoint locationPt = location as LocationPoint;
-                                    XYZ point = locationPt.Point;
+                                    var locationPt = location as LocationPoint;
+                                    var point = locationPt.Point;
                                     point = lip.TransformValue.OfPoint(point);
 
                                     if (null != hostElement && null != hostLevel)
@@ -335,8 +332,8 @@ namespace HOK.ElementMover
                                 }
                                 else if (location is LocationCurve)
                                 {
-                                    LocationCurve locationCv = location as LocationCurve;
-                                    Curve curve = locationCv.Curve;
+                                    var locationCv = location as LocationCurve;
+                                    var curve = locationCv.Curve;
                                     curve = curve.CreateTransformed(lip.TransformValue);
                                     //check existing level mapping
                                     if (null != hostLevel)
@@ -349,12 +346,12 @@ namespace HOK.ElementMover
                         else
                         {
                             //System Families : Copy Element and change type
-                            List<ElementId> elementIds = new List<ElementId>();
+                            var elementIds = new List<ElementId>();
                             elementIds.Add(sourceElement.Id);
-                            ICollection<ElementId> copiedElementIds = ElementTransformUtils.CopyElements(lip.LinkedDocument, elementIds, recipientDoc, lip.TransformValue, options);
+                            var copiedElementIds = ElementTransformUtils.CopyElements(lip.LinkedDocument, elementIds, recipientDoc, lip.TransformValue, options);
                             if (copiedElementIds.Count > 0)
                             {
-                                ElementId copiedElementId = copiedElementIds.First();
+                                var copiedElementId = copiedElementIds.First();
                                 copiedElement = recipientDoc.GetElement(copiedElementId);
                                 if(copiedElement.CanHaveTypeAssigned())
                                 {
@@ -377,34 +374,34 @@ namespace HOK.ElementMover
             FamilyInstance placedInstance = null;
             try
             {
-                FamilyInstance sourceInstance = sourceElement as FamilyInstance;
+                var sourceInstance = sourceElement as FamilyInstance;
                 if (null != sourceInstance)
                 {
-                    FamilySymbol sourceSymbol = sourceInstance.Symbol;
+                    var sourceSymbol = sourceInstance.Symbol;
                     var foundSymbols = from symbol in lip.LinkedFamilies.Values
                                        where symbol.SourceLinkInstanceId == lip.InstanceId && symbol.SourceTypeId == sourceSymbol.Id
                                        select symbol;
 
                     if (foundSymbols.Count() > 0)
                     {
-                        LinkedFamilyInfo linkedFamilyInfo = foundSymbols.First();
-                        FamilySymbol targetSymbol = recipientDoc.GetElement(linkedFamilyInfo.TargetTypeId) as FamilySymbol;
+                        var linkedFamilyInfo = foundSymbols.First();
+                        var targetSymbol = recipientDoc.GetElement(linkedFamilyInfo.TargetTypeId) as FamilySymbol;
                         if (null != targetSymbol)
                         {
-                            Location location = sourceInstance.Location;
+                            var location = sourceInstance.Location;
                             if (null != location)
                             {
                                 if (location is LocationPoint)
                                 {
-                                    LocationPoint locationPt = location as LocationPoint;
-                                    XYZ point = locationPt.Point;
+                                    var locationPt = location as LocationPoint;
+                                    var point = locationPt.Point;
                                     point = lip.TransformValue.OfPoint(point);
                                     placedInstance = recipientDoc.Create.NewFamilyInstance(point, targetSymbol, sourceInstance.StructuralType);
                                 }
                                 else if (location is LocationCurve)
                                 {
-                                    LocationCurve locationCv = location as LocationCurve;
-                                    Curve curve = locationCv.Curve;
+                                    var locationCv = location as LocationCurve;
+                                    var curve = locationCv.Curve;
                                     curve = curve.CreateTransformed(lip.TransformValue);
 
                                 }
@@ -452,15 +449,15 @@ namespace HOK.ElementMover
         public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
         {
 
-            IList<FailureMessageAccessor> failureMessages = failuresAccessor.GetFailureMessages();
+            var failureMessages = failuresAccessor.GetFailureMessages();
             //if (failureMessages.Count == 0) { return FailureProcessingResult.Continue; }
 
-            bool needRollBack = false;
-            foreach (FailureMessageAccessor fma in failureMessages)
+            var needRollBack = false;
+            foreach (var fma in failureMessages)
             {
-                FailureMessageInfo messageInfo = new FailureMessageInfo();
+                var messageInfo = new FailureMessageInfo();
                 
-                FailureSeverity severity = fma.GetSeverity();
+                var severity = fma.GetSeverity();
                 try
                 {
                     if (severity == FailureSeverity.Warning)

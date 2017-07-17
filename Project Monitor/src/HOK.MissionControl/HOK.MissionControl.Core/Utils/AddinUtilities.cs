@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 
 namespace HOK.MissionControl.Core.Utils
@@ -7,19 +9,27 @@ namespace HOK.MissionControl.Core.Utils
     {
         public static void PublishAddinLog<T>(T addinLog) where T: new()
         {
-            var collections = ServerUtilities.GetCollection(new AddinData(), "addins");
-            var c = collections.FirstOrDefault();
-            var collectionId = "";
-            if (c != null)
+            try
             {
-                collectionId = c.Id;
-            }
-            if (collections.Count == 0)
-            {
-                collectionId = ServerUtilities.PostDataScheme(new AddinData(), "addins").Id;
-            }
+                var collections = ServerUtilities.GetCollection(new AddinData(), "addins");
+                var c = collections.FirstOrDefault();
+                var collectionId = "";
+                if (c != null)
+                {
+                    collectionId = c.Id;
+                }
+                if (collections.Count == 0)
+                {
+                    collectionId = ServerUtilities.PostDataScheme(new AddinData(), "addins").Id;
+                }
 
-            ServerUtilities.PostToMongoDB(addinLog, "addins", collectionId, "addlog");
+                ServerUtilities.PostToMongoDB(addinLog, "addins", collectionId, "addlog");
+            }
+            catch (Exception e)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+            }
+            
         }
     }
 }

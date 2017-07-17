@@ -1,53 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.DB;
-using System.Windows.Forms;
-using System.IO;
 using System.Data;
+using System.IO;
+using System.Linq;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
 
 namespace HOK.LPDCalculator.Schedule
 {
     public class ScheduleDataManager
     {
-        private UIApplication m_app;
-        private Document m_doc;
-        private CalculationTypes calculationType;
-        private ViewSchedule selectedSchedule;
-        private string extension = ".txt";
-        private string txtPath = "";
-        private DataTable scheduleData = null;
-        private string areaUnit = "SF";
-        private string lpdUnit = "W/ft²";
-        private string loadUnit = "VA";
-        private Dictionary<string/*fieldName*/, FieldProperties> fieldDictionary = new Dictionary<string, FieldProperties>();
+        private readonly UIApplication m_app;
+        private readonly Document m_doc;
+        private readonly CalculationTypes calculationType;
+        private const string extension = ".txt";
+        private const string areaUnit = "SF";
+        private const string lpdUnit = "W/ft²";
+        private const string loadUnit = "VA";
+        private readonly Dictionary<string/*fieldName*/, FieldProperties> fieldDictionary = new Dictionary<string, FieldProperties>();
+        private readonly string[] buildingAreaFields = { "ASHRAE LPD Category (BAM)", "ASHRAE Allowable LPD_BAM", "25% Below ASHRAE_BAM", "ActualLightingLoad", "Area" };
+        private readonly string[] spaceBySpaceFields = { "AllowableLightingLoad ", "ActualLightingLoad", "Area" };
+        public ViewSchedule SelectedSchedule { get; set; }
+        public string TextFilePath { get; set; } = "";
+        public DataTable ScheduleData { get; set; }
 
-        private string[] buildingAreaFields = new string[] { "ASHRAE LPD Category (BAM)", "ASHRAE Allowable LPD_BAM", "25% Below ASHRAE_BAM", "ActualLightingLoad", "Area" };
-        private string[] spaceBySpaceFields = new string[] { "AllowableLightingLoad ", "ActualLightingLoad", "Area" };
-
-        public ViewSchedule SelectedSchedule { get { return selectedSchedule; } set { selectedSchedule = value; } }
-        public string TextFilePath { get { return txtPath; } set { txtPath = value; } }
-        public DataTable ScheduleData { get { return scheduleData; } set { scheduleData = value; } }
-        
         public ScheduleDataManager(UIApplication uiapp, CalculationTypes calType)
         {
             m_app = uiapp;
             m_doc = m_app.ActiveUIDocument.Document;
             calculationType = calType;
-            selectedSchedule = FindViewSchedule(calculationType);
-            if (null != selectedSchedule)
-            {
-                if (ValidateViewSchedule(selectedSchedule))
-                {
-                    if (ExportViewSchedule(selectedSchedule))
-                    {
-                        scheduleData = GetScheduleDataTable();
-                        RestoreFields(selectedSchedule);
-                    }
-                }
-            }
+            SelectedSchedule = FindViewSchedule(calculationType);
+            if (null == SelectedSchedule) return;
+            if (!ValidateViewSchedule(SelectedSchedule)) return;
+            if (!ExportViewSchedule(SelectedSchedule)) return;
+
+            ScheduleData = GetScheduleDataTable();
+            RestoreFields(SelectedSchedule);
         }
 
         private ViewSchedule FindViewSchedule(CalculationTypes calType)
@@ -55,75 +44,79 @@ namespace HOK.LPDCalculator.Schedule
             ViewSchedule viewSchedule=null;
             try
             {
-                string viewName = "";
-                if (calType == CalculationTypes.BuildingArea)
+                var viewName = "";
+                switch (calType)
                 {
-                    viewName = "LPD (BUILDING AREA METHOD)";
-                }
-                else if (calType == CalculationTypes.SpaceBySpace)
-                {
-                    viewName = "LPD (SPACE BY SPACE METHOD)";
+                    case CalculationTypes.BuildingArea:
+                        viewName = "LPD (BUILDING AREA METHOD)";
+                        break;
+                    case CalculationTypes.SpaceBySpace:
+                        viewName = "LPD (SPACE BY SPACE METHOD)";
+                        break;
                 }
 
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc).OfClass(typeof(ViewSchedule));
-                foreach (ViewSchedule vs in collector)
+                var collector = new FilteredElementCollector(m_doc).OfClass(typeof(ViewSchedule));
+                foreach (var element in collector)
                 {
-                    if (vs.ViewName == viewName)
-                    {
-                        viewSchedule = vs;
-                        break;
-                    }
+                    var vs = (ViewSchedule) element;
+                    if (vs.ViewName != viewName) continue;
+
+                    viewSchedule = vs;
+                    break;
                 }
 
                 return viewSchedule;
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("LPD schedule was not found.", "Not Found Schedule", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return viewSchedule;
             }
         }
 
         private bool ExportViewSchedule(ViewSchedule viewSchedule)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                ViewScheduleExportOptions options = new ViewScheduleExportOptions();
-                options.ColumnHeaders = ExportColumnHeaders.OneRow;
-#if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
-                options.Title = false;
-#endif
+                var options = new ViewScheduleExportOptions
+                {
+                    ColumnHeaders = ExportColumnHeaders.OneRow,
+                    Title = false
+                };
 
-                string centralPath = GetCentralPath(m_doc);
+                var centralPath = GetCentralPath(m_doc);
                 if (!string.IsNullOrEmpty(centralPath))
                 {
-                    string directoryName = Path.GetDirectoryName(centralPath);
-                    using (Transaction trans = new Transaction(m_doc))
+                    var directoryName = Path.GetDirectoryName(centralPath);
+                    using (var trans = new Transaction(m_doc))
                     {
                         try
                         {
                             trans.Start("Export Schedule");
-                            txtPath = Path.Combine(directoryName, viewSchedule.Name + extension);
-                            if (File.Exists(txtPath))
+                            if (directoryName != null)
                             {
-                                File.Delete(txtPath);
+                                TextFilePath = Path.Combine(directoryName, viewSchedule.Name + extension);
+                                if (File.Exists(TextFilePath))
+                                {
+                                    File.Delete(TextFilePath);
+                                }
+                                viewSchedule.Export(directoryName, viewSchedule.Name + extension, options);
                             }
-                            viewSchedule.Export(directoryName, viewSchedule.Name + extension, options);
                             trans.Commit();
                         }
                         catch { trans.RollBack(); }
                     }
                 }
 
-                if (File.Exists(txtPath))
+                if (File.Exists(TextFilePath))
                 {
                     result = true;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(viewSchedule.Name+": Failed to export the selected schedule.\n"+ex.Message, "Export Schedule", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 result = false;
             }
             return result;
@@ -131,14 +124,14 @@ namespace HOK.LPDCalculator.Schedule
 
         private bool ValidateViewSchedule(ViewSchedule viewSchedule)
         {
-            bool result = false;
-            using (Transaction trans = new Transaction(m_doc))
+            bool result;
+            using (var trans = new Transaction(m_doc))
             {
                 trans.Start("Check Validation of Schedule Definition");
                 try
                 {
-                    string[] requiredFields = new string[] { };
-                    ScheduleDefinition definition = viewSchedule.Definition;
+                    var requiredFields = new string[] { };
+                    var definition = viewSchedule.Definition;
                     if (null != definition)
                     {
                         if (calculationType == CalculationTypes.BuildingArea)
@@ -154,39 +147,38 @@ namespace HOK.LPDCalculator.Schedule
                             requiredFields = spaceBySpaceFields;
                         }
 
-                        int count = definition.GetFieldCount();
-                        for (int i = 0; i < count; i++)
+                        var count = definition.GetFieldCount();
+                        for (var i = 0; i < count; i++)
                         {
-                            ScheduleField field = definition.GetField(i);
-                            string fieldName = field.GetName();
+                            var field = definition.GetField(i);
+                            var fieldName = field.GetName();
                             if (!fieldDictionary.ContainsKey(fieldName))
                             {
-                                FieldProperties fp = new FieldProperties();
-                                fp.ColumnHeading = field.ColumnHeading;
-#if RELEASE2017
-                                fp.HasTotals = (field.DisplayType == ScheduleFieldDisplayType.Totals) ? true : false;
+                                var fp = new FieldProperties
+                                {
+                                    ColumnHeading = field.ColumnHeading,
+                                    HasTotals = field.DisplayType == ScheduleFieldDisplayType.Totals,
+                                    IsHidden = field.IsHidden
+                                };
+#if RELEASE2017 || RELEASE2018
 #else
                                 fp.HasTotals = field.HasTotals;
 #endif
-
-                                fp.IsHidden = field.IsHidden;
                                 fieldDictionary.Add(fieldName, fp);
                             }
-                           
-                            if (requiredFields.Contains(fieldName))
+
+                            if (!requiredFields.Contains(fieldName)) continue;
+
+                            if (fieldName.Contains("ASHRAE Allowable LPD") || fieldName.Contains("25% Below ASHRAE"))
                             {
-                                if (fieldName.Contains("ASHRAE Allowable LPD") || fieldName.Contains("25% Below ASHRAE"))
-                                {
-                                    continue;
-                                }
-#if RELEASE2017
-                                if (field.CanTotal()) { field.DisplayType = ScheduleFieldDisplayType.Totals; }
+                                continue;
+                            }
+#if RELEASE2017 || RELEASE2018
+                            if (field.CanTotal()) { field.DisplayType = ScheduleFieldDisplayType.Totals; }
 #else
                                 if (field.CanTotal()) { field.HasTotals = true; }
 #endif
-
-                                field.IsHidden = false;
-                            }
+                            field.IsHidden = false;
                         }
                     }
                     trans.Commit();
@@ -203,26 +195,25 @@ namespace HOK.LPDCalculator.Schedule
 
         private void RestoreFields(ViewSchedule viewSchedule)
         {
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(m_doc))
             {
                 trans.Start("Restore Fields");
                 try
                 {
-                    ScheduleDefinition definition = viewSchedule.Definition;
-                    int count = definition.GetFieldCount();
-                    for (int i = 0; i < count; i++)
+                    var definition = viewSchedule.Definition;
+                    var count = definition.GetFieldCount();
+                    for (var i = 0; i < count; i++)
                     {
-                        ScheduleField field = definition.GetField(i);
-                        string fieldName = field.GetName();
+                        var field = definition.GetField(i);
+                        var fieldName = field.GetName();
                         if (fieldDictionary.ContainsKey(fieldName))
                         {
-                            FieldProperties originalField = fieldDictionary[fieldName];
-#if RELEASE2017
-                            if (field.CanTotal()) { field.DisplayType = (originalField.HasTotals) ? ScheduleFieldDisplayType.Totals : ScheduleFieldDisplayType.Standard; }
+                            var originalField = fieldDictionary[fieldName];
+#if RELEASE2017 || RELEASE2018
+                            if (field.CanTotal()) { field.DisplayType = originalField.HasTotals ? ScheduleFieldDisplayType.Totals : ScheduleFieldDisplayType.Standard; }
 #else
                             if (field.CanTotal()) { field.HasTotals = originalField.HasTotals; }
 #endif
-
                             field.IsHidden = originalField.IsHidden;
                         }
                     }
@@ -230,8 +221,8 @@ namespace HOK.LPDCalculator.Schedule
                 }
                 catch (Exception ex)
                 {
+                    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                     trans.RollBack();
-                    MessageBox.Show("Failed to restore fields settings.\n" + ex.Message, "Restore Schedule Fields", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }
@@ -241,34 +232,26 @@ namespace HOK.LPDCalculator.Schedule
             DataTable dataTable = null;
             try
             {
-                ScheduleDataParser parser = new ScheduleDataParser(txtPath);
+                var parser = new ScheduleDataParser(TextFilePath);
                 dataTable = parser.Table;
             }
-            catch
+            catch (Exception ex)
             {
-                MessageBox.Show("Failed to get the data table from the exported schedule.\n"+txtPath, "Schedule Data Table", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return dataTable;
         }
 
         private string GetCentralPath(Document doc)
         {
-            string docCentralPath = "";
+            string docCentralPath;
             try
             {
                 if (doc.IsWorkshared)
                 {
-                    ModelPath modelPath = doc.GetWorksharingCentralModelPath();
-                    string centralPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
-                    if (!string.IsNullOrEmpty(centralPath))
-                    {
-                        docCentralPath = centralPath;
-                    }
-                    else
-                    {
-                        //detached
-                        docCentralPath = doc.PathName;
-                    }
+                    var modelPath = doc.GetWorksharingCentralModelPath();
+                    var centralPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
+                    docCentralPath = !string.IsNullOrEmpty(centralPath) ? centralPath : doc.PathName;
                 }
                 else
                 {
@@ -277,7 +260,7 @@ namespace HOK.LPDCalculator.Schedule
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 docCentralPath = doc.PathName;
             }
             return docCentralPath;
@@ -285,7 +268,7 @@ namespace HOK.LPDCalculator.Schedule
 
         private string GetHeaderText(string fieldName)
         {
-            string header = "";
+            var header = "";
             if (fieldDictionary.ContainsKey(fieldName))
             {
                 header = fieldDictionary[fieldName].ColumnHeading;
@@ -298,24 +281,30 @@ namespace HOK.LPDCalculator.Schedule
             double allowableLoad = 0;
             try
             {
-                string headerText = GetHeaderText("AllowableLightingLoad");
-                string strValue = scheduleData.Rows[scheduleData.Rows.Count - 1][headerText].ToString();
+                var headerText = GetHeaderText("AllowableLightingLoad");
+                var strValue = ScheduleData.Rows[ScheduleData.Rows.Count - 1][headerText].ToString();
                 strValue = strValue.Replace(loadUnit, "");
                 double.TryParse(strValue, out allowableLoad);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return allowableLoad;
         }
 
         public string GetLPDCategoryBAM()
         {
-            string categoryName = "";
+            var categoryName = "";
             try
             {
-                string headerText = GetHeaderText("ASHRAE LPD Category (BAM)");
-                categoryName = scheduleData.Rows[scheduleData.Rows.Count - 2][headerText].ToString();
+                var headerText = GetHeaderText("ASHRAE LPD Category (BAM)");
+                categoryName = ScheduleData.Rows[ScheduleData.Rows.Count - 2][headerText].ToString();
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return categoryName;
         }
 
@@ -324,12 +313,15 @@ namespace HOK.LPDCalculator.Schedule
             double allowableLPD = 0;
             try
             {
-                string headerText = GetHeaderText("ASHRAE Allowable LPD_BAM");
-                string strValue = scheduleData.Rows[scheduleData.Rows.Count - 2][headerText].ToString();
+                var headerText = GetHeaderText("ASHRAE Allowable LPD_BAM");
+                var strValue = ScheduleData.Rows[ScheduleData.Rows.Count - 2][headerText].ToString();
                 strValue = strValue.Replace(lpdUnit, "");
                 double.TryParse(strValue, out allowableLPD);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return allowableLPD;
         }
 
@@ -338,12 +330,15 @@ namespace HOK.LPDCalculator.Schedule
             double allowableLPD = 0;
             try
             {
-                string headerText = GetHeaderText("25% Below ASHRAE_BAM");
-                string strValue = scheduleData.Rows[scheduleData.Rows.Count - 2][headerText].ToString();
+                var headerText = GetHeaderText("25% Below ASHRAE_BAM");
+                var strValue = ScheduleData.Rows[ScheduleData.Rows.Count - 2][headerText].ToString();
                 strValue = strValue.Replace(lpdUnit, "");
                 double.TryParse(strValue, out allowableLPD);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return allowableLPD;
         }
 
@@ -352,12 +347,15 @@ namespace HOK.LPDCalculator.Schedule
             double actualLightingLoad = 0;
             try
             {
-                string headerText = GetHeaderText("ActualLightingLoad");
-                string strValue = scheduleData.Rows[scheduleData.Rows.Count - 1][headerText].ToString();
+                var headerText = GetHeaderText("ActualLightingLoad");
+                var strValue = ScheduleData.Rows[ScheduleData.Rows.Count - 1][headerText].ToString();
                 strValue = strValue.Replace(loadUnit, "");
                 double.TryParse(strValue, out actualLightingLoad);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return actualLightingLoad;
         }
 
@@ -366,12 +364,15 @@ namespace HOK.LPDCalculator.Schedule
             double area = 0;
             try
             {
-                string headerText = GetHeaderText("Area");
-                string areaValue = scheduleData.Rows[scheduleData.Rows.Count - 1][headerText].ToString();
+                var headerText = GetHeaderText("Area");
+                var areaValue = ScheduleData.Rows[ScheduleData.Rows.Count - 1][headerText].ToString();
                 areaValue = areaValue.Replace(areaUnit, "");
                 double.TryParse(areaValue, out area);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return area;
         }
 
@@ -380,12 +381,15 @@ namespace HOK.LPDCalculator.Schedule
             double savings = 0;
             try
             {
-                string headerText = GetHeaderText("Savings/Overage");
-                string strValue = scheduleData.Rows[scheduleData.Rows.Count - 1][headerText].ToString();
+                var headerText = GetHeaderText("Savings/Overage");
+                var strValue = ScheduleData.Rows[ScheduleData.Rows.Count - 1][headerText].ToString();
                 strValue = strValue.Replace(loadUnit, "");
                 double.TryParse(strValue, out savings);
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
             return savings;
         }
 

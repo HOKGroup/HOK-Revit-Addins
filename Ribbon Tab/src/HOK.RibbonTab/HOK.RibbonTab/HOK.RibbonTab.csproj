@@ -139,7 +139,6 @@
     <EmbeddedResource Include="Resources\tooltip.png" />
     <EmbeddedResource Include="Resources\workset.png" />
     <EmbeddedResource Include="Resources\viewTooltip.png" />
-    <EmbeddedResource Include="Resources\bulb.png" />
     <EmbeddedResource Include="Resources\cube.png" />
     <EmbeddedResource Include="Resources\finish.png" />
     <EmbeddedResource Include="Resources\height.png" />

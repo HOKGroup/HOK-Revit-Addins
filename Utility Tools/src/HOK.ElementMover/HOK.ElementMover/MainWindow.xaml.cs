@@ -56,7 +56,7 @@ namespace HOK.ElementMover
 
             this.Title = "Element Mover v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             
-            List<LinkedInstanceProperties> instanceList = linkInstances.Values.OrderBy(o => o.DisplayName).ToList();
+            var instanceList = linkInstances.Values.OrderBy(o => o.DisplayName).ToList();
             comboBoxLinkModel.ItemsSource = instanceList;
             comboBoxLinkModel.DisplayMemberPath = "DisplayName";
             comboBoxLinkModel.SelectedIndex = 0;
@@ -67,7 +67,7 @@ namespace HOK.ElementMover
 
         private void SetFocus()
         {
-            IntPtr hBefore = GetForegroundWindow();
+            var hBefore = GetForegroundWindow();
             SetForegroundWindow(ComponentManager.ApplicationWindow);
             SetForegroundWindow(hBefore);
         }
@@ -80,7 +80,7 @@ namespace HOK.ElementMover
                 {
                     selectedLink = (LinkedInstanceProperties)comboBoxLinkModel.SelectedItem;
                     m_handler.SelectedLink = selectedLink;
-                    List<CategoryProperties> catList = selectedLink.Categories.Values.OrderBy(o => o.CategoryName).ToList();
+                    var catList = selectedLink.Categories.Values.OrderBy(o => o.CategoryName).ToList();
                     dataGridCategory.ItemsSource = catList;
                 }
             }
@@ -94,10 +94,10 @@ namespace HOK.ElementMover
         {
             try
             {
-                List<LinkedInstanceProperties> instanceList = (List<LinkedInstanceProperties>)comboBoxLinkModel.ItemsSource;
+                var instanceList = (List<LinkedInstanceProperties>)comboBoxLinkModel.ItemsSource;
                 if (instanceList.Count > 0)
                 {
-                    for (int i = 0; i < instanceList.Count; i++)
+                    for (var i = 0; i < instanceList.Count; i++)
                     {
                         if (instanceList[i].InstanceId == lip.InstanceId)
                         {
@@ -117,9 +117,9 @@ namespace HOK.ElementMover
         {
             try
             {
-                List<CategoryProperties> catList = (List<CategoryProperties>)dataGridCategory.ItemsSource;
-                List<CategoryProperties> updatedList = new List<CategoryProperties>();
-                foreach (CategoryProperties cp in catList)
+                var catList = (List<CategoryProperties>)dataGridCategory.ItemsSource;
+                var updatedList = new List<CategoryProperties>();
+                foreach (var cp in catList)
                 {
                     cp.Selected = true;
                     updatedList.Add(cp);
@@ -137,9 +137,9 @@ namespace HOK.ElementMover
         {
             try
             {
-                List<CategoryProperties> catList = (List<CategoryProperties>)dataGridCategory.ItemsSource;
-                List<CategoryProperties> updatedList = new List<CategoryProperties>();
-                foreach (CategoryProperties cp in catList)
+                var catList = (List<CategoryProperties>)dataGridCategory.ItemsSource;
+                var updatedList = new List<CategoryProperties>();
+                foreach (var cp in catList)
                 {
                     cp.Selected = false;
                     updatedList.Add(cp);
@@ -167,13 +167,13 @@ namespace HOK.ElementMover
             {
                 if (null != selectedLink)
                 {
-                    List<CategoryProperties> catList = (List<CategoryProperties>)dataGridCategory.ItemsSource;
+                    var catList = (List<CategoryProperties>)dataGridCategory.ItemsSource;
                     var dictionary = catList.Distinct().ToDictionary(x => x.CategoryId, x => x);
                     
                     selectedLink.Categories = dictionary;
                     m_handler.SelectedLink = selectedLink;
 
-                    UpdateMode updateMode = UpdateMode.None;
+                    var updateMode = UpdateMode.None;
                     if ((bool)radioButtonLocation.IsChecked) { updateMode = UpdateMode.UpdateLocationOnly; }
                     if ((bool)radioButtonReplace.IsChecked) { updateMode = UpdateMode.ReplaceElements; }
                     
@@ -197,7 +197,7 @@ namespace HOK.ElementMover
             {
                 linkInstances = m_handler.LinkInstances;
 
-                List<LinkedInstanceProperties> instanceList = linkInstances.Values.OrderBy(o => o.DisplayName).ToList();
+                var instanceList = linkInstances.Values.OrderBy(o => o.DisplayName).ToList();
                 comboBoxLinkModel.ItemsSource = null;
                 comboBoxLinkModel.ItemsSource = instanceList;
                 DisplayCategories(m_handler.SelectedLink);

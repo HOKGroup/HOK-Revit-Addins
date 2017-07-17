@@ -41,7 +41,7 @@ namespace HOK.ElementMover
 
                 if (null != elementSchema)
                 {
-                    Entity entity = linkedElement.GetEntity(elementSchema);
+                    var entity = linkedElement.GetEntity(elementSchema);
                     if (entity.IsValid())
                     {
                         linkInfo = new LinkedElementInfo();
@@ -64,7 +64,7 @@ namespace HOK.ElementMover
 
         public static bool UpdateLinkedElementInfo(LinkedElementInfo linkInfo, Element linkedElement)
         {
-            bool updated = false;
+            var updated = false;
             try
             {
                 if (null == elementSchema)
@@ -74,7 +74,7 @@ namespace HOK.ElementMover
 
                 if (null != elementSchema)
                 {
-                    Entity entity = linkedElement.GetEntity(elementSchema);
+                    var entity = linkedElement.GetEntity(elementSchema);
                     if (entity.IsValid())
                     {
                         linkedElement.DeleteEntity(elementSchema);
@@ -99,10 +99,10 @@ namespace HOK.ElementMover
 
         public static bool RemoveLinkedElementInfo(Element linkedElement)
         {
-            bool removed = false;
+            var removed = false;
             try
             {
-                Entity entity = linkedElement.GetEntity(elementSchema);
+                var entity = linkedElement.GetEntity(elementSchema);
                 if (entity.IsValid())
                 {
                     linkedElement.DeleteEntity(elementSchema);
@@ -128,7 +128,7 @@ namespace HOK.ElementMover
 
                 if (null != familySchema)
                 {
-                    Entity entity = linkedType.GetEntity(familySchema);
+                    var entity = linkedType.GetEntity(familySchema);
                     if (entity.IsValid())
                     {
                         familyInfo = new LinkedFamilyInfo();
@@ -147,7 +147,7 @@ namespace HOK.ElementMover
 
         public static bool UpdateLinkedFamilyInfo(LinkedFamilyInfo familyInfo, ElementType linkedType)
         {
-            bool updated = false;
+            var updated = false;
             try
             {
                 if (null == familySchema)
@@ -157,7 +157,7 @@ namespace HOK.ElementMover
 
                 if (null != familySchema)
                 {
-                    Entity entity = linkedType.GetEntity(familySchema);
+                    var entity = linkedType.GetEntity(familySchema);
                     if (entity.IsValid())
                     {
                         linkedType.DeleteEntity(familySchema);
@@ -180,10 +180,10 @@ namespace HOK.ElementMover
 
         public static bool RemoveLinkedFamilyInfo(ElementType linkedType)
         {
-            bool removed = false;
+            var removed = false;
             try
             {
-                Entity entity = linkedType.GetEntity(familySchema);
+                var entity = linkedType.GetEntity(familySchema);
                 if (entity.IsValid())
                 {
                     linkedType.DeleteEntity(familySchema);
@@ -202,7 +202,7 @@ namespace HOK.ElementMover
             Schema schema = null;
             try
             {
-                SchemaBuilder sBuilder = new SchemaBuilder(elementSchemaId);
+                var sBuilder = new SchemaBuilder(elementSchemaId);
                 sBuilder.SetSchemaName("LinkedElementInfo");
                 sBuilder.AddSimpleField(s_LinkElementType, typeof(string));
                 sBuilder.AddSimpleField(s_SourceElementId, typeof(ElementId));
@@ -226,7 +226,7 @@ namespace HOK.ElementMover
             Schema schema = null;
             try
             {
-                SchemaBuilder sBuilder = new SchemaBuilder(familySchemaId);
+                var sBuilder = new SchemaBuilder(familySchemaId);
                 sBuilder.SetSchemaName("LinkedFamilyInfo");
                 sBuilder.AddSimpleField(s_SourceLinkInstanceId, typeof(ElementId));
                 sBuilder.AddSimpleField(s_SourceSymbolId, typeof(ElementId));

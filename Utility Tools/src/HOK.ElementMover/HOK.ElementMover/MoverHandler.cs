@@ -61,13 +61,13 @@ namespace HOK.ElementMover
         {
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<RevitLinkInstance> instances = collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().Cast<RevitLinkInstance>().ToList();
+                var collector = new FilteredElementCollector(m_doc);
+                var instances = collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().Cast<RevitLinkInstance>().ToList();
                 if (instances.Count > 0)
                 {
-                    foreach (RevitLinkInstance instance in instances)
+                    foreach (var instance in instances)
                     {
-                        LinkedInstanceProperties lip = new LinkedInstanceProperties(instance);
+                        var lip = new LinkedInstanceProperties(instance);
                         if (!linkInstances.ContainsKey(lip.InstanceId))
                         {
                             linkInstances.Add(lip.InstanceId, lip);
@@ -95,7 +95,7 @@ namespace HOK.ElementMover
                 {
                     case RequestId.SelectLinkInstance:
                         mainWindow.DozeOff();
-                        bool picked = PickLinkInstance(out selectedLink);
+                        var picked = PickLinkInstance(out selectedLink);
                         if (picked)
                         {
                             mainWindow.DisplayCategories(selectedLink);
@@ -116,7 +116,7 @@ namespace HOK.ElementMover
                         }
                         catch (Exception ex)
                         {
-                            string message = ex.Message;
+                            var message = ex.Message;
                         }
                         mainWindow.WakeUp();
                         break;
@@ -124,7 +124,7 @@ namespace HOK.ElementMover
                         mappingWindow.DozeOff();
                         Element sourceElement = null;
                         Element targetElement = null;
-                        bool pickedMap = PickMappingElements(out sourceElement, out targetElement);
+                        var pickedMap = PickMappingElements(out sourceElement, out targetElement);
                         if (pickedMap)
                         {
                             if (linkInstances.ContainsKey(selectedLink.InstanceId))
@@ -140,20 +140,20 @@ namespace HOK.ElementMover
                         mappingWindow.DozeOff();
                         if (linkedElementToDelete.Count > 0)
                         {
-                            using (Transaction trans = new Transaction(m_doc))
+                            using (var trans = new Transaction(m_doc))
                             {
                                 trans.Start("Delete Element Maps");
                                 try
                                 {
-                                    foreach (LinkedElementInfo linkedInfo in linkedElementToDelete)
+                                    foreach (var linkedInfo in linkedElementToDelete)
                                     {
                                         if (selectedLink.LinkedElements.ContainsKey(linkedInfo.LinkedElementId))
                                         {
                                             selectedLink.LinkedElements.Remove(linkedInfo.LinkedElementId);
-                                            Element linkedElement = m_doc.GetElement(linkedInfo.LinkedElementId);
+                                            var linkedElement = m_doc.GetElement(linkedInfo.LinkedElementId);
                                             if (null != linkedElement)
                                             {
-                                                bool removed = MoverDataStorageUtil.RemoveLinkedElementInfo(linkedElement);
+                                                var removed = MoverDataStorageUtil.RemoveLinkedElementInfo(linkedElement);
                                             }
                                         }
                                     }
@@ -189,10 +189,10 @@ namespace HOK.ElementMover
                         familyWindow.DozeOff();
                         if (null != selectedFamilyInfo)
                         {
-                            ElementType tType = m_doc.GetElement(selectedFamilyInfo.TargetTypeId) as ElementType;
+                            var tType = m_doc.GetElement(selectedFamilyInfo.TargetTypeId) as ElementType;
                             if (null != tType)
                             {
-                                using (Transaction trans = new Transaction(m_doc))
+                                using (var trans = new Transaction(m_doc))
                                 {
                                     trans.Start("Add Family Map");
                                     try
@@ -203,7 +203,7 @@ namespace HOK.ElementMover
                                         }
                                         selectedLink.LinkedFamilies.Add(selectedFamilyInfo.TargetTypeId, selectedFamilyInfo);
 
-                                        bool updated = MoverDataStorageUtil.UpdateLinkedFamilyInfo(selectedFamilyInfo, tType);
+                                        var updated = MoverDataStorageUtil.UpdateLinkedFamilyInfo(selectedFamilyInfo, tType);
 
                                         if (linkInstances.ContainsKey(selectedLink.InstanceId))
                                         {
@@ -216,7 +216,7 @@ namespace HOK.ElementMover
                                     catch (Exception ex)
                                     {
                                         trans.RollBack();
-                                        string message = ex.Message;
+                                        var message = ex.Message;
                                     }
                                 }
                             }
@@ -228,20 +228,20 @@ namespace HOK.ElementMover
                         mappingWindow.DozeOff();
                         if (null != selectedFamilyInfo)
                         {
-                            using (Transaction trans = new Transaction(m_doc))
+                            using (var trans = new Transaction(m_doc))
                             {
                                 trans.Start("Delete Family Map");
                                 try
                                 {
-                                    foreach (LinkedFamilyInfo familyInfo in linkedFamilyToDelete)
+                                    foreach (var familyInfo in linkedFamilyToDelete)
                                     {
                                         if (selectedLink.LinkedFamilies.ContainsKey(familyInfo.TargetTypeId))
                                         {
                                             selectedLink.LinkedFamilies.Remove(familyInfo.TargetTypeId);
-                                            ElementType tType = m_doc.GetElement(familyInfo.TargetTypeId) as ElementType;
+                                            var tType = m_doc.GetElement(familyInfo.TargetTypeId) as ElementType;
                                             if (null != tType)
                                             {
-                                                bool removed = MoverDataStorageUtil.RemoveLinkedFamilyInfo(tType);
+                                                var removed = MoverDataStorageUtil.RemoveLinkedFamilyInfo(tType);
                                             }
                                         }
                                     }
@@ -256,7 +256,7 @@ namespace HOK.ElementMover
                                 catch (Exception ex)
                                 {
                                     trans.RollBack();
-                                    string message = ex.Message;
+                                    var message = ex.Message;
                                 }
                             }
                         }
@@ -274,19 +274,19 @@ namespace HOK.ElementMover
 
         private bool PickLinkInstance(out LinkedInstanceProperties lip)
         {
-            bool picked = false;
+            var picked = false;
             lip = null;
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(m_doc))
             {
                 trans.Start("Pick Revit Link");
                 try
                 {
-                    Selection selection = m_app.ActiveUIDocument.Selection;
+                    var selection = m_app.ActiveUIDocument.Selection;
                     ISelectionFilter selectFilter = new LinkInstanceSelectionFilter();
-                    Reference reference = selection.PickObject(ObjectType.Element, selectFilter, "Select a Revit Link instance to retreive elements for source items.");
+                    var reference = selection.PickObject(ObjectType.Element, selectFilter, "Select a Revit Link instance to retreive elements for source items.");
                     if (null != reference)
                     {
-                        ElementId elementId = reference.ElementId;
+                        var elementId = reference.ElementId;
                         if (linkInstances.ContainsKey(elementId))
                         {
                             lip = linkInstances[elementId];
@@ -306,50 +306,50 @@ namespace HOK.ElementMover
 
         private bool PickMappingElements(out Element sourceElement/*in link*/, out Element targetElement/*in host*/)
         {
-            bool picked = false;
+            var picked = false;
             sourceElement = null;
             targetElement = null; 
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(m_doc))
             {
                 trans.Start("Pick Mapping Elements");
                 try
                 {
-                    Selection selection = m_app.ActiveUIDocument.Selection;
-                    Reference reference = PickLinkedElement();
+                    var selection = m_app.ActiveUIDocument.Selection;
+                    var reference = PickLinkedElement();
                     if (null != reference)
                     {
-                        ElementId linkedInstanceId = reference.ElementId;
+                        var linkedInstanceId = reference.ElementId;
                         if (linkInstances.ContainsKey(linkedInstanceId) && reference.LinkedElementId!=ElementId.InvalidElementId)
                         {
-                            LinkedInstanceProperties lip = linkInstances[linkedInstanceId];
-                            Document linkedDoc = lip.LinkedDocument;
+                            var lip = linkInstances[linkedInstanceId];
+                            var linkedDoc = lip.LinkedDocument;
 
-                            Element linkedElement = linkedDoc.GetElement(reference.LinkedElementId); //element in linked model
+                            var linkedElement = linkedDoc.GetElement(reference.LinkedElementId); //element in linked model
                             if (null != linkedElement)
                             {
                                 if(null!=linkedElement.Category)
                                 {
-                                    ElementId categoryId = linkedElement.Category.Id;
-                                    string categoryName = linkedElement.Category.Name;
+                                    var categoryId = linkedElement.Category.Id;
+                                    var categoryName = linkedElement.Category.Name;
                                     ISelectionFilter selFilter = new TargetElementSelectionFilter(categoryId);
-                                    Reference secondReference = selection.PickObject(ObjectType.Element, "Pick a target item in the host model. The required category should be "+categoryName);
+                                    var secondReference = selection.PickObject(ObjectType.Element, "Pick a target item in the host model. The required category should be "+categoryName);
                                     if (null != secondReference)
                                     {
-                                        ElementId eId = secondReference.ElementId;
-                                        Element element = m_doc.GetElement(eId);
+                                        var eId = secondReference.ElementId;
+                                        var element = m_doc.GetElement(eId);
                                         if (null != element)
                                         {
                                             ElementTypeInfo sourceTypeInfo = null;
-                                            ElementId sourceTypeId = linkedElement.GetTypeId();
-                                            ElementType sourceType = linkedDoc.GetElement(sourceTypeId) as ElementType;
+                                            var sourceTypeId = linkedElement.GetTypeId();
+                                            var sourceType = linkedDoc.GetElement(sourceTypeId) as ElementType;
                                             if (null != sourceType)
                                             {
                                                 sourceTypeInfo = new ElementTypeInfo(sourceType);
                                             }
 
                                             ElementTypeInfo targetTypeInfo = null;
-                                            ElementId targetTypeId = element.GetTypeId();
-                                            ElementType targetType = m_doc.GetElement(targetTypeId) as ElementType;
+                                            var targetTypeId = element.GetTypeId();
+                                            var targetType = m_doc.GetElement(targetTypeId) as ElementType;
                                             if (null != targetType)
                                             {
                                                 targetTypeInfo = new ElementTypeInfo(targetType);
@@ -363,12 +363,12 @@ namespace HOK.ElementMover
                                             }
                                             else
                                             {
-                                                StringBuilder strBuilder = new StringBuilder();
+                                                var strBuilder = new StringBuilder();
                                                 strBuilder.AppendLine("Source Family Name: " + sourceTypeInfo.FamilyName + ", Source Type Name: " + sourceTypeInfo.Name);
                                                 strBuilder.AppendLine("Target Family Name: " + targetTypeInfo.FamilyName + ", Target Type Name: " + targetTypeInfo.Name);
                                                 strBuilder.AppendLine("");
                                                 strBuilder.AppendLine("Would you like to proceed with creating a map?");
-                                                MessageBoxResult result = MessageBox.Show(strBuilder.ToString(), "Mismatch Name", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                                                var result = MessageBox.Show(strBuilder.ToString(), "Mismatch Name", MessageBoxButton.YesNo, MessageBoxImage.Question);
                                                 if (result == MessageBoxResult.Yes)
                                                 {
                                                     sourceElement = linkedElement;
@@ -389,14 +389,14 @@ namespace HOK.ElementMover
 
                     if (picked && null != sourceElement && null != targetElement)
                     {
-                        LinkedElementInfo linkInfo = new LinkedElementInfo(LinkType.ByMap, sourceElement, targetElement, selectedLink.InstanceId, selectedLink.TransformValue);
+                        var linkInfo = new LinkedElementInfo(LinkType.ByMap, sourceElement, targetElement, selectedLink.InstanceId, selectedLink.TransformValue);
                         if (selectedLink.LinkedElements.ContainsKey(linkInfo.LinkedElementId))
                         {
                             selectedLink.LinkedElements.Remove(linkInfo.LinkedElementId);
                         }
                         selectedLink.LinkedElements.Add(linkInfo.LinkedElementId, linkInfo);
 
-                        bool updated = MoverDataStorageUtil.UpdateLinkedElementInfo(linkInfo, targetElement);
+                        var updated = MoverDataStorageUtil.UpdateLinkedElementInfo(linkInfo, targetElement);
                     }
 
                     trans.Commit();
@@ -415,7 +415,7 @@ namespace HOK.ElementMover
             Reference reference = null;
             try
             {
-                Selection selection = m_app.ActiveUIDocument.Selection;
+                var selection = m_app.ActiveUIDocument.Selection;
                 reference = selection.PickObject(ObjectType.LinkedElement, "Pick a linked element in a linked instance " + selectedLink.DisplayName);
                 if (null != reference)
                 {
@@ -425,7 +425,7 @@ namespace HOK.ElementMover
                     }
                     else
                     {
-                        MessageBoxResult msgResult = MessageBox.Show("Please select a linked element from the selected link instance.\n" + selectedLink.DisplayName, "Linked Instance Mismatch", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                        var msgResult = MessageBox.Show("Please select a linked element from the selected link instance.\n" + selectedLink.DisplayName, "Linked Instance Mismatch", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
                         if (msgResult == MessageBoxResult.OK)
                         {
                             PickLinkedElement();
@@ -439,19 +439,19 @@ namespace HOK.ElementMover
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return reference;
         }
 
         private void HighlightElement()
         {
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(m_doc))
             {
                 trans.Start("Select Element");
                 try
                 {
-                    UIDocument uidoc = new UIDocument(m_doc);
+                    var uidoc = new UIDocument(m_doc);
 #if RELEASE2014
                     Element element = m_doc.GetElement(selectedLinkedInfo.LinkedElementId);
                     if(null!=element)

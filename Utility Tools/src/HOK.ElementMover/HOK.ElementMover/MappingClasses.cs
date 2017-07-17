@@ -53,7 +53,7 @@ namespace HOK.ElementMover
         {
             try
             {
-                Parameter param = m_instance.get_Parameter(BuiltInParameter.RVT_LINK_INSTANCE_NAME);
+                var param = m_instance.get_Parameter(BuiltInParameter.RVT_LINK_INSTANCE_NAME);
                 if (null != param)
                 {
                     instanceName = param.AsString();
@@ -78,7 +78,7 @@ namespace HOK.ElementMover
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
         }
 
@@ -87,29 +87,25 @@ namespace HOK.ElementMover
             try
             {
                 //Categories that have material quantities
-                FilteredElementCollector collector = new FilteredElementCollector(linkedDocument);
-                List<Element> elements = collector.WhereElementIsNotElementType().ToElements().ToList();
+                var collector = new FilteredElementCollector(linkedDocument);
+                var elements = collector.WhereElementIsNotElementType().ToElements().ToList();
                 var elementCategories = from element in elements where null != element.Category select element.Category;
-#if RELEASE2014
-                var modelCategories = from category in elementCategories where category.HasMaterialQuantities select category;
-#elif RELEASE2015|| RELEASE2016 || RELEASE2017
                 var modelCategories = from category in elementCategories where  category.HasMaterialQuantities && category.CategoryType == CategoryType.Model select category;
-#endif
 
                 var categoryNames = from category in modelCategories select category.Name;
-                List<string> categoryNameList = categoryNames.Distinct().ToList();
+                var categoryNameList = categoryNames.Distinct().ToList();
 
-                Autodesk.Revit.DB.Categories categoryObjects = linkedDocument.Settings.Categories;
-                foreach (string catName in categoryNameList)
+                var categoryObjects = linkedDocument.Settings.Categories;
+                foreach (var catName in categoryNameList)
                 {
                     if (!categoryObjects.Contains(catName)) { continue; }
                    
-                    Category category = categoryObjects.get_Item(catName);
+                    var category = categoryObjects.get_Item(catName);
                     if (null != category)
                     {
-                        CategoryProperties catProperties = new CategoryProperties(category);
+                        var catProperties = new CategoryProperties(category);
                         var categoryFound = from modelCat in modelCategories where modelCat.Id == category.Id select modelCat;
-                        int itemCount = categoryFound.Count();
+                        var itemCount = categoryFound.Count();
                         if (itemCount > 0)
                         {
                             catProperties.ItemCount = itemCount;
@@ -123,21 +119,21 @@ namespace HOK.ElementMover
 
                 //Categories that belongs to MEP curves
                 collector = new FilteredElementCollector(linkedDocument);
-                List<Element> mepCurves = collector.OfClass(typeof(MEPCurve)).ToElements().ToList();
+                var mepCurves = collector.OfClass(typeof(MEPCurve)).ToElements().ToList();
                 if (mepCurves.Count > 0)
                 {
                     var mepCategories = from mepCurve in mepCurves select mepCurve.Category.Name;
-                    List<string> mepCategoryNameList = mepCategories.Distinct().ToList();
-                    foreach (string catName in mepCategoryNameList)
+                    var mepCategoryNameList = mepCategories.Distinct().ToList();
+                    foreach (var catName in mepCategoryNameList)
                     {
                         if (!categoryObjects.Contains(catName)) { continue; }
 
-                        Category category = categoryObjects.get_Item(catName);
+                        var category = categoryObjects.get_Item(catName);
                         if (null != category)
                         {
-                            CategoryProperties catProperties = new CategoryProperties(category);
+                            var catProperties = new CategoryProperties(category);
                             var categoryFound = from mepCurve in mepCurves where mepCurve.Category.Id == category.Id select mepCurve;
-                            int itemCount= categoryFound.Count();
+                            var itemCount= categoryFound.Count();
                             if (itemCount > 0)
                             {
                                 catProperties.ItemCount = itemCount;
@@ -150,19 +146,19 @@ namespace HOK.ElementMover
                     }
                 }
 
-                foreach (BuiltInCategory bltCategory in customCategories)
+                foreach (var bltCategory in customCategories)
                 {
-                    int catPriority = 0;
+                    var catPriority = 0;
                     if (bltCategory == BuiltInCategory.OST_Rooms) { catPriority = 2; }
 
                     collector = new FilteredElementCollector(linkedDocument);
-                    ICollection<ElementId> customCatElements = collector.OfCategory(bltCategory).ToElementIds();
+                    var customCatElements = collector.OfCategory(bltCategory).ToElementIds();
                     if (customCatElements.Count > 0)
                     {
-                        Category category = categoryObjects.get_Item(bltCategory);
+                        var category = categoryObjects.get_Item(bltCategory);
                         if (null != category)
                         {
-                            CategoryProperties catProperties = new CategoryProperties(category);
+                            var catProperties = new CategoryProperties(category);
                             catProperties.Priority = catPriority;
                             catProperties.ItemCount = customCatElements.Count;
                             if (!categories.ContainsKey(catProperties.CategoryId))
@@ -175,7 +171,7 @@ namespace HOK.ElementMover
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
         }
 
@@ -183,29 +179,29 @@ namespace HOK.ElementMover
         {
             try
             {
-                Document hostDoc = m_instance.Document;
-                List<ElementId> categoryIds = categories.Keys.ToList();
-                foreach (ElementId catId in categoryIds)
+                var hostDoc = m_instance.Document;
+                var categoryIds = categories.Keys.ToList();
+                foreach (var catId in categoryIds)
                 {
-                    FilteredElementCollector collector = new FilteredElementCollector(hostDoc);
-                    List<Element> elements = collector.OfCategoryId(catId).WhereElementIsNotElementType().ToElements().ToList();
+                    var collector = new FilteredElementCollector(hostDoc);
+                    var elements = collector.OfCategoryId(catId).WhereElementIsNotElementType().ToElements().ToList();
                     var elementWithEntities = from element in elements where element.GetEntitySchemaGuids().Count > 0 select element;
                     if (elementWithEntities.Count() > 0)
                     {
                         elements = elementWithEntities.ToList();
                     }
 
-                    foreach (Element element in elements)
+                    foreach (var element in elements)
                     {
                         if (null == element.Location) { continue; } // unplaced rooms
 
-                        LinkedElementInfo linkInfo = MoverDataStorageUtil.GetLinkedElementInfo(element);
+                        var linkInfo = MoverDataStorageUtil.GetLinkedElementInfo(element);
                         if (null != linkInfo)
                         {
                             if (linkInfo.SourceLinkInstanceId != instanceId) { continue; }
                             if (element.Id != linkInfo.LinkedElementId) { continue; }
 
-                            Element sourceElement = linkedDocument.GetElement(linkInfo.SourceElementId);
+                            var sourceElement = linkedDocument.GetElement(linkInfo.SourceElementId);
                             if (null != sourceElement)
                             {
                                 linkInfo = new LinkedElementInfo(linkInfo.LinkElementType, sourceElement, element, instanceId, transformValue);
@@ -228,28 +224,28 @@ namespace HOK.ElementMover
         {
             try
             {
-                Document hostDoc = m_instance.Document;
-                List<ElementId> categoryIds = categories.Keys.ToList();
-                foreach (ElementId catId in categoryIds)
+                var hostDoc = m_instance.Document;
+                var categoryIds = categories.Keys.ToList();
+                foreach (var catId in categoryIds)
                 {
-                    FilteredElementCollector collector = new FilteredElementCollector(hostDoc);
-                    List<Element> elements = collector.OfCategoryId(catId).WhereElementIsElementType().ToElements().ToList();
-                    foreach (Element element in elements)
+                    var collector = new FilteredElementCollector(hostDoc);
+                    var elements = collector.OfCategoryId(catId).WhereElementIsElementType().ToElements().ToList();
+                    foreach (var element in elements)
                     {
-                        ElementType elementType = element as ElementType;
+                        var elementType = element as ElementType;
                         if (null != elementType)
                         {
-                            LinkedFamilyInfo familyInfo = MoverDataStorageUtil.GetLinkedFamilyInfo(elementType);
+                            var familyInfo = MoverDataStorageUtil.GetLinkedFamilyInfo(elementType);
                             if (null != familyInfo)
                             {
                                 if (familyInfo.SourceLinkInstanceId != instanceId) { continue; }
                                 if (element.Id != familyInfo.TargetTypeId) { continue; }
 
-                                ElementType sourceType = linkedDocument.GetElement(familyInfo.SourceTypeId) as ElementType;
+                                var sourceType = linkedDocument.GetElement(familyInfo.SourceTypeId) as ElementType;
                                 if (null != sourceType)
                                 {
-                                    ElementTypeInfo sourceTypeInfo = new ElementTypeInfo(sourceType);
-                                    ElementTypeInfo targetTypeInfo = new ElementTypeInfo(elementType);
+                                    var sourceTypeInfo = new ElementTypeInfo(sourceType);
+                                    var targetTypeInfo = new ElementTypeInfo(elementType);
 
                                     familyInfo = new LinkedFamilyInfo(familyInfo.SourceLinkInstanceId, sourceTypeInfo, targetTypeInfo);
                                     if (!linkedFamilies.ContainsKey(familyInfo.TargetTypeId))
@@ -357,13 +353,13 @@ namespace HOK.ElementMover
             }
             else
             {
-                ElementId typeId = linkedElement.GetTypeId();
+                var typeId = linkedElement.GetTypeId();
                 if (typeId != ElementId.InvalidElementId)
                 {
-                    ElementType elementType = linkedElement.Document.GetElement(typeId) as ElementType;
+                    var elementType = linkedElement.Document.GetElement(typeId) as ElementType;
                     if (null != elementType)
                     {
-                        ElementTypeInfo typeInfo = new ElementTypeInfo(elementType);
+                        var typeInfo = new ElementTypeInfo(elementType);
                         familyName = typeInfo.FamilyName;
                         familyTypeName = typeInfo.Name;
                         linkDisplayText = "Source Id: " + sourceElementId.IntegerValue + ", Target Id: " + linkedElementId.IntegerValue;
@@ -376,17 +372,17 @@ namespace HOK.ElementMover
 
         public static bool CompareLocation(Element sourceElement, Element linkedElement, Transform transform)
         {
-            bool identical = false;
+            var identical = false;
             try
             {
                 if (null != sourceElement.Location && null != linkedElement.Location)
                 {
                     if (sourceElement.Location is LocationPoint && linkedElement.Location is LocationPoint)
                     {
-                        LocationPoint sourceLocation = sourceElement.Location as LocationPoint;
-                        LocationPoint targetLocation = linkedElement.Location as LocationPoint;
-                        XYZ sourcePt = transform.OfPoint(sourceLocation.Point);
-                        XYZ targetPt = targetLocation.Point;
+                        var sourceLocation = sourceElement.Location as LocationPoint;
+                        var targetLocation = linkedElement.Location as LocationPoint;
+                        var sourcePt = transform.OfPoint(sourceLocation.Point);
+                        var targetPt = targetLocation.Point;
                         if (sourcePt.IsAlmostEqualTo(targetPt))
                         {
                             if (sourceLocation.Rotation == targetLocation.Rotation)
@@ -397,11 +393,11 @@ namespace HOK.ElementMover
                     }
                     else if (sourceElement.Location is LocationCurve && linkedElement.Location is LocationCurve)
                     {
-                        LocationCurve sourceLocation = sourceElement.Location as LocationCurve;
-                        LocationCurve targetLocation = linkedElement.Location as LocationCurve;
-                        Curve sourceCurve = sourceLocation.Curve.CreateTransformed(transform);
-                        Curve targetCurve = targetLocation.Curve;
-                        SetComparisonResult result = sourceCurve.Intersect(targetCurve);
+                        var sourceLocation = sourceElement.Location as LocationCurve;
+                        var targetLocation = linkedElement.Location as LocationCurve;
+                        var sourceCurve = sourceLocation.Curve.CreateTransformed(transform);
+                        var targetCurve = targetLocation.Curve;
+                        var result = sourceCurve.Intersect(targetCurve);
                         if (result == SetComparisonResult.Equal)
                         {
                             identical = true;
@@ -419,42 +415,42 @@ namespace HOK.ElementMover
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return identical;
         }
 
         public static bool MoveLocation(Element sourceElement, Element linkedElement, Transform transform)
         {
-            bool moved = false;
+            var moved = false;
             try
             {
                 if (null != sourceElement.Location && null != linkedElement.Location)
                 {
                     if (sourceElement.Location is LocationPoint && linkedElement.Location is LocationPoint)
                     {
-                        LocationPoint sourceLocation = sourceElement.Location as LocationPoint;
-                        LocationPoint targetLocation = linkedElement.Location as LocationPoint;
-                        XYZ sourcePt = transform.OfPoint(sourceLocation.Point);
-                        XYZ targetPt = targetLocation.Point;
+                        var sourceLocation = sourceElement.Location as LocationPoint;
+                        var targetLocation = linkedElement.Location as LocationPoint;
+                        var sourcePt = transform.OfPoint(sourceLocation.Point);
+                        var targetPt = targetLocation.Point;
                         targetLocation.Point = sourcePt;
-                        Line axis = Line.CreateBound(targetPt, new XYZ(targetPt.X, targetPt.Y, targetPt.Z + 10));
-                        bool rotated = targetLocation.Rotate(axis, sourceLocation.Rotation);
+                        var axis = Line.CreateBound(targetPt, new XYZ(targetPt.X, targetPt.Y, targetPt.Z + 10));
+                        var rotated = targetLocation.Rotate(axis, sourceLocation.Rotation);
                         moved = rotated;
                     }
                     else if (sourceElement.Location is LocationCurve && linkedElement.Location is LocationCurve)
                     {
-                        LocationCurve sourceLocation = sourceElement.Location as LocationCurve;
-                        LocationCurve targetLocation = linkedElement.Location as LocationCurve;
-                        Curve sourceCurve = sourceLocation.Curve.CreateTransformed(transform);
-                        Curve targetCurve = targetLocation.Curve;
+                        var sourceLocation = sourceElement.Location as LocationCurve;
+                        var targetLocation = linkedElement.Location as LocationCurve;
+                        var sourceCurve = sourceLocation.Curve.CreateTransformed(transform);
+                        var targetCurve = targetLocation.Curve;
                         targetLocation.Curve = sourceCurve;
                     }
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return moved;
         }

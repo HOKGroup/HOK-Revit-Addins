@@ -1,74 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Autodesk.Revit.UI;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI.Selection;
-
+using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.LPDCalculator
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-
-    public class Command:IExternalCommand
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
+    public class Command : IExternalCommand
     {
         private UIApplication m_app;
         private Document m_doc;
 
-        Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             m_app = commandData.Application;
             m_doc = m_app.ActiveUIDocument.Document;
+            Log.AppendLog(LogMessageType.INFO, "Started");
 
-            string docPath = GetCentralPath(m_doc);
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            AddinUtilities.PublishAddinLog(new AddinLog("ViewAnalysis-LPD Analysis", m_doc));
+
+            var docPath = RevitDocument.GetCentralPath(m_doc);
             if (!string.IsNullOrEmpty(docPath))
             {
-                CommandForm commandForm = new CommandForm(m_app);
+                var commandForm = new CommandForm(m_app);
                 commandForm.ShowDialog();
             }
             else
             {
-                MessageBox.Show("Please save the current Revit project before running the LPD Analysis.", "File Not Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Log.AppendLog(LogMessageType.WARNING, "File not saved");
+                MessageBox.Show(Properties.Resources.Command_FileNotSaved, Properties.Resources.Command_FileNotSavedHeader, MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
-
-        private string GetCentralPath(Document doc)
-        {
-            string docCentralPath = "";
-            try
-            {
-                if (doc.IsWorkshared)
-                {
-                    ModelPath modelPath = doc.GetWorksharingCentralModelPath();
-                    string centralPath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
-                    if (!string.IsNullOrEmpty(centralPath))
-                    {
-                        docCentralPath = centralPath;
-                    }
-                    else
-                    {
-                        //detached
-                        docCentralPath = doc.PathName;
-                    }
-                }
-                else
-                {
-                    docCentralPath = doc.PathName;
-                }
-            }
-            catch (Exception ex)
-            {
-                string message = ex.Message;
-                docCentralPath = doc.PathName;
-            }
-            return docCentralPath;
-        }
-
     }
 }

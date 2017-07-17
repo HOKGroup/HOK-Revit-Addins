@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CommandForm));
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(CommandForm));
             this.bttnBuilding = new System.Windows.Forms.Button();
             this.bttnSpace = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();

@@ -32,7 +32,7 @@ namespace HOK.LPDCalculator
             m_doc = m_app.ActiveUIDocument.Document;
            
             InitializeComponent();
-            this.Text = "LPD Analysis - v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Text = "LPD Analysis - v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             progressBar.Visible = false;
             statusLabel.Text = "Ready";
         }
@@ -41,33 +41,33 @@ namespace HOK.LPDCalculator
         {
             try
             {
-                ModelSelection selection = GetModelSelection();
+                var selection = GetModelSelection();
 
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                Area area = collector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList().First() as Area;
+                var collector = new FilteredElementCollector(m_doc);
+                var area = collector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList().First() as Area;
 
-                bool param1Found = FindParameter(area, "ActualLightingLoad", ParameterType.ElectricalApparentPower);
-                bool param2Found = FindParameter(area, "ActualLPD", ParameterType.ElectricalPowerDensity);
+                var param1Found = FindParameter(area, "ActualLightingLoad", ParameterType.ElectricalApparentPower);
+                var param2Found = FindParameter(area, "ActualLPD", ParameterType.ElectricalPowerDensity);
 
                 if (param1Found && param2Found)
                 {
                     FamilySymbol annotationType = null;
-                    string annotationFamilyName = "LPD_BuildingAreaMethod_HOK_I";
-                    bool annotationFound = FindAnnotationFamily(m_doc, annotationFamilyName, out annotationType);
+                    var annotationFamilyName = "LPD_BuildingAreaMethod_HOK_I";
+                    var annotationFound = FindAnnotationFamily(m_doc, annotationFamilyName, out annotationType);
                     if (annotationFound && null != annotationType)
                     {
-                        List<Element> areaElements = FindAreasOnLPDAreaSchemes("LPD Building");
+                        var areaElements = FindAreasOnLPDAreaSchemes("LPD Building");
                         if (areaElements.Count > 0)
                         {
                             progressBar.Visible = true;
                             statusLabel.Text = "Calculating ...";
-                            CalculatorMethods calculator = new CalculatorMethods(m_app, areaElements, annotationType, selection);
+                            var calculator = new CalculatorMethods(m_app, areaElements, annotationType, selection);
                             if (calculator.CalculateLPD(progressBar))
                             {
                                 if (calculator.UpdateBuildingAnnotationFamily())
                                 {
                                     MessageBox.Show("Lighting Power Density was successfully calculated based on Area elements.\n Please review the schedule and annotation family.", annotationFamilyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                    this.Close();
+                                    Close();
                                 }
                             }
                             else
@@ -88,7 +88,7 @@ namespace HOK.LPDCalculator
                 }
                 else
                 {
-                    StringBuilder strBuilder = new StringBuilder();
+                    var strBuilder = new StringBuilder();
                     strBuilder.AppendLine("The following parameters are required in Area elements. Please create those two parameters to run the LPD calculator.\n");
                     strBuilder.AppendLine("1. Parameter Name: ActualLightingLoad");
                     strBuilder.AppendLine("Parameter Type: Apparent Power");
@@ -109,34 +109,34 @@ namespace HOK.LPDCalculator
             try
             {
                 
-                ModelSelection selection = GetModelSelection();
+                var selection = GetModelSelection();
 
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                Area area = collector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList().First() as Area;
+                var collector = new FilteredElementCollector(m_doc);
+                var area = collector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList().First() as Area;
 
-                bool param1Found = FindParameter(area, "ActualLightingLoad", ParameterType.ElectricalApparentPower);
-                bool param2Found = FindParameter(area, "ActualLPD", ParameterType.ElectricalPowerDensity);
+                var param1Found = FindParameter(area, "ActualLightingLoad", ParameterType.ElectricalApparentPower);
+                var param2Found = FindParameter(area, "ActualLPD", ParameterType.ElectricalPowerDensity);
 
                 if (param1Found && param2Found)
                 {
                     FamilySymbol annotationType = null;
-                    string annotationFamilyName = "LPD_SpaceBySpaceMethod_HOK_I";
-                    bool annotationFound = FindAnnotationFamily(m_doc, annotationFamilyName, out annotationType);
+                    var annotationFamilyName = "LPD_SpaceBySpaceMethod_HOK_I";
+                    var annotationFound = FindAnnotationFamily(m_doc, annotationFamilyName, out annotationType);
                     if (annotationFound && null != annotationType)
                     {
-                        List<Element> areaElements = FindAreasOnLPDAreaSchemes("LPD Space");
+                        var areaElements = FindAreasOnLPDAreaSchemes("LPD Space");
                         if (areaElements.Count > 0)
                         {
                             progressBar.Visible = true;
                             statusLabel.Text = "Calculating ...";
-                            CalculatorMethods calculator = new CalculatorMethods(m_app, areaElements, annotationType, selection);
+                            var calculator = new CalculatorMethods(m_app, areaElements, annotationType, selection);
                             if (calculator.CalculateLPD(progressBar))
                             {
                                 if (calculator.UpdateSpaceAnnotationFamily())
                                 {
                                     statusLabel.Text = "Completed.";
                                     MessageBox.Show("Lighting Power Density was successfully calculated based on Area elements.\n Please review the schedule and annotation family.", annotationFamilyName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                                    this.Close();
+                                    Close();
                                 }
                             }
                             else
@@ -157,7 +157,7 @@ namespace HOK.LPDCalculator
                 }
                 else
                 {
-                    StringBuilder strBuilder = new StringBuilder();
+                    var strBuilder = new StringBuilder();
                     strBuilder.AppendLine("The following parameters are required in Area elements. Please create those two parameters to run the LPD calculator.\n");
                     strBuilder.AppendLine("1. Parameter Name: ActualLightingLoad");
                     strBuilder.AppendLine("Parameter Type: Apparent Power");
@@ -175,15 +175,15 @@ namespace HOK.LPDCalculator
 
         private List<Element> FindAreasOnLPDAreaSchemes(string schemeName)
         {
-            List<Element> areasOnLPD = new List<Element>();
+            var areasOnLPD = new List<Element>();
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<ViewPlan> viewPlans = collector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().ToElements().Cast<ViewPlan>().ToList();
+                var collector = new FilteredElementCollector(m_doc);
+                var viewPlans = collector.OfClass(typeof(ViewPlan)).WhereElementIsNotElementType().ToElements().Cast<ViewPlan>().ToList();
                 var areaPlans = from view in viewPlans where view.ViewType == ViewType.AreaPlan select view;
 
-                List<ViewPlan> lpdAreaPlans = new List<ViewPlan>();
-                foreach (ViewPlan viewPlan in areaPlans)
+                var lpdAreaPlans = new List<ViewPlan>();
+                foreach (var viewPlan in areaPlans)
                 {
                     if (null != viewPlan.AreaScheme)
                     {
@@ -196,10 +196,10 @@ namespace HOK.LPDCalculator
 
                 if (lpdAreaPlans.Count > 0)
                 {
-                    foreach (ViewPlan areaPlan in lpdAreaPlans)
+                    foreach (var areaPlan in lpdAreaPlans)
                     {
-                        FilteredElementCollector areaCollector = new FilteredElementCollector(m_doc, areaPlan.Id);
-                        List<Element> areas = areaCollector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList();
+                        var areaCollector = new FilteredElementCollector(m_doc, areaPlan.Id);
+                        var areas = areaCollector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList();
                         areasOnLPD.AddRange(areas);
                     }
                 }
@@ -213,7 +213,7 @@ namespace HOK.LPDCalculator
 
         private ModelSelection GetModelSelection()
         {
-            ModelSelection selection = ModelSelection.Both;
+            var selection = ModelSelection.Both;
 
             if (radioButtonBoth.Checked)
             {
@@ -233,14 +233,10 @@ namespace HOK.LPDCalculator
 
         private bool FindParameter(Area area, string paramName, ParameterType paramType)
         {
-            bool result = false;
+            var result = false;
             try
             {
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
-                Parameter param = area.LookupParameter(paramName);
-#else 
-                Parameter param = area.get_Parameter(paramName);
-#endif
+                var param = area.LookupParameter(paramName);
                 
                 if (null != param)
                 {
@@ -267,14 +263,10 @@ namespace HOK.LPDCalculator
 
         private bool FindParameter(Room room, string paramName, ParameterType paramType)
         {
-            bool result = false;
+            var result = false;
             try
             {
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
-                Parameter param = room.LookupParameter(paramName);
-#else 
-                Parameter param = room.get_Parameter(paramName);
-#endif
+                var param = room.LookupParameter(paramName);
 
                 if (null != param)
                 {
@@ -301,12 +293,12 @@ namespace HOK.LPDCalculator
 
         private bool FindAnnotationFamily(Document doc, string familyName, out FamilySymbol symbolType)
         {
-            bool found = false;
+            var found = false;
             symbolType = null;
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(doc);
-                List<FamilySymbol> annoSymbolTypes = collector.OfClass(typeof(FamilySymbol)).ToElements().Cast<FamilySymbol>().ToList();
+                var collector = new FilteredElementCollector(doc);
+                var annoSymbolTypes = collector.OfClass(typeof(FamilySymbol)).ToElements().Cast<FamilySymbol>().ToList();
                 var symbolTypes = from annoType in annoSymbolTypes where annoType.Name.Contains(familyName) select annoType;
                 if (symbolTypes.Count() > 0)
                 {
@@ -320,14 +312,14 @@ namespace HOK.LPDCalculator
 
         private void bttnCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void linkLabelHelp_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             try
             {
-                string helpPath = @"V:\RVT-Data\HOK Program\Documentation\LPD Calculator_Instruction.pdf";
+                var helpPath = @"V:\RVT-Data\HOK Program\Documentation\LPD Calculator_Instruction.pdf";
                 System.Diagnostics.Process.Start(helpPath);
             }
             catch

@@ -50,10 +50,10 @@ namespace HOK.ElementMover
 
             InitializeComponent();
 
-            List<LinkedInstanceProperties> instances = linkInstances.Values.OrderBy(o => o.DisplayName).ToList();
+            var instances = linkInstances.Values.OrderBy(o => o.DisplayName).ToList();
             comboBoxLink.ItemsSource = instances;
             comboBoxLink.DisplayMemberPath = "DisplayName";
-            int selectedIndex = instances.FindIndex(o => o.InstanceId == selectedLink.InstanceId);
+            var selectedIndex = instances.FindIndex(o => o.InstanceId == selectedLink.InstanceId);
             if (selectedIndex > -1) { comboBoxLink.SelectedIndex = selectedIndex; }
         }
 
@@ -63,7 +63,7 @@ namespace HOK.ElementMover
             {
                 if (null != comboBoxLink.SelectedItem)
                 {
-                    LinkedInstanceProperties lip = (LinkedInstanceProperties)comboBoxLink.SelectedItem;
+                    var lip = (LinkedInstanceProperties)comboBoxLink.SelectedItem;
                     m_handler.SelectedLink = lip;
                     m_handler.MoverRequest.Make(RequestId.SelectMappingElements);
                     m_event.Raise();
@@ -82,14 +82,14 @@ namespace HOK.ElementMover
             {
                 if (null != comboBoxLink.SelectedItem)
                 {
-                    LinkedInstanceProperties lip = (LinkedInstanceProperties)comboBoxLink.SelectedItem;
+                    var lip = (LinkedInstanceProperties)comboBoxLink.SelectedItem;
                     m_handler.SelectedLink = lip;
 
-                    List<LinkedElementInfo> linkedInfoToDelete = new List<LinkedElementInfo>();
-                    List<TreeViewElementModel> treeviewModels = treeViewMapping.ItemsSource as List<TreeViewElementModel>;
-                    foreach (TreeViewElementModel categoryNode in treeviewModels)
+                    var linkedInfoToDelete = new List<LinkedElementInfo>();
+                    var treeviewModels = treeViewMapping.ItemsSource as List<TreeViewElementModel>;
+                    foreach (var categoryNode in treeviewModels)
                     {
-                        List<LinkedElementInfo> infoList = FindElementMappingNode(categoryNode);
+                        var infoList = FindElementMappingNode(categoryNode);
                         if (infoList.Count > 0)
                         {
                             linkedInfoToDelete.AddRange(infoList);
@@ -110,22 +110,22 @@ namespace HOK.ElementMover
 
         private List<LinkedElementInfo> FindElementMappingNode(TreeViewElementModel parentNode)
         {
-            List<LinkedElementInfo> linkedElements = new List<LinkedElementInfo>();
+            var linkedElements = new List<LinkedElementInfo>();
             try
             {
-                foreach (TreeViewElementModel node in parentNode.ChildrenNodes)
+                foreach (var node in parentNode.ChildrenNodes)
                 {
                     if (node.NodeType == TreeViewNodeType.ElementMapping)
                     {
                         if (node.IsChecked == true)
                         {
-                            LinkedElementInfo linkedInfo = node.Tag as LinkedElementInfo;
+                            var linkedInfo = node.Tag as LinkedElementInfo;
                             linkedElements.Add(linkedInfo);
                         }
                     }
                     else
                     {
-                        List<LinkedElementInfo> infoList = FindElementMappingNode(node);
+                        var infoList = FindElementMappingNode(node);
                         if (infoList.Count > 0)
                         {
                             linkedElements.AddRange(infoList);
@@ -146,11 +146,11 @@ namespace HOK.ElementMover
             {
                 linkInstances = m_handler.LinkInstances;
                 selectedLink = m_handler.SelectedLink;
-                List<LinkedInstanceProperties> instances = linkInstances.Values.OrderBy(o => o.DisplayName).ToList();
+                var instances = linkInstances.Values.OrderBy(o => o.DisplayName).ToList();
                 comboBoxLink.ItemsSource = null;
                 comboBoxLink.ItemsSource = instances;
 
-                int selectedIndex = instances.FindIndex(o => o.InstanceId == selectedLink.InstanceId);
+                var selectedIndex = instances.FindIndex(o => o.InstanceId == selectedLink.InstanceId);
                 if (selectedIndex > -1) { comboBoxLink.SelectedIndex = selectedIndex; }
             }
             catch (Exception ex)
@@ -161,7 +161,7 @@ namespace HOK.ElementMover
 
         private void SetFocus()
         {
-            IntPtr hBefore = GetForegroundWindow();
+            var hBefore = GetForegroundWindow();
             SetForegroundWindow(ComponentManager.ApplicationWindow);
             SetForegroundWindow(hBefore);
         }
@@ -210,12 +210,12 @@ namespace HOK.ElementMover
         {
             try
             {
-                TreeViewElementModel selectedItem = e.NewValue as TreeViewElementModel;
+                var selectedItem = e.NewValue as TreeViewElementModel;
                 if (null != selectedItem)
                 {
                     if (selectedItem.NodeType == TreeViewNodeType.ElementMapping)
                     {
-                        LinkedElementInfo linkInfo = selectedItem.Tag as LinkedElementInfo;
+                        var linkInfo = selectedItem.Tag as LinkedElementInfo;
                         if (null != linkInfo)
                         {
                             m_handler.SelectedLinkedInfo = linkInfo;
@@ -260,14 +260,14 @@ namespace HOK.ElementMover
             {
                 if (null != comboBoxLink.SelectedItem)
                 {
-                    LinkedInstanceProperties lip = (LinkedInstanceProperties)comboBoxLink.SelectedItem;
+                    var lip = (LinkedInstanceProperties)comboBoxLink.SelectedItem;
                     m_handler.SelectedLink = lip;
 
-                    List<LinkedFamilyInfo> linkedInfoToDelete = new List<LinkedFamilyInfo>();
-                    List<TreeViewFamilyModel> treeviewModels = treeViewFamilyMapping.ItemsSource as List<TreeViewFamilyModel>;
-                    foreach (TreeViewFamilyModel categoryNode in treeviewModels)
+                    var linkedInfoToDelete = new List<LinkedFamilyInfo>();
+                    var treeviewModels = treeViewFamilyMapping.ItemsSource as List<TreeViewFamilyModel>;
+                    foreach (var categoryNode in treeviewModels)
                     {
-                        List<LinkedFamilyInfo> infoList = FindFamilyMappingNode(categoryNode);
+                        var infoList = FindFamilyMappingNode(categoryNode);
                         if (infoList.Count > 0)
                         {
                             linkedInfoToDelete.AddRange(infoList);
@@ -288,16 +288,16 @@ namespace HOK.ElementMover
 
         private List<LinkedFamilyInfo> FindFamilyMappingNode(TreeViewFamilyModel parentNode)
         {
-            List<LinkedFamilyInfo> linkedFamilies = new List<LinkedFamilyInfo>();
+            var linkedFamilies = new List<LinkedFamilyInfo>();
             try
             {
-                foreach (TreeViewFamilyModel node in parentNode.ChildrenNodes)
+                foreach (var node in parentNode.ChildrenNodes)
                 {
                     if (node.NodeType == TreeViewNodeType.FamilyType)
                     {
                         if (node.IsChecked == true)
                         {
-                            LinkedFamilyInfo linkedInfo = node.Tag as LinkedFamilyInfo;
+                            var linkedInfo = node.Tag as LinkedFamilyInfo;
                             if (null != linkedInfo)
                             {
                                 linkedFamilies.Add(linkedInfo);
@@ -306,7 +306,7 @@ namespace HOK.ElementMover
                     }
                     else
                     {
-                        List<LinkedFamilyInfo> infoList = FindFamilyMappingNode(node);
+                        var infoList = FindFamilyMappingNode(node);
                         if (infoList.Count > 0)
                         {
                             linkedFamilies.AddRange(infoList);

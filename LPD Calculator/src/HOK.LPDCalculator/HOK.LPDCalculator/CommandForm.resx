@@ -310,4 +310,7 @@
         AAAAAAAA
 </value>
   </data>
+  <data name="Command_FileNotSaved" xml:space="preserve">
+    <value>Please save the current Revit project before running the LPD Analysis.</value>
+  </data>
 </root>

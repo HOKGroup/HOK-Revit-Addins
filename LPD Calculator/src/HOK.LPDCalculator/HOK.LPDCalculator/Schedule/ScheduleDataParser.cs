@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace HOK.LPDCalculator.Schedule
@@ -11,11 +9,11 @@ namespace HOK.LPDCalculator.Schedule
     class ScheduleDataParser
     {
         //delimiter
-        static char[] tabs = new char[] { '\t' };
-        static char[] quotes = new char[] { '"' };
+        static char[] tabs = { '\t' };
+        static char[] quotes = { '"' };
 
         
-        DataTable table = null;
+        DataTable table;
 
       
         public DataTable Table
@@ -27,7 +25,7 @@ namespace HOK.LPDCalculator.Schedule
         {
             try
             {
-                StreamReader stream = File.OpenText(filename);
+                var stream = File.OpenText(filename);
 
                 string line;
                 string[] a;
@@ -36,7 +34,7 @@ namespace HOK.LPDCalculator.Schedule
                 {
                     a = line
                       .Split(tabs)
-                      .Select<string, string>(s => s.Trim(quotes))
+                      .Select(s => s.Trim(quotes))
                       .ToArray();
 
                     // Second line of text file contains 
@@ -46,9 +44,9 @@ namespace HOK.LPDCalculator.Schedule
                     {
                         table = new DataTable();
 
-                        foreach (string column_name in a)
+                        foreach (var column_name in a)
                         {
-                            DataColumn column = new DataColumn();
+                            var column = new DataColumn();
                             column.DataType = typeof(string);
                             column.ColumnName = column_name;
                             table.Columns.Add(column);
@@ -61,7 +59,7 @@ namespace HOK.LPDCalculator.Schedule
 
                     // Remaining lines define schedula data
 
-                    DataRow dr = table.LoadDataRow(a, true);
+                    var dr = table.LoadDataRow(a, true);
                 }
                 table.EndLoadData();
             }

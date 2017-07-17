@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Element Mover</Name>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.ElementMover.dll</Assembly>
+    <AddInId>4685D7AA-12CB-4C00-9C16-F95DD8A01F6A</AddInId>
+    <FullClassName>HOK.ElementMover.AppCommand</FullClassName>
+    <VendorId>JKIM</VendorId>
+    <VendorDescription>JKIM</VendorDescription>
+  </AddIn>
+</RevitAddIns>

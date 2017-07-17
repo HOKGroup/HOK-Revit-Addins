@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Media.Imaging;
 using System.Reflection;
 using Autodesk.Revit.DB.Events;
@@ -274,7 +275,8 @@ namespace HOK.RibbonTab
             try
             {
                 var fileExist = false;
-                var hokPanel = m_app.CreateRibbonPanel(tabName, "Customizations");
+                var created = m_app.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Customizations");
+                var hokPanel = created ?? m_app.CreateRibbonPanel(tabName, "Customizations");
 
                 if (File.Exists(currentDirectory + "/HOK.SheetManager.dll"))
                 {
@@ -398,8 +400,10 @@ namespace HOK.RibbonTab
 
                 if (File.Exists(currentDirectory + "/HOK.LPDCalculator.dll"))
                 {
+                    var assemblyPath = currentDirectory + "/HOK.LPDCalculator.dll";
+                    var ass = Assembly.LoadFrom(assemblyPath);
                     var pb15 = splitButton.AddPushButton(new PushButtonData("LPD Analysis", "LPD Analysis", currentDirectory + "/HOK.LPDCalculator.dll", "HOK.LPDCalculator.Command"));
-                    pb15.LargeImage = LoadBitmapImage(assembly, "bulb.png");
+                    pb15.LargeImage = ButtonUtil.LoadBitmapImage(ass, "HOK.LPDCalculator", "lpdCalculator_32.png");
                     pb15.ToolTip = "Calculating Lighting Power Density";
                     AddToolTips(pb15);
                 }
