@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using HOK.Core.Utilities;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -45,8 +46,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to display parameters lists.\n" + ex.Message, "Form_Parameters:Form_Parameters_Load", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("Form_Parameters_Load", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -87,8 +87,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect selected parameters.\n" + ex.Message, "Form_Parameters:bttnApply_Click", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("bttnApply_Click", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 

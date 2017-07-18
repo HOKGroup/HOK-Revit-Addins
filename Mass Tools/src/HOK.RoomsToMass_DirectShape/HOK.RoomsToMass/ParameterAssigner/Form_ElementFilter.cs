@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Autodesk.Revit.DB;
+using HOK.Core.Utilities;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -59,8 +60,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to display categories.\n" + ex.Message, "Form_ElementFilter:DisplayCategory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("DisplayCategory", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -309,8 +309,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create a category filter.\n" + ex.Message, "Form_ElementFilter:buttonFilter_Click", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("buttonFilter_Click", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 

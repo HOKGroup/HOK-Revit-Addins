@@ -46,7 +46,7 @@ namespace HOK.RoomsToMass.ToMass
                         roomGeometries.Add(roomSolid);
                     }
                 }
-#if RELEASE2017
+#if RELEASE2017 || RELEASE2018
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = rp.RoomId.ToString();
@@ -98,7 +98,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     IList<GeometryObject> roomGeometries = GetGeometryObjectsFromFace(rp.BottomFace);
 
-#if RELEASE2017
+#if RELEASE2017 || RELEASE2018
                     DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                     createdShape.ApplicationId = appGuid;
                     createdShape.ApplicationDataId = rp.RoomId.ToString();
@@ -153,7 +153,7 @@ namespace HOK.RoomsToMass.ToMass
                         areaGeometries.Add(areaSolid);
                     }
                 }
-#if RELEASE2017
+#if RELEASE2017 || RELEASE2018
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = ap.AreaId.ToString();
@@ -204,7 +204,7 @@ namespace HOK.RoomsToMass.ToMass
 
                 IList<GeometryObject> areaGeometries = GetGeometryObjectsFromFace(ap.AreaFace);
 
-#if RELEASE2017
+#if RELEASE2017 || RELEASE2018
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = ap.AreaId.ToString();
@@ -263,7 +263,7 @@ namespace HOK.RoomsToMass.ToMass
                         floorGeometries.Add(floorSolid);
                     }
                 }
-#if RELEASE2017
+#if RELEASE2017 || RELEASE2018
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = fp.FloorId.ToString();
@@ -313,7 +313,7 @@ namespace HOK.RoomsToMass.ToMass
 
                 IList<GeometryObject> floorGeometries = GetGeometryObjectsFromFace(fp.TopFace);
 
-#if RELEASE2017
+#if RELEASE2017 || RELEASE2018
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = fp.FloorId.ToString();
@@ -397,7 +397,7 @@ namespace HOK.RoomsToMass.ToMass
                 }
 
                 builder.CloseConnectedFaceSet();
-#if RELEASE2017
+#if RELEASE2017 || RELEASE2018
                 builder.Target = TessellatedShapeBuilderTarget.AnyGeometry;
                 builder.Fallback = TessellatedShapeBuilderFallback.Mesh;
                 builder.Build();

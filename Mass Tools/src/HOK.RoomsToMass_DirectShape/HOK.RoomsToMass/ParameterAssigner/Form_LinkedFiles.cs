@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using HOK.Core.Utilities;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -68,8 +69,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect workset from the host project.\n" + ex.Message, "LinkedModelManager:CollectWorksets", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("CollectWorksets", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -172,8 +172,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to display RevitLinkTypes.\n" + ex.Message, "Form_LinkedFiles:DisplayRvtLinkTypes", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("DisplayRvtLinkTypes", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -208,8 +207,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to find selected mass elements.\n" + ex.Message, "Form_LinkedFiles:FindSelectedMass", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("FindSelectedMass", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -243,8 +241,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect RevitLinkTypes.\n" + ex.Message, "Form_LinkedFiles:bttnApply_Click", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("bttnApply_Click", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -327,8 +324,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect mass elements from the host project.\n" + ex.Message, "LinkedModelManager:CollectHostMass", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("CollectHostMass", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -443,8 +439,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect mass elements from the linked files.\n" + ex.Message, "LinkedModelManager:CollectLinkedMass", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("CollectLinkedMass", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -500,8 +495,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to find mass elements in mass.\n" + ex.Message, "LinkedModelManager:FindElementsInMass", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("FindElementsInMass", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return elementList;
             }
         }
@@ -779,8 +773,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to find overlapping conditions.\n" + ex.Message, "LinkedModelManager:FindOverlaps", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("FindOverlaps", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 

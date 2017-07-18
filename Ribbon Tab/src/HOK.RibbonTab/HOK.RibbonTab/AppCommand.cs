@@ -322,13 +322,15 @@ namespace HOK.RibbonTab
                     splitButton.SetContextualHelp(contextualHelp);
 
                     var pb8 = splitButton.AddPushButton(new PushButtonData("Create Mass", "Create Mass", currentDirectory + "/HOK.RoomsToMass.dll", "HOK.RoomsToMass.Command"));
-                    pb8.LargeImage = LoadBitmapImage(assembly, "cube.png");
+                    //pb8.LargeImage = LoadBitmapImage(assembly, "createMass_32.png");
+                    pb8.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "createMass_32.png");
                     pb8.ToolTip = "Creates 3D Mass from rooms, areas and floors.";
                     pb8.ToolTipImage = LoadBitmapImage(assembly, "tooltip.png");
                     AddToolTips(pb8);
 
                     var pb10 = splitButton.AddPushButton(new PushButtonData("Mass Commands", "Mass Commands", currentDirectory + "/HOK.RoomsToMass.dll", "HOK.RoomsToMass.AssignerCommand"));
-                    pb10.LargeImage = LoadBitmapImage(assembly, "shape.png");
+                    //pb10.LargeImage = LoadBitmapImage(assembly, "massCommands_32.png");
+                    pb10.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "massCommands_32.png");
                     pb10.ToolTip = "Assign parameters or split elements";
                     AddToolTips(pb10);
                     fileExist = true;

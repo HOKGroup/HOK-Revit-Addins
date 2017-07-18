@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Autodesk.Revit.UI;
+﻿using System.Collections.Generic;
 using Autodesk.Revit.DB;
-using System.Windows.Forms;
 using Autodesk.Revit.DB.Structure;
 
 namespace HOK.RoomsToMass.ParameterAssigner
@@ -72,66 +67,47 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
     public class ElementProperties
     {
-        private Element m_elem = null;
-        private Document doc = null;
-        private int elementId = -1;
-        private string elementName = "";
-        private int hostElementId = -1;
+        public Document Doc { get; set; } = null;
+        public int ElementId { get; set; } = -1;
+        public string ElementName { get; set; } = "";
+        public int HostElementId { get; set; } = -1;
+        public Element ElementObj { get; set; } = null;
 
-        private Element copiedElement = null;
-        private ElementId copiedElementId = Autodesk.Revit.DB.ElementId.InvalidElementId;
-        private Transform transformValue = Transform.Identity;
+        public Element CopiedElement { get; set; } = null;
+        public ElementId CopiedElementId { get; set; } = Autodesk.Revit.DB.ElementId.InvalidElementId;
+        public Transform TransformValue { get; set; } = Transform.Identity;
 
-        private int categoryId = -1;
-        private string categoryName = "";
-        private Dictionary<int, Solid> massContainers = new Dictionary<int, Solid>();
-        private Solid elementSolid = null;
-        private Dictionary<int, double> overappingMaps = new Dictionary<int, double>();
-
-        private bool linkedElement = false;
-        private int selectedMassId = -1;
-        private List<Element> primaryElements = new List<Element>();
-        private List<Element> secondaryElements = new List<Element>();
-        private bool splitSucceed = false;
-
-        public Document Doc { get { return doc; } set { doc = value; } }
-        public int ElementId { get { return elementId; } set { elementId = value; } }
-        public string ElementName { get { return elementName; } set { elementName = value; } }
-        public int HostElementId { get { return hostElementId; } set { hostElementId = value; } }
-        public Element ElementObj { get { return m_elem; } set { m_elem = value; } }
-
-        public Element CopiedElement { get { return copiedElement; } set { copiedElement = value; } }
-        public ElementId CopiedElementId { get { return copiedElementId; } set { copiedElementId = value; } }
-        public Transform TransformValue { get { return transformValue; } set { transformValue = value; } }
-
-        public int CategoryId { get { return categoryId; } set { categoryId = value; } }
-        public string CategoryName { get { return categoryName; } set { categoryName = value; } }
-        public Dictionary<int/*massId*/, Solid/*MassSolid*/> MassContainers { get { return massContainers; } set { massContainers = value; } }
-        public Solid ElementSolid { get { return elementSolid; } set { elementSolid = value; } }
-        public Dictionary<int/*massId*/, double/*percentage of intersected*/> OpverappingMaps { get { return overappingMaps; } set { overappingMaps = value; } }
+        public int CategoryId { get; set; } = -1;
+        public string CategoryName { get; set; } = "";
+        public Dictionary<int/*massId*/, Solid/*MassSolid*/> MassContainers { get; set; } = new Dictionary<int, Solid>();
+        public Solid ElementSolid { get; set; } = null;
+        public Dictionary<int/*massId*/, double/*percentage of intersected*/> OpverappingMaps { get; set; } = new Dictionary<int, double>();
 
         //use for split options
-        public bool LinkedElement { get { return linkedElement; } set { linkedElement = value; } }
-        public int SelectedMassId { get { return selectedMassId; } set { selectedMassId = value; } }
-        public List<Element> PrimaryElements { get { return primaryElements; } set { primaryElements = value; } } //splited element from selected mass
-        public List<Element> SecondaryElements { get { return secondaryElements; } set { secondaryElements = value; } } //result of the differecne operation of the mass
+        public bool LinkedElement { get; set; } = false;
 
-        public bool SplitSucceed { get { return splitSucceed; } set { splitSucceed = value; } }
+        public int SelectedMassId { get; set; } = -1;
+        public List<Element> PrimaryElements { get; set; } = new List<Element>();
+//splited element from selected mass
+        public List<Element> SecondaryElements { get; set; } = new List<Element>();
+//result of the differecne operation of the mass
+
+        public bool SplitSucceed { get; set; } = false;
 
         public ElementProperties(Element element)
         {
-            m_elem = element;
-            doc = m_elem.Document;
-            elementId = m_elem.Id.IntegerValue;
-            elementName=element.Name;
+            ElementObj = element;
+            Doc = ElementObj.Document;
+            ElementId = ElementObj.Id.IntegerValue;
+            ElementName=element.Name;
 
-            if (null != m_elem.Category)
+            if (null != ElementObj.Category)
             {
-                categoryId = m_elem.Category.Id.IntegerValue;
-                categoryName = m_elem.Category.Name;
+                CategoryId = ElementObj.Category.Id.IntegerValue;
+                CategoryName = ElementObj.Category.Name;
             }
            
-            doc = element.Document;
+            Doc = element.Document;
 
         }
 
@@ -166,17 +142,13 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         public StorageType ParamStorageType { get { return m_param.StorageType; } }
 
-        private List<ElementId> elementIds = new List<ElementId>();
-        public List<ElementId> ElementIDValues { get { return elementIds; } set { elementIds = value; } }
+        public List<ElementId> ElementIDValues { get; set; } = new List<ElementId>();
 
-        private List<double> doubleValues = new List<double>();
-        public List<double> DoubleValues { get { return doubleValues; } set { doubleValues = value; } }
+        public List<double> DoubleValues { get; set; } = new List<double>();
 
-        private List<int> intValues = new List<int>();
-        public List<int> IntValues { get { return intValues; } set { intValues = value; } }
+        public List<int> IntValues { get; set; } = new List<int>();
 
-        private List<string> strValues = new List<string>();
-        public List<string> StringValues { get { return strValues; } set { strValues = value; } }
+        public List<string> StringValues { get; set; } = new List<string>();
 
         public void AddValue(Parameter param)
         {

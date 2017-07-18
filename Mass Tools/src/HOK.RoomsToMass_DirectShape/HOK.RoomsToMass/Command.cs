@@ -1,38 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Autodesk.Revit.UI;
 using System.Windows.Forms;
-using HOK.RoomsToMass.ToMass;
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI.Selection;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
+using HOK.RoomsToMass.ToMass;
 
 namespace HOK.RoomsToMass
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    [Autodesk.Revit.Attributes.Regeneration(Autodesk.Revit.Attributes.RegenerationOption.Manual)]
-    [Autodesk.Revit.Attributes.Journaling(Autodesk.Revit.Attributes.JournalingMode.NoCommandData)]
-
-    public class Command:IExternalCommand
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
+    public class Command : IExternalCommand
     {
-        private Autodesk.Revit.UI.UIApplication m_app;
+        private UIApplication m_app;
         private Document m_doc;
-        private Dictionary<string, RevitDocumentProperties> modelDictionary = new Dictionary<string, RevitDocumentProperties>();
+        private readonly Dictionary<string, RevitDocumentProperties> modelDictionary = new Dictionary<string, RevitDocumentProperties>();
         private SourceType selectedSource = SourceType.None;
         private Dictionary<string, RoomProperties> roomDictionary = new Dictionary<string, RoomProperties>();
         private Dictionary<string, AreaProperties> areaDictionary = new Dictionary<string, AreaProperties>();
         private Dictionary<string, FloorProperties> floorDictionary = new Dictionary<string, FloorProperties>();
       
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             try
             {
                 m_app = commandData.Application;
                 m_doc = m_app.ActiveUIDocument.Document;
+                Log.AppendLog(LogMessageType.INFO, "Started");
+
+                // (Konrad) We are gathering information about the addin use. This allows us to
+                // better maintain the most used plug-ins or discontiue the unused ones.
+                AddinUtilities.PublishAddinLog(new AddinLog("MassTools-CreateMass", m_doc));
 
                 GetModelInformation();
-                MassSourceWindow sourceWindow = new MassSourceWindow(m_app, modelDictionary);
+                var sourceWindow = new MassSourceWindow(m_app, modelDictionary);
                 if (sourceWindow.ShowDialog() == true)
                 {
                     selectedSource = sourceWindow.SelectedSourceType;
@@ -40,26 +46,28 @@ namespace HOK.RoomsToMass
                     {
                         case SourceType.Rooms:
                             roomDictionary = sourceWindow.RoomDictionary;
-                            RoomWindow roomWindow = new RoomWindow(m_app, modelDictionary, roomDictionary);
+                            var roomWindow = new RoomWindow(m_app, modelDictionary, roomDictionary);
                             roomWindow.ShowDialog();
                             break;
                         case SourceType.Areas:
                             areaDictionary = sourceWindow.AreaDictionary;
-                            AreaWindow areaWindow = new AreaWindow(m_app, modelDictionary, areaDictionary);
+                            var areaWindow = new AreaWindow(m_app, modelDictionary, areaDictionary);
                             areaWindow.ShowDialog();
                             break;
                         case SourceType.Floors:
                             floorDictionary = sourceWindow.FloorDictionary;
-                            FloorWindow floorWindow = new FloorWindow(m_app, modelDictionary, floorDictionary);
+                            var floorWindow = new FloorWindow(m_app, modelDictionary, floorDictionary);
                             floorWindow.ShowDialog();
                             break;
                     }
                 }
+
+                Log.AppendLog(LogMessageType.INFO, "Ended.");
                 return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: cannot start Rooms to Mass.\n" + ex.Message, "Rooms to Mass");
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return Result.Failed;
             }
         }
@@ -71,15 +79,15 @@ namespace HOK.RoomsToMass
                 //host project
                 if (!string.IsNullOrEmpty(m_doc.Title))
                 {
-                    RevitDocumentProperties hostModel = new RevitDocumentProperties(m_doc);
+                    var hostModel = new RevitDocumentProperties(m_doc);
                     modelDictionary.Add(hostModel.DocumentTitle, hostModel);
 
-                    FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                    List<RevitLinkInstance> linkInstances = collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().Cast<RevitLinkInstance>().ToList();
-                    foreach (RevitLinkInstance instance in linkInstances)
+                    var collector = new FilteredElementCollector(m_doc);
+                    var linkInstances = collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().Cast<RevitLinkInstance>().ToList();
+                    foreach (var instance in linkInstances)
                     {
-                        LinkedInstanceProperties lip = new LinkedInstanceProperties(instance);
-                        Document linkedDoc = instance.GetLinkDocument();
+                        var lip = new LinkedInstanceProperties(instance);
+                        var linkedDoc = instance.GetLinkDocument();
                         if (null != linkedDoc)
                         {
                             if (modelDictionary.ContainsKey(linkedDoc.Title))
@@ -88,7 +96,7 @@ namespace HOK.RoomsToMass
                             }
                             else
                             {
-                                RevitDocumentProperties linkedModel = new RevitDocumentProperties(linkedDoc);
+                                var linkedModel = new RevitDocumentProperties(linkedDoc);
                                 linkedModel.LinkedInstances.Add(lip.InstanceId, lip);
                                 modelDictionary.Add(linkedModel.DocumentTitle, linkedModel);
                             }
@@ -97,58 +105,48 @@ namespace HOK.RoomsToMass
                 }
                 else
                 {
+                    Log.AppendLog(LogMessageType.ERROR, "The current Revit model hasn't been saved yet.");
                     MessageBox.Show("The current Revit model hasn't been saved yet.", "Empty Document Title", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to get the inforamtion of models loaded into this project.\n"+ex.Message, "Get Model Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
-
     }
 
     public class RevitDocumentProperties
     {
-        private bool isLinked = false;
-        private Document documentObj = null;
-        private string documentTitle = "";
-        private Dictionary<int, LinkedInstanceProperties> linkedInstances = new Dictionary<int,LinkedInstanceProperties>();
-
-        public bool IsLinked { get { return isLinked; } set { isLinked = value; } }
-        public Document DocumentObj { get { return documentObj; } set { documentObj = value; } }
-        public string DocumentTitle { get { return documentTitle; } set { documentTitle = value; } }
-        public Dictionary<int, LinkedInstanceProperties> LinkedInstances { get { return linkedInstances; } set { linkedInstances = value; } }
+        public bool IsLinked { get; set; }
+        public Document DocumentObj { get; set; }
+        public string DocumentTitle { get; set; }
+        public Dictionary<int, LinkedInstanceProperties> LinkedInstances { get; set; } = new Dictionary<int,LinkedInstanceProperties>();
 
         public RevitDocumentProperties(Document doc)
         {
-            documentObj = doc;
-            documentTitle = doc.Title;
-            isLinked = doc.IsLinked;
+            DocumentObj = doc;
+            DocumentTitle = doc.Title;
+            IsLinked = doc.IsLinked;
         }
     }
 
 
     public class LinkedInstanceProperties
     {
-        private RevitLinkInstance m_instance = null;
-        private int instanceId = -1;
-        private Autodesk.Revit.DB.Transform transformValue = null;
-
-        public RevitLinkInstance Instance { get { return m_instance; } set { m_instance = value; } }
-        public int InstanceId { get { return instanceId; } set { instanceId = value; } }
-        public Autodesk.Revit.DB.Transform TransformValue { get { return transformValue; } set { transformValue = value; } }
+        public RevitLinkInstance Instance { get; set; }
+        public int InstanceId { get; set; }
+        public Transform TransformValue { get; set; }
 
         public LinkedInstanceProperties(RevitLinkInstance instance)
         {
-            m_instance = instance;
-            instanceId = instance.Id.IntegerValue;
+            Instance = instance;
+            InstanceId = instance.Id.IntegerValue;
             
             if (null != instance.GetTotalTransform())
             {
-                transformValue = instance.GetTotalTransform();
+                TransformValue = instance.GetTotalTransform();
             }
         }
     }
-
 }

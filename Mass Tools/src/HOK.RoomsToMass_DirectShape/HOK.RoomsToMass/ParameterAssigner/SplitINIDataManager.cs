@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using System.IO;
 using System.Windows.Forms;
+using HOK.Core.Utilities;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -62,8 +63,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to find INI file. \n" + ex.Message, "SplitINIDataManager : FindINI", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("FindINI", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return false;
             }
         }
@@ -117,8 +117,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to read INI file.\n" + ex.Message, "SplitINIDataManager:ReadINI", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("ReadINI", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -151,8 +150,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to append line." + ex.Message, "Form_Assigner:AppendINI", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("AppendINI", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -224,8 +222,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to write the INI file.\n" + ex.Message, "SplitINIDataManager:WriteINI", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("WriteINI", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 

@@ -139,13 +139,11 @@
     <EmbeddedResource Include="Resources\tooltip.png" />
     <EmbeddedResource Include="Resources\workset.png" />
     <EmbeddedResource Include="Resources\viewTooltip.png" />
-    <EmbeddedResource Include="Resources\cube.png" />
     <EmbeddedResource Include="Resources\finish.png" />
     <EmbeddedResource Include="Resources\height.png" />
     <EmbeddedResource Include="Resources\level.png" />
     <EmbeddedResource Include="Resources\project.png" />
     <EmbeddedResource Include="Resources\refresh.png" />
-    <EmbeddedResource Include="Resources\shape.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -198,8 +196,10 @@
     <Content Include="HOK.RibbonTab.addin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Resources\massCommands_32.png" />
     <EmbeddedResource Include="Resources\doorTool_32.png" />
     <EmbeddedResource Include="Resources\arrowhead_32.png" />
+    <EmbeddedResource Include="Resources\createMass_32.png" />
     <Content Include="Resources\HOK.Tooltip.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -11,6 +11,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 using HOK.RoomsToMass.ToMass;
 using System.IO;
+using HOK.Core.Utilities;
 
 
 namespace HOK.RoomsToMass.ParameterAssigner
@@ -73,7 +74,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         private void Form_Assigner_Load(object sender, EventArgs e)
         {
-            foreach (string paramName in massParameters)
+            foreach (var paramName in massParameters)
             {
                 selectedParameters.Add(paramName, paramName);
             }
@@ -118,10 +119,10 @@ namespace HOK.RoomsToMass.ParameterAssigner
             {
                 dataGridViewParameter.Rows.Clear();
                 dataGridViewParameter.Columns.Clear();
-                foreach (string paramName in massParameters)
+                foreach (var paramName in massParameters)
                 {
                    
-                    int colIndex = dataGridViewParameter.Columns.Add(paramName, paramName);
+                    var colIndex = dataGridViewParameter.Columns.Add(paramName, paramName);
                     if (selectedParameters.ContainsKey(paramName))
                     {
                         dataGridViewParameter.Columns[paramName].HeaderText = selectedParameters[paramName];
@@ -133,9 +134,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 }
 
                 dataGridViewMass.Rows.Clear();
-                int index = 0;
+                var index = 0;
                 //mass instances from linked files
-                foreach (MassProperties mp in integratedMassList)
+                foreach (var mp in integratedMassList)
                 {
                     if (mp.IsHost && massSourceType == MassSource.OnlyLink) { continue; }
                     if (!mp.IsHost && massSourceType == MassSource.OnlyHost) { continue; }
@@ -179,14 +180,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                int index = dataGridViewParameter.Rows.Add();
+                var index = dataGridViewParameter.Rows.Add();
                 dataGridViewParameter.Rows[index].Tag = mp;
                 foreach (DataGridViewColumn column in dataGridViewParameter.Columns)
                 {
                     dataGridViewParameter.Rows[index].Cells[column.Name].Value = "";
                 }
 
-                foreach (Parameter param in mp.MassParameters)
+                foreach (var param in mp.MassParameters)
                 {
                     if (dataGridViewParameter.Columns.Contains(param.Definition.Name))
                     {
@@ -294,7 +295,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                Form_Parameters parametersForm = new Form_Parameters(massParameters, selectedParameters);
+                var parametersForm = new Form_Parameters(massParameters, selectedParameters);
                 if (DialogResult.OK == parametersForm.ShowDialog())
                 {
                     selectedParameters = new Dictionary<string, string>();
@@ -302,9 +303,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     parametersForm.Close();
                 }
 
-                for (int i = 0; i < dataGridViewParameter.Columns.Count; i++)
+                for (var i = 0; i < dataGridViewParameter.Columns.Count; i++)
                 {
-                    DataGridViewColumn column = dataGridViewParameter.Columns[i];
+                    var column = dataGridViewParameter.Columns[i];
                     if (selectedParameters.ContainsKey(column.Name))
                     {
                         column.HeaderText = selectedParameters[column.Name];
@@ -326,19 +327,19 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                List<string> missingWorksets = new List<string>();
-                List<MassProperties> massList = CountElements();
-                List<string> existingParameters = new List<string>();
-                bool emptyOnly = checkBoxEmptyParam.Checked;
-                bool modelGroupExist = false;
+                var missingWorksets = new List<string>();
+                var massList = CountElements();
+                var existingParameters = new List<string>();
+                var emptyOnly = checkBoxEmptyParam.Checked;
+                var modelGroupExist = false;
 
                 if (massList.Count > 0)
                 {
                     if (CheckOverlappingToAssign(massList))
                     {
-                        foreach (MassProperties mp in massList)
+                        foreach (var mp in massList)
                         {
-                            List<Element> elementList = new List<Element>();
+                            var elementList = new List<Element>();
                             if (checkBoxFilter.Checked) 
                             {
                                 elementList = mp.FilteredContainer; 
@@ -348,36 +349,36 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                 elementList = mp.ElementContainer; 
                             }
 
-                            foreach (Element element in elementList)
+                            foreach (var element in elementList)
                             {
                                 toolStripProgressBar.PerformStep();
                                 //if (ElementId.InvalidElementId!=element.GroupId) {  modelGroupExist = true; continue;  }
                                 if (intersectingElements.ContainsKey(element.Id.IntegerValue))
                                 {
-                                    ElementProperties ep = intersectingElements[element.Id.IntegerValue];
+                                    var ep = intersectingElements[element.Id.IntegerValue];
                                     if (ep.CategoryName == "Model Groups") { modelGroupExist = true; continue; }
                                     if (ep.SelectedMassId != mp.MassId) { continue; } //if an element already assigned to another mass to propagate parameters
                                 }
 
-                                using (Transaction trans = new Transaction(m_doc))
+                                using (var trans = new Transaction(m_doc))
                                 {
-                                    FailureHandlingOptions failureHandlingOptions = trans.GetFailureHandlingOptions();
-                                    FailureHandler failureHandler = new FailureHandler();
+                                    var failureHandlingOptions = trans.GetFailureHandlingOptions();
+                                    var failureHandler = new FailureHandler();
                                     failureHandlingOptions.SetFailuresPreprocessor(failureHandler);
                                     failureHandlingOptions.SetClearAfterRollback(true);
                                     trans.SetFailureHandlingOptions(failureHandlingOptions);
 
                                     trans.Start("Set Parameter");
                                     //set parameters
-                                    foreach (Parameter param in mp.MassParameters)
+                                    foreach (var param in mp.MassParameters)
                                     {
                                         if (!selectedParameters.ContainsKey(param.Definition.Name)) { continue; }
 
-                                        string paramName = selectedParameters[param.Definition.Name];
+                                        var paramName = selectedParameters[param.Definition.Name];
 #if RELEASE2013||RELEASE2014
                                         Parameter elemParam = element.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                                        Parameter elemParam = element.LookupParameter(paramName);
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+                                        var elemParam = element.LookupParameter(paramName);
 #endif
 
                                         if (null != elemParam)
@@ -395,7 +396,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                                         if (emptyOnly){ if (elemParam.AsInteger() != 0) { break; } } 
                                                         if (paramName == "Workset")
                                                         {
-                                                            string worksetName = param.AsString();
+                                                            var worksetName = param.AsString();
                                                             if (worksetDictionary.ContainsKey(worksetName))
                                                             {
                                                                 elemParam.Set(worksetDictionary[worksetName]);
@@ -427,7 +428,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                                     try
                                                     {
                                                         if (emptyOnly) { if (elemParam.AsString() != "") { break; } }
-                                                        string value = param.AsString();
+                                                        var value = param.AsString();
                                                         elemParam.Set(value);
                                                     }
                                                     catch { }
@@ -447,9 +448,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                         if (missingWorksets.Count > 0)
                         {
-                            StringBuilder strBuilder = new StringBuilder();
+                            var strBuilder = new StringBuilder();
                             strBuilder.AppendLine("The following worksets were not found in the host project.\n");
-                            foreach (string worksetName in missingWorksets)
+                            foreach (var worksetName in missingWorksets)
                             {
                                 strBuilder.AppendLine(worksetName);
                             }
@@ -458,9 +459,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                         if (selectedParameters.Count!=existingParameters.Count)
                         {
-                            StringBuilder strBuilder = new StringBuilder();
+                            var strBuilder = new StringBuilder();
                             strBuilder.AppendLine("The following selected parameters cannot be found in any of elements.");
-                            foreach (string massParam in selectedParameters.Keys)
+                            foreach (var massParam in selectedParameters.Keys)
                             {
                                 if (!existingParameters.Contains(massParam))
                                 {
@@ -480,16 +481,16 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                         if (failureMessage.Length > 0)
                         {
-                            logCreated = LogFileManager.CreateLogFile(m_doc, MassTool.MassCommands);
-                            LogFileManager.ClearLogFile();
+                            //logCreated = LogFileManager.CreateLogFile(m_doc, MassTool.MassCommands);
+                            //LogFileManager.ClearLogFile();
 
-                            StringBuilder strBuilder = new StringBuilder();
-                            strBuilder.AppendLine(DateTime.Now.ToString() + ": Started Assigning Parameter Values");
+                            var strBuilder = new StringBuilder();
+                            strBuilder.AppendLine(DateTime.Now + ": Started Assigning Parameter Values");
                             strBuilder.AppendLine("Parameter values cannot be set on following elements\n");
-                            LogFileManager.AppendLog(strBuilder.ToString() + failureMessage.ToString());
-                            if (logCreated) { LogFileManager.WriteLogFile(); }
+                            Log.AppendLog(LogMessageType.WARNING, strBuilder.ToString() + failureMessage);
+                            //if (logCreated) { LogFileManager.WriteLogFile(); }
 
-                            MessageBoxForm msgForm = new MessageBoxForm("Assigning Parameters", strBuilder.ToString() + failureMessage.ToString(), LogFileManager.logFullName, true, true);
+                            var msgForm = new MessageBoxForm("Assigning Parameters", strBuilder.ToString() + failureMessage, LogFileManager.logFullName, true, true);
                             msgForm.ShowDialog();
                             
                             //MessageBox.Show("Parameter values cannot be set on following elements:\n\n"+failureMessage.ToString(), "Failure Message : Assigning Parameters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -498,20 +499,20 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         {
                             if (unassignedElements.Count > 0)
                             {
-                                logCreated = LogFileManager.CreateLogFile(m_doc, MassTool.MassCommands);
-                                LogFileManager.ClearLogFile();
-                                StringBuilder strBuilder = new StringBuilder();
-                                strBuilder.AppendLine(DateTime.Now.ToString() + ": Unassigned Elements");
+                                //logCreated = LogFileManager.CreateLogFile(m_doc, MassTool.MassCommands);
+                                //LogFileManager.ClearLogFile();
+                                var strBuilder = new StringBuilder();
+                                strBuilder.AppendLine(DateTime.Now + ": Unassigned Elements");
                                 strBuilder.AppendLine("Following elements are skipped and not assigned with any of mass parameters.\n");
-                                foreach (int elementId in unassignedElements.Keys)
+                                foreach (var elementId in unassignedElements.Keys)
                                 {
-                                    ElementProperties ep = unassignedElements[elementId];
+                                    var ep = unassignedElements[elementId];
                                     strBuilder.AppendLine("Element Id: " + ep.ElementId + " Element Name: " + ep.ElementName);
                                 }
-                                LogFileManager.AppendLog(strBuilder.ToString());
-                                if (logCreated) { LogFileManager.WriteLogFile(); }
+                                Log.AppendLog(LogMessageType.WARNING, strBuilder.ToString());
+                                //if (logCreated) { LogFileManager.WriteLogFile(); }
 
-                                MessageBoxForm msgForm = new MessageBoxForm("Unassigned Elements", strBuilder.ToString(), LogFileManager.logFullName, true, true);
+                                var msgForm = new MessageBoxForm("Unassigned Elements", strBuilder.ToString(), LogFileManager.logFullName, true, true);
                                 msgForm.ShowDialog();
                                
                             }
@@ -536,24 +537,24 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         private List<Element> FindEmptyParameter(List<Element> selectedElements)
         {
-            List<Element> filteredElements = new List<Element>();
+            var filteredElements = new List<Element>();
             try
             {
-                List<string> parameterNames = selectedParameters.Values.ToList();
-                List<string> categoryNames = new List<string>();
-                Dictionary<int/*id*/, Parameter> paramDictionary = new Dictionary<int, Parameter>();
+                var parameterNames = selectedParameters.Values.ToList();
+                var categoryNames = new List<string>();
+                var paramDictionary = new Dictionary<int, Parameter>();
 
-                foreach (Element element in selectedElements)
+                foreach (var element in selectedElements)
                 {
                     if (null != element.Category)
                     {
                         if (categoryNames.Contains(element.Category.Name)) { continue; }
-                        foreach (string paramName in parameterNames)
+                        foreach (var paramName in parameterNames)
                         {
 #if RELEASE2013||RELEASE2014
                             Parameter param = element.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
-                            Parameter param = element.LookupParameter(paramName);
+#elif RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+                            var param = element.LookupParameter(paramName);
 #endif
 
                             if (null != param)
@@ -569,40 +570,40 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     }
                 }
                 
-                List<ElementFilter> elementParamFilters = new List<ElementFilter>();
-                foreach (int paramId in paramDictionary.Keys)
+                var elementParamFilters = new List<ElementFilter>();
+                foreach (var paramId in paramDictionary.Keys)
                 {
-                    Parameter param = paramDictionary[paramId];
-                    ParameterValueProvider provider = new ParameterValueProvider(param.Id);
+                    var param = paramDictionary[paramId];
+                    var provider = new ParameterValueProvider(param.Id);
                     ElementParameterFilter filter;
                     switch (param.StorageType)
                     {
                         case StorageType.Double:
-                            FilterDoubleRule doubleRule = new FilterDoubleRule(provider, new FilterNumericEquals(), 0, 0);
+                            var doubleRule = new FilterDoubleRule(provider, new FilterNumericEquals(), 0, 0);
                             filter = new ElementParameterFilter(doubleRule);
                             elementParamFilters.Add(filter);
                             break;
                         case StorageType.Integer:
-                            FilterIntegerRule integerRule = new FilterIntegerRule(provider, new FilterNumericEquals(), 0);
+                            var integerRule = new FilterIntegerRule(provider, new FilterNumericEquals(), 0);
                             filter = new ElementParameterFilter(integerRule);
                             elementParamFilters.Add(filter);
                             break;
                         case StorageType.String:
-                            FilterStringRule stringRule = new FilterStringRule(provider, new FilterStringEquals(), "", false);
+                            var stringRule = new FilterStringRule(provider, new FilterStringEquals(), "", false);
                             filter = new ElementParameterFilter(stringRule);
                             elementParamFilters.Add(filter);
                             break;
                     }
                 }
-                LogicalOrFilter orFilter = new LogicalOrFilter(elementParamFilters);
+                var orFilter = new LogicalOrFilter(elementParamFilters);
 
-                List<ElementId> selectedElementIds = new List<ElementId>();
-                foreach (Element elem in selectedElements)
+                var selectedElementIds = new List<ElementId>();
+                foreach (var elem in selectedElements)
                 {
                     selectedElementIds.Add(elem.Id);
                 }
 
-                FilteredElementCollector elementCollector = new FilteredElementCollector(m_doc, selectedElementIds);
+                var elementCollector = new FilteredElementCollector(m_doc, selectedElementIds);
                 filteredElements = elementCollector.WherePasses(orFilter).ToElements().ToList();
                 
             }
@@ -617,13 +618,13 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                List<MassProperties> massList = new List<MassProperties>();
+                var massList = new List<MassProperties>();
                 foreach (DataGridViewRow row in dataGridViewMass.Rows)
                 {
-                    bool selected = Convert.ToBoolean(row.Cells[0].Value);
+                    var selected = Convert.ToBoolean(row.Cells[0].Value);
                     if (selected && null != row.Tag)
                     {
-                        MassProperties mp = row.Tag as MassProperties;
+                        var mp = row.Tag as MassProperties;
                         massList.Add(mp);
                     }
                 }
@@ -639,15 +640,15 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                         if (intersectingElements.Count > 0)
                         {
-                            List<int> keys = intersectingElements.Keys.ToList();
-                            ElementSpliter elementSpliter = new ElementSpliter(m_doc);
-                            StringBuilder errorString = new StringBuilder();
+                            var keys = intersectingElements.Keys.ToList();
+                            var elementSpliter = new ElementSpliter(m_doc);
+                            var errorString = new StringBuilder();
 
-                            foreach (int elementId in keys)
+                            foreach (var elementId in keys)
                             {
                                 toolStripProgressBar.ProgressBar.PerformStep();
 
-                                ElementProperties ep = intersectingElements[elementId];
+                                var ep = intersectingElements[elementId];
                                 if (ep.SelectedMassId == 0) { continue; }
                                 if (!splitCategories.Contains(ep.CategoryName)) { continue; }
                                 if (ep.OpverappingMaps.Count > 0)
@@ -678,14 +679,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                             if (errorString.Length > 0)
                             {
-                                logCreated = LogFileManager.CreateLogFile(m_doc, MassTool.MassCommands);
-                                LogFileManager.ClearLogFile();
-                                LogFileManager.AppendLog(DateTime.Now.ToString() + ": Started Spliting Elements");
-                                LogFileManager.AppendLog(errorString.ToString());
-                                if (logCreated) { LogFileManager.WriteLogFile(); }
+                                //logCreated = LogFileManager.CreateLogFile(m_doc, MassTool.MassCommands);
+                                //LogFileManager.ClearLogFile();
+                                //LogFileManager.AppendLog(DateTime.Now.ToString() + ": Started Spliting Elements");
+                                //LogFileManager.AppendLog(errorString.ToString());
+                                //if (logCreated) { LogFileManager.WriteLogFile(); }
 
-                                MessageBoxForm msgForm = new MessageBoxForm("Spliting Elements", "This tool was not able to split following elements: \n\n" + errorString.ToString(), LogFileManager.logFullName, true, true);
-                                DialogResult dr = msgForm.ShowDialog();
+                                var msgForm = new MessageBoxForm("Spliting Elements", "This tool was not able to split following elements: \n\n" + errorString.ToString(), LogFileManager.logFullName, true, true);
+                                var dr = msgForm.ShowDialog();
 
                                 //MessageBox.Show("This tool was not able to split following elements: \n\n" + errorString.ToString(), "Failure Message : Split Elements", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             }
@@ -711,20 +712,20 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         private List<MassProperties> CountElements()
         {
-            List<MassProperties> massList = new List<MassProperties>();
+            var massList = new List<MassProperties>();
             try
             {
-                int elementCount = 0;
+                var elementCount = 0;
                 foreach (DataGridViewRow row in dataGridViewMass.Rows)
                 {
-                    bool selected = Convert.ToBoolean(row.Cells[0].Value);
-                    List<Parameter> paramToTransfer = new List<Parameter>();
+                    var selected = Convert.ToBoolean(row.Cells[0].Value);
+                    var paramToTransfer = new List<Parameter>();
                     if (selected && null != row.Tag)
                     {
-                        MassProperties mp = row.Tag as MassProperties;
+                        var mp = row.Tag as MassProperties;
                         if (mp.MassParameters.Count > 0)
                         {
-                            foreach (Parameter param in mp.MassParameters)
+                            foreach (var param in mp.MassParameters)
                             {
                                 if (selectedParameters.ContainsKey(param.Definition.Name))
                                 {
@@ -758,15 +759,15 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         private bool CheckOverlappingToSplit(List<MassProperties> selectedMass)
         {
-            bool result = false;
+            var result = false;
             try
             {
                 intersectingElements = new Dictionary<int, ElementProperties>();
-                List<string> intersectingCategories = new List<string>();
-                List<int> massIds = new List<int>();//massIds that will be displayed in the overapping form
-                foreach (int elementId in elementDictionary.Keys)
+                var intersectingCategories = new List<string>();
+                var massIds = new List<int>();//massIds that will be displayed in the overapping form
+                foreach (var elementId in elementDictionary.Keys)
                 {
-                    ElementProperties ep = elementDictionary[elementId];
+                    var ep = elementDictionary[elementId];
                     if (!ep.LinkedElement) { continue; }//elements in host model won't be split
                     if (!categoryNames.Contains(ep.CategoryName)) { continue; }
                     if (checkBoxFilter.Checked)
@@ -777,14 +778,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     {
                         if (ep.MassContainers.Count > 0)
                         {
-                            foreach (MassProperties mp in selectedMass)
+                            foreach (var mp in selectedMass)
                             {
                                 if (ep.MassContainers.ContainsKey(mp.MassId))
                                 {
                                     intersectingElements.Add(ep.ElementId, ep);
                                     if (!intersectingCategories.Contains(ep.CategoryName)) { intersectingCategories.Add(ep.CategoryName); }
 
-                                    foreach (int massId in ep.MassContainers.Keys)
+                                    foreach (var massId in ep.MassContainers.Keys)
                                     {
                                         if (!massIds.Contains(massId))
                                         {
@@ -800,12 +801,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                 if (intersectingElements.Count > 0)
                 {
-                    Dictionary<int, MassProperties> massdictionary = new Dictionary<int, MassProperties>();
+                    var massdictionary = new Dictionary<int, MassProperties>();
                     foreach (DataGridViewRow row in dataGridViewMass.Rows)
                     {
                         if (null != row.Tag)
                         {
-                            MassProperties mp = row.Tag as MassProperties;
+                            var mp = row.Tag as MassProperties;
                             if (!massdictionary.ContainsKey(mp.MassId))
                             {
                                 massdictionary.Add(mp.MassId, mp);
@@ -813,7 +814,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         }
                     }
 
-                    Form_OverlapMass overlapForm = new Form_OverlapMass(m_app, true, intersectingElements, massdictionary, massIds, intersectingCategories);
+                    var overlapForm = new Form_OverlapMass(m_app, true, intersectingElements, massdictionary, massIds, intersectingCategories);
                     if (ratio != 0)
                     {
                         overlapForm.SetDeterminant(ratio);
@@ -855,15 +856,15 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         private bool CheckOverlappingToAssign(List<MassProperties> selectedMass)
         {
-            bool result = false;
+            var result = false;
             try
             {
                 intersectingElements = new Dictionary<int, ElementProperties>();
-                List<string> intersectingCategories = new List<string>();
-                List<int> massIds = new List<int>();//massIds that will be displayed in the overapping form
-                foreach (int elementId in elementDictionary.Keys)
+                var intersectingCategories = new List<string>();
+                var massIds = new List<int>();//massIds that will be displayed in the overapping form
+                foreach (var elementId in elementDictionary.Keys)
                 {
-                    ElementProperties ep = elementDictionary[elementId];
+                    var ep = elementDictionary[elementId];
                     if (ep.LinkedElement) { continue; } //parameters in linked models cannot be assigned
                     if (!categoryNames.Contains(ep.CategoryName)) { continue; }
                     if (checkBoxFilter.Checked)
@@ -874,14 +875,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     {
                         if (ep.MassContainers.Count > 1)
                         {
-                            foreach (MassProperties mp in selectedMass)
+                            foreach (var mp in selectedMass)
                             {
                                 if (ep.MassContainers.ContainsKey(mp.MassId))
                                 {
                                     intersectingElements.Add(ep.ElementId, ep);
                                     if (!intersectingCategories.Contains(ep.CategoryName)) { intersectingCategories.Add(ep.CategoryName); }
 
-                                    foreach (int massId in ep.MassContainers.Keys)
+                                    foreach (var massId in ep.MassContainers.Keys)
                                     {
                                         if (!massIds.Contains(massId))
                                         {
@@ -897,12 +898,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                 if (intersectingElements.Count > 0)
                 {
-                    Dictionary<int, MassProperties> massdictionary = new Dictionary<int, MassProperties>();
+                    var massdictionary = new Dictionary<int, MassProperties>();
                     foreach (DataGridViewRow row in dataGridViewMass.Rows)
                     {
                         if (null != row.Tag)
                         {
-                            MassProperties mp = row.Tag as MassProperties;
+                            var mp = row.Tag as MassProperties;
                             if (!massdictionary.ContainsKey(mp.MassId))
                             {
                                 massdictionary.Add(mp.MassId, mp);
@@ -910,7 +911,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         }
                     }
 
-                    Form_OverlapMass overlapForm = new Form_OverlapMass(m_app, false, intersectingElements, massdictionary, massIds, intersectingCategories);
+                    var overlapForm = new Form_OverlapMass(m_app, false, intersectingElements, massdictionary, massIds, intersectingCategories);
                     if (ratio != 0)
                     {
                         overlapForm.SetDeterminant(ratio);
@@ -955,8 +956,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 {
                     if (null != dataGridViewMass.Rows[e.RowIndex].Tag)
                     {
-                        MassProperties mp = dataGridViewMass.Rows[e.RowIndex].Tag as MassProperties;
-                        UIDocument uidoc = m_app.ActiveUIDocument;
+                        var mp = dataGridViewMass.Rows[e.RowIndex].Tag as MassProperties;
+                        var uidoc = m_app.ActiveUIDocument;
 #if RELEASE2013||RELEASE2014
                         SelElementSet newSelection = SelElementSet.Create();
 
@@ -1003,7 +1004,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             if (dataGridViewMass.RowCount == dataGridViewParameter.RowCount)
             {
-                for (int index = 0; index < dataGridViewMass.Rows.Count; index++)
+                for (var index = 0; index < dataGridViewMass.Rows.Count; index++)
                 {
                     if (dataGridViewMass.Rows[index].Selected)
                     {
@@ -1018,7 +1019,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             if (dataGridViewMass.RowCount == dataGridViewParameter.RowCount)
             {
-                for (int index = 0; index < dataGridViewParameter.Rows.Count; index++)
+                for (var index = 0; index < dataGridViewParameter.Rows.Count; index++)
                 {
                     if (dataGridViewParameter.Rows[index].Selected)
                     {
@@ -1033,7 +1034,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                Form_ElementFilter filterForm = new Form_ElementFilter(m_doc, integratedMassList, elementCategories, parameterMaps);
+                var filterForm = new Form_ElementFilter(m_doc, integratedMassList, elementCategories, parameterMaps);
                 if(DialogResult.OK==filterForm.ShowDialog())
                 {
                     integratedMassList = filterForm.IntegratedMassDictionary;
@@ -1044,7 +1045,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     DisplayMassList(selectedSource);
 
                     selectedCategoryIds = new List<int>();
-                    foreach (Category category in elementCategories.Keys)
+                    foreach (var category in elementCategories.Keys)
                     {
                         if (elementCategories[category])
                         {
@@ -1075,7 +1076,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                Form_Settings formSettings = new Form_Settings(ratio, followHost);
+                var formSettings = new Form_Settings(ratio, followHost);
                 if (DialogResult.OK == formSettings.ShowDialog())
                 {
                     ratio = formSettings.Ratio;
@@ -1092,7 +1093,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                string htmPath = @"V:\RVT-Data\HOK Program\Documentation\Mass Tool_Instruction.pdf";
+                var htmPath = @"V:\RVT-Data\HOK Program\Documentation\Mass Tool_Instruction.pdf";
                 System.Diagnostics.Process.Start(htmPath);
             }
             catch (Exception ex)

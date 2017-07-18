@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using HOK.Core.Utilities;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -69,8 +70,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to check validation.\n"+ex.Message, "Form_Settings:CheckValidation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("CheckValidation", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 result = false;
             }
             return result;

@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
+using HOK.Core.Utilities;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -85,8 +86,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to display cateogires.\n" + ex.Message, "Form_OverlapMass:DisplayCategories", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("DisplayCategories", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -192,8 +192,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch(Exception ex)
             {
-                MessageBox.Show("Failed to display elements and intersecting masses.\n" + ex.Message, "Form_OverlapMass:DisplayIntersectingMasses", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("DisplayIntersectingMasses", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -229,8 +228,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch(Exception ex)
             {
-                MessageBox.Show("Failed to set ratio determinant.\n"+ex.Message,"Form_OverlapMass:SetDeterminant", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("SetDeterminant", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -266,8 +264,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create a host map.\n" + ex.Message, "Form_OverlapMass:CreateHostMap", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("CreateHostMap", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -284,8 +281,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to create eventhandler for comboboxcell.\n" + ex.Message, "Form_OverlapMass:dataGridViewElement_EditingControlShowing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("dataGridViewElement_EditingControlShowing", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -330,8 +326,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to tag massId on the cell.\n" + ex.Message, "Form_OverlapMass:ComboBox_SelectedIndexChanged", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("ComboBox_SelectedIndexChanged", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -377,8 +372,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to show elements.\n" + ex.Message, "Form_OverlapMass:buttonDetermine_Click", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("showElementToolStripMenuItem_Click", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -398,8 +392,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to control context menu strip.\n" + ex.Message, "Form_OverlapMass:dataGridViewElement_CellMouseDown", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("dataGridViewElement_CellMouseDown", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -423,8 +416,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to check list view items.\n" + ex.Message, "Form_OverlapMass:listViewCategories_ItemChecked", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("listViewCategories_ItemChecked", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -467,8 +459,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to set the ratio determinant.\n" + ex.Message, "Form_OverlapMass:buttonDetermine_Click", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("buttonDetermine_Click", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -504,8 +495,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to assign Mass elements to propagate.\n" + ex.Message, "Form_OverlapMass:buttonApply_Click", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("buttonApply_Click", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -531,8 +521,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to check validation.\n" + ex.Message, "Form_OverlapMass:CheckValidation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                LogFileManager.AppendLog("CheckValidation", ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 result = false;
             }
             return result;
