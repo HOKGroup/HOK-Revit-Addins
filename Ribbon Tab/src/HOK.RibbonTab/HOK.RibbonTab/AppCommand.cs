@@ -45,7 +45,7 @@ namespace HOK.RibbonTab
 
             CreateHOKPushButtons();
             CreateCustomPushButtons();
-            CreateDataPushButtons();
+            //CreateDataPushButtons();
             CreateAVFPushButtons();
             CreateMissionControlPushButtons();
 
@@ -347,34 +347,34 @@ namespace HOK.RibbonTab
             }
         }
 
-        private void CreateDataPushButtons()
-        {
-            try
-            {
-                if (!File.Exists(currentDirectory + "/HOK.RevitDBManager.dll")) return;
+        //private void CreateDataPushButtons()
+        //{
+        //    try
+        //    {
+        //        if (!File.Exists(currentDirectory + "/HOK.RevitDBManager.dll")) return;
 
-                var dataPanel = m_app.CreateRibbonPanel(tabName, "Revit Data");
+        //        var dataPanel = m_app.CreateRibbonPanel(tabName, "Revit Data");
 
-                var pb11 = (PushButton)dataPanel.AddItem(new PushButtonData("Data Sync", "Data Sync", currentDirectory + "/HOK.RevitDBManager.dll", "RevitDBManager.Command"));
-                pb11.LargeImage = LoadBitmapImage(assembly, "sync.ico");
-                pb11.ToolTip = "Data Sync";
-                AddToolTips(pb11);
+        //        var pb11 = (PushButton)dataPanel.AddItem(new PushButtonData("Data Sync", "Data Sync", currentDirectory + "/HOK.RevitDBManager.dll", "RevitDBManager.Command"));
+        //        pb11.LargeImage = LoadBitmapImage(assembly, "sync.ico");
+        //        pb11.ToolTip = "Data Sync";
+        //        AddToolTips(pb11);
 
-                var pb12 = (PushButton)dataPanel.AddItem(new PushButtonData("Setup", "  Setup  ", currentDirectory + "/HOK.RevitDBManager.dll", "RevitDBManager.EditorCommand"));
-                pb12.LargeImage = LoadBitmapImage(assembly, "editor.ico");
-                pb12.ToolTip = "Setup";
-                AddToolTips(pb12);
+                //var pb12 = (PushButton)dataPanel.AddItem(new PushButtonData("Setup", "  Setup  ", currentDirectory + "/HOK.RevitDBManager.dll", "RevitDBManager.EditorCommand"));
+                //pb12.LargeImage = LoadBitmapImage(assembly, "editor.ico");
+                //pb12.ToolTip = "Setup";
+                //AddToolTips(pb12);
 
-                var pb13 = (PushButton)dataPanel.AddItem(new PushButtonData("Data Editor", "Data Editor", currentDirectory + "/HOK.RevitDBManager.dll", "RevitDBManager.ViewerCommand"));
-                pb13.LargeImage = LoadBitmapImage(assembly, "view.ico");
-                pb13.ToolTip = "Data Editor";
-                AddToolTips(pb13);
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-        }
+        //        var pb13 = (PushButton)dataPanel.AddItem(new PushButtonData("Data Editor", "Data Editor", currentDirectory + "/HOK.RevitDBManager.dll", "RevitDBManager.ViewerCommand"));
+        //        pb13.LargeImage = LoadBitmapImage(assembly, "view.ico");
+        //        pb13.ToolTip = "Data Editor";
+        //        AddToolTips(pb13);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+        //    }
+        //}
 
         /// <summary>
         /// Creates all Analysis related buttons.

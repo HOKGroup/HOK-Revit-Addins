@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -57,58 +59,96 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2018\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2018</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="HOK.MissionControl.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\Release\HOK.MissionControl.Core.dll</HintPath>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2017\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2016\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2017\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2018\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2017'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2017'">
-      <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.99.0\lib\net45\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.105.2, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.105.2\lib\net46\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SQLite.EF6">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.105.2\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Data.SQLite.EF6, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.99.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.99.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
+    <Reference Include="System.Data.SQLite.Linq">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.105.2\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Drawing" />
@@ -224,18 +264,60 @@
   <ItemGroup>
     <Resource Include="Windows\Images\database.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="HOK.SheetDataManager.addin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>echo Signing...
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"
+
+echo Configuration: $(Configuration)
+
+if $(Configuration) == 2015 goto Build2015
+if $(Configuration) == 2016 goto Build2016
+if $(Configuration) == 2017 goto Build2017
+if $(Configuration) == 2018 goto Build2018
+
+:Build2015
+echo Copying results to Build2015
+if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2016
+echo Copying results to Build2016
+if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2017
+echo Copying results to Build2017
+if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2018
+echo Copying results to Build2018
+if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)System.Data.SQLite.dll" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)System.Data.SQLite.EF6.dll" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)System.Data.SQLite.Linq.dll" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+goto exit
+
+:exit</PostBuildEvent>
+  </PropertyGroup>
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.99.0\build\net45\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.105.2\build\net46\System.Data.SQLite.Core.targets'))" />
   </Target>
-  <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\8.0\bin\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

@@ -331,7 +331,7 @@ namespace RevitDBManager.Classes
         public string Number { get { try { return m_room.Number; } catch { return "0"; } } }
 #if RELEASE2013
         public string Level { get { try { return m_room.Level.Name; } catch { return "null"; } } }
-#elif RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
+#elif RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
         public string Level 
         { 
             get 

@@ -109,10 +109,10 @@ namespace RevitDBManager.GenericForms
             Outlook.Folder folderInbox = (Outlook.Folder)nameSpace.GetDefaultFolder(Outlook.OlDefaultFolders.olFolderInbox);
             Outlook.MailItem mailItem = (Outlook.MailItem)outlookApplication.CreateItem(Outlook.OlItemType.olMailItem);
 
-            mailItem.Subject = "Revit 2013 Problem Report: RevitDBManager";
+            mailItem.Subject = "Revit 2018 Problem Report: RevitDBManager";
             mailItem.Body = "**** This email will go to the Firmwide [_HOK BIM Support Request] team. ****\n" + "What office are you in? \n" + "What project are you working on? \n" + "Describe the problem:";
 
-            mailItem.Recipients.Add("jinsol.kim@hok.com");
+            mailItem.Recipients.Add("konrad.sobon@hok.com");
             mailItem.Display(false);
         }
     }

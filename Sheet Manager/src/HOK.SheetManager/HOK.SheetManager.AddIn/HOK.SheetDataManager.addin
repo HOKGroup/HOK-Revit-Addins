@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Sheet Data Manager</Name>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.SheetManager.AddIn.dll</Assembly>
+    <FullClassName>HOK.SheetManager.AddIn.AppCommand</FullClassName>
+    <ClientId>3FBC935E-FB1C-438D-9398-A6700442A5A8</ClientId>
+    <VendorId>Konrad K Sobon</VendorId>
+    <VendorDescription>HOK Group</VendorDescription>
+  </AddIn>
+</RevitAddIns>

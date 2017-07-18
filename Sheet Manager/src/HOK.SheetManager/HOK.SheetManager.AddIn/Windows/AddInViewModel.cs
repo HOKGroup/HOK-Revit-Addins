@@ -414,13 +414,6 @@ namespace HOK.SheetManager.AddIn.Windows
                 revisionWindow.Owner = AppCommand.thisApp.mainWindow;
                 revisionWindow.DataContext = rvtSheetData;
                 revisionWindow.Show();
-
-                /*
-                if ((bool)revisionWindow.ShowDialog())
-                {
-                    m_handler.Request.Make(RequestId.UpdateRevision);
-                    m_event.Raise();
-                }*/
             }
             catch (Exception ex)
             {
