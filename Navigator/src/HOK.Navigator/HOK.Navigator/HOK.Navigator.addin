@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>HOK Navigator</Name>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.Navigator.dll</Assembly>
+    <AddInId>7FAE29E5-9571-4A8B-9C06-436D3C70A2B1</AddInId>
+    <FullClassName>HOK.Navigator.AppCommand</FullClassName>
+    <VendorId>JKIM</VendorId>
+    <VendorDescription>JKIM</VendorDescription>
+  </AddIn>
+</RevitAddIns>

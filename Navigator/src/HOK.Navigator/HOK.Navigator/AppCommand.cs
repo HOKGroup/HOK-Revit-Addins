@@ -1,32 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Autodesk.Revit.UI;
 using System.IO;
-using Autodesk.Revit.UI.Events;
 using System.Windows.Media.Imaging;
-using System.Windows.Forms;
-using Autodesk.Revit.DB.Events;
-using System.Net.NetworkInformation;
 using System.Reflection;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Events;
+using Autodesk.Revit.DB.Events;
+using HOK.Core.Utilities;
 
 namespace HOK.Navigator
 {
-    public class AppCommand:IExternalApplication
+    public class AppCommand : IExternalApplication
     {
         private UIControlledApplication m_app;
         private string tabName = "";
         private string currentDirectory = "";
         private string currentAssembly = "";
         private string versionNumber = "";
-        public PushButton helpButton = null;
-        private bool onCitrix = false;
+        public PushButton helpButton;
+        private bool onCitrix;
 
         public Result OnShutdown(UIControlledApplication application)
         {
-            application.ApplicationClosing -= new EventHandler<ApplicationClosingEventArgs>(EventAppClosing);
-            application.ControlledApplication.ApplicationInitialized -= new EventHandler<ApplicationInitializedEventArgs>(EventAppInitialize);
+            application.ApplicationClosing -= EventAppClosing;
+            application.ControlledApplication.ApplicationInitialized -= EventAppInitialize;
 
             return Result.Succeeded;
         }
@@ -37,17 +34,17 @@ namespace HOK.Navigator
             tabName = "   HOK   ";
             versionNumber = m_app.ControlledApplication.VersionNumber;
             
-            currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
+            currentAssembly = Assembly.GetAssembly(GetType()).Location;
             currentDirectory = Path.GetDirectoryName(currentAssembly);
 
-            string machineName = Environment.MachineName.ToUpper();
+            var machineName = Environment.MachineName.ToUpper();
             if (machineName.Contains("SVR") || machineName.Contains("VS"))
             {
                 onCitrix = true;
             }
 
-            application.ControlledApplication.ApplicationInitialized += new EventHandler<ApplicationInitializedEventArgs>(EventAppInitialize);
-            application.ApplicationClosing += new EventHandler<ApplicationClosingEventArgs>(EventAppClosing);
+            application.ControlledApplication.ApplicationInitialized += EventAppInitialize;
+            application.ApplicationClosing += EventAppClosing;
             return Result.Succeeded;
         }
 
@@ -62,26 +59,30 @@ namespace HOK.Navigator
             try
             {
                 //create a new button
-                try { m_app.CreateRibbonTab(tabName); }
-                catch { }
-
-                foreach (RibbonPanel panel in m_app.GetRibbonPanels(tabName))
+                try
                 {
-                    if (panel.Name == "Help")
+                    m_app.CreateRibbonTab(tabName);
+                }
+                catch (Exception ex)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                }
+
+                foreach (var panel in m_app.GetRibbonPanels(tabName))
+                {
+                    if (panel.Name != "Help") continue;
+
+                    foreach (var ribbonItem in panel.GetItems())
                     {
-                        foreach (RibbonItem ribbonItem in panel.GetItems())
-                        {
-                            if (ribbonItem.ItemText.Equals("   Help   ") || ribbonItem.ItemText.Equals("HOK Navigator"))
-                            {
-                                helpButton = ribbonItem as PushButton;
-                                break;
-                            }
-                        }
+                        if (!ribbonItem.ItemText.Equals("   Help   ") && !ribbonItem.ItemText.Equals("HOK Navigator")) continue;
+
+                        helpButton = ribbonItem as PushButton;
+                        break;
                     }
                 }
 
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                BitmapImage hokImage = LoadBitmapImage(assembly, "hok.png");
+                var assembly = Assembly.GetExecutingAssembly();
+                var hokImage = LoadBitmapImage(assembly, "hok.png");
 
                 if (null != helpButton)
                 {
@@ -95,27 +96,29 @@ namespace HOK.Navigator
                 }
                 else
                 {
-                    RibbonPanel helpPanel = m_app.CreateRibbonPanel(tabName, "Help");
-                    PushButtonData buttonData = new PushButtonData("HOK Navigator", "HOK Navigator", currentAssembly, "HOK.Navigator.HelpCommand");
-                    buttonData.AvailabilityClassName = "HOK.Navigator.Availability";
-                    buttonData.LargeImage = hokImage;
-                    buttonData.Image = hokImage;
+                    var helpPanel = m_app.CreateRibbonPanel(tabName, "Help");
+                    var buttonData = new PushButtonData("HOK Navigator", "HOK" + Environment.NewLine + " Navigator ", currentAssembly, "HOK.Navigator.HelpCommand")
+                    {
+                        AvailabilityClassName = "HOK.Navigator.Availability",
+                        LargeImage = hokImage,
+                        Image = hokImage
+                    };
                     helpButton = helpPanel.AddItem(buttonData) as PushButton;
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
-        private BitmapImage LoadBitmapImage(Assembly assembly, string imageName)
+        private static BitmapImage LoadBitmapImage(Assembly assembly, string imageName)
         {
-            BitmapImage image = new BitmapImage();
+            var image = new BitmapImage();
             try
             {
-                string prefix = typeof(AppCommand).Namespace + ".Resources.";
-                Stream stream = assembly.GetManifestResourceStream(prefix + imageName);
+                var prefix = typeof(AppCommand).Namespace + ".Resources.";
+                var stream = assembly.GetManifestResourceStream(prefix + imageName);
 
                 image.BeginInit();
                 image.StreamSource = stream;
@@ -123,7 +126,7 @@ namespace HOK.Navigator
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to load the embedded resource image.\n" + ex.Message, "Load Bitmap Image", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return image;
         }
@@ -137,52 +140,45 @@ namespace HOK.Navigator
             ReguralUpdate();
         }
 
-        private void ReguralUpdate()
+        private static void ReguralUpdate()
         {
             try
             {
-                if (InstallerTrigger.Activated)
-                {
-                    Dictionary<string, bool> activatedInstaller = new Dictionary<string, bool>();
-                    Dictionary<string, string> installerUrl = new Dictionary<string, string>();
-                    activatedInstaller = InstallerTrigger.ActivatedInstaller;
-                    installerUrl = InstallerTrigger.InstallerUrl;
+                if (!InstallerTrigger.Activated) return;
 
-                    if (activatedInstaller.Count > 0)
-                    {
-                        foreach (string installerName in activatedInstaller.Keys)
-                        {
-                            if (activatedInstaller[installerName])
-                            {
-                                if (installerUrl.ContainsKey(installerName))
-                                {
-                                    string url = installerUrl[installerName];
-                                    System.Diagnostics.Process.Start(url);
-                                }
-                            }
-                        }
-                    }
+                var activatedInstaller = new Dictionary<string, bool>();
+                var installerUrl = new Dictionary<string, string>();
+                activatedInstaller = InstallerTrigger.ActivatedInstaller;
+                installerUrl = InstallerTrigger.InstallerUrl;
+
+                if (activatedInstaller.Count <= 0) return;
+
+                foreach (var installerName in activatedInstaller.Keys)
+                {
+                    if (!activatedInstaller[installerName]) continue;
+                    if (!installerUrl.ContainsKey(installerName)) continue;
+
+                    var url = installerUrl[installerName];
+                    System.Diagnostics.Process.Start(url);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to update AddIns.\n" + ex.Message, "HOK Navigator: Regular Update", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
     }
 
     public static class InstallerTrigger
     {
-        private static bool activated = false;
-        public static bool Activated { get { return activated; } set { activated = value; } }
-
-        private static Dictionary<string, string> installerUrl = new Dictionary<string, string>();
-        public static Dictionary<string, string> InstallerUrl { get { return installerUrl; } set { installerUrl = value; } }
-
-        private static Dictionary<string, bool> activatedInstaller = new Dictionary<string, bool>();
-        public static Dictionary<string, bool> ActivatedInstaller { get { return activatedInstaller; } set { activatedInstaller = value; } }
+        public static bool Activated { get; set; }
+        public static Dictionary<string, string> InstallerUrl { get; set; } = new Dictionary<string, string>();
+        public static Dictionary<string, bool> ActivatedInstaller { get; set; } = new Dictionary<string, bool>();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class Availability : IExternalCommandAvailability
     {
         public bool IsCommandAvailable(UIApplication applicationData, Autodesk.Revit.DB.CategorySet selectedCategories)
