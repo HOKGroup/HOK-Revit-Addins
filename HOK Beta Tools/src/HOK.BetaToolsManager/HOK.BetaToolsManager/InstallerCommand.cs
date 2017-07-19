@@ -8,22 +8,27 @@ namespace HOK.BetaToolsManager
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-
     public class InstallerCommand:IExternalCommand
     {
-        private UIApplication m_app;
-
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
         {
             try
             {
-                m_app = commandData.Application;
+                var version = commandData.Application.Application.VersionNumber;
 
-                AppCommand.thisApp.ShowInstaller(m_app);
+                var model = new AddinInstallerModel(version);
+                var viewModel = new AddinInstallerViewModel(model);
+                var view = new AddinInstallerWindow
+                {
+                    DataContext = viewModel
+                };
+
+                view.ShowDialog();
+
+                //AppCommand.thisApp.ShowInstaller(m_app);
             }
             catch (Exception ex)
             {
-                
                 MessageBox.Show("Failed to initialize Installer command.\n"+ex.Message , "HOK Beta Tool Manager - Installer Command ", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return Result.Succeeded;

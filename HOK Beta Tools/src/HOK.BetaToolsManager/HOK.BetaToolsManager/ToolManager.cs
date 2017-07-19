@@ -1,7 +1,9 @@
-﻿using System;
+﻿using HOK.Core.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -19,9 +21,58 @@ namespace HOK.BetaToolsManager
         public ToolManager(string version)
         {
             VersionNumber = version;
-            BetaDirectory = BetaDirectory + VersionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
-            InstallDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Autodesk\Revit\Addins\" + VersionNumber + @"\HOK-Addin.bundle\Contents_Beta\";
-            TempInstallDirectory = Path.Combine(InstallDirectory, "Temp");
+            BetaDirectory = BetaDirectory + VersionNumber + @"\HOK-Addin.bundle\Contents_Beta\"; // at HOK Group drive
+            InstallDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) 
+                + @"\Autodesk\Revit\Addins\" 
+                + VersionNumber 
+                + @"\HOK-Addin.bundle\Contents_Beta\"; // user roaming location
+            TempInstallDirectory = Path.Combine(InstallDirectory, "Temp"); // TODO: get rid of this whole idea!
+
+            if (Directory.Exists(InstallDirectory))
+            {
+                var dic = new Dictionary<string, AddinWrapper>();
+                foreach (var file in Directory.GetFiles(InstallDirectory, "*.dll"))
+                {
+                    // (Konrad) Using LoadFrom() instead of LoadFile() because
+                    // LoadFile() doesn't load dependent assemblies causing exception later.
+                    var assembly = Assembly.LoadFrom(file); 
+                    Type[] types;
+                    try
+                    {
+                        types = assembly.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException e)
+                    {
+                        types = e.Types;
+                    }
+                    foreach (var t in types.Where(x => x != null && x.GetInterface("IExternalCommand") != null))
+                    {
+                        MemberInfo info = t;
+                        var nameAttribute = info.GetCustomAttributes(typeof(NameAttribute), true).FirstOrDefault() as NameAttribute;
+                        var descAttribute = t.GetCustomAttributes(typeof(DescriptionAttribute), true).FirstOrDefault() as DescriptionAttribute;
+                        var imageAttribute = t.GetCustomAttributes(typeof(ImageAttribute), true).FirstOrDefault() as ImageAttribute;
+                        var buttonTextAttribute = t.GetCustomAttributes(typeof(ButtonTextAttribute), true).FirstOrDefault() as ButtonTextAttribute;
+                        var panelNameAttribute = t.GetCustomAttributes(typeof(PanelNameAttribute), true).FirstOrDefault() as PanelNameAttribute;
+                        if (nameAttribute == null
+                            || descAttribute == null
+                            || imageAttribute == null
+                            || buttonTextAttribute == null
+                            || panelNameAttribute == null) continue;
+
+                        var aw = new AddinWrapper
+                        {
+                            Name = nameAttribute.Name,
+                            Description = descAttribute.Description,
+                            //Image = imageAttribute.Image,
+                            ImageName = imageAttribute.ImageName, // (Konrad) Image name is assigned from Image attribute so order matters here.
+                            Panel = panelNameAttribute.PanelName,
+                            ButtonText = buttonTextAttribute.ButtonText,
+                            FullName = t.FullName
+                        };
+                        dic.Add(aw.Name, aw);
+                    }
+                }
+            }
 
             if (ExistBetaContentFolder())
             {

@@ -57,7 +57,7 @@ namespace HOK.BetaToolsManager
             thisApp = this;
 
             m_app = application;
-            versionNumber = m_app.ControlledApplication.VersionNumber;
+            versionNumber = m_app.ControlledApplication.VersionNumber; // Revit version
             toolManager = new ToolManager(versionNumber);
             ToolInfoDictionary = toolManager.ToolInfoDictionary;
 

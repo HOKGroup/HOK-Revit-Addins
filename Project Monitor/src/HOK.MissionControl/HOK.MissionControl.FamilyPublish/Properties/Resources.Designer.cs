@@ -61,11 +61,58 @@ namespace HOK.MissionControl.FamilyPublish.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Publish Family
+        ///Data.
+        /// </summary>
+        internal static string FamilyPublish_ButtonText {
+            get {
+                return ResourceManager.GetString("FamilyPublish_ButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This plug-in publishes information about Families currently loaded in the project to Mission Control. This is time intensive operation, please be ready to spare 2-5min while the tool is running..
+        /// </summary>
+        internal static string FamilyPublish_Description {
+            get {
+                return ResourceManager.GetString("FamilyPublish_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PublishFamily.
+        /// </summary>
+        internal static string FamilyPublish_Name {
+            get {
+                return ResourceManager.GetString("FamilyPublish_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mission Control.
+        /// </summary>
+        internal static string FamilyPublish_PanelName {
+            get {
+                return ResourceManager.GetString("FamilyPublish_PanelName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 56603be6-aeb2-45d0-9ebc-2830fad6368b.
         /// </summary>
         internal static string HealthReportTrackerGuid {
             get {
                 return ResourceManager.GetString("HealthReportTrackerGuid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap sheetManager_32 {
+            get {
+                object obj = ResourceManager.GetObject("sheetManager_32", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

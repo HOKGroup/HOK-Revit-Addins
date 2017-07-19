@@ -9,6 +9,11 @@ using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.FamilyPublish
 {
+    [Name(nameof(Properties.Resources.FamilyPublish_Name), typeof(Properties.Resources))]
+    [Description(nameof(Properties.Resources.FamilyPublish_Description), typeof(Properties.Resources))]
+    [Image(nameof(Properties.Resources.sheetManager_32), typeof(Properties.Resources))]
+    [PanelName(nameof(Properties.Resources.FamilyPublish_PanelName), typeof(Properties.Resources))]
+    [ButtonText(nameof(Properties.Resources.FamilyPublish_ButtonText), typeof(Properties.Resources))]
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
