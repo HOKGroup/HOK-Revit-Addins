@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Media.Imaging;
 using Newtonsoft.Json;
 
@@ -12,6 +13,11 @@ namespace HOK.Core.Utilities
         public string ButtonText { get; set; }
         public string FullName { get; set; }
         public string ImageName { get; set; }
+        public string Version { get; set; }
+        public bool ExternalCommand { get; set; }
+        public List<string> ReferencedAssembliesNames { get; set; }
+        public string HostDllName { get; set; }
+        public string AddinName { get; set; }
 
         [JsonIgnore]
         public BitmapSource Image { get; set; }

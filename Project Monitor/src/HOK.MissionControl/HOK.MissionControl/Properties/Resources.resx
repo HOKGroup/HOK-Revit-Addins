@@ -120,4 +120,19 @@
   <data name="HealthReportTrackerGuid" xml:space="preserve">
     <value>56603be6-aeb2-45d0-9ebc-2830fad6368b</value>
   </data>
+  <data name="MissionControl_AddinName" xml:space="preserve">
+    <value>HOK.MissionControl.addin</value>
+  </data>
+  <data name="MissionControl_Desc" xml:space="preserve">
+    <value>This plug-in allows Design Technology Group to collect valuable information about the model and its contents that are then reported back to the user via online dashboard.</value>
+  </data>
+  <data name="MissionControl_ImageName" xml:space="preserve">
+    <value>missionControl_32x32.png</value>
+  </data>
+  <data name="MissionControl_Name" xml:space="preserve">
+    <value>Mission Control</value>
+  </data>
+  <data name="MissionControl_Namespace" xml:space="preserve">
+    <value>HOK.MissionControl</value>
+  </data>
 </root>

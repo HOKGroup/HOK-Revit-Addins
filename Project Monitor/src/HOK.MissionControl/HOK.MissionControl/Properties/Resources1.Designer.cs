@@ -68,5 +68,50 @@ namespace HOK.MissionControl.Properties {
                 return ResourceManager.GetString("HealthReportTrackerGuid", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HOK.MissionControl.addin.
+        /// </summary>
+        internal static string MissionControl_AddinName {
+            get {
+                return ResourceManager.GetString("MissionControl_AddinName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This plug-in allows Design Technology Group to collect valuable information about the model and its contents that are then reported back to the user via online dashboard..
+        /// </summary>
+        internal static string MissionControl_Desc {
+            get {
+                return ResourceManager.GetString("MissionControl_Desc", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to missionControl_32x32.png.
+        /// </summary>
+        internal static string MissionControl_ImageName {
+            get {
+                return ResourceManager.GetString("MissionControl_ImageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mission Control.
+        /// </summary>
+        internal static string MissionControl_Name {
+            get {
+                return ResourceManager.GetString("MissionControl_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HOK.MissionControl.
+        /// </summary>
+        internal static string MissionControl_Namespace {
+            get {
+                return ResourceManager.GetString("MissionControl_Namespace", resourceCulture);
+            }
+        }
     }
 }

@@ -61,6 +61,15 @@ namespace HOK.MissionControl.FamilyPublish.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to HOK.MissionControl.FamilyPublish.addin.
+        /// </summary>
+        internal static string FamilyPublish_AddinName {
+            get {
+                return ResourceManager.GetString("FamilyPublish_AddinName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Publish Family
         ///Data.
         /// </summary>
@@ -71,11 +80,20 @@ namespace HOK.MissionControl.FamilyPublish.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This plug-in publishes information about Families currently loaded in the project to Mission Control. This is time intensive operation, please be ready to spare 2-5min while the tool is running..
+        ///   Looks up a localized string similar to This plug-in publishes information about Families currently loaded in the project to Mission Control..
         /// </summary>
         internal static string FamilyPublish_Description {
             get {
                 return ResourceManager.GetString("FamilyPublish_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to publishFamily_32x32.png.
+        /// </summary>
+        internal static string FamilyPublish_ImageName {
+            get {
+                return ResourceManager.GetString("FamilyPublish_ImageName", resourceCulture);
             }
         }
         
@@ -85,6 +103,15 @@ namespace HOK.MissionControl.FamilyPublish.Properties {
         internal static string FamilyPublish_Name {
             get {
                 return ResourceManager.GetString("FamilyPublish_Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HOK.MissionControl.FamilyPublish.
+        /// </summary>
+        internal static string FamilyPublish_Namespace {
+            get {
+                return ResourceManager.GetString("FamilyPublish_Namespace", resourceCulture);
             }
         }
         

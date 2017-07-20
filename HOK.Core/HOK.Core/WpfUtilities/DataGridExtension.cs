@@ -38,7 +38,6 @@ namespace HOK.Core.WpfUtilities
     /// </summary>
     public static class EventHelper
     {
-
         internal static void DataGridPreviewMouseLeftButtonDownEvent
             (object sender, RoutedEventArgs e)
         {

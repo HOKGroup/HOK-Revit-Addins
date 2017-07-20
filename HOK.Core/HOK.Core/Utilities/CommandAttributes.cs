@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Reflection;
-using System.Windows.Media.Imaging;
 
 namespace HOK.Core.Utilities
 {
+    /// <summary>
+    /// Name of the Addin.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class NameAttribute : Attribute
     {
@@ -16,6 +18,9 @@ namespace HOK.Core.Utilities
         }
     }
 
+    /// <summary>
+    /// Description used by this addin on Tooltip.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class DescriptionAttribute : Attribute
     {
@@ -28,6 +33,9 @@ namespace HOK.Core.Utilities
         }
     }
 
+    /// <summary>
+    /// Text displayed on the button. 
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class ButtonTextAttribute : Attribute
     {
@@ -40,6 +48,9 @@ namespace HOK.Core.Utilities
         }
     }
 
+    /// <summary>
+    /// Name of the Panel on a Ribbon that this addin is in.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class PanelNameAttribute : Attribute
     {
@@ -52,26 +63,54 @@ namespace HOK.Core.Utilities
         }
     }
 
+    /// <summary>
+    /// Fully qualified name of the Namespace that Resource folder is in. Usually main class namespace.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class NamespaceAttribute : Attribute
+    {
+        public string Namespace { get; protected set; }
+
+        public NamespaceAttribute(string resourceName, Type resourceType)
+        {
+            var value = ResourceHelper.GetResourceLookup<string>(resourceType, resourceName);
+            Namespace = value;
+        }
+    }
+
+    /// <summary>
+    /// Name of the *.addin manifest file that this addin goes with.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class AddinNameAttribute : Attribute
+    {
+        public string AddinName { get; protected set; }
+
+        public AddinNameAttribute(string resourceName, Type resourceType)
+        {
+            var value = ResourceHelper.GetResourceLookup<string>(resourceType, resourceName);
+            AddinName = value;
+        }
+    }
+
+    /// <summary>
+    /// Name of the Icon image resource. Has to be of Embedded Resource type, and NOT loaded via resex.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class ImageAttribute : Attribute
     {
-        public BitmapSource Image { get; protected set; }
         public string ImageName { get; protected set; }
 
         public ImageAttribute(string resourceName, Type resourceType)
         {
-            //var bitmap = Properties.Resources.ResourceManager.GetObject(resourceName) as Bitmap;
-            //if (bitmap != null)
-            //{
-            //    var bitmapImage = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(),
-            //        IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
-            //    Image = bitmapImage;
-            //}
-            ImageName = resourceName;
+            var value = ResourceHelper.GetResourceLookup<string>(resourceType, resourceName);
+            ImageName = value;
         }
     }
 
+    /// <summary>
+    /// Resource lookup that allows to retrieve resource from DLL.
+    /// </summary>
     public class ResourceHelper
     {
         public static T GetResourceLookup<T>(Type resourceType, string resourceName)

@@ -11,9 +11,11 @@ namespace HOK.MissionControl.FamilyPublish
 {
     [Name(nameof(Properties.Resources.FamilyPublish_Name), typeof(Properties.Resources))]
     [Description(nameof(Properties.Resources.FamilyPublish_Description), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.sheetManager_32), typeof(Properties.Resources))]
+    [Image(nameof(Properties.Resources.FamilyPublish_ImageName), typeof(Properties.Resources))]
     [PanelName(nameof(Properties.Resources.FamilyPublish_PanelName), typeof(Properties.Resources))]
     [ButtonText(nameof(Properties.Resources.FamilyPublish_ButtonText), typeof(Properties.Resources))]
+    [Namespace(nameof(Properties.Resources.FamilyPublish_Namespace), typeof(Properties.Resources))]
+    [AddinName(nameof(Properties.Resources.FamilyPublish_AddinName), typeof(Properties.Resources))]
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
