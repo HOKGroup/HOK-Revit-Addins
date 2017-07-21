@@ -18,7 +18,7 @@ namespace HOK.BetaToolsManager
         public AddinInstallerViewModel(AddinInstallerModel model)
         {
             Model = model;
-            Addins = Model.LoadAddins();
+            Addins = Model.Addins;
             CloseCommand = new RelayCommand<Window>(OnCloseCommand);
             CheckAll = new RelayCommand(OnCheckAll);
             CheckNone = new RelayCommand(OnCheckNone);
@@ -52,7 +52,7 @@ namespace HOK.BetaToolsManager
             }
         }
 
-        private void OnCloseCommand(Window win)
+        private static void OnCloseCommand(Window win)
         {
             win.Close();
         }

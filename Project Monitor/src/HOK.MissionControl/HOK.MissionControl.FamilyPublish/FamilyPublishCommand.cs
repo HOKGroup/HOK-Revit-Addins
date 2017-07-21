@@ -15,7 +15,6 @@ namespace HOK.MissionControl.FamilyPublish
     [PanelName(nameof(Properties.Resources.FamilyPublish_PanelName), typeof(Properties.Resources))]
     [ButtonText(nameof(Properties.Resources.FamilyPublish_ButtonText), typeof(Properties.Resources))]
     [Namespace(nameof(Properties.Resources.FamilyPublish_Namespace), typeof(Properties.Resources))]
-    [AddinName(nameof(Properties.Resources.FamilyPublish_AddinName), typeof(Properties.Resources))]
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
@@ -33,11 +32,15 @@ namespace HOK.MissionControl.FamilyPublish
             var doc = uiApp.ActiveUIDocument.Document;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
+            var version = commandData.Application.Application.VersionNumber;
+
             try
             {
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-PublishFamilyData", doc));
+
+                
 
                 var pathName = doc.PathName;
                 if (string.IsNullOrEmpty(pathName))
@@ -89,7 +92,7 @@ namespace HOK.MissionControl.FamilyPublish
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
 
-            Log.AppendLog(LogMessageType.INFO, "Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
     }

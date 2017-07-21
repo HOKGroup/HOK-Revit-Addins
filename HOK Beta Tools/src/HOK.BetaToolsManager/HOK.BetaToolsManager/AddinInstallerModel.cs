@@ -5,8 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Media.Imaging;
+using System.Xml;
+using System.Xml.Linq;
 using HOK.Core.Utilities;
 using Newtonsoft.Json;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace HOK.BetaToolsManager
 {
@@ -16,93 +19,133 @@ namespace HOK.BetaToolsManager
         //public string BetaDirectory { get; set; } = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
         public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\test_beta_location\";
         public string InstallDirectory { get; set; }
-        public string AddinDirectory { get; set; }
+        //public string AddinDirectory { get; set; }
+        public ObservableCollection<AddinWrapper> Addins { get; set; }
 
         public AddinInstallerModel(string version)
         {
             VersionNumber = version;
-            BetaDirectory = BetaDirectory + VersionNumber + @"\HOK-Addin.bundle\Contents_Beta\"; // at HOK Group drive
+            BetaDirectory = BetaDirectory + VersionNumber + @"\"; // at HOK Group drive
             InstallDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
                                + @"\Autodesk\Revit\Addins\"
-                               + VersionNumber
-                               + @"\HOK-Addin.bundle\Contents_Beta\"; // user roaming location
-            AddinDirectory = Path.GetFullPath(Path.Combine(InstallDirectory, @"..\..\"));
+                               + VersionNumber + @"\"; // user roaming location
+            //AddinDirectory = Path.GetFullPath(Path.Combine(InstallDirectory, @"..\..\"));
+
+            LoadAddins();
         }
 
         public void UninstallAddins(ObservableCollection<AddinWrapper> addins)
         {
-            foreach (var addin in addins)
-            {
-                if(!addin.Install) continue;
+            //foreach (var addin in addins)
+            //{
+            //    if(!addin.Install) continue;
 
-                if (File.Exists(InstallDirectory + addin.HostDllName))
-                {
-                    File.Delete(InstallDirectory + addin.HostDllName);
-                }
+            //    if (File.Exists(InstallDirectory + addin.HostDllName))
+            //    {
+            //        try
+            //        {
+            //            File.Delete(InstallDirectory + addin.HostDllName);
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            // ignored
+            //        }
+            //    }
 
-                // TODO: There are all of the reference files still in the install directory
-                // TODO: Is there a way to delete them safely without affecting other plugins?
+            //    // TODO: There are all of the reference files still in the install directory
+            //    // TODO: Is there a way to delete them safely without affecting other plugins?
 
-                if (File.Exists(AddinDirectory + addin.AddinName))
-                {
-                    File.Delete(AddinDirectory + addin.AddinName);
-                }
+            //    if (File.Exists(AddinDirectory + addin.AddinName))
+            //    {
+            //        try
+            //        {
+            //            File.Delete(AddinDirectory + addin.AddinName);
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            // ignored
+            //        }
+            //    }
 
-                var app = AppCommand.Instance.m_app;
-                var panel = app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel);
-                var button = panel?.GetItems().FirstOrDefault(x => x.ItemText == addin.ButtonText);
-                if (button != null)
-                {
-                    button.Enabled = false;
-                }
-            }
+            //    // (Konrad) Button needs to be disabled after DLLs were removed since it doesn't work anyways.
+            //    var app = AppCommand.Instance.m_app;
+            //    var panel = app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel);
+            //    var button = panel?.GetItems().FirstOrDefault(x => x.ItemText == addin.ButtonText);
+            //    if (button != null)
+            //    {
+            //        button.Enabled = false;
+            //    }
+
+            //    // Reset installed version flag to update datagrid control
+            //    addin.InstalledVersion = "Not installed";
+            //}
         }
 
         public void InstallUpdateAddins(ObservableCollection<AddinWrapper> addins)
         {
-            foreach (var addin in addins)
-            {
-                if(!addin.Install) continue;
+            //foreach (var addin in addins)
+            //{
+            //    if(!addin.Install) continue;
 
-                // Copy host DLL
-                if (File.Exists(InstallDirectory + addin.HostDllName))
-                {
-                    File.Delete(InstallDirectory + addin.HostDllName);
-                }
-                File.Copy(BetaDirectory + addin.HostDllName, InstallDirectory + addin.HostDllName);
+            //    // Copy host DLL
+            //    if (File.Exists(InstallDirectory + addin.HostDllName))
+            //    {
+            //        File.Delete(InstallDirectory + addin.HostDllName);
+            //    }
+            //    File.Copy(BetaDirectory + addin.HostDllName, InstallDirectory + addin.HostDllName);
 
-                // Copy all references
-                foreach (var resource in addin.ReferencedAssembliesNames)
-                {
-                    if (File.Exists(InstallDirectory + resource))
-                    {
-                        File.Delete(InstallDirectory + resource);
-                    }
-                    if (File.Exists(BetaDirectory + resource))
-                    {
-                        File.Copy(BetaDirectory + resource, InstallDirectory + resource);
-                    }
-                }
+            //    // Copy all references
+            //    foreach (var resource in addin.ReferencedAssembliesNames)
+            //    {
+            //        if (File.Exists(InstallDirectory + resource))
+            //        {
+            //            File.Delete(InstallDirectory + resource);
+            //        }
+            //        if (File.Exists(BetaDirectory + resource))
+            //        {
+            //            File.Copy(BetaDirectory + resource, InstallDirectory + resource);
+            //        }
+            //    }
 
-                // Copy addin manifest
-                if (File.Exists(AddinDirectory + addin.AddinName))
-                {
-                    File.Delete(AddinDirectory + addin.AddinName);
-                }
-                File.Copy(BetaDirectory + addin.AddinName, AddinDirectory + addin.AddinName);
-            }
+            //    // Copy addin manifest
+            //    if (File.Exists(AddinDirectory + addin.AddinName))
+            //    {
+            //        File.Delete(AddinDirectory + addin.AddinName);
+            //    }
+            //    File.Copy(BetaDirectory + addin.AddinName, AddinDirectory + addin.AddinName);
+
+            //    // Reset installed version flag to update datagrid control
+            //    addin.InstalledVersion = addin.Version;
+            //}
         }
 
-        public ObservableCollection<AddinWrapper> LoadAddins()
+        private static string ParseXml(string file)
+        {
+            var value = string.Empty;
+            var response = File.ReadAllText(file);
+            var doc = XDocument.Parse(response);
+
+            foreach (var element in doc.Descendants("Assembly"))
+            {
+                value = (string)element;
+                break;
+            }
+            return value;
+        }
+
+        private void LoadAddins()
         {
             var dic = new Dictionary<string, AddinWrapper>();
             if (Directory.Exists(BetaDirectory))
             {
-                foreach (var file in Directory.GetFiles(BetaDirectory, "*.dll"))
+                foreach (var file in Directory.GetFiles(BetaDirectory, "*.addin"))
                 {
+                    var dllRelativePath = ParseXml(file);
+                    var dllPath = BetaDirectory + dllRelativePath;
+
                     // (Konrad) Using LoadFrom() instead of LoadFile() because
                     // LoadFile() doesn't load dependent assemblies causing exception later.
-                    var assembly = Assembly.LoadFrom(file);
+                    var assembly = Assembly.LoadFrom(dllPath);
                     Type[] types;
                     try
                     {
@@ -115,18 +158,23 @@ namespace HOK.BetaToolsManager
                     foreach (var t in types.Where(x => x != null && (x.GetInterface("IExternalCommand") != null || x.GetInterface("IExternalApplication") != null)))
                     {
                         MemberInfo info = t;
-                        var nameAttr = (NameAttribute) info.GetCustomAttributes(typeof(NameAttribute), true).FirstOrDefault();
+                        var nameAttr = (NameAttribute)info.GetCustomAttributes(typeof(NameAttribute), true).FirstOrDefault();
                         var descAttr = (DescriptionAttribute)t.GetCustomAttributes(typeof(DescriptionAttribute), true).FirstOrDefault();
                         var imageAttr = (ImageAttribute)t.GetCustomAttributes(typeof(ImageAttribute), true).FirstOrDefault();
                         var namespaceAttr = (NamespaceAttribute)t.GetCustomAttributes(typeof(NamespaceAttribute), true).FirstOrDefault();
-                        var addinNameAttr = (AddinNameAttribute)t.GetCustomAttributes(typeof(AddinNameAttribute), true).FirstOrDefault();
 
-                        if (nameAttr == null || descAttr == null || imageAttr == null || namespaceAttr == null ||
-                            addinNameAttr == null) continue;
+                        if (nameAttr == null || descAttr == null || imageAttr == null || namespaceAttr == null) continue;
 
                         var bitmap = (BitmapSource)ButtonUtil.LoadBitmapImage(assembly, namespaceAttr.Namespace, imageAttr.ImageName);
                         var version = assembly.GetName().Version.ToString();
-                        var referencedAssemblies = GetNamesOfAssembliesReferencedBy(assembly);
+                        //var referencedAssemblies = GetNamesOfAssembliesReferencedBy(assembly);
+
+                        var installedVersion = "Not installed";
+                        if (File.Exists(InstallDirectory + Path.GetFileName(file)))
+                        {
+                            var a = Assembly.LoadFile(InstallDirectory + dllRelativePath);
+                            installedVersion = a.GetName().Version.ToString();
+                        }
 
                         var aw = new AddinWrapper
                         {
@@ -136,9 +184,8 @@ namespace HOK.BetaToolsManager
                             ImageName = imageAttr.ImageName,
                             FullName = t.FullName,
                             Version = version,
-                            AddinName = addinNameAttr.AddinName,
                             HostDllName = Path.GetFileName(file),
-                            ReferencedAssembliesNames = referencedAssemblies
+                            InstalledVersion = installedVersion
                         };
 
                         if (t.GetInterface("IExternalCommand") != null)
@@ -156,7 +203,7 @@ namespace HOK.BetaToolsManager
                 }
             }
             var output = new ObservableCollection<AddinWrapper>(dic.Values.ToList().OrderBy(x => x.Name));
-            return output;
+            Addins = output;
         }
 
         public List<string> GetNamesOfAssembliesReferencedBy(Assembly assembly)

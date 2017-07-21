@@ -25,6 +25,7 @@ namespace HOK.RibbonTab
         Result IExternalApplication.OnStartup(UIControlledApplication application)
         {
             application.ControlledApplication.DocumentOpening += OnDocumentOpening;
+            application.ControlledApplication.DocumentCreating += OnDocumentCreating;
             m_app = application;
             tabName = "   HOK   ";
 
@@ -50,6 +51,18 @@ namespace HOK.RibbonTab
             //CreateMissionControlPushButtons();
 
             return Result.Succeeded;
+        }
+
+        private static void OnDocumentCreating(object sender, DocumentCreatingEventArgs args)
+        {
+            try
+            {
+                Log.Initialize("HOK_Tools", "New Document");
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
         }
 
         private static void OnDocumentOpening(object source, DocumentOpeningEventArgs args)

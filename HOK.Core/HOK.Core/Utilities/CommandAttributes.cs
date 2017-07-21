@@ -78,20 +78,20 @@ namespace HOK.Core.Utilities
         }
     }
 
-    /// <summary>
-    /// Name of the *.addin manifest file that this addin goes with.
-    /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class AddinNameAttribute : Attribute
-    {
-        public string AddinName { get; protected set; }
+    ///// <summary>
+    ///// Name of the *.addin manifest file that this addin goes with.
+    ///// </summary>
+    //[AttributeUsage(AttributeTargets.Class)]
+    //public class AddinNameAttribute : Attribute
+    //{
+    //    public string AddinName { get; protected set; }
 
-        public AddinNameAttribute(string resourceName, Type resourceType)
-        {
-            var value = ResourceHelper.GetResourceLookup<string>(resourceType, resourceName);
-            AddinName = value;
-        }
-    }
+    //    public AddinNameAttribute(string resourceName, Type resourceType)
+    //    {
+    //        var value = ResourceHelper.GetResourceLookup<string>(resourceType, resourceName);
+    //        AddinName = value;
+    //    }
+    //}
 
     /// <summary>
     /// Name of the Icon image resource. Has to be of Embedded Resource type, and NOT loaded via resex.

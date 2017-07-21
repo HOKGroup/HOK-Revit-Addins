@@ -17,10 +17,18 @@ namespace HOK.Core.Utilities
         public bool ExternalCommand { get; set; }
         public List<string> ReferencedAssembliesNames { get; set; }
         public string HostDllName { get; set; }
-        public string AddinName { get; set; }
+        //public string AddinName { get; set; }
+        
 
         [JsonIgnore]
         public BitmapSource Image { get; set; }
+
+        private string _installedVersion;
+        public string InstalledVersion
+        {
+            get => _installedVersion;
+            set { _installedVersion = value; RaisePropertyChanged("InstalledVersion"); }
+        }
 
         private bool _install;
         public bool Install

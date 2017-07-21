@@ -25,7 +25,7 @@ namespace HOK.MissionControl.Core.Schemas
         {
             pluginName = name;
             user = Environment.UserName;
-            revitVersion = BasicFileInfo.Extract(doc.PathName).SavedInVersion;
+            revitVersion = doc.Application.VersionNumber;
         }
     }
 

@@ -16,7 +16,6 @@
             <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
             <Setter Property="SelectionMode" Value="Extended"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="LightGray"/>
         </Style>

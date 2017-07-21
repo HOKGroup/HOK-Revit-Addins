@@ -21,7 +21,6 @@ namespace HOK.MissionControl
     [Description(nameof(Properties.Resources.MissionControl_Desc), typeof(Properties.Resources))]
     [Image(nameof(Properties.Resources.MissionControl_ImageName), typeof(Properties.Resources))]
     [Namespace(nameof(Properties.Resources.MissionControl_Namespace), typeof(Properties.Resources))]
-    [AddinName(nameof(Properties.Resources.MissionControl_AddinName), typeof(Properties.Resources))]
     public class AppCommand : IExternalApplication
     {
         public static AppCommand Instance { get; private set; }
