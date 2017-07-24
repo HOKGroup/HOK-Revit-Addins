@@ -16,7 +16,9 @@ namespace HOK.BetaToolsManager
             {
                 var version = commandData.Application.Application.VersionNumber;
 
-                var model = new AddinInstallerModel(version);
+                //var model = new AddinInstallerModel(version);
+                //var viewModel = new AddinInstallerViewModel(model);
+                var model = AppCommand.Instance.ViewModel;
                 var viewModel = new AddinInstallerViewModel(model);
                 var view = new AddinInstallerWindow
                 {

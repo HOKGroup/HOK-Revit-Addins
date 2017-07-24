@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
+using Newtonsoft.Json;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace HOK.BetaToolsManager
 {
@@ -27,9 +31,13 @@ namespace HOK.BetaToolsManager
 
     public class AppCommand : IExternalApplication
     {
+        public AddinInstallerModel ViewModel { get; set; }
         public UIControlledApplication m_app;
         public static AppCommand Instance;
         private const string tabName = "  HOK - Beta";
+
+        public static List<AddinWrapper> AddinsToSetPathsFor { get; } = new List<AddinWrapper>();
+
         //private string versionNumber = "";
         //private ToolManager toolManager;
         //private Dictionary<ToolEnum, ToolProperties> ToolInfoDictionary = new Dictionary<ToolEnum, ToolProperties>();
@@ -49,17 +57,39 @@ namespace HOK.BetaToolsManager
 
         Result IExternalApplication.OnShutdown(UIControlledApplication application)
         {
+            SerializeSetting(ViewModel.InstallDirectory + "BetaSettings.json");
+
             return Result.Succeeded;
+        }
+
+        public ObservableCollection<AddinWrapper> DeserializeSetting(string filePath)
+        {
+            var json = File.ReadAllText(filePath);
+            var settings = JsonConvert.DeserializeObject<ObservableCollection<AddinWrapper>>(json);
+            if (settings == null) return new ObservableCollection<AddinWrapper>();
+
+            return settings;
+        }
+
+
+        public void SerializeSetting(string filePath)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(ViewModel.Addins, Formatting.Indented);
+                File.WriteAllText(filePath, json);
+            }
+            catch (Exception e)
+            {
+                // ignored
+            }
         }
 
         Result IExternalApplication.OnStartup(UIControlledApplication application)
         {
             Instance = this;
-
             m_app = application;
-            //versionNumber = m_app.ControlledApplication.VersionNumber; // Revit version
-            //toolManager = new ToolManager(versionNumber);
-            //ToolInfoDictionary = toolManager.ToolInfoDictionary;
+            var versionNumber = m_app.ControlledApplication.VersionNumber;
 
             try
             {
@@ -68,6 +98,43 @@ namespace HOK.BetaToolsManager
             catch
             {
                 // ignored
+            }
+
+            
+            ViewModel = new AddinInstallerModel(versionNumber);
+            var addins = ViewModel.Addins;
+            var settings = DeserializeSetting(ViewModel.InstallDirectory + "BetaSettings.json");
+            if (settings.Any())
+            {
+                foreach (var addin in settings)
+                {
+                    if (addin.IsInstalled)
+                    {
+                        // TODO: This is just killing me. But I got to keep going at it.
+                    }
+                }
+            }
+
+            foreach (var addin in addins)
+            {
+                // TODO: This needs to work for UI-less addins too
+                if (string.IsNullOrEmpty(addin.Panel)) continue;
+
+                // (Konrad) Temp path dll, to file moved from install location
+                // Keeps install location free from being locked by Revit.
+                // If addin hasn't been installed yet, we create a button for it,
+                // but assign it a Temp.dll reference so that we can re-assign it later.
+                var dllPath = addin.IsInstalled ? ViewModel.TempDirectory + addin.DllRelativePath : ViewModel.InstallDirectory + "Temp.dll";
+
+                var panel = m_app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel) 
+                    ?? m_app.CreateRibbonPanel(tabName, addin.Panel);
+
+                var button = (PushButton)panel.AddItem(new PushButtonData(addin.Panel, addin.ButtonText, dllPath, addin.CommandNamespace));
+                button.LargeImage = addin.Image;
+                button.ToolTip = addin.Description;
+
+                button.Visible = addin.IsInstalled;
+                panel.Visible = panel.GetItems().Any(x => x.Visible);
             }
 
             currentAssembly = System.Reflection.Assembly.GetAssembly(GetType()).Location;
@@ -86,6 +153,38 @@ namespace HOK.BetaToolsManager
 
             return Result.Succeeded;
         }
+
+        //private void OnDocumentCreated(object sender, DocumentCreatedEventArgs e)
+        //{
+        //    foreach (var addin in AddinsToSetPathsFor)
+        //    {
+        //        if (addin.IsInstalled)
+        //        {
+        //            var panel = m_app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel);
+        //            var button = panel?.GetItems().FirstOrDefault(x => x.ItemText == addin.ButtonText);
+        //            if (button != null)
+        //            {
+        //                ((PushButton)button).AssemblyName = ViewModel.InstallDirectory + addin.DllRelativePath;
+        //            }
+        //        }
+        //    }
+        //}
+
+        //private void OnDocumentOpened(object sender, DocumentOpenedEventArgs e)
+        //{
+        //    foreach (var addin in AddinsToSetPathsFor)
+        //    {
+        //        if (addin.IsInstalled)
+        //        {
+        //            var panel = m_app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel);
+        //            var button = panel?.GetItems().FirstOrDefault(x => x.ItemText == addin.ButtonText);
+        //            if (button != null)
+        //            {
+        //                ((PushButton)button).AssemblyName = ViewModel.InstallDirectory + addin.DllRelativePath;
+        //            }
+        //        }
+        //    }
+        //}
 
         //public void ShowInstaller(UIApplication uiapp)
         //{
