@@ -97,7 +97,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\RevitDocument.cs" />
     <Compile Include="Utilities\SelectionFilters.cs" />
-    <Compile Include="WpfUtilities\DataGrid.cs" />
+    <Compile Include="WpfUtilities\DataGridUtilities.cs" />
     <Compile Include="WpfUtilities\DataGridExtension.cs" />
     <Compile Include="WpfUtilities\ProgressManager.cs" />
     <Compile Include="WpfUtilities\RelayCommand.cs" />
@@ -136,8 +136,8 @@ goto exit
 echo Copying results to Build2018
 if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 copy "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-copy "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\HOK.MissionControl.FamilyPublish"
-copy "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\HOK.MissionControl"
+copy "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\Temp\HOK.MissionControl"
 goto exit
 
 :exit</PostBuildEvent>

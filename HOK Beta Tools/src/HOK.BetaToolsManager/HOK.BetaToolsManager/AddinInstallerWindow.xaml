@@ -59,7 +59,7 @@
                                       CanUserAddRows="False" 
                                       IsReadOnly="False" 
                                       SelectionUnit="FullRow" 
-                                      SelectedItemsList="{Binding SelectedAddins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" RenderTransformOrigin="0.5,0.5">
+                                      SelectedItemsList="{Binding SelectedAddins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" RenderTransformOrigin="0.5,0.5" Margin="10,0">
                     <ex:DataGridExtension.Columns>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 

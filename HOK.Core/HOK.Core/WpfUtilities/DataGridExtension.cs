@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -7,14 +6,18 @@ using System.Windows.Media;
 
 namespace HOK.Core.WpfUtilities
 {
-    public class DataGridExtension : System.Windows.Controls.DataGrid
+    /// <summary>
+    /// Tools using this:
+    /// - HOK.BetaToolsManager
+    /// </summary>
+    public class DataGridExtension : DataGrid
     {
         public DataGridExtension()
         {
             SelectionChanged += DataGridEx_SelectionChanged;
 
             // add event handler for single click editing
-            EventManager.RegisterClassHandler(typeof(System.Windows.Controls.DataGrid), PreviewMouseLeftButtonDownEvent,
+            EventManager.RegisterClassHandler(typeof(DataGrid), PreviewMouseLeftButtonDownEvent,
                 new RoutedEventHandler(EventHelper.DataGridPreviewMouseLeftButtonDownEvent));
         }
 
@@ -25,12 +28,12 @@ namespace HOK.Core.WpfUtilities
 
         public IList SelectedItemsList
         {
-            get => (IList)GetValue(SelectedItemsListProperty);
-            set => SetValue(SelectedItemsListProperty, value);
+            get { return (IList)GetValue(SelectedItemsListProperty); }
+            set { SetValue(SelectedItemsListProperty, value); }
         }
 
         public static readonly DependencyProperty SelectedItemsListProperty =
-            DependencyProperty.Register("SelectedItemsList", typeof(IList<>), typeof(DataGridExtension), new PropertyMetadata(null));
+            DependencyProperty.Register("SelectedItemsList", typeof(IList), typeof(DataGridExtension), new PropertyMetadata(null));
     }
 
     /// <summary>
@@ -38,6 +41,7 @@ namespace HOK.Core.WpfUtilities
     /// </summary>
     public static class EventHelper
     {
+
         internal static void DataGridPreviewMouseLeftButtonDownEvent
             (object sender, RoutedEventArgs e)
         {
@@ -63,7 +67,7 @@ namespace HOK.Core.WpfUtilities
             {
                 cell.Focus();
             }
-            var dataGrid = FindVisualParent<System.Windows.Controls.DataGrid>(cell);
+            var dataGrid = FindVisualParent<DataGrid>(cell);
             if (dataGrid == null) return;
             if (dataGrid.SelectionUnit
                 != DataGridSelectionUnit.FullRow)

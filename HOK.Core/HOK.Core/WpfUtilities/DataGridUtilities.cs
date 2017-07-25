@@ -1,13 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
+﻿using System.Windows;
 using System.Windows.Media;
 
 namespace HOK.Core.WpfUtilities
 {
-    public static class DataGrid
+    /// <summary>
+    /// Tools using this:
+    /// - 
+    /// </summary>
+    public static class DataGridUtilities
     {
         public static T FindVisualChild<T>(Visual parent) where T : Visual
         {

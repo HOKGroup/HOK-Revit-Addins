@@ -24,7 +24,7 @@ namespace HOK.AddInManager.UserControls
         {
             try
             {
-                var comboBox = Core.WpfUtilities.DataGrid.FindVisualParent<ComboBox>(e.OriginalSource as UIElement);
+                var comboBox = Core.WpfUtilities.DataGridUtilities.FindVisualParent<ComboBox>(e.OriginalSource as UIElement);
                 if (!(dataGridAddins.SelectedItems?.Count > 1) || !userSelection) return;
 
                 userSelection = false;
@@ -34,7 +34,7 @@ namespace HOK.AddInManager.UserControls
                 {
                     var rowIndex = dataGridAddins.Items.IndexOf(info);
                     var row = (DataGridRow)dataGridAddins.ItemContainerGenerator.ContainerFromIndex(rowIndex);
-                    var rowComboBox = Core.WpfUtilities.DataGrid.FindVisualChild<ComboBox>(row);
+                    var rowComboBox = Core.WpfUtilities.DataGridUtilities.FindVisualChild<ComboBox>(row);
                     if (null != rowComboBox)
                     {
                         rowComboBox.SelectedIndex = selectedIndex;

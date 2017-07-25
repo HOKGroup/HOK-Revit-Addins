@@ -177,12 +177,12 @@ goto exit
 
 :Build2018
 echo Copying results to Build2018
-copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\HOK.MissionControl"
-copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\HOK.MissionControl"
-copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\HOK.MissionControl"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\test_beta_location\2018\Temp\HOK.MissionControl"
 goto exit
 
 :exit</PostBuildEvent>

@@ -9,6 +9,9 @@ using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.FamilyPublish
 {
+    /// <summary>
+    /// Class attributes are used for beta tools management.
+    /// </summary>
     [Name(nameof(Properties.Resources.FamilyPublish_Name), typeof(Properties.Resources))]
     [Description(nameof(Properties.Resources.FamilyPublish_Description), typeof(Properties.Resources))]
     [Image(nameof(Properties.Resources.FamilyPublish_ImageName), typeof(Properties.Resources))]
@@ -39,8 +42,6 @@ namespace HOK.MissionControl.FamilyPublish
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-PublishFamilyData", doc));
-
-                
 
                 var pathName = doc.PathName;
                 if (string.IsNullOrEmpty(pathName))
