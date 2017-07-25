@@ -4,10 +4,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:ex="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core" 
+             xmlns:ex="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" Title="HOK Beta Tools Installer" Icon="Resources/hoklogo.ico" WindowStartupLocation="CenterScreen"
              BorderThickness="0,5,0,0" BorderBrush="#C45C44"
              d:DesignHeight="300" d:DesignWidth="852" Width="850" Height="500" MinHeight="500" MinWidth="850">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Window.Resources>
         <Style TargetType="{x:Type ex:DataGridExtension}">
             <Setter Property="Background" Value="White"/>
@@ -39,18 +45,21 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition Height="30"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="GroupBox" Margin="10">
-            <Grid Margin="0,10,0,10">
+        <GroupBox Header="Beta Tools" Margin="10">
+            <Grid Margin="0,10,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
                 <ex:DataGridExtension x:Name="DataGridPlugins" Grid.Row="0"
                                       ItemsSource="{Binding Addins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                       CellStyle="{StaticResource ContentDataGridCentering}"
                                       CanUserAddRows="False" 
                                       IsReadOnly="False" 
                                       SelectionUnit="FullRow" 
-                                      SelectedItemsList="{Binding SelectedAddins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" RenderTransformOrigin="0.5,0.5" Margin="10,0">
+                                      SelectedItemsList="{Binding SelectedAddins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" RenderTransformOrigin="0.5,0.5">
                     <ex:DataGridExtension.Columns>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
@@ -79,9 +88,9 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridTextColumn Header="Version" 
+                        <DataGridTextColumn Header="Beta Version" 
                                             Binding="{Binding Version, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="75" 
+                                            Width="85" 
                                             IsReadOnly="True"
                                             HeaderStyle="{StaticResource CenterGridHeaderStyle}">
                             <DataGridTextColumn.ElementStyle>
@@ -104,22 +113,25 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
                         <DataGridCheckBoxColumn Header="Install" 
-                                                Binding="{Binding Install, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 IsReadOnly="False" 
                                                 Width="40"
                                                 HeaderStyle="{StaticResource CenterGridHeaderStyle}">
                         </DataGridCheckBoxColumn>
                     </ex:DataGridExtension.Columns>
                 </ex:DataGridExtension>
+                <Button Content="All" Command="{Binding CheckAll}" Margin="10,0,0,10" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
+                <Button Content="None" Command="{Binding CheckNone}" Margin="90,0,0,10" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
             </Grid>
         </GroupBox>
         <Button Content="Install/Update"
                 Command="{Binding InstallCommand, Mode=OneWay}" 
+                CommandParameter="{Binding ElementName=Win}"
                 Margin="0,0,195,10" 
                 Height="20" 
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Right" 
-                Width="100" Grid.Row="2" />
+                Width="100" Grid.Row="1" />
         <Button Content="Close" 
                 Command="{Binding CloseCommand, Mode=OneWay}" 
                 CommandParameter="{Binding ElementName=Win}" 
@@ -127,13 +139,13 @@
                 Margin="0,0,10,10" 
                 Width="75" 
                 Height="20" 
-                VerticalAlignment="Bottom" Grid.Row="2" />
+                VerticalAlignment="Bottom" Grid.Row="1" />
         <Button Content="Uninstall" 
-            Command="{Binding UninstallCommand, Mode=OneWay}" 
-            Margin="0,0,90,10" 
-            Height="20" 
-            VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Grid.Row="2" />
-        <Button Content="All" Command="{Binding CheckAll}" Margin="10,0,0,5" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
-        <Button Content="None" Command="{Binding CheckNone}" Margin="90,0,0,5" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
+                Command="{Binding UninstallCommand, Mode=OneWay}" 
+                CommandParameter="{Binding ElementName=Win}"
+                Margin="0,0,90,10" 
+                Height="20" 
+                VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Grid.Row="1" />
+
     </Grid>
 </Window>

@@ -1,23 +1,29 @@
 ﻿using System;
-using System.Windows;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.BetaToolsManager
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class InstallerCommand:IExternalCommand
+    public class AddinInstallerCommand : IExternalCommand
     {
         Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
         {
+            var uiApp = commandData.Application;
+            var doc = uiApp.ActiveUIDocument.Document;
+            Log.AppendLog(LogMessageType.INFO, "Started");
+
             try
             {
-                var version = commandData.Application.Application.VersionNumber;
+                // (Konrad) We are gathering information about the addin use. This allows us to
+                // better maintain the most used plug-ins or discontiue the unused ones.
+                AddinUtilities.PublishAddinLog(new AddinLog("Beta-BetaInstaller", doc));
 
-                //var model = new AddinInstallerModel(version);
-                //var viewModel = new AddinInstallerViewModel(model);
                 var model = AppCommand.Instance.ViewModel;
                 var viewModel = new AddinInstallerViewModel(model);
                 var view = new AddinInstallerWindow
@@ -26,13 +32,13 @@ namespace HOK.BetaToolsManager
                 };
 
                 view.ShowDialog();
-
-                //AppCommand.thisApp.ShowInstaller(m_app);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to initialize Installer command.\n"+ex.Message , "HOK Beta Tool Manager - Installer Command ", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
+
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
     }

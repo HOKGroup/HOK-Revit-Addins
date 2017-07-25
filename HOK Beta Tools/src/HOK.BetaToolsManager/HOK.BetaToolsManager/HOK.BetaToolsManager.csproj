@@ -73,6 +73,9 @@
     <Reference Include="HOK.Core">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
     </Reference>
+    <Reference Include="HOK.MissionControl.Core">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2018\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
@@ -134,56 +137,22 @@
       <DependentUpon>AddinInstallerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="AppCommand.cs" />
-    <Compile Include="BetaInstallerWindow.xaml.cs">
-      <DependentUpon>BetaInstallerWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="InstallerCommand.cs" />
+    <Compile Include="AddinInstallerCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="ToolManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="AddinInstallerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="BetaInstallerWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\hoklogo.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\arrowhead.png" />
-    <EmbeddedResource Include="Resources\bulb.png" />
-    <EmbeddedResource Include="Resources\camera.ico" />
-    <EmbeddedResource Include="Resources\chart.ico" />
-    <EmbeddedResource Include="Resources\color32.png" />
-    <EmbeddedResource Include="Resources\comment.ico" />
-    <EmbeddedResource Include="Resources\container.png" />
-    <EmbeddedResource Include="Resources\cube.png" />
-    <EmbeddedResource Include="Resources\door.png" />
-    <EmbeddedResource Include="Resources\editor.ico" />
-    <EmbeddedResource Include="Resources\element.ico" />
-    <EmbeddedResource Include="Resources\finish.png" />
-    <EmbeddedResource Include="Resources\height.png" />
-    <EmbeddedResource Include="Resources\level.png" />
-    <EmbeddedResource Include="Resources\parameter.ico" />
-    <EmbeddedResource Include="Resources\project.png" />
-    <EmbeddedResource Include="Resources\refresh.png" />
-    <EmbeddedResource Include="Resources\shape.png" />
-    <EmbeddedResource Include="Resources\sheet.ico" />
-    <EmbeddedResource Include="Resources\sync.ico" />
-    <EmbeddedResource Include="Resources\tooltip.png" />
-    <EmbeddedResource Include="Resources\view.ico" />
-    <EmbeddedResource Include="Resources\viewTooltip.png" />
-    <EmbeddedResource Include="Resources\workset.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -194,27 +163,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\settings.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\remove.png" />
-    <Resource Include="Resources\install.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\cameraview.png" />
-    <EmbeddedResource Include="Resources\elevation.png" />
-    <EmbeddedResource Include="Resources\eq.ico" />
-    <EmbeddedResource Include="Resources\create.ico" />
-    <EmbeddedResource Include="Resources\update.png" />
-    <EmbeddedResource Include="Resources\kruler.png" />
-    <EmbeddedResource Include="Resources\location.ico" />
-    <EmbeddedResource Include="Resources\toolbox.png" />
     <Content Include="HOK.BetaToolsManager.addin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\HOK.Tooltip.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <EmbeddedResource Include="Resources\betaPluginManager_32x32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -37,10 +37,28 @@ namespace HOK.BetaToolsManager
         {
             foreach (var addin in addins)
             {
-                if (!addin.Install) continue;
+                if (!addin.IsSelected) continue;
 
                 // Reset installed version flag to update datagrid control
                 addin.InstalledVersion = "Not installed";
+                addin.IsInstalled = false;
+
+                if (string.IsNullOrEmpty(addin.Panel))
+                {
+                    // no UI addin
+                    // remove addin file
+                    if (File.Exists(InstallDirectory + Path.GetFileName(addin.AddinFilePath)))
+                    {
+                        try
+                        {
+                            File.Delete(InstallDirectory + Path.GetFileName(addin.AddinFilePath));
+                        }
+                        catch
+                        {
+                            Log.AppendLog(LogMessageType.ERROR, "Could not delete Addin File. Moving on.");
+                        }
+                    }
+                }
 
                 // (Konrad) Button needs to be disabled after DLLs were removed since it doesn't work anyways.
                 var app = AppCommand.Instance.m_app;
@@ -50,81 +68,33 @@ namespace HOK.BetaToolsManager
                 {
                     button.Visible = false;
                     panel.Visible = panel.GetItems().Any(x => x.Visible);
-                    ((PushButton)button).AssemblyName = InstallDirectory + "Temp.dll";
-                }
-
-                // remove dependancies directory
-                if (Directory.Exists(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
-                {
-                    try
-                    {
-                        Directory.Delete(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name, true);
-                    }
-                    catch
-                    {
-                        Log.AppendLog(LogMessageType.ERROR, "Could not delete addin directory. Moving on.");
-                    }
-
                 }
             }
-        }
-
-        public static void CopyDirectory(string sourcePath, string destinationPath)
-        {
-            foreach (var dirPath in Directory.GetDirectories(sourcePath, "*",
-                SearchOption.AllDirectories))
-                Directory.CreateDirectory(dirPath.Replace(sourcePath, destinationPath));
-
-            foreach (var newPath in Directory.GetFiles(sourcePath, "*.*",
-                SearchOption.AllDirectories))
-                File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
         }
 
         public void InstallUpdateAddins(ObservableCollection<AddinWrapper> addins)
         {
             foreach (var addin in addins)
             {
-                if (!addin.Install) continue;
-
-                //// move the directory with dependancies to install location
-                //if (!Directory.Exists(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
-                //{
-                //    try
-                //    {
-                //        Directory.CreateDirectory(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                //    }
-                //    catch
-                //    {
-                //        Log.AppendLog(LogMessageType.ERROR, "Could not delete addin directory. Moving on.");
-                //    }
-                //}
-                //// either fill out the empty directory with content
-                //// or if it existed just override it with new one
-                //CopyDirectory(addin.BetaResourcesPath, InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-
-
-                //// if temp version of the currently installed addin doesnt exist yet, let's add it in
-                //// and make a copy of all contents so that we can bind the button to temp location
-                //if (!Directory.Exists(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
-                //{
-                //    try
-                //    {
-                //        Directory.CreateDirectory(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                //    }
-                //    catch
-                //    {
-                //        Log.AppendLog(LogMessageType.ERROR, "Could not delete addin directory. Moving on.");
-                //    }
-                //    // don't touch temp if it existed hence this is just an update
-                //    CopyDirectory(addin.BetaResourcesPath, TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                //}
-                
-
+                if (!addin.IsSelected) continue;
 
                 // (Konrad) Bind button to Temp directory dll
                 if (string.IsNullOrEmpty(addin.Panel))
                 {
                     // no UI addin
+                    // move the addin file
+                    if (File.Exists(InstallDirectory + Path.GetFileName(addin.AddinFilePath)))
+                    {
+                        try
+                        {
+                            File.Delete(InstallDirectory + Path.GetFileName(addin.AddinFilePath));
+                        }
+                        catch
+                        {
+                            Log.AppendLog(LogMessageType.ERROR, "Could not delete Addin File. Moving on.");
+                        }
+                    }
+                    File.Copy(addin.AddinFilePath, InstallDirectory + Path.GetFileName(addin.AddinFilePath));
                 }
                 else
                 {
@@ -135,83 +105,31 @@ namespace HOK.BetaToolsManager
                     {
                         button.Visible = true;
                         panel.Visible = panel.GetItems().Any(x => x.Visible);
-                        ((PushButton)button).AssemblyName = TempDirectory + addin.DllRelativePath;
+                        ((PushButton)button).AssemblyName = InstallDirectory + addin.DllRelativePath;
                     }
                 }
 
                 // Reset installed version flag to update datagrid control
                 addin.InstalledVersion = addin.Version;
                 addin.IsInstalled = true;
-
-                //// move the addin file
-                //if (File.Exists(InstallDirectory + Path.GetFileName(addin.AddinFilePath)))
-                //{
-                //    try
-                //    {
-                //        File.Delete(InstallDirectory + Path.GetFileName(addin.AddinFilePath));
-                //    }
-                //    catch
-                //    {
-                //        Log.AppendLog(LogMessageType.ERROR, "Could not delete Addin File. Moving on.");
-                //    }
-                //}
-                //File.Copy(addin.AddinFilePath, InstallDirectory + Path.GetFileName(addin.AddinFilePath));
-
-                //// move the directory with dependancies
-                //if (Directory.Exists(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
-                //{
-                //    try
-                //    {
-                //        Directory.Delete(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name, true);
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        Log.AppendLog(LogMessageType.ERROR, "Could not delete addin directory. Moving on.");
-                //    }
-                //}
-                //Directory.CreateDirectory(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-
-                ////CopyFilesRecursively(new DirectoryInfo(addin.BetaResourcesPath), new DirectoryInfo(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name));
-                //CopyDirectory(addin.BetaResourcesPath, InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-
-
             }
-        }
-
-        private static string ParseXml(string file)
-        {
-            var value = string.Empty;
-            var response = File.ReadAllText(file);
-            var doc = XDocument.Parse(response);
-
-            foreach (var element in doc.Descendants("Assembly"))
-            {
-                value = (string)element;
-                break;
-            }
-            return value;
         }
 
         private void LoadAddinsOnStartup()
         {
+            var addins = File.Exists(InstallDirectory + "BetaSettings.json")
+                ? DeserializeSetting(InstallDirectory + "BetaSettings.json")
+                : null;
+
             var dic = new Dictionary<string, AddinWrapper>();
             if (Directory.Exists(BetaDirectory))
             {
-                // create Temp folder if it doesn't exists.
+                // create Temp folder if it doesn't exists and temp.dll to bind to
                 if (!Directory.Exists(TempDirectory))
-                {
                     Directory.CreateDirectory(TempDirectory);
-                }
 
-                // (Konrad) Create a copy of all installed plugins in temp location
-                // we will bind all buttons to temp Dlls so that we can keep install folder untouched
-                // exclude Temp folder 
-                foreach (var dir in Directory.GetDirectories(BetaDirectory))
-                {
-                    if (!Directory.Exists(InstallDirectory + new DirectoryInfo(dir).Name))
-                        Directory.CreateDirectory(InstallDirectory + new DirectoryInfo(dir).Name);
-                    CopyDirectory(dir, InstallDirectory + new DirectoryInfo(dir).Name);
-                }
+                // (Konrad) Create a copy of all installed plugins by copying the temp dir from beta
+                CopyDirectory(BetaDirectory + @"Temp\", TempDirectory);
 
                 // (Konrad) Get all addins from beta directory, check their versions agains installed
                 foreach (var file in Directory.GetFiles(BetaDirectory, "*.addin"))
@@ -246,11 +164,19 @@ namespace HOK.BetaToolsManager
 
                         var installedVersion = "Not installed";
                         var installed = false;
-                        if (File.Exists(TempDirectory + dllRelativePath))
+                        var addin = addins?.FirstOrDefault(x => x.Name == nameAttr.Name);
+                        if (addin != null)
                         {
-                            var a = Assembly.LoadFile(TempDirectory + dllRelativePath);
-                            installedVersion = a.GetName().Version.ToString();
-                            installed = true;
+                            installedVersion = addin.InstalledVersion;
+                            installed = addin.IsInstalled;
+
+                            if (installed)
+                            {
+                                // get the latest version of it from beta
+                                if (!Directory.Exists(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
+                                    Directory.CreateDirectory(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                                CopyDirectory(addin.BetaResourcesPath, InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                            }
                         }
 
                         var aw = new AddinWrapper
@@ -285,48 +211,60 @@ namespace HOK.BetaToolsManager
             Addins = output;
         }
 
-        public List<string> GetNamesOfAssembliesReferencedBy(Assembly assembly)
+        /// <summary>
+        /// Read Addin Manifest file to extract DLL path.
+        /// </summary>
+        /// <param name="file">File path.</param>
+        /// <returns></returns>
+        private static string ParseXml(string file)
         {
-            return assembly.GetReferencedAssemblies()
-                .Select(assemblyName => assemblyName.Name + ".dll").ToList();
+            var value = string.Empty;
+            var response = File.ReadAllText(file);
+            var doc = XDocument.Parse(response);
+
+            foreach (var element in doc.Descendants("Assembly"))
+            {
+                value = (string)element;
+                break;
+            }
+            return value;
+        }
+
+        /// <summary>
+        /// Copy Directory and its contents to another directory.
+        /// </summary>
+        /// <param name="sourcePath">Source Path</param>
+        /// <param name="destinationPath">Destination Path</param>
+        public static void CopyDirectory(string sourcePath, string destinationPath)
+        {
+            try
+            {
+                foreach (var dirPath in Directory.GetDirectories(sourcePath, "*",
+                    SearchOption.AllDirectories))
+                    Directory.CreateDirectory(dirPath.Replace(sourcePath, destinationPath));
+
+                foreach (var newPath in Directory.GetFiles(sourcePath, "*.*",
+                    SearchOption.AllDirectories))
+                    File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
+            }
+            catch (Exception e)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+            }
+        }
+
+        /// <summary>
+        /// Deserializes Settings file for installed addins.
+        /// </summary>
+        /// <param name="filePath">File Path</param>
+        /// <returns>Addin Wrapper objects.</returns>
+        public ObservableCollection<AddinWrapper> DeserializeSetting(string filePath)
+        {
+            var json = File.ReadAllText(filePath);
+            var settings = JsonConvert.DeserializeObject<ObservableCollection<AddinWrapper>>(json);
+            if (settings == null) return new ObservableCollection<AddinWrapper>();
+
+            return settings;
         }
     }
-
-    //public static class Serialization
-    //{
-    //    /// <summary>
-    //    /// Deserializes JSON string into Collection of AddinWrappers.
-    //    /// </summary>
-    //    /// <param name="filePath">Path to file.</param>
-    //    /// <returns></returns>
-    //    public static ObservableCollection<AddinWrapper> Deserialize(string filePath)
-    //    {
-    //        var jsonString = File.ReadAllText(filePath);
-    //        var settings = new JsonSerializerSettings
-    //        {
-    //            TypeNameHandling = TypeNameHandling.Auto
-    //        };
-    //        var deserialized = JsonConvert.DeserializeObject<ObservableCollection<AddinWrapper>>(jsonString, settings);
-
-    //        return deserialized;
-    //    }
-
-    //    /// <summary>
-    //    /// Serializes Addins selections for future use.
-    //    /// </summary>
-    //    /// <param name="filePath">Path to file.</param>
-    //    /// <param name="addins">Collection of AddinWrappers to be serialized.</param>
-    //    /// <returns></returns>
-    //    public static string Serialize(string filePath, ObservableCollection<AddinWrapper> addins)
-    //    {
-    //        var settings = new JsonSerializerSettings
-    //        {
-    //            TypeNameHandling = TypeNameHandling.Auto
-    //        };
-    //        var jsonString = JsonConvert.SerializeObject(addins, Formatting.Indented, settings);
-    //        File.WriteAllText(filePath, jsonString);
-
-    //        return new FileInfo(filePath).Length > 0 ? filePath : string.Empty;
-    //    }
-    //}
 }

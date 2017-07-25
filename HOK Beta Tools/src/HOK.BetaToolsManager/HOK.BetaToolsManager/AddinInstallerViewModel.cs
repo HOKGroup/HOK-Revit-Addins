@@ -12,8 +12,9 @@ namespace HOK.BetaToolsManager
         public RelayCommand<Window> CloseCommand { get; }
         public RelayCommand CheckAll { get; }
         public RelayCommand CheckNone { get; }
-        public RelayCommand InstallCommand { get; }
-        public RelayCommand UninstallCommand { get; }
+        public RelayCommand<Window> InstallCommand { get; }
+        public RelayCommand<Window> UninstallCommand { get; }
+        public RelayCommand<Window> WindowLoaded { get; }
 
         public AddinInstallerViewModel(AddinInstallerModel model)
         {
@@ -22,25 +23,33 @@ namespace HOK.BetaToolsManager
             CloseCommand = new RelayCommand<Window>(OnCloseCommand);
             CheckAll = new RelayCommand(OnCheckAll);
             CheckNone = new RelayCommand(OnCheckNone);
-            InstallCommand = new RelayCommand(OnInstall);
-            UninstallCommand = new RelayCommand(OnUninstall);
+            InstallCommand = new RelayCommand<Window>(OnInstall);
+            UninstallCommand = new RelayCommand<Window>(OnUninstall);
+            WindowLoaded = new RelayCommand<Window>(OnWindowLoaded);
         }
 
-        private void OnUninstall()
+        private void OnWindowLoaded(Window win)
+        {
+            OnCheckNone();
+        }
+
+        private void OnUninstall(Window win)
         {
             Model.UninstallAddins(Addins);
+            win.Close();
         }
 
-        private void OnInstall()
+        private void OnInstall(Window win)
         {
             Model.InstallUpdateAddins(Addins);
+            win.Close();
         }
 
         private void OnCheckNone()
         {
             foreach (var addin in Addins)
             {
-                addin.Install = false;
+                addin.IsSelected = false;
             }
         }
 
@@ -48,7 +57,7 @@ namespace HOK.BetaToolsManager
         {
             foreach (var addin in Addins)
             {
-                addin.Install = true;
+                addin.IsSelected = true;
             }
         }
 
