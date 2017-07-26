@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Autodesk.Revit.UI;
 using System.Windows.Threading;
 using System.Windows;
 using System.IO;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
-
-
+using HOK.Core.Utilities;
 
 namespace HOK.FileOnpeningMonitor
 {
-    public class AppCommand:IExternalApplication
+    public class AppCommand : IExternalApplication
     {
-        private Dictionary<string/*filePath*/, CentralFileInfo> openedCentralFiles = new Dictionary<string, CentralFileInfo>();
-        private Document openedDocument = null;
-        private UIControlledApplication m_app = null;
-        private bool isCentral = false;
-        private DispatcherTimer dispatcherTimer = null;
+        private readonly Dictionary<string/*filePath*/, CentralFileInfo> openedCentralFiles = new Dictionary<string, CentralFileInfo>();
+        private Document openedDocument;
+        private UIControlledApplication m_app;
+        private bool isCentral;
+        private DispatcherTimer dispatcherTimer;
         private int timerCount = 1;
-        private bool timerOn = false;
+        private bool timerOn;
 
         public Result OnShutdown(UIControlledApplication application)
         {
@@ -37,12 +33,12 @@ namespace HOK.FileOnpeningMonitor
             {
                 m_app = application;
                 dispatcherTimer = new DispatcherTimer();
-                application.ControlledApplication.DocumentOpened += new EventHandler<DocumentOpenedEventArgs>(Application_DocumentOpened);
-                application.ControlledApplication.DocumentClosing += new EventHandler<DocumentClosingEventArgs>(Application_DocumentClosing);
+                application.ControlledApplication.DocumentOpened += Application_DocumentOpened;
+                application.ControlledApplication.DocumentClosing += Application_DocumentClosing;
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return Result.Failed;
             }
             return Result.Succeeded;
@@ -53,82 +49,75 @@ namespace HOK.FileOnpeningMonitor
             try
             {
                 openedDocument = args.Document;
-                if (null == openedDocument.ActiveView) { return; } // to distinguish linked model 
-                if (openedDocument.IsWorkshared)
+                if (null == openedDocument.ActiveView) return; // to distinguish linked model 
+                if (!openedDocument.IsWorkshared) return;
+                if (string.IsNullOrEmpty(openedDocument.PathName)) return;
+                if (openedDocument.IsDetached) return;
+                var isOnNetwork = IsNetworkDrive(openedDocument.PathName);
+                if (!isOnNetwork) return;
+                isCentral = IsCentralFile(openedDocument);
+                if (!isCentral) return;
+
+                var fileInfo = new CentralFileInfo(openedDocument);
+                var properties = new Dictionary<string, string>();
+
+                FMEServerUtil.RunFMEWorkspace(fileInfo, "buildingSMART Notifications", "OpenCentralFileNotification.fmw", out properties);
+
+                if (!openedCentralFiles.ContainsKey(fileInfo.DocCentralPath))
                 {
-                    if (string.IsNullOrEmpty(openedDocument.PathName)) { return; }
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
-                    if (openedDocument.IsDetached) { return; }
-#endif
-                    bool isOnNetwork = IsNetworkDrive(openedDocument.PathName);
-                    if (!isOnNetwork) { return; }
+                    openedCentralFiles.Add(openedDocument.PathName, fileInfo);
+                }
 
-                    isCentral = IsCentralFile(openedDocument);
-                    if (isCentral)
+                var firstWindow = new CentralFileWarningWindow(fileInfo);
+                if (firstWindow.ShowDialog() != true) return;
+
+                timerCount = 1;
+                var timedWindow = new TimedWarningWindow(timerCount, openedCentralFiles);
+                if (timedWindow.ShowDialog() == true)
+                {
+                    timerOn = false;
+                }
+                else
+                {
+                    timerOn = true;
+                    if (null != dispatcherTimer)
                     {
-                        CentralFileInfo fileInfo = new CentralFileInfo(openedDocument);
-                        Dictionary<string, string> properties = new Dictionary<string, string>();
-                        bool submittedJob = FMEServerUtil.RunFMEWorkspace(fileInfo, "buildingSMART Notifications", "OpenCentralFileNotification.fmw", out properties);
-
-                        if (!openedCentralFiles.ContainsKey(fileInfo.DocCentralPath))
-                        {
-                            openedCentralFiles.Add(openedDocument.PathName, fileInfo);
-                        }
-
-                        CentralFileWarningWindow firstWindow = new CentralFileWarningWindow(fileInfo);
-                        if (firstWindow.ShowDialog() == true)
-                        {
-                            timerCount = 1;
-                            TimedWarningWindow timedWindow = new TimedWarningWindow(timerCount, openedCentralFiles);
-                            if (timedWindow.ShowDialog() == true)
-                            {
-                                timerOn = false;
-                            }
-                            else
-                            {
-                                timerOn = true;
-                                if (null != dispatcherTimer)
-                                {
-                                    dispatcherTimer.IsEnabled = false;
-                                    dispatcherTimer.Tick -= DispatcherTimer_Tick;
-                                    dispatcherTimer = null;
-                                }
-
-                                dispatcherTimer = new DispatcherTimer();
-                                dispatcherTimer.Tick += new EventHandler(DispatcherTimer_Tick);
-                                dispatcherTimer.Interval = new TimeSpan(0, 0, 30);
-                                dispatcherTimer.IsEnabled = true;
-                                dispatcherTimer.Start();
-                            }
-                        }
+                        dispatcherTimer.IsEnabled = false;
+                        dispatcherTimer.Tick -= DispatcherTimer_Tick;
+                        dispatcherTimer = null;
                     }
+
+                    dispatcherTimer = new DispatcherTimer();
+                    dispatcherTimer.Tick += DispatcherTimer_Tick;
+                    dispatcherTimer.Interval = new TimeSpan(0, 0, 30);
+                    dispatcherTimer.IsEnabled = true;
+                    dispatcherTimer.Start();
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
         public bool IsNetworkDrive(string pathName)
         {
-            bool onNetwork = false;
+            const bool onNetwork = false;
             try
             {
                 if (pathName.StartsWith(@"\\")) { return true; }
                 if (pathName.StartsWith("RSN:")) { return true; }
 
-                DriveInfo[] infoArray = DriveInfo.GetDrives();
-                foreach (DriveInfo info in infoArray)
+                var infoArray = DriveInfo.GetDrives();
+                foreach (var info in infoArray)
                 {
-                    if (info.DriveType == DriveType.Network)
-                    {
-                        if (pathName.StartsWith(info.Name)) { return true; }
-                    }
+                    if (info.DriveType != DriveType.Network) continue;
+                    if (pathName.StartsWith(info.Name)) return true;
                 }
             }
             catch (Exception ex)
             {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 MessageBox.Show("Failed to get information of the file location.\n" + ex.Message, "Find File Location", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return onNetwork;
@@ -136,39 +125,38 @@ namespace HOK.FileOnpeningMonitor
 
         public bool IsCentralFile(Document document)
         {
-            bool isCentralFile = false;
+            var isCentralFile = false;
             try
             {
-                ModelPath centralModelPath = document.GetWorksharingCentralModelPath();
+                var centralModelPath = document.GetWorksharingCentralModelPath();
                 if (null!=centralModelPath)
                 {
-                    string userVisiblePath = ModelPathUtils.ConvertModelPathToUserVisiblePath(centralModelPath);
+                    var userVisiblePath = ModelPathUtils.ConvertModelPathToUserVisiblePath(centralModelPath);
                     if (centralModelPath.ServerPath)
                     {
-                        string revitServerPrefix = "RSN://";
-                        string a360Prefix = "A360://";
-                        string relativePath = "";
+                        const string revitServerPrefix = "RSN://";
+                        const string a360Prefix = "A360://";
+                        var relativePath = "";
 
                         if (userVisiblePath.Contains(revitServerPrefix))
                         {
-                            string serverLocation = revitServerPrefix + centralModelPath.CentralServerPath;
+                            var serverLocation = revitServerPrefix + centralModelPath.CentralServerPath;
                             relativePath = userVisiblePath.Substring(serverLocation.Length);
                         }
                         else if (userVisiblePath.Contains(a360Prefix))
                         {
-                            string serverLocation = a360Prefix + centralModelPath.CentralServerPath;
+                            var serverLocation = a360Prefix + centralModelPath.CentralServerPath;
                             relativePath = userVisiblePath.Substring(serverLocation.Length);
                         }
 
-                        ServerPath serverPath = new ServerPath(centralModelPath.CentralServerPath, relativePath);
-                        Guid centralGUID = document.Application.GetWorksharingCentralGUID(serverPath);
+                        var serverPath = new ServerPath(centralModelPath.CentralServerPath, relativePath);
+                        var centralGUID = document.Application.GetWorksharingCentralGUID(serverPath);
                         if (centralGUID != Guid.Empty)
                         {
-                            ModelPath currentModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(document.PathName);
+                            var currentModelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(document.PathName);
                             if (null!=currentModelPath)
                             {
-#if RELEASE2015|| RELEASE2016 || RELEASE2017
-                                Guid currentGuid = currentModelPath.GetModelGUID();
+                                var currentGuid = currentModelPath.GetModelGUID();
                                 if (currentGuid != Guid.Empty)
                                 {
                                     if (centralGUID.Equals(currentGuid))
@@ -176,7 +164,6 @@ namespace HOK.FileOnpeningMonitor
                                         isCentralFile = true;
                                     }
                                 }
-#endif
                             }
                         }
                     }
@@ -191,6 +178,7 @@ namespace HOK.FileOnpeningMonitor
             }
             catch (Exception ex)
             {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 MessageBox.Show("Failed to determine whether the file is central or local.\n"+ex.Message, "IsCentralFile", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return isCentralFile;
@@ -200,27 +188,26 @@ namespace HOK.FileOnpeningMonitor
         {
             try
             {
-                if (timerOn)
+                if (!timerOn) return;
+
+                dispatcherTimer.IsEnabled = false;
+                var timedWindow = new TimedWarningWindow(timerCount, openedCentralFiles);
+                if (timedWindow.ShowDialog() == true)
                 {
+                    dispatcherTimer.Stop();
                     dispatcherTimer.IsEnabled = false;
-                    TimedWarningWindow timedWindow = new TimedWarningWindow(timerCount, openedCentralFiles);
-                    if (timedWindow.ShowDialog() == true)
-                    {
-                        dispatcherTimer.Stop();
-                        dispatcherTimer.IsEnabled = false;
-                        dispatcherTimer.Tick -= DispatcherTimer_Tick;
-                        timerOn = false;
-                    }
-                    else
-                    {
-                        dispatcherTimer.IsEnabled = true;
-                        timerCount++;
-                    }
+                    dispatcherTimer.Tick -= DispatcherTimer_Tick;
+                    timerOn = false;
+                }
+                else
+                {
+                    dispatcherTimer.IsEnabled = true;
+                    timerCount++;
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -228,24 +215,22 @@ namespace HOK.FileOnpeningMonitor
         {
             try
             {
-                Document closingDocument = args.Document;
-                if (!string.IsNullOrEmpty(closingDocument.PathName))
+                var closingDocument = args.Document;
+                if (string.IsNullOrEmpty(closingDocument.PathName)) return;
+
+                if (openedCentralFiles.ContainsKey(closingDocument.PathName))
                 {
-                    if (openedCentralFiles.ContainsKey(closingDocument.PathName))
-                    {
-                        openedCentralFiles.Remove(closingDocument.PathName);
-                    }
-                    if (openedCentralFiles.Count == 0)
-                    {
-                        timerOn = false;
-                    }
+                    openedCentralFiles.Remove(closingDocument.PathName);
+                }
+                if (openedCentralFiles.Count == 0)
+                {
+                    timerOn = false;
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
-
     }
 }

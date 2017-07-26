@@ -9,6 +9,15 @@ using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.FamilyPublish
 {
+    /// <summary>
+    /// Class attributes are used for beta tools management.
+    /// </summary>
+    [Name(nameof(Properties.Resources.FamilyPublish_Name), typeof(Properties.Resources))]
+    [Description(nameof(Properties.Resources.FamilyPublish_Description), typeof(Properties.Resources))]
+    [Image(nameof(Properties.Resources.FamilyPublish_ImageName), typeof(Properties.Resources))]
+    [PanelName(nameof(Properties.Resources.FamilyPublish_PanelName), typeof(Properties.Resources))]
+    [ButtonText(nameof(Properties.Resources.FamilyPublish_ButtonText), typeof(Properties.Resources))]
+    [Namespace(nameof(Properties.Resources.FamilyPublish_Namespace), typeof(Properties.Resources))]
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
@@ -25,6 +34,8 @@ namespace HOK.MissionControl.FamilyPublish
             var uiApp = commandData.Application;
             var doc = uiApp.ActiveUIDocument.Document;
             Log.AppendLog(LogMessageType.INFO, "Started");
+
+            var version = commandData.Application.Application.VersionNumber;
 
             try
             {
@@ -82,7 +93,7 @@ namespace HOK.MissionControl.FamilyPublish
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
 
-            Log.AppendLog(LogMessageType.INFO, "Ended.");
+            Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
         }
     }

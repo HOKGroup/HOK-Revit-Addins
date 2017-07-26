@@ -25,6 +25,7 @@ namespace HOK.RibbonTab
         Result IExternalApplication.OnStartup(UIControlledApplication application)
         {
             application.ControlledApplication.DocumentOpening += OnDocumentOpening;
+            application.ControlledApplication.DocumentCreating += OnDocumentCreating;
             m_app = application;
             tabName = "   HOK   ";
 
@@ -47,9 +48,21 @@ namespace HOK.RibbonTab
             CreateCustomPushButtons();
             //CreateDataPushButtons();
             CreateAVFPushButtons();
-            CreateMissionControlPushButtons();
+            //CreateMissionControlPushButtons();
 
             return Result.Succeeded;
+        }
+
+        private static void OnDocumentCreating(object sender, DocumentCreatingEventArgs args)
+        {
+            try
+            {
+                Log.Initialize("HOK_Tools", "New Document");
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
         }
 
         private static void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
@@ -77,32 +90,32 @@ namespace HOK.RibbonTab
             return Result.Succeeded;
         }
 
-        private void CreateMissionControlPushButtons()
-        {
-            try
-            {
-                // TODO: It would be nice to automatically prompt user once a week, to run this export.
-                var missionControlPanel = m_app.CreateRibbonPanel(tabName, "Mission Control");
-                var assemblyPath = currentDirectory + "/HOK.MissionControl.FamilyPublish.dll";
+        //private void CreateMissionControlPushButtons()
+        //{
+        //    try
+        //    {
+        //        // TODO: It would be nice to automatically prompt user once a week, to run this export.
+        //        var missionControlPanel = m_app.CreateRibbonPanel(tabName, "Mission Control");
+        //        var assemblyPath = currentDirectory + "/HOK.MissionControl.FamilyPublish.dll";
 
-                var pb1 = new PushButtonData(
-                    "PublishFamilyDataCommand",
-                    "Publish Family" + Environment.NewLine + "Data",
-                    assemblyPath,
-                    "HOK.MissionControl.FamilyPublish.FamilyPublishCommand")
-                {
-                    ToolTip = "Mission Control Family Export Tool."
-                };
-                var fpAssembly = Assembly.LoadFrom(assemblyPath);
-                pb1.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl.FamilyPublish", "publishFamily_32x32.png");
+        //        var pb1 = new PushButtonData(
+        //            "PublishFamilyDataCommand",
+        //            "Publish Family" + Environment.NewLine + "Data",
+        //            assemblyPath,
+        //            "HOK.MissionControl.FamilyPublish.FamilyPublishCommand")
+        //        {
+        //            ToolTip = "Mission Control Family Export Tool."
+        //        };
+        //        var fpAssembly = Assembly.LoadFrom(assemblyPath);
+        //        pb1.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl.FamilyPublish", "publishFamily_32x32.png");
 
-                missionControlPanel.AddItem(pb1);
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-        }
+        //        missionControlPanel.AddItem(pb1);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+        //    }
+        //}
 
         /// <summary>
         /// Creates all of the Utilities buttons.

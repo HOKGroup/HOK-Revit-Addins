@@ -52,7 +52,6 @@ namespace HOK.SheetManager.AddIn
                 var sheetImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(Properties.Resources.sync.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
                 var sheetButton = (PushButton)panel.AddItem(new PushButtonData("SheetDataManager", "Sheet Data Manager", currentAssembly, "HOK.SheetManager.AddIn.Command"));
                 sheetButton.LargeImage = sheetImage;
-                sheetButton.AvailabilityClassName = "HOK.SheetManager.AddIn.Availability";
 
                 var instructionFile = @"V:\RVT-Data\HOK Program\Documentation\SheetManagerTools_Instruction.pdf";
                 if (File.Exists(instructionFile))
@@ -232,16 +231,5 @@ namespace HOK.SheetManager.AddIn
             }
         }
 
-    }
-
-    /// <summary>
-    /// External command availability class.
-    /// </summary>
-    public class Availability : IExternalCommandAvailability
-    {
-        public bool IsCommandAvailable(UIApplication applicationData, CategorySet selectedCategories)
-        {
-            return true;
-        }
     }
 }

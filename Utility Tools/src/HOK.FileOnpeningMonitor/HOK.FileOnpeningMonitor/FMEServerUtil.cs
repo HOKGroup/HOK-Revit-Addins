@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using Safe.FMEServer.API;
 
@@ -14,15 +11,15 @@ namespace HOK.FileOnpeningMonitor
         private static string userId = "";
         private static string password = "";
         private static string host = "";
-        private static int port = 0;
+        private static int port;
         private static string clientId = "";
 
-        private static IFMEServerSession serverSession = null;
-        private static IFMERepositoryManager repositoryMgr = null;
+        private static IFMEServerSession serverSession;
+        private static IFMERepositoryManager repositoryMgr;
 
         public static bool RunFMEWorkspace(CentralFileInfo info, string repository, string workspace, out Dictionary<string, string> properties)
         {
-            bool result = false;
+            var result = false;
             properties = new Dictionary<string, string>();
             try
             {
@@ -33,26 +30,21 @@ namespace HOK.FileOnpeningMonitor
 
                 if (null != serverSession)
                 {
-                    IFMETransformationManager transformationMgr = serverSession.GetTransformationManager();
+                    var transformationMgr = serverSession.GetTransformationManager();
 
-                    IFMETransformationRequest request = serverSession.CreateTransformationRequest("SERVER_CONSOLE_CLIENT", repository, workspace);
+                    var request = serverSession.CreateTransformationRequest("SERVER_CONSOLE_CLIENT", repository, workspace);
                     request.SetPublishedParameter("Office_pp", info.UserLocation);
                     request.SetPublishedParameter("Username_pp", info.UserName);
                     request.SetPublishedParameter("FileName_pp", info.DocCentralPath);
 
-                    IFMETransformationResult transformationResult = serverSession.CreateTransformationResult();
-                    long jobId = transformationMgr.SubmitJob(request);
+                    var transformationResult = serverSession.CreateTransformationResult();
+                    var jobId = transformationMgr.SubmitJob(request);
                     Thread.Sleep(500);
 
                     if (transformationMgr.GetJobResult(jobId, transformationResult))
                     {
                         result = true;
                     }
-
-
-                    //run Synchronously
-                    //transformationResult = transformationMgr.TransactJob(request);
-
                 }
             }
             catch (Exception ex)
@@ -64,7 +56,7 @@ namespace HOK.FileOnpeningMonitor
 
         private static IFMEServerSession ConnectToFMEServer()
         {
-            IFMEServerSession fmeServerSession = null;
+            IFMEServerSession fmeServerSession;
             try
             {
                 userId = "revit";
@@ -76,7 +68,7 @@ namespace HOK.FileOnpeningMonitor
 
                 fmeServerSession = FMEServer.CreateServerSession();
 
-                IFMEServerConnectionInfo connectInfo = fmeServerSession.CreateServerConnectionInfo(host, port, userId, password);
+                var connectInfo = fmeServerSession.CreateServerConnectionInfo(host, port, userId, password);
                 IDictionary<string, string> directives = new Dictionary<string, string>();
                 directives.Add("CLIENT_ID", clientId);
                 fmeServerSession.Init(connectInfo, directives);
