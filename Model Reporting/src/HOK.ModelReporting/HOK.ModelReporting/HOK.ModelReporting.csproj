@@ -33,24 +33,6 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2013|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\2013\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2013</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2014|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\2014\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2014</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2015|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2015\</OutputPath>
@@ -78,12 +60,84 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2018\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2018</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2017'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+    <Reference Include="AdWindows" Condition="'$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\AdWindows.dll</HintPath>
     </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2017'">
+    <Reference Include="AdWindows" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\AdWindows.dll</HintPath>
+    </Reference>
+    <Reference Include="AdWindows" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\AdWindows.dll</HintPath>
+    </Reference>
+    <Reference Include="AdWindows" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\AdWindows.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2017\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2016\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2017\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2018\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2017'">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -134,11 +188,51 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="HOK.ModelReporting.addin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"</PostBuildEvent>
+    <PostBuildEvent>echo Signing...
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"
+
+echo Configuration: $(Configuration)
+
+if $(Configuration) == 2015 goto Build2015
+if $(Configuration) == 2016 goto Build2016
+if $(Configuration) == 2017 goto Build2017
+if $(Configuration) == 2018 goto Build2018
+
+:Build2015
+echo Copying results to Build2015
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2016
+echo Copying results to Build2016
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2017
+echo Copying results to Build2017
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2018
+echo Copying results to Build2018
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)HOK.ModelReporting.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018"
+goto exit
+
+:exit</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI.Events;
 using Autodesk.Revit.DB;
+using HOK.Core.Utilities;
 
 namespace HOK.ModelReporting
 {
@@ -32,7 +33,6 @@ namespace HOK.ModelReporting
                 application.ControlledApplication.DocumentSynchronizingWithCentral += EventSwcStart;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += EventSwcStop;
 
-#if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
                 application.ControlledApplication.DocumentChanged += EventCommandFinished;
 
                 if (_binding != null) return Result.Succeeded;
@@ -41,11 +41,11 @@ namespace HOK.ModelReporting
                 if (!_commandId.CanHaveBinding) return Result.Succeeded;
                 _binding = application.CreateAddInCommandBinding(_commandId);
                 _binding.BeforeExecuted +=EventCommandStart;
-#endif
                 return Result.Succeeded;
             }
-            catch
+            catch (Exception e)
             {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
                 return Result.Failed;
             }
         }
@@ -59,18 +59,17 @@ namespace HOK.ModelReporting
                 application.ControlledApplication.DocumentSynchronizingWithCentral -= EventSwcStart;
                 application.ControlledApplication.DocumentSynchronizedWithCentral -= EventSwcStop;
 
-#if RELEASE2014 || RELEASE2015 ||RELEASE2016 || RELEASE2017
                 application.ControlledApplication.DocumentChanged -= EventCommandFinished;
                
                 if (_commandId.HasBinding)
                 {
                     application.RemoveAddInCommandBinding(_commandId);
                 }
-#endif
                 return Result.Succeeded;
             }
-            catch
+            catch (Exception e)
             {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
                 return Result.Failed;
             }
         }
@@ -93,9 +92,9 @@ namespace HOK.ModelReporting
                 }
                 _syncSettingsDictionary.Add(_syncSettings.DocCentralPath, _syncSettings);
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -112,9 +111,9 @@ namespace HOK.ModelReporting
                 eventSettings.EndTime = DateTime.Now;
                 WriteRecord(eventSettings, "SYNC-FILE");
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -147,9 +146,9 @@ namespace HOK.ModelReporting
                     //warning message
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                //ignored
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -166,13 +165,12 @@ namespace HOK.ModelReporting
                 eventSettings.EndTime = DateTime.Now;
                 WriteRecord(eventSettings, eventSettings.OpenCentral ? "OPEN-CENTRAL" : "OPEN-FILE");
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
-#if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017
         private void EventCommandStart(object sender, BeforeExecutedEventArgs e)
         {
             try
@@ -193,9 +191,9 @@ namespace HOK.ModelReporting
                 }
                 _purgeSettingsDictionary.Add(_purgeSettings.DocCentralPath, _purgeSettings);
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
@@ -222,12 +220,11 @@ namespace HOK.ModelReporting
                 }
                 _purgeStarted = false;
             }
-            catch
+            catch (Exception ex)
             {
-                // ignored
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
-#endif
 
         private void WriteRecord(EventSettings settings, string eventTypeName)
         {
@@ -261,9 +258,9 @@ namespace HOK.ModelReporting
                 entities.AddToRevitEvents(dataPointEntity);
                 entities.SaveChanges();
             }
-            catch
+            catch (Exception e)
             {
-                // ignored
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
             }
         }
 
@@ -283,8 +280,9 @@ namespace HOK.ModelReporting
                     docCentralPath = doc.PathName;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
                 docCentralPath = doc.PathName;
             }
             return docCentralPath;

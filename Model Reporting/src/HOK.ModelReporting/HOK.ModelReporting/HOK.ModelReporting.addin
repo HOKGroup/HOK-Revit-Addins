@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>HOK.ModelReporting</Name>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.ModelReporting.dll</Assembly>
+    <ClientId>D7AF5D1E-62DD-4D4C-BA40-F975522DA1B3</ClientId>
+    <FullClassName>HOK.ModelReporting.AppCommand</FullClassName>
+    <VendorId>JKIM</VendorId>
+    <VendorDescription></VendorDescription>
+  </AddIn>
+</RevitAddIns>
