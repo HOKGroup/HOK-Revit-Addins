@@ -5,7 +5,7 @@ namespace HOK.Core.WpfUtilities
 {
     /// <summary>
     /// Tools using this:
-    /// - 
+    /// - HOK.AddinManager
     /// </summary>
     public static class DataGridUtilities
     {

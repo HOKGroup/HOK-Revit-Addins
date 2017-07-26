@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -15,22 +16,34 @@ namespace HOK.BetaToolsManager
         public RelayCommand<Window> InstallCommand { get; }
         public RelayCommand<Window> UninstallCommand { get; }
         public RelayCommand<Window> WindowLoaded { get; }
+        public RelayCommand<Window> WindowClosing { get; }
 
         public AddinInstallerViewModel(AddinInstallerModel model)
         {
             Model = model;
             Addins = Model.Addins;
+
             CloseCommand = new RelayCommand<Window>(OnCloseCommand);
             CheckAll = new RelayCommand(OnCheckAll);
             CheckNone = new RelayCommand(OnCheckNone);
             InstallCommand = new RelayCommand<Window>(OnInstall);
             UninstallCommand = new RelayCommand<Window>(OnUninstall);
             WindowLoaded = new RelayCommand<Window>(OnWindowLoaded);
+            WindowClosing = new RelayCommand<Window>(OnWindowClosing);
+        }
+
+        private void OnWindowClosing(Window obj)
+        {
+            foreach (var addin in Addins)
+            {
+                if (AutoUpdateStatus != null) addin.AutoUpdate = (bool) AutoUpdateStatus;
+            }
         }
 
         private void OnWindowLoaded(Window win)
         {
             OnCheckNone();
+            AutoUpdateStatus = Addins.FirstOrDefault()?.AutoUpdate;
         }
 
         private void OnUninstall(Window win)
@@ -71,6 +84,13 @@ namespace HOK.BetaToolsManager
         {
             get => _addins;
             set { _addins = value; RaisePropertyChanged(() => Addins); }
+        }
+
+        private bool? _autoUpdateStatus;
+        public bool? AutoUpdateStatus
+        {
+            get => _autoUpdateStatus;
+            set { _autoUpdateStatus = value; RaisePropertyChanged(() => AutoUpdateStatus); }
         }
     }
 }

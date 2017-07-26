@@ -121,7 +121,6 @@ namespace HOK.BetaToolsManager
                 installerButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "betaPluginManager_32x32.png");
                 installerButton.Image = installerButton.LargeImage;
                 installerButton.ToolTip = "HOK Beta Tools Installer";
-                installerButton.AvailabilityClassName = "HOK.BetaToolsManager.Availability";
             }
             catch (Exception ex)
             {
@@ -144,17 +143,6 @@ namespace HOK.BetaToolsManager
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
             }
-        }
-    }
-
-    /// <summary>
-    /// Button availability class.
-    /// </summary>
-    public class Availability : IExternalCommandAvailability
-    {
-        public bool IsCommandAvailable(UIApplication applicationData, Autodesk.Revit.DB.CategorySet selectedCategories)
-        {
-            return true;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace HOK.Core.Utilities
         public string Panel { get; set; } // used to find button to be disabled when uninstalling addin
         public string ButtonText { get; set; } // used to find button to be disabled when uninstalling addin
         public string ImageName { get; set; } // used to retrieve image for datagrid
-        public string Version { get; set; } // version of addin in beta
+        public string Version { get; set; } = ""; // version of addin in beta
         public string BetaResourcesPath { get; set; } //used by install to copy dependancies
         public string AddinFilePath { get; set; } // used by install/uninstall to copy addin file
         public string DllRelativePath { get; set; } // used to check if addin is installed and to track main DLL for each addin
@@ -24,7 +24,21 @@ namespace HOK.Core.Utilities
         /// <summary>
         /// Assembly version number for display in DataGrid.
         /// </summary>
-        private string _installedVersion;
+        private bool _versionsMatch;
+        public bool VersionsMatch
+        {
+            get
+            {
+                _versionsMatch = Version == InstalledVersion;
+                return _versionsMatch;
+            }
+            set { _versionsMatch = value; RaisePropertyChanged("VersionsMatch"); }
+        }
+
+        /// <summary>
+        /// Assembly version number for display in DataGrid.
+        /// </summary>
+        private string _installedVersion = "";
         public string InstalledVersion
         {
             get => _installedVersion;
@@ -39,6 +53,13 @@ namespace HOK.Core.Utilities
         {
             get => _isSelected;
             set { _isSelected = value; RaisePropertyChanged("IsSelected"); }
+        }
+
+        private bool _autoUpdate;
+        public bool AutoUpdate
+        {
+            get => _autoUpdate;
+            set { _autoUpdate = value; RaisePropertyChanged("AutoUpdate"); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -164,18 +164,34 @@ namespace HOK.BetaToolsManager
 
                         var installedVersion = "Not installed";
                         var installed = false;
+                        var autoUpdate = false;
+
                         var addin = addins?.FirstOrDefault(x => x.Name == nameAttr.Name);
                         if (addin != null)
                         {
-                            installedVersion = addin.InstalledVersion;
                             installed = addin.IsInstalled;
+                            autoUpdate = addin.AutoUpdate;
 
                             if (installed)
                             {
-                                // get the latest version of it from beta
-                                if (!Directory.Exists(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
+                                installedVersion = addin.AutoUpdate ? version : addin.InstalledVersion;
+
+                                // if directory doesn't exist in "installed" it means that it was not yet installed before.
+                                if (!Directory.Exists(
+                                    InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
+                                {
                                     Directory.CreateDirectory(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                                CopyDirectory(addin.BetaResourcesPath, InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                                    CopyDirectory(addin.BetaResourcesPath, InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                                }
+                                else
+                                {
+                                    // directory exists, which means it was installed before, let's check if its on autoupdate
+                                    if (addin.AutoUpdate)
+                                    {
+                                        // let's automatically copy the latest version in
+                                        CopyDirectory(addin.BetaResourcesPath, InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                                    }
+                                }
                             }
                         }
 
@@ -191,7 +207,8 @@ namespace HOK.BetaToolsManager
                             InstalledVersion = installedVersion,
                             BetaResourcesPath = Path.GetDirectoryName(dllPath),
                             AddinFilePath = file,
-                            DllRelativePath = dllRelativePath
+                            DllRelativePath = dllRelativePath,
+                            AutoUpdate = autoUpdate
                         };
 
                         if (t.GetInterface("IExternalCommand") != null)
