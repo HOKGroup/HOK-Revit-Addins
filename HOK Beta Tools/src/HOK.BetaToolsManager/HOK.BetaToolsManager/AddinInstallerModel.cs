@@ -15,8 +15,8 @@ namespace HOK.BetaToolsManager
     public class AddinInstallerModel
     {
         public string VersionNumber { get; set; }
-        //public string BetaDirectory { get; set; } = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
-        public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\test_beta_location\";
+        public string BetaDirectory { get; set; } = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
+        //public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\test_beta_location\";
         public string InstallDirectory { get; set; }
         public string TempDirectory { get; set; }
         public ObservableCollection<AddinWrapper> Addins { get; set; }
@@ -33,6 +33,10 @@ namespace HOK.BetaToolsManager
             LoadAddinsOnStartup();
         }
 
+        /// <summary>
+        /// Removes addins from the ribbon.
+        /// </summary>
+        /// <param name="addins"></param>
         public void UninstallAddins(ObservableCollection<AddinWrapper> addins)
         {
             foreach (var addin in addins)
@@ -72,6 +76,10 @@ namespace HOK.BetaToolsManager
             }
         }
 
+        /// <summary>
+        /// Adds addins to the ribbon.
+        /// </summary>
+        /// <param name="addins"></param>
         public void InstallUpdateAddins(ObservableCollection<AddinWrapper> addins)
         {
             foreach (var addin in addins)
@@ -115,6 +123,9 @@ namespace HOK.BetaToolsManager
             }
         }
 
+        /// <summary>
+        /// Main method for loading and parsing of the beta/installed folders.
+        /// </summary>
         private void LoadAddinsOnStartup()
         {
             var addins = File.Exists(InstallDirectory + "BetaSettings.json")

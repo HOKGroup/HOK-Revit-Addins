@@ -7,7 +7,6 @@ using HOK.AddInManager.Classes;
 using HOK.AddInManager.UserControls;
 using Autodesk.Revit.Attributes;
 using HOK.Core.Utilities;
-using Autodesk.Revit.DB;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
@@ -18,21 +17,17 @@ namespace HOK.AddInManager
     [Journaling(JournalingMode.NoCommandData)]
     public class Command : IExternalCommand
     {
-        private UIApplication m_app;
-        private Document m_doc;
         private readonly Dictionary<string/*toolName*/, LoadType> tempSettings = new Dictionary<string, LoadType>();
 
         public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
         {
-            m_app = commandData.Application;
-            m_doc = m_app.ActiveUIDocument.Document;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
             {
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
-                AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", m_doc));
+                AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", commandData.Application.Application.VersionNumber));
 
                 var addins = AppCommand.thisApp.addins;
                 StoreTempCollection(addins.AddinCollection);

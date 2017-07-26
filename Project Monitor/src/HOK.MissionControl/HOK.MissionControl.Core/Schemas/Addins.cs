@@ -21,11 +21,20 @@ namespace HOK.MissionControl.Core.Schemas
         {
         }
 
+        // TODO: We should not be passing a document into the constructor here.
+        // TODO: Apps in a "zero doc" state will fail to initialize.
         public AddinLog(string name, Document doc)
         {
             pluginName = name;
             user = Environment.UserName;
             revitVersion = doc.Application.VersionNumber;
+        }
+
+        public AddinLog(string name, string version)
+        {
+            pluginName = name;
+            user = Environment.UserName;
+            revitVersion = version;
         }
     }
 
