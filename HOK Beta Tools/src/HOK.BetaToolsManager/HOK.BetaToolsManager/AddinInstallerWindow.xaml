@@ -6,7 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ex="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             mc:Ignorable="d" Title="HOK Beta Tools Installer" Icon="Resources/hoklogo.ico" WindowStartupLocation="CenterScreen"
+             mc:Ignorable="d" Title="{Binding Title, Mode=OneWay}" Icon="Resources/hoklogo.ico" WindowStartupLocation="CenterScreen"
              BorderThickness="0,5,0,0" BorderBrush="#C45C44"
              d:DesignHeight="300" d:DesignWidth="852" Width="850" Height="500" MinHeight="500" MinWidth="850">
     <i:Interaction.Triggers>

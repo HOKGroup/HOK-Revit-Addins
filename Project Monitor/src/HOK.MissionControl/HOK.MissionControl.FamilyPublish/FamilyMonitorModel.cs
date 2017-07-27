@@ -4,40 +4,50 @@ using System.IO;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
+using HOK.Core.WpfUtilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.FamilyPublish.Properties;
 
 namespace HOK.MissionControl.FamilyPublish
 {
-    public class FamilyMonitor
+    public class FamilyMonitorModel
     {
         public static Guid UpdaterGuid { get; set; } = new Guid(Resources.HealthReportTrackerGuid);
         public static Document Doc { get; set; }
+        public Configuration Config { get; set; }
+        public Project Project { get; set; }
+
+        public FamilyMonitorModel(Document doc, Configuration config, Project project)
+        {
+            Doc = doc;
+            Config = config;
+            Project = project;
+        }
 
         /// <summary>
         /// Publishes information about linked models/images/object styles in the model.
         /// </summary>
-        /// <param name="doc">Revit Document.</param>
-        /// <param name="config">Configuration for the model.</param>
-        /// <param name="project">Project for the model.</param>
-        public static void PublishData(Document doc, Configuration config, Project project)
+        public void PublishData()
         {
             try
             {
-                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
-                var worksetDocumentId = project.worksets.FirstOrDefault();
+                if (!MonitorUtilities.IsUpdaterOn(Project, Config, UpdaterGuid)) return;
+                var worksetDocumentId = Project.worksets.FirstOrDefault();
                 if (string.IsNullOrEmpty(worksetDocumentId)) return;
-
-                Doc = doc;
 
                 var suspectFamilies = new List<FamilyItem>();
                 var totalFamilies = 0;
                 var unusedFamilies = 0;
                 var oversizedFamilies = 0;
                 var inPlaceFamilies = 0;
-                foreach (var family in new FilteredElementCollector(doc).OfClass(typeof(Family)).Cast<Family>())
+                var families = new FilteredElementCollector(Doc).OfClass(typeof(Family)).Cast<Family>().ToList();
+
+                StatusBarManager.InitializeProgress("Exporting Family Info:", families.Count);
+                foreach (var family in families)
                 {
+                    StatusBarManager.StepForward();
+
                     var sizeCheck = false;
                     var instanceCheck = false;
                     var nameCheck = false;
@@ -55,7 +65,7 @@ namespace HOK.MissionControl.FamilyPublish
 
                     try
                     {
-                        var famDoc = doc.EditFamily(family);
+                        var famDoc = Doc.EditFamily(family);
                         var myDocPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                         var path = myDocPath + "\\temp_" + famDoc.Title;
                         famDoc.SaveAs(path);
@@ -104,6 +114,8 @@ namespace HOK.MissionControl.FamilyPublish
                 };
 
                 ServerUtilities.PostToMongoDB(familyStats, "worksets", worksetDocumentId, "familystats");
+                StatusBarManager.FinalizeProgress();
+                //dialog.Close();
             }
             catch (Exception ex)
             {

@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using Visibility = System.Windows.Visibility;
 
 namespace HOK.MissionControl.FamilyPublish
 {
@@ -35,18 +36,24 @@ namespace HOK.MissionControl.FamilyPublish
             var doc = uiApp.ActiveUIDocument.Document;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
-            var version = commandData.Application.Application.VersionNumber;
-
             try
             {
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
-                AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-PublishFamilyData", doc));
+                AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-PublishFamilyData", commandData.Application.Application.VersionNumber));
 
                 var pathName = doc.PathName;
                 if (string.IsNullOrEmpty(pathName))
                 {
-                    Log.AppendLog(LogMessageType.ERROR, "Path is Null or Empty.");
+                    Log.AppendLog(LogMessageType.ERROR, "Path is Empty. File was not saved yet.");
+                    var dialog = new FamilyMonitorView
+                    {
+                        DataContext =
+                            new FamilyMonitorViewModel(null,
+                                "...establish a connection to Mission Control for unsaved files.")
+                    };
+                    dialog.ShowDialog();
+
                     return Result.Failed;
                 }
                 
@@ -55,6 +62,14 @@ namespace HOK.MissionControl.FamilyPublish
                 if (string.IsNullOrEmpty(centralPath))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Could not get Central Path.");
+                    var dialog = new FamilyMonitorView
+                    {
+                        DataContext =
+                            new FamilyMonitorViewModel(null,
+                                "...get a Central File Path. Only Workshared projects can be added to Mission Control.")
+                    };
+                    dialog.ShowDialog();
+
                     return Result.Failed;
                 }
                 
@@ -82,11 +97,29 @@ namespace HOK.MissionControl.FamilyPublish
                 if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "No Config Found.");
+                    var dialog = new FamilyMonitorView
+                    {
+                        DataContext =
+                            new FamilyMonitorViewModel(null,
+                                "...find your project in Mission Control database. Please make sure that it was added.")
+                    };
+                    dialog.ShowDialog();
+
                     return Result.Failed;
                 }
-                
 
-                FamilyMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
+                var model = new FamilyMonitorModel(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
+                var viewModel =
+                    new FamilyMonitorViewModel(model, "...make this any faster. Hang in there!")
+                    {
+                        ExecuteFamilyPublish = true
+                    };
+                var view = new FamilyMonitorView
+                {
+                    DataContext = viewModel,
+                    CloseButton = { Visibility = Visibility.Collapsed }
+                };
+                view.ShowDialog();
             }
             catch (Exception ex)
             {

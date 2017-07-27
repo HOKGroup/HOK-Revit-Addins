@@ -132,7 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppCommand.cs" />
-    <Compile Include="FamilyMonitor.cs" />
+    <Compile Include="FamilyMonitorModel.cs" />
     <Compile Include="FamilyMonitorView.xaml.cs">
       <DependentUpon>FamilyMonitorView.xaml</DependentUpon>
     </Compile>

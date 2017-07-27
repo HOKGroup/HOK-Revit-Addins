@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -10,6 +11,7 @@ namespace HOK.BetaToolsManager
     public class AddinInstallerViewModel : ViewModelBase
     {
         public AddinInstallerModel Model;
+        public string Title { get; set; }
         public RelayCommand<Window> CloseCommand { get; }
         public RelayCommand CheckAll { get; }
         public RelayCommand CheckNone { get; }
@@ -22,6 +24,7 @@ namespace HOK.BetaToolsManager
         {
             Model = model;
             Addins = Model.Addins;
+            Title = "Beta Tools - Beta Installer v." + Assembly.GetExecutingAssembly().GetName().Version;
 
             CloseCommand = new RelayCommand<Window>(OnCloseCommand);
             CheckAll = new RelayCommand(OnCheckAll);

@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             Height="700" Width="500" MinHeight="700" MinWidth="500" Icon="Images/hoklogo.ico" Title="Element Mover" 
+             Height="700" Width="500" MinHeight="700" MinWidth="500" Icon="Images/hoklogo.ico"
              WindowStartupLocation="CenterScreen" UseLayoutRounding="True" Closing="Window_Closing" BorderBrush="#2C7BB6" BorderThickness="0,5,0,0">
     <Window.Resources>
         <Style TargetType="{x:Type DataGrid}">

@@ -2,20 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 using ComponentManager = Autodesk.Windows.ComponentManager;
 
 namespace HOK.ElementMover
@@ -28,15 +18,15 @@ namespace HOK.ElementMover
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
-        private ExternalEvent m_event = null;
-        private MoverHandler m_handler = null;
+        private ExternalEvent m_event;
+        private MoverHandler m_handler;
 
         private Dictionary<ElementId/*instanceId*/, LinkedInstanceProperties> linkInstances = new Dictionary<ElementId, LinkedInstanceProperties>();
-        private LinkedInstanceProperties selectedLink = null;
+        private LinkedInstanceProperties selectedLink;
 
-        private MappingWindow mappingWindow = null;
+        private MappingWindow mappingWindow;
 
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
@@ -54,7 +44,7 @@ namespace HOK.ElementMover
 
             InitializeComponent();
 
-            this.Title = "Element Mover v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Title = "Element Mover v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             
             var instanceList = linkInstances.Values.OrderBy(o => o.DisplayName).ToList();
             comboBoxLinkModel.ItemsSource = instanceList;
@@ -228,8 +218,7 @@ namespace HOK.ElementMover
             {
                 if (null == mappingWindow)
                 {
-                    mappingWindow = new MappingWindow(m_event, m_handler);
-                    mappingWindow.Owner = this;
+                    mappingWindow = new MappingWindow(m_event, m_handler) {Owner = this};
                     mappingWindow.Closed += WindowClosed;
                     mappingWindow.Show();
                 }

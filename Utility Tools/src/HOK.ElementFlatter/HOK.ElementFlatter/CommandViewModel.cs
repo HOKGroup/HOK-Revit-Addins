@@ -126,11 +126,11 @@ namespace HOK.ElementFlatter
                     {
                         var index = categories.IndexOf(catInfo);
                         StatusText = "Flattening " + catInfo.Name + "..";
-                        ProgressManager.InitializeProgress("Flattening " + catInfo.Name + "..", catInfo.ElementIds.Count);
+                        StatusBarManager.InitializeProgress("Flattening " + catInfo.Name + "..", catInfo.ElementIds.Count);
 
                         foreach (var elementId in catInfo.ElementIds)
                         {
-                            ProgressManager.StepForward();
+                            StatusBarManager.StepForward();
                             using (var trans = new Transaction(m_doc))
                             {
                                 trans.Start("Create Shape");
@@ -168,7 +168,7 @@ namespace HOK.ElementFlatter
                     }
                 }
             }
-            ProgressManager.FinalizeProgress();
+            StatusBarManager.FinalizeProgress();
 
             CollectModelCategories();
         }

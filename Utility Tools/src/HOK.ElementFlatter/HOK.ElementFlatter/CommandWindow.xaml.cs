@@ -13,8 +13,8 @@ namespace HOK.ElementFlatter
             InitializeComponent();
             Title = "Element Flatter v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 
-            ProgressManager.progressBar = progressBar;
-            ProgressManager.statusLabel = statusLable;
+            StatusBarManager.ProgressBar = progressBar;
+            StatusBarManager.StatusLabel = statusLable;
         }
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
