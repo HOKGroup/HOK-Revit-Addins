@@ -19,17 +19,19 @@ namespace HOK.BetaToolsManager
         //public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\test_beta_location\";
         public string InstallDirectory { get; set; }
         public string TempDirectory { get; set; }
+        public string BetaTempDirectory { get; set; }
         public ObservableCollection<AddinWrapper> Addins { get; set; }
 
         public AddinInstallerModel(string version)
         {
             VersionNumber = version;
             BetaDirectory = BetaDirectory + VersionNumber + @"\"; // at HOK Group drive
+            BetaTempDirectory = BetaDirectory + @"Temp\"; // at HOK drive
             InstallDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
                                + @"\Autodesk\Revit\Addins\"
                                + VersionNumber + @"\"; // user roaming location
             TempDirectory = InstallDirectory + @"Temp\";
-
+            
             LoadAddinsOnStartup();
         }
 
@@ -102,7 +104,21 @@ namespace HOK.BetaToolsManager
                             Log.AppendLog(LogMessageType.ERROR, "Could not delete Addin File. Moving on.");
                         }
                     }
-                    File.Copy(addin.AddinFilePath, InstallDirectory + Path.GetFileName(addin.AddinFilePath));
+                    File.Copy(TempDirectory + Path.GetFileName(addin.AddinFilePath), InstallDirectory + Path.GetFileName(addin.AddinFilePath));
+
+                    if (!Directory.Exists(
+                        InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
+                    {
+                        Directory.CreateDirectory(
+                            InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                        CopyDirectory(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                            InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                    }
+                    else
+                    {
+                        CopyDirectory(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                            InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                    }
                 }
                 else
                 {
@@ -133,20 +149,30 @@ namespace HOK.BetaToolsManager
                 : null;
 
             var dic = new Dictionary<string, AddinWrapper>();
-            if (Directory.Exists(BetaDirectory))
+
+            // (Konrad) It's possible for user to be offline, and have no access to Beta HOK Drive.
+            // In that case we still want to create addins, but instead use the Temp location on local drive.
+            var betaTemp2 = Directory.Exists(BetaDirectory)
+                ? BetaTempDirectory
+                : Directory.Exists(TempDirectory)
+                    ? TempDirectory
+                    : string.Empty;
+
+            if (betaTemp2 != string.Empty)
             {
-                // create Temp folder if it doesn't exists and temp.dll to bind to
                 if (!Directory.Exists(TempDirectory))
                     Directory.CreateDirectory(TempDirectory);
 
                 // (Konrad) Create a copy of all installed plugins by copying the temp dir from beta
-                CopyDirectory(BetaDirectory + @"Temp\", TempDirectory);
+                // We only do this if Beta is accessible otherwise we use local temp
+                if(Directory.Exists(BetaDirectory))
+                    CopyDirectory(BetaTempDirectory, TempDirectory);
 
                 // (Konrad) Get all addins from beta directory, check their versions agains installed
-                foreach (var file in Directory.GetFiles(BetaDirectory, "*.addin"))
+                foreach (var file in Directory.GetFiles(betaTemp2, "*.addin"))
                 {
-                    var dllRelativePath = ParseXml(file);
-                    var dllPath = BetaDirectory + dllRelativePath;
+                    var dllRelativePath = ParseXml(file); // relative to temp
+                    var dllPath = betaTemp2 + dllRelativePath;
 
                     // (Konrad) Using LoadFrom() instead of LoadFile() because
                     // LoadFile() doesn't load dependent assemblies causing exception later.
@@ -160,17 +186,26 @@ namespace HOK.BetaToolsManager
                     {
                         types = e.Types;
                     }
-                    foreach (var t in types.Where(x => x != null && (x.GetInterface("IExternalCommand") != null || x.GetInterface("IExternalApplication") != null)))
+                    foreach (var t in types.Where(x => x != null &&
+                                                       (x.GetInterface("IExternalCommand") != null ||
+                                                        x.GetInterface("IExternalApplication") != null)))
                     {
                         MemberInfo info = t;
-                        var nameAttr = (NameAttribute)info.GetCustomAttributes(typeof(NameAttribute), true).FirstOrDefault();
-                        var descAttr = (DescriptionAttribute)t.GetCustomAttributes(typeof(DescriptionAttribute), true).FirstOrDefault();
-                        var imageAttr = (ImageAttribute)t.GetCustomAttributes(typeof(ImageAttribute), true).FirstOrDefault();
-                        var namespaceAttr = (NamespaceAttribute)t.GetCustomAttributes(typeof(NamespaceAttribute), true).FirstOrDefault();
+                        var nameAttr = (NameAttribute) info.GetCustomAttributes(typeof(NameAttribute), true)
+                            .FirstOrDefault();
+                        var descAttr = (DescriptionAttribute) t.GetCustomAttributes(typeof(DescriptionAttribute), true)
+                            .FirstOrDefault();
+                        var imageAttr = (ImageAttribute) t.GetCustomAttributes(typeof(ImageAttribute), true)
+                            .FirstOrDefault();
+                        var namespaceAttr = (NamespaceAttribute) t.GetCustomAttributes(typeof(NamespaceAttribute), true)
+                            .FirstOrDefault();
 
-                        if (nameAttr == null || descAttr == null || imageAttr == null || namespaceAttr == null) continue;
+                        if (nameAttr == null || descAttr == null || imageAttr == null ||
+                            namespaceAttr == null) continue;
 
-                        var bitmap = (BitmapSource)ButtonUtil.LoadBitmapImage(assembly, namespaceAttr.Namespace, imageAttr.ImageName);
+                        var bitmap =
+                            (BitmapSource) ButtonUtil.LoadBitmapImage(assembly, namespaceAttr.Namespace,
+                                imageAttr.ImageName);
                         var version = assembly.GetName().Version.ToString();
 
                         var installedVersion = "Not installed";
@@ -191,8 +226,10 @@ namespace HOK.BetaToolsManager
                                 if (!Directory.Exists(
                                     InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
                                 {
-                                    Directory.CreateDirectory(InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                                    CopyDirectory(addin.BetaResourcesPath, InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                                    Directory.CreateDirectory(
+                                        InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                                    CopyDirectory(betaTemp2 + new DirectoryInfo(addin.BetaResourcesPath),
+                                        InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                                 }
                                 else
                                 {
@@ -200,7 +237,10 @@ namespace HOK.BetaToolsManager
                                     if (addin.AutoUpdate)
                                     {
                                         // let's automatically copy the latest version in
-                                        CopyDirectory(addin.BetaResourcesPath, InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
+                                        // we can use temp directory here since it was already either updated with latest
+                                        // or is the only source of files (no network drive)
+                                        CopyDirectory(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath),
+                                            InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                                     }
                                 }
                             }
@@ -224,8 +264,12 @@ namespace HOK.BetaToolsManager
 
                         if (t.GetInterface("IExternalCommand") != null)
                         {
-                            var buttonTextAttr = (ButtonTextAttribute)t.GetCustomAttributes(typeof(ButtonTextAttribute), true).FirstOrDefault();
-                            var panelNameAttr = (PanelNameAttribute)t.GetCustomAttributes(typeof(PanelNameAttribute), true).FirstOrDefault();
+                            var buttonTextAttr =
+                                (ButtonTextAttribute) t.GetCustomAttributes(typeof(ButtonTextAttribute), true)
+                                    .FirstOrDefault();
+                            var panelNameAttr =
+                                (PanelNameAttribute) t.GetCustomAttributes(typeof(PanelNameAttribute), true)
+                                    .FirstOrDefault();
 
                             aw.Panel = panelNameAttr?.PanelName;
                             aw.ButtonText = buttonTextAttr?.ButtonText;

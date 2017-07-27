@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Xml.Linq;
 using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using Newtonsoft.Json;
@@ -43,19 +42,6 @@ namespace HOK.BetaToolsManager
                 {
                     if (addin.IsInstalled)
                     {
-                        // there should be a manifest file existing in Installed directory
-                        // that will make Revit latch onto the proper dll by default
-                        // we only need to repath it to installed folder for installed plugins
-                        var response = File.ReadAllText(addin.AddinFilePath);
-                        var doc = XDocument.Parse(response);
-
-                        foreach (var element in doc.Descendants("Assembly"))
-                        {
-                            var currentPath = (string)element;
-                            var newPath = currentPath.Replace("Temp\\", "");
-                            element.SetValue(newPath);
-                            break;
-                        }
                         if (File.Exists(ViewModel.InstallDirectory + Path.GetFileName(addin.AddinFilePath)))
                         {
                             try
@@ -67,7 +53,7 @@ namespace HOK.BetaToolsManager
                                 Log.AppendLog(LogMessageType.ERROR, "Could not delete existing Addin Manifest.");
                             }
                         }
-                        doc.Save(ViewModel.InstallDirectory + Path.GetFileName(addin.AddinFilePath));
+                        File.Copy(ViewModel.TempDirectory + Path.GetFileName(addin.AddinFilePath), ViewModel.InstallDirectory + Path.GetFileName(addin.AddinFilePath));
                     }
                     continue;
                 }
