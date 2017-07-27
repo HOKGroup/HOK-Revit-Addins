@@ -175,9 +175,6 @@
   <ItemGroup>
     <Resource Include="Resources\hoklogo.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\sheetManager_32.png" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo Signing...

@@ -37,11 +37,10 @@ namespace HOK.MissionControl.FamilyPublish
         /// Binds Progress/Status Bar Manager to controls.
         /// </summary>
         /// <param name="win">Window reference.</param>
-        private void OnWindowLoaded(Window win)
+        private static void OnWindowLoaded(Window win)
         {
             StatusBarManager.ProgressBar = ((FamilyMonitorView)win).progressBar;
-            StatusBarManager.StatusLabel = ((FamilyMonitorView)win).statusLabel;
-
+            StatusBarManager.StatusLabel = ((FamilyMonitorView) win).statusLabel;
         }
 
         private static void OnClose(Window window)

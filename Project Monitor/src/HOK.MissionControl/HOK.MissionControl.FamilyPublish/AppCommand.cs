@@ -55,7 +55,6 @@ namespace HOK.MissionControl.FamilyPublish
                 {
                     ToolTip = "Mission Control Family Export Tool."
                 };
-                //var fpAssembly = Assembly.LoadFrom(assemblyPath);
                 var fpAssembly = Assembly.GetExecutingAssembly();
                 pb1.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl.FamilyPublish", "publishFamily_32x32.png");
 

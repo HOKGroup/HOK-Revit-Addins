@@ -115,7 +115,6 @@ namespace HOK.MissionControl.FamilyPublish
 
                 ServerUtilities.PostToMongoDB(familyStats, "worksets", worksetDocumentId, "familystats");
                 StatusBarManager.FinalizeProgress();
-                //dialog.Close();
             }
             catch (Exception ex)
             {
