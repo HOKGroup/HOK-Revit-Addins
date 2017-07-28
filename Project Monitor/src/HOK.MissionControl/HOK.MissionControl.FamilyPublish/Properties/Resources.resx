@@ -128,7 +128,7 @@ Data</value>
     <value>publishFamily_32x32.png</value>
   </data>
   <data name="FamilyPublish_Name" xml:space="preserve">
-    <value>PublishFamily</value>
+    <value>Publish Family</value>
   </data>
   <data name="FamilyPublish_Namespace" xml:space="preserve">
     <value>HOK.MissionControl.FamilyPublish</value>

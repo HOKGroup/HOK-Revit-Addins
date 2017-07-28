@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -111,12 +112,12 @@ namespace HOK.BetaToolsManager
                     {
                         Directory.CreateDirectory(
                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                        CopyDirectory(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                        CopyIfNewer(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                     }
                     else
                     {
-                        CopyDirectory(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                        CopyIfNewer(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                     }
                 }
@@ -165,15 +166,42 @@ namespace HOK.BetaToolsManager
 
                 // (Konrad) Create a copy of all installed plugins by copying the temp dir from beta
                 // We only do this if Beta is accessible otherwise we use local temp
-                // TODO: This is a bottle neck here. There is no reason to ALWAYS copy all of the folders over to temp
-                if(Directory.Exists(BetaDirectory))
-                    CopyDirectory(BetaTempDirectory, TempDirectory);
+                if (Directory.Exists(BetaDirectory))
+                    CopyIfNewer(BetaTempDirectory, TempDirectory);
 
                 // (Konrad) Get all addins from beta directory, check their versions agains installed
                 foreach (var file in Directory.GetFiles(betaTemp2, "*.addin"))
                 {
+                    //AddinWrapper currentAddinWrapper;
+
+                    //BitmapSource Image;
+
+                    //// TODO: I am wondering if it makes sense to ALWAYS read the DLL. If the file didn't change, why not just use Settings.json. 
                     var dllRelativePath = ParseXml(file); // relative to temp
                     var dllPath = betaTemp2 + dllRelativePath;
+                    var addin = addins?.FirstOrDefault(x => x.DllRelativePath == dllRelativePath);
+                    //if (addin != null)
+                    //{
+                    //    var sourceVersion = FileVersionInfo.GetVersionInfo(dllPath).FileVersion;
+                    //    var storedVersion = addin.Version;
+                    //    if (sourceVersion == storedVersion)
+                    //    {
+                    //        // (Konrad) There is no reason to Load this into current AppDomain
+                    //        // We can just reuse the attributes from the serialized file.
+                    //        currentAddinWrapper = addin;
+                    //        var a = Assembly.LoadFile(dllPath);
+                    //        currentAddinWrapper.Image = (BitmapSource)ButtonUtil.LoadBitmapImage(a, currentAddinWrapper.CommandNamespace,
+                    //            imageAttr.ImageName);
+                    //    }
+                    //    else
+                    //    {
+
+                    //    }
+                    //}
+
+                    //TODO: This needs work but it should be possible to get this loaded.
+
+
 
                     // (Konrad) Using LoadFrom() instead of LoadFile() because
                     // LoadFile() doesn't load dependent assemblies causing exception later.
@@ -213,7 +241,7 @@ namespace HOK.BetaToolsManager
                         var installed = false;
                         var autoUpdate = false;
 
-                        var addin = addins?.FirstOrDefault(x => x.Name == nameAttr.Name);
+                        //var addin = addins?.FirstOrDefault(x => x.Name == nameAttr.Name);
                         if (addin != null)
                         {
                             installed = addin.IsInstalled;
@@ -229,7 +257,7 @@ namespace HOK.BetaToolsManager
                                 {
                                     Directory.CreateDirectory(
                                         InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                                    CopyDirectory(betaTemp2 + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                                    CopyIfNewer(betaTemp2 + new DirectoryInfo(addin.BetaResourcesPath).Name,
                                         InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                                 }
                                 else
@@ -240,7 +268,7 @@ namespace HOK.BetaToolsManager
                                         // let's automatically copy the latest version in
                                         // we can use temp directory here since it was already either updated with latest
                                         // or is the only source of files (no network drive)
-                                        CopyDirectory(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                                        CopyIfNewer(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
                                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                                     }
                                 }
@@ -304,27 +332,78 @@ namespace HOK.BetaToolsManager
         }
 
         /// <summary>
-        /// Copy Directory and its contents to another directory.
+        /// Copies contents of one directory into another if/when source is newer version of DLL, or file changed.
         /// </summary>
-        /// <param name="sourcePath">Source Path</param>
-        /// <param name="destinationPath">Destination Path</param>
-        public static void CopyDirectory(string sourcePath, string destinationPath)
+        /// <param name="sourceDir"></param>
+        /// <param name="targetDir"></param>
+        private static void CopyIfNewer(string sourceDir, string targetDir)
         {
-            try
-            {
-                foreach (var dirPath in Directory.GetDirectories(sourcePath, "*",
-                    SearchOption.AllDirectories))
-                    Directory.CreateDirectory(dirPath.Replace(sourcePath, destinationPath));
+            // (Konrad) Precreate all Directories - limited overhead since existing are automatically skipped
+            foreach (var dirPath in Directory.GetDirectories(sourceDir, "*",
+                SearchOption.AllDirectories))
+                Directory.CreateDirectory(dirPath.Replace(sourceDir, targetDir));
 
-                foreach (var newPath in Directory.GetFiles(sourcePath, "*.*",
-                    SearchOption.AllDirectories))
-                    File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
-            }
-            catch (Exception e)
+            // (Konrad) Copy all files only if newer versions exist.
+            foreach (var file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
             {
-                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                if (Path.GetExtension(file) == ".dll")
+                {
+                    var sourceVersion = FileVersionInfo.GetVersionInfo(file).FileVersion;
+                    if (File.Exists(file.Replace(sourceDir, targetDir)))
+                    {
+                        var targetVersion = FileVersionInfo.GetVersionInfo(file.Replace(sourceDir, targetDir))
+                            .FileVersion;
+                        if (sourceVersion != targetVersion)
+                        {
+                            File.Copy(file, file.Replace(sourceDir, targetDir), true);
+                        }
+                    }
+                    else
+                    {
+                        File.Copy(file, file.Replace(sourceDir, targetDir), true);
+                    }
+                }
+                else
+                {
+                    var sourceSize = new FileInfo(file).Length;
+                    if (File.Exists(file.Replace(sourceDir, targetDir)))
+                    {
+                        var targetSize = new FileInfo(file.Replace(sourceDir, targetDir)).Length;
+                        if (sourceSize != targetSize)
+                        {
+                            File.Copy(file, file.Replace(sourceDir, targetDir), true);
+                        }
+                    }
+                    else
+                    {
+                        File.Copy(file, file.Replace(sourceDir, targetDir), true);
+                    }
+                }
             }
         }
+
+        ///// <summary>
+        ///// Copy Directory and its contents to another directory.
+        ///// </summary>
+        ///// <param name="sourcePath">Source Path</param>
+        ///// <param name="destinationPath">Destination Path</param>
+        //public static void CopyDirectory(string sourcePath, string destinationPath)
+        //{
+        //    try
+        //    {
+        //        foreach (var dirPath in Directory.GetDirectories(sourcePath, "*",
+        //            SearchOption.AllDirectories))
+        //            Directory.CreateDirectory(dirPath.Replace(sourcePath, destinationPath));
+
+        //        foreach (var newPath in Directory.GetFiles(sourcePath, "*.*",
+        //            SearchOption.AllDirectories))
+        //            File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+        //    }
+        //}
 
         /// <summary>
         /// Deserializes Settings file for installed addins.

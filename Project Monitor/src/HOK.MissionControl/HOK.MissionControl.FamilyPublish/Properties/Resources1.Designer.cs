@@ -89,7 +89,7 @@ namespace HOK.MissionControl.FamilyPublish.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PublishFamily.
+        ///   Looks up a localized string similar to Publish Family.
         /// </summary>
         internal static string FamilyPublish_Name {
             get {
