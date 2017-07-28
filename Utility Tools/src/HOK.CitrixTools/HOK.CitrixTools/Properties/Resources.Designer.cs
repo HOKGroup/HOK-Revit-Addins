@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HOK.MissionControl.FamilyPublish.Properties {
+namespace HOK.CitrixTools.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace HOK.MissionControl.FamilyPublish.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HOK.MissionControl.FamilyPublish.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("HOK.CitrixTools.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,76 +61,57 @@ namespace HOK.MissionControl.FamilyPublish.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Publish Family
-        ///Data.
+        ///   Looks up a localized string similar to   Copy  
+        ///   Files   .
         /// </summary>
-        internal static string FamilyPublish_ButtonText {
+        internal static string CopyFiles_ButtonText {
             get {
-                return ResourceManager.GetString("FamilyPublish_ButtonText", resourceCulture);
+                return ResourceManager.GetString("CopyFiles_ButtonText", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This plug-in publishes information about Families currently loaded in the project to Mission Control..
+        ///   Looks up a localized string similar to Utility tool that allows users to transfer files from their Citrix environment to their local computer..
         /// </summary>
-        internal static string FamilyPublish_Description {
+        internal static string CopyFiles_Description {
             get {
-                return ResourceManager.GetString("FamilyPublish_Description", resourceCulture);
+                return ResourceManager.GetString("CopyFiles_Description", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to publishFamily_32x32.png.
+        ///   Looks up a localized string similar to citrixFileCopier_32x32.png.
         /// </summary>
-        internal static string FamilyPublish_ImageName {
+        internal static string CopyFiles_ImageName {
             get {
-                return ResourceManager.GetString("FamilyPublish_ImageName", resourceCulture);
+                return ResourceManager.GetString("CopyFiles_ImageName", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to PublishFamily.
+        ///   Looks up a localized string similar to CopyFiles.
         /// </summary>
-        internal static string FamilyPublish_Name {
+        internal static string CopyFiles_Name {
             get {
-                return ResourceManager.GetString("FamilyPublish_Name", resourceCulture);
+                return ResourceManager.GetString("CopyFiles_Name", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to HOK.MissionControl.FamilyPublish.
+        ///   Looks up a localized string similar to HOK.CitrixTools.
         /// </summary>
-        internal static string FamilyPublish_Namespace {
+        internal static string CopyFiles_Namespace {
             get {
-                return ResourceManager.GetString("FamilyPublish_Namespace", resourceCulture);
+                return ResourceManager.GetString("CopyFiles_Namespace", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Mission Control.
+        ///   Looks up a localized string similar to Citrix Tools.
         /// </summary>
-        internal static string FamilyPublish_PanelName {
+        internal static string CopyFiles_PanelName {
             get {
-                return ResourceManager.GetString("FamilyPublish_PanelName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to 56603be6-aeb2-45d0-9ebc-2830fad6368b.
-        /// </summary>
-        internal static string HealthReportTrackerGuid {
-            get {
-                return ResourceManager.GetString("HealthReportTrackerGuid", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap sheetManager_32 {
-            get {
-                object obj = ResourceManager.GetObject("sheetManager_32", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ResourceManager.GetString("CopyFiles_PanelName", resourceCulture);
             }
         }
     }

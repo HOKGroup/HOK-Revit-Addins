@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Citrix Tools</Name>
+    <Assembly>HOK.CitrixTools\HOK.CitrixTools.dll</Assembly>
+    <AddInId>a327194b-264f-4273-969d-83e8f7e0c17a</AddInId>
+    <FullClassName>HOK.CitrixTools.CopyFilesCommand</FullClassName>
+    <VendorId>Konrad K Sobon</VendorId>
+    <VendorDescription>HOK BuildingSMART Team.</VendorDescription>
+  </AddIn>
+</RevitAddIns>

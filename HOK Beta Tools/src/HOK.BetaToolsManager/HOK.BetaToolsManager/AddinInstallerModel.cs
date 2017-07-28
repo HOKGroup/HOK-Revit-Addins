@@ -165,6 +165,7 @@ namespace HOK.BetaToolsManager
 
                 // (Konrad) Create a copy of all installed plugins by copying the temp dir from beta
                 // We only do this if Beta is accessible otherwise we use local temp
+                // TODO: This is a bottle neck here. There is no reason to ALWAYS copy all of the folders over to temp
                 if(Directory.Exists(BetaDirectory))
                     CopyDirectory(BetaTempDirectory, TempDirectory);
 
@@ -228,7 +229,7 @@ namespace HOK.BetaToolsManager
                                 {
                                     Directory.CreateDirectory(
                                         InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                                    CopyDirectory(betaTemp2 + new DirectoryInfo(addin.BetaResourcesPath),
+                                    CopyDirectory(betaTemp2 + new DirectoryInfo(addin.BetaResourcesPath).Name,
                                         InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                                 }
                                 else
@@ -239,7 +240,7 @@ namespace HOK.BetaToolsManager
                                         // let's automatically copy the latest version in
                                         // we can use temp directory here since it was already either updated with latest
                                         // or is the only source of files (no network drive)
-                                        CopyDirectory(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath),
+                                        CopyDirectory(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
                                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                                     }
                                 }

@@ -138,6 +138,7 @@ if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\
 xcopy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 xcopy /Y "$(TargetPath)" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.FamilyPublish"
 xcopy /Y "$(TargetPath)" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl"
+xcopy /Y "$(TargetPath)" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.CitrixTools"
 goto exit
 
 :exit</PostBuildEvent>

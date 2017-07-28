@@ -117,60 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FamilyPublish_ButtonText" xml:space="preserve">
-    <value>Publish Family
-Data</value>
+  <data name="CopyFiles_ButtonText" xml:space="preserve">
+    <value>  Copy  
+   Files   </value>
   </data>
-  <data name="FamilyPublish_Description" xml:space="preserve">
-    <value>This plug-in publishes information about Families currently loaded in the project to Mission Control.</value>
+  <data name="CopyFiles_Description" xml:space="preserve">
+    <value>Utility tool that allows users to transfer files from their Citrix environment to their local computer.</value>
   </data>
-  <data name="FamilyPublish_ImageName" xml:space="preserve">
-    <value>publishFamily_32x32.png</value>
+  <data name="CopyFiles_ImageName" xml:space="preserve">
+    <value>citrixFileCopier_32x32.png</value>
   </data>
-  <data name="FamilyPublish_Name" xml:space="preserve">
-    <value>PublishFamily</value>
+  <data name="CopyFiles_Name" xml:space="preserve">
+    <value>CopyFiles</value>
   </data>
-  <data name="FamilyPublish_Namespace" xml:space="preserve">
-    <value>HOK.MissionControl.FamilyPublish</value>
+  <data name="CopyFiles_Namespace" xml:space="preserve">
+    <value>HOK.CitrixTools</value>
   </data>
-  <data name="FamilyPublish_PanelName" xml:space="preserve">
-    <value>Mission Control</value>
-  </data>
-  <data name="HealthReportTrackerGuid" xml:space="preserve">
-    <value>56603be6-aeb2-45d0-9ebc-2830fad6368b</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="sheetManager_32" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        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
-        RU5ErkJggg==
-</value>
+  <data name="CopyFiles_PanelName" xml:space="preserve">
+    <value>Citrix Tools</value>
   </data>
 </root>
