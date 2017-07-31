@@ -128,7 +128,7 @@
     <value>citrixFileCopier_32x32.png</value>
   </data>
   <data name="CopyFiles_Name" xml:space="preserve">
-    <value>CopyFiles</value>
+    <value>Copy Files</value>
   </data>
   <data name="CopyFiles_Namespace" xml:space="preserve">
     <value>HOK.CitrixTools</value>

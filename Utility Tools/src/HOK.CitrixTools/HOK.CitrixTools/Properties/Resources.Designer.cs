@@ -89,7 +89,7 @@ namespace HOK.CitrixTools.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CopyFiles.
+        ///   Looks up a localized string similar to Copy Files.
         /// </summary>
         internal static string CopyFiles_Name {
             get {

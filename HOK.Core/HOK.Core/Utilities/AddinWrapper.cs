@@ -11,6 +11,7 @@ namespace HOK.Core.Utilities
         public string Panel { get; set; } // used to find button to be disabled when uninstalling addin
         public string ButtonText { get; set; } // used to find button to be disabled when uninstalling addin
         public string ImageName { get; set; } // used to retrieve image for datagrid
+        public string ImageNamespace { get; set; } // 
         public string Version { get; set; } = ""; // version of addin in beta
         public string BetaResourcesPath { get; set; } //used by install to copy dependancies
         public string AddinFilePath { get; set; } // used by install/uninstall to copy addin file

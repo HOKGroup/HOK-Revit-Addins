@@ -172,36 +172,8 @@ namespace HOK.BetaToolsManager
                 // (Konrad) Get all addins from beta directory, check their versions agains installed
                 foreach (var file in Directory.GetFiles(betaTemp2, "*.addin"))
                 {
-                    //AddinWrapper currentAddinWrapper;
-
-                    //BitmapSource Image;
-
-                    //// TODO: I am wondering if it makes sense to ALWAYS read the DLL. If the file didn't change, why not just use Settings.json. 
                     var dllRelativePath = ParseXml(file); // relative to temp
                     var dllPath = betaTemp2 + dllRelativePath;
-                    var addin = addins?.FirstOrDefault(x => x.DllRelativePath == dllRelativePath);
-                    //if (addin != null)
-                    //{
-                    //    var sourceVersion = FileVersionInfo.GetVersionInfo(dllPath).FileVersion;
-                    //    var storedVersion = addin.Version;
-                    //    if (sourceVersion == storedVersion)
-                    //    {
-                    //        // (Konrad) There is no reason to Load this into current AppDomain
-                    //        // We can just reuse the attributes from the serialized file.
-                    //        currentAddinWrapper = addin;
-                    //        var a = Assembly.LoadFile(dllPath);
-                    //        currentAddinWrapper.Image = (BitmapSource)ButtonUtil.LoadBitmapImage(a, currentAddinWrapper.CommandNamespace,
-                    //            imageAttr.ImageName);
-                    //    }
-                    //    else
-                    //    {
-
-                    //    }
-                    //}
-
-                    //TODO: This needs work but it should be possible to get this loaded.
-
-
 
                     // (Konrad) Using LoadFrom() instead of LoadFile() because
                     // LoadFile() doesn't load dependent assemblies causing exception later.
@@ -241,7 +213,7 @@ namespace HOK.BetaToolsManager
                         var installed = false;
                         var autoUpdate = false;
 
-                        //var addin = addins?.FirstOrDefault(x => x.Name == nameAttr.Name);
+                        var addin = addins?.FirstOrDefault(x => x.DllRelativePath == dllRelativePath);
                         if (addin != null)
                         {
                             installed = addin.IsInstalled;
@@ -382,29 +354,6 @@ namespace HOK.BetaToolsManager
             }
         }
 
-        ///// <summary>
-        ///// Copy Directory and its contents to another directory.
-        ///// </summary>
-        ///// <param name="sourcePath">Source Path</param>
-        ///// <param name="destinationPath">Destination Path</param>
-        //public static void CopyDirectory(string sourcePath, string destinationPath)
-        //{
-        //    try
-        //    {
-        //        foreach (var dirPath in Directory.GetDirectories(sourcePath, "*",
-        //            SearchOption.AllDirectories))
-        //            Directory.CreateDirectory(dirPath.Replace(sourcePath, destinationPath));
-
-        //        foreach (var newPath in Directory.GetFiles(sourcePath, "*.*",
-        //            SearchOption.AllDirectories))
-        //            File.Copy(newPath, newPath.Replace(sourcePath, destinationPath), true);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-        //    }
-        //}
-
         /// <summary>
         /// Deserializes Settings file for installed addins.
         /// </summary>
@@ -414,9 +363,7 @@ namespace HOK.BetaToolsManager
         {
             var json = File.ReadAllText(filePath);
             var settings = JsonConvert.DeserializeObject<ObservableCollection<AddinWrapper>>(json);
-            if (settings == null) return new ObservableCollection<AddinWrapper>();
-
-            return settings;
+            return settings ?? new ObservableCollection<AddinWrapper>();
         }
     }
 }
