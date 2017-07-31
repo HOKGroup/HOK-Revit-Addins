@@ -42,7 +42,7 @@ namespace HOK.Core.Utilities
         private string _installedVersion = "";
         public string InstalledVersion
         {
-            get => _installedVersion;
+            get { return _installedVersion; }
             set { _installedVersion = value; RaisePropertyChanged("InstalledVersion"); }
         }
 
@@ -52,14 +52,14 @@ namespace HOK.Core.Utilities
         private bool _isSelected;
         public bool IsSelected
         {
-            get => _isSelected;
+            get { return _isSelected; }
             set { _isSelected = value; RaisePropertyChanged("IsSelected"); }
         }
 
         private bool _autoUpdate;
         public bool AutoUpdate
         {
-            get => _autoUpdate;
+            get { return _autoUpdate; }
             set { _autoUpdate = value; RaisePropertyChanged("AutoUpdate"); }
         }
 

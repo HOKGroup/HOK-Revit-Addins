@@ -178,7 +178,9 @@ goto exit
 :Build2018
 echo Copying results to Build2018
 copy /Y "$(TargetDir)RestSharp.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)RestSharp.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager"
 copy /Y "$(TargetDir)MongoDB.Bson.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager"
 copy /Y "$(TargetDir)RestSharp.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl"
 copy /Y "$(TargetDir)MongoDB.Bson.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl"
 copy /Y "$(TargetPath)" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl"

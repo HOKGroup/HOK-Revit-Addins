@@ -68,7 +68,7 @@ namespace HOK.BetaToolsManager
                 var panel = m_app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel) 
                     ?? m_app.CreateRibbonPanel(tabName, addin.Panel);
 
-                var button = (PushButton)panel.AddItem(new PushButtonData(addin.Panel, addin.ButtonText, dllPath, addin.CommandNamespace));
+                var button = (PushButton)panel.AddItem(new PushButtonData(addin.Name + "_Command", addin.ButtonText, dllPath, addin.CommandNamespace));
                 button.LargeImage = addin.Image;
                 button.ToolTip = addin.Description;
 
