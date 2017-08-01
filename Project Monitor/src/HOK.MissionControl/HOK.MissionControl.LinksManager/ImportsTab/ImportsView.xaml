@@ -1,12 +1,12 @@
-﻿<UserControl x:Class="HOK.MissionControl.LinksManager.StylesTab.StylesView"
+﻿<UserControl x:Class="HOK.MissionControl.LinksManager.ImportsTab.ImportsView"
              x:Name="Control"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500">
+             d:DesignHeight="300" d:DesignWidth="600">
     <UserControl.Resources>
         <Style TargetType="{x:Type wpfUtilities:DataGridExtension}">
             <Setter Property="Background" Value="White"/>
@@ -67,7 +67,7 @@
         <GroupBox Header="Imported DWGs" Margin="10">
             <Grid Margin="10">
                 <wpfUtilities:DataGridExtension x:Name="DataGridImages" Grid.Row="0"
-                                                ItemsSource="{Binding Styles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                ItemsSource="{Binding Imports, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 CellStyle="{StaticResource ContentDataGridCentering}"
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
@@ -85,7 +85,7 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <!--<DataGridTextColumn Header="View Specific" 
+                        <DataGridTextColumn Header="View Specific" 
                                             Binding="{Binding IsViewSpecific, Converter={StaticResource BooleanConverter}}" 
                                             Width="120" 
                                             IsReadOnly="True"
@@ -119,7 +119,7 @@
                                     <Setter Property="TextBlock.TextAlignment" Value="Center"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>-->
+                        </DataGridTextColumn>
                         <DataGridCheckBoxColumn Header="Select" 
                                                 Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 IsReadOnly="False" 

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Autodesk.Revit.DB;
+using HOK.Core.ElementWrapers;
 using HOK.Core.Utilities;
 
 namespace HOK.MissionControl.LinksManager.ImagesTab
@@ -9,7 +11,7 @@ namespace HOK.MissionControl.LinksManager.ImagesTab
     public class ImagesModel
     {
         private readonly Document _doc;
-        public ObservableCollection<ImageWrapper> Images { get; set; }
+        public ObservableCollection<ImageTypeWrapper> Images { get; set; }
 
         public ImagesModel(Document doc)
         {
@@ -17,27 +19,63 @@ namespace HOK.MissionControl.LinksManager.ImagesTab
             CollectImages();
         }
 
+        /// <summary>
+        /// Deletes selected images from Model.
+        /// </summary>
+        /// <param name="images">Images to process.</param>
+        public List<ImageTypeWrapper> Delete(ObservableCollection<ImageTypeWrapper> images)
+        {
+            var deleted = new List<ImageTypeWrapper>();
+            using (var trans = new Transaction(_doc, "Delete Images"))
+            {
+                trans.Start();
+
+                foreach (var image in images)
+                {
+                    if (!image.IsSelected) continue;
+                    try
+                    {
+                        _doc.Delete(image.Id);
+                        deleted.Add(image);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                    }
+                }
+
+                trans.Commit();
+            }
+
+            return deleted;
+        }
+
+        /// <summary>
+        /// Collects all image types in the model.
+        /// </summary>
         private void CollectImages()
         {
-            var images = new Dictionary<ElementId, ImageWrapper>();
-
-            var allPlacedImageIds = new FilteredElementCollector(_doc)
-                .OfCategory(BuiltInCategory.OST_RasterImages)
-                .Select(x => x.GetTypeId())
+            var images = new Dictionary<ElementId, ImageTypeWrapper>();
+            var allImageTypeIds = new FilteredElementCollector(_doc)
+                .OfClass(typeof(ImageType))
+                .WhereElementIsElementType()
+                .ToElementIds()
                 .ToList();
 
-            foreach (var id in allPlacedImageIds)
+            foreach (var id in allImageTypeIds)
             {
+                var instances = new FilteredElementCollector(_doc)
+                    .OfCategory(BuiltInCategory.OST_RasterImages)
+                    .Count(x => x.GetTypeId() == id);
+
                 if (!images.ContainsKey(id))
                 {
                     var type = (ImageType)_doc.GetElement(id);
                     if (type == null) continue;
 
-                    var wrapper = new ImageWrapper
+                    var wrapper = new ImageTypeWrapper(type)
                     {
-                        Name = type.Name,
-                        FilePath = type.Path,
-                        Instances = 1
+                        Instances = instances
                     };
                     images.Add(id, wrapper);
                 }
@@ -49,7 +87,7 @@ namespace HOK.MissionControl.LinksManager.ImagesTab
                 }
             }
 
-            Images = new ObservableCollection<ImageWrapper>(images.Values);
+            Images = new ObservableCollection<ImageTypeWrapper>(images.Values);
         }
     }
 }

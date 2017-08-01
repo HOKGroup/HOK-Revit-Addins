@@ -1,45 +1,48 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using HOK.Core.Utilities;
+using HOK.Core.ElementWrapers;
 
 namespace HOK.MissionControl.LinksManager.ImagesTab
 {
     public class ImagesViewModel : ViewModelBase
     {
         public ImagesModel Model { get; set; }
-        public RelayCommand CheckAll { get; }
-        public RelayCommand CheckNone { get; }
+        public RelayCommand Delete { get; }
+        public RelayCommand<UserControl> Close { get; }
 
         public ImagesViewModel(ImagesModel model)
         {
             Model = model;
-            CheckAll = new RelayCommand(OnCheckAll);
-            CheckNone = new RelayCommand(OnCheckNone);
             Images = Model.Images;
+
+            Delete = new RelayCommand(OnDelete);
+            Close = new RelayCommand<UserControl>(OnClose);
         }
 
-        private ObservableCollection<ImageWrapper> _images = new ObservableCollection<ImageWrapper>();
-        public ObservableCollection<ImageWrapper> Images
+        private void OnDelete()
+        {
+            var deleted = Model.Delete(Images);
+
+            foreach (var i in deleted)
+            {
+                Images.Remove(i);
+            }
+        }
+
+        private static void OnClose(UserControl control)
+        {
+            var win = Window.GetWindow(control);
+            win?.Close();
+        }
+
+        private ObservableCollection<ImageTypeWrapper> _images = new ObservableCollection<ImageTypeWrapper>();
+        public ObservableCollection<ImageTypeWrapper> Images
         {
             get { return _images; }
             set { _images = value; RaisePropertyChanged(() => Images); }
-        }
-
-        private void OnCheckNone()
-        {
-            foreach (var image in Images)
-            {
-                image.IsSelected = false;
-            }
-        }
-
-        private void OnCheckAll()
-        {
-            foreach (var image in Images)
-            {
-                image.IsSelected = true;
-            }
         }
     }
 }

@@ -36,18 +36,18 @@ namespace HOK.Core.Utilities
             return image;
         }
 
-        ///// <summary>
-        ///// Converts Bitmap to BitmapSource that can be used with WPF.
-        ///// </summary>
-        ///// <param name="bitmap">Bitmap image to convert.</param>
-        ///// <returns></returns>
-        //public static BitmapSource BitmapToBitmapSource(Bitmap bitmap)
-        //{
-        //    if (bitmap == null) return null;
+        /// <summary>
+        /// Converts Bitmap to BitmapSource that can be used with WPF.
+        /// </summary>
+        /// <param name="bitmap">Bitmap image to convert.</param>
+        /// <returns></returns>
+        public static BitmapSource BitmapToBitmapSource(Bitmap bitmap)
+        {
+            if (bitmap == null) return null;
 
-        //    var bitmapImage = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), 
-        //        IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-        //    return bitmapImage;
-        //}
+            var bitmapImage = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(),
+                IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            return bitmapImage;
+        }
     }
 }

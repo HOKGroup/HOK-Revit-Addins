@@ -5,19 +5,19 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.Core.ElementWrapers;
 
-namespace HOK.MissionControl.LinksManager.StylesTab
+namespace HOK.MissionControl.LinksManager.ImportsTab
 {
-    public class StylesViewModel : ViewModelBase
+    public class ImportsViewModel : ViewModelBase
     {
-        public StylesModel Model { get; set; }
-        public ObservableCollection<CategoryWrapper> Styles { get; set; }
+        public ImportsModel Model { get; set; }
+        public ObservableCollection<CadLinkTypeWrapper> Imports { get; set; }
         public RelayCommand Delete { get; }
         public RelayCommand<UserControl> Close { get; }
 
-        public StylesViewModel(StylesModel model)
+        public ImportsViewModel(ImportsModel model)
         {
             Model = model;
-            Styles = Model.Styles;
+            Imports = Model.Imports;
 
             Delete = new RelayCommand(OnDelete);
             Close = new RelayCommand<UserControl>(OnClose);
@@ -25,11 +25,11 @@ namespace HOK.MissionControl.LinksManager.StylesTab
 
         private void OnDelete()
         {
-            var deleted = Model.Delete(Styles);
+            var deleted = Model.Delete(Imports);
 
             foreach (var i in deleted)
             {
-                Styles.Remove(i);
+                Imports.Remove(i);
             }
         }
 
