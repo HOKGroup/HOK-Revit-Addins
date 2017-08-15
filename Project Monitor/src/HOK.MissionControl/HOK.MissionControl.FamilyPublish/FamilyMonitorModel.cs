@@ -17,12 +17,14 @@ namespace HOK.MissionControl.FamilyPublish
         public static Document Doc { get; set; }
         public Configuration Config { get; set; }
         public Project Project { get; set; }
+        private string RecordId { get; set; }
 
-        public FamilyMonitorModel(Document doc, Configuration config, Project project)
+        public FamilyMonitorModel(Document doc, Configuration config, Project project, string recordId)
         {
             Doc = doc;
             Config = config;
             Project = project;
+            RecordId = recordId;
         }
 
         /// <summary>
@@ -33,8 +35,7 @@ namespace HOK.MissionControl.FamilyPublish
             try
             {
                 if (!MonitorUtilities.IsUpdaterOn(Project, Config, UpdaterGuid)) return;
-                var worksetDocumentId = Project.worksets.FirstOrDefault();
-                if (string.IsNullOrEmpty(worksetDocumentId)) return;
+                if (string.IsNullOrEmpty(RecordId)) return;
 
                 var suspectFamilies = new List<FamilyItem>();
                 var totalFamilies = 0;
@@ -113,7 +114,7 @@ namespace HOK.MissionControl.FamilyPublish
                     createdBy = Environment.UserName
                 };
 
-                ServerUtilities.PostToMongoDB(familyStats, "worksets", worksetDocumentId, "familystats");
+                ServerUtilities.PostToMongoDB(familyStats, "healthrecords", RecordId, "familystats");
                 StatusBarManager.FinalizeProgress();
             }
             catch (Exception ex)

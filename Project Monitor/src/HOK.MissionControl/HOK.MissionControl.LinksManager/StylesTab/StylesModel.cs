@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core.ElementWrapers;
 using HOK.Core.Utilities;
+using HOK.Core.WpfUtilities;
 
 namespace HOK.MissionControl.LinksManager.StylesTab
 {
@@ -19,16 +20,22 @@ namespace HOK.MissionControl.LinksManager.StylesTab
             CollectStyles();
         }
 
-        public List<CategoryWrapper> Delete(ObservableCollection<CategoryWrapper> styles)
+        /// <summary>
+        /// Deletes selected styles from the model.
+        /// </summary>
+        /// <param name="styles">List of styles to delete.</param>
+        /// <returns>List of deleted styles.</returns>
+        public List<CategoryWrapper> Delete(List<CategoryWrapper> styles)
         {
             var deleted = new List<CategoryWrapper>();
             using (var trans = new Transaction(_doc, "Delete Styles"))
             {
                 trans.Start();
+                StatusBarManager.InitializeProgress("Deleting Styles:", styles.Count);
 
                 foreach (var style in styles)
                 {
-                    if (!style.IsSelected) continue;
+                    StatusBarManager.StepForward();
                     try
                     {
                         _doc.Delete(style.Id);
@@ -40,12 +47,16 @@ namespace HOK.MissionControl.LinksManager.StylesTab
                     }
                 }
 
+                StatusBarManager.FinalizeProgress();
                 trans.Commit();
             }
 
             return deleted;
         }
 
+        /// <summary>
+        /// Collects all of the imported styles in the model.
+        /// </summary>
         private void CollectStyles()
         {
             var wrappers = new ObservableCollection<CategoryWrapper>();
@@ -57,22 +68,25 @@ namespace HOK.MissionControl.LinksManager.StylesTab
 
             if (!allStyles.Any()) return;
 
-            // TODO: How to get all SubCategories here?
-            //foreach (var style in allStyles)
-            //{
-            //    if (style.GraphicsStyleCategory.Name.Contains(".dwg"))
-            //    {
-            //        wrappers.Add(new CategoryWrapper(style.GraphicsStyleCategory));
-            //    }
-            //    else if (style.Name == "Imports in Families")
-            //    {
-            //        foreach (var subCategory in style.GraphicsStyleCategory.SubCategories)
-            //        {
-            //            wrappers.Add(new CategoryWrapper(subCategory));
-            //        }
-                    
-            //    }
-            //}
+            foreach (var style in allStyles)
+            {
+                if (style.GraphicsStyleCategory.Name.Contains(".dwg"))
+                {
+                    var subCats = style.GraphicsStyleCategory.SubCategories;
+                    foreach (Category subCat in subCats)
+                    {
+                        wrappers.Add(new CategoryWrapper(subCat));
+                    }
+                }
+                else if (style.Name == "Imports in Families")
+                {
+                    var subCats = style.GraphicsStyleCategory.SubCategories;
+                    foreach (Category subCat in subCats)
+                    {
+                        wrappers.Add(new CategoryWrapper(subCat));
+                    }
+                }
+            }
 
             Styles = new ObservableCollection<CategoryWrapper>(wrappers.OrderBy(x => x.Name));
         }

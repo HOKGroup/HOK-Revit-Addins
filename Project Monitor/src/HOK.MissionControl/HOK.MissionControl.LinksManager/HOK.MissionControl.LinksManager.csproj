@@ -114,9 +114,6 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="RevitAPIUI">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -144,7 +141,6 @@
     </Compile>
     <Compile Include="ImportsTab\ImportsViewModel.cs" />
     <Compile Include="LinksManagerCommand.cs" />
-    <Compile Include="LinksManagerModel.cs" />
     <Compile Include="LinksManagerView.xaml.cs">
       <DependentUpon>LinksManagerView.xaml</DependentUpon>
     </Compile>
@@ -230,18 +226,20 @@ goto exit
 
 :Build2017
 echo Copying results to Build2017
-if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)HOK.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)HOK.MissionControl.LinksManager.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp"
 goto exit
 
 :Build2018
 echo Copying results to Build2018
-if not exist "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager" mkdir "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetPath)" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.Core.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.LinksManager.addin" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)HOK.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)HOK.MissionControl.LinksManager.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp"
 goto exit
 
 :exit</PostBuildEvent>

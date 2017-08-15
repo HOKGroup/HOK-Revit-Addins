@@ -57,6 +57,11 @@
                         <Setter Property="Foreground" Value="Red"/>
                         <Setter Property="FontWeight"  Value="Bold"/>
                     </DataTrigger>
+                    <DataTrigger Binding="{Binding IsLinked}" Value="False">
+                        <Setter Property="IsEnabled" Value="False"/>
+                        <Setter Property="Foreground" Value="Red"/>
+                        <Setter Property="FontWeight"  Value="Bold"/>
+                    </DataTrigger>
                 </Style.Triggers>
             </Style>
         </Grid.Resources>
@@ -65,15 +70,16 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <GroupBox Header="Imported DWGs" Margin="10">
-            <Grid Margin="10">
+            <Grid Background="Transparent">
                 <wpfUtilities:DataGridExtension x:Name="DataGridImages" Grid.Row="0"
                                                 ItemsSource="{Binding Imports, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 CellStyle="{StaticResource ContentDataGridCentering}"
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
                                                 SelectionUnit="FullRow"
-                                                RowHeight="45"
-                                                Margin="10">
+                                                RowHeight="40"
+                                                Margin="10"
+                                                SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <wpfUtilities:DataGridExtension.Columns>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
@@ -98,6 +104,7 @@
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="Link/Import" 
                                             Binding="{Binding IsLinked, Converter={StaticResource Boolean2Converter}}" 
+                                            CellStyle="{StaticResource dgCellStyle}"
                                             Width="120" 
                                             IsReadOnly="True"
                                             HeaderStyle="{StaticResource CenterGridHeaderStyle}">
@@ -120,12 +127,6 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridCheckBoxColumn Header="Select" 
-                                                Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                                IsReadOnly="False" 
-                                                Width="45"
-                                                HeaderStyle="{StaticResource CenterGridHeaderStyle}">
-                        </DataGridCheckBoxColumn>
                     </wpfUtilities:DataGridExtension.Columns>
                 </wpfUtilities:DataGridExtension>
             </Grid>

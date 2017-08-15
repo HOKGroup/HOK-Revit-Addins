@@ -134,6 +134,7 @@
     <Compile Include="Schemas\HealthReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\AddinUtilities.cs" />
+    <Compile Include="Utils\MissionControlSetup.cs" />
     <Compile Include="Utils\MonitorUtilities.cs" />
     <Compile Include="Utils\ServerUtilities.cs" />
   </ItemGroup>
@@ -169,22 +170,27 @@ goto exit
 
 :Build2017
 echo Copying results to Build2017
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.FamilyPublish"
 copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\ProgramData\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)RestSharp.dll" "C:\ProgramData\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2018
 echo Copying results to Build2018
-copy /Y "$(TargetDir)RestSharp.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetDir)RestSharp.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)MongoDB.Bson.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetDir)MongoDB.Bson.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)RestSharp.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)MongoDB.Bson.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl"
-copy /Y "$(TargetPath)" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl"
-copy /Y "$(TargetPath)" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.FamilyPublish"
 copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 goto exit
 

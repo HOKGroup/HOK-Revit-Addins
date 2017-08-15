@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
@@ -28,8 +27,6 @@ namespace HOK.MissionControl
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
 
-        public Dictionary<string, Configuration> ConfigDictionary { get; set; } = new Dictionary<string, Configuration>();
-        public Dictionary<string, Project> ProjectDictionary { get; set; } = new Dictionary<string, Project>();
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
         public RevisionUpdater RevisionUpdaterInstance { get; set; }
@@ -93,7 +90,6 @@ namespace HOK.MissionControl
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 //serch for config
-                Log.AppendLog(LogMessageType.INFO, centralPath + " opening...");
                 var configFound = ServerUtilities.GetConfigurationByCentralPath(centralPath);
                 if (null != configFound)
                 {
@@ -112,20 +108,20 @@ namespace HOK.MissionControl
                         }
                     }
 
-                    if (ConfigDictionary.ContainsKey(centralPath))
+                    if (MissionControlSetup.Configurations.ContainsKey(centralPath))
                     {
-                        ConfigDictionary.Remove(centralPath);
+                        MissionControlSetup.Configurations.Remove(centralPath);
                     }
-                    ConfigDictionary.Add(centralPath, configFound);
+                    MissionControlSetup.Configurations.Add(centralPath, configFound);
 
                     var projectFound = ServerUtilities.GetProjectByConfigurationId(configFound.Id);
                     if (null != projectFound)
                     {
-                        if (ProjectDictionary.ContainsKey(centralPath))
+                        if (MissionControlSetup.Projects.ContainsKey(centralPath))
                         {
-                            ProjectDictionary.Remove(centralPath);
+                            MissionControlSetup.Projects.Remove(centralPath);
                         }
-                        ProjectDictionary.Add(centralPath, projectFound);
+                        MissionControlSetup.Projects.Add(centralPath, projectFound);
                     }
 
                     OpenTime["from"] = DateTime.Now;
@@ -156,38 +152,55 @@ namespace HOK.MissionControl
         {
             try
             {
-                if (null == args.Document || args.IsCancelled()) return;
-
                 var doc = args.Document;
+                if (doc == null || args.IsCancelled()) return;
                 if (!doc.IsWorkshared) return;
 
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (string.IsNullOrEmpty(centralPath)) return;
+                // (Konrad) HashCode will be the same for the document in this session.
+                // If the same document will be open in a different session new HashCode is created.
+                var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
+                if (!MissionControlSetup.Projects.ContainsKey(centralPath)) return;
+                if (!MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
+
+                var currentConfig = MissionControlSetup.Configurations[centralPath];
+                var currentProject = MissionControlSetup.Projects[centralPath];
 
                 // (Konrad) Register Updaters that are in the config file.
                 SingleSessionMonitor.OpenedDocuments.Add(centralPath);
-                if (ConfigDictionary.ContainsKey(centralPath))
+                ApplyConfiguration(doc, currentConfig);
+
+                // (Konrad) It's possible that Health Report Document doesn't exist in database yet.
+                // Create it and set the reference to it in Project if that's the case.
+                if (!MonitorUtilities.IsUpdaterOn(currentProject, currentConfig, new Guid(Properties.Resources.HealthReportTrackerGuid))) return;
+
+                bool refreshProject = false;
+                if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
                 {
-                    ApplyConfiguration(doc, ConfigDictionary[centralPath]);
+                    var id = ServerUtilities.GetHealthRecordByCentralPath(centralPath);
+                    if (string.IsNullOrEmpty(id))
+                    {
+                        id = ServerUtilities.PostDataScheme(new HealthReportData() { centralPath = centralPath }, "healthrecords").Id;
+                        ServerUtilities.AddHealthRecordToProject(currentProject, id);
+                        refreshProject = true;
+                    }
+                    MissionControlSetup.HealthRecordIds.Add(centralPath, id);
                 }
 
-                // (Konrad) Setup Workset Open Monitor
-                if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return;
+                var recordId = MissionControlSetup.HealthRecordIds[centralPath];
 
-                bool refreshProject;
-                WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onopened, centralPath, out refreshProject);
-                ModelMonitor.PublishModelSize(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], centralPath);
-                ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.FirstOrDefault(), SessionEvent.documentOpened);
+                WorksetOpenSynch.PublishData(doc, recordId, currentConfig, currentProject, WorksetMonitorState.onopened);
+                ModelMonitor.PublishModelSize(centralPath, recordId, currentConfig, currentProject);
+                ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentOpened);
                 if (OpenTime.ContainsKey("from"))
                 {
-                    ModelMonitor.PublishOpenTime(ProjectDictionary[centralPath].worksets.FirstOrDefault());
+                    ModelMonitor.PublishOpenTime(recordId);
                 }
                 
                 if (!refreshProject) return;
 
-                var projectFound = ServerUtilities.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
+                var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
                 if (null == projectFound) return;
-                ProjectDictionary[centralPath] = projectFound; // this won't be null since we checked before.
+                MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
             }
             catch (Exception ex)
             {
@@ -206,34 +219,6 @@ namespace HOK.MissionControl
                 if (!doc.IsWorkshared) return;
 
                 UnregisterUpdaters(doc);
-
-                //// (Konrad) Only prompt user once a week if they are willing to post Family stats to MongoDB.
-                //// This usually takes some time so it's best to minimize the annoyance factor. Getting data
-                //// from every user on the project once a week should be more than enough.
-                //var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                //var response = ServerUtilities.GetFamilyStats(ProjectDictionary[centralPath].worksets.FirstOrDefault(), "familystats");
-                //var lastWeek = DateTime.Now.AddDays(-7);
-                //var alreadyPosted = response.familyStats.FirstOrDefault(x => x.createdOn > lastWeek && x.createdBy == Environment.UserName);
-
-                //if (alreadyPosted == null)
-                //{
-                //    var famViewModel = new FamilyMonitorViewModel();
-                //    var famWindow = new FamilyMonitorView { DataContext = famViewModel };
-                //    var showDialog = famWindow.ShowDialog();
-                //    if (showDialog != null && (bool)showDialog)
-                //    {
-                //        if (args.Cancellable) args.Cancel();
-                //        RunExport = !RunExport;
-                //    }
-                //    else
-                //    {
-                //        UnregisterUpdaters(doc);
-                //    }
-                //}
-                //else
-                //{
-                //    UnregisterUpdaters(doc);
-                //}
             }
             catch (Exception ex)
             {
@@ -249,7 +234,6 @@ namespace HOK.MissionControl
             try
             {
                 FailureProcessor.IsSynchronizing = true;
-
                 if (args.Document == null) return;
 
                 var doc = args.Document;
@@ -257,21 +241,11 @@ namespace HOK.MissionControl
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 // (Konrad) Setup Workset Open Monitor
-                if (!ProjectDictionary.ContainsKey(centralPath) || !ConfigDictionary.ContainsKey(centralPath)) return;
+                if (!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
+                if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
 
-                bool refreshProject;
-                WorksetOpenSynch.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], WorksetMonitorState.onsynched, centralPath, out refreshProject);
+                WorksetOpenSynch.PublishData(doc, centralPath, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], WorksetMonitorState.onsynched);
                 SynchTime["from"] = DateTime.Now;
-
-                if (!refreshProject) return;
-
-                var projectFound = ServerUtilities.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
-                if (null == projectFound) return;
-
-                if (ProjectDictionary.ContainsKey(centralPath))
-                {
-                    ProjectDictionary[centralPath] = projectFound;
-                }
             }
             catch (Exception ex)
             {
@@ -292,11 +266,17 @@ namespace HOK.MissionControl
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 FailureProcessor.IsSynchronizing = false;
+
+                // (Konrad) If project is not registered with MongoDB let's skip this
+                if(!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
+                if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
+                var recordId = MissionControlSetup.HealthRecordIds[centralPath];
+
                 if (SynchTime.ContainsKey("from"))
                 {
-                    ModelMonitor.PublishSynchTime(ProjectDictionary[centralPath].worksets.FirstOrDefault());
+                    ModelMonitor.PublishSynchTime(recordId);
                 }
-                ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.First(), SessionEvent.documentSynched);
+                ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentSynched);
             }
             catch (Exception ex)
             {
@@ -350,10 +330,10 @@ namespace HOK.MissionControl
             if (string.IsNullOrEmpty(centralPath)) return;
 
             SingleSessionMonitor.CloseFile(centralPath);
-            if (!ConfigDictionary.ContainsKey(centralPath)) return;
+            if (!MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
 
-            var configFound = ConfigDictionary[centralPath];
-            foreach (var updater in configFound.updaters)
+            var currentConfig = MissionControlSetup.Configurations[centralPath];
+            foreach (var updater in currentConfig.updaters)
             {
                 if (!updater.isUpdaterOn) { continue; }
                 if (string.Equals(updater.updaterId.ToLower(),
@@ -373,25 +353,17 @@ namespace HOK.MissionControl
                 }
             }
 
-            // (Konrad) Setup Workset Item count.
-            if (!ProjectDictionary.ContainsKey(centralPath)) return;
+            // (Konrad) Make sure that Project and HealthRecords are specified.
+            if (!MissionControlSetup.Projects.ContainsKey(centralPath)) return;
+            if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
 
-            bool refreshProject;
-            WorksetItemCount.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath], centralPath, out refreshProject);
-            ViewMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
-            LinkMonitor.PublishData(doc, ConfigDictionary[centralPath], ProjectDictionary[centralPath]);
-            ModelMonitor.PublishSessionInfo(ProjectDictionary[centralPath].worksets.First(), SessionEvent.documentClosed);
+            var recordId = MissionControlSetup.HealthRecordIds[centralPath];
+            var currentProject = MissionControlSetup.Projects[centralPath];
 
-            // TODO: Do we need this?
-            if (!refreshProject) return;
-
-            var projectFound = ServerUtilities.GetProjectByConfigurationId(ConfigDictionary[centralPath].Id);
-            if (null == projectFound) return;
-
-            if (ProjectDictionary.ContainsKey(centralPath))
-            {
-                ProjectDictionary[centralPath] = projectFound;
-            }
+            WorksetItemCount.PublishData(doc, recordId, currentConfig, currentProject);
+            ViewMonitor.PublishData(doc, recordId, currentConfig, currentProject);
+            LinkMonitor.PublishData(doc, recordId, currentConfig, currentProject);
+            ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentClosed);
         }
     }
 }

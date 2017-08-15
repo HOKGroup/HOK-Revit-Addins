@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Net;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
@@ -10,24 +8,18 @@ namespace HOK.MissionControl.Tools.HealthReport
 {
     public static class WorksetOpenSynch
     {
-        public static Guid UpdaterGuid { get; set; } = new Guid(Properties.Resources.HealthReportTrackerGuid);
-
         /// <summary>
         /// Publishes Workset Open Data to database for onOpened/onSynched events.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
+        /// <param name="recordId">Health Record Document Id.</param>
         /// <param name="config">Configuration for the model.</param>
         /// <param name="project">Project for the model.</param>
         /// <param name="state">State of the Revit model.</param>
-        /// <param name="centralPath">Central File path.</param>
-        /// <param name="refreshProject">Return value that indicates if we should make another call to server to retrieve updated Project Document.</param>
-        public static void PublishData(Document doc, Configuration config, Project project, WorksetMonitorState state, string centralPath, out bool refreshProject)
+        public static void PublishData(Document doc, string recordId, Configuration config, Project project, WorksetMonitorState state)
         {
-            refreshProject = false;
             try
             {
-                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
-
                 var worksets = new FilteredWorksetCollector(doc)
                     .OfKind(WorksetKind.UserWorkset)
                     .ToWorksets();
@@ -48,18 +40,8 @@ namespace HOK.MissionControl.Tools.HealthReport
                     closed = closed
                 };
 
-                // (Konrad) It's possible that Workset Document doesn't exist in database yet.
-                // Create it and set the reference to it in Project if that's the case.
-                var worksetDocumentId = project.worksets.FirstOrDefault();
-                if (string.IsNullOrEmpty(worksetDocumentId))
-                {
-                    worksetDocumentId = ServerUtilities.PostDataScheme(new HealthReportData(), "worksets").Id;
-                    var status = ServerUtilities.AddWorksetToProject(project, worksetDocumentId);
-                    if (status == HttpStatusCode.Created) refreshProject = true;
-                }
-
                 // (Konrad) Publish Workset information to database based on current state.
-                ServerUtilities.PostToMongoDB(worksetInfo, "worksets", worksetDocumentId, state.ToString());
+                ServerUtilities.PostToMongoDB(worksetInfo, "healthrecords", recordId, state.ToString());
             }
             catch (Exception ex)
             {

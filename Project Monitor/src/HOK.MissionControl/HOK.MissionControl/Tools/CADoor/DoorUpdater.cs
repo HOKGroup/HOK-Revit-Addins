@@ -1,13 +1,12 @@
-﻿using Autodesk.Revit.DB;
-using HOK.MissionControl.Core.Utils;
-using HOK.MissionControl.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using HOK.Core;
+using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Utils;
 
 namespace HOK.MissionControl.Tools.CADoor
 {
@@ -230,9 +229,9 @@ namespace HOK.MissionControl.Tools.CADoor
                             if (data.IsChangeTriggered(doorId, Element.GetChangeTypeParameter(caParameter)))
                             {
                                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                                if (AppCommand.Instance.ProjectDictionary.ContainsKey(centralPath))
+                                if (MissionControlSetup.Projects.ContainsKey(centralPath))
                                 {
-                                    var project = AppCommand.Instance.ProjectDictionary[centralPath];
+                                    var project = MissionControlSetup.Projects[centralPath];
                                     if (project.address.state == "CA")
                                     {
                                         caParameter.Set(1);
@@ -256,9 +255,9 @@ namespace HOK.MissionControl.Tools.CADoor
                         if (null != caParameter)
                         {
                             var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                            if (AppCommand.Instance.ProjectDictionary.ContainsKey(centralPath))
+                            if (MissionControlSetup.Projects.ContainsKey(centralPath))
                             {
-                                var project = AppCommand.Instance.ProjectDictionary[centralPath];
+                                var project = MissionControlSetup.Projects[centralPath];
                                 if (project.address.state == "CA")
                                 {
                                     caParameter.Set(1);

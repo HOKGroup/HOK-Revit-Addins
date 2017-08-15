@@ -10,22 +10,16 @@ namespace HOK.MissionControl.Tools.HealthReport
 {
     public class ViewMonitor
     {
-        public static Guid UpdaterGuid { get; set; } = new Guid(Properties.Resources.HealthReportTrackerGuid);
-
         /// <summary>
         /// Publishes View count data when Document is closed.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
         /// <param name="config">Configuration for the model.</param>
         /// <param name="project">Project for the model.</param>
-        public static void PublishData(Document doc, Configuration config, Project project)
+        public static void PublishData(Document doc, string recordId, Configuration config, Project project)
         {
             try
             {
-                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
-                var worksetDocumentId = project.worksets.FirstOrDefault();
-                if (string.IsNullOrEmpty(worksetDocumentId)) return;
-
                 // (Konrad) Collect info about views.
                 // Views on sheet, schedules on sheet, views total etc.
                 var scheduleTotalCount = new FilteredElementCollector(doc)
@@ -98,7 +92,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     unclippedViews = unclippedViews
                 };
 
-                ServerUtilities.PostToMongoDB(viewStats, "worksets", worksetDocumentId, "viewstats");
+                ServerUtilities.PostToMongoDB(viewStats, "healthrecords", recordId, "viewstats");
             }
             catch (Exception ex)
             {

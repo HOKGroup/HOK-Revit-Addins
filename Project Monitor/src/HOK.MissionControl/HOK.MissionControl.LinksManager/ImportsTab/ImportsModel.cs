@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core.ElementWrapers;
 using HOK.Core.Utilities;
+using HOK.Core.WpfUtilities;
 
 namespace HOK.MissionControl.LinksManager.ImportsTab
 {
@@ -19,16 +20,22 @@ namespace HOK.MissionControl.LinksManager.ImportsTab
             CollectImports();
         }
 
-        public List<CadLinkTypeWrapper> Delete(ObservableCollection<CadLinkTypeWrapper> imports)
+        /// <summary>
+        /// Deletes all of the specified DWG imports.
+        /// </summary>
+        /// <param name="imports">DWGs to be deleted.</param>
+        /// <returns>List of deleted DWGs.</returns>
+        public List<CadLinkTypeWrapper> Delete(List<CadLinkTypeWrapper> imports)
         {
             var deleted = new List<CadLinkTypeWrapper>();
             using (var trans = new Transaction(_doc, "Delete Imports"))
             {
                 trans.Start();
+                StatusBarManager.InitializeProgress("Deleting DWGs:", imports.Count);
 
                 foreach (var import in imports)
                 {
-                    if (!import.IsSelected) continue;
+                    StatusBarManager.StepForward();
                     try
                     {
                         _doc.Delete(import.Id);
@@ -40,12 +47,16 @@ namespace HOK.MissionControl.LinksManager.ImportsTab
                     }
                 }
 
+                StatusBarManager.FinalizeProgress();
                 trans.Commit();
             }
 
             return deleted;
         }
 
+        /// <summary>
+        /// Collects all of the imported DWGs.
+        /// </summary>
         private void CollectImports()
         {
             var cadLinksDic = new FilteredElementCollector(_doc)

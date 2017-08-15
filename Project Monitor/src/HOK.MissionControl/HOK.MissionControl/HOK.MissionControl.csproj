@@ -228,15 +228,14 @@ goto exit
 
 :Build2017
 echo Copying results to Build2017
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\ProgramData\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
 goto exit
 
 :Build2018
 echo Copying results to Build2018
-copy /Y "$(TargetPath)" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\2018\Temp\HOK.MissionControl"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
 goto exit
 
 :exit</PostBuildEvent>

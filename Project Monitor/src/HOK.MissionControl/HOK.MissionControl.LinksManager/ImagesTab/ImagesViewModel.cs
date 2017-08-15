@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Linq;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using GalaSoft.MvvmLight;
@@ -10,8 +12,10 @@ namespace HOK.MissionControl.LinksManager.ImagesTab
     public class ImagesViewModel : ViewModelBase
     {
         public ImagesModel Model { get; set; }
+        public ObservableCollection<ImageTypeWrapper> Images { get; set; }
         public RelayCommand Delete { get; }
         public RelayCommand<UserControl> Close { get; }
+        public IList SelectedRows { get; set; }
 
         public ImagesViewModel(ImagesModel model)
         {
@@ -24,7 +28,8 @@ namespace HOK.MissionControl.LinksManager.ImagesTab
 
         private void OnDelete()
         {
-            var deleted = Model.Delete(Images);
+            var wrappers = SelectedRows.Cast<ImageTypeWrapper>().ToList();
+            var deleted = Model.Delete(wrappers);
 
             foreach (var i in deleted)
             {
@@ -36,13 +41,6 @@ namespace HOK.MissionControl.LinksManager.ImagesTab
         {
             var win = Window.GetWindow(control);
             win?.Close();
-        }
-
-        private ObservableCollection<ImageTypeWrapper> _images = new ObservableCollection<ImageTypeWrapper>();
-        public ObservableCollection<ImageTypeWrapper> Images
-        {
-            get { return _images; }
-            set { _images = value; RaisePropertyChanged(() => Images); }
         }
     }
 }

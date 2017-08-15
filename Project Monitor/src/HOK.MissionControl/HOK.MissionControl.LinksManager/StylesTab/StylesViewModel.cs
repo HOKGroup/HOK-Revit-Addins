@@ -1,9 +1,11 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.Core.ElementWrapers;
+using System.Linq;
 
 namespace HOK.MissionControl.LinksManager.StylesTab
 {
@@ -13,6 +15,7 @@ namespace HOK.MissionControl.LinksManager.StylesTab
         public ObservableCollection<CategoryWrapper> Styles { get; set; }
         public RelayCommand Delete { get; }
         public RelayCommand<UserControl> Close { get; }
+        public IList SelectedRows { get; set; }
 
         public StylesViewModel(StylesModel model)
         {
@@ -25,7 +28,8 @@ namespace HOK.MissionControl.LinksManager.StylesTab
 
         private void OnDelete()
         {
-            var deleted = Model.Delete(Styles);
+            var wrappers = SelectedRows.Cast<CategoryWrapper>().ToList();
+            var deleted = Model.Delete(wrappers);
 
             foreach (var i in deleted)
             {

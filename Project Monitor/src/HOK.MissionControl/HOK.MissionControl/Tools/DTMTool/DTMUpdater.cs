@@ -8,6 +8,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Tools.DTMTool.DTMUtils;
 using HOK.MissionControl.Utils;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.DTMTool
 {
@@ -84,9 +85,9 @@ namespace HOK.MissionControl.Tools.DTMTool
             {
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 var configId = "";
-                if (AppCommand.Instance.ConfigDictionary.ContainsKey(centralPath))
+                if (MissionControlSetup.Configurations.ContainsKey(centralPath))
                 {
-                    configId = AppCommand.Instance.ConfigDictionary[centralPath].Id;
+                    configId = MissionControlSetup.Configurations[centralPath].Id;
                 }
 
                 UpdaterRegistry.RemoveDocumentTriggers(_updaterId, doc);
@@ -187,9 +188,9 @@ namespace HOK.MissionControl.Tools.DTMTool
                 var doc = data.GetDocument();
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 var configId = "";
-                if (AppCommand.Instance.ConfigDictionary.ContainsKey(centralPath))
+                if (MissionControlSetup.Configurations.ContainsKey(centralPath))
                 {
-                    configId = AppCommand.Instance.ConfigDictionary[centralPath].Id;
+                    configId = MissionControlSetup.Configurations[centralPath].Id;
                 }
 
                 var addedElementIds = data.GetAddedElementIds().ToList();
@@ -314,9 +315,9 @@ namespace HOK.MissionControl.Tools.DTMTool
             var triggerMsg = "";
             try
             {
-                if (AppCommand.Instance.ConfigDictionary.ContainsKey(configId))
+                if (MissionControlSetup.Configurations.ContainsKey(configId))
                 {
-                    var configFound = AppCommand.Instance.ConfigDictionary[configId];
+                    var configFound = MissionControlSetup.Configurations[configId];
 
                     var updaterFound = configFound.updaters
                         .Where(x => string.Equals(x.updaterId.ToLower(), UpdaterGuid.ToString().ToLower()))

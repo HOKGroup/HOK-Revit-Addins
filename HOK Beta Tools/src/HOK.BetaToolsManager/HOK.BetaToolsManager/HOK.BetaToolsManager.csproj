@@ -70,10 +70,32 @@
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
     </Reference>
-    <Reference Include="HOK.Core">
+    <Reference Include="HOK.Core, Version=2018.0.6436.17363, Culture=neutral, processorArchitecture=MSIL" Condition=" '$(Configuration)' == '2015'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.Core, Version=2018.0.6436.17363, Culture=neutral, processorArchitecture=MSIL" Condition=" '$(Configuration)' == '2016'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.Core, Version=2018.0.6436.17363, Culture=neutral, processorArchitecture=MSIL" Condition=" '$(Configuration)' == '2017'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2017\HOK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.Core, Version=2018.0.6436.17363, Culture=neutral, processorArchitecture=MSIL" Condition=" '$(Configuration)' == '2018'">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
     </Reference>
-    <Reference Include="HOK.MissionControl.Core">
+    <Reference Include="HOK.MissionControl.Core" Condition=" '$(Configuration)' == '2015'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition=" '$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2016\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition=" '$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2017\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition=" '$(Configuration)' == '2018'">
       <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2018\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -197,15 +219,15 @@ goto exit
 :Build2017
 echo Copying results to Build2017
 if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy "$(TargetDir)HOK.BetaToolsManager.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017"
+xcopy /Q/Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)HOK.BetaToolsManager.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017"
 goto exit
 
 :Build2018
 echo Copying results to Build2018
 if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-copy "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-copy "$(TargetDir)HOK.BetaToolsManager.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018"
+xcopy /Q/Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)HOK.BetaToolsManager.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018"
 goto exit
 
 :exit</PostBuildEvent>

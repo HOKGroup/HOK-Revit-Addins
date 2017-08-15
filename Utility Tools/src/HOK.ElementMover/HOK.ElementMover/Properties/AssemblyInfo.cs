@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.ElementMover")]
 [assembly: AssemblyCopyright("Copyright © HOK Group 2015")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2018.0.0.1")]
-[assembly: AssemblyFileVersion("2018.0.0.1")]
+[assembly: AssemblyVersion("2017.0.0.1")]
+[assembly: AssemblyFileVersion("2017.0.0.1")]

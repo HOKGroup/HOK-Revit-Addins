@@ -1,8 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using Autodesk.Revit.DB;
-using HOK.Core;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.Core.Utilities;
@@ -26,9 +23,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes data about Session duration and Synch intervals.
         /// </summary>
-        /// <param name="worksetDocumentId">ObjectId of the Workset document.</param>
         /// <param name="state">Current document state.</param>
-        public static void PublishSessionInfo(string worksetDocumentId, SessionEvent state)
+        public static void PublishSessionInfo(string recordId, SessionEvent state)
         {
             try
             {
@@ -40,21 +36,21 @@ namespace HOK.MissionControl.Tools.HealthReport
                             user = Environment.UserName,
                             from = DateTime.Now
                         };
-                        var guid = ServerUtilities.PostToMongoDB(AppCommand.SessionInfo, "worksets", worksetDocumentId, "sessioninfo").Id;
+                        var guid = ServerUtilities.PostToMongoDB(AppCommand.SessionInfo, "healthrecords", recordId, "sessioninfo").Id;
                         AppCommand.SessionInfo.Id = guid;
                         break;
                     case SessionEvent.documentSynched:
                         if (AppCommand.SessionInfo != null)
                         {
                             var objectId = AppCommand.SessionInfo.Id;
-                            ServerUtilities.UpdateSessionInfo(worksetDocumentId, objectId, "putSynchTime");
+                            ServerUtilities.UpdateSessionInfo(recordId, objectId, "putSynchTime");
                         }
                         break;
                     case SessionEvent.documentClosed:
                         if (AppCommand.SessionInfo != null)
                         {
                             var objectId = AppCommand.SessionInfo.Id;
-                            ServerUtilities.UpdateSessionInfo(worksetDocumentId, objectId, "putToTime");
+                            ServerUtilities.UpdateSessionInfo(recordId, objectId, "putToTime");
                         }
                         break;
                     default:
@@ -70,8 +66,7 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes data about Model Synch duration.
         /// </summary>
-        /// <param name="worksetDocumentId">ObjectId of the Workset document.</param>
-        public static void PublishSynchTime(string worksetDocumentId)
+        public static void PublishSynchTime(string recordId)
         {
             try
             {
@@ -85,7 +80,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     value = ms
                 };
 
-                ServerUtilities.PostToMongoDB(eventItem, "worksets", worksetDocumentId, "modelsynchtime");
+                ServerUtilities.PostToMongoDB(eventItem, "healthrecords", recordId, "modelsynchtime");
             }
             catch (Exception ex)
             {
@@ -97,7 +92,7 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// Publishes data about Model Opening duration.
         /// </summary>
         /// <param name="worksetDocumentId">ObjectId of the Workset document.</param>
-        public static void PublishOpenTime(string worksetDocumentId)
+        public static void PublishOpenTime(string recordId)
         {
             try
             {
@@ -111,7 +106,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     value = ms
                 };
 
-                ServerUtilities.PostToMongoDB(eventItem, "worksets", worksetDocumentId, "modelopentime");
+                ServerUtilities.PostToMongoDB(eventItem, "healthrecords", recordId, "modelopentime");
             }
             catch (Exception ex)
             {
@@ -122,26 +117,20 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes information about linked models/images/object styles in the model.
         /// </summary>
-        /// <param name="doc">Revit Document.</param>
+        /// <param name="filePath">Revit Document central file path.</param>
         /// <param name="config">Configuration for the model.</param>
         /// <param name="project">Project for the model.</param>
-        /// <param name="centralPath"></param>
-        public static void PublishModelSize(Document doc, Configuration config, Project project, string centralPath)
+        public static void PublishModelSize(string filePath, string recordId, Configuration config, Project project)
         {
             try
             {
                 if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
-                var worksetDocumentId = project.worksets.FirstOrDefault();
-                if (string.IsNullOrEmpty(worksetDocumentId)) return;
 
                 long fileSize = 0;
                 try
                 {
-                    if (!string.IsNullOrEmpty(centralPath))
-                    {
-                        var fileInfo = new FileInfo(centralPath);
-                        fileSize = fileInfo.Length;
-                    }
+                    var fileInfo = new FileInfo(filePath);
+                    fileSize = fileInfo.Length;
                 }
                 catch (Exception ex)
                 {
@@ -154,7 +143,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     value = fileSize
                 };
 
-                ServerUtilities.PostToMongoDB(eventItem, "worksets", worksetDocumentId, "modelsize");
+                ServerUtilities.PostToMongoDB(eventItem, "healthrecords", recordId, "modelsize");
             }
             catch (Exception ex)
             {

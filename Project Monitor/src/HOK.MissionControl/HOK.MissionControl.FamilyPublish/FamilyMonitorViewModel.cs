@@ -40,7 +40,7 @@ namespace HOK.MissionControl.FamilyPublish
         private static void OnWindowLoaded(Window win)
         {
             StatusBarManager.ProgressBar = ((FamilyMonitorView)win).progressBar;
-            StatusBarManager.StatusLabel = ((FamilyMonitorView) win).statusLabel;
+            StatusBarManager.StatusLabel = ((FamilyMonitorView)win).statusLabel;
         }
 
         private static void OnClose(Window window)

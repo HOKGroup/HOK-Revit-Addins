@@ -296,7 +296,10 @@ goto exit
 :Build2017
 echo Copying results to Build2017
 if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)System.Data.SQLite.dll" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)System.Data.SQLite.EF6.dll" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)System.Data.SQLite.Linq.dll" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2018

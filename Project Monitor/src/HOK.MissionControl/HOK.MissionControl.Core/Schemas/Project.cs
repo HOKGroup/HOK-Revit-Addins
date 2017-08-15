@@ -18,6 +18,6 @@ namespace HOK.MissionControl.Core.Schemas
         public List<string> configurations { get; set; } = new List<string>();
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public List<string> worksets { get; set; } = new List<string>();
+        public List<string> healthrecords { get; set; } = new List<string>();
     }
 }

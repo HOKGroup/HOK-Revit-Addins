@@ -6,7 +6,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500">
+             d:DesignHeight="300" d:DesignWidth="500" MaxHeight="600">
     <UserControl.Resources>
         <Style TargetType="{x:Type wpfUtilities:DataGridExtension}">
             <Setter Property="Background" Value="White"/>
@@ -64,16 +64,20 @@
             <RowDefinition/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="Imported DWGs" Margin="10">
-            <Grid Margin="10">
-                <wpfUtilities:DataGridExtension x:Name="DataGridImages" Grid.Row="0"
+        <GroupBox Header="Imported Styles" Margin="10">
+            <Grid Background="Transparent">
+                <wpfUtilities:DataGridExtension x:Name="DataGridImages" 
+                                                Grid.Row="0"
                                                 ItemsSource="{Binding Styles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 CellStyle="{StaticResource ContentDataGridCentering}"
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
                                                 SelectionUnit="FullRow"
-                                                RowHeight="45"
-                                                Margin="10">
+                                                SelectionMode="Extended"
+                                                RowHeight="20"
+                                                MaxHeight="585"
+                                                Margin="10"
+                                                SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <wpfUtilities:DataGridExtension.Columns>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
@@ -85,47 +89,6 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <!--<DataGridTextColumn Header="View Specific" 
-                                            Binding="{Binding IsViewSpecific, Converter={StaticResource BooleanConverter}}" 
-                                            Width="120" 
-                                            IsReadOnly="True"
-                                            HeaderStyle="{StaticResource CenterGridHeaderStyle}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style>
-                                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        <DataGridTextColumn Header="Link/Import" 
-                                            Binding="{Binding IsLinked, Converter={StaticResource Boolean2Converter}}" 
-                                            Width="120" 
-                                            IsReadOnly="True"
-                                            HeaderStyle="{StaticResource CenterGridHeaderStyle}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style>
-                                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        <DataGridTextColumn Header="Instances" 
-                                            Binding="{Binding Instances, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                            CellStyle="{StaticResource dgCellStyle}"
-                                            Width="80" 
-                                            IsReadOnly="True"
-                                            HeaderStyle="{StaticResource CenterGridHeaderStyle}">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style>
-                                    <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
-                                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>-->
-                        <DataGridCheckBoxColumn Header="Select" 
-                                                Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                                IsReadOnly="False" 
-                                                Width="45"
-                                                HeaderStyle="{StaticResource CenterGridHeaderStyle}">
-                        </DataGridCheckBoxColumn>
                     </wpfUtilities:DataGridExtension.Columns>
                 </wpfUtilities:DataGridExtension>
             </Grid>

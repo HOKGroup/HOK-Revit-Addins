@@ -43,9 +43,9 @@ namespace HOK.MissionControl.Tools.DTMTool
                 //update category trigger settings
                 var settingsUpdated = false;
                 var centralPath = reportingInfo.CentralPath;
-                if (AppCommand.Instance.ConfigDictionary.ContainsKey(centralPath))
+                if (MissionControlSetup.Configurations.ContainsKey(centralPath))
                 {
-                    var config = AppCommand.Instance.ConfigDictionary[centralPath];
+                    var config = MissionControlSetup.Configurations[centralPath];
                     var updaterFound = config.updaters
                         .FirstOrDefault(x => string.Equals(x.updaterId.ToLower(), reportingInfo.UpdaterId.ToLower(),
                             StringComparison.Ordinal));
@@ -59,8 +59,8 @@ namespace HOK.MissionControl.Tools.DTMTool
                             var triggerIndex = updaterFound.CategoryTriggers.IndexOf(triggerFound);
                             config.updaters[updaterIndex].CategoryTriggers[triggerIndex].isEnabled = false;
 
-                            AppCommand.Instance.ConfigDictionary.Remove(centralPath);
-                            AppCommand.Instance.ConfigDictionary.Add(centralPath, config);
+                            MissionControlSetup.Configurations.Remove(centralPath);
+                            MissionControlSetup.Configurations.Add(centralPath, config);
 
                             //refresh category trigger
                             AppCommand.Instance.DtmUpdaterInstance.Unregister(Doc);

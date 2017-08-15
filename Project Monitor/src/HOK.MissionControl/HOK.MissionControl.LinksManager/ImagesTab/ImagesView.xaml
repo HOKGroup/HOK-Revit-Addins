@@ -63,15 +63,16 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <GroupBox Header="Imported Images" Margin="10">
-            <Grid Margin="10">
+            <Grid Background="Transparent">
                 <wpfUtilities:DataGridExtension x:Name="DataGridImages" Grid.Row="0"
                                                 ItemsSource="{Binding Images, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 CellStyle="{StaticResource ContentDataGridCentering}"
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
                                                 SelectionUnit="FullRow"
-                                                RowHeight="45"
-                                                Margin="10">
+                                                RowHeight="40"
+                                                Margin="10"
+                                                SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <wpfUtilities:DataGridExtension.Columns>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
@@ -110,12 +111,6 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridCheckBoxColumn Header="Select" 
-                                                Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                                IsReadOnly="False" 
-                                                Width="45"
-                                                HeaderStyle="{StaticResource CenterGridHeaderStyle}">
-                        </DataGridCheckBoxColumn>
                     </wpfUtilities:DataGridExtension.Columns>
                 </wpfUtilities:DataGridExtension>
             </Grid>

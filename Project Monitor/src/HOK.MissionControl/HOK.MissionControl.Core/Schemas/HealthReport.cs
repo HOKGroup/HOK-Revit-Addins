@@ -149,6 +149,7 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+        public string centralPath { get; set; }
         public List<WorksetEvent> onOpened { get; set; } = new List<WorksetEvent>();
         public List<WorksetEvent> onSynched { get; set; } = new List<WorksetEvent>();
         public List<WorksetItem> itemCount { get; set; } = new List<WorksetItem>();

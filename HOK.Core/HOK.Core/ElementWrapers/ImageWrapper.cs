@@ -35,13 +35,6 @@ namespace HOK.Core.ElementWrapers
             set { _hasInstances = value; RaisePropertyChanged("HasInstances"); }
         }
 
-        private bool _isSelected;
-        public bool IsSelected
-        {
-            get { return _isSelected; }
-            set { _isSelected = value; RaisePropertyChanged("IsSelected"); }
-        }
-
         public override bool Equals(object obj)
         {
             var item = obj as ImageTypeWrapper;

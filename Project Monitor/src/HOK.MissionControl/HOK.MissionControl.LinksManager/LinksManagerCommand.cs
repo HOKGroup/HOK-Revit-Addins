@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Windows.Interop;
+using System.Diagnostics;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -32,12 +34,17 @@ namespace HOK.MissionControl.LinksManager
                 AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-LinksManager",
                     commandData.Application.Application.VersionNumber));
 
-                var model = new LinksManagerModel(doc);
-                var viewModel = new LinksManagerViewModel(model);
+                var viewModel = new LinksManagerViewModel(doc);
                 var view = new LinksManagerView
                 {
                     DataContext = viewModel
                 };
+
+                var unused = new WindowInteropHelper(view)
+                {
+                    Owner = Process.GetCurrentProcess().MainWindowHandle
+                };
+
                 view.ShowDialog();
             }
             catch (Exception e)

@@ -20,12 +20,11 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        //public const string baseUrlLocal = "http://hok-184vs/";
-        public const string BaseUrlLocal = "http://localhost:8080/";
+        public const string BaseUrlLocal = "http://hok-184vs/";
+        //public const string BaseUrlLocal = "http://localhost:8080/";
         public const string BaseUrlGlobal = "http://hokmissioncontrol.herokuapp.com/";
         public const string ApiVersion = "api/v1";
         public static string RestApiBaseUrl => UseLocalServer ? BaseUrlLocal : BaseUrlGlobal;
-        public static string RestApiUri => RestApiBaseUrl + "/" + ApiVersion;
 
         #region GET
 
@@ -75,6 +74,7 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddUrlSegment("uri", fileName);
 
                 var response = client.Execute<List<Configuration>>(request);
+                if (response.StatusCode == HttpStatusCode.InternalServerError) return configFound;
                 if (response.Data != null)
                 {
                     var items = response.Data;
@@ -97,6 +97,42 @@ namespace HOK.MissionControl.Core.Utils
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return configFound;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="centralPath"></param>
+        /// <returns></returns>
+        public static string GetHealthRecordByCentralPath(string centralPath)
+        {
+            var recordId = "";
+            try
+            {
+                var fileName = System.IO.Path.GetFileNameWithoutExtension(centralPath);
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(ApiVersion + "/healthrecords/uri/{uri}", Method.GET);
+                request.AddUrlSegment("uri", fileName);
+
+                var response = client.Execute<List<HealthReportData>>(request);
+                if (response.StatusCode == HttpStatusCode.InternalServerError) return recordId;
+                if (response.Data != null)
+                {
+                    var items = response.Data;
+                    foreach (var record in items)
+                    {
+                        if (!string.Equals(record.centralPath.ToLower(), centralPath.ToLower())) continue;
+                        recordId = record.Id;
+                        Log.AppendLog(LogMessageType.INFO, "Health Record Found: " + recordId);
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+            return recordId;
         }
 
         ///// <summary>
@@ -185,34 +221,27 @@ namespace HOK.MissionControl.Core.Utils
         }
 
         /// <summary>
-        /// PUTs created Workset id into Project's Worksets array.
+        /// PUTs created Health Record Id into Project's healthrecords array.
         /// </summary>
         /// <param name="project">Project class.</param>
-        /// <param name="worksetDocumentId">Id of the Workset to add.</param>
-        /// <returns>Status</returns>
-        public static HttpStatusCode AddWorksetToProject(Project project, string worksetDocumentId)
+        public static void AddHealthRecordToProject(Project project, string id)
         {
-            var status = HttpStatusCode.Unused;
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(
-                    ApiVersion + "/projects/" + project.Id + "/addworkset/" + worksetDocumentId, Method.PUT)
+                    ApiVersion + "/projects/" + project.Id + "/addhealthrecord/" + id, Method.PUT)
                 {
                     RequestFormat = DataFormat.Json
                 };
                 request.AddBody(project);
-
                 var response = client.Execute(request);
-                status = response.StatusCode;
-
-                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-addworkset");
+                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-addhealthrecord");
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return status;
         }
 
         /// <summary>

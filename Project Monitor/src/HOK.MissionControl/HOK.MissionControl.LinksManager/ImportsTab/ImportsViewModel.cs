@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections;
+using System.Linq;
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using GalaSoft.MvvmLight;
@@ -13,6 +15,7 @@ namespace HOK.MissionControl.LinksManager.ImportsTab
         public ObservableCollection<CadLinkTypeWrapper> Imports { get; set; }
         public RelayCommand Delete { get; }
         public RelayCommand<UserControl> Close { get; }
+        public IList SelectedRows { get; set; }
 
         public ImportsViewModel(ImportsModel model)
         {
@@ -25,7 +28,8 @@ namespace HOK.MissionControl.LinksManager.ImportsTab
 
         private void OnDelete()
         {
-            var deleted = Model.Delete(Imports);
+            var wrappers = SelectedRows.Cast<CadLinkTypeWrapper>().ToList();
+            var deleted = Model.Delete(wrappers);
 
             foreach (var i in deleted)
             {

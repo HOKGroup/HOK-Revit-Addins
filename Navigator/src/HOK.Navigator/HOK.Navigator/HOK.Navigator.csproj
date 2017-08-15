@@ -233,8 +233,8 @@ goto exit
 :Build2017
 echo Copying results to Build2017
 if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-xcopy /Q/Y "$(TargetDir)HOK.Navigator.addin" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017"
+xcopy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)HOK.Navigator.addin" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017"
 goto exit
 
 :Build2018

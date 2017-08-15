@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Autodesk.Revit.DB;
-using HOK.Core;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
@@ -10,22 +9,16 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
 {
     public class LinkMonitor
     {
-        public static Guid UpdaterGuid { get; set; } = new Guid(Properties.Resources.HealthReportTrackerGuid);
-
         /// <summary>
         /// Publishes information about linked models/images/object styles in the model.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
         /// <param name="config">Configuration for the model.</param>
         /// <param name="project">Project for the model.</param>
-        public static void PublishData(Document doc, Configuration config, Project project)
+        public static void PublishData(Document doc, string recordId, Configuration config, Project project)
         {
             try
             {
-                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
-                var worksetDocumentId = project.worksets.FirstOrDefault();
-                if (string.IsNullOrEmpty(worksetDocumentId)) return;
-
                 var dwgStyles = new FilteredElementCollector(doc)
                     .OfClass(typeof(GraphicsStyle))
                     .Cast<GraphicsStyle>()
@@ -64,14 +57,14 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                     .Select(x => new DwgFileInfo { name = x.Name, elementId = x.Id.IntegerValue })
                     .ToDictionary(key => key.elementId, value => value);
                 var totalImportInstance = 0;
-                foreach (var ii in new FilteredElementCollector(doc).OfClass(typeof(ImportInstance)).Cast<ImportInstance>())
+                foreach (var ii in new FilteredElementCollector(doc).OfClass(typeof(ImportInstance)))
                 {
                     totalImportInstance++;
                     var id = ii.GetTypeId().IntegerValue;
                     if (cadLinksDic[id].instances == 0)
                     {
                         cadLinksDic[id].isViewSpecific = ii.ViewSpecific;
-                        cadLinksDic[id].isLinked = ii.IsLinked;
+                        cadLinksDic[id].isLinked = ((ImportInstance)ii).IsLinked;
                     }
                     cadLinksDic[id].instances = cadLinksDic[id].instances + 1;
                 }
@@ -87,7 +80,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                     totalLinkedDwg = totalLinkedCad
                 };
 
-                ServerUtilities.PostToMongoDB(linkStats, "worksets", worksetDocumentId, "linkstats");
+                ServerUtilities.PostToMongoDB(linkStats, "healthrecords", recordId, "linkstats");
             }
             catch (Exception ex)
             {

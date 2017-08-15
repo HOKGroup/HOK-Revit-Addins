@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core.ElementWrapers;
 using HOK.Core.Utilities;
+using HOK.Core.WpfUtilities;
 
 namespace HOK.MissionControl.LinksManager.ImagesTab
 {
@@ -23,16 +24,18 @@ namespace HOK.MissionControl.LinksManager.ImagesTab
         /// Deletes selected images from Model.
         /// </summary>
         /// <param name="images">Images to process.</param>
-        public List<ImageTypeWrapper> Delete(ObservableCollection<ImageTypeWrapper> images)
+        /// <returns>List of deleted images.</returns>
+        public List<ImageTypeWrapper> Delete(List<ImageTypeWrapper> images)
         {
             var deleted = new List<ImageTypeWrapper>();
             using (var trans = new Transaction(_doc, "Delete Images"))
             {
                 trans.Start();
+                StatusBarManager.InitializeProgress("Deleting Images:", images.Count);
 
                 foreach (var image in images)
                 {
-                    if (!image.IsSelected) continue;
+                    StatusBarManager.StepForward();
                     try
                     {
                         _doc.Delete(image.Id);
@@ -44,6 +47,7 @@ namespace HOK.MissionControl.LinksManager.ImagesTab
                     }
                 }
 
+                StatusBarManager.FinalizeProgress();
                 trans.Commit();
             }
 

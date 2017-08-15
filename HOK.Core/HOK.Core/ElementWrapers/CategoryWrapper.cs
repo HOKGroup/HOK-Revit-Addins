@@ -18,16 +18,9 @@ namespace HOK.Core.ElementWrapers
             Id = cat.Id;
         }
 
-        private bool _isSelected;
-        public bool IsSelected
-        {
-            get { return _isSelected; }
-            set { _isSelected = value; RaisePropertyChanged("IsSelected"); }
-        }
-
         public override bool Equals(object obj)
         {
-            var item = obj as ImageTypeWrapper;
+            var item = obj as CategoryWrapper;
             return item != null && Id.Equals(item.Id);
         }
 

@@ -8,7 +8,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" Title="{Binding Title, Mode=OneWay}" Icon="Resources/hoklogo.ico" WindowStartupLocation="CenterScreen"
              BorderThickness="0,5,0,0" BorderBrush="#C45C44"
-             d:DesignHeight="300" d:DesignWidth="852" Width="850" Height="500" MinHeight="500" MinWidth="850">
+             d:DesignHeight="300" d:DesignWidth="852" Width="885" MinWidth="885" SizeToContent="Height">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
@@ -31,8 +31,7 @@
         <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
-        <Style x:Key="ContentDataGridCentering"
-               TargetType="{x:Type DataGridCell}">
+        <Style x:Key="ContentDataGridCentering" TargetType="{x:Type DataGridCell}">
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -113,7 +112,7 @@
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="Beta Version" 
                                             Binding="{Binding Version, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="85" 
+                                            Width="110" 
                                             IsReadOnly="True"
                                             HeaderStyle="{StaticResource CenterGridHeaderStyle}">
                             <DataGridTextColumn.ElementStyle>
@@ -126,7 +125,7 @@
                         <DataGridTextColumn Header="Installed Version" 
                                             Binding="{Binding InstalledVersion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                             CellStyle="{StaticResource dgCellStyle}"
-                                            Width="100" 
+                                            Width="110" 
                                             IsReadOnly="True"
                                             HeaderStyle="{StaticResource CenterGridHeaderStyle}">
                             <DataGridTextColumn.ElementStyle>
@@ -139,7 +138,7 @@
                         <DataGridCheckBoxColumn Header="Install" 
                                                 Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 IsReadOnly="False" 
-                                                Width="40"
+                                                Width="45"
                                                 HeaderStyle="{StaticResource CenterGridHeaderStyle}">
                         </DataGridCheckBoxColumn>
                     </ex:DataGridExtension.Columns>
@@ -179,6 +178,5 @@
                   Width="103" 
                   Height="20" 
                   VerticalAlignment="Bottom"/>
-
     </Grid>
 </Window>
