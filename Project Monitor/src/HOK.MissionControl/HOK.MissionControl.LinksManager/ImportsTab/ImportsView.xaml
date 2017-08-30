@@ -57,6 +57,20 @@
                         <Setter Property="Foreground" Value="Red"/>
                         <Setter Property="FontWeight"  Value="Bold"/>
                     </DataTrigger>
+                </Style.Triggers>
+            </Style>
+            <Style x:Key="dgCellStyle2" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                            <Grid Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
                     <DataTrigger Binding="{Binding IsLinked}" Value="False">
                         <Setter Property="IsEnabled" Value="False"/>
                         <Setter Property="Foreground" Value="Red"/>
@@ -77,7 +91,8 @@
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
                                                 SelectionUnit="FullRow"
-                                                RowHeight="40"
+                                                RowHeight="20"
+                                                MaxHeight="580"
                                                 Margin="10"
                                                 SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <wpfUtilities:DataGridExtension.Columns>
@@ -104,7 +119,7 @@
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="Link/Import" 
                                             Binding="{Binding IsLinked, Converter={StaticResource Boolean2Converter}}" 
-                                            CellStyle="{StaticResource dgCellStyle}"
+                                            CellStyle="{StaticResource dgCellStyle2}"
                                             Width="120" 
                                             IsReadOnly="True"
                                             HeaderStyle="{StaticResource CenterGridHeaderStyle}">

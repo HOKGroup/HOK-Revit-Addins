@@ -1,0 +1,86 @@
+﻿<UserControl x:Class="HOK.MissionControl.Tools.Communicator.HealthReportSummaryControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="300" Height="50" Width="300">
+    <UserControl.Resources>
+        <wpfUtilities:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
+        <wpfUtilities:BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+        <SolidColorBrush x:Key="mouseOverColor" Color="Red" />
+        <Style TargetType="Button" x:Key="mouseOverStyle">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Foreground" Value="{StaticResource mouseOverColor}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="1"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Ellipse Grid.Column="0" 
+                 Fill="{Binding FillColor, Converter={StaticResource ColorToBrushConverter }}"  
+                 Margin="4"/>
+        <Label Grid.Column="0" 
+               Content="{Binding Count}" 
+               HorizontalAlignment="Center" 
+               Height="50"
+               FontSize="13"
+               VerticalAlignment="Center"
+               VerticalContentAlignment="Center"
+               HorizontalContentAlignment="Center"
+               Width="50" 
+               Margin="0"/>
+        <Rectangle Grid.Column="1" 
+                   Fill="LightGray"
+                   Margin="0,2"/>
+        <Label Content="{Binding Title}" 
+               Grid.Column="2" 
+               Margin="4,0,10,0"
+               Padding="0"
+               FontSize="11"
+               FontWeight="Bold"
+               VerticalAlignment="Top"/>
+        <Label Content="Score:" 
+            Grid.Column="2" 
+            Margin="4,17,0,0"
+            Padding="0"
+            FontSize="10"
+            VerticalAlignment="Top" HorizontalAlignment="Left" Width="76"/>
+        <Label Content="Manager Tools:" 
+            Grid.Column="2" 
+            Margin="4,30,0,0"
+            Padding="0"
+            FontSize="10"
+            VerticalAlignment="Top" HorizontalAlignment="Left" Width="76"/>
+        <Label Content="{Binding Score}" 
+            Grid.Column="2" 
+            Margin="85,17,10,0"
+            Padding="0"
+            FontSize="10"
+            VerticalAlignment="Top"/>
+        <Button Content="{Binding ToolName}" 
+                Name="ToolButton"
+                Cursor="Hand"
+                Grid.Column="2" 
+                FontSize="10"
+                Margin="85,30,10,0" 
+                VerticalAlignment="Top"
+                Visibility="{Binding ShowButton, Converter={StaticResource BoolToVisConverter}}"
+                Command="{Binding LaunchTool, Mode=OneWay}"
+                CommandParameter="{Binding ElementName=ToolButton}"
+                Style="{StaticResource mouseOverStyle}">
+            <Button.Template>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <ContentPresenter/>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </Grid>
+</UserControl>

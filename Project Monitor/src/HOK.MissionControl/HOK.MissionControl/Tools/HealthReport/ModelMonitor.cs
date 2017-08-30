@@ -23,6 +23,7 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes data about Session duration and Synch intervals.
         /// </summary>
+        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
         /// <param name="state">Current document state.</param>
         public static void PublishSessionInfo(string recordId, SessionEvent state)
         {
@@ -91,7 +92,7 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes data about Model Opening duration.
         /// </summary>
-        /// <param name="worksetDocumentId">ObjectId of the Workset document.</param>
+        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
         public static void PublishOpenTime(string recordId)
         {
             try
@@ -118,6 +119,7 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// Publishes information about linked models/images/object styles in the model.
         /// </summary>
         /// <param name="filePath">Revit Document central file path.</param>
+        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
         /// <param name="config">Configuration for the model.</param>
         /// <param name="project">Project for the model.</param>
         public static void PublishModelSize(string filePath, string recordId, Configuration config, Project project)
@@ -126,7 +128,7 @@ namespace HOK.MissionControl.Tools.HealthReport
             {
                 if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
 
-                long fileSize = 0;
+                long fileSize;
                 try
                 {
                     var fileInfo = new FileInfo(filePath);

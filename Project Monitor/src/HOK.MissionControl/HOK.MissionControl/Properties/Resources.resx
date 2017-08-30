@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CommunicatorGuid" xml:space="preserve">
+    <value>D7C963CE-B7CA-426A-8D51-6E8254D21157</value>
+  </data>
   <data name="HealthReportTrackerGuid" xml:space="preserve">
     <value>56603be6-aeb2-45d0-9ebc-2830fad6368b</value>
   </data>
@@ -134,5 +137,8 @@
   </data>
   <data name="MissionControl_Namespace" xml:space="preserve">
     <value>HOK.MissionControl</value>
+  </data>
+  <data name="SharedParameterTrackerGuid" xml:space="preserve">
+    <value>32d44b45-7bf6-49f1-9b81-f41ae929cfcb</value>
   </data>
 </root>

@@ -61,17 +61,29 @@ namespace HOK.MissionControl.FamilyPublish
                         instanceCheck = true;
                     }
 
-                    if (family.FamilyCategory.Name == "Mass") inPlaceFamilies++;
+                    if (family.IsInPlace) inPlaceFamilies++;
                     if (!family.IsEditable) continue;
 
                     try
                     {
+                        long size;
                         var famDoc = Doc.EditFamily(family);
-                        var myDocPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                        var path = myDocPath + "\\temp_" + famDoc.Title;
-                        famDoc.SaveAs(path);
+                        var storedPath = famDoc.PathName;
+                        if (File.Exists(storedPath))
+                        {
+                            size = new FileInfo(storedPath).Length;
+                        }
+                        else
+                        {
+                            var myDocPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                            var path = myDocPath + "\\temp_" + famDoc.Title;
+                            famDoc.SaveAs(path);
 
-                        var size = new FileInfo(path).Length;
+                            size = new FileInfo(path).Length;
+                            TryToDelete(path);
+                        }
+                        famDoc.Close(false);
+
                         var sizeStr = BytesToString(size);
                         if (size > 1000000)
                         {
@@ -95,8 +107,6 @@ namespace HOK.MissionControl.FamilyPublish
 
                             suspectFamilies.Add(famItem);
                         }
-                        famDoc.Close(false);
-                        TryToDelete(path);
                     }
                     catch (Exception ex)
                     {

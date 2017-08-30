@@ -6,9 +6,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d" 
-        d:DesignHeight="300" d:DesignWidth="500" Width="800"
-        Title="{Binding Title, Mode=OneWay}" Icon="Resources/hoklogo.ico"  WindowStartupLocation="CenterScreen"
-        BorderThickness="0,5,0,0" BorderBrush="#E6E3DB" SizeToContent="Height" ResizeMode="NoResize">
+        d:DesignHeight="300" d:DesignWidth="500" Width="1000"
+        Title="{Binding Title, Mode=OneWay}" Icon="Resources/hoklogo.ico"  WindowStartupLocation="CenterOwner"
+        BorderThickness="0,5,0,0" BorderBrush="#E6E3DB" MaxHeight="800" SizeToContent="Height" ResizeMode="NoResize">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>

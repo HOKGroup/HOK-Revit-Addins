@@ -21,7 +21,7 @@ namespace HOK.MissionControl.Core.Schemas
         {
         }
 
-        // TODO: We should not be passing a document into the constructor here.
+        // TODO: We should NOT be passing a document into the constructor here.
         // TODO: Apps in a "zero doc" state will fail to initialize.
         public AddinLog(string name, Document doc)
         {

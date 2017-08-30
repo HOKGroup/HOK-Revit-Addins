@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
@@ -7,12 +9,14 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
+using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
-using HOK.MissionControl.Tools.HealthReport.ObjectTrackers;
 using HOK.MissionControl.Tools.SheetTracker;
 using HOK.MissionControl.Tools.SingleSession;
+using HOK.MissionControl.Tools.SharedParamMonitor;
 using HOK.MissionControl.Utils;
+using Autodesk.Revit.UI.Events;
 
 namespace HOK.MissionControl
 {
@@ -26,10 +30,14 @@ namespace HOK.MissionControl
         public static SessionInfo SessionInfo { get; set; }
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
-
+        private static Queue<Action<UIApplication>> Tasks;
+        public static HealthReportData HrData { get; set; }
+        public static bool CommunicatorOnOff { get; set; }
+        private CommunicatorView CommunicatorWindow { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
         public RevisionUpdater RevisionUpdaterInstance { get; set; }
+        private const string tabName = "  HOK - Beta";
 
         /// <summary>
         /// Registers all event handlers during startup.
@@ -43,19 +51,56 @@ namespace HOK.MissionControl
                 DoorUpdaterInstance = new DoorUpdater(appId);
                 DtmUpdaterInstance = new DtmUpdater(appId);
                 RevisionUpdaterInstance = new RevisionUpdater(appId);
+                Tasks = new Queue<Action<UIApplication>>();
 
+                application.Idling += OnIdling;
                 application.ControlledApplication.DocumentOpening += OnDocumentOpening;
                 application.ControlledApplication.DocumentOpened += OnDocumentOpened;
                 application.ControlledApplication.FailuresProcessing += FailureProcessor.CheckFailure;
                 application.ControlledApplication.DocumentClosing += OnDocumentClosing;
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
+
+                // Create Communicator button and register dockable panel
+                RegisterCommunicator(application);
+
+                try
+                {
+                    application.CreateRibbonTab(tabName);
+                }
+                catch
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Ribbon tab was not created: " + tabName);
+                }
+
+                var currentAssembly = Assembly.GetAssembly(GetType()).Location;
+                var fpAssembly = Assembly.GetExecutingAssembly();
+                var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
+                            ?? application.CreateRibbonPanel(tabName, "Mission Control");
+                var button = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
+                    currentAssembly, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
+                button.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl", "workset_32.png");
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Handled Idling events. Currently Communicator uses it to interact with Revit.
+        /// </summary>
+        private static void OnIdling(object sender, IdlingEventArgs e)
+        {
+            var app = (UIApplication)sender;
+            lock (Tasks)
+            {
+                if (Tasks.Count <= 0) return;
+
+                var task = Tasks.Dequeue();
+                task(app);
+            }
         }
 
         /// <summary>
@@ -89,7 +134,7 @@ namespace HOK.MissionControl
                 var centralPath = fileInfo.CentralPath;
                 if (string.IsNullOrEmpty(centralPath)) return;
 
-                //serch for config
+                //search for config
                 var configFound = ServerUtilities.GetConfigurationByCentralPath(centralPath);
                 if (null != configFound)
                 {
@@ -156,8 +201,6 @@ namespace HOK.MissionControl
                 if (doc == null || args.IsCancelled()) return;
                 if (!doc.IsWorkshared) return;
 
-                // (Konrad) HashCode will be the same for the document in this session.
-                // If the same document will be open in a different session new HashCode is created.
                 var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
                 if (!MissionControlSetup.Projects.ContainsKey(centralPath)) return;
                 if (!MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
@@ -169,21 +212,31 @@ namespace HOK.MissionControl
                 SingleSessionMonitor.OpenedDocuments.Add(centralPath);
                 ApplyConfiguration(doc, currentConfig);
 
+                if (MonitorUtilities.IsUpdaterOn(currentProject, currentConfig,
+                    new Guid(Properties.Resources.SharedParameterTrackerGuid)))
+                {
+                    SharedParamMonitor.VerifySharedParamPath();
+                }
+
                 // (Konrad) It's possible that Health Report Document doesn't exist in database yet.
                 // Create it and set the reference to it in Project if that's the case.
                 if (!MonitorUtilities.IsUpdaterOn(currentProject, currentConfig, new Guid(Properties.Resources.HealthReportTrackerGuid))) return;
 
-                bool refreshProject = false;
+                var refreshProject = false;
                 if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
                 {
-                    var id = ServerUtilities.GetHealthRecordByCentralPath(centralPath);
-                    if (string.IsNullOrEmpty(id))
+                    HrData = ServerUtilities.GetHealthRecordByCentralPath(centralPath);
+                    if (HrData == null)
                     {
-                        id = ServerUtilities.PostDataScheme(new HealthReportData() { centralPath = centralPath }, "healthrecords").Id;
-                        ServerUtilities.AddHealthRecordToProject(currentProject, id);
+                        HrData = ServerUtilities.PostDataScheme(new HealthReportData {centralPath = centralPath}, "healthrecords");
+                        ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
                         refreshProject = true;
                     }
-                    MissionControlSetup.HealthRecordIds.Add(centralPath, id);
+                    if (HrData != null)
+                    {
+                        MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
+                        CommunicatorWindow.DataContext = new CommunicatorViewModel(HrData); // create new communicator VM
+                    }
                 }
 
                 var recordId = MissionControlSetup.HealthRecordIds[centralPath];
@@ -195,7 +248,7 @@ namespace HOK.MissionControl
                 {
                     ModelMonitor.PublishOpenTime(recordId);
                 }
-                
+
                 if (!refreshProject) return;
 
                 var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
@@ -243,8 +296,9 @@ namespace HOK.MissionControl
                 // (Konrad) Setup Workset Open Monitor
                 if (!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
                 if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
+                var recordId = MissionControlSetup.HealthRecordIds[centralPath];
 
-                WorksetOpenSynch.PublishData(doc, centralPath, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], WorksetMonitorState.onsynched);
+                WorksetOpenSynch.PublishData(doc, recordId, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], WorksetMonitorState.onsynched);
                 SynchTime["from"] = DateTime.Now;
             }
             catch (Exception ex)
@@ -281,6 +335,74 @@ namespace HOK.MissionControl
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Shows or Hides the Communicator dockable pane.
+        /// </summary>
+        /// <param name="application">UIApp</param>
+        public void ToggleCommunicator(UIApplication application)
+        {
+            var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
+            var dp = application.GetDockablePane(dpid);
+            if (dp == null) return;
+
+            if (CommunicatorOnOff)
+            {
+                if (!dp.IsShown())
+                {
+                    dp.Show();
+                    CommunicatorOnOff = true;
+                }
+                else
+                {
+                    dp.Hide();
+                    CommunicatorOnOff = false;
+                }
+            }
+            else
+            {
+                dp.Show();
+                CommunicatorOnOff = true;
+            }
+        }
+
+        /// <summary>
+        /// Registers Communicator Dockable Panel.
+        /// </summary>
+        /// <param name="application">UIControlledApp</param>
+        private void RegisterCommunicator(UIControlledApplication application)
+        {
+            // Create View
+            var view = new CommunicatorView();
+            CommunicatorWindow = view;
+
+            // Create Dockable Pane
+            var unused = new DockablePaneProviderData
+            {
+                FrameworkElement = CommunicatorWindow,
+                InitialState = new DockablePaneState
+                {
+                    DockPosition = DockPosition.Tabbed,
+                    TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
+                }
+            };
+
+            // Register Dockable Pane
+            var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
+            application.RegisterDockablePane(dpid, "Mission Control", CommunicatorWindow);
+        }
+
+        /// <summary>
+        /// Adds action to task list.
+        /// </summary>
+        /// <param name="task">Task to be executed.</param>
+        public static void EnqueueTask(Action<UIApplication> task)
+        {
+            lock (Tasks)
+            {
+                Tasks.Enqueue(task);
             }
         }
 

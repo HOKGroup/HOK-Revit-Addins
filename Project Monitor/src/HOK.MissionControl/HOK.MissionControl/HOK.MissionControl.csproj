@@ -117,6 +117,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
@@ -139,6 +140,17 @@
     </Compile>
     <Compile Include="Tools\CADoor\DoorFailure.cs" />
     <Compile Include="Tools\CADoor\DoorUpdater.cs" />
+    <Compile Include="Tools\Communicator\CommunicatorCommand.cs" />
+    <Compile Include="Tools\Communicator\CommunicatorModel.cs" />
+    <Compile Include="Tools\Communicator\CommunicatorView.xaml.cs">
+      <DependentUpon>CommunicatorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Communicator\CommunicatorViewModel.cs" />
+    <Compile Include="Tools\Communicator\HealthReportSummaryControl.xaml.cs">
+      <DependentUpon>HealthReportSummaryControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Communicator\HealthReportSummaryModel.cs" />
+    <Compile Include="Tools\Communicator\HealthReportSummaryViewModel.cs" />
     <Compile Include="Tools\DTMTool\DTMFailure.cs" />
     <Compile Include="Tools\DTMTool\DTMUpdater.cs" />
     <Compile Include="Tools\DTMTool\DTMUtils\GridUtils.cs" />
@@ -148,6 +160,7 @@
     </Compile>
     <Compile Include="Tools\DTMTool\ReportingElementInfo.cs" />
     <Compile Include="Tools\HealthReport\ModelMonitor.cs" />
+    <Compile Include="Tools\SharedParamMonitor\SharedParamMonitor.cs" />
     <Compile Include="Tools\SheetTracker\RevisionFailure.cs" />
     <Compile Include="Tools\SheetTracker\RevisionUpdater.cs" />
     <Compile Include="Tools\SingleSession\SingleSessionMonitor.cs" />
@@ -168,6 +181,14 @@
     <Resource Include="Tools\DTMTool\Images\video.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Tools\Communicator\CommunicatorView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\Communicator\HealthReportSummaryControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Tools\DTMTool\DTMWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -197,6 +218,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\workset_32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

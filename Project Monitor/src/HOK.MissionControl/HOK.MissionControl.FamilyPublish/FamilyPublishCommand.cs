@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Windows.Interop;
+using System.Diagnostics;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.DB.Events;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
@@ -23,10 +26,7 @@ namespace HOK.MissionControl.FamilyPublish
     [Journaling(JournalingMode.NoCommandData)]
     public class FamilyPublishCommand : IExternalCommand
     {
-        public Result Execute(
-            ExternalCommandData commandData,
-            ref string message,
-            ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             var uiApp = commandData.Application;
             var doc = uiApp.ActiveUIDocument.Document;
@@ -37,6 +37,8 @@ namespace HOK.MissionControl.FamilyPublish
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-PublishFamilyData", commandData.Application.Application.VersionNumber));
+
+                uiApp.Application.FailuresProcessing += FailureProcessing;
 
                 var pathName = doc.PathName;
                 if (string.IsNullOrEmpty(pathName))
@@ -99,15 +101,18 @@ namespace HOK.MissionControl.FamilyPublish
 
                 var recordId = MissionControlSetup.HealthRecordIds[centralPath];
                 var model = new FamilyMonitorModel(doc, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], recordId);
-                var viewModel =
-                    new FamilyMonitorViewModel(model, "...make this any faster. Hang in there!")
-                    {
-                        ExecuteFamilyPublish = true
-                    };
+                var viewModel = new FamilyMonitorViewModel(model, "...make this any faster. Hang in there!")
+                {
+                    ExecuteFamilyPublish = true
+                };
                 var view = new FamilyMonitorView
                 {
                     DataContext = viewModel,
                     CloseButton = { Visibility = Visibility.Collapsed }
+                };
+                var unused = new WindowInteropHelper(view)
+                {
+                    Owner = Process.GetCurrentProcess().MainWindowHandle
                 };
                 view.ShowDialog();
             }
@@ -116,8 +121,30 @@ namespace HOK.MissionControl.FamilyPublish
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
 
+            uiApp.Application.FailuresProcessing -= FailureProcessing;
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Error handler for "Constraints are not satisfied" that pops up frequently w/ Families.
+        /// </summary>
+        private void FailureProcessing(object sender, FailuresProcessingEventArgs args)
+        {
+            var fa = args.GetFailuresAccessor();
+            var a = fa.GetFailureMessages();
+            int count = 0;
+
+            foreach (FailureMessageAccessor failure in a)
+            {
+                fa.ResolveFailure(failure);
+                count++;
+            }
+
+            if (count > 0 && args.GetProcessingResult() == FailureProcessingResult.Continue)
+            {
+                args.SetProcessingResult(FailureProcessingResult.ProceedWithCommit);
+            }
         }
     }
 }

@@ -70,14 +70,20 @@
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
                                                 SelectionUnit="FullRow"
-                                                RowHeight="40"
                                                 Margin="10"
                                                 SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <wpfUtilities:DataGridExtension.Columns>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                            Width="150" 
-                                            IsReadOnly="True"/>
+                                            Width="200" 
+                                            IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style>
+                                    <Setter Property="TextBlock.TextWrapping" Value="WrapWithOverflow"/>
+                                    <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                         <!--<DataGridTemplateColumn Header="Icon" 
                                                 Width="50">
                             <DataGridTemplateColumn.CellTemplate>
@@ -93,7 +99,7 @@
                                             IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style>
-                                    <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+                                    <Setter Property="TextBlock.TextWrapping" Value="WrapWithOverflow"/>
                                     <Setter Property="TextBlock.TextAlignment" Value="Left"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>

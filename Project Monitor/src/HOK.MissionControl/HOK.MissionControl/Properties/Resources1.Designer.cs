@@ -61,6 +61,15 @@ namespace HOK.MissionControl.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to D7C963CE-B7CA-426A-8D51-6E8254D21157.
+        /// </summary>
+        internal static string CommunicatorGuid {
+            get {
+                return ResourceManager.GetString("CommunicatorGuid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 56603be6-aeb2-45d0-9ebc-2830fad6368b.
         /// </summary>
         internal static string HealthReportTrackerGuid {
@@ -111,6 +120,15 @@ namespace HOK.MissionControl.Properties {
         internal static string MissionControl_Namespace {
             get {
                 return ResourceManager.GetString("MissionControl_Namespace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 32d44b45-7bf6-49f1-9b81-f41ae929cfcb.
+        /// </summary>
+        internal static string SharedParameterTrackerGuid {
+            get {
+                return ResourceManager.GetString("SharedParameterTrackerGuid", resourceCulture);
             }
         }
     }

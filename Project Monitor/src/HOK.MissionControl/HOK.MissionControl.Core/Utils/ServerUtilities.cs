@@ -20,11 +20,14 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        public const string BaseUrlLocal = "http://hok-184vs/";
-        //public const string BaseUrlLocal = "http://localhost:8080/";
+        //public const string BaseUrlLocal = "http://hok-184vs/";
+        public const string BaseUrlLocal = "http://localhost:8080/";
         public const string BaseUrlGlobal = "http://hokmissioncontrol.herokuapp.com/";
         public const string ApiVersion = "api/v1";
-        public static string RestApiBaseUrl => UseLocalServer ? BaseUrlLocal : BaseUrlGlobal;
+        public static string RestApiBaseUrl
+        {
+            get { return UseLocalServer ? BaseUrlLocal : BaseUrlGlobal; }
+        }
 
         #region GET
 
@@ -58,6 +61,20 @@ namespace HOK.MissionControl.Core.Utils
             return projectFound;
         }
 
+        //public static void GetHealthRecords(Project project)
+        //{
+        //    try
+        //    {
+        //        var client = new RestClient(RestApiBaseUrl);
+        //        var request = new RestRequest(ApiVersion + "/projects/populatehr/" + project.Id + "/process", Method.GET);
+        //        var unused = client.Execute(request);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+        //    }
+        //}
+
         /// <summary>
         /// Retrieves a Mission Control Configuration that matches given Central File path.
         /// </summary>
@@ -74,7 +91,7 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddUrlSegment("uri", fileName);
 
                 var response = client.Execute<List<Configuration>>(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError) return configFound;
+                if (response.StatusCode == HttpStatusCode.InternalServerError) return null;
                 if (response.Data != null)
                 {
                     var items = response.Data;
@@ -104,9 +121,10 @@ namespace HOK.MissionControl.Core.Utils
         /// </summary>
         /// <param name="centralPath"></param>
         /// <returns></returns>
-        public static string GetHealthRecordByCentralPath(string centralPath)
+        public static HealthReportData GetHealthRecordByCentralPath(string centralPath)
         {
-            var recordId = "";
+            HealthReportData result = null;
+            //var recordId = "";
             try
             {
                 var fileName = System.IO.Path.GetFileNameWithoutExtension(centralPath);
@@ -115,15 +133,16 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddUrlSegment("uri", fileName);
 
                 var response = client.Execute<List<HealthReportData>>(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError) return recordId;
+                if (response.StatusCode == HttpStatusCode.InternalServerError) return null;
                 if (response.Data != null)
                 {
                     var items = response.Data;
                     foreach (var record in items)
                     {
                         if (!string.Equals(record.centralPath.ToLower(), centralPath.ToLower())) continue;
-                        recordId = record.Id;
-                        Log.AppendLog(LogMessageType.INFO, "Health Record Found: " + recordId);
+                        result = record;
+                        //recordId = record.Id;
+                        //Log.AppendLog(LogMessageType.INFO, "Health Record Found: " + recordId);
                         break;
                     }
                 }
@@ -132,7 +151,7 @@ namespace HOK.MissionControl.Core.Utils
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return recordId;
+            return result;
         }
 
         ///// <summary>
@@ -224,6 +243,7 @@ namespace HOK.MissionControl.Core.Utils
         /// PUTs created Health Record Id into Project's healthrecords array.
         /// </summary>
         /// <param name="project">Project class.</param>
+        /// <param name="id"></param>
         public static void AddHealthRecordToProject(Project project, string id)
         {
             try

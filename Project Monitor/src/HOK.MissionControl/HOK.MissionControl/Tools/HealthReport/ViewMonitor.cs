@@ -14,6 +14,7 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// Publishes View count data when Document is closed.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
+        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
         /// <param name="config">Configuration for the model.</param>
         /// <param name="project">Project for the model.</param>
         public static void PublishData(Document doc, string recordId, Configuration config, Project project)
@@ -31,7 +32,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var viewsOnSheet = 0;
                 var viewsOnSheetWithTemplate = 0;
                 var sheetTotalCount = 0;
-                foreach (var v in new FilteredElementCollector(doc).OfClass(typeof(View)).Cast<View>())
+                foreach (var v in new FilteredElementCollector(doc).OfClass(typeof(View)).Cast<View>().Where(x => !x.IsTemplate))
                 {
                     viewTotalCount++;
                     switch (v.ViewType)

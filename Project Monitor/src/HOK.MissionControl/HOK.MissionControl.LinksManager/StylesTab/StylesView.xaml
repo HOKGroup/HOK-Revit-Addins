@@ -19,9 +19,6 @@
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="LightGray"/>
         </Style>
-        <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        </Style>
         <Style x:Key="ContentDataGridCentering"
                TargetType="{x:Type DataGridCell}">
             <Setter Property="Padding" Value="10"/>
@@ -39,27 +36,6 @@
         <wpfUtilities:Boolean2Converter x:Key="Boolean2Converter"/>
     </UserControl.Resources>
     <Grid>
-        <Grid.Resources>
-            <Style x:Key="dgCellStyle" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
-                <Setter Property="Padding" Value="10"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type DataGridCell}">
-                            <Grid Background="{TemplateBinding Background}">
-                                <ContentPresenter VerticalAlignment="Center"/>
-                            </Grid>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding HasInstances}" Value="False">
-                        <Setter Property="IsEnabled" Value="False"/>
-                        <Setter Property="Foreground" Value="Red"/>
-                        <Setter Property="FontWeight"  Value="Bold"/>
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="40"/>
@@ -75,7 +51,7 @@
                                                 SelectionUnit="FullRow"
                                                 SelectionMode="Extended"
                                                 RowHeight="20"
-                                                MaxHeight="585"
+                                                MaxHeight="580"
                                                 Margin="10"
                                                 SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <wpfUtilities:DataGridExtension.Columns>

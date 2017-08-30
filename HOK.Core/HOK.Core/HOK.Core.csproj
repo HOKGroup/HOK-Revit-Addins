@@ -102,6 +102,7 @@
     <Compile Include="Utilities\SelectionFilters.cs" />
     <Compile Include="WpfUtilities\BitmapConverter.cs" />
     <Compile Include="WpfUtilities\BooleanConverter.cs" />
+    <Compile Include="WpfUtilities\Converters.cs" />
     <Compile Include="WpfUtilities\DataGridUtilities.cs" />
     <Compile Include="WpfUtilities\DataGridExtension.cs" />
     <Compile Include="WpfUtilities\ProgressManager.cs" />
@@ -137,6 +138,7 @@ xcopy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-A
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.FamilyPublish"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.CitrixTools"
+xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
 goto exit
 
 :Build2018
@@ -145,6 +147,7 @@ xcopy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-A
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.FamilyPublish"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.CitrixTools"
+xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
 goto exit
 
 :exit</PostBuildEvent>

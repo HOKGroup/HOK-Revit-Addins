@@ -73,6 +73,8 @@ namespace HOK.MissionControl.LinksManager.ImportsTab
             foreach (var ii in imports)
             {
                 var id = ii.GetTypeId();
+                if (!cadLinksDic.ContainsKey(id)) continue;
+
                 if (cadLinksDic[id].Instances == 0)
                 {
                     cadLinksDic[id].IsViewSpecific = ii.ViewSpecific;

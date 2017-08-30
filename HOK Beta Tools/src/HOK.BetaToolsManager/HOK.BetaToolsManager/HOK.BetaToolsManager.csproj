@@ -70,21 +70,21 @@
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
     </Reference>
-    <Reference Include="HOK.Core, Version=2018.0.6436.17363, Culture=neutral, processorArchitecture=MSIL" Condition=" '$(Configuration)' == '2015'">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="HOK.Core, Version=2018.0.6436.17363, Culture=neutral, processorArchitecture=MSIL" Condition=" '$(Configuration)' == '2016'">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="HOK.Core, Version=2018.0.6436.17363, Culture=neutral, processorArchitecture=MSIL" Condition=" '$(Configuration)' == '2017'">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2017'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2017\HOK.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="HOK.Core, Version=2018.0.6436.17363, Culture=neutral, processorArchitecture=MSIL" Condition=" '$(Configuration)' == '2018'">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2018'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition=" '$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>

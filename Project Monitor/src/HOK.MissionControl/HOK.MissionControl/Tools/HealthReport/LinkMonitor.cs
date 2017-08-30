@@ -5,7 +5,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
-namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
+namespace HOK.MissionControl.Tools.HealthReport
 {
     public class LinkMonitor
     {
@@ -13,6 +13,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
         /// Publishes information about linked models/images/object styles in the model.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
+        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
         /// <param name="config">Configuration for the model.</param>
         /// <param name="project">Project for the model.</param>
         public static void PublishData(Document doc, string recordId, Configuration config, Project project)
@@ -24,6 +25,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                     .Cast<GraphicsStyle>()
                     .Where(x => x.GraphicsStyleCategory.Name.Contains(".dwg"))
                     .Select(x => x.GraphicsStyleCategory);
+
                 var totalDwgStyles = dwgStyles.Sum(x => x.SubCategories.Size);
 
                 var familyStyles = new FilteredElementCollector(doc)
@@ -48,6 +50,7 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                 var totalLinkedCad = new FilteredElementCollector(doc)
                     .OfClass(typeof(CADLinkType))
                     .GetElementCount();
+
                 var totalLinkedRvt = new FilteredElementCollector(doc)
                     .OfClass(typeof(RevitLinkType))
                     .GetElementCount();
@@ -56,11 +59,14 @@ namespace HOK.MissionControl.Tools.HealthReport.ObjectTrackers
                     .OfClass(typeof(CADLinkType))
                     .Select(x => new DwgFileInfo { name = x.Name, elementId = x.Id.IntegerValue })
                     .ToDictionary(key => key.elementId, value => value);
+
                 var totalImportInstance = 0;
                 foreach (var ii in new FilteredElementCollector(doc).OfClass(typeof(ImportInstance)))
                 {
                     totalImportInstance++;
                     var id = ii.GetTypeId().IntegerValue;
+                    if (!cadLinksDic.ContainsKey(id)) continue;
+
                     if (cadLinksDic[id].instances == 0)
                     {
                         cadLinksDic[id].isViewSpecific = ii.ViewSpecific;
