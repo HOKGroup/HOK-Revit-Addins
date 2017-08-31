@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
-using HOK.Core;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
 {
     public static class GridUtils
     {
         public static Dictionary<string/*centralPath*/, Dictionary<ElementId, Outline>> gridExtents = new Dictionary<string, Dictionary<ElementId, Outline>>();
-        public static Dictionary<string/*centralPath*/, List<ElementId>> gridParameters = new Dictionary<string, List<ElementId>>();
+        public static Dictionary<string/*centralPath*/, IEnumerable<ElementId>> gridParameters = new Dictionary<string, IEnumerable<ElementId>>();
 
         /// <summary>
         /// Updates all of the Grid Extents objects.
@@ -29,12 +27,14 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
                     .Cast<Grid>()
                     .ToList();
 
-                var paramIds = new List<ElementId>();
-                if (grids.Any())
-                {
-                    var firstGrid = grids.First();
-                    paramIds.AddRange(from Parameter param in firstGrid.Parameters select param.Id);
-                }
+                // (Konrad) We are only interested in watching editable parameters. There is no need to watch them all.
+                IEnumerable<ElementId> paramIds;
+                if (grids.Any()) paramIds = from Parameter param 
+                                            in grids.First().Parameters
+                                            where !param.IsReadOnly
+                                            select param.Id;
+                else return;
+
                 if (gridParameters.ContainsKey(centralPath))
                 {
                     gridParameters.Remove(centralPath);
@@ -49,6 +49,7 @@ namespace HOK.MissionControl.Tools.DTMTool.DTMUtils
                         extents.Add(grid.Id, grid.GetExtents());
                     }
                 }
+
                 if (gridExtents.ContainsKey(centralPath))
                 {
                     gridExtents.Remove(centralPath);

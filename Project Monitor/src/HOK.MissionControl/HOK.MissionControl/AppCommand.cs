@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,6 @@ using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Tools.SheetTracker;
 using HOK.MissionControl.Tools.SingleSession;
-using HOK.MissionControl.Tools.SharedParamMonitor;
 using HOK.MissionControl.Utils;
 using Autodesk.Revit.UI.Events;
 
@@ -39,6 +39,8 @@ namespace HOK.MissionControl
         public RevisionUpdater RevisionUpdaterInstance { get; set; }
         private const string tabName = "  HOK - Beta";
 
+        public static bool IsSynching { get; set; }
+
         /// <summary>
         /// Registers all event handlers during startup.
         /// </summary>
@@ -60,6 +62,7 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentClosing += OnDocumentClosing;
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
+                
 
                 // Create Communicator button and register dockable panel
                 RegisterCommunicator(application);
@@ -212,48 +215,53 @@ namespace HOK.MissionControl
                 SingleSessionMonitor.OpenedDocuments.Add(centralPath);
                 ApplyConfiguration(doc, currentConfig);
 
-                if (MonitorUtilities.IsUpdaterOn(currentProject, currentConfig,
-                    new Guid(Properties.Resources.SharedParameterTrackerGuid)))
+                // (Konrad) This tool will reset Shared Parameters Location to one specified in Mission Control
+                if (currentConfig.sharedParamMonitor.isMonitorOn)
                 {
-                    SharedParamMonitor.VerifySharedParamPath();
+                    if (File.Exists(currentConfig.sharedParamMonitor.filePath))
+                    {
+                        doc.Application.SharedParametersFilename = currentConfig.sharedParamMonitor.filePath;
+                    }
                 }
 
                 // (Konrad) It's possible that Health Report Document doesn't exist in database yet.
                 // Create it and set the reference to it in Project if that's the case.
-                if (!MonitorUtilities.IsUpdaterOn(currentProject, currentConfig, new Guid(Properties.Resources.HealthReportTrackerGuid))) return;
-
-                var refreshProject = false;
-                if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
+                if (MonitorUtilities.IsUpdaterOn(currentProject, currentConfig,
+                    new Guid(Properties.Resources.HealthReportTrackerGuid)))
                 {
-                    HrData = ServerUtilities.GetHealthRecordByCentralPath(centralPath);
-                    if (HrData == null)
+                    var refreshProject = false;
+                    if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
                     {
-                        HrData = ServerUtilities.PostDataScheme(new HealthReportData {centralPath = centralPath}, "healthrecords");
-                        ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
-                        refreshProject = true;
+                        HrData = ServerUtilities.GetHealthRecordByCentralPath(centralPath);
+                        if (HrData == null)
+                        {
+                            HrData = ServerUtilities.PostDataScheme(new HealthReportData { centralPath = centralPath }, "healthrecords");
+                            ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
+                            refreshProject = true;
+                        }
+                        if (HrData != null)
+                        {
+                            MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
+                            CommunicatorWindow.DataContext = new CommunicatorViewModel(HrData); // create new communicator VM
+                        }
                     }
-                    if (HrData != null)
+
+                    var recordId = MissionControlSetup.HealthRecordIds[centralPath];
+
+                    WorksetOpenSynch.PublishData(doc, recordId, currentConfig, currentProject, WorksetMonitorState.onopened);
+                    ModelMonitor.PublishModelSize(centralPath, recordId, currentConfig, currentProject);
+                    ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentOpened);
+                    if (OpenTime.ContainsKey("from"))
                     {
-                        MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
-                        CommunicatorWindow.DataContext = new CommunicatorViewModel(HrData); // create new communicator VM
+                        ModelMonitor.PublishOpenTime(recordId);
                     }
+
+                    if (!refreshProject) return;
+
+                    var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
+                    if (null == projectFound) return;
+                    MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
                 }
-
-                var recordId = MissionControlSetup.HealthRecordIds[centralPath];
-
-                WorksetOpenSynch.PublishData(doc, recordId, currentConfig, currentProject, WorksetMonitorState.onopened);
-                ModelMonitor.PublishModelSize(centralPath, recordId, currentConfig, currentProject);
-                ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentOpened);
-                if (OpenTime.ContainsKey("from"))
-                {
-                    ModelMonitor.PublishOpenTime(recordId);
-                }
-
-                if (!refreshProject) return;
-
-                var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
-                if (null == projectFound) return;
-                MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
             }
             catch (Exception ex)
             {
@@ -286,6 +294,7 @@ namespace HOK.MissionControl
         {
             try
             {
+                IsSynching = true;
                 FailureProcessor.IsSynchronizing = true;
                 if (args.Document == null) return;
 
@@ -314,6 +323,7 @@ namespace HOK.MissionControl
         {
             try
             {
+                IsSynching = false;
                 if (args.Document == null) return;
 
                 var centralPath = FileInfoUtil.GetCentralFilePath(args.Document);

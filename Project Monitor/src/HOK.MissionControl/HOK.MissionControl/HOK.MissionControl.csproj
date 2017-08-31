@@ -160,7 +160,6 @@
     </Compile>
     <Compile Include="Tools\DTMTool\ReportingElementInfo.cs" />
     <Compile Include="Tools\HealthReport\ModelMonitor.cs" />
-    <Compile Include="Tools\SharedParamMonitor\SharedParamMonitor.cs" />
     <Compile Include="Tools\SheetTracker\RevisionFailure.cs" />
     <Compile Include="Tools\SheetTracker\RevisionUpdater.cs" />
     <Compile Include="Tools\SingleSession\SingleSessionMonitor.cs" />
