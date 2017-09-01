@@ -221,6 +221,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\workset_32.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Tools\SingleSession\Images\singleSessionDialog_300.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo Signing...

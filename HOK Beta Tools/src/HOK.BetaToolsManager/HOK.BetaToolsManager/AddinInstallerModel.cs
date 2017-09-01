@@ -16,8 +16,8 @@ namespace HOK.BetaToolsManager
     public class AddinInstallerModel
     {
         public string VersionNumber { get; set; }
-        //public string BetaDirectory { get; set; } = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
-        public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\BetaFiles Testing\";
+        public string BetaDirectory { get; set; } = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
+        //public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\BetaFiles Testing\";
         public string InstallDirectory { get; set; }
         public string TempDirectory { get; set; }
         public string BetaTempDirectory { get; set; }

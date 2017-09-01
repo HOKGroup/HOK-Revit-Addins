@@ -3,10 +3,14 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Events;
+
 using HOK.Core.Utilities;
+using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
@@ -15,8 +19,6 @@ using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Tools.SheetTracker;
 using HOK.MissionControl.Tools.SingleSession;
-using HOK.MissionControl.Utils;
-using Autodesk.Revit.UI.Events;
 
 namespace HOK.MissionControl
 {
@@ -62,11 +64,12 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentClosing += OnDocumentClosing;
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
-                
 
-                // Create Communicator button and register dockable panel
+                // (Konrad) We need this to prevent DTM Tool from popping up when Reloading.
+                CreateReloadLatestOverride();
+
+                // Create Communicator button and register dockable panel.
                 RegisterCommunicator(application);
-
                 try
                 {
                     application.CreateRibbonTab(tabName);
@@ -124,7 +127,7 @@ namespace HOK.MissionControl
         /// <summary>
         /// Retrieves the configuration from Database.
         /// </summary>
-        private void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
+        private static void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
         {
             try
             {
@@ -215,15 +218,6 @@ namespace HOK.MissionControl
                 SingleSessionMonitor.OpenedDocuments.Add(centralPath);
                 ApplyConfiguration(doc, currentConfig);
 
-                // (Konrad) This tool will reset Shared Parameters Location to one specified in Mission Control
-                if (currentConfig.sharedParamMonitor.isMonitorOn)
-                {
-                    if (File.Exists(currentConfig.sharedParamMonitor.filePath))
-                    {
-                        doc.Application.SharedParametersFilename = currentConfig.sharedParamMonitor.filePath;
-                    }
-                }
-
                 // (Konrad) It's possible that Health Report Document doesn't exist in database yet.
                 // Create it and set the reference to it in Project if that's the case.
                 if (MonitorUtilities.IsUpdaterOn(currentProject, currentConfig,
@@ -262,6 +256,15 @@ namespace HOK.MissionControl
                     if (null == projectFound) return;
                     MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
                 }
+
+                // (Konrad) This tool will reset Shared Parameters Location to one specified in Mission Control
+                if (currentConfig.sharedParamMonitor.isMonitorOn)
+                {
+                    if (File.Exists(currentConfig.sharedParamMonitor.filePath))
+                    {
+                        doc.Application.SharedParametersFilename = currentConfig.sharedParamMonitor.filePath;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -290,11 +293,11 @@ namespace HOK.MissionControl
         /// <summary>
         /// Handler for Document Synchronizing event.
         /// </summary>
-        private void OnDocumentSynchronizing(object source, DocumentSynchronizingWithCentralEventArgs args)
+        private static void OnDocumentSynchronizing(object source, DocumentSynchronizingWithCentralEventArgs args)
         {
             try
             {
-                IsSynching = true;
+                IsSynching = true; // disables DTM Tool
                 FailureProcessor.IsSynchronizing = true;
                 if (args.Document == null) return;
 
@@ -302,7 +305,7 @@ namespace HOK.MissionControl
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 if (string.IsNullOrEmpty(centralPath)) return;
 
-                // (Konrad) Setup Workset Open Monitor
+                // (Konrad) Setup Health Report Monitor
                 if (!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
                 if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
                 var recordId = MissionControlSetup.HealthRecordIds[centralPath];
@@ -319,11 +322,11 @@ namespace HOK.MissionControl
         /// <summary>
         /// Document Synchronized handler.
         /// </summary>
-        private void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
+        private static void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
         {
             try
             {
-                IsSynching = false;
+                IsSynching = false; // enables DTM Tool again
                 if (args.Document == null) return;
 
                 var centralPath = FileInfoUtil.GetCentralFilePath(args.Document);
@@ -346,6 +349,40 @@ namespace HOK.MissionControl
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Replacement method for reloading latest which disables the DTM Tool.
+        /// </summary>
+        private static void OnReloadLatest(object sender, ExecutedEventArgs args)
+        {
+            // (Konrad) This will disable the DTM Tool when we are reloading latest.
+            IsSynching = true;
+
+            // (Konrad) Reloads Latest.
+            EnqueueTask(app =>
+            {
+                try
+                {
+                    var reloadOptions = new ReloadLatestOptions();
+                    var doc = app.ActiveUIDocument.Document;
+                    doc.ReloadLatest(reloadOptions);
+                    if (!doc.HasAllChangesFromCentral())
+                    {
+                        doc.ReloadLatest(reloadOptions);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                }
+            });
+
+            // (Konrad) Turns the DTM Tool back on when reload is done.
+            EnqueueTask(app =>
+            {
+                IsSynching = false;
+            });
         }
 
         /// <summary>
@@ -376,6 +413,28 @@ namespace HOK.MissionControl
                 dp.Show();
                 CommunicatorOnOff = true;
             }
+        }
+
+        /// <summary>
+        /// Creates an idling task that will bind our own Reload Latest command to existing one.
+        /// </summary>
+        private static void CreateReloadLatestOverride()
+        {
+            EnqueueTask(app =>
+            {
+                try
+                {
+                    var commandId = RevitCommandId.LookupCommandId("ID_WORKSETS_RELOAD_LATEST");
+                    if (commandId == null) return;
+
+                    var binding = app.CreateAddInCommandBinding(commandId);
+                    binding.Executed += OnReloadLatest;
+                }
+                catch (Exception e)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                }
+            });
         }
 
         /// <summary>

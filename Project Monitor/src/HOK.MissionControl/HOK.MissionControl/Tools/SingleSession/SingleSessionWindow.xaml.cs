@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
 using System.Windows.Input;
 
 namespace HOK.MissionControl.Tools.SingleSession
@@ -11,7 +12,7 @@ namespace HOK.MissionControl.Tools.SingleSession
         public SingleSessionWindow(string filePath)
         {
             InitializeComponent();
-            textBlockFile.Text = filePath + " will be closed.";
+            textBlockFile.Text = Path.GetFileNameWithoutExtension(filePath) + " will be closed.";
         }
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)
@@ -25,21 +26,19 @@ namespace HOK.MissionControl.Tools.SingleSession
             Close();
         }
 
-        private void PART_MAXIMIZE_RESTORE_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
-        }
+        //private void PART_MAXIMIZE_RESTORE_Click(object sender, RoutedEventArgs e)
+        //{
+        //    WindowState = WindowState == WindowState.Normal ? WindowState.Maximized : WindowState.Normal;
+        //}
 
-        private void PART_MINIMIZE_Click(object sender, RoutedEventArgs e)
-        {
-            WindowState = WindowState.Minimized;
-        }
+        //private void PART_MINIMIZE_Click(object sender, RoutedEventArgs e)
+        //{
+        //    WindowState = WindowState.Minimized;
+        //}
 
         private void PART_TITLEBAR_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DragMove();
         }
-
-        
     }
 }

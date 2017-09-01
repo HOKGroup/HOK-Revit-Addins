@@ -24,7 +24,6 @@ namespace HOK.MissionControl.Tools.Communicator
             {
                 app.PostCommand(addinId);
             });
-            
         }
     }
 }

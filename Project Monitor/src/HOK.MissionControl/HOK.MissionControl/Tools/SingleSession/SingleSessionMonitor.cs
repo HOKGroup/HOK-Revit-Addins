@@ -24,27 +24,20 @@ namespace HOK.MissionControl.Tools.SingleSession
             var cancel = false;
             try
             {
-                if (SingleSessionActivated && OpenedDocuments.Count > 0) { return true; }
+                if (SingleSessionActivated && OpenedDocuments.Count > 0) return true;
 
-                var updaterFound = config.updaters
-                    .Where(x => string.Equals(x.updaterId.ToLower(), UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    .ToList();
-                if (updaterFound.Any())
+                var ssUpdater = config.updaters.FirstOrDefault(x => string.Equals(x.updaterId.ToLower(), UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal));
+                if (ssUpdater == null || !ssUpdater.isUpdaterOn) return false;
+
+                if (OpenedDocuments.Count > 0)
                 {
-                    var ssUpdater = updaterFound.First();
-                    if (ssUpdater.isUpdaterOn)
-                    {
-                        if (OpenedDocuments.Count > 0)
-                        {
-                            cancel = true;
-                        }
-                        else
-                        {
-                            //first opening single file that will activate the single session
-                            SingleFile = centralFile;
-                            SingleSessionActivated = true;
-                        }
-                    }
+                    cancel = true;
+                }
+                else
+                {
+                    //first opening single file that will activate the single session
+                    SingleFile = centralFile;
+                    SingleSessionActivated = true;
                 }
             }
             catch (Exception ex)
