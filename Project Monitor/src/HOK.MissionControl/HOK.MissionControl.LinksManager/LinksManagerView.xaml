@@ -47,7 +47,7 @@
                 </Style>
             </TabControl.ItemContainerStyle>
         </TabControl>
-        <StatusBar Grid.Row="3" Height="23" HorizontalAlignment="Stretch" Margin="0,0,0,0" Name="statusBar" VerticalAlignment="Bottom">
+        <StatusBar Grid.Row="1" Height="23" HorizontalAlignment="Stretch" Margin="0,0,0,0" Name="statusBar" VerticalAlignment="Bottom">
             <StatusBar.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Grid>

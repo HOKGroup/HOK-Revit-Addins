@@ -32,8 +32,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <wpfUtilities:BooleanConverter x:Key="BooleanConverter"/>
-        <wpfUtilities:Boolean2Converter x:Key="Boolean2Converter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>

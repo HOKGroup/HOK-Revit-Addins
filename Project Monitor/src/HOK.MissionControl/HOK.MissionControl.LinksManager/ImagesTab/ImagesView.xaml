@@ -34,7 +34,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <wpfUtilities:BitmapConverter x:Key="BitmapConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.Resources>
@@ -84,15 +83,6 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <!--<DataGridTemplateColumn Header="Icon" 
-                                                Width="50">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Image Source="{Binding Image, Converter={StaticResource BitmapConverter}}" 
-                                           Height="36"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>-->
                         <DataGridTextColumn Header="File Path" 
                                             Binding="{Binding FilePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                             Width="*" 

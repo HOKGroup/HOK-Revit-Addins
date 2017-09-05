@@ -250,15 +250,16 @@ namespace HOK.MissionControl
                         ModelMonitor.PublishOpenTime(recordId);
                     }
 
-                    if (!refreshProject) return;
-
-                    var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
-                    if (null == projectFound) return;
-                    MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
+                    if (refreshProject)
+                    {
+                        var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
+                        if (null == projectFound) return;
+                        MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
+                    }
                 }
 
                 // (Konrad) This tool will reset Shared Parameters Location to one specified in Mission Control
-                if (currentConfig.sharedParamMonitor.isMonitorOn)
+                if (currentConfig.GetType().GetProperty("sharedParamMonitor") != null && currentConfig.sharedParamMonitor.isMonitorOn)
                 {
                     if (File.Exists(currentConfig.sharedParamMonitor.filePath))
                     {
