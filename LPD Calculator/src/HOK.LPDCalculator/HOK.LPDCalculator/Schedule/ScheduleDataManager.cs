@@ -157,7 +157,9 @@ namespace HOK.LPDCalculator.Schedule
                                 var fp = new FieldProperties
                                 {
                                     ColumnHeading = field.ColumnHeading,
+#if RELEASE2017 || RELEASE2018
                                     HasTotals = field.DisplayType == ScheduleFieldDisplayType.Totals,
+#endif
                                     IsHidden = field.IsHidden
                                 };
 #if RELEASE2017 || RELEASE2018

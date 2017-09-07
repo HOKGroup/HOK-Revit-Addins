@@ -160,10 +160,15 @@ goto exit
 
 :Build2016
 echo Copying results to Build2016
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.FamilyPublish"
 copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\ProgramData\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)RestSharp.dll" "C:\ProgramData\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2017

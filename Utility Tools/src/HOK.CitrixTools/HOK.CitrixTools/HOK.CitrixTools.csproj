@@ -173,8 +173,10 @@ goto exit
 
 :Build2016
 echo Copying results to Build2016
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.CitrixTools"
+copy /Y "$(TargetDir)HOK.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.CitrixTools"
+copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.CitrixTools"
+copy /Y "$(TargetDir)HOK.CitrixTools.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp"
 goto exit
 
 :Build2017

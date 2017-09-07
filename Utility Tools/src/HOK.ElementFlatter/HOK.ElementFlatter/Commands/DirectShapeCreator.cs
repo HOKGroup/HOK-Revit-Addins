@@ -101,7 +101,7 @@ namespace HOK.ElementFlatter.Commands
 #if RELEASE2017 || RELEASE2018
                             directShape = DirectShape.CreateElement(doc, element.Category.Id);
 #else
-                            directShape = DirectShape.CreateElement(doc, element.Category.Id, appGUID, appDataGUID);
+                            directShape = DirectShape.CreateElement(doc, element.Category.Id, appDataGUID, appDataGUID);
 #endif
                             directShape.SetShape(shapeGeometries);
                         }

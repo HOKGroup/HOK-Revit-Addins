@@ -103,6 +103,12 @@ namespace HOK.MissionControl.Core.Schemas
         public long sizeValue { get; set; }
         public int instances { get; set; }
         public int elementId { get; set; }
+
+        public int refPlaneCount { get; set; }
+        public int arrayCount { get; set; }
+        public int voidCount { get; set; }
+        public int nestedFamilyCount { get; set; }
+        public int parametersCount { get; set; }
     }
 
     public class FamilyStat

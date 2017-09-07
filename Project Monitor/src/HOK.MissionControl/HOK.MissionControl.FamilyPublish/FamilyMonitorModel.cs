@@ -68,6 +68,33 @@ namespace HOK.MissionControl.FamilyPublish
                     {
                         long size;
                         var famDoc = Doc.EditFamily(family);
+
+                        var refPlanes = new FilteredElementCollector(famDoc)
+                            .OfClass(typeof(ReferencePlane))
+                            .GetElementCount();
+
+                        var filter = new LogicalAndFilter(new List<ElementFilter>
+                        {
+                            new ElementClassFilter(typeof(LinearArray)),
+                            new ElementClassFilter(typeof(RadialArray))
+                        });
+                        var arrays = new FilteredElementCollector(famDoc)
+                            .WherePasses(filter)
+                            .GetElementCount();
+
+                        var voids = new FilteredElementCollector(famDoc)
+                            .OfClass(typeof(Extrusion))
+                            .Cast<Extrusion>()
+                            .Count(x => !x.IsSolid);
+
+                        var nestedFamilies = new FilteredElementCollector(famDoc)
+                            .OfClass(typeof(Family))
+                            .GetElementCount();
+
+                        var parameters = new FilteredElementCollector(famDoc)
+                            .OfClass(typeof(ParameterElement))
+                            .GetElementCount();
+
                         var storedPath = famDoc.PathName;
                         if (File.Exists(storedPath))
                         {
@@ -102,7 +129,13 @@ namespace HOK.MissionControl.FamilyPublish
                                 elementId = family.Id.IntegerValue,
                                 size = sizeStr,
                                 sizeValue = size,
-                                instances = instances
+                                instances = instances,
+
+                                arrayCount = arrays,
+                                refPlaneCount = refPlanes,
+                                voidCount = voids,
+                                nestedFamilyCount = nestedFamilies,
+                                parametersCount = parameters
                             };
 
                             suspectFamilies.Add(famItem);

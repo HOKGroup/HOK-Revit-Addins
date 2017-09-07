@@ -93,13 +93,7 @@ namespace HOK.ViewAnalysis
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
-            var addinInfo = new AddinLog
-            {
-                pluginName = "ViewAnalysis-LEED Analysis",
-                user = Environment.UserName,
-                revitVersion = BasicFileInfo.Extract(m_doc.PathName).SavedInVersion
-            };
-            AddinUtilities.PublishAddinLog(addinInfo);
+            AddinUtilities.PublishAddinLog(new AddinLog("ViewAnalysis-LEED Analysis", commandData.Application.Application.VersionNumber));
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;

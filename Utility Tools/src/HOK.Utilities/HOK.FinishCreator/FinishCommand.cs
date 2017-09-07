@@ -30,7 +30,7 @@ namespace HOK.FinishCreator
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
-                AddinUtilities.PublishAddinLog(new AddinLog("Utilities-FinishCreator", m_doc));
+                AddinUtilities.PublishAddinLog(new AddinLog("Utilities-FinishCreator", commandData.Application.Application.VersionNumber));
 
                 var uidoc = m_app.ActiveUIDocument;
                 var title = "Finish Creator v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;

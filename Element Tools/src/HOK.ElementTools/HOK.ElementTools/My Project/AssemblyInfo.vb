@@ -13,7 +13,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyCompany("HOK")> 
 <Assembly: AssemblyProduct("HOK.ElementTools")> 
 <Assembly: AssemblyCopyright("Copyright © HOK 2014")> 
-<Assembly: AssemblyTrademark("Don Rudder, SF BIM Manager")> 
+<Assembly: AssemblyTrademark("Don Rudder, Jinsol Kim, Konrad K Sobon")> 
 
 <Assembly: ComVisible(False)>
 
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("2017.0.0.1")> 
-<Assembly: AssemblyFileVersion("2017.0.0.1")> 
+<Assembly: AssemblyVersion("2018.0.0.1")> 
+<Assembly: AssemblyFileVersion("2018.0.0.1")> 

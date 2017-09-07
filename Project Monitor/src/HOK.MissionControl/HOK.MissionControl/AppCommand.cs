@@ -3,12 +3,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas;
@@ -85,7 +83,7 @@ namespace HOK.MissionControl
                             ?? application.CreateRibbonPanel(tabName, "Mission Control");
                 var button = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
                     currentAssembly, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
-                button.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl", "workset_32.png");
+                button.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl", "communicator_32x32.png");
             }
             catch (Exception ex)
             {

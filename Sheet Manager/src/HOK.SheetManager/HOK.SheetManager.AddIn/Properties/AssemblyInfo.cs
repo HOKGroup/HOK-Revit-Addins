@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.SheetManager.AddIn")]
 [assembly: AssemblyCopyright("Copyright © HOK Group 2016")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

@@ -24,7 +24,7 @@ namespace HOK.LPDCalculator
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
-            AddinUtilities.PublishAddinLog(new AddinLog("ViewAnalysis-LPD Analysis", m_doc));
+            AddinUtilities.PublishAddinLog(new AddinLog("ViewAnalysis-LPD Analysis", m_app.Application.VersionNumber));
 
             var docPath = RevitDocument.GetCentralPath(m_doc);
             if (!string.IsNullOrEmpty(docPath))

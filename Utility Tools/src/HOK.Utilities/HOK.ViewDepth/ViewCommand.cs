@@ -23,7 +23,7 @@ namespace HOK.ViewDepth
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
-            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-ViewDepth", m_doc));
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-ViewDepth", commandData.Application.Application.VersionNumber));
 
             var overrideViewDepth = new OverrideViewDepth(m_app);
 

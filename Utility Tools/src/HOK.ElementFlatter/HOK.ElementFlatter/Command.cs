@@ -11,17 +11,15 @@ namespace HOK.ElementFlatter
     public class Command : IExternalCommand
     {
         private UIApplication m_app;
-        private Document m_doc;
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             m_app = commandData.Application;
-            m_doc = m_app.ActiveUIDocument.Document;
             Log.AppendLog(LogMessageType.INFO, "Started.");
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
-            AddinUtilities.PublishAddinLog(new AddinLog("ElementFlatter", m_doc));
+            AddinUtilities.PublishAddinLog(new AddinLog("ElementFlatter", m_app.Application.VersionNumber));
 
             var viewModel = new CommandViewModel(m_app);
 

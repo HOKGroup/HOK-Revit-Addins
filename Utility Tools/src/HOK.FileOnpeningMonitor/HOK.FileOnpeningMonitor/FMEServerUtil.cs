@@ -69,9 +69,9 @@ namespace HOK.FileOnpeningMonitor
                 fmeServerSession = FMEServer.CreateServerSession();
 
                 var connectInfo = fmeServerSession.CreateServerConnectionInfo(host, port, userId, password);
-                IDictionary<string, string> directives = new Dictionary<string, string>();
-                directives.Add("CLIENT_ID", clientId);
-                fmeServerSession.Init(connectInfo, directives);
+                //IDictionary<string, string> directives = new Dictionary<string, string>();
+                //directives.Add("CLIENT_ID", clientId);
+                fmeServerSession.Init(connectInfo, null);
 
                 repositoryMgr = fmeServerSession.GetRepositoryManager();
             }

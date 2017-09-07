@@ -321,7 +321,7 @@ namespace HOK.ViewAnalysis
 #if RELEASE2017
             BoundaryCurve = segment.GetCurve();
 #else
-            boundaryCurve = segment.Curve;
+            BoundaryCurve = segment.Curve;
 #endif
 
 #if RELEASE2015

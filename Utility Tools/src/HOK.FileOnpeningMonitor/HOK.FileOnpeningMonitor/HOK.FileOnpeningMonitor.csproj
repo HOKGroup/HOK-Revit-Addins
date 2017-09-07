@@ -67,7 +67,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="fmeserverapidotnet">
+    <Reference Include="fmeserverapidotnet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\FMEServer\Server\sdk\dotnet\fmeserverapidotnet.dll</HintPath>
     </Reference>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
@@ -211,9 +212,9 @@ goto exit
 
 :Build2016
 echo Copying results to Build2016
-if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)HOK.ElementMover.addin" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016"
+xcopy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents\"
+xcopy /Y "$(TargetDir)fmeserverapidotnet.dll" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents\"
+xcopy /Y "$(TargetDir)HOK.FileOpeningMonitor.addin" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\"
 goto exit
 
 :Build2017
