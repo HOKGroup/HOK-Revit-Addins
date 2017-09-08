@@ -15,8 +15,8 @@ using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
+using HOK.MissionControl.Tools.LinkUnloadMonitor;
 using HOK.MissionControl.Tools.SheetTracker;
-using HOK.MissionControl.Tools.SingleSession;
 
 namespace HOK.MissionControl
 {
@@ -37,8 +37,8 @@ namespace HOK.MissionControl
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
         public RevisionUpdater RevisionUpdaterInstance { get; set; }
+        public LinkUnloadMonitor LinkUnloadInstance { get; set; }
         private const string tabName = "  HOK - Beta";
-
         public static bool IsSynching { get; set; }
 
         /// <summary>
@@ -53,6 +53,7 @@ namespace HOK.MissionControl
                 DoorUpdaterInstance = new DoorUpdater(appId);
                 DtmUpdaterInstance = new DtmUpdater(appId);
                 RevisionUpdaterInstance = new RevisionUpdater(appId);
+                LinkUnloadInstance = new LinkUnloadMonitor();
                 Tasks = new Queue<Action<UIApplication>>();
 
                 application.Idling += OnIdling;
@@ -63,10 +64,7 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
 
-                // (Konrad) We need this to prevent DTM Tool from popping up when Reloading.
-                CreateReloadLatestOverride();
-
-                // Create Communicator button and register dockable panel.
+                // (Konrad) Create Communicator button and register dockable panel.
                 RegisterCommunicator(application);
                 try
                 {
@@ -90,21 +88,6 @@ namespace HOK.MissionControl
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return Result.Succeeded;
-        }
-
-        /// <summary>
-        /// Handled Idling events. Currently Communicator uses it to interact with Revit.
-        /// </summary>
-        private static void OnIdling(object sender, IdlingEventArgs e)
-        {
-            var app = (UIApplication)sender;
-            lock (Tasks)
-            {
-                if (Tasks.Count <= 0) return;
-
-                var task = Tasks.Dequeue();
-                task(app);
-            }
         }
 
         /// <summary>
@@ -142,21 +125,6 @@ namespace HOK.MissionControl
                 var configFound = ServerUtilities.GetConfigurationByCentralPath(centralPath);
                 if (null != configFound)
                 {
-                    //check if the single session should be activated
-                    if (SingleSessionMonitor.CancelOpening(centralPath, configFound))
-                    {
-                        if (args.Cancellable)
-                        {
-                            var ssWindow = new SingleSessionWindow(centralPath);
-                            var o = ssWindow.ShowDialog();
-                            if (o != null && (bool)o)
-                            {
-                                args.Cancel();
-                                return;
-                            }
-                        }
-                    }
-
                     if (MissionControlSetup.Configurations.ContainsKey(centralPath))
                     {
                         MissionControlSetup.Configurations.Remove(centralPath);
@@ -174,18 +142,6 @@ namespace HOK.MissionControl
                     }
 
                     OpenTime["from"] = DateTime.Now;
-                }
-                else
-                {
-                    //not a seed file, just check if the single session is activated
-                    if (!SingleSessionMonitor.SingleSessionActivated) return;
-
-                    var ssWindow = new SingleSessionWindow(centralPath);
-                    var o = ssWindow.ShowDialog();
-                    if (o != null && (bool)o)
-                    {
-                        args.Cancel();
-                    }
                 }
             }
             catch (Exception ex)
@@ -213,7 +169,6 @@ namespace HOK.MissionControl
                 var currentProject = MissionControlSetup.Projects[centralPath];
 
                 // (Konrad) Register Updaters that are in the config file.
-                SingleSessionMonitor.OpenedDocuments.Add(centralPath);
                 ApplyConfiguration(doc, currentConfig);
 
                 // (Konrad) It's possible that Health Report Document doesn't exist in database yet.
@@ -351,9 +306,25 @@ namespace HOK.MissionControl
         }
 
         /// <summary>
+        /// Handled Idling events. Currently Communicator uses it to interact with Revit.
+        /// It checks a queue for any outstanding tasks and executes them.
+        /// </summary>
+        private static void OnIdling(object sender, IdlingEventArgs e)
+        {
+            var app = (UIApplication)sender;
+            lock (Tasks)
+            {
+                if (Tasks.Count <= 0) return;
+
+                var task = Tasks.Dequeue();
+                task(app);
+            }
+        }
+
+        /// <summary>
         /// Replacement method for reloading latest which disables the DTM Tool.
         /// </summary>
-        private static void OnReloadLatest(object sender, ExecutedEventArgs args)
+        public static void OnReloadLatest(object sender, ExecutedEventArgs args)
         {
             // (Konrad) This will disable the DTM Tool when we are reloading latest.
             IsSynching = true;
@@ -382,6 +353,16 @@ namespace HOK.MissionControl
             {
                 IsSynching = false;
             });
+        }
+        
+        /// <summary>
+        /// Removes ability to Unload a link for All Users.
+        /// </summary>
+        public static void OnUnloadForAllUsers(object sender, ExecutedEventArgs args)
+        {
+            var ssWindow = new LinkUnloadMonitorView();
+            var o = ssWindow.ShowDialog();
+            if(o != null && ssWindow.IsActive) ssWindow.Close();
         }
 
         /// <summary>
@@ -415,38 +396,14 @@ namespace HOK.MissionControl
         }
 
         /// <summary>
-        /// Creates an idling task that will bind our own Reload Latest command to existing one.
-        /// </summary>
-        private static void CreateReloadLatestOverride()
-        {
-            EnqueueTask(app =>
-            {
-                try
-                {
-                    var commandId = RevitCommandId.LookupCommandId("ID_WORKSETS_RELOAD_LATEST");
-                    if (commandId == null) return;
-
-                    var binding = app.CreateAddInCommandBinding(commandId);
-                    binding.Executed += OnReloadLatest;
-                }
-                catch (Exception e)
-                {
-                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-                }
-            });
-        }
-
-        /// <summary>
         /// Registers Communicator Dockable Panel.
         /// </summary>
         /// <param name="application">UIControlledApp</param>
         private void RegisterCommunicator(UIControlledApplication application)
         {
-            // Create View
             var view = new CommunicatorView();
             CommunicatorWindow = view;
 
-            // Create Dockable Pane
             var unused = new DockablePaneProviderData
             {
                 FrameworkElement = CommunicatorWindow,
@@ -457,7 +414,6 @@ namespace HOK.MissionControl
                 }
             };
 
-            // Register Dockable Pane
             var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
             application.RegisterDockablePane(dpid, "Mission Control", CommunicatorWindow);
         }
@@ -496,11 +452,17 @@ namespace HOK.MissionControl
                         DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         DtmUpdaterInstance.Register(doc, updater);
+                        DtmUpdaterInstance.CreateReloadLatestOverride();
                     }
                     else if (string.Equals(updater.updaterId.ToLower(),
                         RevisionUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         RevisionUpdaterInstance.Register(doc, updater);
+                    }
+                    else if (string.Equals(updater.updaterId.ToLower(),
+                        LinkUnloadInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    {
+                        LinkUnloadInstance.CreateLinkUnloadOverride();
                     }
                 }
             }
@@ -518,8 +480,6 @@ namespace HOK.MissionControl
         {
             var centralPath = FileInfoUtil.GetCentralFilePath(doc);
             if (string.IsNullOrEmpty(centralPath)) return;
-
-            SingleSessionMonitor.CloseFile(centralPath);
             if (!MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
 
             var currentConfig = MissionControlSetup.Configurations[centralPath];

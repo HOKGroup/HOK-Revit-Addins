@@ -1,18 +1,18 @@
-﻿using System.IO;
+﻿using System.Reflection;
 using System.Windows;
 using System.Windows.Input;
 
-namespace HOK.MissionControl.Tools.SingleSession
+namespace HOK.MissionControl.Tools.LinkUnloadMonitor
 {
     /// <summary>
-    /// Interaction logic for SingleSessionWindow.xaml
+    /// Interaction logic for LinkUnloadMonitorView.xaml
     /// </summary>
-    public partial class SingleSessionWindow
+    public partial class LinkUnloadMonitorView
     {
-        public SingleSessionWindow(string filePath)
+        public LinkUnloadMonitorView()
         {
             InitializeComponent();
-            textBlockFile.Text = Path.GetFileNameWithoutExtension(filePath) + " will be closed.";
+            Title = "Link Unload Monitor v." + Assembly.GetExecutingAssembly().GetName().Version;
         }
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)

@@ -1,10 +1,9 @@
-﻿<Window x:Class="HOK.MissionControl.Tools.SingleSession.SingleSessionWindow"
+﻿<Window x:Class="HOK.MissionControl.Tools.LinkUnloadMonitor.LinkUnloadMonitorView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         mc:Ignorable="d" 
-        Title="Single Session Monitor"
         Height="500" Width="500" MinHeight="500" MaxHeight="500" MinWidth="500" MaxWidth="500" 
         Style="{DynamicResource MetroWindowStyle}" WindowStartupLocation="CenterScreen" >
     <Window.Resources>
@@ -136,8 +135,10 @@
                    VerticalAlignment="Bottom" 
                    FontWeight="Bold"
                    FontSize="18" 
-                   Foreground="#FF767474">Only one workshared file can be opened per session.</TextBlock>
+                   Foreground="#FF767474">SORRY, YOU CAN'T DO THAT!</TextBlock>
         <TextBlock FontSize="14" 
+                   TextAlignment="Center"
+                   Text="This would cause the Link to be Unloaded for ALL USERS. Instead please close the Workset that Link is on. That will unload it safely."
                    x:Name="textBlockFile" 
                    Foreground="#FF383737" 
                    Grid.Row="1" 

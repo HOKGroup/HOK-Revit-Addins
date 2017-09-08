@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Tools.DTMTool.DTMUtils;
@@ -393,6 +394,28 @@ namespace HOK.MissionControl.Tools.DTMTool
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Creates an idling task that will bind our own Reload Latest command to existing one.
+        /// </summary>
+        public void CreateReloadLatestOverride()
+        {
+            AppCommand.EnqueueTask(app =>
+            {
+                try
+                {
+                    var commandId = RevitCommandId.LookupCommandId("ID_WORKSETS_RELOAD_LATEST");
+                    if (commandId == null || !commandId.CanHaveBinding) return;
+
+                    var binding = app.CreateAddInCommandBinding(commandId);
+                    binding.Executed += AppCommand.OnReloadLatest;
+                }
+                catch (Exception e)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                }
+            });
         }
 
         public string GetAdditionalInformation()

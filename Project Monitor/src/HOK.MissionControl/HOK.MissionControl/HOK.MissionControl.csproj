@@ -162,9 +162,9 @@
     <Compile Include="Tools\HealthReport\ModelMonitor.cs" />
     <Compile Include="Tools\SheetTracker\RevisionFailure.cs" />
     <Compile Include="Tools\SheetTracker\RevisionUpdater.cs" />
-    <Compile Include="Tools\SingleSession\SingleSessionMonitor.cs" />
-    <Compile Include="Tools\SingleSession\SingleSessionWindow.xaml.cs">
-      <DependentUpon>SingleSessionWindow.xaml</DependentUpon>
+    <Compile Include="Tools\LinkUnloadMonitor\LinkUnloadMonitor.cs" />
+    <Compile Include="Tools\LinkUnloadMonitor\LinkUnloadMonitorView.xaml.cs">
+      <DependentUpon>LinkUnloadMonitorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\HealthReport\LinkMonitor.cs" />
     <Compile Include="Tools\HealthReport\ViewMonitor.cs" />
@@ -192,7 +192,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Tools\SingleSession\SingleSessionWindow.xaml">
+    <Page Include="Tools\LinkUnloadMonitor\LinkUnloadMonitorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -202,9 +202,6 @@
       <Project>{09fda7ee-7a4b-4d34-8b22-4ce0af04cce0}</Project>
       <Name>HOK.MissionControl.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Tools\SingleSession\Images\open-box.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -219,7 +216,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Tools\SingleSession\Images\singleSessionDialog_300.png" />
+    <Resource Include="Tools\LinkUnloadMonitor\Images\singleSessionDialog_300.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\communicator_32x32.png" />
