@@ -181,6 +181,8 @@ namespace HOK.BetaToolsManager
 
             if (betaTemp2 != string.Empty)
             {
+                var availableAddins = Directory.GetFiles(betaTemp2, "*.addin");
+
                 if (!Directory.Exists(TempDirectory))
                     Directory.CreateDirectory(TempDirectory);
 
@@ -189,8 +191,11 @@ namespace HOK.BetaToolsManager
                 if (Directory.Exists(BetaDirectory))
                     CopyIfNewer(BetaTempDirectory, TempDirectory);
 
+                // Cleans any holdovers from old beta addins
+                RemoveLegacyPlugins(availableAddins);
+
                 // (Konrad) Get all addins from beta directory, check their versions agains installed
-                foreach (var file in Directory.GetFiles(betaTemp2, "*.addin"))
+                foreach (var file in availableAddins)
                 {
                     var dllRelativePath = ParseXml(file); // relative to temp
                     var dllPath = betaTemp2 + dllRelativePath;
@@ -304,6 +309,35 @@ namespace HOK.BetaToolsManager
             }
             var output = new ObservableCollection<AddinWrapper>(dic.Values.ToList().OrderBy(x => x.Name));
             Addins = output;
+        }
+
+        /// <summary>
+        /// In case that we discontinued some Beta Plugin, or moved it to ProgramData, it's possible for some *.addin
+        /// files to remain behind on user machines. It's best to remove them, to prevent any potential load errors.
+        /// </summary>
+        /// <param name="availableAddins">An array of *.addin files that are available to be installed in Temp folder.</param>
+        private void RemoveLegacyPlugins(string[] availableAddins)
+        {
+            var availableFileNames = availableAddins.Select(Path.GetFileName).ToList();
+            var installedAddins = Directory.GetFiles(InstallDirectory, "*.addin");
+            foreach (var installedAddin in installedAddins)
+            {
+                var fileName = Path.GetFileName(installedAddin);
+                if (fileName != null && fileName.StartsWith("HOK.") && !availableFileNames.Contains(fileName))
+                {
+                    var dllPath = ParseXml(installedAddin);
+                    var folder = Path.GetDirectoryName(dllPath);
+                    try
+                    {
+                        if (folder != null) Directory.Delete(Path.Combine(InstallDirectory, folder), true);
+                        File.Delete(installedAddin);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                    }
+                }
+            }
         }
 
         /// <summary>
