@@ -17,6 +17,7 @@ namespace HOK.BetaToolsManager
     {
         public string VersionNumber { get; set; }
         //public string BetaDirectory { get; set; } = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
+        //public string BetaDirectory { get; set; } = @"\\group\sysvol\group.hok.com\HOK\Tools\Revit\";
         public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\BetaFiles Testing\";
         public string InstallDirectory { get; set; }
         public string TempDirectory { get; set; }
@@ -89,8 +90,9 @@ namespace HOK.BetaToolsManager
             {
                 if (!addin.IsSelected) continue;
 
-                // (Konrad) Bind button to Temp directory dll
-                if (string.IsNullOrEmpty(addin.Panel))
+                // (Konrad) Currently the only way to distinguish between ExternalCommands and ExternalApplications
+                // is via "ButtonText" attribute. It should be empty for ExternalApplications. 
+                if (string.IsNullOrEmpty(addin.ButtonText))
                 {
                     // no UI addin
                     // move the addin file
@@ -120,6 +122,23 @@ namespace HOK.BetaToolsManager
                         CopyIfNewer(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                     }
+
+                    var app = AppCommand.Instance.m_app;
+                    var panel = app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel);
+
+                    if (panel != null && addin.AdditionalButtonNames != null)
+                    {
+                        var splits = addin.AdditionalButtonNames.Split(';');
+                        foreach (var name in splits)
+                        {
+                            var button = panel.GetItems().FirstOrDefault(x => x.Name == name);
+                            if (button != null)
+                            {
+                                button.Enabled = false;
+                                panel.Visible = panel.GetItems().Any(x => x.Visible);
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -129,6 +148,7 @@ namespace HOK.BetaToolsManager
                     if (button != null)
                     {
                         button.Visible = true;
+                        button.Enabled = false;
                         panel.Visible = panel.GetItems().Any(x => x.Visible);
                         ((PushButton)button).AssemblyName = InstallDirectory + addin.DllRelativePath;
                     }
@@ -192,17 +212,14 @@ namespace HOK.BetaToolsManager
                                                         x.GetInterface("IExternalApplication") != null)))
                     {
                         MemberInfo info = t;
-                        var nameAttr = (NameAttribute) info.GetCustomAttributes(typeof(NameAttribute), true)
-                            .FirstOrDefault();
-                        var descAttr = (DescriptionAttribute) t.GetCustomAttributes(typeof(DescriptionAttribute), true)
-                            .FirstOrDefault();
-                        var imageAttr = (ImageAttribute) t.GetCustomAttributes(typeof(ImageAttribute), true)
-                            .FirstOrDefault();
-                        var namespaceAttr = (NamespaceAttribute) t.GetCustomAttributes(typeof(NamespaceAttribute), true)
-                            .FirstOrDefault();
+                        var nameAttr = (NameAttribute) info.GetCustomAttributes(typeof(NameAttribute), true).FirstOrDefault();
+                        var descAttr = (DescriptionAttribute) t.GetCustomAttributes(typeof(DescriptionAttribute), true).FirstOrDefault();
+                        var imageAttr = (ImageAttribute) t.GetCustomAttributes(typeof(ImageAttribute), true).FirstOrDefault();
+                        var namespaceAttr = (NamespaceAttribute) t.GetCustomAttributes(typeof(NamespaceAttribute), true).FirstOrDefault();
+                        var panelNameAttr = (PanelNameAttribute) t.GetCustomAttributes(typeof(PanelNameAttribute), true).FirstOrDefault();
 
                         if (nameAttr == null || descAttr == null || imageAttr == null ||
-                            namespaceAttr == null) continue;
+                            namespaceAttr == null || panelNameAttr == null) continue;
 
                         var bitmap =
                             (BitmapSource) ButtonUtil.LoadBitmapImage(assembly, namespaceAttr.Namespace,
@@ -260,7 +277,8 @@ namespace HOK.BetaToolsManager
                             BetaResourcesPath = Path.GetDirectoryName(dllPath),
                             AddinFilePath = file,
                             DllRelativePath = dllRelativePath,
-                            AutoUpdate = autoUpdate
+                            AutoUpdate = autoUpdate,
+                            Panel = panelNameAttr.PanelName
                         };
 
                         if (t.GetInterface("IExternalCommand") != null)
@@ -268,12 +286,16 @@ namespace HOK.BetaToolsManager
                             var buttonTextAttr =
                                 (ButtonTextAttribute) t.GetCustomAttributes(typeof(ButtonTextAttribute), true)
                                     .FirstOrDefault();
-                            var panelNameAttr =
-                                (PanelNameAttribute) t.GetCustomAttributes(typeof(PanelNameAttribute), true)
-                                    .FirstOrDefault();
-
-                            aw.Panel = panelNameAttr?.PanelName;
+                            
                             aw.ButtonText = buttonTextAttr?.ButtonText;
+                        }
+                        else
+                        {
+                            var additionalButtonNamesAttr = (AdditionalButtonNamesAttribute) t
+                                .GetCustomAttributes(typeof(AdditionalButtonNamesAttribute), true)
+                                .FirstOrDefault();
+
+                            aw.AdditionalButtonNames = additionalButtonNamesAttr?.AdditionalNames;
                         }
 
                         dic.Add(aw.Name, aw);

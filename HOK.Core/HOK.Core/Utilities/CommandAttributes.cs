@@ -77,21 +77,21 @@ namespace HOK.Core.Utilities
             Namespace = value;
         }
     }
+    
+    /// <summary>
+    /// Fully qualified name of the Namespace that Resource folder is in. Usually main class namespace.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class AdditionalButtonNamesAttribute : Attribute
+    {
+        public string AdditionalNames { get; protected set; }
 
-    ///// <summary>
-    ///// Name of the *.addin manifest file that this addin goes with.
-    ///// </summary>
-    //[AttributeUsage(AttributeTargets.Class)]
-    //public class AddinNameAttribute : Attribute
-    //{
-    //    public string AddinName { get; protected set; }
-
-    //    public AddinNameAttribute(string resourceName, Type resourceType)
-    //    {
-    //        var value = ResourceHelper.GetResourceLookup<string>(resourceType, resourceName);
-    //        AddinName = value;
-    //    }
-    //}
+        public AdditionalButtonNamesAttribute(string resourceName, Type resourceType)
+        {
+            var value = ResourceHelper.GetResourceLookup<string>(resourceType, resourceName);
+            AdditionalNames = value;
+        }
+    }
 
     /// <summary>
     /// Name of the Icon image resource. Has to be of Embedded Resource type, and NOT loaded via resex.

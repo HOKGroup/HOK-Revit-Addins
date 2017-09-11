@@ -88,6 +88,15 @@ namespace HOK.MissionControl.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Communicator_Command.
+        /// </summary>
+        internal static string MissionControl_AdditionalButtons {
+            get {
+                return ResourceManager.GetString("MissionControl_AdditionalButtons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This plug-in allows Design Technology Group to collect valuable information about the model and its contents that are then reported back to the user via online dashboard..
         /// </summary>
         internal static string MissionControl_Desc {
@@ -120,6 +129,15 @@ namespace HOK.MissionControl.Properties {
         internal static string MissionControl_Namespace {
             get {
                 return ResourceManager.GetString("MissionControl_Namespace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mission Control.
+        /// </summary>
+        internal static string MissionControl_PanelName {
+            get {
+                return ResourceManager.GetString("MissionControl_PanelName", resourceCulture);
             }
         }
         

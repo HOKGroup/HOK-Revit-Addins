@@ -33,12 +33,13 @@ namespace HOK.BetaToolsManager
                 Log.AppendLog(LogMessageType.WARNING, "Ribbon tab was not created. It might already exist.");
             }
             
+            var panelsVisibility = new Dictionary<string, bool>();
             ViewModel = new AddinInstallerModel(versionNumber);
-            var addins = ViewModel.Addins;
-
-            foreach (var addin in addins)
+            foreach (var addin in ViewModel.Addins)
             {
-                if (string.IsNullOrEmpty(addin.Panel))
+                // (Konrad) Currently the only way to distinguish between ExternalCommands and ExternalApplications
+                // is via "ButtonText" attribute. It should be empty for ExternalApplications. 
+                if (string.IsNullOrEmpty(addin.ButtonText))
                 {
                     if (addin.IsInstalled)
                     {
@@ -55,6 +56,12 @@ namespace HOK.BetaToolsManager
                         }
                         File.Copy(ViewModel.TempDirectory + Path.GetFileName(addin.AddinFilePath), ViewModel.InstallDirectory + Path.GetFileName(addin.AddinFilePath));
                     }
+
+                    if (addin.AdditionalButtonNames != null)
+                    {
+                        panelsVisibility.Add(addin.Panel, true);
+                    }
+
                     continue;
                 }
 
@@ -73,7 +80,15 @@ namespace HOK.BetaToolsManager
                 button.ToolTip = addin.Description;
 
                 button.Visible = addin.IsInstalled;
-                panel.Visible = panel.GetItems().Any(x => x.Visible);
+
+                if (panelsVisibility.ContainsKey(addin.Panel))
+                {
+                    if (panelsVisibility[addin.Panel]) panel.Visible = true;
+                }
+                else
+                {
+                    panel.Visible = panel.GetItems().Any(x => x.Visible);
+                }
             }
 
             currentAssembly = Assembly.GetAssembly(GetType()).Location;

@@ -18,6 +18,7 @@ namespace HOK.Core.Utilities
         public string DllRelativePath { get; set; } // used to check if addin is installed and to track main DLL for each addin
         public string CommandNamespace { get; set; } // used to create ribbon button
         public bool IsInstalled { get; set; } // indicates if addin is installed on user computer by checking if dll exists in directory
+        public string AdditionalButtonNames { get; set; } // external applications might be creating extra buttons, these are their names ";" separated
 
         [JsonIgnore]
         public BitmapSource Image { get; set; } // used be the datagrid

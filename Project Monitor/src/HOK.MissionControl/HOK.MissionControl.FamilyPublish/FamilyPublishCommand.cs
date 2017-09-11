@@ -129,13 +129,13 @@ namespace HOK.MissionControl.FamilyPublish
         /// <summary>
         /// Error handler for "Constraints are not satisfied" that pops up frequently w/ Families.
         /// </summary>
-        private void FailureProcessing(object sender, FailuresProcessingEventArgs args)
+        private static void FailureProcessing(object sender, FailuresProcessingEventArgs args)
         {
             var fa = args.GetFailuresAccessor();
             var a = fa.GetFailureMessages();
-            int count = 0;
+            var count = 0;
 
-            foreach (FailureMessageAccessor failure in a)
+            foreach (var failure in a)
             {
                 fa.ResolveFailure(failure);
                 count++;
