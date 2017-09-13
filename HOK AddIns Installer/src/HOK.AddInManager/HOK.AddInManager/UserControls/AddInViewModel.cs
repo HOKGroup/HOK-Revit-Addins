@@ -16,22 +16,28 @@ namespace HOK.AddInManager.UserControls
 
         public Addins AddinsObj
         {
-            get => addins;
+            get { return addins; }
             set { addins = value; NotifyPropertyChanged("AddinsObj"); }
         }
 
         private ObservableCollection<AddinInfo> selectedAddins = new ObservableCollection<AddinInfo>();
         public ObservableCollection<AddinInfo> SelectedAddins
         {
-            get => selectedAddins;
+            get { return selectedAddins; }
             set { selectedAddins = value; NotifyPropertyChanged("SelectedAddins"); }
         }
 
         private readonly RelayCommand openUrlCommand;
-        public ICommand OpenUrlCommand => openUrlCommand;
+        public ICommand OpenUrlCommand
+        {
+            get { return openUrlCommand; }
+        }
 
         private readonly RelayCommand loadTypeCommand;
-        public ICommand LoadTypeCommand => loadTypeCommand;
+        public ICommand LoadTypeCommand
+        {
+            get { return loadTypeCommand; }
+        }
 
         public AddInViewModel(Addins addinsObj)
         {

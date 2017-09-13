@@ -20,8 +20,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        //public const string BaseUrlLocal = "http://hok-184vs/";
-        public const string BaseUrlLocal = "http://localhost:8080/";
+        public const string BaseUrlLocal = "http://hok-184vs/";
+        //public const string BaseUrlLocal = "http://localhost:8080/";
         public const string BaseUrlGlobal = "http://hokmissioncontrol.herokuapp.com/";
         public const string ApiVersion = "api/v1";
         public static string RestApiBaseUrl

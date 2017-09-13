@@ -15,7 +15,7 @@ namespace HOK.AddInManager.Classes
         private ObservableCollection<AddinInfo> addinCollection = new ObservableCollection<AddinInfo>();
         public ObservableCollection<AddinInfo> AddinCollection
         {
-            get => addinCollection;
+            get { return addinCollection; }
             set { addinCollection = value; NotifyPropertyChanged("AddinCollection"); }
         }
 
@@ -53,73 +53,84 @@ namespace HOK.AddInManager.Classes
         [XmlAttribute]
         public string ToolName
         {
-            get => toolName;
+            get { return toolName; }
             set { toolName = value; NotifyPropertyChanged("ToolName"); }
         }
+
         [XmlAttribute]
         public LoadType ToolLoadType
         {
-            get => toolLoadType;
+            get { return toolLoadType; }
             set { toolLoadType = value; NotifyPropertyChanged("ToolLoadType"); }
         }
+
         [XmlIgnore]
         public string IconName
         {
-            get => iconName;
+            get { return iconName; }
             set { iconName = value; NotifyPropertyChanged("IconName"); }
         }
+
         [XmlIgnore]
         public string IconPath
         {
-            get => iconPath;
+            get { return iconPath; }
             set { iconPath = value; NotifyPropertyChanged("IconPath"); }
         }
+
         [XmlIgnore]
         public BitmapImage ToolIcon
         {
-            get => toolIcon;
+            get { return toolIcon; }
             set { toolIcon = value; NotifyPropertyChanged("ToolIcon"); }
         }
+
         [XmlIgnore]
         public string[] AddInNames
         {
-            get => addinNames;
+            get { return addinNames; }
             set { addinNames = value; NotifyPropertyChanged("AddInNames"); }
         }
+
         [XmlIgnore]
         public string[] AddInPaths
         {
-            get => addInPaths;
+            get { return addInPaths; }
             set { addInPaths = value; NotifyPropertyChanged("AddInPaths"); }
         }
+
         [XmlIgnore]
         public string[] InstallPaths
         {
-            get => installPaths;
+            get { return installPaths; }
             set { installPaths = value; NotifyPropertyChanged("InstallPaths"); }
         }
+
         [XmlIgnore]
         public int Index
         {
-            get => index;
+            get { return index; }
             set { index = value; NotifyPropertyChanged("Index"); }
         }
+
         [XmlIgnore]
         public string Tooltip
         {
-            get => tooltip;
+            get { return tooltip; }
             set { tooltip = value; NotifyPropertyChanged("Tooltip"); }
         }
+
         [XmlIgnore]
         public string Url
         {
-            get => url;
+            get { return url; }
             set { url = value; NotifyPropertyChanged("Url"); }
         }
+
         [XmlIgnore]
         public LoadType[] LoadTypes
         {
-            get => loadTypes;
+            get { return loadTypes; }
             set { loadTypes = value; NotifyPropertyChanged("LoadTypes"); }
         }
 

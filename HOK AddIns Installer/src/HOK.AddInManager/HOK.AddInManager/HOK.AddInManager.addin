@@ -5,7 +5,7 @@
     <Assembly>HOK-Addin.bundle\Contents\HOK.AddInManager.dll</Assembly>
     <AddInId>34A1240F-185F-4C56-B9A0-A41E00D2B7C4</AddInId>
     <FullClassName>HOK.AddInManager.AppCommand</FullClassName>
-    <VendorId>JKIM</VendorId>
-    <VendorDescription>JKIM</VendorDescription>
+    <VendorId>Konrad K Sobon</VendorId>
+    <VendorDescription>HOK Group</VendorDescription>
   </AddIn>
 </RevitAddIns>
