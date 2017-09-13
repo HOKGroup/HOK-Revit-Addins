@@ -7,7 +7,7 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
-##### Release 2018.0.0.2
+###### Release 2018.0.0.2
 
 * Fix to Mission Control Single Session. It was replaced with Link Unload Monitor to better describe the original intent of preventing
 users from unloading links. It hijacks Unload for All Users method in Revit, replacing it with our own message. 
@@ -20,7 +20,7 @@ and users will be stopped from messing with it.
 * Family Publish tool adds additional properties to its export. Things such as number of reference planes, voids, extrusions, etc. 
 * Other small fixes and refactors.
 
-##### Release 2018.0.0.1
+###### Release 2018.0.0.1
 
 * Update to 2018
 * Added Logging functionality
