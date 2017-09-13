@@ -17,6 +17,7 @@ with our own reload functionality that first disables DTM Tool. Similar apprach 
 Instead it will now allow users to create them and edit, only upon closing and reopening will they be added to "monitored" elements list
 and users will be stopped from messing with it. 
 * Addition of Communicator tool, that displays a summary of Health Report in a dockable panel.
+* Family Publish tool adds additional properties to its export. Things such as number of reference planes, voids, extrusions, etc. 
 * Other small fixes and refactors.
 
 ##### Release 2018.0.0.1
