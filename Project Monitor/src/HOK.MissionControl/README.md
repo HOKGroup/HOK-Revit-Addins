@@ -7,6 +7,11 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.3
+
+* Fix to Communicator button not always activating the docable panel. 
+* Added Communicator icon that changes colors to indicate Communicator state.
+
 ###### Release 2018.0.0.2
 
 * Fix to Mission Control Single Session. It was replaced with Link Unload Monitor to better describe the original intent of preventing
