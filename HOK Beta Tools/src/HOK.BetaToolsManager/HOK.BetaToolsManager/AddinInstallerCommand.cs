@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Interop;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
 using HOK.Core.Utilities;
@@ -27,6 +30,10 @@ namespace HOK.BetaToolsManager
                 var view = new AddinInstallerWindow
                 {
                     DataContext = viewModel
+                };
+                var unused = new WindowInteropHelper(view)
+                {
+                    Owner = Process.GetCurrentProcess().MainWindowHandle
                 };
 
                 view.ShowDialog();

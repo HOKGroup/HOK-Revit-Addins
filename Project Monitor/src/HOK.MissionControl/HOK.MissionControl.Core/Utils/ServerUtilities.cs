@@ -20,8 +20,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        public const string BaseUrlLocal = "http://hok-184vs/";
-        //public const string BaseUrlLocal = "http://localhost:8080/";
+        //public const string BaseUrlLocal = "http://hok-184vs/";
+        public const string BaseUrlLocal = "http://localhost:8080/";
         public const string BaseUrlGlobal = "http://hokmissioncontrol.herokuapp.com/";
         public const string ApiVersion = "api/v1";
         public static string RestApiBaseUrl
@@ -154,6 +154,37 @@ namespace HOK.MissionControl.Core.Utils
             return result;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="centralPath"></param>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static List<T> GetDataByCentralPath<T>(string centralPath, string path)
+        {
+            var result = new List<T>();
+            try
+            {
+                var fileName = System.IO.Path.GetFileNameWithoutExtension(centralPath);
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(ApiVersion + "/" + path + "/uri/{uri}", Method.GET);
+                request.AddUrlSegment("uri", fileName);
+
+                var response = client.Execute<List<T>>(request);
+                if (response.StatusCode == HttpStatusCode.InternalServerError) return result;
+                if (response.Data != null)
+                {
+                    var items = response.Data;
+                    return items;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+            return result;
+        }
+
         ///// <summary>
         ///// 
         ///// </summary>
@@ -257,6 +288,31 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddBody(project);
                 var response = client.Execute(request);
                 Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-addhealthrecord");
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// PUTs body
+        /// </summary>
+        /// <param name="body"></param>
+        /// <param name="route"></param>
+        public static void UpdateField<T>(T body, string route)
+        {
+            try
+            {
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(
+                    ApiVersion + "/" + route, Method.PUT)
+                {
+                    RequestFormat = DataFormat.Json
+                };
+                request.AddBody(body);
+                var response = client.Execute(request);
+                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + route);
             }
             catch (Exception ex)
             {

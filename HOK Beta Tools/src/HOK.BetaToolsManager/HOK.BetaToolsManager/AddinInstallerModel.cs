@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,8 +16,8 @@ namespace HOK.BetaToolsManager
     {
         public string VersionNumber { get; set; }
         //public string BetaDirectory { get; set; } = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
-        public string BetaDirectory { get; set; } = @"\\group\sysvol\group.hok.com\HOK\Tools\Revit\";
-        //public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\BetaFiles Testing\";
+        //public string BetaDirectory { get; set; } = @"\\group\sysvol\group.hok.com\HOK\Tools\Revit\";
+        public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\BetaFiles Testing\";
         public string InstallDirectory { get; set; }
         public string TempDirectory { get; set; }
         public string BetaTempDirectory { get; set; }
@@ -51,7 +50,10 @@ namespace HOK.BetaToolsManager
                 addin.InstalledVersion = "Not installed";
                 addin.IsInstalled = false;
 
-                if (string.IsNullOrEmpty(addin.Panel))
+                var app1 = AppCommand.Instance.m_app;
+                var panel = app1.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel);
+
+                if (string.IsNullOrEmpty(addin.ButtonText))
                 {
                     // no UI addin
                     // remove addin file
@@ -66,11 +68,30 @@ namespace HOK.BetaToolsManager
                             Log.AppendLog(LogMessageType.ERROR, "Could not delete Addin File. Moving on.");
                         }
                     }
+
+                    // (Konrad) We are using Idling event here for the reason that depending on order
+                    // at which these buttons are installed or added to the ribbon, at the moment that
+                    // we are adding this particular tool, it could not be ready on the ribbon yet, 
+                    // button variable will be null and we won't be able to disable it.
+                    AppCommand.EnqueueTask(app =>
+                    {
+                        if (panel != null && addin.AdditionalButtonNames != null)
+                        {
+                            var splits = addin.AdditionalButtonNames.Split(';');
+                            foreach (var name in splits)
+                            {
+                                var button1 = panel.GetItems().FirstOrDefault(x => x.Name == name);
+                                if (button1 != null)
+                                {
+                                    button1.Visible = false;
+                                    panel.Visible = panel.GetItems().Any(x => x.Visible);
+                                }
+                            }
+                        }
+                    });
                 }
 
                 // (Konrad) Button needs to be disabled after DLLs were removed since it doesn't work anyways.
-                var app = AppCommand.Instance.m_app;
-                var panel = app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel);
                 var button = panel?.GetItems().FirstOrDefault(x => x.ItemText == addin.ButtonText);
                 if (button != null)
                 {
@@ -114,31 +135,36 @@ namespace HOK.BetaToolsManager
                     {
                         Directory.CreateDirectory(
                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                        CopyIfNewer(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                        CopyAll(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                     }
                     else
                     {
-                        CopyIfNewer(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                        CopyAll(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                     }
 
-                    var app = AppCommand.Instance.m_app;
-                    var panel = app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel);
-
-                    if (panel != null && addin.AdditionalButtonNames != null)
+                    // (Konrad) We are using Idling event here for the reason that depending on order
+                    // at which these buttons are installed or added to the ribbon, at the moment that
+                    // we are adding this particular tool, it could not be ready on the ribbon yet, 
+                    // button variable will be null and we won't be able to disable it.
+                    AppCommand.EnqueueTask(app =>
                     {
-                        var splits = addin.AdditionalButtonNames.Split(';');
-                        foreach (var name in splits)
+                        var panel = app.GetRibbonPanels("  HOK - Beta").FirstOrDefault(x => x.Name == addin.Panel);
+                        if (panel != null && addin.AdditionalButtonNames != null)
                         {
-                            var button = panel.GetItems().FirstOrDefault(x => x.Name == name);
-                            if (button != null)
+                            var splits = addin.AdditionalButtonNames.Split(';');
+                            foreach (var name in splits)
                             {
-                                button.Enabled = false;
-                                panel.Visible = panel.GetItems().Any(x => x.Visible);
+                                var button = panel.GetItems().FirstOrDefault(x => x.Name == name);
+                                if (button != null)
+                                {
+                                    button.Enabled = false;
+                                    panel.Visible = panel.GetItems().Any(x => x.Visible);
+                                }
                             }
                         }
-                    }
+                    });
                 }
                 else
                 {
@@ -189,7 +215,7 @@ namespace HOK.BetaToolsManager
                 // (Konrad) Create a copy of all installed plugins by copying the temp dir from beta
                 // We only do this if Beta is accessible otherwise we use local temp
                 if (Directory.Exists(BetaDirectory))
-                    CopyIfNewer(BetaTempDirectory, TempDirectory);
+                    CopyAll(BetaTempDirectory, TempDirectory);
 
                 // Cleans any holdovers from old beta addins
                 RemoveLegacyPlugins(availableAddins);
@@ -251,7 +277,7 @@ namespace HOK.BetaToolsManager
                                 {
                                     Directory.CreateDirectory(
                                         InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                                    CopyIfNewer(betaTemp2 + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                                    CopyAll(betaTemp2 + new DirectoryInfo(addin.BetaResourcesPath).Name,
                                         InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                                 }
                                 else
@@ -262,7 +288,7 @@ namespace HOK.BetaToolsManager
                                         // let's automatically copy the latest version in
                                         // we can use temp directory here since it was already either updated with latest
                                         // or is the only source of files (no network drive)
-                                        CopyIfNewer(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                                        CopyAll(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
                                             InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                                     }
                                 }
@@ -360,55 +386,78 @@ namespace HOK.BetaToolsManager
         }
 
         /// <summary>
-        /// Copies contents of one directory into another if/when source is newer version of DLL, or file changed.
+        /// Copies all contents of one directory to another.
         /// </summary>
-        /// <param name="sourceDir"></param>
-        /// <param name="targetDir"></param>
-        private static void CopyIfNewer(string sourceDir, string targetDir)
+        /// <param name="sourceDir">Source directory path.</param>
+        /// <param name="targetDir">Target directory path.</param>
+        private static void CopyAll(string sourceDir, string targetDir)
         {
-            // (Konrad) Precreate all Directories - limited overhead since existing are automatically skipped
-            foreach (var dirPath in Directory.GetDirectories(sourceDir, "*",
-                SearchOption.AllDirectories))
-                Directory.CreateDirectory(dirPath.Replace(sourceDir, targetDir));
-
-            // (Konrad) Copy all files only if newer versions exist.
-            foreach (var file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+            try
             {
-                if (Path.GetExtension(file) == ".dll")
-                {
-                    var sourceVersion = FileVersionInfo.GetVersionInfo(file).FileVersion;
-                    if (File.Exists(file.Replace(sourceDir, targetDir)))
-                    {
-                        var targetVersion = FileVersionInfo.GetVersionInfo(file.Replace(sourceDir, targetDir))
-                            .FileVersion;
-                        if (sourceVersion != targetVersion)
-                        {
-                            File.Copy(file, file.Replace(sourceDir, targetDir), true);
-                        }
-                    }
-                    else
-                    {
-                        File.Copy(file, file.Replace(sourceDir, targetDir), true);
-                    }
-                }
-                else
-                {
-                    var sourceSize = new FileInfo(file).Length;
-                    if (File.Exists(file.Replace(sourceDir, targetDir)))
-                    {
-                        var targetSize = new FileInfo(file.Replace(sourceDir, targetDir)).Length;
-                        if (sourceSize != targetSize)
-                        {
-                            File.Copy(file, file.Replace(sourceDir, targetDir), true);
-                        }
-                    }
-                    else
-                    {
-                        File.Copy(file, file.Replace(sourceDir, targetDir), true);
-                    }
-                }
+                foreach (var dirPath in Directory.GetDirectories(sourceDir, "*",
+                    SearchOption.AllDirectories))
+                    Directory.CreateDirectory(dirPath.Replace(sourceDir, targetDir));
+
+                foreach (var newPath in Directory.GetFiles(sourceDir, "*.*",
+                    SearchOption.AllDirectories))
+                    File.Copy(newPath, newPath.Replace(sourceDir, targetDir), true);
+            }
+            catch (Exception e)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
             }
         }
+
+        ///// <summary>
+        ///// Copies contents of one directory into another if/when source is newer version of DLL, or file changed.
+        ///// </summary>
+        ///// <param name="sourceDir">Source directory path.</param>
+        ///// <param name="targetDir">Target directory path.</param>
+        //private static void CopyIfNewer(string sourceDir, string targetDir)
+        //{
+        //    // (Konrad) Precreate all Directories - limited overhead since existing are automatically skipped
+        //    foreach (var dirPath in Directory.GetDirectories(sourceDir, "*",
+        //        SearchOption.AllDirectories))
+        //        Directory.CreateDirectory(dirPath.Replace(sourceDir, targetDir));
+
+        //    // (Konrad) Copy all files only if newer versions exist.
+        //    foreach (var file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
+        //    {
+        //        if (Path.GetExtension(file) == ".dll")
+        //        {
+        //            var sourceVersion = FileVersionInfo.GetVersionInfo(file).FileVersion;
+        //            if (File.Exists(file.Replace(sourceDir, targetDir)))
+        //            {
+        //                var targetVersion = FileVersionInfo.GetVersionInfo(file.Replace(sourceDir, targetDir))
+        //                    .FileVersion;
+        //                if (sourceVersion != targetVersion)
+        //                {
+        //                    File.Copy(file, file.Replace(sourceDir, targetDir), true);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                File.Copy(file, file.Replace(sourceDir, targetDir), true);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            var sourceSize = new FileInfo(file).Length;
+        //            if (File.Exists(file.Replace(sourceDir, targetDir)))
+        //            {
+        //                var targetSize = new FileInfo(file.Replace(sourceDir, targetDir)).Length;
+        //                if (sourceSize != targetSize)
+        //                {
+        //                    File.Copy(file, file.Replace(sourceDir, targetDir), true);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                File.Copy(file, file.Replace(sourceDir, targetDir), true);
+        //            }
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Deserializes Settings file for installed addins.

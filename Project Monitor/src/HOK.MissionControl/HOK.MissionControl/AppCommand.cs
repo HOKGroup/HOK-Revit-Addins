@@ -34,13 +34,14 @@ namespace HOK.MissionControl
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
         private static Queue<Action<UIApplication>> Tasks;
         public static HealthReportData HrData { get; set; }
-        public static bool CommunicatorOnOff { get; set; }
         private CommunicatorView CommunicatorWindow { get; set; }
+        private PushButton _communicatorButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
         public RevisionUpdater RevisionUpdaterInstance { get; set; }
         public LinkUnloadMonitor LinkUnloadInstance { get; set; }
         private const string tabName = "  HOK - Beta";
+        private Assembly _CurrentAssembly { get; set; }
         public static bool IsSynching { get; set; }
 
         /// <summary>
@@ -78,12 +79,11 @@ namespace HOK.MissionControl
                 }
 
                 var currentAssembly = Assembly.GetAssembly(GetType()).Location;
-                var fpAssembly = Assembly.GetExecutingAssembly();
+                _CurrentAssembly = Assembly.GetExecutingAssembly();
                 var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
                             ?? application.CreateRibbonPanel(tabName, "Mission Control");
-                var button = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
+                _communicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
                     currentAssembly, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
-                button.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl", "communicator_32x32.png");
             }
             catch (Exception ex)
             {
@@ -159,6 +159,22 @@ namespace HOK.MissionControl
         {
             try
             {
+                // (Konrad) This needs to run after the doc is opened, because UI elements don't get created until then.
+                EnqueueTask(app =>
+                {
+                    var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
+                    var dp = app.GetDockablePane(dpid);
+                    if (dp != null)
+                    {
+                        _communicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(_CurrentAssembly, "HOK.MissionControl", dp.IsShown() 
+                            ? "communicatorOn_32x32.png" 
+                            : "communicatorOff_32x32.png");
+                        _communicatorButton.ItemText = dp.IsShown()
+                            ? "Hide" + Environment.NewLine + "Communicator"
+                            : "Show" + Environment.NewLine + "Communicator";
+                    }
+                });
+
                 var doc = args.Document;
                 if (doc == null || args.IsCancelled()) return;
                 if (!doc.IsWorkshared) return;
@@ -377,23 +393,17 @@ namespace HOK.MissionControl
             var dp = application.GetDockablePane(dpid);
             if (dp == null) return;
 
-            if (CommunicatorOnOff)
+            if (dp.IsShown())
             {
-                if (!dp.IsShown())
-                {
-                    dp.Show();
-                    CommunicatorOnOff = true;
-                }
-                else
-                {
-                    dp.Hide();
-                    CommunicatorOnOff = false;
-                }
+                dp.Hide();
+                _communicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(_CurrentAssembly, "HOK.MissionControl", "communicatorOff_32x32.png");
+                _communicatorButton.ItemText = "Show" + Environment.NewLine + "Communicator";
             }
             else
             {
                 dp.Show();
-                CommunicatorOnOff = true;
+                _communicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(_CurrentAssembly, "HOK.MissionControl", "communicatorOn_32x32.png");
+                _communicatorButton.ItemText = "Hide" + Environment.NewLine + "Communicator";
             }
         }
 

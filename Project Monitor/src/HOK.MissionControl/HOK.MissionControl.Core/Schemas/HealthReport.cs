@@ -93,6 +93,37 @@ namespace HOK.MissionControl.Core.Schemas
         public DateTime createdOn { get; set; } = DateTime.Now;
     }
 
+    //public class FamilyItem
+    //{
+    //    [BsonId]
+    //    [BsonRepresentation(BsonType.ObjectId)]
+    //    public string Id { get; set; }
+    //    public string name { get; set; }
+    //    public string size { get; set; }
+    //    public long sizeValue { get; set; }
+    //    public int instances { get; set; }
+    //    public int elementId { get; set; }
+
+    //    public int refPlaneCount { get; set; }
+    //    public int arrayCount { get; set; }
+    //    public int voidCount { get; set; }
+    //    public int nestedFamilyCount { get; set; }
+    //    public int parametersCount { get; set; }
+    //}
+
+    public class FamilyTask
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+        public string assignedTo { get; set; }
+        public string message { get; set; }
+        public string submittedBy { get; set; }
+        public string completedBy { get; set; }
+        public DateTime submittedOn { get; set; } = DateTime.Now;
+        public DateTime completedOn { get; set; } = DateTime.Now;
+    }
+
     public class FamilyItem
     {
         [BsonId]
@@ -103,12 +134,14 @@ namespace HOK.MissionControl.Core.Schemas
         public long sizeValue { get; set; }
         public int instances { get; set; }
         public int elementId { get; set; }
-
         public int refPlaneCount { get; set; }
         public int arrayCount { get; set; }
         public int voidCount { get; set; }
         public int nestedFamilyCount { get; set; }
         public int parametersCount { get; set; }
+        public bool isFailingChecks { get; set; }
+        public bool isDeleted { get; set; }
+        public List<FamilyTask> tasks { get; set; } = new List<FamilyTask>();
     }
 
     public class FamilyStat
@@ -116,14 +149,14 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
-        public List<FamilyItem> suspectFamilies { get; set; }
+        public string centralPath { get; set; }
         public int totalFamilies { get; set; }
         public int unusedFamilies { get; set; }
         public int oversizedFamilies { get; set; }
         public int inPlaceFamilies { get; set; }
         public string createdBy { get; set; }
         public DateTime createdOn { get; set; } = DateTime.Now;
-
+        public List<FamilyItem> families { get; set; } = new List<FamilyItem>();
     }
 
     public class EventTime
@@ -161,7 +194,12 @@ namespace HOK.MissionControl.Core.Schemas
         public List<WorksetItem> itemCount { get; set; } = new List<WorksetItem>();
         public List<ViewStat> viewStats { get; set; } = new List<ViewStat>();
         public List<LinkStat> linkStats { get; set; } = new List<LinkStat>();
-        public List<FamilyStat> familyStats { get; set; } = new List<FamilyStat>();
+        //public List<FamilyStat> familyStats { get; set; } = new List<FamilyStat>();
+
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string familyStats { get; set; }
+
         public List<EventTime> openTimes { get; set; } = new List<EventTime>();
         public List<EventTime> synchTimes { get; set; } = new List<EventTime>();
         public List<EventTime> modelSizes { get; set; } = new List<EventTime>();

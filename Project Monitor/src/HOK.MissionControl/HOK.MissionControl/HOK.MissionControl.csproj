@@ -219,7 +219,8 @@
     <Resource Include="Tools\LinkUnloadMonitor\Images\singleSessionDialog_300.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\communicator_32x32.png" />
+    <EmbeddedResource Include="Resources\communicatorOff_32x32.png" />
+    <EmbeddedResource Include="Resources\communicatorOn_32x32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

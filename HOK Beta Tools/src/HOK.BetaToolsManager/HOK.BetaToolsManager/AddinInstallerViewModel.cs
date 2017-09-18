@@ -58,6 +58,8 @@ namespace HOK.BetaToolsManager
         private void OnInstall(Window win)
         {
             Model.InstallUpdateAddins(Addins);
+            MessageBox.Show("Please restart Revit for new plug-ins to work.",
+                "Beta Tools - Beta Installer", MessageBoxButton.OK, MessageBoxImage.Information);
             win.Close();
         }
 
@@ -85,14 +87,14 @@ namespace HOK.BetaToolsManager
         private ObservableCollection<AddinWrapper> _addins = new ObservableCollection<AddinWrapper>();
         public ObservableCollection<AddinWrapper> Addins
         {
-            get => _addins;
+            get { return _addins; }
             set { _addins = value; RaisePropertyChanged(() => Addins); }
         }
 
         private bool? _autoUpdateStatus;
         public bool? AutoUpdateStatus
         {
-            get => _autoUpdateStatus;
+            get { return _autoUpdateStatus; }
             set { _autoUpdateStatus = value; RaisePropertyChanged(() => AutoUpdateStatus); }
         }
     }

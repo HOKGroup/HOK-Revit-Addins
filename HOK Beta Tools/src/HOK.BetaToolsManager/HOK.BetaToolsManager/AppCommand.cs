@@ -6,6 +6,7 @@ using System.Reflection;
 using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using Newtonsoft.Json;
+using Autodesk.Revit.UI.Events;
 
 namespace HOK.BetaToolsManager
 {
@@ -17,12 +18,16 @@ namespace HOK.BetaToolsManager
         private string currentAssembly = "";
         public AddinInstallerModel ViewModel { get; set; }
         public static List<AddinWrapper> AddinsToSetPathsFor { get; } = new List<AddinWrapper>();
+        private static Queue<Action<UIApplication>> Tasks;
 
-        Result IExternalApplication.OnStartup(UIControlledApplication application)
+        public Result OnStartup(UIControlledApplication application)
         {
             Instance = this;
             m_app = application;
             var versionNumber = m_app.ControlledApplication.VersionNumber;
+            Tasks = new Queue<Action<UIApplication>>();
+
+            application.Idling += OnIdling;
 
             try
             {
@@ -55,13 +60,12 @@ namespace HOK.BetaToolsManager
                             }
                         }
                         File.Copy(ViewModel.TempDirectory + Path.GetFileName(addin.AddinFilePath), ViewModel.InstallDirectory + Path.GetFileName(addin.AddinFilePath));
-                    }
 
-                    if (addin.AdditionalButtonNames != null)
-                    {
-                        panelsVisibility.Add(addin.Panel, true);
+                        if (addin.AdditionalButtonNames != null)
+                        {
+                            panelsVisibility.Add(addin.Panel, true);
+                        }
                     }
-
                     continue;
                 }
 
@@ -97,11 +101,39 @@ namespace HOK.BetaToolsManager
             return Result.Succeeded;
         }
 
-        Result IExternalApplication.OnShutdown(UIControlledApplication application)
+        public Result OnShutdown(UIControlledApplication application)
         {
             SerializeSetting(ViewModel.InstallDirectory + "BetaSettings.json");
 
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Handled Idling events. Currently Communicator uses it to interact with Revit.
+        /// It checks a queue for any outstanding tasks and executes them.
+        /// </summary>
+        private static void OnIdling(object sender, IdlingEventArgs e)
+        {
+            var app = (UIApplication)sender;
+            lock (Tasks)
+            {
+                if (Tasks.Count <= 0) return;
+
+                var task = Tasks.Dequeue();
+                task(app);
+            }
+        }
+
+        /// <summary>
+        /// Adds action to task list.
+        /// </summary>
+        /// <param name="task">Task to be executed.</param>
+        public static void EnqueueTask(Action<UIApplication> task)
+        {
+            lock (Tasks)
+            {
+                Tasks.Enqueue(task);
+            }
         }
 
         /// <summary>

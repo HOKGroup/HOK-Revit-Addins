@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.MissionControl")]
 [assembly: AssemblyCopyright("Copyright © HOK Group 2016")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -33,5 +33,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 //[assembly: AssemblyVersion("2018.0.*")]
-[assembly: AssemblyVersion("2018.0.0.2")]
+[assembly: AssemblyVersion("2018.0.0.3")]
 //[assembly: AssemblyFileVersion("2014.0.1.5")]

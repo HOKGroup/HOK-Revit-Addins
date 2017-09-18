@@ -100,7 +100,7 @@ namespace HOK.MissionControl.FamilyPublish
                 }
 
                 var recordId = MissionControlSetup.HealthRecordIds[centralPath];
-                var model = new FamilyMonitorModel(doc, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], recordId);
+                var model = new FamilyMonitorModel(doc, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], recordId, centralPath);
                 var viewModel = new FamilyMonitorViewModel(model, "...make this any faster. Hang in there!")
                 {
                     ExecuteFamilyPublish = true

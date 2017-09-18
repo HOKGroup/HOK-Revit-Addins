@@ -6,7 +6,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:ex="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        mc:Ignorable="d" Title="{Binding Title, Mode=OneWay}" Icon="Resources/hoklogo.ico" WindowStartupLocation="CenterScreen"
+        mc:Ignorable="d" Title="{Binding Title, Mode=OneWay}" Icon="Resources/hoklogo.ico"
         BorderThickness="0,5,0,0" BorderBrush="#C45C44"
         d:DesignHeight="300" d:DesignWidth="852" Width="885" MinWidth="885" SizeToContent="Height">
     <i:Interaction.Triggers>
@@ -83,6 +83,12 @@
                                       SelectionUnit="FullRow" 
                                       SelectedItemsList="{Binding SelectedAddins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" RenderTransformOrigin="0.5,0.5" Margin="10,0">
                     <ex:DataGridExtension.Columns>
+                        <DataGridCheckBoxColumn Header="Select" 
+                                                Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                IsReadOnly="False" 
+                                                Width="45"
+                                                HeaderStyle="{StaticResource CenterGridHeaderStyle}">
+                        </DataGridCheckBoxColumn>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                             Width="150" 
@@ -136,12 +142,6 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
-                        <DataGridCheckBoxColumn Header="Install" 
-                                                Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                                IsReadOnly="False" 
-                                                Width="45"
-                                                HeaderStyle="{StaticResource CenterGridHeaderStyle}">
-                        </DataGridCheckBoxColumn>
                     </ex:DataGridExtension.Columns>
                 </ex:DataGridExtension>
                 <Button Content="All" Command="{Binding CheckAll}" Margin="10,0,0,10" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>

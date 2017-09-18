@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Move Backup</Name>
+    <Assembly>HOK.MoveBackup\HOK.MoveBackup.dll</Assembly>
+    <AddInId>1c55adb3-ae22-4620-a580-db777fe7cb32</AddInId>
+    <FullClassName>HOK.MoveBackup.AppCommand</FullClassName>
+    <VendorId>Konrad K Sobon</VendorId>
+    <VendorDescription>HOK</VendorDescription>
+  </AddIn>
+</RevitAddIns>
