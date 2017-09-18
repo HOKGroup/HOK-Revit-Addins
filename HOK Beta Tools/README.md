@@ -7,6 +7,8 @@
 * Since Mission Control tool has things that subscribe to events, and dockable panels, it requires to be properly loaded in on startup
 to not crash. To accomodate that all new installed tools, are disabled, until user restarts Revit. 
 * Added new "sysvol" based location for the beta tools to speed up the process of mirroring. 
+* Beta installer will also now compare the contents of the current temp directory against what is installed in the user addins directory to identify any `HOK.` plugins that might be discontinued and delete them. 
+* Minor UI fixes.
 
 ###### Release 2018.0.0.1
 
