@@ -20,7 +20,7 @@ namespace HOK.MissionControl.Tools.Communicator
             // better maintain the most used plug-ins or discontiue the unused ones.
             AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-Communicator", commandData.Application.Application.VersionNumber));
 
-            AppCommand.Instance.ToggleCommunicator(commandData.Application);
+            new CommunicatorModel().ToggleCommunicator(commandData.Application);
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;

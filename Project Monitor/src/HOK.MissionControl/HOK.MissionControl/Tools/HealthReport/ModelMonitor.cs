@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Windows.Documents;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.Core.Utilities;
@@ -122,17 +124,38 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
         /// <param name="config">Configuration for the model.</param>
         /// <param name="project">Project for the model.</param>
-        public static void PublishModelSize(string filePath, string recordId, Configuration config, Project project)
+        /// <param name="version">Revit file version.</param>
+        public static void PublishModelSize(string filePath, string recordId, Configuration config, Project project, string version)
         {
             try
             {
-                if (!MonitorUtilities.IsUpdaterOn(project, config, UpdaterGuid)) return;
-
                 long fileSize;
                 try
                 {
-                    var fileInfo = new FileInfo(filePath);
-                    fileSize = fileInfo.Length;
+                    if (filePath.StartsWith("RSN://"))
+                    {
+                        var server = string.Empty;
+                        var subfolder = string.Empty;
+
+                        // (Konrad) This is a Revit Server project. To get it's size one must use REST API,
+                        // and ping the server that it's hosted on.
+                        var splits = filePath.Split('/');
+                        for (var i = 2; i < splits.Length; i++)
+                        {
+                            if (i == 2) server = splits[i];
+                            else subfolder = subfolder + splits[i] + (i == splits.Length - 1 ? string.Empty : "|");
+                        }
+                        var clientPath = "http://" + server;
+                        var requestPath = "RevitServerAdminRestService" + version + "/" + "AdminRestService.svc/" +
+                                          subfolder + "/modelinfo";
+
+                        fileSize = ServerUtilities.GetFileInfoFromRevitServer(clientPath, requestPath);
+                    }
+                    else
+                    {
+                        var fileInfo = new FileInfo(filePath);
+                        fileSize = fileInfo.Length;
+                    }
                 }
                 catch (Exception ex)
                 {

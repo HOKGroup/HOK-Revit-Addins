@@ -127,6 +127,7 @@
     <Compile Include="Schemas\Configuration.cs" />
     <Compile Include="Schemas\Project.cs" />
     <Compile Include="Schemas\ProjectAddress.cs" />
+    <Compile Include="Schemas\RevitServer.cs" />
     <Compile Include="Schemas\RvtFile.cs" />
     <Compile Include="Schemas\TriggerRecord.cs" />
     <Compile Include="Schemas\HealthReport.cs" />

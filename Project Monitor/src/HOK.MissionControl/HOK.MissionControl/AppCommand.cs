@@ -35,13 +35,12 @@ namespace HOK.MissionControl
         private static Queue<Action<UIApplication>> Tasks;
         public static HealthReportData HrData { get; set; }
         private CommunicatorView CommunicatorWindow { get; set; }
-        private PushButton _communicatorButton { get; set; }
+        public PushButton CommunicatorButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
         public RevisionUpdater RevisionUpdaterInstance { get; set; }
         public LinkUnloadMonitor LinkUnloadInstance { get; set; }
         private const string tabName = "  HOK - Beta";
-        private Assembly _CurrentAssembly { get; set; }
         public static bool IsSynching { get; set; }
 
         /// <summary>
@@ -66,6 +65,7 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentClosing += OnDocumentClosing;
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
+                application.ControlledApplication.DocumentCreated += OnDocumentCreated;
 
                 // (Konrad) Create Communicator button and register dockable panel.
                 RegisterCommunicator(application);
@@ -79,10 +79,9 @@ namespace HOK.MissionControl
                 }
 
                 var currentAssembly = Assembly.GetAssembly(GetType()).Location;
-                _CurrentAssembly = Assembly.GetExecutingAssembly();
                 var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
                             ?? application.CreateRibbonPanel(tabName, "Mission Control");
-                _communicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
+                CommunicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
                     currentAssembly, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
             }
             catch (Exception ex)
@@ -153,27 +152,22 @@ namespace HOK.MissionControl
         }
 
         /// <summary>
+        /// Handles Communicator button image setting.
+        /// </summary>
+        private static void OnDocumentCreated(object sender, DocumentCreatedEventArgs e)
+        {
+            new CommunicatorModel().SetCommunicatorImage();
+        }
+
+        /// <summary>
         /// Registers IUpdaters
         /// </summary>
         private void OnDocumentOpened(object source, DocumentOpenedEventArgs args)
         {
             try
             {
-                // (Konrad) This needs to run after the doc is opened, because UI elements don't get created until then.
-                EnqueueTask(app =>
-                {
-                    var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
-                    var dp = app.GetDockablePane(dpid);
-                    if (dp != null)
-                    {
-                        _communicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(_CurrentAssembly, "HOK.MissionControl", dp.IsShown() 
-                            ? "communicatorOn_32x32.png" 
-                            : "communicatorOff_32x32.png");
-                        _communicatorButton.ItemText = dp.IsShown()
-                            ? "Hide" + Environment.NewLine + "Communicator"
-                            : "Show" + Environment.NewLine + "Communicator";
-                    }
-                });
+                // (Konrad) We need to set the Communicator Button image first, or it will be blank.
+                new CommunicatorModel().SetCommunicatorImage();
 
                 var doc = args.Document;
                 if (doc == null || args.IsCancelled()) return;
@@ -214,7 +208,7 @@ namespace HOK.MissionControl
                     var recordId = MissionControlSetup.HealthRecordIds[centralPath];
 
                     WorksetOpenSynch.PublishData(doc, recordId, currentConfig, currentProject, WorksetMonitorState.onopened);
-                    ModelMonitor.PublishModelSize(centralPath, recordId, currentConfig, currentProject);
+                    ModelMonitor.PublishModelSize(centralPath, recordId, currentConfig, currentProject, doc.Application.VersionNumber);
                     ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentOpened);
                     if (OpenTime.ContainsKey("from"))
                     {
@@ -381,30 +375,6 @@ namespace HOK.MissionControl
             var ssWindow = new LinkUnloadMonitorView();
             var o = ssWindow.ShowDialog();
             if(o != null && ssWindow.IsActive) ssWindow.Close();
-        }
-
-        /// <summary>
-        /// Shows or Hides the Communicator dockable pane.
-        /// </summary>
-        /// <param name="application">UIApp</param>
-        public void ToggleCommunicator(UIApplication application)
-        {
-            var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
-            var dp = application.GetDockablePane(dpid);
-            if (dp == null) return;
-
-            if (dp.IsShown())
-            {
-                dp.Hide();
-                _communicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(_CurrentAssembly, "HOK.MissionControl", "communicatorOff_32x32.png");
-                _communicatorButton.ItemText = "Show" + Environment.NewLine + "Communicator";
-            }
-            else
-            {
-                dp.Show();
-                _communicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(_CurrentAssembly, "HOK.MissionControl", "communicatorOn_32x32.png");
-                _communicatorButton.ItemText = "Hide" + Environment.NewLine + "Communicator";
-            }
         }
 
         /// <summary>

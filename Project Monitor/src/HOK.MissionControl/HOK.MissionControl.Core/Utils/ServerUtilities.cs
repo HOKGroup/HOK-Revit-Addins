@@ -20,8 +20,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        //public const string BaseUrlLocal = "http://hok-184vs/";
-        public const string BaseUrlLocal = "http://localhost:8080/";
+        public const string BaseUrlLocal = "http://hok-184vs/";
+        //public const string BaseUrlLocal = "http://localhost:8080/";
         public const string BaseUrlGlobal = "http://hokmissioncontrol.herokuapp.com/";
         public const string ApiVersion = "api/v1";
         public static string RestApiBaseUrl
@@ -416,6 +416,40 @@ namespace HOK.MissionControl.Core.Utils
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return output;
+        }
+
+        #endregion
+
+        #region Revit Server REST API
+
+        /// <summary>
+        /// Retrieves information about the model, inclusing its file size.
+        /// </summary>
+        /// <param name="clientPath">Base URL to the Revit Server.</param>
+        /// <param name="requestPath">Request string.</param>
+        /// <returns>File size in bytes.</returns>
+        public static int GetFileInfoFromRevitServer(string clientPath, string requestPath)
+        {
+            var size = 0;
+            try
+            {
+                var client = new RestClient(clientPath);
+                var request = new RestRequest(requestPath, Method.GET);
+                request.AddHeader("User-Name", Environment.UserName);
+                request.AddHeader("User-Machine-Name", Environment.UserName + "PC");
+                request.AddHeader("Operation-GUID", Guid.NewGuid().ToString());
+
+                var response = client.Execute<RsFileInfo>(request);
+                if (response.Data != null)
+                {
+                    size = response.Data.ModelSize;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+            return size;
         }
 
         #endregion
