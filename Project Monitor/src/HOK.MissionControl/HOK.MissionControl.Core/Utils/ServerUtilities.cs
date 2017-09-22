@@ -20,8 +20,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        public const string BaseUrlLocal = "http://hok-184vs/";
-        //public const string BaseUrlLocal = "http://localhost:8080/";
+        //public const string BaseUrlLocal = "http://hok-184vs/";
+        public const string BaseUrlLocal = "http://localhost:8080/";
         public const string BaseUrlGlobal = "http://hokmissioncontrol.herokuapp.com/";
         public const string ApiVersion = "api/v1";
         public static string RestApiBaseUrl
@@ -218,7 +218,7 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="responseType">Response object type.</param>
         /// <param name="route">Route to post request to.</param>
         /// <returns></returns>
-        public static List<T> GetCollection<T>(T responseType, string route) where T : new()
+        public static List<T> FindAll<T>(T responseType, string route) where T : new()
         {
             var items = new List<T>();
             try
@@ -226,6 +226,34 @@ namespace HOK.MissionControl.Core.Utils
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(ApiVersion + "/" + route, Method.GET);
                 var response = client.Execute<List<T>>(request);
+                if (response.Data != null)
+                {
+                    items = response.Data;
+
+                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+            return items;
+        }
+
+        /// <summary>
+        /// Retrieves a Collection from MongoDB.
+        /// </summary>
+        /// <typeparam name="T">Type of response class.</typeparam>
+        /// <param name="route">Route to post request to.</param>
+        /// <returns></returns>
+        public static T FindOne<T>(string route) where T : new()
+        {
+            var items = default(T);
+            try
+            {
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(ApiVersion + "/" + route, Method.GET);
+                var response = client.Execute<T>(request);
                 if (response.Data != null)
                 {
                     items = response.Data;

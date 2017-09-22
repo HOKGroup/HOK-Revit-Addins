@@ -2,7 +2,7 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 
-namespace HOK.MissionControl.Tools.Communicator
+namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
     public class HealthReportSummaryViewModel : ViewModelBase
     {

@@ -11,7 +11,7 @@ namespace HOK.MissionControl.Core.Utils
         {
             try
             {
-                var collections = ServerUtilities.GetCollection(new AddinData(), "addins");
+                var collections = ServerUtilities.FindAll(new AddinData(), "addins");
                 var c = collections.FirstOrDefault();
                 var collectionId = "";
                 if (c != null)

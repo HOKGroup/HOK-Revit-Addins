@@ -13,6 +13,7 @@ using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
+using HOK.MissionControl.Tools.Communicator.HealthReport;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Tools.LinkUnloadMonitor;
@@ -156,7 +157,7 @@ namespace HOK.MissionControl
         /// </summary>
         private static void OnDocumentCreated(object sender, DocumentCreatedEventArgs e)
         {
-            new CommunicatorModel().SetCommunicatorImage();
+            new CommunicatorHealthReportModel().SetCommunicatorImage();
         }
 
         /// <summary>
@@ -167,7 +168,7 @@ namespace HOK.MissionControl
             try
             {
                 // (Konrad) We need to set the Communicator Button image first, or it will be blank.
-                new CommunicatorModel().SetCommunicatorImage();
+                new CommunicatorHealthReportModel().SetCommunicatorImage();
 
                 var doc = args.Document;
                 if (doc == null || args.IsCancelled()) return;

@@ -141,16 +141,35 @@
     <Compile Include="Tools\CADoor\DoorFailure.cs" />
     <Compile Include="Tools\CADoor\DoorUpdater.cs" />
     <Compile Include="Tools\Communicator\CommunicatorCommand.cs" />
-    <Compile Include="Tools\Communicator\CommunicatorModel.cs" />
     <Compile Include="Tools\Communicator\CommunicatorView.xaml.cs">
       <DependentUpon>CommunicatorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\Communicator\CommunicatorViewModel.cs" />
-    <Compile Include="Tools\Communicator\HealthReportSummaryControl.xaml.cs">
+    <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksView.xaml.cs">
+      <DependentUpon>CommunicatorTasksView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Communicator\HealthReport\CommunicatorHealthReportModel.cs" />
+    <Compile Include="Tools\Communicator\HealthReport\CommunicatorHealthReportView.xaml.cs">
+      <DependentUpon>CommunicatorHealthReportView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Communicator\HealthReport\CommunicatorHealthReportViewModel.cs" />
+    <Compile Include="Tools\Communicator\HealthReport\HealthReportSummaryControl.xaml.cs">
       <DependentUpon>HealthReportSummaryControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Communicator\HealthReportSummaryModel.cs" />
-    <Compile Include="Tools\Communicator\HealthReportSummaryViewModel.cs" />
+    <Compile Include="Tools\Communicator\HealthReport\HealthReportSummaryModel.cs" />
+    <Compile Include="Tools\Communicator\HealthReport\HealthReportSummaryViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskAssistantModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskAssistantView.xaml.cs">
+      <DependentUpon>TaskAssistantView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Communicator\Tasks\TaskAssistantViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskControl.xaml.cs">
+      <DependentUpon>TaskControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Communicator\Tasks\TaskControlModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskControlViewModel.cs" />
     <Compile Include="Tools\DTMTool\DTMFailure.cs" />
     <Compile Include="Tools\DTMTool\DTMUpdater.cs" />
     <Compile Include="Tools\DTMTool\DTMUtils\GridUtils.cs" />
@@ -181,10 +200,26 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Tools\Communicator\CommunicatorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\Communicator\Tasks\CommunicatorTasksView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\Communicator\HealthReport\CommunicatorHealthReportView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Tools\Communicator\HealthReportSummaryControl.xaml">
+    <Page Include="Tools\Communicator\HealthReport\HealthReportSummaryControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\Communicator\Tasks\TaskAssistantView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\Communicator\Tasks\TaskControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -221,6 +256,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\communicatorOff_32x32.png" />
     <EmbeddedResource Include="Resources\communicatorOn_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\taskComplete_24x24.png" />
+    <Resource Include="Resources\taskIncomplete_24x24.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

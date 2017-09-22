@@ -4,6 +4,7 @@ using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Tools.Communicator.HealthReport;
 
 namespace HOK.MissionControl.Tools.Communicator
 {
@@ -20,7 +21,7 @@ namespace HOK.MissionControl.Tools.Communicator
             // better maintain the most used plug-ins or discontiue the unused ones.
             AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-Communicator", commandData.Application.Application.VersionNumber));
 
-            new CommunicatorModel().ToggleCommunicator(commandData.Application);
+            new CommunicatorHealthReportModel().ToggleCommunicator(commandData.Application);
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;

@@ -26,7 +26,7 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var opened = 0;
                 var closed = 0;
-                var user = Environment.UserName;
+                var user = Environment.UserName.ToLower();
                 foreach (var w in worksets)
                 {
                     if (w.IsOpen) opened++;

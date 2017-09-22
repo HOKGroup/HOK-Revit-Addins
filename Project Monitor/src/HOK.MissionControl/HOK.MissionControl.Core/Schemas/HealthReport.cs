@@ -93,37 +93,26 @@ namespace HOK.MissionControl.Core.Schemas
         public DateTime createdOn { get; set; } = DateTime.Now;
     }
 
-    //public class FamilyItem
-    //{
-    //    [BsonId]
-    //    [BsonRepresentation(BsonType.ObjectId)]
-    //    public string Id { get; set; }
-    //    public string name { get; set; }
-    //    public string size { get; set; }
-    //    public long sizeValue { get; set; }
-    //    public int instances { get; set; }
-    //    public int elementId { get; set; }
-
-    //    public int refPlaneCount { get; set; }
-    //    public int arrayCount { get; set; }
-    //    public int voidCount { get; set; }
-    //    public int nestedFamilyCount { get; set; }
-    //    public int parametersCount { get; set; }
-    //}
-
+    /// <summary>
+    /// Task object added to Family.
+    /// </summary>
     public class FamilyTask
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+        public string name { get; set; }
         public string assignedTo { get; set; }
         public string message { get; set; }
         public string submittedBy { get; set; }
         public string completedBy { get; set; }
-        public DateTime submittedOn { get; set; } = DateTime.Now;
-        public DateTime completedOn { get; set; } = DateTime.Now;
+        public DateTime submittedOn { get; set; }
+        public DateTime completedOn { get; set; }
     }
 
+    /// <summary>
+    /// Individual Family object data.
+    /// </summary>
     public class FamilyItem
     {
         [BsonId]
@@ -144,6 +133,9 @@ namespace HOK.MissionControl.Core.Schemas
         public List<FamilyTask> tasks { get; set; } = new List<FamilyTask>();
     }
 
+    /// <summary>
+    /// Summarized Family stats for Dashbord generation.
+    /// </summary>
     public class FamilyStat
     {
         [BsonId]
@@ -159,15 +151,21 @@ namespace HOK.MissionControl.Core.Schemas
         public List<FamilyItem> families { get; set; } = new List<FamilyItem>();
     }
 
-    public class EventTime
+    /// <summary>
+    /// Model size data, model session event data.
+    /// </summary>
+    public class EventData
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
-        public double value { get; set; }
+        public long value { get; set; }
         public DateTime createdOn { get; set; } = DateTime.Now;
     }
 
+    /// <summary>
+    /// Session monitoring data.
+    /// </summary>
     public class SessionInfo
     {
         [BsonId]
@@ -194,30 +192,12 @@ namespace HOK.MissionControl.Core.Schemas
         public List<WorksetItem> itemCount { get; set; } = new List<WorksetItem>();
         public List<ViewStat> viewStats { get; set; } = new List<ViewStat>();
         public List<LinkStat> linkStats { get; set; } = new List<LinkStat>();
-        //public List<FamilyStat> familyStats { get; set; } = new List<FamilyStat>();
-
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string familyStats { get; set; }
-
-        public List<EventTime> openTimes { get; set; } = new List<EventTime>();
-        public List<EventTime> synchTimes { get; set; } = new List<EventTime>();
-        public List<EventTime> modelSizes { get; set; } = new List<EventTime>();
+        public List<EventData> openTimes { get; set; } = new List<EventData>();
+        public List<EventData> synchTimes { get; set; } = new List<EventData>();
+        public List<EventData> modelSizes { get; set; } = new List<EventData>();
         public List<SessionInfo> sessionLogs { get; set; } = new List<SessionInfo>();
     }
-
-    #region GET
-
-    /// <summary>
-    /// Response returned by MongoDB when queried for /familystats
-    /// </summary>
-    public class FamilyResponse
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
-        public List<FamilyStat> familyStats { get; set; } = new List<FamilyStat>();
-    }
-
-    #endregion
 }

@@ -1,5 +1,5 @@
 ﻿
-namespace HOK.MissionControl.Tools.Communicator
+namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
     /// <summary>
     /// Interaction logic for HealthReportSummaryControl.xaml

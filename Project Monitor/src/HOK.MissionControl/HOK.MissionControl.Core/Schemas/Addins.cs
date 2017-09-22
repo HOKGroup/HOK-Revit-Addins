@@ -26,14 +26,14 @@ namespace HOK.MissionControl.Core.Schemas
         public AddinLog(string name, Document doc)
         {
             pluginName = name;
-            user = Environment.UserName;
+            user = Environment.UserName.ToLower();
             revitVersion = doc.Application.VersionNumber;
         }
 
         public AddinLog(string name, string version)
         {
             pluginName = name;
-            user = Environment.UserName;
+            user = Environment.UserName.ToLower();
             revitVersion = version;
         }
     }

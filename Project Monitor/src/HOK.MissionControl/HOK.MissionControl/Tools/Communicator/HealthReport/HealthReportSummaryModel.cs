@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.UI;
 
-namespace HOK.MissionControl.Tools.Communicator
+namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
     public class HealthReportSummaryModel
     {

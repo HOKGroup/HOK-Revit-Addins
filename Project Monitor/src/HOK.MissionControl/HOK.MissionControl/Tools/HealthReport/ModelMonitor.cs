@@ -78,7 +78,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var span = to - from;
                 var ms = (int)span.TotalMilliseconds;
 
-                var eventItem = new EventTime
+                var eventItem = new EventData
                 {
                     value = ms
                 };
@@ -104,7 +104,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var span = to - from;
                 var ms = (int)span.TotalMilliseconds;
 
-                var eventItem = new EventTime
+                var eventItem = new EventData
                 {
                     value = ms
                 };
@@ -163,7 +163,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 }
 
-                var eventItem = new EventTime
+                var eventItem = new EventData
                 {
                     value = fileSize
                 };

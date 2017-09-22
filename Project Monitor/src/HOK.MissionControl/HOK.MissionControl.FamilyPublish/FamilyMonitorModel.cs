@@ -272,7 +272,7 @@ namespace HOK.MissionControl.FamilyPublish
                         }
                         famDoc.Close(false);
 
-                        var sizeStr = BytesToString(size);
+                        var sizeStr = StringUtilities.BytesToString(size);
                         if (size > 1000000)
                         {
                             oversizedFamilies++; // >1MB
@@ -332,7 +332,7 @@ namespace HOK.MissionControl.FamilyPublish
                     unusedFamilies = unusedFamilies,
                     inPlaceFamilies = inPlaceFamilies,
                     oversizedFamilies = oversizedFamilies,
-                    createdBy = Environment.UserName,
+                    createdBy = Environment.UserName.ToLower(),
                     families = famOutput
                 };
 
@@ -352,22 +352,6 @@ namespace HOK.MissionControl.FamilyPublish
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Converts byte size to human readable size ex. kB, MB etc.
-        /// </summary>
-        /// <param name="byteCount">Size of the file in bytes.</param>
-        /// <returns></returns>
-        private static string BytesToString(long byteCount)
-        {
-            string[] suf = { "b", "kb", "mb", "gb", "tb", "pb", "eb" }; //Longs run out around EB
-            if (byteCount == 0)
-                return "0" + suf[0];
-            var bytes = Math.Abs(byteCount);
-            var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
-            var num = Math.Round(bytes / Math.Pow(1024, place), 1);
-            return Math.Sign(byteCount) * num + suf[place];
         }
 
         /// <summary>
@@ -396,10 +380,7 @@ namespace HOK.MissionControl.FamilyPublish
             var count = 0;
             var famSymbolIds = f.GetFamilySymbolIds();
 
-            if (famSymbolIds.Count == 0)
-            {
-                count = 0;
-            }
+            if (famSymbolIds.Count == 0) count = 0;
             else
             {
                 foreach (var id in famSymbolIds)
