@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.Revit.DB;
-using HOK.MissionControl.Core.Schemas;
+﻿using HOK.MissionControl.Core.Schemas;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {
@@ -25,18 +19,10 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
 
         public void EditFamily()
         {
-            // (Konrad) We are in a modeless dialog context. The only way to talk back to
-            // Revit is via Idling Event (or External Event but that's a different story).
-            AppCommand.EnqueueTask(app =>
-            {
-                var doc = app.ActiveUIDocument.Document;
-                if (doc == null) return;
-
-                var family = new FilteredElementCollector(doc).OfClass(typeof(Family)).FirstOrDefault(x => x.Id.IntegerValue == Family.elementId);
-                if (family == null) return;
-
-                var famDoc = doc.EditFamily((Family)family);
-            });
+            AppCommand.CommunicatorHandler.FamilyItem = Family;
+            AppCommand.CommunicatorHandler.FamilyTask = Task;
+            AppCommand.CommunicatorHandler.Request.Make(RequestId.EditFamily);
+            AppCommand.CommunicatorEvent.Raise();
         }
     }
 }

@@ -6,7 +6,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d" 
-        d:DesignHeight="300" d:DesignWidth="400">
+        d:DesignHeight="300" d:DesignWidth="400" Title="{Binding Title, Mode=OneWay}" Icon="../../../Resources/hoklogo.ico" WindowStartupLocation="CenterOwner"
+        BorderThickness="0,5,0,0" BorderBrush="#E6E3DB" ResizeMode="NoResize" Width="400" Height="400">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction Command="{Binding WindowClosing}" CommandParameter="{Binding ElementName=Win}"/>
@@ -123,6 +124,16 @@
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Right" 
                 Width="75"/>
-        <Button Content="Close" Margin="0,0,170,10" Grid.Row="3" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75" Grid.ColumnSpan="2"/>
+        <Button Content="Close" 
+                Margin="0,0,170,10" 
+                Command="{Binding Close}"
+                CommandParameter="{Binding ElementName=Win}"
+                Grid.Row="3" 
+                Height="20" 
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Right" 
+                Width="75" 
+                Grid.ColumnSpan="2"
+                Grid.Column="0" />
     </Grid>
 </Window>

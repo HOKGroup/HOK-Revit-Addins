@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Reflection;
+using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 
@@ -10,10 +11,13 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         public RelayCommand<Window> Complete { get; set; }
         public RelayCommand<Window> WindowClosing { get; set; }
         public RelayCommand EditFamily { get; set; }
+        public RelayCommand<Window> Close { get; set; }
+        public string Title { get; set; }
 
         public TaskAssistantViewModel(TaskAssistantModel model)
         {
             Model = model;
+            Title = "Mission Control - Task Assistant v." + Assembly.GetExecutingAssembly().GetName().Version;
             FamilyName = Model.Family.name + " - " + Model.Family.elementId;
             TaskName = Model.Task.name;
             Recipient = Model.Task.assignedTo;
@@ -22,6 +26,12 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             Complete = new RelayCommand<Window>(OnComplete);
             WindowClosing = new RelayCommand<Window>(OnWindowClosing);
             EditFamily = new RelayCommand(OnEditFamily);
+            Close = new RelayCommand<Window>(OnClose);
+        }
+
+        private static void OnClose(Window win)
+        {
+            win.Close();
         }
 
         private void OnEditFamily()
@@ -36,6 +46,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
 
         private void OnComplete(Window win)
         {
+            // talk to the server
             win.Close();
         }
 

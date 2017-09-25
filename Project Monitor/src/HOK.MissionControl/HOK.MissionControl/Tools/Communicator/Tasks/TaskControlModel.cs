@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Windows.Interop;
 using HOK.MissionControl.Core.Schemas;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
@@ -11,6 +8,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
     {
         public FamilyItem Family { get; set; }
         public FamilyTask Task { get; set; }
+        public static TaskAssistantView View { get; set; }
 
         public TaskControlModel(FamilyItem family, FamilyTask task)
         {
@@ -22,12 +20,24 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         {
             var model = new TaskAssistantModel(Family, Task);
             var viewModel = new TaskAssistantViewModel(model);
-            var view = new TaskAssistantView
+            if (View != null && View.IsVisible)
             {
-                DataContext = viewModel
-            };
+                View.DataContext = viewModel;
+                View.Activate();
+            }
+            else
+            {
+                View = new TaskAssistantView
+                {
+                    DataContext = viewModel
+                };
+                var unused = new WindowInteropHelper(View)
+                {
+                    Owner = Process.GetCurrentProcess().MainWindowHandle
+                };
 
-            view.Show();
+                View.Show();
+            }
         }
     }
 }

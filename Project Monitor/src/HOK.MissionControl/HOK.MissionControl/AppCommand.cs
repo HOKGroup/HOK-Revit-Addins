@@ -44,6 +44,15 @@ namespace HOK.MissionControl
         private const string tabName = "  HOK - Beta";
         public static bool IsSynching { get; set; }
 
+        public static CommunicatorRequestHandler CommunicatorHandler { get; set; }
+        public static ExternalEvent CommunicatorEvent { get; set; }
+
+        public void CreateExternalEvent()
+        {
+            CommunicatorHandler = new CommunicatorRequestHandler();
+            CommunicatorEvent = ExternalEvent.Create(CommunicatorHandler);
+        }
+
         /// <summary>
         /// Registers all event handlers during startup.
         /// </summary>
@@ -58,6 +67,8 @@ namespace HOK.MissionControl
                 RevisionUpdaterInstance = new RevisionUpdater(appId);
                 LinkUnloadInstance = new LinkUnloadMonitor();
                 Tasks = new Queue<Action<UIApplication>>();
+
+                CreateExternalEvent();
 
                 application.Idling += OnIdling;
                 application.ControlledApplication.DocumentOpening += OnDocumentOpening;

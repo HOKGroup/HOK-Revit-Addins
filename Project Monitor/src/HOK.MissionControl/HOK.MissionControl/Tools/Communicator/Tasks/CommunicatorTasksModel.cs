@@ -23,7 +23,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                     {
                         Model = new TaskControlModel(family, task),
                         TaskComplete = !string.IsNullOrEmpty(task.completedBy),
-                        TaskName = $"Family Task | {task.submittedBy} | {task.name}"
+                        TaskName = $"({task.submittedBy}){family.name}: {task.name}"
                     });
                 }
             }

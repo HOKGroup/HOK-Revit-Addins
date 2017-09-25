@@ -145,6 +145,7 @@
       <DependentUpon>CommunicatorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\Communicator\CommunicatorViewModel.cs" />
+    <Compile Include="Tools\Communicator\CommunicatorRequestHandler.cs" />
     <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksView.xaml.cs">
       <DependentUpon>CommunicatorTasksView.xaml</DependentUpon>
@@ -260,6 +261,9 @@
   <ItemGroup>
     <Resource Include="Resources\taskComplete_24x24.png" />
     <Resource Include="Resources\taskIncomplete_24x24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\hoklogo.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
