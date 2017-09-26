@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Tools.Communicator.Tasks.TaskControl;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {
@@ -11,7 +13,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         {
             if (famStat == null) return new ObservableCollection<TaskControlViewModel>();
 
-            var output = new ObservableCollection<TaskControlViewModel>();
+            var familiesToWatch = new Dictionary<int, FamilyItem>();
+            var output = new List<TaskControlViewModel>();
             foreach (var family in famStat.families)
             {
                 if(!family.tasks.Any()) continue;
@@ -19,6 +22,9 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                 {
                     if(!string.Equals(task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
 
+                    // (Konrad) We are storing this Family Item for later so that if user makes any changes to this family
+                    // and reloads it back into the model, we can capture that and post to MongoDB at the end of the session.
+                    if(!familiesToWatch.ContainsKey(family.elementId)) familiesToWatch.Add(family.elementId, family);
                     output.Add(new TaskControlViewModel
                     {
                         Model = new TaskControlModel(family, task),
@@ -28,7 +34,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                 }
             }
 
-            return output;
+            AppCommand.FamiliesToWatch = familiesToWatch;
+            return new ObservableCollection<TaskControlViewModel>(output.OrderBy(x => x.TaskComplete));
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
-using System.Linq;
 using HOK.MissionControl.Core.Schemas;
-using System.IO;
 
 namespace HOK.MissionControl.Tools.Communicator
 {
@@ -29,10 +29,12 @@ namespace HOK.MissionControl.Tools.Communicator
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class CommunicatorRequestHandler : IExternalEventHandler
     {
         public FamilyItem FamilyItem { get; set; }
-        public FamilyTask FamilyTask { get; set; }
 
         public CommunicatorRequest Request { get; } = new CommunicatorRequest();
 
@@ -65,10 +67,14 @@ namespace HOK.MissionControl.Tools.Communicator
             }
         }
 
+        /// <summary>
+        /// Method to open family for editing.
+        /// </summary>
+        /// <param name="app">Current UI Application.</param>
         public void EditFamily(UIApplication app)
         {
             var doc = app.ActiveUIDocument.Document;
-            if (doc == null) return;
+            if (doc == null || doc.IsFamilyDocument) return;
 
             var family = new FilteredElementCollector(doc).OfClass(typeof(Family)).FirstOrDefault(x => x.Id.IntegerValue == FamilyItem.elementId);
             if (family == null) return;

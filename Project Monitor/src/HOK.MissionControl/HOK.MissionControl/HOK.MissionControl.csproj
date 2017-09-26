@@ -161,16 +161,21 @@
     <Compile Include="Tools\Communicator\HealthReport\HealthReportSummaryModel.cs" />
     <Compile Include="Tools\Communicator\HealthReport\HealthReportSummaryViewModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksViewModel.cs" />
-    <Compile Include="Tools\Communicator\Tasks\TaskAssistantModel.cs" />
-    <Compile Include="Tools\Communicator\Tasks\TaskAssistantView.xaml.cs">
+    <Compile Include="Tools\Communicator\Tasks\FamilyChecksControl\FamilyCheckControl.xaml.cs">
+      <DependentUpon>FamilyCheckControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Communicator\Tasks\FamilyChecksControl\FamilyCheckModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\FamilyChecksControl\FamilyCheckViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantView.xaml.cs">
       <DependentUpon>TaskAssistantView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Communicator\Tasks\TaskAssistantViewModel.cs" />
-    <Compile Include="Tools\Communicator\Tasks\TaskControl.xaml.cs">
+    <Compile Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskControl\TaskControl.xaml.cs">
       <DependentUpon>TaskControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Communicator\Tasks\TaskControlModel.cs" />
-    <Compile Include="Tools\Communicator\Tasks\TaskControlViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskControl\TaskControlModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskControl\TaskControlViewModel.cs" />
     <Compile Include="Tools\DTMTool\DTMFailure.cs" />
     <Compile Include="Tools\DTMTool\DTMUpdater.cs" />
     <Compile Include="Tools\DTMTool\DTMUtils\GridUtils.cs" />
@@ -216,11 +221,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Tools\Communicator\Tasks\TaskAssistantView.xaml">
+    <Page Include="Tools\Communicator\Tasks\FamilyChecksControl\FamilyCheckControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Tools\Communicator\Tasks\TaskControl.xaml">
+    <Page Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\Communicator\Tasks\TaskControl\TaskControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -264,6 +273,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\hoklogo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\taskInfo_24x24.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

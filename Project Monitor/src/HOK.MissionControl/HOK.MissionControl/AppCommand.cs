@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
+using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas;
@@ -14,6 +15,8 @@ using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.Communicator.HealthReport;
+using HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant;
+using HOK.MissionControl.Tools.Communicator.Tasks.TaskControl;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Tools.LinkUnloadMonitor;
@@ -46,12 +49,7 @@ namespace HOK.MissionControl
 
         public static CommunicatorRequestHandler CommunicatorHandler { get; set; }
         public static ExternalEvent CommunicatorEvent { get; set; }
-
-        public void CreateExternalEvent()
-        {
-            CommunicatorHandler = new CommunicatorRequestHandler();
-            CommunicatorEvent = ExternalEvent.Create(CommunicatorHandler);
-        }
+        public static Dictionary<int, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<int, FamilyItem>();
 
         /// <summary>
         /// Registers all event handlers during startup.
@@ -68,8 +66,6 @@ namespace HOK.MissionControl
                 LinkUnloadInstance = new LinkUnloadMonitor();
                 Tasks = new Queue<Action<UIApplication>>();
 
-                CreateExternalEvent();
-
                 application.Idling += OnIdling;
                 application.ControlledApplication.DocumentOpening += OnDocumentOpening;
                 application.ControlledApplication.DocumentOpened += OnDocumentOpened;
@@ -78,6 +74,7 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
                 application.ControlledApplication.DocumentCreated += OnDocumentCreated;
+                application.ControlledApplication.FamilyLoadedIntoDocument += OnFamilyLoadedIntoDocument;
 
                 // (Konrad) Create Communicator button and register dockable panel.
                 RegisterCommunicator(application);
@@ -95,6 +92,11 @@ namespace HOK.MissionControl
                             ?? application.CreateRibbonPanel(tabName, "Mission Control");
                 CommunicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
                     currentAssembly, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
+
+                // (Konrad) Since Communicator Task Assistant offers to open Families for editing,
+                // it requires an External Event because new document cannot be opened from Idling Event
+                CommunicatorHandler = new CommunicatorRequestHandler();
+                CommunicatorEvent = ExternalEvent.Create(CommunicatorHandler);
             }
             catch (Exception ex)
             {
@@ -103,17 +105,40 @@ namespace HOK.MissionControl
             return Result.Succeeded;
         }
 
+        private void OnFamilyLoadedIntoDocument(object sender, FamilyLoadedIntoDocumentEventArgs e)
+        {
+            if (e.Status != RevitAPIEventStatus.Succeeded) return;
+
+            if (FamiliesToWatch.ContainsKey(e.OriginalFamilyId.IntegerValue))
+            {
+                var family = FamiliesToWatch[e.OriginalFamilyId.IntegerValue];
+                family.elementId = e.NewFamilyId.IntegerValue; // updating this value here propagates to all other references
+
+                FamiliesToWatch.Remove(e.OriginalFamilyId.IntegerValue);
+                FamiliesToWatch.Add(e.NewFamilyId.IntegerValue, family);
+
+                var info = new RegistrationInfo
+                {
+                    Family = family
+                };
+                Messenger.Default.Send(info);
+            }
+        }
+
         /// <summary>
         /// Un-registers all event handlers that were registered at startup.
         /// </summary>
         public Result OnShutdown(UIControlledApplication application)
         {
+            application.Idling -= OnIdling;
             application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
             application.ControlledApplication.DocumentOpened -= OnDocumentOpened;
             application.ControlledApplication.FailuresProcessing -= FailureProcessor.CheckFailure;
             application.ControlledApplication.DocumentClosing -= OnDocumentClosing;
             application.ControlledApplication.DocumentSynchronizingWithCentral -= OnDocumentSynchronizing;
             application.ControlledApplication.DocumentSynchronizedWithCentral -= OnDocumentSynchronized;
+            application.ControlledApplication.DocumentCreated -= OnDocumentCreated;
+            application.ControlledApplication.FamilyLoadedIntoDocument -= OnFamilyLoadedIntoDocument;
 
             return Result.Succeeded;
         }

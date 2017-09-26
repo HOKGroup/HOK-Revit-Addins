@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight;
 using HOK.MissionControl.Core.Schemas;
 using System.Collections.ObjectModel;
+using HOK.MissionControl.Tools.Communicator.Tasks.TaskControl;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {

@@ -1,5 +1,5 @@
 ﻿
-namespace HOK.MissionControl.Tools.Communicator.Tasks
+namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskControl
 {
     /// <summary>
     /// Interaction logic for TaskControl.xaml

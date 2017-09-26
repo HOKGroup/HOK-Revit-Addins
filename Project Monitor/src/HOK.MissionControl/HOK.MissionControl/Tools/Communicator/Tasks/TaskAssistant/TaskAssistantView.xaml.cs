@@ -1,5 +1,5 @@
 ﻿
-namespace HOK.MissionControl.Tools.Communicator.Tasks
+namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
 {
     /// <summary>
     /// Interaction logic for TaskAssistantView.xaml

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="HOK.MissionControl.Tools.Communicator.Tasks.TaskControl"
+﻿<UserControl x:Class="HOK.MissionControl.Tools.Communicator.Tasks.TaskControl.TaskControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -26,10 +26,10 @@
                 <Style TargetType="{x:Type Image}">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding TaskComplete}" Value="True">
-                            <Setter Property="Source" Value="../../../Resources/taskComplete_24x24.png"/>
+                            <Setter Property="Source" Value="../../../../Resources/taskComplete_24x24.png"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding TaskComplete}" Value="False">
-                            <Setter Property="Source" Value="../../../Resources/taskIncomplete_24x24.png"/>
+                            <Setter Property="Source" Value="../../../../Resources/taskIncomplete_24x24.png"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

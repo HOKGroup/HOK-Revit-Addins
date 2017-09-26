@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Windows.Interop;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant;
 
-namespace HOK.MissionControl.Tools.Communicator.Tasks
+namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskControl
 {
     public class TaskControlModel
     {

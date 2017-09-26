@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:tasks="clr-namespace:HOK.MissionControl.Tools.Communicator.Tasks"
+             xmlns:taskControl="clr-namespace:HOK.MissionControl.Tools.Communicator.Tasks.TaskControl"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -15,8 +15,8 @@
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type tasks:TaskControl}">
-                    <tasks:TaskControl Margin="0, 4, 0, 0"/>
+                <DataTemplate DataType="{x:Type taskControl:TaskControl}">
+                    <taskControl:TaskControl Margin="0, 4, 0, 0"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

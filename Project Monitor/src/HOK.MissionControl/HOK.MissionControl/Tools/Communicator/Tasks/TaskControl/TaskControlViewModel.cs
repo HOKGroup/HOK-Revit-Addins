@@ -2,7 +2,7 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 
-namespace HOK.MissionControl.Tools.Communicator.Tasks
+namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskControl
 {
     public class TaskControlViewModel : ViewModelBase
     {
