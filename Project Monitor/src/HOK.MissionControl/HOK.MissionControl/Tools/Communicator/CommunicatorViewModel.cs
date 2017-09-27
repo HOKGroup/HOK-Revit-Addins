@@ -12,14 +12,17 @@ namespace HOK.MissionControl.Tools.Communicator
     {
         public ObservableCollection<TabItem> TabItems { get; set; }
 
-        public CommunicatorViewModel(HealthReportData hrData)
+        public CommunicatorViewModel()
         {
-            var familiesCollectionId = hrData.familyStats;
-            var familyStats = ServerUtilities.FindOne<FamilyStat>("families/" + familiesCollectionId);
+            var familyStatsId = AppCommand.HrData.familyStats;
+            if (familyStatsId == null) return;
+
+            var familyStats = ServerUtilities.FindOne<FamilyStat>("families/" + familyStatsId);
+            if (familyStats == null) return;
 
             TabItems = new ObservableCollection<TabItem>
             {
-                new TabItem{Content = new CommunicatorHealthReportView {DataContext = new CommunicatorHealthReportViewModel(hrData, familyStats)}, Header = "Health Report"},
+                new TabItem{Content = new CommunicatorHealthReportView {DataContext = new CommunicatorHealthReportViewModel(familyStats)}, Header = "Health Report"},
                 new TabItem{Content = new CommunicatorTasksView {DataContext = new CommunicatorTasksViewModel(familyStats)}, Header = "Tasks"}
             };
         }

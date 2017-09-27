@@ -161,11 +161,10 @@
     <Compile Include="Tools\Communicator\HealthReport\HealthReportSummaryModel.cs" />
     <Compile Include="Tools\Communicator\HealthReport\HealthReportSummaryViewModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksViewModel.cs" />
-    <Compile Include="Tools\Communicator\Tasks\FamilyChecksControl\FamilyCheckControl.xaml.cs">
+    <Compile Include="Tools\Communicator\Tasks\CheckControl\FamilyCheckControl.xaml.cs">
       <DependentUpon>FamilyCheckControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Communicator\Tasks\FamilyChecksControl\FamilyCheckModel.cs" />
-    <Compile Include="Tools\Communicator\Tasks\FamilyChecksControl\FamilyCheckViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\CheckControl\FamilyCheckViewModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantView.xaml.cs">
       <DependentUpon>TaskAssistantView.xaml</DependentUpon>
@@ -221,7 +220,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Tools\Communicator\Tasks\FamilyChecksControl\FamilyCheckControl.xaml">
+    <Page Include="Tools\Communicator\Tasks\CheckControl\FamilyCheckControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

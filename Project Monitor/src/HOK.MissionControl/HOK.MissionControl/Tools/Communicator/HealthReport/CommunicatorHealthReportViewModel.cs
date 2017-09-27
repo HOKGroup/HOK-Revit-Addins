@@ -9,10 +9,13 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         public ObservableCollection<HealthReportSummaryViewModel> HealthReports { get; set; }
         public CommunicatorHealthReportModel Model { get; set; }
 
-        public CommunicatorHealthReportViewModel(HealthReportData data, FamilyStat famStat)
+        public CommunicatorHealthReportViewModel(FamilyStat famStat)
         {
+            var hrData = AppCommand.HrData;
+            if (hrData == null) return;
+
             Model = new CommunicatorHealthReportModel();
-            HealthReports = Model.ProcessData(data, famStat);
+            HealthReports = Model.ProcessData(hrData, famStat);
         }
     }
 }

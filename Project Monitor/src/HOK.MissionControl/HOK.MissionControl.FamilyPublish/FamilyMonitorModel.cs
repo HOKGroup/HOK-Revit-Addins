@@ -338,7 +338,7 @@ namespace HOK.MissionControl.FamilyPublish
 
                 if (famStat == null)
                 {
-                    famStat = ServerUtilities.PostDataScheme(familyStats, "families");
+                    famStat = ServerUtilities.Post<FamilyStat>(familyStats, "families");
                     ServerUtilities.UpdateField(new {key = famStat.Id}, "healthrecords/" + RecordId + "/addfamilies");
                 }
                 else

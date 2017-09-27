@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:familyChecksControl="clr-namespace:HOK.MissionControl.Tools.Communicator.Tasks.FamilyChecksControl"
+        xmlns:familyChecksControl="clr-namespace:HOK.MissionControl.Tools.Communicator.Tasks.CheckControl"
         mc:Ignorable="d" 
         d:DesignHeight="400" d:DesignWidth="400" Title="{Binding Title, Mode=OneWay}" Icon="../../../../Resources/hoklogo.ico" WindowStartupLocation="CenterOwner"
         BorderThickness="0,5,0,0" BorderBrush="#E6E3DB" Width="450" SizeToContent="Height">
@@ -114,22 +114,27 @@
                Margin="10,0"
                VerticalAlignment="Top" 
                Padding="0"/>
-        <ItemsControl Grid.Row="3" 
-                      Grid.Column="0" 
-                      Grid.ColumnSpan="2" 
-                      ItemsSource="{Binding ChecksControls}" 
-                      Margin="20,21,10,10">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type familyChecksControl:FamilyCheckControl}">
-                    <familyChecksControl:FamilyCheckControl Margin="0, 4, 0, 0"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <Border Grid.Row="3" 
+                Grid.Column="0"
+                BorderBrush="DarkGray" 
+                BorderThickness="0" 
+                Margin="10,21,10,10"
+                Grid.ColumnSpan="2"
+                CornerRadius="2">
+            <ItemsControl ItemsSource="{Binding ChecksControls}" 
+                          Margin="5">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type familyChecksControl:FamilyCheckControl}">
+                        <familyChecksControl:FamilyCheckControl Margin="0, 4, 0, 0"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
         <Button Content="Complete" 
                 Grid.Column="1" 
                 Command="{Binding Complete, Mode=OneWay}"

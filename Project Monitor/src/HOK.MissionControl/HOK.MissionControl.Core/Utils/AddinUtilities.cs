@@ -20,7 +20,7 @@ namespace HOK.MissionControl.Core.Utils
                 }
                 if (collections.Count == 0)
                 {
-                    collectionId = ServerUtilities.PostDataScheme(new AddinData(), "addins").Id;
+                    collectionId = ServerUtilities.Post<AddinData>(new AddinData(), "addins").Id;
                 }
 
                 ServerUtilities.PostToMongoDB(addinLog, "addins", collectionId, "addlog");

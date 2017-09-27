@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -120,15 +119,23 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string name { get; set; }
+        public bool isNameVerified { get; set; }
         public string size { get; set; }
+        public bool isSizeVerified { get; set; }
         public long sizeValue { get; set; }
         public int instances { get; set; }
+        public bool isInstancesVerified { get; set; }
         public int elementId { get; set; }
         public int refPlaneCount { get; set; }
+        public bool isRefPlaneCountVerified { get; set; }
         public int arrayCount { get; set; }
+        public bool isArrayCountVerified { get; set; }
         public int voidCount { get; set; }
+        public bool isVoidCountVerified { get; set; }
         public int nestedFamilyCount { get; set; }
+        public bool isNestedFamilyCountVerified { get; set; }
         public int parametersCount { get; set; }
+        public bool isParametersCountVerified { get; set; }
         public bool isFailingChecks { get; set; }
         public bool isDeleted { get; set; }
         public List<FamilyTask> tasks { get; set; } = new List<FamilyTask>();

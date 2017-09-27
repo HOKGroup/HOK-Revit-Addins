@@ -352,7 +352,7 @@ namespace HOK.MissionControl.Core.Utils
         /// POSTs any new data Schema. Creates new Collection in MongoDB.
         /// </summary>
         /// <returns>Newly created Collection Schema with MongoDB assigned Id.</returns>
-        public static T PostDataScheme<T>(T dataSchema, string route) where T : new()
+        public static T Post<T>(object body, string route) where T : new()
         {
             var resresponse = default(T);
             try
@@ -361,7 +361,7 @@ namespace HOK.MissionControl.Core.Utils
                 var request = new RestRequest(ApiVersion + "/"+ route, Method.POST);
                 request.AddHeader("Content-type", "application/json");
                 request.RequestFormat = DataFormat.Json;
-                request.AddBody(dataSchema);
+                request.AddBody(body);
 
                 var response = client.Execute<T>(request);
                 if (response.Data != null)

@@ -16,7 +16,6 @@ using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.Communicator.HealthReport;
 using HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant;
-using HOK.MissionControl.Tools.Communicator.Tasks.TaskControl;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Tools.LinkUnloadMonitor;
@@ -105,7 +104,12 @@ namespace HOK.MissionControl
             return Result.Succeeded;
         }
 
-        private void OnFamilyLoadedIntoDocument(object sender, FamilyLoadedIntoDocumentEventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void OnFamilyLoadedIntoDocument(object sender, FamilyLoadedIntoDocumentEventArgs e)
         {
             if (e.Status != RevitAPIEventStatus.Succeeded) return;
 
@@ -117,7 +121,7 @@ namespace HOK.MissionControl
                 FamiliesToWatch.Remove(e.OriginalFamilyId.IntegerValue);
                 FamiliesToWatch.Add(e.NewFamilyId.IntegerValue, family);
 
-                var info = new RegistrationInfo
+                var info = new FamilyUpdatedMessage
                 {
                     Family = family
                 };
@@ -231,14 +235,14 @@ namespace HOK.MissionControl
                         HrData = ServerUtilities.GetHealthRecordByCentralPath(centralPath);
                         if (HrData == null)
                         {
-                            HrData = ServerUtilities.PostDataScheme(new HealthReportData { centralPath = centralPath }, "healthrecords");
+                            HrData = ServerUtilities.Post<HealthReportData>(new HealthReportData { centralPath = centralPath }, "healthrecords");
                             ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
                             refreshProject = true;
                         }
                         if (HrData != null)
                         {
                             MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
-                            CommunicatorWindow.DataContext = new CommunicatorViewModel(HrData); // create new communicator VM
+                            CommunicatorWindow.DataContext = new CommunicatorViewModel(); // create new communicator VM
                         }
                     }
 

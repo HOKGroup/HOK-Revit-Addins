@@ -1,5 +1,5 @@
 ﻿
-namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyChecksControl
+namespace HOK.MissionControl.Tools.Communicator.Tasks.CheckControl
 {
     /// <summary>
     /// Interaction logic for FamilyCheckControl.xaml
