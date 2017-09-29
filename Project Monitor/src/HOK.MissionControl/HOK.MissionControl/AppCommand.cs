@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
@@ -15,7 +16,8 @@ using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.Communicator.HealthReport;
-using HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant;
+using HOK.MissionControl.Tools.Communicator.Messaging;
+using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Tools.LinkUnloadMonitor;
@@ -96,6 +98,11 @@ namespace HOK.MissionControl
                 // it requires an External Event because new document cannot be opened from Idling Event
                 CommunicatorHandler = new CommunicatorRequestHandler();
                 CommunicatorEvent = ExternalEvent.Create(CommunicatorHandler);
+
+                // (Konrad) in order not to become out of synch with the database we need a way
+                // to communicate live updates from the database to task assistant/communicator
+                new Thread( new MissionControlSocket().Main){ Priority = ThreadPriority.BelowNormal }.Start();
+
             }
             catch (Exception ex)
             {
@@ -111,22 +118,24 @@ namespace HOK.MissionControl
         /// <param name="e"></param>
         private static void OnFamilyLoadedIntoDocument(object sender, FamilyLoadedIntoDocumentEventArgs e)
         {
-            if (e.Status != RevitAPIEventStatus.Succeeded) return;
+            //TODO: This would be a pretty invasive thing to do. First and foremost we are tracking every family being edited.
+            //TODO: Maybe we can do this if we spawn a new thread, and post this stuff directly to MongoDB right away.
+            //if (e.Status != RevitAPIEventStatus.Succeeded) return;
 
-            if (FamiliesToWatch.ContainsKey(e.OriginalFamilyId.IntegerValue))
-            {
-                var family = FamiliesToWatch[e.OriginalFamilyId.IntegerValue];
-                family.elementId = e.NewFamilyId.IntegerValue; // updating this value here propagates to all other references
+            //if (FamiliesToWatch.ContainsKey(e.OriginalFamilyId.IntegerValue))
+            //{
+            //    var family = FamiliesToWatch[e.OriginalFamilyId.IntegerValue];
+            //    family.elementId = e.NewFamilyId.IntegerValue; // updating this value here propagates to all other references
 
-                FamiliesToWatch.Remove(e.OriginalFamilyId.IntegerValue);
-                FamiliesToWatch.Add(e.NewFamilyId.IntegerValue, family);
+            //    FamiliesToWatch.Remove(e.OriginalFamilyId.IntegerValue);
+            //    FamiliesToWatch.Add(e.NewFamilyId.IntegerValue, family);
 
-                var info = new FamilyUpdatedMessage
-                {
-                    Family = family
-                };
-                Messenger.Default.Send(info);
-            }
+            //    var info = new FamilyUpdatedMessage
+            //    {
+            //        Family = family
+            //    };
+            //    Messenger.Default.Send(info);
+            //}
         }
 
         /// <summary>

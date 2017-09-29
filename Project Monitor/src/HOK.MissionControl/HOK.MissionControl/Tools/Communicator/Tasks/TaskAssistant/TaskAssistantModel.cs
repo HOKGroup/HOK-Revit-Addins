@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Tools.Communicator.Tasks.CheckControl;
-using HOK.MissionControl.Tools.Communicator.Tasks.TaskControl;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
 {

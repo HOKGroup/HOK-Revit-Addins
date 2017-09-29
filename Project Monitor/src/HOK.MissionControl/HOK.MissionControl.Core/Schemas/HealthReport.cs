@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -96,18 +97,69 @@ namespace HOK.MissionControl.Core.Schemas
     /// <summary>
     /// Task object added to Family.
     /// </summary>
+    [DataContract]
     public class FamilyTask
     {
+        //private static readonly DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [DataMember(Name = "_id")]
         public string Id { get; set; }
+
+        [DataMember(Name = "name")]
         public string name { get; set; }
+
+        [DataMember(Name = "assignedTo")]
         public string assignedTo { get; set; }
+
+        [DataMember(Name = "message")]
         public string message { get; set; }
+
+        [DataMember(Name = "submittedBy")]
         public string submittedBy { get; set; }
+
+        [DataMember(Name = "completedBy")]
         public string completedBy { get; set; }
-        public DateTime submittedOn { get; set; }
-        public DateTime completedOn { get; set; }
+
+        //[IgnoreDataMember]
+        [DataMember(Name = "submittedOn")]
+        public DateTime? submittedOn { get; set; }
+
+        //[DataMember(Name = "submittedOn")]
+        //private long submittedOnTicks {
+        //    get { return (long) (submittedOn - unixEpoch).TotalMilliseconds; }
+        //    set { submittedOn = unixEpoch.AddMilliseconds(value); }
+        //}
+
+        //[IgnoreDataMember]
+        [DataMember(Name = "completedOn")]
+        public DateTime? completedOn { get; set; }
+
+        //[DataMember(Name = "completedOn")]
+        //private long completedOnTicks
+        //{
+        //    get
+        //    {
+        //        if (completedOn.HasValue)
+        //        {
+        //            return (long)(completedOn.Value - unixEpoch).TotalMilliseconds;
+        //        }
+        //        // completedOn is null, return something reasonable
+        //        return long.MinValue;
+        //    }
+        //    //set
+        //    //{
+        //    //    if (value != long.MinValue)
+        //    //    {
+        //    //        completedOn = unixEpoch.AddMilliseconds(value);
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        completedOn = null;
+        //    //    }
+        //    //}
+        //}
     }
 
     /// <summary>
@@ -117,27 +169,70 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [DataMember(Name = "_id")]
         public string Id { get; set; }
+
+        [DataMember(Name = "name")]
         public string name { get; set; }
+
+        [DataMember(Name = "isNameVerified")]
         public bool isNameVerified { get; set; }
+
+        [DataMember(Name = "size")]
         public string size { get; set; }
+
+        [DataMember(Name = "isSizeVerified")]
         public bool isSizeVerified { get; set; }
+
+        [DataMember(Name = "sizeValue")]
         public long sizeValue { get; set; }
+
+        [DataMember(Name = "instances")]
         public int instances { get; set; }
+
+        [DataMember(Name = "isInstancesVerified")]
         public bool isInstancesVerified { get; set; }
+
+        [DataMember(Name = "elementId")]
         public int elementId { get; set; }
+
+        [DataMember(Name = "refPlaneCount")]
         public int refPlaneCount { get; set; }
+
+        [DataMember(Name = "isRefPlaneCountVerified")]
         public bool isRefPlaneCountVerified { get; set; }
+
+        [DataMember(Name = "arrayCount")]
         public int arrayCount { get; set; }
+
+        [DataMember(Name = "isArrayCountVerified")]
         public bool isArrayCountVerified { get; set; }
+
+        [DataMember(Name = "voidCount")]
         public int voidCount { get; set; }
+
+        [DataMember(Name = "isVoidCountVerified")]
         public bool isVoidCountVerified { get; set; }
+
+        [DataMember(Name = "nestedFamilyCount")]
         public int nestedFamilyCount { get; set; }
+
+        [DataMember(Name = "isNestedFamilyCountVerified")]
         public bool isNestedFamilyCountVerified { get; set; }
+
+        [DataMember(Name = "parametersCount")]
         public int parametersCount { get; set; }
+
+        [DataMember(Name = "isParametersCountVerified")]
         public bool isParametersCountVerified { get; set; }
+
+        [DataMember(Name = "isFailingChecks")]
         public bool isFailingChecks { get; set; }
+
+        [DataMember(Name = "isDeleted")]
         public bool isDeleted { get; set; }
+
+        [DataMember(Name = "tasks")]
         public List<FamilyTask> tasks { get; set; } = new List<FamilyTask>();
     }
 
@@ -148,14 +243,31 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [DataMember(Name = "_id")]
         public string Id { get; set; }
+
+        [DataMember(Name = "centralPath")]
         public string centralPath { get; set; }
+
+        [DataMember(Name = "totalFamilies")]
         public int totalFamilies { get; set; }
+
+        [DataMember(Name = "unusedFamilies")]
         public int unusedFamilies { get; set; }
+
+        [DataMember(Name = "oversizedFamilies")]
         public int oversizedFamilies { get; set; }
+
+        [DataMember(Name = "inPlaceFamilies")]
         public int inPlaceFamilies { get; set; }
+
+        [DataMember(Name = "createdBy")]
         public string createdBy { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.Now;
+
+        [DataMember(Name = "createdOn")]
+        public DateTime? createdOn { get; set; }
+
+        [DataMember(Name = "families")]
         public List<FamilyItem> families { get; set; } = new List<FamilyItem>();
     }
 

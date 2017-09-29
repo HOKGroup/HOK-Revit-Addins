@@ -2,15 +2,10 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Tools.Communicator.Messaging;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskControl
 {
-    public class TaskUpdatedMessage
-    {
-        public FamilyTask Task { get; set; }
-    }
-
     public class TaskControlViewModel : ViewModelBase
     {
         public RelayCommand<Button> LaunchTaskAssistant { get; set; }

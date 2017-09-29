@@ -17,14 +17,15 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             var output = new List<TaskControlViewModel>();
             foreach (var family in famStat.families)
             {
-                if(!family.tasks.Any()) continue;
+                // (Konrad) We are storing this Family Item for later so that if user makes any changes to this family
+                // and reloads it back into the model, we can capture that and post to MongoDB at the end of the session.
+                if (!familiesToWatch.ContainsKey(family.elementId)) familiesToWatch.Add(family.elementId, family);
+
+                if (!family.tasks.Any()) continue;
                 foreach (var task in family.tasks)
                 {
                     if(!string.Equals(task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
 
-                    // (Konrad) We are storing this Family Item for later so that if user makes any changes to this family
-                    // and reloads it back into the model, we can capture that and post to MongoDB at the end of the session.
-                    if(!familiesToWatch.ContainsKey(family.elementId)) familiesToWatch.Add(family.elementId, family);
                     output.Add(new TaskControlViewModel
                     {
                         Model = new TaskControlModel(family, task),

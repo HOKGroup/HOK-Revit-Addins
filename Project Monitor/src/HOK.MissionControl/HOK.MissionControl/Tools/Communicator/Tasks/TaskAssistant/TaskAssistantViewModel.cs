@@ -4,16 +4,11 @@ using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Tools.Communicator.Tasks.CheckControl;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
 {
-    public class FamilyUpdatedMessage
-    {
-        public FamilyItem Family { get; set; }
-    }
-
     public class TaskAssistantViewModel : ViewModelBase
     {
         public TaskAssistantModel Model { get; set; }
@@ -40,20 +35,20 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
             EditFamily = new RelayCommand(OnEditFamily);
             Close = new RelayCommand<Window>(OnClose);
 
-            Messenger.Default.Register<FamilyUpdatedMessage>(this, OnFamilyUpdatedReceived);
+            //Messenger.Default.Register<FamilyUpdatedMessage>(this, OnFamilyUpdatedReceived);
         }
 
-        /// <summary>
-        /// When a new family is loaded into the model, it's being caught and if this window is running
-        /// it updates its information. That way I can keep the updated information about the family stored/displayed.
-        /// </summary>
-        /// <param name="msg">MessageInfo containing updated family item.</param>
-        private void OnFamilyUpdatedReceived(FamilyUpdatedMessage msg)
-        {
-            if (msg.Family.elementId != Model.Family.elementId) return;
+        ///// <summary>
+        ///// When a new family is loaded into the model, it's being caught and if this window is running
+        ///// it updates its information. That way I can keep the updated information about the family stored/displayed.
+        ///// </summary>
+        ///// <param name="msg">MessageInfo containing updated family item.</param>
+        //private void OnFamilyUpdatedReceived(FamilyUpdatedMessage msg)
+        //{
+        //    if (msg.Family.elementId != Model.Family.elementId) return;
 
-            FamilyName = msg.Family.name + " - " + msg.Family.elementId;
-        }
+        //    FamilyName = msg.Family.name + " - " + msg.Family.elementId;
+        //}
 
         private static void OnClose(Window win)
         {

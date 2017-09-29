@@ -92,7 +92,8 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
             if (linkStats != null)
             {
                 var passingChecks = 0;
-                if (linkStats.totalImportedDwg == 0) passingChecks += 2;
+                var imports = linkStats.importedDwgFiles.Select(x => !x.isLinked).Count();
+                if (imports == 0) passingChecks += 2;
                 if (linkStats.unusedLinkedImages == 0) passingChecks += 2;
                 else
                 {
