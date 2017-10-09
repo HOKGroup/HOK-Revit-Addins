@@ -23,7 +23,7 @@ namespace HOK.MissionControl.Tools.Communicator
             TabItems = new ObservableCollection<TabItem>
             {
                 new TabItem{Content = new CommunicatorHealthReportView {DataContext = new CommunicatorHealthReportViewModel(familyStats)}, Header = "Health Report"},
-                new TabItem{Content = new CommunicatorTasksView {DataContext = new CommunicatorTasksViewModel(familyStats)}, Header = "Tasks"}
+                new TabItem{Content = new CommunicatorTasksView {DataContext = new CommunicatorTasksViewModel(new CommunicatorTasksModel(familyStats))}, Header = "Tasks"}
             };
         }
     }

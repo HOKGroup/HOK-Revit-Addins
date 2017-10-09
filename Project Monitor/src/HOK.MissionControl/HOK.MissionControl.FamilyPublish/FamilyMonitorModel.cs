@@ -29,145 +29,6 @@ namespace HOK.MissionControl.FamilyPublish
             CentralPath = centralPath;
         }
 
-        ///// <summary>
-        ///// Publishes information about linked models/images/object styles in the model.
-        ///// </summary>
-        //public void PublishData()
-        //{
-        //    try
-        //    {
-        //        if (!MonitorUtilities.IsUpdaterOn(Project, Config, UpdaterGuid)) return;
-        //        if (string.IsNullOrEmpty(RecordId)) return;
-
-        //        var suspectFamilies = new List<FamilyItem>();
-        //        var totalFamilies = 0;
-        //        var unusedFamilies = 0;
-        //        var oversizedFamilies = 0;
-        //        var inPlaceFamilies = 0;
-        //        var families = new FilteredElementCollector(Doc).OfClass(typeof(Family)).Cast<Family>().ToList();
-
-        //        StatusBarManager.InitializeProgress("Exporting Family Info:", families.Count);
-        //        foreach (var family in families)
-        //        {
-        //            StatusBarManager.StepForward();
-
-        //            var sizeCheck = false;
-        //            var instanceCheck = false;
-        //            var nameCheck = false;
-
-        //            totalFamilies++;
-        //            var instances = CountFamilyInstances(family);
-        //            if (instances == 0)
-        //            {
-        //                unusedFamilies++;
-        //                instanceCheck = true;
-        //            }
-
-        //            if (family.IsInPlace) inPlaceFamilies++;
-        //            if (!family.IsEditable) continue;
-
-        //            try
-        //            {
-        //                long size;
-        //                var famDoc = Doc.EditFamily(family);
-
-        //                var refPlanes = new FilteredElementCollector(famDoc)
-        //                    .OfClass(typeof(ReferencePlane))
-        //                    .GetElementCount();
-
-        //                var filter = new LogicalAndFilter(new List<ElementFilter>
-        //                {
-        //                    new ElementClassFilter(typeof(LinearArray)),
-        //                    new ElementClassFilter(typeof(RadialArray))
-        //                });
-        //                var arrays = new FilteredElementCollector(famDoc)
-        //                    .WherePasses(filter)
-        //                    .GetElementCount();
-
-        //                var voids = new FilteredElementCollector(famDoc)
-        //                    .OfClass(typeof(Extrusion))
-        //                    .Cast<Extrusion>()
-        //                    .Count(x => !x.IsSolid);
-
-        //                var nestedFamilies = new FilteredElementCollector(famDoc)
-        //                    .OfClass(typeof(Family))
-        //                    .GetElementCount();
-
-        //                var parameters = new FilteredElementCollector(famDoc)
-        //                    .OfClass(typeof(ParameterElement))
-        //                    .GetElementCount();
-
-        //                var storedPath = famDoc.PathName;
-        //                if (File.Exists(storedPath))
-        //                {
-        //                    size = new FileInfo(storedPath).Length;
-        //                }
-        //                else
-        //                {
-        //                    var myDocPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        //                    var path = myDocPath + "\\temp_" + famDoc.Title;
-        //                    famDoc.SaveAs(path);
-
-        //                    size = new FileInfo(path).Length;
-        //                    TryToDelete(path);
-        //                }
-        //                famDoc.Close(false);
-
-        //                var sizeStr = BytesToString(size);
-        //                if (size > 1000000)
-        //                {
-        //                    oversizedFamilies++; // >1MB
-        //                    sizeCheck = true;
-        //                }
-
-        //                if (!family.Name.Contains("_HOK_I") && !family.Name.Contains("_HOK_M")) nameCheck = true;
-
-        //                // (Konrad) We only want to export families that don't have proper name, are oversized or unplaced.
-        //                if (nameCheck || sizeCheck || instanceCheck)
-        //                {
-        //                    var famItem = new FamilyItem
-        //                    {
-        //                        name = family.Name,
-        //                        elementId = family.Id.IntegerValue,
-        //                        size = sizeStr,
-        //                        sizeValue = size,
-        //                        instances = instances,
-
-        //                        arrayCount = arrays,
-        //                        refPlaneCount = refPlanes,
-        //                        voidCount = voids,
-        //                        nestedFamilyCount = nestedFamilies,
-        //                        parametersCount = parameters
-        //                    };
-
-        //                    suspectFamilies.Add(famItem);
-        //                }
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-        //            }
-        //        }
-
-        //        var familyStats = new FamilyStat
-        //        {
-        //            suspectFamilies = suspectFamilies,
-        //            totalFamilies = totalFamilies,
-        //            unusedFamilies = unusedFamilies,
-        //            inPlaceFamilies = inPlaceFamilies,
-        //            oversizedFamilies = oversizedFamilies,
-        //            createdBy = Environment.UserName
-        //        };
-
-        //        ServerUtilities.PostToMongoDB(familyStats, "healthrecords", RecordId, "familystats");
-        //        StatusBarManager.FinalizeProgress();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-        //    }
-        //}
-
         /// <summary>
         /// Publishes information about linked models/images/object styles in the model.
         /// </summary>
@@ -178,26 +39,6 @@ namespace HOK.MissionControl.FamilyPublish
                 if (!MonitorUtilities.IsUpdaterOn(Project, Config, UpdaterGuid)) return;
                 if (string.IsNullOrEmpty(RecordId)) return;
 
-                var famData = ServerUtilities.GetDataByCentralPath<FamilyStat>(CentralPath, "families");
-                FamilyStat famStat = null;
-                if (famData.Any())
-                {
-                    foreach (var fam in famData)
-                    {
-                        if (!string.Equals(fam.centralPath.ToLower(), CentralPath.ToLower())) continue;
-                        famStat = fam;
-                        break;
-                    }
-                }
-
-                var famDict = new Dictionary<string, FamilyItem>();
-                var famOutput = new List<FamilyItem>();
-                if (famStat != null)
-                {
-                    famDict = famStat.families.ToDictionary(x => x.name, x => x);
-                }
-
-                var totalFamilies = 0;
                 var unusedFamilies = 0;
                 var oversizedFamilies = 0;
                 var inPlaceFamilies = 0;
@@ -206,9 +47,16 @@ namespace HOK.MissionControl.FamilyPublish
                     .Cast<Family>()
                     .ToList();
 
+                var famOutput = new List<FamilyItem>();
                 StatusBarManager.InitializeProgress("Exporting Family Info:", families.Count);
                 foreach (var family in families)
                 {
+                    if (StatusBarManager.Cancel)
+                    {
+                        StatusBarManager.CancelProgress();
+                        return;
+                    }
+
                     StatusBarManager.StepForward();
                     if (!family.IsEditable) continue;
 
@@ -216,7 +64,6 @@ namespace HOK.MissionControl.FamilyPublish
                     var instanceCheck = false;
                     var nameCheck = false;
 
-                    totalFamilies++;
                     var instances = CountFamilyInstances(family);
                     if (instances == 0)
                     {
@@ -229,6 +76,25 @@ namespace HOK.MissionControl.FamilyPublish
                     {
                         long size;
                         var famDoc = Doc.EditFamily(family);
+
+                        var storedPath = famDoc.PathName;
+                        if (File.Exists(storedPath))
+                        {
+                            size = new FileInfo(storedPath).Length;
+                        }
+                        else
+                        {
+                            if (string.IsNullOrWhiteSpace(famDoc.Title)) continue; // could cause an exception
+
+                            var myDocPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                            var path = myDocPath + "\\temp_" + famDoc.Title;
+                            if (path.IndexOfAny(Path.GetInvalidPathChars()) != -1) continue; // could cause an exception
+
+                            if (File.Exists(path)) TryToDelete(path);
+                            famDoc.SaveAs(path);
+                            size = new FileInfo(path).Length;
+                            TryToDelete(path);
+                        }
 
                         var refPlanes = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(ReferencePlane))
@@ -256,20 +122,6 @@ namespace HOK.MissionControl.FamilyPublish
                             .OfClass(typeof(ParameterElement))
                             .GetElementCount();
 
-                        var storedPath = famDoc.PathName;
-                        if (File.Exists(storedPath))
-                        {
-                            size = new FileInfo(storedPath).Length;
-                        }
-                        else
-                        {
-                            var myDocPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                            var path = myDocPath + "\\temp_" + famDoc.Title;
-                            famDoc.SaveAs(path);
-
-                            size = new FileInfo(path).Length;
-                            TryToDelete(path);
-                        }
                         famDoc.Close(false);
 
                         var sizeStr = StringUtilities.BytesToString(size);
@@ -298,24 +150,42 @@ namespace HOK.MissionControl.FamilyPublish
                         if (nameCheck || sizeCheck || instanceCheck) famItem.isFailingChecks = true;
                         else famItem.isFailingChecks = false;
 
-                        // (Konrad) We need to check if new family is already stored in MongoDB.
-                        // If it was stored, get its tasks list.
-                        // If it was not stored, add it to list.
-                        // If it no longer exists mark it as deleted.
-                        if (famDict.ContainsKey(famItem.name))
-                        {
-                            famItem.tasks.AddRange(famDict[famItem.name].tasks);
-                            famOutput.Add(famItem);
-                            famDict.Remove(famItem.name);
-                        }
-                        else
-                        {
-                            famOutput.Add(famItem);
-                        }
+                        famOutput.Add(famItem);
                     }
                     catch (Exception ex)
                     {
                         Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                    }
+                }
+
+                var famData = ServerUtilities.GetDataByCentralPath<FamilyStat>(CentralPath, "families");
+                FamilyStat famStat = null;
+                if (famData.Any())
+                {
+                    foreach (var fam in famData)
+                    {
+                        if (!string.Equals(fam.centralPath.ToLower(), CentralPath.ToLower())) continue;
+                        famStat = fam;
+                        break;
+                    }
+                }
+
+                var famDict = new Dictionary<string, FamilyItem>();
+                if (famStat != null)
+                {
+                    famDict = famStat.families.ToDictionary(x => x.name, x => x);
+                }
+
+                // (Konrad) I know it's not efficient to iterate this list yet again, but
+                // I want to minimize the amount of time between publishing families and
+                // retrieving them from database to avoid someone addind tasks to DB while
+                // we are exporting and hence losing them after the export.
+                foreach (var family in famOutput)
+                {
+                    if (famDict.ContainsKey(family.name))
+                    {
+                        family.tasks.AddRange(famDict[family.name].tasks);
+                        famDict.Remove(family.name);
                     }
                 }
 
@@ -328,11 +198,12 @@ namespace HOK.MissionControl.FamilyPublish
                 var familyStats = new FamilyStat
                 {
                     centralPath = CentralPath,
-                    totalFamilies = totalFamilies,
+                    totalFamilies = famOutput.Count,
                     unusedFamilies = unusedFamilies,
                     inPlaceFamilies = inPlaceFamilies,
                     oversizedFamilies = oversizedFamilies,
                     createdBy = Environment.UserName.ToLower(),
+                    createdOn = DateTime.Now,
                     families = famOutput
                 };
 

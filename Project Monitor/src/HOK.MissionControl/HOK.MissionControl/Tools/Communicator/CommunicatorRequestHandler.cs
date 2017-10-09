@@ -29,9 +29,6 @@ namespace HOK.MissionControl.Tools.Communicator
         }
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
     public class CommunicatorRequestHandler : IExternalEventHandler
     {
         public FamilyItem FamilyItem { get; set; }

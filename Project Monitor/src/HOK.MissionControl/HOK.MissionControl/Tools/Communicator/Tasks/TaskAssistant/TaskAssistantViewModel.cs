@@ -5,50 +5,35 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using HOK.MissionControl.Tools.Communicator.Messaging;
-using HOK.MissionControl.Tools.Communicator.Tasks.CheckControl;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
 {
     public class TaskAssistantViewModel : ViewModelBase
     {
+        public string Title { get; set; }
         public TaskAssistantModel Model { get; set; }
         public RelayCommand<Window> Complete { get; set; }
-        public RelayCommand<Window> WindowClosing { get; set; }
         public RelayCommand EditFamily { get; set; }
-        public RelayCommand RefreshChecks { get; set; }
         public RelayCommand<Window> Close { get; set; }
-        public string Title { get; set; }
-        public ObservableCollection<FamilyCheckViewModel> ChecksControls { get; set; }
+        public RelayCommand<Window> WindowClosed { get; set; }
 
-        public TaskAssistantViewModel(TaskAssistantModel model)
+        public TaskAssistantViewModel(FamilyTaskWrapper wrapper)
         {
-            Model = model;
+            Model = new TaskAssistantModel();
+            Wrapper = wrapper;
             Title = "Mission Control - Task Assistant v." + Assembly.GetExecutingAssembly().GetName().Version;
-            FamilyName = Model.Family.name + " - " + Model.Family.elementId;
-            TaskName = Model.Task.name;
-            Recipient = Model.Task.assignedTo;
-            Message = Model.Task.message;
-            ChecksControls = Model.ProcessChecks();
+            Checks = Model.CollectChecks(wrapper.Family);
 
             Complete = new RelayCommand<Window>(OnComplete);
-            WindowClosing = new RelayCommand<Window>(OnWindowClosing);
             EditFamily = new RelayCommand(OnEditFamily);
             Close = new RelayCommand<Window>(OnClose);
-
-            //Messenger.Default.Register<FamilyUpdatedMessage>(this, OnFamilyUpdatedReceived);
+            WindowClosed = new RelayCommand<Window>(OnWindowClosed);
         }
 
-        ///// <summary>
-        ///// When a new family is loaded into the model, it's being caught and if this window is running
-        ///// it updates its information. That way I can keep the updated information about the family stored/displayed.
-        ///// </summary>
-        ///// <param name="msg">MessageInfo containing updated family item.</param>
-        //private void OnFamilyUpdatedReceived(FamilyUpdatedMessage msg)
-        //{
-        //    if (msg.Family.elementId != Model.Family.elementId) return;
-
-        //    FamilyName = msg.Family.name + " - " + msg.Family.elementId;
-        //}
+        private static void OnWindowClosed(Window win)
+        {
+            Messenger.Default.Send(new TaskAssistantClosedMessage { IsClosed = true });
+        }
 
         private static void OnClose(Window win)
         {
@@ -57,44 +42,27 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
 
         private void OnEditFamily()
         {
-            Model.EditFamily();
-        }
-
-        private void OnWindowClosing(Window win)
-        {
-            Model.SubmitEdits();
+            Model.EditFamily(Wrapper.Family);
         }
 
         private void OnComplete(Window win)
         {
-            // talk to the server
+            Model.Submit(Wrapper);
             win.Close();
         }
 
-        private string _message;
-        public string Message
+        private ObservableCollection<CheckWrapper> _checks;
+        public ObservableCollection<CheckWrapper> Checks
         {
-            get { return _message; }
-            set { _message = value; RaisePropertyChanged(() => Message); }
+            get { return _checks; }
+            set { _checks = value; RaisePropertyChanged(() => Checks); }
         }
 
-        private string _recipient;
-        public string Recipient
+        private FamilyTaskWrapper _wrapper;
+        public FamilyTaskWrapper Wrapper
         {
-            get { return _recipient; }
-            set { _recipient = value; RaisePropertyChanged(() => Recipient); }
-        }
-
-        private string _taskName;
-        public string TaskName {
-            get { return _taskName; }
-            set { _taskName = value; RaisePropertyChanged(() => TaskName); }
-        }
-
-        private string _familyName;
-        public string FamilyName {
-            get { return _familyName; }
-            set { _familyName = value; RaisePropertyChanged(() => FamilyName); }
+            get { return _wrapper; }
+            set { _wrapper = value; RaisePropertyChanged(() => Wrapper); }
         }
     }
 }

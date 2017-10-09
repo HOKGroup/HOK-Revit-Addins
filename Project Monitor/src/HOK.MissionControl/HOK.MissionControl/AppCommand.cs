@@ -39,7 +39,7 @@ namespace HOK.MissionControl
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
         private static Queue<Action<UIApplication>> Tasks;
         public static HealthReportData HrData { get; set; }
-        private CommunicatorView CommunicatorWindow { get; set; }
+        public CommunicatorView CommunicatorWindow { get; set; }
         public PushButton CommunicatorButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
@@ -50,7 +50,7 @@ namespace HOK.MissionControl
 
         public static CommunicatorRequestHandler CommunicatorHandler { get; set; }
         public static ExternalEvent CommunicatorEvent { get; set; }
-        public static Dictionary<int, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<int, FamilyItem>();
+        public static Dictionary<string, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<string, FamilyItem>();
 
         /// <summary>
         /// Registers all event handlers during startup.

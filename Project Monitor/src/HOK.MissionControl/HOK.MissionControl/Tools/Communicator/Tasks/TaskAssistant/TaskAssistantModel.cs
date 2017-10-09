@@ -1,130 +1,80 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using GalaSoft.MvvmLight.Messaging;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
-using HOK.MissionControl.Tools.Communicator.Messaging;
-using HOK.MissionControl.Tools.Communicator.Tasks.CheckControl;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
 {
+    public class CheckWrapper
+    {
+        public string CheckName { get; set; }
+        public bool IsCheckPassing { get; set; }
+        public string ToolTipText { get; set; }
+    }
+
     public class TaskAssistantModel
     {
-        public FamilyItem Family { get; set; }
-        public FamilyTask Task { get; set; }
-
-        public TaskAssistantModel(FamilyItem family, FamilyTask task)
+        public ObservableCollection<CheckWrapper> CollectChecks(FamilyItem family)
         {
-            Family = family;
-            Task = task;
+            var output = new ObservableCollection<CheckWrapper>
+            {
+                new CheckWrapper
+                {
+                    CheckName = $"Name: {family.name}",
+                    IsCheckPassing = family.name.Contains("_HOK_I") || family.name.Contains("_HOK_M"),
+                    ToolTipText = "Check will fail if Family name does not contain \"_HOK_I\" or \"_HOK_M\"."
+                },
+                new CheckWrapper
+                {
+                    CheckName = $"Size: {family.size}",
+                    IsCheckPassing = family.sizeValue < 1000000,
+                    ToolTipText = "Check will fail if file size exceeds 1MB."
+                },
+                new CheckWrapper
+                {
+                    CheckName = $"Instances: {family.instances}",
+                    IsCheckPassing = family.instances > 0,
+                    ToolTipText = "Check will fail if Family has no placed instances."
+                },
+                new CheckWrapper
+                {
+                    CheckName = $"Voids: {family.voidCount}",
+                    IsCheckPassing = family.voidCount < 5,
+                    ToolTipText = "Check will fail if Family contains more than 5 void cuts."
+                },
+                new CheckWrapper
+                {
+                    CheckName = $"Arrays: {family.arrayCount}",
+                    IsCheckPassing = family.arrayCount < 5,
+                    ToolTipText = "Check will fail if Family contains more than 5 arrays."
+                },
+                new CheckWrapper
+                {
+                    CheckName = $"Nested Families: {family.nestedFamilyCount}",
+                    IsCheckPassing = family.nestedFamilyCount < 5,
+                    ToolTipText = "Check will fail if Family contains more than 5 nested families."
+                }
+            };
+
+            return output;
         }
 
-        public void SubmitEdits()
+        public void EditFamily(FamilyItem family)
+        {
+            AppCommand.CommunicatorHandler.FamilyItem = family;
+            AppCommand.CommunicatorHandler.Request.Make(RequestId.EditFamily);
+            AppCommand.CommunicatorEvent.Raise();
+        }
+
+        public void Submit(FamilyTaskWrapper wrapper)
         {
             var familyStatsId = AppCommand.HrData.familyStats;
             if (string.IsNullOrEmpty(familyStatsId)) return;
 
-            //var families = AppCommand.FamiliesToWatch;
+            wrapper.Task.completedOn = DateTime.Now;
+            wrapper.Task.completedBy = Environment.UserName.ToLower();
 
-            //// TODO: This is disgusting! I need to figure out a way to make a single call to MongoDB.
-            //foreach (var family in families.Values)
-            //{
-            //    ServerUtilities.UpdateField(new {key = family}, "families/" + familyStatsId + "/updateone");
-            //}
-
-            if (AppCommand.FamiliesToWatch.ContainsKey(Family.elementId))
-            {
-                ServerUtilities.UpdateField(new { key = AppCommand.FamiliesToWatch[Family.elementId] }, "families/" + familyStatsId + "/updateone");
-            }
-
-            Task.completedOn = DateTime.Now;
-            Task.completedBy = Environment.UserName.ToLower();
-
-            ServerUtilities.Post<FamilyStat>(Task, "families/" + familyStatsId + "/name/" + Family.name + "/updatetask/" + Task.Id);
-
-            var info = new TaskUpdatedMessage
-            {
-                Task = Task
-            };
-            Messenger.Default.Send(info);
-
-            //var updatedFamily = updated.families.FirstOrDefault(x => x.elementId == Family.elementId);
-            //if (updatedFamily != null)
-            //{
-            //    var updatedTask = updatedFamily.tasks.FirstOrDefault(x => x.Id == Task.Id);
-            //    var info = new TaskUpdatedMessage
-            //    {
-            //        Task = updatedTask
-            //    };
-            //    Messenger.Default.Send(info);
-            //}
+            ServerUtilities.Post<FamilyStat>(wrapper.Task, "families/" + familyStatsId + "/family/" + wrapper.Family.name + "/updatetask/" + wrapper.Task.Id);
         }
-
-        public ObservableCollection<FamilyCheckViewModel> ProcessChecks()
-        {
-            var output = new ObservableCollection<FamilyCheckViewModel>
-            {
-                new FamilyCheckViewModel(Family)
-                {
-                    CheckName = $"Name: {Family.name}",
-                    IsCheckPassing = Family.name.Contains("_HOK_I") || Family.name.Contains("_HOK_M"),
-                    CheckType = FamilyCheckTypes.Name,
-                    IsCheckVerified = Family.isNameVerified
-                },
-                new FamilyCheckViewModel(Family)
-                {
-                    CheckName = $"Size: {Family.size}",
-                    IsCheckPassing = Family.sizeValue < 1000000,
-                    CheckType = FamilyCheckTypes.Size,
-                    IsCheckVerified = Family.isSizeVerified
-                },
-                new FamilyCheckViewModel(Family)
-                {
-                    CheckName = $"Instances: {Family.instances}",
-                    IsCheckPassing = Family.instances > 0,
-                    CheckType = FamilyCheckTypes.Instances,
-                    IsCheckVerified = Family.isInstancesVerified
-                },
-                new FamilyCheckViewModel(Family)
-                {
-                    CheckName = $"Voids: {Family.voidCount}",
-                    IsCheckPassing = Family.voidCount < 5,
-                    CheckType = FamilyCheckTypes.Voids,
-                    IsCheckVerified = Family.isVoidCountVerified
-                },
-                new FamilyCheckViewModel(Family)
-                {
-                    CheckName = $"Arrays: {Family.arrayCount}",
-                    IsCheckPassing = Family.arrayCount < 5,
-                    CheckType = FamilyCheckTypes.Arrays,
-                    IsCheckVerified = Family.isArrayCountVerified
-                },
-                new FamilyCheckViewModel(Family)
-                {
-                    CheckName = $"Nested Families: {Family.nestedFamilyCount}",
-                    IsCheckPassing = Family.nestedFamilyCount < 5,
-                    CheckType = FamilyCheckTypes.NestedFamilies,
-                    IsCheckVerified = Family.isNestedFamilyCountVerified
-                }
-            };
-            return output;
-        }
-
-        public void EditFamily()
-        {
-            AppCommand.CommunicatorHandler.FamilyItem = Family;
-            AppCommand.CommunicatorHandler.Request.Make(RequestId.EditFamily);
-            AppCommand.CommunicatorEvent.Raise();
-        }
-    }
-
-    public enum FamilyCheckTypes
-    {
-        Name,
-        Size,
-        Instances,
-        Voids,
-        Arrays,
-        NestedFamilies
     }
 }

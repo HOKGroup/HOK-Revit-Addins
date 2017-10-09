@@ -16,7 +16,7 @@ namespace HOK.Core.WpfUtilities
         public static ProgressBar ProgressBar = null;
         public static TextBlock StatusLabel = null;
         public static double ProgressValue;
-        public static string DatabaseFilePath = "";
+        public static bool Cancel;
 
         private delegate void UpdateProgressBarDelegate(DependencyProperty dp, object value);
         private delegate void UpdateStatusLabelDelegate(DependencyProperty dp, object value);
@@ -56,6 +56,15 @@ namespace HOK.Core.WpfUtilities
         }
 
         /// <summary>
+        /// Cancels the progress bar and resets the status.
+        /// </summary>
+        public static void CancelProgress()
+        {
+            Cancel = false;
+            FinalizeProgress();
+        }
+
+        /// <summary>
         /// Clean up Progress bar by resetting Status Label.
         /// </summary>
         public static void FinalizeProgress()
@@ -64,7 +73,7 @@ namespace HOK.Core.WpfUtilities
 
             ProgressValue = 0;
             ProgressBar.Visibility = Visibility.Hidden;
-            StatusLabel.Text = !string.IsNullOrEmpty(DatabaseFilePath) ? DatabaseFilePath : "Ready";
+            StatusLabel.Text = "Ready";
         }
     }
 }

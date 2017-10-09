@@ -163,7 +163,16 @@
                 Margin="0,10,10,0" VerticalAlignment="Top" Width="100" Height="28" 
                 FontSize="15" 
                 Command="{Binding Close, Mode=OneWay}" 
-                CommandParameter="{Binding ElementName=Win}" Grid.RowSpan="2"/>
+                CommandParameter="{Binding ElementName=Win}"/>
+        <Button x:Name="CancelButton" 
+                Grid.Row="2" 
+                Content="Cancel" 
+                Style="{StaticResource colorButtonStyle}"  
+                HorizontalAlignment="Right" 
+                Margin="0,10,10,0" VerticalAlignment="Top" Width="100" Height="28" 
+                FontSize="15" 
+                Command="{Binding Cancel, Mode=OneWay}" 
+                CommandParameter="{Binding ElementName=Win}"/>
 
         <StatusBar Grid.Row="3" Height="23" HorizontalAlignment="Stretch" Margin="0,0,0,0" Name="statusBar" VerticalAlignment="Bottom">
             <StatusBar.ItemsPanel>

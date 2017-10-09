@@ -3,22 +3,109 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:taskControl="clr-namespace:HOK.MissionControl.Tools.Communicator.Tasks.TaskControl"
+             xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
+             xmlns:tasks="clr-namespace:HOK.MissionControl.Tools.Communicator.Tasks"
+             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <tasks:StringToBoolConverter x:Key="StringToBoolConverter"/>
+    </UserControl.Resources>
     <Grid>
-        <ItemsControl ItemsSource="{Binding TaskControls}" 
-                      Margin="10,10,10,10">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate DataType="{x:Type taskControl:TaskControl}">
-                    <taskControl:TaskControl Margin="0, 4, 0, 0"/>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <wpfUtilities:DataGridExtension x:Name="DataGridTasks"
+                                        ItemsSource="{Binding Tasks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                        CanUserAddRows="False" 
+                                        AutoGenerateColumns="False"
+                                        BorderThickness="0"
+                                        Background="White"
+                                        GridLinesVisibility="None"
+                                        SelectedItem="{Binding SelectedTask, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        HeadersVisibility="None"
+                                        IsReadOnly="False" 
+                                        RowHeight="20"
+                                        SelectionUnit="FullRow"
+                                        SelectionMode="Single"
+                                        Margin="10,10,10,0" 
+                                        VerticalAlignment="Top">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <i:InvokeCommandAction Command="{Binding LaunchTaskAssistant}" 
+                                           CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=wpfUtilities:DataGridExtension}}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseEnter">
+                    <i:InvokeCommandAction Command="{Binding MouseEnter}" 
+                                           CommandParameter="{Binding ElementName=DataGridTasks}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <wpfUtilities:DataGridExtension.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="BorderBrush">
+                                <Setter.Value>
+                                    <SolidColorBrush Color="Transparent"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </wpfUtilities:DataGridExtension.CellStyle>
+            <wpfUtilities:DataGridExtension.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black" />
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="Red" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </wpfUtilities:DataGridExtension.RowStyle>
+            <wpfUtilities:DataGridExtension.Columns>
+                <DataGridTemplateColumn Width="20">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <DockPanel Height="20" HorizontalAlignment="Stretch">
+                                <Image Width="12" Height="12" DockPanel.Dock="Left">
+                                    <Image.Style>
+                                        <Style TargetType="{x:Type Image}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Task.completedBy, Converter={StaticResource StringToBoolConverter}, diag:PresentationTraceSources.TraceLevel=High}" Value="True">
+                                                    <Setter Property="Source" Value="../../../Resources/taskComplete_24x24.png"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Task.completedBy, Converter={StaticResource StringToBoolConverter}}" Value="False">
+                                                    <Setter Property="Source" Value="../../../Resources/taskIncomplete_24x24.png"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Image.Style>
+                                </Image>
+                                <Rectangle Fill="LightGray" Width="1" Height="16" DockPanel.Dock="Right"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Binding="{Binding Task.name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                    Width="*"
+                                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.VerticalAlignment" Value="Center"/>
+                            <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+            </wpfUtilities:DataGridExtension.Columns>
+        </wpfUtilities:DataGridExtension>
     </Grid>
 </UserControl>

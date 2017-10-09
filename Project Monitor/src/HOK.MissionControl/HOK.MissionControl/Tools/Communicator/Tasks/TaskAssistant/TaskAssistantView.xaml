@@ -4,14 +4,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:familyChecksControl="clr-namespace:HOK.MissionControl.Tools.Communicator.Tasks.CheckControl"
         mc:Ignorable="d" 
         d:DesignHeight="400" d:DesignWidth="400" Title="{Binding Title, Mode=OneWay}" Icon="../../../../Resources/hoklogo.ico" WindowStartupLocation="CenterOwner"
-        BorderThickness="0,5,0,0" BorderBrush="#E6E3DB" Width="450" SizeToContent="Height">
+        BorderThickness="0,5,0,0" BorderBrush="#E6E3DB" Width="450" SizeToContent="Height" MinWidth="450" MinHeight="525">
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding WindowClosing}" CommandParameter="{Binding ElementName=Win}"/>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Win}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
@@ -23,7 +23,8 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="45"/>
             <RowDefinition Height="100"/>
-            <RowDefinition/>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Label Content="Family Info:" 
@@ -39,7 +40,7 @@
                 CornerRadius="2" 
                 Height="20" 
                 VerticalAlignment="Bottom" Grid.ColumnSpan="2" Grid.Column="0">
-            <Label Content="{Binding FamilyName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <Label Content="{Binding Wrapper.Family.name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
                    Margin="5,0,0,0" 
@@ -60,7 +61,7 @@
                 CornerRadius="2" 
                 Height="20" 
                 VerticalAlignment="Bottom">
-            <Label Content="{Binding TaskName}" 
+            <Label Content="{Binding Wrapper.Task.name}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
                    Margin="5,0,0,0" 
@@ -81,7 +82,7 @@
                 CornerRadius="2" 
                 Height="20" 
                 VerticalAlignment="Bottom">
-            <Label Content="{Binding Recipient}" 
+            <Label Content="{Binding Wrapper.Task.assignedTo}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
                    Margin="5,0,0,0" 
@@ -101,7 +102,7 @@
                 Margin="10,21,10,10"
                 Grid.ColumnSpan="2"
                 CornerRadius="2">
-            <Label Content="{Binding Message}" 
+            <Label Content="{Binding Wrapper.Task.message}" 
                    VerticalContentAlignment="Top" 
                    Padding="0" 
                    Margin="5,0,0,0" 
@@ -109,38 +110,123 @@
         </Border>
         <Label Grid.Row="3" 
                Grid.Column="0"
-               Content="Checks:" 
+               Content="Comments:" 
                FontWeight="Bold"
-               Margin="10,0"
+               Margin="10,0,10,0"
                VerticalAlignment="Top" 
                Padding="0"/>
         <Border Grid.Row="3" 
                 Grid.Column="0"
                 BorderBrush="DarkGray" 
-                BorderThickness="0" 
+                BorderThickness="1" 
                 Margin="10,21,10,10"
                 Grid.ColumnSpan="2"
                 CornerRadius="2">
-            <ItemsControl ItemsSource="{Binding ChecksControls}" 
-                          Margin="5">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <StackPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type familyChecksControl:FamilyCheckControl}">
-                        <familyChecksControl:FamilyCheckControl Margin="0, 4, 0, 0"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <TextBox Text="{Binding Wrapper.Task.comments}" 
+                     Margin="2"
+                     BorderThickness="0"/>
+        </Border>
+        <Label Grid.Row="4" 
+               Grid.Column="0"
+               Content="Checks:" 
+               FontWeight="Bold"
+               Margin="10,0"
+               VerticalAlignment="Top" 
+               Padding="0"/>
+        <Border Grid.Row="4" 
+                Grid.Column="0"
+                BorderBrush="DarkGray" 
+                BorderThickness="0" 
+                Margin="10,21,10,0"
+                Grid.ColumnSpan="2"
+                CornerRadius="2">
+            <wpfUtilities:DataGridExtension x:Name="DataGridTasks"
+                                            ItemsSource="{Binding Checks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                            CanUserAddRows="False" 
+                                            AutoGenerateColumns="False"
+                                            BorderThickness="0"
+                                            Background="White"
+                                            GridLinesVisibility="None"
+                                            HeadersVisibility="None"
+                                            IsReadOnly="False" 
+                                            RowHeight="20"
+                                            SelectionUnit="FullRow"
+                                            SelectionMode="Single"
+                                            Margin="10,0,10,0" 
+                                            VerticalAlignment="Top">
+                <wpfUtilities:DataGridExtension.CellStyle>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="BorderBrush">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="Transparent"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </wpfUtilities:DataGridExtension.CellStyle>
+                <wpfUtilities:DataGridExtension.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Style.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="Black" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black" />
+                        </Style.Resources>
+                        <Setter Property="ToolTip">
+                            <Setter.Value>
+                                <TextBlock Text="{Binding ToolTipText}"/>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </wpfUtilities:DataGridExtension.RowStyle>
+                <wpfUtilities:DataGridExtension.Columns>
+                    <DataGridTemplateColumn Width="20">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <DockPanel Height="20" HorizontalAlignment="Stretch">
+                                    <Image Width="12" Height="12" DockPanel.Dock="Left">
+                                        <Image.Style>
+                                            <Style TargetType="{x:Type Image}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCheckPassing}" Value="True">
+                                                        <Setter Property="Source" Value="../../../../Resources/taskComplete_24x24.png"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsCheckPassing}" Value="False">
+                                                        <Setter Property="Source" Value="../../../../Resources/taskIncomplete_24x24.png"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Image.Style>
+                                    </Image>
+                                    <Rectangle Fill="LightGray" Width="1" Height="16" DockPanel.Dock="Right"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Binding="{Binding CheckName}" 
+                                        Width="*"
+                                        IsReadOnly="True">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style>
+                                <Setter Property="TextBlock.VerticalAlignment" Value="Center"/>
+                                <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </wpfUtilities:DataGridExtension.Columns>
+            </wpfUtilities:DataGridExtension>
         </Border>
         <Button Content="Complete" 
                 Grid.Column="1" 
                 Command="{Binding Complete, Mode=OneWay}"
                 CommandParameter="{Binding ElementName=Win}"
                 Margin="0,0,10,10"
-                Grid.Row="4" 
+                Grid.Row="5" 
                 Height="20"
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Right" 
@@ -148,14 +234,14 @@
         <Button Content="Edit Family" 
                 Margin="10,0,0,10" 
                 Command="{Binding EditFamily, Mode=OneWay}"
-                Grid.Row="4" Grid.Column="0"
+                Grid.Row="5" Grid.Column="0"
                 Height="20" 
                 VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
         <Button Content="Close" 
                 Margin="0,0,90,10" 
                 Command="{Binding Close}"
                 CommandParameter="{Binding ElementName=Win}"
-                Grid.Row="4" 
+                Grid.Row="5" 
                 Height="20" 
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Right" 

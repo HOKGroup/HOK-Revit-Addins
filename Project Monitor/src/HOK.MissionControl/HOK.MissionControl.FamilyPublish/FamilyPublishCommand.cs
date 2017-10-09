@@ -38,8 +38,6 @@ namespace HOK.MissionControl.FamilyPublish
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-PublishFamilyData", commandData.Application.Application.VersionNumber));
 
-                uiApp.Application.FailuresProcessing += FailureProcessing;
-
                 var pathName = doc.PathName;
                 if (string.IsNullOrEmpty(pathName))
                 {
@@ -48,7 +46,8 @@ namespace HOK.MissionControl.FamilyPublish
                     {
                         DataContext =
                             new FamilyMonitorViewModel(null,
-                                "...establish a connection to Mission Control for unsaved files.")
+                                "...establish a connection to Mission Control for unsaved files."),
+                        CancelButton = { Visibility = Visibility.Collapsed }
                     };
                     dialog.ShowDialog();
 
@@ -64,7 +63,8 @@ namespace HOK.MissionControl.FamilyPublish
                     {
                         DataContext =
                             new FamilyMonitorViewModel(null,
-                                "...get a Central File Path. Only Workshared projects can be added to Mission Control.")
+                                "...get a Central File Path. Only Workshared projects can be added to Mission Control."),
+                        CancelButton = { Visibility = Visibility.Collapsed }
                     };
                     dialog.ShowDialog();
 
@@ -78,7 +78,8 @@ namespace HOK.MissionControl.FamilyPublish
                     {
                         DataContext =
                             new FamilyMonitorViewModel(null,
-                                "...find your project in Mission Control database. Please make sure that it was added.")
+                                "...find your project in Mission Control database. Please make sure that it was added."),
+                        CancelButton = { Visibility = Visibility.Collapsed }
                     };
                     dialog.ShowDialog();
 
@@ -92,13 +93,15 @@ namespace HOK.MissionControl.FamilyPublish
                     {
                         DataContext =
                             new FamilyMonitorViewModel(null,
-                                "...find the Health Monitor data for this project. Please make sure that Health Monitor is turned on.")
+                                "...find the Health Monitor data for this project. Please make sure that Health Monitor is turned on."),
+                        CancelButton = { Visibility = Visibility.Collapsed }
                     };
                     dialog.ShowDialog();
 
                     return Result.Failed;
                 }
 
+                uiApp.Application.FailuresProcessing += FailureProcessing;
                 var recordId = MissionControlSetup.HealthRecordIds[centralPath];
                 var model = new FamilyMonitorModel(doc, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], recordId, centralPath);
                 var viewModel = new FamilyMonitorViewModel(model, "...make this any faster. Hang in there!")
@@ -132,16 +135,28 @@ namespace HOK.MissionControl.FamilyPublish
         private static void FailureProcessing(object sender, FailuresProcessingEventArgs args)
         {
             var fa = args.GetFailuresAccessor();
-            var a = fa.GetFailureMessages();
+            var fmas = fa.GetFailureMessages();
             var count = 0;
 
-            foreach (var failure in a)
+            if (fmas.Count == 0)
             {
-                fa.ResolveFailure(failure);
-                count++;
+                args.SetProcessingResult(FailureProcessingResult.Continue);
+                return;
+            }
+            foreach (var fma in fmas)
+            {
+                if (fma.GetSeverity() == FailureSeverity.Warning)
+                {
+                    fa.DeleteWarning(fma);
+                }
+                else
+                {
+                    fa.ResolveFailure(fma);
+                    count++;
+                }
             }
 
-            if (count > 0 && args.GetProcessingResult() == FailureProcessingResult.Continue)
+            if (count > 0)
             {
                 args.SetProcessingResult(FailureProcessingResult.ProceedWithCommit);
             }

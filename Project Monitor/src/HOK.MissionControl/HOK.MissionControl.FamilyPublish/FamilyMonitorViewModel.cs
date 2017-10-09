@@ -9,6 +9,7 @@ namespace HOK.MissionControl.FamilyPublish
     public class FamilyMonitorViewModel : ViewModelBase
     {
         public RelayCommand<Window> Close { get; }
+        public RelayCommand<Window> Cancel { get; }
         public RelayCommand<Window> WindowLoaded { get; }
         public RelayCommand<Window> WindowShown { get; }
         public string Title { get; set; }
@@ -20,9 +21,16 @@ namespace HOK.MissionControl.FamilyPublish
             Message = message;
             Model = model;
             Close = new RelayCommand<Window>(OnClose);
+            Cancel = new RelayCommand<Window>(OnCancel);
             WindowLoaded = new RelayCommand<Window>(OnWindowLoaded);
             WindowShown = new RelayCommand<Window>(OnWindowShown);
             Title = "Mission Control - Family Publish v." + Assembly.GetExecutingAssembly().GetName().Version;
+        }
+
+        private static void OnCancel(Window win)
+        {
+            StatusBarManager.Cancel = true;
+            win.Close();
         }
 
         private void OnWindowShown(Window win)

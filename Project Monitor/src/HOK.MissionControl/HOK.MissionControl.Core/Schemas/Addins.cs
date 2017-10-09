@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Autodesk.Revit.DB;
+using HOK.Core.Utilities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -14,7 +16,7 @@ namespace HOK.MissionControl.Core.Schemas
         public string pluginName { get; set; }
         public string user { get; set; }
         public string revitVersion { get; set; }
-        public int executionTime { get; set; }
+        public string office { get; set; }
         public DateTime createdOn { get; set; } = new DateTime();
 
         public AddinLog()
@@ -35,6 +37,34 @@ namespace HOK.MissionControl.Core.Schemas
             pluginName = name;
             user = Environment.UserName.ToLower();
             revitVersion = version;
+            office = GetOffice();
+        }
+
+        /// <summary>
+        /// Retrieves office name from machine name ex. NY
+        /// </summary>
+        /// <returns>Office name.</returns>
+        private static string GetOffice()
+        {
+            try
+            {
+                var machineName = Environment.MachineName;
+                var splits = machineName.Split('-');
+                if (!splits.Any()) return string.Empty;
+
+                var s = splits.FirstOrDefault();
+                if (s != null)
+                {
+                    var office = s.ToUpper();
+                    return office;
+                }
+                return string.Empty;
+            }
+            catch (Exception e)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                return string.Empty;
+            }
         }
     }
 
