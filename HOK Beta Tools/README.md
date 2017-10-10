@@ -2,6 +2,10 @@
 
 #### This tool dynamically generates Ribbon Tab items based on user selection.
 
+###### Release 2018.0.0.3
+
+* Bug fix where reading assembly file would cause the dll to be loaded into app domain and lock the file on sysvol. That in turn causes inability for me to swap the files etc. 
+
 ###### Release 2018.0.0.2
 
 * Since Mission Control tool has things that subscribe to events, and dockable panels, it requires to be properly loaded in on startup
