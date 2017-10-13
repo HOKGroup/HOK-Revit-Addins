@@ -86,7 +86,10 @@ namespace HOK.MissionControl.FamilyPublish
                         {
                             if (string.IsNullOrWhiteSpace(famDoc.Title)) continue; // could cause an exception
 
-                            var myDocPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                            var myDocPath = IsCitrixMachine(Environment.MachineName) 
+                                ? "B:\\Temp" 
+                                : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                            
                             var path = myDocPath + "\\temp_" + famDoc.Title;
                             if (path.IndexOfAny(Path.GetInvalidPathChars()) != -1) continue; // could cause an exception
 
@@ -223,6 +226,18 @@ namespace HOK.MissionControl.FamilyPublish
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Checks if user machine is Citrix server or desktop/laptop.
+        /// </summary>
+        /// <param name="machineName">Environment.MachineName</param>
+        /// <returns>True if machine is a Citrix server or false if it's not.</returns>
+        private static bool IsCitrixMachine(string machineName)
+        {
+            // (Konrad) All Citrix servers sit on a Physical Hardware the name will contain/end with SVR. 
+            // Virtual server would end with VS. 
+            return machineName.Substring(machineName.Length - 3).ToLower() == "svr";
         }
 
         /// <summary>

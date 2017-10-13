@@ -301,6 +301,9 @@ goto exit
 echo Copying results to Build2016
 copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
 copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)WebSocket4Net.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
 goto exit
 
 :Build2017

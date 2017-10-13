@@ -16,8 +16,8 @@ namespace HOK.BetaToolsManager
     {
         public string VersionNumber { get; set; }
         //public string BetaDirectory { get; set; } = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
-        //public string BetaDirectory { get; set; } = @"\\group\sysvol\group.hok.com\HOK\Tools\Revit\";
-        public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\BetaFiles Testing\";
+        public string BetaDirectory { get; set; } = @"\\group\sysvol\group.hok.com\HOK\Tools\Revit\";
+        //public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\BetaFiles Testing\";
         public string InstallDirectory { get; set; }
         public string TempDirectory { get; set; }
         public string BetaTempDirectory { get; set; }
@@ -207,8 +207,6 @@ namespace HOK.BetaToolsManager
 
             if (betaTemp2 != string.Empty)
             {
-                var availableAddins = Directory.GetFiles(betaTemp2, "*.addin");
-
                 if (!Directory.Exists(TempDirectory))
                     Directory.CreateDirectory(TempDirectory);
 
@@ -217,14 +215,17 @@ namespace HOK.BetaToolsManager
                 if (Directory.Exists(BetaDirectory))
                     CopyAll(BetaTempDirectory, TempDirectory);
 
+                // (Konrad) We use the direcotry on the local drive that was already copied over to scan for addins.
+                var availableAddins = Directory.GetFiles(betaTemp2, "*.addin");
+
                 // Cleans any holdovers from old beta addins
                 RemoveLegacyPlugins(availableAddins);
 
-                // (Konrad) Get all addins from beta directory, check their versions agains installed
+                // (Konrad) Get all addins from beta directory
                 foreach (var file in availableAddins)
                 {
                     var dllRelativePath = ParseXml(file); // relative to temp
-                    var dllPath = betaTemp2 + dllRelativePath;
+                    var dllPath = TempDirectory + dllRelativePath;
 
                     // (Konrad) Using LoadFrom() instead of LoadFile() because
                     // LoadFile() doesn't load dependent assemblies causing exception later.
@@ -349,7 +350,7 @@ namespace HOK.BetaToolsManager
             foreach (var installedAddin in installedAddins)
             {
                 var fileName = Path.GetFileName(installedAddin);
-                if (fileName != null && fileName.StartsWith("HOK.") && !availableFileNames.Contains(fileName))
+                if (!string.IsNullOrEmpty(fileName) && fileName.StartsWith("HOK.") && !availableFileNames.Contains(fileName))
                 {
                     var dllPath = ParseXml(installedAddin);
                     var folder = Path.GetDirectoryName(dllPath);
@@ -382,6 +383,7 @@ namespace HOK.BetaToolsManager
                 value = (string)element;
                 break;
             }
+
             return value;
         }
 
@@ -407,57 +409,6 @@ namespace HOK.BetaToolsManager
                 Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
             }
         }
-
-        ///// <summary>
-        ///// Copies contents of one directory into another if/when source is newer version of DLL, or file changed.
-        ///// </summary>
-        ///// <param name="sourceDir">Source directory path.</param>
-        ///// <param name="targetDir">Target directory path.</param>
-        //private static void CopyIfNewer(string sourceDir, string targetDir)
-        //{
-        //    // (Konrad) Precreate all Directories - limited overhead since existing are automatically skipped
-        //    foreach (var dirPath in Directory.GetDirectories(sourceDir, "*",
-        //        SearchOption.AllDirectories))
-        //        Directory.CreateDirectory(dirPath.Replace(sourceDir, targetDir));
-
-        //    // (Konrad) Copy all files only if newer versions exist.
-        //    foreach (var file in Directory.GetFiles(sourceDir, "*.*", SearchOption.AllDirectories))
-        //    {
-        //        if (Path.GetExtension(file) == ".dll")
-        //        {
-        //            var sourceVersion = FileVersionInfo.GetVersionInfo(file).FileVersion;
-        //            if (File.Exists(file.Replace(sourceDir, targetDir)))
-        //            {
-        //                var targetVersion = FileVersionInfo.GetVersionInfo(file.Replace(sourceDir, targetDir))
-        //                    .FileVersion;
-        //                if (sourceVersion != targetVersion)
-        //                {
-        //                    File.Copy(file, file.Replace(sourceDir, targetDir), true);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                File.Copy(file, file.Replace(sourceDir, targetDir), true);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            var sourceSize = new FileInfo(file).Length;
-        //            if (File.Exists(file.Replace(sourceDir, targetDir)))
-        //            {
-        //                var targetSize = new FileInfo(file.Replace(sourceDir, targetDir)).Length;
-        //                if (sourceSize != targetSize)
-        //                {
-        //                    File.Copy(file, file.Replace(sourceDir, targetDir), true);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                File.Copy(file, file.Replace(sourceDir, targetDir), true);
-        //            }
-        //        }
-        //    }
-        //}
 
         /// <summary>
         /// Deserializes Settings file for installed addins.

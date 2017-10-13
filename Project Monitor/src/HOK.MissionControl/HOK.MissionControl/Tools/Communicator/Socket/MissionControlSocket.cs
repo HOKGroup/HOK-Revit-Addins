@@ -13,8 +13,8 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
 {
     public class MissionControlSocket
     {
-        //public const string BaseUrlLocal = "http://hok-184vs/";
-        public const string BaseUrlLocal = "http://localhost:8080";
+        public const string BaseUrlLocal = "http://hok-184vs/";
+        //public const string BaseUrlLocal = "http://localhost:8080";
 
         public void Main()
         {

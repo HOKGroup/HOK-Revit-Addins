@@ -8,7 +8,6 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas;
@@ -16,7 +15,6 @@ using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.Communicator.HealthReport;
-using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
@@ -75,7 +73,6 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
                 application.ControlledApplication.DocumentCreated += OnDocumentCreated;
-                application.ControlledApplication.FamilyLoadedIntoDocument += OnFamilyLoadedIntoDocument;
 
                 // (Konrad) Create Communicator button and register dockable panel.
                 RegisterCommunicator(application);
@@ -112,33 +109,6 @@ namespace HOK.MissionControl
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void OnFamilyLoadedIntoDocument(object sender, FamilyLoadedIntoDocumentEventArgs e)
-        {
-            //TODO: This would be a pretty invasive thing to do. First and foremost we are tracking every family being edited.
-            //TODO: Maybe we can do this if we spawn a new thread, and post this stuff directly to MongoDB right away.
-            //if (e.Status != RevitAPIEventStatus.Succeeded) return;
-
-            //if (FamiliesToWatch.ContainsKey(e.OriginalFamilyId.IntegerValue))
-            //{
-            //    var family = FamiliesToWatch[e.OriginalFamilyId.IntegerValue];
-            //    family.elementId = e.NewFamilyId.IntegerValue; // updating this value here propagates to all other references
-
-            //    FamiliesToWatch.Remove(e.OriginalFamilyId.IntegerValue);
-            //    FamiliesToWatch.Add(e.NewFamilyId.IntegerValue, family);
-
-            //    var info = new FamilyUpdatedMessage
-            //    {
-            //        Family = family
-            //    };
-            //    Messenger.Default.Send(info);
-            //}
-        }
-
-        /// <summary>
         /// Un-registers all event handlers that were registered at startup.
         /// </summary>
         public Result OnShutdown(UIControlledApplication application)
@@ -151,7 +121,6 @@ namespace HOK.MissionControl
             application.ControlledApplication.DocumentSynchronizingWithCentral -= OnDocumentSynchronizing;
             application.ControlledApplication.DocumentSynchronizedWithCentral -= OnDocumentSynchronized;
             application.ControlledApplication.DocumentCreated -= OnDocumentCreated;
-            application.ControlledApplication.FamilyLoadedIntoDocument -= OnFamilyLoadedIntoDocument;
 
             return Result.Succeeded;
         }
