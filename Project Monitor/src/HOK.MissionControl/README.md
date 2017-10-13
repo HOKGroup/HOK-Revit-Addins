@@ -7,6 +7,17 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.4
+
+* Added Tasks to Communicator Tab.
+* Messaging integration for Tasks form and MongoDB using Sockets.IO.
+* New class decorators for serialization and descerialization of MongoDB data.
+* Addins now publish user location.
+* Cancel button for Family Publish.
+* More robust handling of failures while exporting Families.
+* Family export logic for updating rather than constantly adding new items. Should improve server response time with smaller paylods.
+
+
 ###### Release 2018.0.0.3
 
 * Fix to Communicator button not always activating the docable panel. 

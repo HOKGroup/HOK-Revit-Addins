@@ -2,6 +2,10 @@
 
 #### Library of commonly used methods and classes. Contains mostly utility methods shared across more than one plug-in. 
 
+###### Release 2018.0.0.3
+
+* Added cancel method to Progress Bar manager class.
+
 ###### Release 2018.0.0.2
 
 * Attribute classes expanded to better suit Beta Installer
