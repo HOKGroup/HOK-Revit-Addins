@@ -5,6 +5,7 @@ using System.Net;
 using HOK.MissionControl.Core.Schemas;
 using RestSharp;
 using HOK.Core.Utilities;
+using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Utils
 {
@@ -20,8 +21,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        public const string BaseUrlLocal = "http://hok-184vs/";
-        //public const string BaseUrlLocal = "http://localhost:8080/";
+        //public const string BaseUrlLocal = "http://hok-184vs/";
+        public const string BaseUrlLocal = "http://localhost:8080/";
         public const string BaseUrlGlobal = "http://hokmissioncontrol.herokuapp.com/";
         public const string ApiVersion = "api/v1";
         public static string RestApiBaseUrl
@@ -124,7 +125,6 @@ namespace HOK.MissionControl.Core.Utils
         public static HealthReportData GetHealthRecordByCentralPath(string centralPath)
         {
             HealthReportData result = null;
-            //var recordId = "";
             try
             {
                 var fileName = System.IO.Path.GetFileNameWithoutExtension(centralPath);
@@ -141,10 +141,43 @@ namespace HOK.MissionControl.Core.Utils
                     {
                         if (!string.Equals(record.centralPath.ToLower(), centralPath.ToLower())) continue;
                         result = record;
-                        //recordId = record.Id;
-                        //Log.AppendLog(LogMessageType.INFO, "Health Record Found: " + recordId);
                         break;
                     }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Retrieves a document from collection by it's centralPath property.
+        /// </summary>
+        /// <param name="centralPath">Full file path with file extension.</param>
+        /// <param name="path">HTTP request url.</param>
+        /// <returns>Document if found matching central path or type.</returns>
+        public static T GetByCentralPath<T>(string centralPath, string path)
+        {
+            var result = default(T);
+            try
+            {
+                // (Konrad) Since we cannot pass file path with "\" they were replaced with illegal pipe char "|".
+                // Since pipe cannot be used in a legal file path, it's a good placeholder to use. 
+                var filePath = centralPath.Replace('\\', '|');
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET);
+
+
+                var response = client.Execute(request);
+                if (response.StatusCode == HttpStatusCode.InternalServerError) return result;
+
+                if (!string.IsNullOrEmpty(response.Content))
+                {
+                    var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
+                    if (data != null) result = data;
+                    Log.AppendLog(LogMessageType.EXCEPTION, "Found document with matching path.");
                 }
             }
             catch (Exception ex)
@@ -328,7 +361,7 @@ namespace HOK.MissionControl.Core.Utils
         /// </summary>
         /// <param name="body"></param>
         /// <param name="route"></param>
-        public static void UpdateField<T>(T body, string route)
+        public static void Put<T>(T body, string route)
         {
             try
             {
@@ -359,6 +392,7 @@ namespace HOK.MissionControl.Core.Utils
             {
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(ApiVersion + "/"+ route, Method.POST);
+                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
                 request.AddHeader("Content-type", "application/json");
                 request.RequestFormat = DataFormat.Json;
                 request.AddBody(body);

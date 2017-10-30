@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using GalaSoft.MvvmLight.Messaging;
 using Newtonsoft.Json.Linq;
@@ -13,8 +15,8 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
 {
     public class MissionControlSocket
     {
-        public const string BaseUrlLocal = "http://hok-184vs/";
-        //public const string BaseUrlLocal = "http://localhost:8080";
+        //public const string BaseUrlLocal = "http://hok-184vs/";
+        public const string BaseUrlLocal = "http://localhost:8080";
 
         public void Main()
         {
@@ -37,7 +39,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
 
             socket.On(Quobject.SocketIoClientDotNet.Client.Socket.EVENT_DISCONNECT, () =>
             {
-                Log.AppendLog(LogMessageType.INFO, "Connected to Mission Control socket.");
+                Log.AppendLog(LogMessageType.INFO, "Disconnected fromo Mission Control socket.");
             });
 
             socket.On("task_deleted", body =>
@@ -57,15 +59,15 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         ids.Add((string)i.Value);
                     }
 
-                    Messenger.Default.Send( new TaskDeletedMessage { DeletedIds = ids });
+                    Messenger.Default.Send( new FamilyTaskDeletedMessage { DeletedIds = ids });
                 }
             });
 
-            socket.On("task_added", body =>
+            socket.On("familyTask_added", body =>
             {
                 if (body == null)
                 {
-                    Log.AppendLog(LogMessageType.ERROR, "task_added: Data was null!");
+                    Log.AppendLog(LogMessageType.ERROR, "familyTask_added: Data was null!");
                 }
                 else
                 {
@@ -74,15 +76,15 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     var familyName = data["familyName"].ToObject<string>();
                     if (familyStats == null || string.IsNullOrEmpty(familyName)) return;
 
-                    Messenger.Default.Send( new TaskAddedMessage { FamilyStat = familyStats, FamilyName = familyName});
+                    Messenger.Default.Send( new FamilyTaskAddedMessage { FamilyStat = familyStats, FamilyName = familyName});
                 }
             });
 
-            socket.On("task_updated", body =>
+            socket.On("familyTask_updated", body =>
             {
                 if (body == null)
                 {
-                    Log.AppendLog(LogMessageType.ERROR, "task_updated: Data was null!");
+                    Log.AppendLog(LogMessageType.ERROR, "familyTask_updated: Data was null!");
                 }
                 else
                 {
@@ -92,7 +94,24 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     var oldTaskId = data["oldTaskId"].ToObject<string>();
                     if (familyStats == null || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(oldTaskId)) return;
 
-                    Messenger.Default.Send(new TaskUpdatedMessage { FamilyStat = familyStats, FamilyName = familyName, OldTaskId = oldTaskId});
+                    Messenger.Default.Send(new FamilyTaskUpdatedMessage { FamilyStat = familyStats, FamilyName = familyName, OldTaskId = oldTaskId});
+                }
+            });
+
+            socket.On("sheetTask_updated", body =>
+            {
+                if (body == null)
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "sheetTask_updated: Data was null!");
+                }
+                else
+                {
+                    var data = JObject.FromObject(body);
+                    var sheetsData = data["body"].ToObject<SheetsData>();
+                    var identifier = data["identifier"].ToObject<string>();
+                    if (sheetsData == null || string.IsNullOrEmpty(identifier)) return;
+
+                    Messenger.Default.Send(new SheetsTaskUpdateMessage { Task = sheetsData.sheetsChanges.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal))});
                 }
             });
 

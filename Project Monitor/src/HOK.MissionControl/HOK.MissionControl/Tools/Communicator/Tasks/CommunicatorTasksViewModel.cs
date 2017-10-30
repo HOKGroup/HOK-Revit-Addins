@@ -16,7 +16,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
     public class CommunicatorTasksViewModel : ViewModelBase
     {
         public CommunicatorTasksModel Model { get; set; }
-        public RelayCommand<FamilyTaskWrapper> LaunchTaskAssistant { get; set; }
+        public RelayCommand<TaskWrapper> LaunchTaskAssistant { get; set; }
         public RelayCommand<DataGridExtension> MouseEnter { get; set; }
         private readonly object _lock = new object();
 
@@ -26,18 +26,52 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             Tasks = Model.GetTasks();
             BindingOperations.EnableCollectionSynchronization(_tasks, _lock);
 
-            LaunchTaskAssistant = new RelayCommand<FamilyTaskWrapper>(OnLaunchTaskAssistant);
+            LaunchTaskAssistant = new RelayCommand<TaskWrapper>(OnLaunchTaskAssistant);
             MouseEnter = new RelayCommand<DataGridExtension>(OnMouseEnter);
-            
-            Messenger.Default.Register<TaskDeletedMessage>(this, OnTaskDeleted);
-            Messenger.Default.Register<TaskAddedMessage>(this, OnTaskAdded);
-            Messenger.Default.Register<TaskUpdatedMessage>(this, OnTaskUpdated);
-            Messenger.Default.Register<TaskAssistantClosedMessage>(this, OnTaskAssistantClosed);
+
+            Messenger.Default.Register<FamilyTaskDeletedMessage>(this, OnFamilyTaskDeleted);
+            Messenger.Default.Register<FamilyTaskAddedMessage>(this, OnFamilyTaskAdded);
+            Messenger.Default.Register<FamilyTaskUpdatedMessage>(this, OnFamilyTaskUpdated);
+            Messenger.Default.Register<FamilyTaskAssistantClosedMessage>(this, OnFamilyTaskAssistantClosed);
+            Messenger.Default.Register<SheetsTaskUpdateMessage>(this, OnSheetTaskUpdated);
         }
 
-        private void OnTaskAssistantClosed(TaskAssistantClosedMessage obj)
+        private void OnSheetTaskUpdated(SheetsTaskUpdateMessage msg)
         {
-            SelectedTask = null;
+            var existingIndex = AppCommand.SheetsData.sheetsChanges.IndexOf(msg.Task);
+            if (existingIndex == -1)
+            {
+                // Add new one
+                AppCommand.SheetsData.sheetsChanges.Add(msg.Task);
+
+                if (msg.Task.assignedTo == Environment.UserName.ToLower())
+                {
+                    lock (_lock)
+                    {
+                        Tasks.Add(new SheetTaskWrapper(msg.Task));
+                    }
+                }
+            }
+            else
+            {
+                // Update existing
+                AppCommand.SheetsData.sheetsChanges[existingIndex] = msg.Task;
+                var storedTask = Tasks.First(x => x.GetType() == typeof(SheetTaskWrapper) &&
+                                                           ((SheetTask) x.Task).identifier == msg.Task.identifier);
+
+                if (msg.Task.assignedTo == Environment.UserName.ToLower() && string.IsNullOrEmpty(msg.Task.completedBy))
+                {
+                    ((SheetTask)storedTask.Task).name = msg.Task.name; //TODO: must be class with propertychanged prop
+                }
+                else
+                {
+                    // (Konrad) Someone reassigned the task away from us.
+                    lock (_lock)
+                    {
+                        Tasks.Remove(storedTask);
+                    }
+                }
+            }
         }
 
         private static void OnMouseEnter(DataGridExtension dg)
@@ -45,13 +79,27 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             dg.Cursor = Cursors.Hand;
         }
 
-        private void OnLaunchTaskAssistant(FamilyTaskWrapper task)
+        private void OnLaunchTaskAssistant(TaskWrapper task)
         {
             if (SelectedTask == null) return;
             Model.LaunchTaskAssistant(task);
         }
 
-        private void OnTaskUpdated(TaskUpdatedMessage msg)
+        /// <summary>
+        /// Handles a message emmited by Closing a Family Task.
+        /// </summary>
+        /// <param name="msg"></param>
+        private void OnFamilyTaskAssistantClosed(FamilyTaskAssistantClosedMessage msg)
+        {
+            SelectedTask = null;
+            Model.TaskView = null;
+        }
+        
+        /// <summary>
+        /// Handles a message emitted by Updating a Family Task.
+        /// </summary>
+        /// <param name="msg"></param>
+        private void OnFamilyTaskUpdated(FamilyTaskUpdatedMessage msg)
         {
             FamilyTask task;
             FamilyItem family;
@@ -73,11 +121,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
             else
             {
-                Log.AppendLog(LogMessageType.ERROR, "TaskAssistant: Attempted to add task to non-existing family.");
+                Log.AppendLog(LogMessageType.ERROR, "FamilyTaskAssistant: Attempted to add task to non-existing family.");
                 return;
             }
 
-            var existingTask = Tasks.FirstOrDefault(x => x.Task.Id == msg.OldTaskId);
+            var existingTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTask) && ((FamilyTask)x.Task).Id == msg.OldTaskId);
             if (existingTask != null)
             {
                 if (task.assignedTo == Environment.UserName.ToLower() && string.IsNullOrEmpty(task.completedBy))
@@ -107,7 +155,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
         }
 
-        private void OnTaskAdded(TaskAddedMessage msg)
+        private void OnFamilyTaskAdded(FamilyTaskAddedMessage msg)
         {
             FamilyTask task;
             FamilyItem family;
@@ -129,7 +177,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
             else
             {
-                Log.AppendLog(LogMessageType.ERROR, "TaskAssistant: Attemted to add task to non-existing family.");
+                Log.AppendLog(LogMessageType.ERROR, "FamilyTaskAssistant: Attemted to add task to non-existing family.");
                 return;
             }
 
@@ -144,32 +192,35 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
         }
 
-        private void OnTaskDeleted(TaskDeletedMessage msg)
+        private void OnFamilyTaskDeleted(FamilyTaskDeletedMessage msg)
         {
-            var currentTasks = Tasks.ToDictionary(x => x.Task.Id, x => x);
+            var currentFamilyTasks = Tasks
+                .Where(x => x.GetType() == typeof(FamilyTask))
+                .ToDictionary(x => ((FamilyTask)x.Task).Id, x => x);
+
             foreach (var id in msg.DeletedIds)
             {
-                if (currentTasks.ContainsKey(id))
+                if (currentFamilyTasks.ContainsKey(id))
                 {
                     // (Konrad) This message was spawned on another thread that Socket App runs
                     // In order to manipulate a collection on UI thread we need to lock it first.
                     lock (_lock)
                     {
-                        Tasks.Remove(currentTasks[id]);
+                        Tasks.Remove(currentFamilyTasks[id]);
                     }
                 }
             }
         }
 
-        private ObservableCollection<FamilyTaskWrapper> _tasks;
-        public ObservableCollection<FamilyTaskWrapper> Tasks
+        private ObservableCollection<TaskWrapper> _tasks;
+        public ObservableCollection<TaskWrapper> Tasks
         {
             get { return _tasks; }
             set { _tasks = value; RaisePropertyChanged(() => Tasks); }
         }
 
-        private FamilyTaskWrapper _selectedTask;
-        public FamilyTaskWrapper SelectedTask
+        private TaskWrapper _selectedTask;
+        public TaskWrapper SelectedTask
         {
             get { return _selectedTask; }
             set { _selectedTask = value; RaisePropertyChanged(() => SelectedTask); }

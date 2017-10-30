@@ -8,49 +8,49 @@ namespace HOK.MissionControl.Tools.DTMTool
         private string configId = "";
         public string ConfigId
         {
-            get => configId;
+            get { return configId; }
             set { configId = value; NotifyPropertyChanged("ConfigId"); }
         }
 
         private string updaterId = "";
         public string UpdaterId
         {
-            get => updaterId;
+            get { return updaterId; }
             set { updaterId = value; NotifyPropertyChanged("UpdaterId"); }
         }
 
         private string centralPath = "";
         public string CentralPath
         {
-            get => centralPath;
+            get { return centralPath; }
             set { centralPath = value; NotifyPropertyChanged("CentralPath"); }
         }
 
         private string categoryName = "";
         public string CategoryName
         {
-            get => categoryName;
+            get { return categoryName; }
             set { categoryName = value; NotifyPropertyChanged("CategoryName"); }
         }
 
         private string description = "";
         public string Description
         {
-            get => description;
+            get { return description; }
             set { description = value; NotifyPropertyChanged("Description"); }
         }
 
         private ElementId reportingElementId = ElementId.InvalidElementId;
         public ElementId ReportingElementId
         {
-            get => reportingElementId;
+            get { return reportingElementId; }
             set { reportingElementId = value; NotifyPropertyChanged("ReportingElementId"); }
         }
 
         private string reportingUniqueId = "";
         public string ReportingUniqueId
         {
-            get => reportingUniqueId;
+            get { return reportingUniqueId; }
             set { reportingUniqueId = value; NotifyPropertyChanged("ReportingUniqueId"); }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -62,7 +63,7 @@ namespace HOK.FinishCreator
                         }
                     }
 
-                    if (selectedRooms.Count > 0)
+                    if (selectedRooms.Any())
                     {
                         var floorCreator = new FloorCreator(m_app, selectedRooms);
                         floorCreator.CreateFloorFromRoom();
@@ -95,7 +96,10 @@ namespace HOK.FinishCreator
                 else if (TaskDialogResult.CommandLink3 == tResult)
                 {
                     //ceiling
-                    var selectedElement = uidoc.Selection.PickObjects(ObjectType.Element, new RoomElementFilter(), "Select rooms to create ceilings with their room boundary. Click Finish on the options bar when you're done selecting rooms.");
+                    var selectedElement = uidoc.Selection.PickObjects(
+                        ObjectType.Element, 
+                        new RoomElementFilter(), 
+                        "Select rooms to create ceilings with their room boundary. Click Finish on the options bar when you're done selecting rooms.");
                     var selectedRooms = new List<Room>();
                     foreach (var reference in selectedElement)
                     {
@@ -106,7 +110,7 @@ namespace HOK.FinishCreator
                         }
                     }
 
-                    if (selectedRooms.Count > 0)
+                    if (selectedRooms.Any())
                     {
                         var ceilingCreator = new CeilingCreator(m_app, selectedRooms);
                         if (ceilingCreator.CreateCeilingFromRoom())

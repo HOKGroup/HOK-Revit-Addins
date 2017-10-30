@@ -120,11 +120,14 @@ namespace HOK.MissionControl.FamilyPublish
                         var nestedFamilies = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(Family))
                             .GetElementCount();
-
+#if RELEASE2015
+                        //(Konrad) Since Revit 2015 API doesn't support this we will just skip it.
+                        const int parameters = 0; 
+#else
                         var parameters = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(ParameterElement))
                             .GetElementCount();
-
+#endif
                         famDoc.Close(false);
 
                         var sizeStr = StringUtilities.BytesToString(size);
@@ -213,11 +216,11 @@ namespace HOK.MissionControl.FamilyPublish
                 if (famStat == null)
                 {
                     famStat = ServerUtilities.Post<FamilyStat>(familyStats, "families");
-                    ServerUtilities.UpdateField(new {key = famStat.Id}, "healthrecords/" + RecordId + "/addfamilies");
+                    ServerUtilities.Put(new {key = famStat.Id}, "healthrecords/" + RecordId + "/addfamilies");
                 }
                 else
                 {
-                    ServerUtilities.UpdateField(familyStats, "families/" + famStat.Id);
+                    ServerUtilities.Put(familyStats, "families/" + famStat.Id);
                 }
 
                 StatusBarManager.FinalizeProgress();

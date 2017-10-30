@@ -16,8 +16,11 @@ namespace HOK.BetaToolsManager
     {
         public string VersionNumber { get; set; }
         //public string BetaDirectory { get; set; } = @"\\Group\hok\FWR\RESOURCES\Apps\HOK AddIns Installer\Beta Files\";
+#if Release18
         public string BetaDirectory { get; set; } = @"\\group\sysvol\group.hok.com\HOK\Tools\Revit\";
-        //public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\BetaFiles Testing\";
+#else
+        public string BetaDirectory { get; set; } = @"C:\Users\konrad.sobon\Desktop\BetaFiles Testing\";
+#endif
         public string InstallDirectory { get; set; }
         public string TempDirectory { get; set; }
         public string BetaTempDirectory { get; set; }
@@ -226,6 +229,7 @@ namespace HOK.BetaToolsManager
                 {
                     var dllRelativePath = ParseXml(file); // relative to temp
                     var dllPath = TempDirectory + dllRelativePath;
+                    if(!File.Exists(dllPath)) continue;
 
                     // (Konrad) Using LoadFrom() instead of LoadFile() because
                     // LoadFile() doesn't load dependent assemblies causing exception later.

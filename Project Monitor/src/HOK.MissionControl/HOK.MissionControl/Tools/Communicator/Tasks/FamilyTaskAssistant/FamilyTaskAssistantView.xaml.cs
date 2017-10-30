@@ -1,12 +1,12 @@
 ﻿
-namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
+namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
 {
     /// <summary>
     /// Interaction logic for TaskAssistantView.xaml
     /// </summary>
-    public partial class TaskAssistantView
+    public partial class FamilyTaskAssistantView
     {
-        public TaskAssistantView()
+        public FamilyTaskAssistantView()
         {
             InitializeComponent();
         }

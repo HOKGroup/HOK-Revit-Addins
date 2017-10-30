@@ -14,17 +14,54 @@ namespace HOK.MissionControl.Tools.Communicator
 
         public CommunicatorViewModel()
         {
+            FamilyStat familyStats = null;
+
+            //TODO: What happens when multiple MissionControl tracked models are open in the same session? Only one HrData/SheetsData is stored.
             var familyStatsId = AppCommand.HrData.familyStats;
-            if (familyStatsId == null) return;
+            var sheetsData = AppCommand.SheetsData;
+            if (familyStatsId == null && sheetsData == null) return;
 
-            var familyStats = ServerUtilities.FindOne<FamilyStat>("families/" + familyStatsId);
-            if (familyStats == null) return;
-
-            TabItems = new ObservableCollection<TabItem>
+            if (familyStatsId != null)
             {
-                new TabItem{Content = new CommunicatorHealthReportView {DataContext = new CommunicatorHealthReportViewModel(familyStats)}, Header = "Health Report"},
-                new TabItem{Content = new CommunicatorTasksView {DataContext = new CommunicatorTasksViewModel(new CommunicatorTasksModel(familyStats))}, Header = "Tasks"}
-            };
+                familyStats = ServerUtilities.FindOne<FamilyStat>("families/" + familyStatsId);
+            }
+
+            TabItems = new ObservableCollection<TabItem>();
+
+            if (familyStats != null)
+            {
+                var reportTab = new TabItem
+                {
+                    Content =
+                        new CommunicatorHealthReportView { DataContext = new CommunicatorHealthReportViewModel(familyStats) },
+                    Header = "Health Report"
+                };
+                TabItems.Add(reportTab);
+
+                var taskTab = new TabItem
+                {
+                    Content = new CommunicatorTasksView
+                    {
+                        DataContext = new CommunicatorTasksViewModel(new CommunicatorTasksModel(familyStats, sheetsData))
+                    },
+                    Header = "Tasks"
+                };
+                TabItems.Add(taskTab);
+
+
+            }
+            else if (sheetsData != null)
+            {
+                var taskTab = new TabItem
+                {
+                    Content = new CommunicatorTasksView
+                    {
+                        DataContext = new CommunicatorTasksViewModel(new CommunicatorTasksModel(null, sheetsData))
+                    },
+                    Header = "Tasks"
+                };
+                TabItems.Add(taskTab);
+            }
         }
     }
 }

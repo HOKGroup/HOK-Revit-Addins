@@ -4,25 +4,26 @@ using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 
-namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
+namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
 {
-    public class TaskAssistantViewModel : ViewModelBase
+    public class FamilyTaskAssistantViewModel : ViewModelBase
     {
         public string Title { get; set; }
-        public TaskAssistantModel Model { get; set; }
+        public FamilyTaskAssistantModel Model { get; set; }
         public RelayCommand<Window> Complete { get; set; }
         public RelayCommand EditFamily { get; set; }
         public RelayCommand<Window> Close { get; set; }
         public RelayCommand<Window> WindowClosed { get; set; }
 
-        public TaskAssistantViewModel(FamilyTaskWrapper wrapper)
+        public FamilyTaskAssistantViewModel(FamilyTaskWrapper wrapper)
         {
-            Model = new TaskAssistantModel();
+            Model = new FamilyTaskAssistantModel();
             Wrapper = wrapper;
             Title = "Mission Control - Task Assistant v." + Assembly.GetExecutingAssembly().GetName().Version;
-            Checks = Model.CollectChecks(wrapper.Family);
+            Checks = Model.CollectChecks((FamilyItem)wrapper.Element);
 
             Complete = new RelayCommand<Window>(OnComplete);
             EditFamily = new RelayCommand(OnEditFamily);
@@ -32,7 +33,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
 
         private static void OnWindowClosed(Window win)
         {
-            Messenger.Default.Send(new TaskAssistantClosedMessage { IsClosed = true });
+            Messenger.Default.Send(new FamilyTaskAssistantClosedMessage { IsClosed = true });
         }
 
         private static void OnClose(Window win)
@@ -42,7 +43,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
 
         private void OnEditFamily()
         {
-            Model.EditFamily(Wrapper.Family);
+            Model.EditFamily((FamilyItem)Wrapper.Element);
         }
 
         private void OnComplete(Window win)

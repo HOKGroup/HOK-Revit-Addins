@@ -3,16 +3,9 @@ using System.Collections.ObjectModel;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
-namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
+namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
 {
-    public class CheckWrapper
-    {
-        public string CheckName { get; set; }
-        public bool IsCheckPassing { get; set; }
-        public string ToolTipText { get; set; }
-    }
-
-    public class TaskAssistantModel
+    public class FamilyTaskAssistantModel
     {
         public ObservableCollection<CheckWrapper> CollectChecks(FamilyItem family)
         {
@@ -68,13 +61,23 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant
 
         public void Submit(FamilyTaskWrapper wrapper)
         {
+            var t = (FamilyTask) wrapper.Task;
+            var e = (FamilyItem) wrapper.Element;
+
             var familyStatsId = AppCommand.HrData.familyStats;
             if (string.IsNullOrEmpty(familyStatsId)) return;
 
-            wrapper.Task.completedOn = DateTime.Now;
-            wrapper.Task.completedBy = Environment.UserName.ToLower();
+            t.completedOn = DateTime.Now;
+            t.completedBy = Environment.UserName.ToLower();
 
-            ServerUtilities.Post<FamilyStat>(wrapper.Task, "families/" + familyStatsId + "/family/" + wrapper.Family.name + "/updatetask/" + wrapper.Task.Id);
+            ServerUtilities.Post<FamilyStat>(wrapper.Task, "families/" + familyStatsId + "/family/" + e.name + "/updatetask/" + t.Id);
         }
+    }
+
+    public class CheckWrapper
+    {
+        public string CheckName { get; set; }
+        public bool IsCheckPassing { get; set; }
+        public string ToolTipText { get; set; }
     }
 }

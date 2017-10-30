@@ -1,4 +1,4 @@
-﻿<Window x:Class="HOK.MissionControl.Tools.Communicator.Tasks.TaskAssistant.TaskAssistantView"
+﻿<Window x:Class="HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant.FamilyTaskAssistantView"
         x:Name="Win"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

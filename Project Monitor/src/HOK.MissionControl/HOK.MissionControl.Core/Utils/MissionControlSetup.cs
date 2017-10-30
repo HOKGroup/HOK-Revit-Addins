@@ -19,5 +19,10 @@ namespace HOK.MissionControl.Core.Utils
         /// Key is Central Path of Document.
         /// </summary>
         public static Dictionary<string, string> HealthRecordIds { get; set; } = new Dictionary<string, string>();
+
+        /// <summary>
+        /// Key is Central Path of Document.
+        /// </summary>
+        public static Dictionary<string, string> SheetsIds { get; set; } = new Dictionary<string, string>();
     }
 }

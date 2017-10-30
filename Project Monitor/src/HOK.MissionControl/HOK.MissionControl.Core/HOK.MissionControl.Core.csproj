@@ -67,6 +67,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
     </Reference>
@@ -130,6 +134,7 @@
     <Compile Include="Schemas\ProjectAddress.cs" />
     <Compile Include="Schemas\RevitServer.cs" />
     <Compile Include="Schemas\RvtFile.cs" />
+    <Compile Include="Schemas\Sheets.cs" />
     <Compile Include="Schemas\TriggerRecord.cs" />
     <Compile Include="Schemas\HealthReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -154,10 +159,15 @@ if $(Configuration) == Debug goto Build2017
 
 :Build2015
 echo Copying results to Build2015
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)RestSharp.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.FamilyPublish"
 copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)MongoDB.Bson.dll" "C:\ProgramData\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)RestSharp.dll" "C:\ProgramData\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2016

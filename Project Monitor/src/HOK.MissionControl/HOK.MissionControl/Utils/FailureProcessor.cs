@@ -25,10 +25,10 @@ namespace HOK.MissionControl.Utils
             {
                 DTMFailure.ProcessFailure(sender, args);
             }
-            else if (RevisionFailure.IsRevisionModified)
-            {
-                RevisionFailure.ProcessFailure(sender, args);
-            }
+            //else if (RevisionFailure.IsRevisionModified)
+            //{
+            //    RevisionFailure.ProcessFailure(sender, args);
+            //}
             IsFailureFound = false;
         }
     }

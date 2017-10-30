@@ -214,8 +214,10 @@ if $(Configuration) == 2018 goto Build2018
 
 :Build2015
 echo Copying results to Build2015
-if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
+copy /Y "$(TargetDir)HOK.MissionControl.LinksManager.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp"
 goto exit
 
 :Build2016

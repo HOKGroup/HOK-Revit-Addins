@@ -5,6 +5,8 @@ namespace HOK.Core.Utilities
 {
     /// <summary>
     /// Filters selection for Rooms only.
+    /// Used by:
+    /// - Utilities.FinishCreator
     /// </summary>
     public class RoomElementFilter : ISelectionFilter
     {

@@ -37,11 +37,12 @@ namespace HOK.MissionControl
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
         private static Queue<Action<UIApplication>> Tasks;
         public static HealthReportData HrData { get; set; }
+        public static SheetsData SheetsData { get; set; }
         public CommunicatorView CommunicatorWindow { get; set; }
         public PushButton CommunicatorButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
-        public RevisionUpdater RevisionUpdaterInstance { get; set; }
+        public SheetUpdater SheetUpdaterInstance { get; set; }
         public LinkUnloadMonitor LinkUnloadInstance { get; set; }
         private const string tabName = "  HOK - Beta";
         public static bool IsSynching { get; set; }
@@ -61,7 +62,7 @@ namespace HOK.MissionControl
                 var appId = application.ActiveAddInId;
                 DoorUpdaterInstance = new DoorUpdater(appId);
                 DtmUpdaterInstance = new DtmUpdater(appId);
-                RevisionUpdaterInstance = new RevisionUpdater(appId);
+                SheetUpdaterInstance = new SheetUpdater(appId);
                 LinkUnloadInstance = new LinkUnloadMonitor();
                 Tasks = new Queue<Action<UIApplication>>();
 
@@ -217,7 +218,7 @@ namespace HOK.MissionControl
                             ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
                             refreshProject = true;
                         }
-                        if (HrData != null)
+                        else
                         {
                             MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
                             CommunicatorWindow.DataContext = new CommunicatorViewModel(); // create new communicator VM
@@ -456,14 +457,16 @@ namespace HOK.MissionControl
                         DtmUpdaterInstance.CreateReloadLatestOverride();
                     }
                     else if (string.Equals(updater.updaterId.ToLower(),
-                        RevisionUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        RevisionUpdaterInstance.Register(doc, updater);
-                    }
-                    else if (string.Equals(updater.updaterId.ToLower(),
                         LinkUnloadInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         LinkUnloadInstance.CreateLinkUnloadOverride();
+                    }
+                    else if (string.Equals(updater.updaterId.ToLower(),
+                        SheetUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    {
+                        SheetUpdaterInstance.Register(doc, updater);
+
+                        new Thread(() => new SheetTracker().SynchSheets(doc)) { Priority = ThreadPriority.BelowNormal }.Start();
                     }
                 }
             }
@@ -498,9 +501,9 @@ namespace HOK.MissionControl
                     DtmUpdaterInstance.Unregister(doc);
                 }
                 else if (string.Equals(updater.updaterId.ToLower(),
-                    RevisionUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    SheetUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                 {
-                    RevisionUpdaterInstance.Unregister(doc);
+                    SheetUpdaterInstance.Unregister(doc);
                 }
             }
 

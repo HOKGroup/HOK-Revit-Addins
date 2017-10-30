@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
@@ -12,53 +11,63 @@ namespace HOK.FinishCreator
 {
     public class CeilingCreator
     {
-        private Autodesk.Revit.UI.UIApplication m_app;
-        private Document m_doc;
-        private List<Room> selectedRooms = new List<Room>();
+        private readonly UIApplication App;
+        private readonly Document Doc;
+        private readonly List<Room> SelectedRooms = new List<Room>();
         private List<LinkedRoomProperties> selectedLinkedRooms = new List<LinkedRoomProperties>();
-        private List<CeilingType> ceilingTypes = new List<CeilingType>();
+        private readonly List<CeilingType> CeilingTypes;
         private Dictionary<int/*roomId*/, List<Ceiling>> createdCeilings = new Dictionary<int, List<Ceiling>>();
 
         public Dictionary<int, List<Ceiling>> CreatedCeilings { get { return createdCeilings; } set { createdCeilings = value; } }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="application"></param>
+        /// <param name="rooms"></param>
         public CeilingCreator(UIApplication application, List<Room> rooms)
         {
-            m_app = application;
-            m_doc = m_app.ActiveUIDocument.Document;
+            App = application;
+            Doc = App.ActiveUIDocument.Document;
+            SelectedRooms = rooms;
 
-            selectedRooms = rooms;
-
-            FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-            ceilingTypes = collector.OfClass(typeof(CeilingType)).ToElements().Cast<CeilingType>().ToList();
+            CeilingTypes = new FilteredElementCollector(Doc)
+                .OfClass(typeof(CeilingType))
+                .Cast<CeilingType>()
+                .ToList();
         }
 
 
         public CeilingCreator(UIApplication application, List<LinkedRoomProperties> rooms)
         {
-            m_app = application;
-            m_doc = m_app.ActiveUIDocument.Document;
+            App = application;
+            Doc = App.ActiveUIDocument.Document;
 
             selectedLinkedRooms = rooms;
 
-            FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-            ceilingTypes = collector.OfClass(typeof(CeilingType)).ToElements().Cast<CeilingType>().ToList();
+            var collector = new FilteredElementCollector(Doc);
+            CeilingTypes = collector.OfClass(typeof(CeilingType)).ToElements().Cast<CeilingType>().ToList();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public bool CreateCeilingFromRoom()
         {
-            bool created = false;
-            using (TransactionGroup tg = new TransactionGroup(m_doc))
+            var created = false;
+            using (var tg = new TransactionGroup(Doc))
             {
                 tg.Start("Create Ceilings");
-                StringBuilder failureMessages = new StringBuilder();
+                var failureMessages = new StringBuilder();
                 try
                 {
-                    foreach (Room room in selectedRooms)
+                    foreach (var room in SelectedRooms)
                     {
-                        List<Ceiling> ceilingsFound = new List<Ceiling>();
+                        var ceilingsFound = new List<Ceiling>();
                         CeilingType ceilingType = null;
 
-                        using (Transaction trans = new Transaction(m_doc))
+                        using (var trans = new Transaction(Doc))
                         {
                             trans.Start("Create a Ceiling");
                             try
@@ -79,7 +88,7 @@ namespace HOK.FinishCreator
 
                         if (ceilingsFound.Count > 0 && null != ceilingType)
                         {
-                            List<Ceiling> copiedCeilings = CreateCeilings(room, ceilingsFound, ceilingType, ref failureMessages);
+                            var copiedCeilings = CreateCeilings(room, ceilingsFound, ceilingType, ref failureMessages);
                             if (copiedCeilings.Count > 0 && !createdCeilings.ContainsKey(room.Id.IntegerValue))
                             {
                                 createdCeilings.Add(room.Id.IntegerValue, copiedCeilings);
@@ -100,20 +109,20 @@ namespace HOK.FinishCreator
 
         public bool CreateCeilingFromLink()
         {
-            bool created = false;
-            using (TransactionGroup tg = new TransactionGroup(m_doc))
+            var created = false;
+            using (var tg = new TransactionGroup(Doc))
             {
                 tg.Start("Create Ceilings");
-                StringBuilder failureMessages = new StringBuilder();
+                var failureMessages = new StringBuilder();
                 try
                 {
-                    foreach (LinkedRoomProperties lrp in selectedLinkedRooms)
+                    foreach (var lrp in selectedLinkedRooms)
                     {
-                        Room room = lrp.LinkedRoom;
-                        List<Ceiling> ceilingsFound = new List<Ceiling>();
+                        var room = lrp.LinkedRoom;
+                        var ceilingsFound = new List<Ceiling>();
                         CeilingType ceilingType = null;
 
-                        using (Transaction trans = new Transaction(m_doc))
+                        using (var trans = new Transaction(Doc))
                         {
                             trans.Start("Create a Ceiling");
                             try
@@ -134,7 +143,7 @@ namespace HOK.FinishCreator
 
                         if (ceilingsFound.Count > 0 && null != ceilingType)
                         {
-                            List<Ceiling> copiedCeilings = CreateCeilings(room, ceilingsFound, ceilingType, ref failureMessages);
+                            var copiedCeilings = CreateCeilings(room, ceilingsFound, ceilingType, ref failureMessages);
                             if (copiedCeilings.Count > 0 && !createdCeilings.ContainsKey(room.Id.IntegerValue))
                             {
                                 createdCeilings.Add(room.Id.IntegerValue, copiedCeilings);
@@ -155,18 +164,18 @@ namespace HOK.FinishCreator
 
         private List<Ceiling> CreateCeilings(Room room, List<Ceiling> ceilingsFound, CeilingType ceilingType, ref StringBuilder msgBuilder)
         {
-            List<Ceiling> copiedCeilings = new List<Ceiling>();
+            var copiedCeilings = new List<Ceiling>();
             try
             {
-                foreach (Ceiling ceiling in ceilingsFound)
+                foreach (var ceiling in ceilingsFound)
                 {
-                    using (Transaction trans = new Transaction(m_doc))
+                    using (var trans = new Transaction(Doc))
                     {
                         trans.Start("Copy Ceiling");
                         try
                         {
                             double finishThickness = 0;
-                            Parameter param = ceilingType.get_Parameter(BuiltInParameter.CEILING_THICKNESS);
+                            var param = ceilingType.get_Parameter(BuiltInParameter.CEILING_THICKNESS);
                             if (null != param)
                             {
                                 if (param.HasValue)
@@ -175,17 +184,17 @@ namespace HOK.FinishCreator
                                 }
                             }
 
-                            ICollection<ElementId> copiedIds = ElementTransformUtils.CopyElement(m_doc, ceiling.Id, new XYZ(0, 0, -finishThickness));
+                            var copiedIds = ElementTransformUtils.CopyElement(Doc, ceiling.Id, new XYZ(0, 0, -finishThickness));
                             trans.Commit();
 
                             trans.Start("Change Ceiling Type");
                             if (copiedIds.Count > 0)
                             {
-                                ElementId copiedCeilingId = copiedIds.First();
-                                Ceiling copiedCeiling = m_doc.GetElement(copiedCeilingId) as Ceiling;
+                                var copiedCeilingId = copiedIds.First();
+                                var copiedCeiling = Doc.GetElement(copiedCeilingId) as Ceiling;
                                 if (null != copiedCeiling)
                                 {
-                                    ElementId changedTypeId = copiedCeiling.ChangeTypeId(ceilingType.Id);
+                                    var changedTypeId = copiedCeiling.ChangeTypeId(ceilingType.Id);
                                     copiedCeilings.Add(copiedCeiling);
                                 }
                             }
@@ -208,14 +217,14 @@ namespace HOK.FinishCreator
 
         private List<Ceiling> FindCeilings(Room room, Transform transformValue)
         {
-            List<Ceiling> ceilings = new List<Ceiling>();
+            var ceilings = new List<Ceiling>();
             try
             {
-                Solid roomSolid = FindRoomSolid(room, transformValue);
+                var roomSolid = FindRoomSolid(room, transformValue);
                 if (null != roomSolid)
                 {
-                    FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                    ElementIntersectsSolidFilter solidFilter = new ElementIntersectsSolidFilter(roomSolid);
+                    var collector = new FilteredElementCollector(Doc);
+                    var solidFilter = new ElementIntersectsSolidFilter(roomSolid);
                     ceilings = collector.OfClass(typeof(Ceiling)).WherePasses(solidFilter).WhereElementIsNotElementType().ToElements().Cast<Ceiling>().ToList();
                 }
             }
@@ -231,11 +240,11 @@ namespace HOK.FinishCreator
             Solid roomSolid = null;
             try
             {
-                GeometryElement geomElem = room.ClosedShell;
+                var geomElem = room.ClosedShell;
                 geomElem = geomElem.GetTransformed(transformValue);
-                foreach (GeometryObject geoObj in geomElem)
+                foreach (var geoObj in geomElem)
                 {
-                    Solid solid = geoObj as Solid;
+                    var solid = geoObj as Solid;
                     if (null != solid)
                     {
                         if (solid.Volume > 0)
@@ -252,15 +261,20 @@ namespace HOK.FinishCreator
             return roomSolid;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="room"></param>
+        /// <returns></returns>
         private CeilingType FindCeilingType(Room room)
         {
             CeilingType ceilingType = null;
             try
             {
-                string typeName = "Ceiling Finish";
+                var typeName = "Ceiling Finish";
                 if (!room.Document.IsLinked)
                 {
-                    Parameter param = room.get_Parameter(BuiltInParameter.ROOM_FINISH_CEILING);
+                    var param = room.get_Parameter(BuiltInParameter.ROOM_FINISH_CEILING);
                     if (null != param)
                     {
                         if (param.HasValue)
@@ -270,23 +284,24 @@ namespace HOK.FinishCreator
                     }
                 }
 
-                var query = from element in ceilingTypes where element.Name == typeName select element;
-                if (query.Count() > 0)
+                var query = CeilingTypes.FirstOrDefault(x => x.Name == typeName);
+                if (query != null)
                 {
-                    ceilingType = query.First();
+                    ceilingType = query;
                 }
                 else
                 {
                     //create a ceiling type
-                    CeilingType typeToCopy = null;
-                    ElementId materialId = ElementId.InvalidElementId;
-                    foreach (CeilingType cType in ceilingTypes)
+                    CeilingType typeToCopy;
+                    var materialId = ElementId.InvalidElementId;
+                    foreach (var cType in CeilingTypes)
                     {
-                        if (!cType.CanBeCopied) { continue; }
-                        if (null != cType.GetCompoundStructure())
+                        if (!cType.CanBeCopied) continue;
+
+                        if (cType.GetCompoundStructure() != null)
                         {
-                            CompoundStructure cStructure = cType.GetCompoundStructure();
-                            foreach (CompoundStructureLayer layer in cStructure.GetLayers())
+                            var cStructure = cType.GetCompoundStructure();
+                            foreach (var layer in cStructure.GetLayers())
                             {
                                 if (layer.Function == MaterialFunctionAssignment.Finish1 || layer.Function == MaterialFunctionAssignment.Finish2)
                                 {
@@ -297,20 +312,20 @@ namespace HOK.FinishCreator
                                 }
                             }
                         }
-                        if (null != ceilingType)
+                        if (ceilingType != null)
                         {
                             break;
                         }
                     }
 
-                    CompoundStructure compoundStructure = ceilingType.GetCompoundStructure();
-                    double layerThickness = 0.020833;
-                    int layerIndex = compoundStructure.GetFirstCoreLayerIndex();
+                    var compoundStructure = ceilingType.GetCompoundStructure();
+                    const double layerThickness = 0.020833;
+                    var layerIndex = compoundStructure.GetFirstCoreLayerIndex();
                     compoundStructure.SetLayerFunction(layerIndex, MaterialFunctionAssignment.Finish1);
                     compoundStructure.SetLayerWidth(layerIndex, layerThickness);
                     compoundStructure.SetMaterialId(layerIndex, materialId);
 
-                    for (int i = compoundStructure.LayerCount - 1; i > -1; i--)
+                    for (var i = compoundStructure.LayerCount - 1; i > -1; i--)
                     {
                         if (i == layerIndex) { continue; }
                         compoundStructure.DeleteLayer(i);

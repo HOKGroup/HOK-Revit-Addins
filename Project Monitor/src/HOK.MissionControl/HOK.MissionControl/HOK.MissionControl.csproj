@@ -177,12 +177,18 @@
     <Compile Include="Tools\Communicator\HealthReport\HealthReportSummaryModel.cs" />
     <Compile Include="Tools\Communicator\HealthReport\HealthReportSummaryViewModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksViewModel.cs" />
-    <Compile Include="Tools\Communicator\Tasks\StringToBoolConverter.cs" />
-    <Compile Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantModel.cs" />
-    <Compile Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantView.xaml.cs">
-      <DependentUpon>TaskAssistantView.xaml</DependentUpon>
+    <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\SheetTaskAssistantModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\SheetTaskAssistantView.xaml.cs">
+      <DependentUpon>SheetTaskAssistantView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\SheetTaskAssistantViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\StringToBoolConverter.cs" />
+    <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantView.xaml.cs">
+      <DependentUpon>FamilyTaskAssistantView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TaskWrappers.cs" />
     <Compile Include="Tools\DTMTool\DTMFailure.cs" />
     <Compile Include="Tools\DTMTool\DTMUpdater.cs" />
     <Compile Include="Tools\DTMTool\DTMUtils\GridUtils.cs" />
@@ -202,6 +208,8 @@
     <Compile Include="Tools\HealthReport\ViewMonitor.cs" />
     <Compile Include="Tools\HealthReport\WorksetItemCount.cs" />
     <Compile Include="Tools\HealthReport\WorksetOpenSynch.cs" />
+    <Compile Include="Tools\SheetTracker\SheetTracker.cs" />
+    <Compile Include="Tools\SheetTracker\SheetUpdater.cs" />
     <Compile Include="Utils\FailureProcessor.cs" />
     <Compile Include="Utils\FileInfoUtil.cs" />
   </ItemGroup>
@@ -228,7 +236,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Tools\Communicator\Tasks\TaskAssistant\TaskAssistantView.xaml">
+    <Page Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\Communicator\Tasks\SheetTaskAssistant\SheetTaskAssistantView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -292,9 +304,11 @@ if $(Configuration) == Debug goto Build2017
 
 :Build2015
 echo Copying results to Build2015
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\ProgramData\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)WebSocket4Net.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
 goto exit
 
 :Build2016

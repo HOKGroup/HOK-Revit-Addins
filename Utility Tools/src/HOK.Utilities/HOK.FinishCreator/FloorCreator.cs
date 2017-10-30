@@ -13,12 +13,17 @@ namespace HOK.FinishCreator
     {
         private Autodesk.Revit.UI.UIApplication m_app;
         private Document m_doc;
-        private List<Element> selectedRooms = new List<Element>();
+        private readonly List<Element> selectedRooms = new List<Element>();
         private List<LinkedRoomProperties> selectedLinkedRooms = new List<LinkedRoomProperties>();
         private List<Floor> createdFloors = new List<Floor>();
 
         public List<Floor> CreatedFloors { get { return createdFloors; } set { createdFloors = value; } }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="application"></param>
+        /// <param name="selectedElements"></param>
         public FloorCreator(UIApplication application, List<Element> selectedElements)
         {
             m_app = application;
@@ -35,20 +40,23 @@ namespace HOK.FinishCreator
             selectedLinkedRooms = selectedLinkedElements;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void CreateFloorFromRoom()
         {
-            using (TransactionGroup tg = new TransactionGroup(m_doc, "Create Floors"))
+            using (var tg = new TransactionGroup(m_doc, "Create Floors"))
             {
                 tg.Start();
                 try
                 {
-                    foreach (Element element in selectedRooms)
+                    foreach (var element in selectedRooms)
                     {
-                        Room room = element as Room;
-                        EdgeArrayArray edgeArrayArray = GetRoomBoundaries(room, Transform.Identity);
-                        List<CurveArray> curveArrayList = CreateProfiles(edgeArrayArray);
-                        FloorType floorType = FindFloorType(room);
-                        Floor newFloor = CreateNewFloor(room, curveArrayList, floorType);
+                        var room = element as Room;
+                        var edgeArrayArray = GetRoomBoundaries(room, Transform.Identity);
+                        var curveArrayList = CreateProfiles(edgeArrayArray);
+                        var floorType = FindFloorType(room);
+                        var newFloor = CreateNewFloor(room, curveArrayList, floorType);
 
                         if (null != newFloor)
                         {
@@ -68,18 +76,18 @@ namespace HOK.FinishCreator
 
         public void CreateFloorFromLink()
         {
-            using (TransactionGroup tg = new TransactionGroup(m_doc))
+            using (var tg = new TransactionGroup(m_doc))
             {
                 tg.Start("Create Floors");
                 try
                 {
-                    foreach (LinkedRoomProperties lrp in selectedLinkedRooms)
+                    foreach (var lrp in selectedLinkedRooms)
                     {
-                        Room room = lrp.LinkedRoom;
-                        EdgeArrayArray edgeArrayArray = GetRoomBoundaries(room, lrp.TransformValue);
-                        List<CurveArray> curveArrayList = CreateProfiles(edgeArrayArray);
-                        FloorType floorType = FindFloorType(room);
-                        Floor newFloor = CreateNewFloor(room, curveArrayList, floorType);
+                        var room = lrp.LinkedRoom;
+                        var edgeArrayArray = GetRoomBoundaries(room, lrp.TransformValue);
+                        var curveArrayList = CreateProfiles(edgeArrayArray);
+                        var floorType = FindFloorType(room);
+                        var newFloor = CreateNewFloor(room, curveArrayList, floorType);
 
                         
                         if (null != newFloor)
@@ -102,14 +110,14 @@ namespace HOK.FinishCreator
             Floor newFloor = null;
             try
             {
-                using (Transaction trans = new Transaction(m_doc))
+                using (var trans = new Transaction(m_doc))
                 {
                     trans.Start("Create Floor");
                     try
                     {
                         if (null != floorType && ElementId.InvalidElementId != room.LevelId)
                         {
-                            Level roomLevel = m_doc.GetElement(room.LevelId) as Level;
+                            var roomLevel = m_doc.GetElement(room.LevelId) as Level;
                             newFloor = m_doc.Create.NewFloor(curveArrayList[0], floorType, roomLevel, false);
                         }
                         else
@@ -125,16 +133,16 @@ namespace HOK.FinishCreator
                     }
                 }
 
-                using (Transaction trans = new Transaction(m_doc))
+                using (var trans = new Transaction(m_doc))
                 {
                     trans.Start("Create Openings");
                     try
                     {
                         if (null != newFloor && curveArrayList.Count > 1)
                         {
-                            for (int i = 1; i < curveArrayList.Count; i++)
+                            for (var i = 1; i < curveArrayList.Count; i++)
                             {
-                                Opening opening = m_doc.Create.NewOpening(newFloor, curveArrayList[i], false);
+                                var opening = m_doc.Create.NewOpening(newFloor, curveArrayList[i], false);
                             }
                         }
                         trans.Commit();
@@ -146,17 +154,17 @@ namespace HOK.FinishCreator
                     }
                 }
 
-                using (Transaction trans = new Transaction(m_doc))
+                using (var trans = new Transaction(m_doc))
                 {
                     trans.Start("Move Floors");
                     try
                     {
                         if (null != newFloor)
                         {
-                            Location location = newFloor.Location;
-                            double thickness = GetFloorThickness(newFloor);
-                            XYZ translationVec = new XYZ(0, 0, thickness);
-                            bool moved = location.Move(translationVec);
+                            var location = newFloor.Location;
+                            var thickness = GetFloorThickness(newFloor);
+                            var translationVec = new XYZ(0, 0, thickness);
+                            var moved = location.Move(translationVec);
                         }
                         trans.Commit();
                     }
@@ -169,29 +177,29 @@ namespace HOK.FinishCreator
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return newFloor;
         }
 
         private EdgeArrayArray GetRoomBoundaries(Room room, Transform transformValue)
         {
-            EdgeArrayArray edgeArrayArray = new EdgeArrayArray();
+            var edgeArrayArray = new EdgeArrayArray();
             try
             {
-                GeometryElement geomElem = room.ClosedShell;
+                var geomElem = room.ClosedShell;
                 if (geomElem != null)
                 {
                     geomElem = geomElem.GetTransformed(transformValue);
-                    foreach (GeometryObject geomObj in geomElem)
+                    foreach (var geomObj in geomElem)
                     {
-                        Solid solid = geomObj as Solid;
+                        var solid = geomObj as Solid;
                         if (solid != null)
                         {
                             foreach (Face face in solid.Faces)
                             {
-                                UV uv = new UV(0, 0);
-                                XYZ normal = face.ComputeNormal(uv);
+                                var uv = new UV(0, 0);
+                                var normal = face.ComputeNormal(uv);
                                 if (normal.IsAlmostEqualTo(new XYZ(0, 0, -1))) //bottom face
                                 {
                                     edgeArrayArray = face.EdgeLoops;
@@ -210,28 +218,28 @@ namespace HOK.FinishCreator
 
         private List<CurveArray> CreateProfiles(EdgeArrayArray edgeArrayArray)
         {
-            List<CurveArray> curveArrayList = new List<CurveArray>();
+            var curveArrayList = new List<CurveArray>();
             try
             {
                 double maxCircum = 0;
 
                 foreach (EdgeArray edgeArray in edgeArrayArray)
                 {
-                    CurveArray curveArray = new CurveArray();
+                    var curveArray = new CurveArray();
                     Curve curve = null;
-                    List<XYZ> pointList = new List<XYZ>();
-                    bool first = true;
+                    var pointList = new List<XYZ>();
+                    var first = true;
                     double circumference = 0;
 
                     foreach (Edge edge in edgeArray)
                     {
                         circumference += edge.ApproximateLength;
-                        int pointCount = edge.Tessellate().Count;
+                        var pointCount = edge.Tessellate().Count;
                         if (pointCount > 2)//edge from a circular face 
                         {
-                            IList<XYZ> tPoints = edge.Tessellate();
+                            var tPoints = edge.Tessellate();
                             tPoints.RemoveAt(tPoints.Count - 1);
-                            foreach (XYZ point in tPoints)
+                            foreach (var point in tPoints)
                             {
                                 pointList.Add(point);
                             }
@@ -239,7 +247,7 @@ namespace HOK.FinishCreator
                         else if (pointCount == 2)
                         {
                             curve = edge.AsCurve();
-                            XYZ point = curve.GetEndPoint(0);
+                            var point = curve.GetEndPoint(0);
 
                             if (first)
                             {
@@ -255,10 +263,10 @@ namespace HOK.FinishCreator
                     if (maxCircum == 0) { maxCircum = circumference; }
                     else if (maxCircum < circumference) { maxCircum = circumference; }
 
-                    int num = pointList.Count;
+                    var num = pointList.Count;
                     if (num > 0)
                     {
-                        for (int i = 0; i < num; i++)
+                        for (var i = 0; i < num; i++)
                         {
                             if (i == num - 1)
                             {
@@ -288,16 +296,16 @@ namespace HOK.FinishCreator
             FloorType floorType = null;
             try
             {
-                string typeName = room.get_Parameter(BuiltInParameter.ROOM_FINISH_FLOOR).AsString();
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                ElementClassFilter classFilter = new ElementClassFilter(typeof(FloorType));
+                var typeName = room.get_Parameter(BuiltInParameter.ROOM_FINISH_FLOOR).AsString();
+                var collector = new FilteredElementCollector(m_doc);
+                var classFilter = new ElementClassFilter(typeof(FloorType));
                 collector.WherePasses(classFilter);
 
                 var query = from element in collector
                             where element.Name == typeName
                             select element;
 
-                List<FloorType> floorTypes = query.Cast<FloorType>().ToList<FloorType>();
+                var floorTypes = query.Cast<FloorType>().ToList<FloorType>();
                 if (floorTypes.Count > 0)
                 {
                     floorType = floorTypes[0];
@@ -318,7 +326,7 @@ namespace HOK.FinishCreator
         private FloorType CreateFloorType(Room room, string typeName)
         {
             FloorType newFloorType = null;
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(m_doc))
             {
                 trans.Start("Create Floor Type");
                 try
@@ -329,22 +337,22 @@ namespace HOK.FinishCreator
                         typeName = "Floor Finish";
                         if (!room.Document.IsLinked)
                         {
-                            Parameter param = room.get_Parameter(BuiltInParameter.ROOM_FINISH_FLOOR);
+                            var param = room.get_Parameter(BuiltInParameter.ROOM_FINISH_FLOOR);
                             param.Set(typeName);
                         }
                     }
 
-                    FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                    ElementClassFilter classFilter = new ElementClassFilter(typeof(FloorType));
+                    var collector = new FilteredElementCollector(m_doc);
+                    var classFilter = new ElementClassFilter(typeof(FloorType));
                     collector.WherePasses(classFilter);
 
-                    List<FloorType> floorTypes = collector.Cast<FloorType>().ToList<FloorType>();
+                    var floorTypes = collector.Cast<FloorType>().ToList<FloorType>();
 
                     var query = from floorType in floorTypes
                                 where floorType.Name == typeName
                                 select floorType;
 
-                    List<FloorType> existingFloorTypes = query.Cast<FloorType>().ToList();
+                    var existingFloorTypes = query.Cast<FloorType>().ToList();
                     if (existingFloorTypes.Count > 0)
                     {
                         newFloorType = existingFloorTypes[0];
@@ -353,7 +361,7 @@ namespace HOK.FinishCreator
                     {
                         if (floorTypes.Count > 0)
                         {
-                            foreach (FloorType floorType in floorTypes)
+                            foreach (var floorType in floorTypes)
                             {
                                 if (floorType.IsFoundationSlab) { continue; }
                                 newFloorType = floorType.Duplicate(typeName) as FloorType;
@@ -363,13 +371,13 @@ namespace HOK.FinishCreator
 
                         if (null != newFloorType)
                         {
-                            CompoundStructure compoundStructure = newFloorType.GetCompoundStructure();
-                            double layerThickness = 0.020833;
-                            int layerIndex = compoundStructure.GetFirstCoreLayerIndex();
+                            var compoundStructure = newFloorType.GetCompoundStructure();
+                            var layerThickness = 0.020833;
+                            var layerIndex = compoundStructure.GetFirstCoreLayerIndex();
                             compoundStructure.SetLayerFunction(layerIndex, MaterialFunctionAssignment.Finish1);
                             compoundStructure.SetLayerWidth(layerIndex, layerThickness);
 
-                            for (int i = compoundStructure.LayerCount - 1; i > -1; i--)
+                            for (var i = compoundStructure.LayerCount - 1; i > -1; i--)
                             {
                                 if (i == layerIndex) { continue; }
                                 else
