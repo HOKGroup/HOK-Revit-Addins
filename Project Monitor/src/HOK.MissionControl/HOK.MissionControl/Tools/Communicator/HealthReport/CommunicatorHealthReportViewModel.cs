@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Families;
 
 namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
@@ -9,7 +10,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         public ObservableCollection<HealthReportSummaryViewModel> HealthReports { get; set; }
         public CommunicatorHealthReportModel Model { get; set; }
 
-        public CommunicatorHealthReportViewModel(FamilyStat famStat)
+        public CommunicatorHealthReportViewModel(FamilyData famStat)
         {
             var hrData = AppCommand.HrData;
             if (hrData == null) return;

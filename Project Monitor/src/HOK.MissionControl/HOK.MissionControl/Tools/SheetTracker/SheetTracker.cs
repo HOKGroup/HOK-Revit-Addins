@@ -1,14 +1,12 @@
 ﻿using Autodesk.Revit.DB;
-using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using System.Linq;
+using HOK.MissionControl.Core.Schemas.Sheets;
 
 namespace HOK.MissionControl.Tools.SheetTracker
 {
     public class SheetTracker
     {
-        //private SheetsData SheetsData { get; set; }
-
         public void SynchSheets(Document doc)
         {
             var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
@@ -18,6 +16,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
             var sheets = new FilteredElementCollector(doc)
                 .OfCategory(BuiltInCategory.OST_Sheets)
                 .WhereElementIsNotElementType()
+                .Cast<ViewSheet>()
                 .Select(x => new SheetItem(x, centralPath))
                 .ToDictionary(key => key.uniqueId, value => value);
 
@@ -30,18 +29,18 @@ namespace HOK.MissionControl.Tools.SheetTracker
             var refreshProject = false;
             if (!MissionControlSetup.SheetsIds.ContainsKey(centralPath))
             {
-                AppCommand.SheetsData = ServerUtilities.GetByCentralPath<SheetsData>(centralPath, "sheets/centralPath");
+                AppCommand.SheetsData = ServerUtilities.GetByCentralPath<SheetData>(centralPath, "sheets/centralPath");
                 if (AppCommand.SheetsData == null)
                 {
                     // (Konrad) This route executes only when we are posting Sheets data for the first time.
-                    var data = new SheetsData
+                    var data = new SheetData
                     {
                         centralPath = centralPath,
                         sheets = sheets.Values.ToList(),
                         revisions = revisions.Values.ToList()
                     };
 
-                    AppCommand.SheetsData = ServerUtilities.Post<SheetsData>(data, "sheets");
+                    AppCommand.SheetsData = ServerUtilities.Post<SheetData>(data, "sheets");
                     ServerUtilities.Put(currentProject, "projects/" + currentProject.Id + "/addsheets/" + AppCommand.SheetsData.Id);
                     refreshProject = true;
                 }

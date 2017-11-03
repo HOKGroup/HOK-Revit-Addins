@@ -8,7 +8,8 @@ using Quobject.Collections.Immutable;
 using Quobject.EngineIoClientDotNet.Client.Transports;
 using Quobject.SocketIoClientDotNet.Client;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 
 namespace HOK.MissionControl.Tools.Communicator.Socket
@@ -72,7 +73,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                 else
                 {
                     var data = JObject.FromObject(body);
-                    var familyStats = data["body"].ToObject<FamilyStat>();
+                    var familyStats = data["body"].ToObject<FamilyData>();
                     var familyName = data["familyName"].ToObject<string>();
                     if (familyStats == null || string.IsNullOrEmpty(familyName)) return;
 
@@ -89,7 +90,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                 else
                 {
                     var data = JObject.FromObject(body);
-                    var familyStats = data["body"].ToObject<FamilyStat>();
+                    var familyStats = data["body"].ToObject<FamilyData>();
                     var familyName = data["familyName"].ToObject<string>();
                     var oldTaskId = data["oldTaskId"].ToObject<string>();
                     if (familyStats == null || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(oldTaskId)) return;
@@ -107,11 +108,44 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                 else
                 {
                     var data = JObject.FromObject(body);
-                    var sheetsData = data["body"].ToObject<SheetsData>();
+                    var sheetsData = data["body"].ToObject<SheetData>();
                     var identifier = data["identifier"].ToObject<string>();
                     if (sheetsData == null || string.IsNullOrEmpty(identifier)) return;
 
                     Messenger.Default.Send(new SheetsTaskUpdateMessage { Task = sheetsData.sheetsChanges.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal))});
+                }
+            });
+
+            socket.On("sheetTask_approved", body =>
+            {
+                if (body == null)
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "sheetTask_approved: Data was null!");
+                }
+                else
+                {
+                    var data = JObject.FromObject(body);
+                    var sheetsData = data["body"].ToObject<SheetData>();
+                    var identifier = data["identifier"].ToObject<string>();
+                    if (sheetsData == null || string.IsNullOrEmpty(identifier)) return;
+
+                    Messenger.Default.Send(new SheetsTaskApprovedMessage { Identifier = identifier, Sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal))});
+                }
+            });
+
+            socket.On("sheetTask_deleted", body =>
+            {
+                if (body == null)
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "sheetTask_deleted: Data was null!");
+                }
+                else
+                {
+                    var data = JObject.FromObject(body);
+                    var identifier = data["identifier"].ToObject<string>();
+                    if (string.IsNullOrEmpty(identifier)) return;
+
+                    Messenger.Default.Send(new SheetsTaskDeletedMessage { Identifier = identifier });
                 }
             });
 

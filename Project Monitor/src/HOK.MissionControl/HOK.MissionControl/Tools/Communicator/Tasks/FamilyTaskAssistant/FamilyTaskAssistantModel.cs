@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
@@ -70,7 +70,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
             t.completedOn = DateTime.Now;
             t.completedBy = Environment.UserName.ToLower();
 
-            ServerUtilities.Post<FamilyStat>(wrapper.Task, "families/" + familyStatsId + "/family/" + e.name + "/updatetask/" + t.Id);
+            ServerUtilities.Post<FamilyData>(wrapper.Task, "families/" + familyStatsId + "/family/" + e.name + "/updatetask/" + t.Id);
         }
     }
 

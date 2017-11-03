@@ -182,6 +182,7 @@
       <DependentUpon>SheetTaskAssistantView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\SheetTaskAssistantViewModel.cs" />
+    <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\StringToColorConverter.cs" />
     <Compile Include="Tools\Communicator\Tasks\StringToBoolConverter.cs" />
     <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantView.xaml.cs">
@@ -198,8 +199,6 @@
     </Compile>
     <Compile Include="Tools\DTMTool\ReportingElementInfo.cs" />
     <Compile Include="Tools\HealthReport\ModelMonitor.cs" />
-    <Compile Include="Tools\SheetTracker\RevisionFailure.cs" />
-    <Compile Include="Tools\SheetTracker\RevisionUpdater.cs" />
     <Compile Include="Tools\LinkUnloadMonitor\LinkUnloadMonitor.cs" />
     <Compile Include="Tools\LinkUnloadMonitor\LinkUnloadMonitorView.xaml.cs">
       <DependentUpon>LinkUnloadMonitorView.xaml</DependentUpon>
@@ -287,6 +286,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\taskInfo_24x24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sheet_256x256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sheetEdited_256x256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sheetPlaceholder_256x256.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -1,35 +1,19 @@
-﻿using System.ComponentModel;
-using HOK.MissionControl.Core.Schemas;
+﻿using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.Sheets;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {
-    public abstract class TaskWrapper : INotifyPropertyChanged
+    public abstract class TaskWrapper
     {
-        private object _element;
-        public virtual object Element
-        {
-            get { return _element; }
-            set { _element = value; RaisePropertyChanged("Element"); }
-        }
-
-        private object _task;
-        public virtual object Task
-        {
-            get { return _task; }
-            set { _task = value; RaisePropertyChanged("Task"); }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void RaisePropertyChanged(string propname)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propname));
-        }
+        public virtual object Element { get; set; }
+        public virtual object Task { get; set; }
     }
 
     public class SheetTaskWrapper : TaskWrapper
     {
-        public SheetTaskWrapper(SheetTask task)
+        public SheetTaskWrapper(SheetItem task, SheetItem sheet)
         {
+            Element = sheet;
             Task = task;
         }
 
@@ -51,6 +35,17 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         {
             Element = element;
             Task = task;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as FamilyTaskWrapper;
+            return item != null && Task.Equals(item.Task);
+        }
+
+        public override int GetHashCode()
+        {
+            return Task.GetHashCode();
         }
     }
 }

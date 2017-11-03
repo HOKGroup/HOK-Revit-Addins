@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Tools.Communicator.Messaging;
+using HOK.MissionControl.Core.Schemas.Sheets;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {
@@ -18,6 +21,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         public CommunicatorTasksModel Model { get; set; }
         public RelayCommand<TaskWrapper> LaunchTaskAssistant { get; set; }
         public RelayCommand<DataGridExtension> MouseEnter { get; set; }
+        public RelayCommand<UserControl> WindowLoaded { get; }
+        public DataGridExtension Control { get; set; }
         private readonly object _lock = new object();
 
         public CommunicatorTasksViewModel(CommunicatorTasksModel model)
@@ -28,50 +33,21 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
 
             LaunchTaskAssistant = new RelayCommand<TaskWrapper>(OnLaunchTaskAssistant);
             MouseEnter = new RelayCommand<DataGridExtension>(OnMouseEnter);
+            WindowLoaded = new RelayCommand<UserControl>(OnWindowLoaded);
 
             Messenger.Default.Register<FamilyTaskDeletedMessage>(this, OnFamilyTaskDeleted);
             Messenger.Default.Register<FamilyTaskAddedMessage>(this, OnFamilyTaskAdded);
             Messenger.Default.Register<FamilyTaskUpdatedMessage>(this, OnFamilyTaskUpdated);
             Messenger.Default.Register<FamilyTaskAssistantClosedMessage>(this, OnFamilyTaskAssistantClosed);
             Messenger.Default.Register<SheetsTaskUpdateMessage>(this, OnSheetTaskUpdated);
+            Messenger.Default.Register<SheetsTaskApprovedMessage>(this, OnSheetTaskApproved);
+            Messenger.Default.Register<SheetsTaskDeletedMessage>(this, OnSheetsTaskDeleted);
         }
 
-        private void OnSheetTaskUpdated(SheetsTaskUpdateMessage msg)
+        private void OnWindowLoaded(UserControl win)
         {
-            var existingIndex = AppCommand.SheetsData.sheetsChanges.IndexOf(msg.Task);
-            if (existingIndex == -1)
-            {
-                // Add new one
-                AppCommand.SheetsData.sheetsChanges.Add(msg.Task);
-
-                if (msg.Task.assignedTo == Environment.UserName.ToLower())
-                {
-                    lock (_lock)
-                    {
-                        Tasks.Add(new SheetTaskWrapper(msg.Task));
-                    }
-                }
-            }
-            else
-            {
-                // Update existing
-                AppCommand.SheetsData.sheetsChanges[existingIndex] = msg.Task;
-                var storedTask = Tasks.First(x => x.GetType() == typeof(SheetTaskWrapper) &&
-                                                           ((SheetTask) x.Task).identifier == msg.Task.identifier);
-
-                if (msg.Task.assignedTo == Environment.UserName.ToLower() && string.IsNullOrEmpty(msg.Task.completedBy))
-                {
-                    ((SheetTask)storedTask.Task).name = msg.Task.name; //TODO: must be class with propertychanged prop
-                }
-                else
-                {
-                    // (Konrad) Someone reassigned the task away from us.
-                    lock (_lock)
-                    {
-                        Tasks.Remove(storedTask);
-                    }
-                }
-            }
+            //(Konrad) We store a control for use later with Messenger
+            Control = ((CommunicatorTasksView) win).DataGridTasks;
         }
 
         private static void OnMouseEnter(DataGridExtension dg)
@@ -85,6 +61,31 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             Model.LaunchTaskAssistant(task);
         }
 
+        private ObservableCollection<TaskWrapper> _tasks;
+        public ObservableCollection<TaskWrapper> Tasks
+        {
+            get { return _tasks; }
+            set { _tasks = value; RaisePropertyChanged(() => Tasks); }
+        }
+
+        private TaskWrapper _selectedTask;
+        public TaskWrapper SelectedTask
+        {
+            get { return _selectedTask; }
+            set { _selectedTask = value; RaisePropertyChanged(() => SelectedTask); }
+        }
+
+        #region Message Handlers
+
+        /// <summary>
+        /// Handles sheet changes being deleted in Mission Control
+        /// </summary>
+        /// <param name="msg">Message from Mission Control</param>
+        private void OnSheetsTaskDeleted(SheetsTaskDeletedMessage msg)
+        {
+            DeleteTask(msg.Identifier);
+        }
+
         /// <summary>
         /// Handles a message emmited by Closing a Family Task.
         /// </summary>
@@ -94,11 +95,75 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             SelectedTask = null;
             Model.TaskView = null;
         }
-        
+
         /// <summary>
-        /// Handles a message emitted by Updating a Family Task.
+        /// Handles sheet change being approved by user and updated in DB.
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="msg">Message from Mission Control.</param>
+        private void OnSheetTaskApproved(SheetsTaskApprovedMessage msg)
+        {
+            // (Konrad) Update AppCommand sheets
+            var currentSheet = AppCommand.SheetsData.sheets.FirstOrDefault(x => x.identifier == msg.Identifier);
+            if (currentSheet != null)
+            {
+                currentSheet.name = msg.Sheet.name;
+                currentSheet.number = msg.Sheet.number;
+            }
+
+            DeleteTask(msg.Identifier);
+        }
+
+        /// <summary>
+        /// Handles Sheets being updated in Mission Control.
+        /// </summary>
+        /// <param name="msg">Message from Mission Control.</param>
+        private void OnSheetTaskUpdated(SheetsTaskUpdateMessage msg)
+        {
+            var existingIndex = AppCommand.SheetsData.sheetsChanges.IndexOf(msg.Task);
+            if (existingIndex == -1)
+            {
+                // Add new one
+                AppCommand.SheetsData.sheetsChanges.Add(msg.Task);
+                var sheetItem = AppCommand.SheetsData.sheets.FirstOrDefault(x => x.uniqueId == msg.Task.uniqueId);
+
+                if (msg.Task.assignedTo == Environment.UserName.ToLower())
+                {
+                    lock (_lock)
+                    {
+                        Tasks.Add(new SheetTaskWrapper(msg.Task, sheetItem));
+                    }
+                }
+            }
+            else
+            {
+                // Update existing
+                AppCommand.SheetsData.sheetsChanges[existingIndex] = msg.Task;
+                var storedTask = Tasks.First(x => x.GetType() == typeof(SheetTaskWrapper) && ((SheetItem)x.Task).identifier == msg.Task.identifier);
+                if (msg.Task.assignedTo == Environment.UserName.ToLower())
+                {
+                    // (Konrad) In order to trigger changes to UI, we need to update properties individually
+                    // Only then do they fire proper events and update UI.
+                    var sheetTask = (SheetItem)storedTask.Task;
+                    sheetTask.name = msg.Task.name;
+                    sheetTask.number = msg.Task.number;
+                    sheetTask.message = msg.Task.message;
+                    sheetTask.assignedTo = msg.Task.assignedTo;
+                }
+                else
+                {
+                    // (Konrad) Someone reassigned the task away from us.
+                    lock (_lock)
+                    {
+                        Tasks.Remove(storedTask);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles FamilyTask updates in Mission Control.
+        /// </summary>
+        /// <param name="msg">Message from Mission Control.</param>
         private void OnFamilyTaskUpdated(FamilyTaskUpdatedMessage msg)
         {
             FamilyTask task;
@@ -125,20 +190,25 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                 return;
             }
 
-            var existingTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTask) && ((FamilyTask)x.Task).Id == msg.OldTaskId);
-            if (existingTask != null)
+            var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTaskWrapper) && ((FamilyTask)x.Task).Id == msg.OldTaskId);
+            if (storedTask != null)
             {
                 if (task.assignedTo == Environment.UserName.ToLower() && string.IsNullOrEmpty(task.completedBy))
                 {
-                    // (Konrad) Task still belongs to us. Let's update it.
-                    existingTask.Task = task;
+                    // (Konrad) In order to trigger changes to UI, we need to update properties individually
+                    // Only then do they fire proper events and update UI.
+                    var familyTask = (FamilyTask)storedTask.Task;
+                    familyTask.name = task.name;
+                    familyTask.assignedTo = task.assignedTo;
+                    familyTask.comments = task.comments;
+                    familyTask.message = task.message;
                 }
                 else
                 {
                     // (Konrad) Someone reassigned the task away from us.
                     lock (_lock)
                     {
-                        Tasks.Remove(existingTask);
+                        Tasks.Remove(storedTask);
                     }
                 }
             }
@@ -155,6 +225,10 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
         }
 
+        /// <summary>
+        /// Handles FamilyTask being added in Mission Control.
+        /// </summary>
+        /// <param name="msg">Message from Mission Control.</param>
         private void OnFamilyTaskAdded(FamilyTaskAddedMessage msg)
         {
             FamilyTask task;
@@ -192,38 +266,86 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
         }
 
+        /// <summary>
+        /// Handles an event when FamilyTask has been deleted in MissionControl.
+        /// </summary>
+        /// <param name="msg">Message from MissionControl.</param>
         private void OnFamilyTaskDeleted(FamilyTaskDeletedMessage msg)
         {
             var currentFamilyTasks = Tasks
-                .Where(x => x.GetType() == typeof(FamilyTask))
-                .ToDictionary(x => ((FamilyTask)x.Task).Id, x => x);
+                .Where(x => x.GetType() == typeof(FamilyTaskWrapper))
+                .ToDictionary(x => ((FamilyTask)x.Task).Id, x => (FamilyTaskWrapper)x);
 
             foreach (var id in msg.DeletedIds)
             {
                 if (currentFamilyTasks.ContainsKey(id))
                 {
-                    // (Konrad) This message was spawned on another thread that Socket App runs
-                    // In order to manipulate a collection on UI thread we need to lock it first.
-                    lock (_lock)
+                    var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTaskWrapper) && ((FamilyTask)x.Task).Id == id);
+                    if (storedTask != null)
                     {
-                        Tasks.Remove(currentFamilyTasks[id]);
+                        // (Konrad) This message was spawned on another thread that Socket App runs
+                        // In order to manipulate a collection on UI thread we need to lock it first.
+                        lock (_lock)
+                        {
+                            Tasks.Remove(storedTask);
+                        }
+
+                        // (Konrad) Similarly to above. We are on a different thread. If we are deleting a task
+                        // that has the window currently open, we want to close the window. To do that we need
+                        // to get back on UI thread. Every Control has a dispatcher that can do that for us.
+                        if (SelectedTask == storedTask)
+                        {
+                            Control.Dispatcher.Invoke(() =>
+                            {
+                                Model.LaunchTaskAssistant(null);
+
+                            }, DispatcherPriority.Normal);
+                        }
                     }
                 }
             }
         }
 
-        private ObservableCollection<TaskWrapper> _tasks;
-        public ObservableCollection<TaskWrapper> Tasks
+        #endregion
+
+        #region Utilities
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="identifier"></param>
+        private void DeleteTask(string identifier)
         {
-            get { return _tasks; }
-            set { _tasks = value; RaisePropertyChanged(() => Tasks); }
+            // (Konrad) Update AppCommand sheetsChanges
+            var approvedItem = AppCommand.SheetsData.sheetsChanges.FirstOrDefault(x => x.identifier == identifier);
+            if (approvedItem != null)
+            {
+                var index = AppCommand.SheetsData.sheetsChanges.IndexOf(approvedItem);
+                if (index != -1) AppCommand.SheetsData.sheetsChanges.RemoveAt(index);
+            }
+
+            // (Konrad) Update Tasks UI
+            var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && ((SheetItem)x.Task).identifier == identifier);
+            if (storedTask != null)
+            {
+                var taskIndex = Tasks.IndexOf(storedTask);
+                lock (_lock)
+                {
+                    Tasks.RemoveAt(taskIndex);
+                }
+
+                // (Konrad) If task is open let's close it 
+                if (SelectedTask == storedTask)
+                {
+                    Control.Dispatcher.Invoke(() =>
+                    {
+                        Model.LaunchTaskAssistant(null);
+
+                    }, DispatcherPriority.Normal);
+                }
+            }
         }
 
-        private TaskWrapper _selectedTask;
-        public TaskWrapper SelectedTask
-        {
-            get { return _selectedTask; }
-            set { _selectedTask = value; RaisePropertyChanged(() => SelectedTask); }
-        }
+        #endregion
     }
 }

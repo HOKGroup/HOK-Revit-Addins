@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.FamilyPublish.Properties;
 
@@ -164,8 +165,8 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                 }
 
-                var famData = ServerUtilities.GetDataByCentralPath<FamilyStat>(CentralPath, "families");
-                FamilyStat famStat = null;
+                var famData = ServerUtilities.GetDataByCentralPath<FamilyData>(CentralPath, "families");
+                FamilyData famStat = null;
                 if (famData.Any())
                 {
                     foreach (var fam in famData)
@@ -201,7 +202,7 @@ namespace HOK.MissionControl.FamilyPublish
                     famOutput.Add(item);
                 }
 
-                var familyStats = new FamilyStat
+                var familyStats = new FamilyData
                 {
                     centralPath = CentralPath,
                     totalFamilies = famOutput.Count,
@@ -215,7 +216,7 @@ namespace HOK.MissionControl.FamilyPublish
 
                 if (famStat == null)
                 {
-                    famStat = ServerUtilities.Post<FamilyStat>(familyStats, "families");
+                    famStat = ServerUtilities.Post<FamilyData>(familyStats, "families");
                     ServerUtilities.Put(new {key = famStat.Id}, "healthrecords/" + RecordId + "/addfamilies");
                 }
                 else

@@ -130,11 +130,17 @@
   <ItemGroup>
     <Compile Include="Schemas\Addins.cs" />
     <Compile Include="Schemas\Configuration.cs" />
+    <Compile Include="Schemas\Families\FamilyData.cs" />
+    <Compile Include="Schemas\Families\FamilyItem.cs" />
+    <Compile Include="Schemas\Families\FamilyTask.cs" />
     <Compile Include="Schemas\Project.cs" />
     <Compile Include="Schemas\ProjectAddress.cs" />
     <Compile Include="Schemas\RevitServer.cs" />
     <Compile Include="Schemas\RvtFile.cs" />
-    <Compile Include="Schemas\Sheets.cs" />
+    <Compile Include="Schemas\Sheets\SheetsData.cs" />
+    <Compile Include="Schemas\Sheets\RevisionItem.cs" />
+    <Compile Include="Schemas\Sheets\SheetItem.cs" />
+    <Compile Include="Schemas\Sheets\SheetTask.cs" />
     <Compile Include="Schemas\TriggerRecord.cs" />
     <Compile Include="Schemas\HealthReport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

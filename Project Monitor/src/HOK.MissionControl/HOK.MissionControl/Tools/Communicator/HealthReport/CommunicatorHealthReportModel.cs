@@ -6,12 +6,13 @@ using System.Windows.Media;
 using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Families;
 
 namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
     public class CommunicatorHealthReportModel
     {
-        public ObservableCollection<HealthReportSummaryViewModel> ProcessData(HealthReportData data, FamilyStat familyStats)
+        public ObservableCollection<HealthReportSummaryViewModel> ProcessData(HealthReportData data, FamilyData familyStats)
         {
             var output = new ObservableCollection<HealthReportSummaryViewModel>();
             if (familyStats != null)

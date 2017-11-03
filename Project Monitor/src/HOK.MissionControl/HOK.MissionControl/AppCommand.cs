@@ -11,6 +11,8 @@ using Autodesk.Revit.UI.Events;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
@@ -37,7 +39,7 @@ namespace HOK.MissionControl
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
         private static Queue<Action<UIApplication>> Tasks;
         public static HealthReportData HrData { get; set; }
-        public static SheetsData SheetsData { get; set; }
+        public static SheetData SheetsData { get; set; }
         public CommunicatorView CommunicatorWindow { get; set; }
         public PushButton CommunicatorButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }

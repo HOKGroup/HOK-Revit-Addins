@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using HOK.MissionControl.Core.Schemas;
 using RestSharp;
-using HOK.Core.Utilities;
 using Newtonsoft.Json;
+using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas;
 
 namespace HOK.MissionControl.Core.Utils
 {
@@ -21,14 +21,9 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        //public const string BaseUrlLocal = "http://hok-184vs/";
-        public const string BaseUrlLocal = "http://localhost:8080/";
-        public const string BaseUrlGlobal = "http://hokmissioncontrol.herokuapp.com/";
+        //public const string RestApiBaseUrl = "http://hok-184vs/";
+        public const string RestApiBaseUrl = "http://localhost:8080/";
         public const string ApiVersion = "api/v1";
-        public static string RestApiBaseUrl
-        {
-            get { return UseLocalServer ? BaseUrlLocal : BaseUrlGlobal; }
-        }
 
         #region GET
 
@@ -61,20 +56,6 @@ namespace HOK.MissionControl.Core.Utils
             }
             return projectFound;
         }
-
-        //public static void GetHealthRecords(Project project)
-        //{
-        //    try
-        //    {
-        //        var client = new RestClient(RestApiBaseUrl);
-        //        var request = new RestRequest(ApiVersion + "/projects/populatehr/" + project.Id + "/process", Method.GET);
-        //        var unused = client.Execute(request);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-        //    }
-        //}
 
         /// <summary>
         /// Retrieves a Mission Control Configuration that matches given Central File path.
@@ -177,7 +158,7 @@ namespace HOK.MissionControl.Core.Utils
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
                     if (data != null) result = data;
-                    Log.AppendLog(LogMessageType.EXCEPTION, "Found document with matching path.");
+                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
                 }
             }
             catch (Exception ex)
@@ -193,6 +174,7 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="centralPath"></param>
         /// <param name="path"></param>
         /// <returns></returns>
+        // TODO: This needs to be redone!
         public static List<T> GetDataByCentralPath<T>(string centralPath, string path)
         {
             var result = new List<T>();
@@ -217,32 +199,6 @@ namespace HOK.MissionControl.Core.Utils
             }
             return result;
         }
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="worksetDocumentId"></param>
-        ///// <param name="route"></param>
-        ///// <returns></returns>
-        //public static FamilyResponse GetFamilyStats(string worksetDocumentId, string route)
-        //{
-        //    var items = new FamilyResponse();
-        //    try
-        //    {
-        //        var client = new RestClient(RestApiBaseUrl);
-        //        var request = new RestRequest(ApiVersion + "/worksets/" + worksetDocumentId + "/" + route, Method.GET);
-        //        var response = client.Execute<FamilyResponse>(request);
-        //        if (null != response.Data)
-        //        {
-        //            items = response.Data;
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        //ignored
-        //    }
-        //    return items;
-        //}
 
         /// <summary>
         /// Retrieves a Collection from MongoDB.
@@ -514,64 +470,6 @@ namespace HOK.MissionControl.Core.Utils
             return size;
         }
 
-        #endregion
-
-        #region UPDATE
-
-        //public static HttpStatusCode UpdateConfiguration(out string content, out string errorMessage, Configuration config)
-        //{
-        //    HttpStatusCode status = HttpStatusCode.Unused;
-        //    content = "";
-        //    errorMessage = "";
-        //    try
-        //    {
-        //        var client = new RestClient(RestApiBaseUrl);
-        //        var request = new RestRequest(apiVersion + "/configurations/" + config._id, Method.PUT);
-        //        request.RequestFormat = RestSharp.DataFormat.Json;
-        //        request.AddBody(config);
-
-        //        IRestResponse response = client.Execute(request);
-
-        //        content = response.Content;
-        //        errorMessage = response.ErrorMessage;
-        //        status = response.StatusCode;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        string message = ex.Message;
-        //        LogUtil.AppendLog("ServerUtil-UpdateConfiguration:" + ex.Message);
-        //    }
-        //    return status;
-        //}
-
-
-        #endregion
-
-        #region DELETE
-
-        //public static HttpStatusCode DeleteTriggerRecord(out string content, out string errorMessage, string query)
-        //{
-        //    HttpStatusCode status = HttpStatusCode.Unused;
-        //    content = "";
-        //    errorMessage = "";
-        //    try
-        //    {
-        //        var client = new RestClient(RestApiBaseUrl);
-        //        var request = new RestRequest(apiVersion + "/triggerrecords/" + query, Method.DELETE);
-
-        //        IRestResponse response = client.Execute(request);
-
-        //        content = response.Content;
-        //        errorMessage = response.ErrorMessage;
-        //        status = response.StatusCode;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        string message = ex.Message;
-        //        LogUtil.AppendLog("ServerUtil-DeleteTriggerRecord:" + ex.Message);
-        //    }
-        //    return status;
-        //}
         #endregion
     }
 }

@@ -4,7 +4,7 @@ using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
@@ -22,7 +22,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
         {
             Model = new FamilyTaskAssistantModel();
             Wrapper = wrapper;
-            Title = "Mission Control - Task Assistant v." + Assembly.GetExecutingAssembly().GetName().Version;
+            Title = "Mission Control - Family Task Assistant v." + Assembly.GetExecutingAssembly().GetName().Version;
             Checks = Model.CollectChecks((FamilyItem)wrapper.Element);
 
             Complete = new RelayCommand<Window>(OnComplete);

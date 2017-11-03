@@ -8,7 +8,7 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d" 
         d:DesignHeight="400" d:DesignWidth="400" Title="{Binding Title, Mode=OneWay}" Icon="../../../../Resources/hoklogo.ico" WindowStartupLocation="CenterOwner"
-        BorderThickness="0,5,0,0" BorderBrush="#E6E3DB" Width="450" SizeToContent="Height" MinWidth="450" MinHeight="525">
+        BorderThickness="0,5,0,0" BorderBrush="#E6E3DB" Width="700" SizeToContent="Height" MinWidth="700" MinHeight="525">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closed">
             <i:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Win}"/>
@@ -40,7 +40,7 @@
                 CornerRadius="2" 
                 Height="20" 
                 VerticalAlignment="Bottom" Grid.ColumnSpan="2" Grid.Column="0">
-            <Label Content="{Binding Wrapper.Family.name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <Label Content="{Binding Wrapper.Element.name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
                    Margin="5,0,0,0" 
