@@ -33,7 +33,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
 
         private static void OnWindowClosed(Window win)
         {
-            Messenger.Default.Send(new FamilyTaskAssistantClosedMessage { IsClosed = true });
+            // (Konrad) We notify the Communicator View Model that window has closed so View gets set to null and selection is reset.
+            Messenger.Default.Send(new TaskAssistantClosedMessage { IsClosed = true });
         }
 
         private static void OnClose(Window win)

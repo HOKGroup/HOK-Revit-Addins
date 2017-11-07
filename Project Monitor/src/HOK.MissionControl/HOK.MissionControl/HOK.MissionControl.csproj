@@ -160,6 +160,7 @@
     </Compile>
     <Compile Include="Tools\Communicator\CommunicatorViewModel.cs" />
     <Compile Include="Tools\Communicator\CommunicatorRequestHandler.cs" />
+    <Compile Include="Tools\Communicator\Messaging\MissionControlMessaging.cs" />
     <Compile Include="Tools\Communicator\Messaging\TaskMessaging.cs" />
     <Compile Include="Tools\Communicator\Socket\MissionControlSocket.cs" />
     <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksModel.cs" />
@@ -182,7 +183,7 @@
       <DependentUpon>SheetTaskAssistantView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\SheetTaskAssistantViewModel.cs" />
-    <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\StringToColorConverter.cs" />
+    <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\Converters.cs" />
     <Compile Include="Tools\Communicator\Tasks\StringToBoolConverter.cs" />
     <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantView.xaml.cs">

@@ -1,7 +1,10 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using Autodesk.Revit.DB;
 using HOK.MissionControl.Core.Utils;
 using System.Linq;
 using HOK.MissionControl.Core.Schemas.Sheets;
+using GalaSoft.MvvmLight.Messaging;
+using HOK.MissionControl.Tools.Communicator.Messaging;
 
 namespace HOK.MissionControl.Tools.SheetTracker
 {
@@ -57,6 +60,11 @@ namespace HOK.MissionControl.Tools.SheetTracker
                 if (null == projectFound) return;
                 MissionControlSetup.Projects[centralPath] = projectFound;
             }
+
+            AppCommand.LunchCommunicator();
+
+            // (Konrad) Since this is running asynch on another thread let's jump back and load communicator
+            //Messenger.Default.Send(new CommunicatorDataReady { LunchCommunicator = true});
         }
     }
 }

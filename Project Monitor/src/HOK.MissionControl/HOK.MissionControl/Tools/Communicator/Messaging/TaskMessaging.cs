@@ -22,7 +22,7 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
         public FamilyData FamilyStat { get; set; }
     }
 
-    public class FamilyTaskAssistantClosedMessage
+    public class TaskAssistantClosedMessage
     {
         public bool IsClosed { get; set; }
     }
@@ -32,7 +32,18 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
         public SheetItem Task { get; set; }
     }
 
+    public class SheetsTaskSheetAddedMessage
+    {
+        public List<SheetItem> NewSheets { get; set; }
+    }
+
     public class SheetsTaskApprovedMessage
+    {
+        public string Identifier { get; set; }
+        public SheetItem Sheet { get; set; }
+    }
+
+    public class SheetsTaskApprovedNewSheetMessage
     {
         public string Identifier { get; set; }
         public SheetItem Sheet { get; set; }

@@ -18,7 +18,8 @@ namespace HOK.MissionControl.Tools.Communicator
         None = 0,
         EditFamily = 1,
         OpenView = 2,
-        UpdateSheet = 3
+        UpdateSheet = 3,
+        CreateSheet = 4
     }
 
     public class CommunicatorRequest
@@ -75,6 +76,11 @@ namespace HOK.MissionControl.Tools.Communicator
                         UpdateSheet(app);
                         break;
                     }
+                    case RequestId.CreateSheet:
+                    {
+                        CreateSheet(app);
+                        break;
+                    }
                 }
             }
             catch (Exception e)
@@ -82,6 +88,64 @@ namespace HOK.MissionControl.Tools.Communicator
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="app"></param>
+        private void CreateSheet(UIApplication app)
+        {
+            IsUpdatingSheet = true;
+
+            app.Application.FailuresProcessing += FailureProcessing;
+            var doc = app.ActiveUIDocument.Document;
+
+            using (var trans = new Transaction(doc, "CreateSheet"))
+            {
+                trans.Start();
+
+                try
+                {
+                    ViewSheet sheet;
+                    if (SheetTask.isPlaceholder)
+                    {
+                        sheet = ViewSheet.CreatePlaceholder(doc);
+                    }
+                    else
+                    {
+                        // TODO: This should be exposed to user in Mission Control.
+                        var titleblock = new FilteredElementCollector(doc).OfClass(typeof(FamilySymbol)).FirstOrDefault(x => x.Category.Name == "Title Blocks");
+                        if (titleblock == null)
+                        {
+                            IsUpdatingSheet = false;
+                            Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = "Could not find a valid TitleBlock." });
+                            return;
+                        }
+                        sheet = ViewSheet.Create(doc, titleblock.Id);
+                    }
+
+                    sheet.get_Parameter(BuiltInParameter.SHEET_NUMBER)?.Set(SheetTask.number);
+                    sheet.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.name);
+
+                    // (Konrad) We can set this here and pick up in the UI before sending off to MongoDB.
+                    SheetItem = new SheetItem(sheet, AppCommand.SheetsData.centralPath);
+
+                    trans.Commit();
+                    IsUpdatingSheet = false;
+                }
+                catch (Exception e)
+                {
+                    trans.RollBack();
+                    IsUpdatingSheet = false;
+
+                    Log.AppendLog(LogMessageType.EXCEPTION, "Failed to create sheet.");
+                    Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = e.Message });
+                }
+            }
+
+            // (Konrad) We don't want Revit to keep triggering this even when we are not processing updates.
+            app.Application.FailuresProcessing -= FailureProcessing;
         }
 
         /// <summary>
@@ -125,6 +189,9 @@ namespace HOK.MissionControl.Tools.Communicator
                     }
                 }
             }
+
+            // (Konrad) We don't want Revit to keep triggering this even when we are not processing updates.
+            app.Application.FailuresProcessing -= FailureProcessing;
         }
 
         /// <summary>

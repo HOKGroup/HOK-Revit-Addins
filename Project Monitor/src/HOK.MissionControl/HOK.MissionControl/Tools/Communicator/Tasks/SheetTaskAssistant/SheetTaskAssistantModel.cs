@@ -11,10 +11,22 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         /// <param name="wrapper">Sheet Task Wrapper object.</param>
         public void SubmitSheetTask(SheetTaskWrapper wrapper)
         {
-            AppCommand.CommunicatorHandler.SheetItem = (SheetItem) wrapper.Element;
-            AppCommand.CommunicatorHandler.SheetTask = (SheetItem) wrapper.Task;
-            AppCommand.CommunicatorHandler.Request.Make(RequestId.UpdateSheet);
-            AppCommand.CommunicatorEvent.Raise();
+            var item = (SheetItem)wrapper.Element;
+            var task = (SheetItem)wrapper.Task;
+            if (item == null && task.identifier == "")
+            {
+                // (Konrad) It's a creation task.
+                AppCommand.CommunicatorHandler.SheetTask = task;
+                AppCommand.CommunicatorHandler.Request.Make(RequestId.CreateSheet);
+                AppCommand.CommunicatorEvent.Raise();
+            }
+            else
+            {
+                AppCommand.CommunicatorHandler.SheetItem = item;
+                AppCommand.CommunicatorHandler.SheetTask = task;
+                AppCommand.CommunicatorHandler.Request.Make(RequestId.UpdateSheet);
+                AppCommand.CommunicatorEvent.Raise();
+            }
         }
 
         /// <summary>
@@ -23,11 +35,24 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         /// <param name="wrapper">Sheet Task Wrapper containing approved task.</param>
         public void Approve(SheetTaskWrapper wrapper)
         {
-            var t = (SheetItem)wrapper.Task;
             var sheetsDataId = AppCommand.SheetsData.Id;
             if (string.IsNullOrEmpty(sheetsDataId)) return;
 
-            ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/sheetchanges/approve");
+            var t = wrapper.Task as SheetItem;
+            var e = wrapper.Element as SheetItem;
+            
+            if (e == null)
+            {
+                // (Konrad) It's a create sheet task (element associated with task is null). Let's approve that.
+                var newSheet = AppCommand.CommunicatorHandler.SheetItem;
+                if (newSheet == null) return;
+
+                ServerUtilities.Post<SheetData>(newSheet, "sheets/" + sheetsDataId + "/sheetchanges/approvenewsheet");
+            }
+            else
+            {
+                ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/sheetchanges/approve");
+            } 
         }
 
         /// <summary>

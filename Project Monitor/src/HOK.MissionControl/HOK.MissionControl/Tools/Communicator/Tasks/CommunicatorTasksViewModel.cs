@@ -38,10 +38,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             Messenger.Default.Register<FamilyTaskDeletedMessage>(this, OnFamilyTaskDeleted);
             Messenger.Default.Register<FamilyTaskAddedMessage>(this, OnFamilyTaskAdded);
             Messenger.Default.Register<FamilyTaskUpdatedMessage>(this, OnFamilyTaskUpdated);
-            Messenger.Default.Register<FamilyTaskAssistantClosedMessage>(this, OnFamilyTaskAssistantClosed);
+            Messenger.Default.Register<TaskAssistantClosedMessage>(this, OnFamilyTaskAssistantClosed);
             Messenger.Default.Register<SheetsTaskUpdateMessage>(this, OnSheetTaskUpdated);
             Messenger.Default.Register<SheetsTaskApprovedMessage>(this, OnSheetTaskApproved);
             Messenger.Default.Register<SheetsTaskDeletedMessage>(this, OnSheetsTaskDeleted);
+            Messenger.Default.Register<SheetsTaskSheetAddedMessage>(this, OnSheetsTaskSheetAdded);
         }
 
         private void OnWindowLoaded(UserControl win)
@@ -90,7 +91,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// Handles a message emmited by Closing a Family Task.
         /// </summary>
         /// <param name="msg"></param>
-        private void OnFamilyTaskAssistantClosed(FamilyTaskAssistantClosedMessage msg)
+        private void OnFamilyTaskAssistantClosed(TaskAssistantClosedMessage msg)
         {
             SelectedTask = null;
             Model.TaskView = null;
@@ -111,6 +112,23 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
 
             DeleteTask(msg.Identifier);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="msg"></param>
+        private void OnSheetsTaskSheetAdded(SheetsTaskSheetAddedMessage msg)
+        {
+            AppCommand.SheetsData.sheetsChanges.AddRange(msg.NewSheets);
+
+            lock (_lock)
+            {
+                foreach (var task in msg.NewSheets)
+                {
+                    Tasks.Add(new SheetTaskWrapper(task, null));
+                }
+            }
         }
 
         /// <summary>

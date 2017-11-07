@@ -18,6 +18,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         public RelayCommand<Window> Close { get; set; }
         public RelayCommand<Window> Approve { get; set; }
         public RelayCommand<Window> WindowLoaded { get; }
+        public RelayCommand<Window> WindowClosed { get; set; }
         public TextBlock Control { get; set; }
 
         public SheetTaskAssistantViewModel(SheetTaskWrapper wrapper)
@@ -25,13 +26,21 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             Model = new SheetTaskAssistantModel();
             Wrapper = wrapper;
             Title = "Mission Control - Sheet Task Assistant v." + Assembly.GetExecutingAssembly().GetName().Version;
+            OkText = wrapper.Element == null ? "Create" : "Approve";
 
             OpenView = new RelayCommand(OnOpenView);
             Close = new RelayCommand<Window>(OnClose);
             Approve = new RelayCommand<Window>(OnApprove);
             WindowLoaded = new RelayCommand<Window>(OnWindowLoaded);
+            WindowClosed = new RelayCommand<Window>(OnWindowClosed);
 
             Messenger.Default.Register<SheetTaskCompletedMessage>(this, OnSheetTaskCompleted);
+        }
+
+        private static void OnWindowClosed(Window win)
+        {
+            // (Konrad) We notify the Communicator View Model that window has closed so View gets set to null and selection is reset.
+            Messenger.Default.Send(new TaskAssistantClosedMessage { IsClosed = true });
         }
 
         private void OnWindowLoaded(Window win)
@@ -59,6 +68,13 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         {
             get { return _wrapper; }
             set { _wrapper = value; RaisePropertyChanged(() => Wrapper); }
+        }
+
+        private string _okText;
+        public string OkText
+        {
+            get { return _okText; }
+            set { _okText = value; RaisePropertyChanged(() => OkText); }
         }
 
         #region Message Handlers

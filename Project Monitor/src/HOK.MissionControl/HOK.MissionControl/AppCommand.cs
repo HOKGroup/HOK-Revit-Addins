@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Windows;
+using System.Windows.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
@@ -40,7 +42,7 @@ namespace HOK.MissionControl
         private static Queue<Action<UIApplication>> Tasks;
         public static HealthReportData HrData { get; set; }
         public static SheetData SheetsData { get; set; }
-        public CommunicatorView CommunicatorWindow { get; set; }
+        public static CommunicatorView CommunicatorWindow { get; set; }
         public PushButton CommunicatorButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
@@ -223,7 +225,7 @@ namespace HOK.MissionControl
                         else
                         {
                             MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
-                            CommunicatorWindow.DataContext = new CommunicatorViewModel(); // create new communicator VM
+                            //CommunicatorWindow.DataContext = new CommunicatorViewModel(); // create new communicator VM
                         }
                     }
 
@@ -258,6 +260,18 @@ namespace HOK.MissionControl
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static void LunchCommunicator()
+        {
+            var control = CommunicatorWindow.MainControl;
+            control.Dispatcher.Invoke(() =>
+            {
+                CommunicatorWindow.DataContext = new CommunicatorViewModel(); // create new communicator VM
+            }, DispatcherPriority.Normal);
         }
 
         /// <summary>

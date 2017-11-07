@@ -116,6 +116,23 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                 }
             });
 
+            socket.On("sheetTask_sheetAdded", body =>
+            {
+                if (body == null)
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "sheetTask_sheetAdded: Data was null!");
+                }
+                else
+                {
+                    var data = JObject.FromObject(body);
+                    var sheetsData = data["body"].ToObject<SheetData>();
+                    if (sheetsData == null) return;
+
+                    // TODO: Do we need to run through all SheetsChanges here? Why not pass sheets through directly? 
+                    Messenger.Default.Send(new SheetsTaskSheetAddedMessage { NewSheets = sheetsData.sheetsChanges.Where(x => string.IsNullOrEmpty(x.identifier)).ToList()});
+                }
+            });
+
             socket.On("sheetTask_approved", body =>
             {
                 if (body == null)
@@ -132,6 +149,23 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     Messenger.Default.Send(new SheetsTaskApprovedMessage { Identifier = identifier, Sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal))});
                 }
             });
+
+            //socket.On("sheetTask_approvedNewSheet", body =>
+            //{
+            //    if (body == null)
+            //    {
+            //        Log.AppendLog(LogMessageType.ERROR, "sheetTask_approvedNewSheet: Data was null!");
+            //    }
+            //    else
+            //    {
+            //        var data = JObject.FromObject(body);
+            //        var sheetsData = data["body"].ToObject<SheetData>();
+            //        var identifier = data["identifier"].ToObject<string>();
+            //        if (sheetsData == null || string.IsNullOrEmpty(identifier)) return;
+
+            //        Messenger.Default.Send(new SheetsTaskApprovedNewSheetMessage { Identifier = identifier, Sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal))});
+            //    }
+            //});
 
             socket.On("sheetTask_deleted", body =>
             {

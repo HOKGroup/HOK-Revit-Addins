@@ -13,9 +13,13 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Win}"/>
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Resources>
         <sheetTaskAssistant:StringToColorConverter x:Key="StringToColorConverter"/>
+        <sheetTaskAssistant:IdentifierToBoolConverter x:Key="IdentifierToBoolConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -176,7 +180,7 @@
                Source="../../../../Resources/sheetEdited_256x256.png" 
                HorizontalAlignment="Center" 
                VerticalAlignment="Center"/>
-        <Button Content="Approve" 
+        <Button Content="{Binding OkText}" 
                 Grid.Column="1" 
                 Command="{Binding Approve, Mode=OneWay}"
                 CommandParameter="{Binding ElementName=Win}"
@@ -200,6 +204,9 @@
                     <Setter Property="IsEnabled" Value="True"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Wrapper.Element.isPlaceholder}" Value="True">
+                            <Setter Property="IsEnabled" Value="False"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Wrapper.Task.identifier, Converter={StaticResource IdentifierToBoolConverter}}" Value="True">
                             <Setter Property="IsEnabled" Value="False"/>
                         </DataTrigger>
                     </Style.Triggers>

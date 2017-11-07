@@ -9,7 +9,8 @@
         <TabControl ItemsSource="{Binding TabItems, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                     SelectedIndex="0" 
                     BorderThickness="0" 
-                    Padding="0">
+                    Padding="0"
+                    Name="MainControl">
             <TabControl.ItemContainerStyle>
                 <Style TargetType="TabItem">
                     <Setter Property="Template">
