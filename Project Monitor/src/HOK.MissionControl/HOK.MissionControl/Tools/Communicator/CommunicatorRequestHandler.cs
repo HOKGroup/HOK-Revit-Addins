@@ -91,7 +91,7 @@ namespace HOK.MissionControl.Tools.Communicator
         }
 
         /// <summary>
-        /// 
+        /// Submits request to create new sheet.
         /// </summary>
         /// <param name="app"></param>
         private void CreateSheet(UIApplication app)

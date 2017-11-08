@@ -22,6 +22,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         public RelayCommand<TaskWrapper> LaunchTaskAssistant { get; set; }
         public RelayCommand<DataGridExtension> MouseEnter { get; set; }
         public RelayCommand<UserControl> WindowLoaded { get; }
+        public RelayCommand<UserControl> WindowClosed { get; set; }
         public DataGridExtension Control { get; set; }
         private readonly object _lock = new object();
 
@@ -34,6 +35,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             LaunchTaskAssistant = new RelayCommand<TaskWrapper>(OnLaunchTaskAssistant);
             MouseEnter = new RelayCommand<DataGridExtension>(OnMouseEnter);
             WindowLoaded = new RelayCommand<UserControl>(OnWindowLoaded);
+            WindowClosed = new RelayCommand<UserControl>(OnWindowClosed);
 
             Messenger.Default.Register<FamilyTaskDeletedMessage>(this, OnFamilyTaskDeleted);
             Messenger.Default.Register<FamilyTaskAddedMessage>(this, OnFamilyTaskAdded);
@@ -49,6 +51,12 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         {
             //(Konrad) We store a control for use later with Messenger
             Control = ((CommunicatorTasksView) win).DataGridTasks;
+        }
+
+        private void OnWindowClosed(UserControl win)
+        {
+            // (Konrad) We need to unregister the event handler when window is closed, otherwise it will add another one next time.
+            Messenger.Default.Unregister(this);
         }
 
         private static void OnMouseEnter(DataGridExtension dg)
@@ -107,20 +115,26 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             var currentSheet = AppCommand.SheetsData.sheets.FirstOrDefault(x => x.identifier == msg.Identifier);
             if (currentSheet != null)
             {
+                // (Konrad) Update stored data.
                 currentSheet.name = msg.Sheet.name;
                 currentSheet.number = msg.Sheet.number;
             }
+            else
+            {
+                // (Konrad) New Sheet would not be present in the storage yet. We can add it.
+                AppCommand.SheetsData.sheets.Add(msg.Sheet);
+            }
 
-            DeleteTask(msg.Identifier);
+            DeleteTask(msg.Identifier, msg.Sheet);
         }
 
         /// <summary>
-        /// 
+        /// Handles new sheets being added to DB.
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="msg">Message from Mission Control.</param>
         private void OnSheetsTaskSheetAdded(SheetsTaskSheetAddedMessage msg)
         {
-            AppCommand.SheetsData.sheetsChanges.AddRange(msg.NewSheets);
+            AppCommand.SheetsData.sheetsChanges.AddRange(msg.NewSheets.Where(x => string.Equals(x.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)));
 
             lock (_lock)
             {
@@ -332,7 +346,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// 
         /// </summary>
         /// <param name="identifier"></param>
-        private void DeleteTask(string identifier)
+        /// <param name="sheet"></param>
+        private void DeleteTask(string identifier, SheetItem sheet = null)
         {
             // (Konrad) Update AppCommand sheetsChanges
             var approvedItem = AppCommand.SheetsData.sheetsChanges.FirstOrDefault(x => x.identifier == identifier);
@@ -340,6 +355,26 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             {
                 var index = AppCommand.SheetsData.sheetsChanges.IndexOf(approvedItem);
                 if (index != -1) AppCommand.SheetsData.sheetsChanges.RemoveAt(index);
+            }
+            else
+            {
+                // (Konrad) In this case the task approved was a new sheet task. It doesn't have identifier. 
+                // We are also using for loop here because SheetItem class compares two items using the identifier. 
+                // It would return true for all new sheets since they have no identifier.
+                var foundIndex = -1;
+                for (var i = 0; i < AppCommand.SheetsData.sheetsChanges.Count; i++)
+                {
+                    var item = AppCommand.SheetsData.sheetsChanges[i];
+                    if (item.identifier == "" && item.name == sheet?.name && item.number == sheet?.number)
+                    {
+                        foundIndex = i;
+                        break;
+                    }
+                }
+                if (foundIndex != -1)
+                {
+                    AppCommand.SheetsData.sheetsChanges.RemoveAt(foundIndex);
+                }
             }
 
             // (Konrad) Update Tasks UI
@@ -354,6 +389,38 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
 
                 // (Konrad) If task is open let's close it 
                 if (SelectedTask == storedTask)
+                {
+                    Control.Dispatcher.Invoke(() =>
+                    {
+                        Model.LaunchTaskAssistant(null);
+
+                    }, DispatcherPriority.Normal);
+                }
+            }
+            else
+            {
+                // (Konrad) Same as above. If new sheet task was approved it will not have identifier on it.
+                var storedIndex = -1;
+                for (var i = 0; i < Tasks.Count; i++)
+                {
+                    var task = (SheetItem)Tasks[i].Task;
+                    if (task.identifier == "" && task.name == sheet?.name && task.number == sheet?.number)
+                    {
+                        storedIndex = i;
+                        break;
+                    }
+                }
+                if (storedIndex != -1)
+                {
+                    lock (_lock)
+                    {
+                        Tasks.RemoveAt(storedIndex);
+                    }
+                }
+
+                // (Konrad) If task is open let's close it 
+                var selected = SelectedTask?.Task as SheetItem;
+                if (selected?.identifier == "" && selected.name == sheet?.name && selected.number == sheet?.number)
                 {
                     Control.Dispatcher.Invoke(() =>
                     {

@@ -14,6 +14,9 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Control}"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Control}"/>
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <UserControl.Resources>
         <tasks:StringToBoolConverter x:Key="StringToBoolConverter"/>

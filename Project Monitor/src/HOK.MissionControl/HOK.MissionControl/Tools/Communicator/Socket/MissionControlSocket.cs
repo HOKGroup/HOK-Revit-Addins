@@ -146,26 +146,9 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     var identifier = data["identifier"].ToObject<string>();
                     if (sheetsData == null || string.IsNullOrEmpty(identifier)) return;
 
-                    Messenger.Default.Send(new SheetsTaskApprovedMessage { Identifier = identifier, Sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal))});
+                    Messenger.Default.Send(new SheetsTaskApprovedMessage { Identifier = identifier, Sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal)) });
                 }
             });
-
-            //socket.On("sheetTask_approvedNewSheet", body =>
-            //{
-            //    if (body == null)
-            //    {
-            //        Log.AppendLog(LogMessageType.ERROR, "sheetTask_approvedNewSheet: Data was null!");
-            //    }
-            //    else
-            //    {
-            //        var data = JObject.FromObject(body);
-            //        var sheetsData = data["body"].ToObject<SheetData>();
-            //        var identifier = data["identifier"].ToObject<string>();
-            //        if (sheetsData == null || string.IsNullOrEmpty(identifier)) return;
-
-            //        Messenger.Default.Send(new SheetsTaskApprovedNewSheetMessage { Identifier = identifier, Sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal))});
-            //    }
-            //});
 
             socket.On("sheetTask_deleted", body =>
             {

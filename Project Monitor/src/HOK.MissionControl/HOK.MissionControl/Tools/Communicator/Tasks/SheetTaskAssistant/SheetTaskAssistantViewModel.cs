@@ -37,10 +37,13 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             Messenger.Default.Register<SheetTaskCompletedMessage>(this, OnSheetTaskCompleted);
         }
 
-        private static void OnWindowClosed(Window win)
+        private void OnWindowClosed(Window win)
         {
             // (Konrad) We notify the Communicator View Model that window has closed so View gets set to null and selection is reset.
             Messenger.Default.Send(new TaskAssistantClosedMessage { IsClosed = true });
+
+            // (Konrad) We need to unregister the event handler when window is closed, otherwise it will add another one next time.
+            Messenger.Default.Unregister(this);
         }
 
         private void OnWindowLoaded(Window win)

@@ -15,7 +15,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             var task = (SheetItem)wrapper.Task;
             if (item == null && task.identifier == "")
             {
-                // (Konrad) It's a creation task.
+                // (Konrad) It's a new sheet creation task.
                 AppCommand.CommunicatorHandler.SheetTask = task;
                 AppCommand.CommunicatorHandler.Request.Make(RequestId.CreateSheet);
                 AppCommand.CommunicatorEvent.Raise();
