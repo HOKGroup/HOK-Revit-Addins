@@ -145,9 +145,13 @@
             <Image Width="48" Height="48" Source="Images/video.png" />
         </Button>
         <TextBlock HorizontalAlignment="Center"  
-                   VerticalAlignment="Center" Grid.Row="1" 
-                   Foreground="#FF383737" FontSize="14" 
-                   TextWrapping="WrapWithOverflow"  
+                   VerticalAlignment="Center" 
+                   Grid.Row="1" 
+                   Foreground="#FF383737" 
+                   FontSize="14" 
+                   Padding="5"
+                   TextAlignment="Center"
+                   TextWrapping="Wrap"  
                    Text="{Binding DescriptionText}"/>
         <Button x:Name="buttonIgnore" 
                 Grid.Row="2" Content="OK" 
