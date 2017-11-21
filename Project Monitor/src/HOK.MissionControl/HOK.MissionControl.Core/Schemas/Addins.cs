@@ -8,6 +8,15 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace HOK.MissionControl.Core.Schemas
 {
+    public class InfoItem
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
+        public string name { get; set; }
+        public string value { get; set; }
+    }
+
     public class AddinLog
     {
         [BsonId]
@@ -18,6 +27,7 @@ namespace HOK.MissionControl.Core.Schemas
         public string revitVersion { get; set; }
         public string office { get; set; }
         public DateTime createdOn { get; set; } = new DateTime();
+        public List<InfoItem> detailInfo { get; set; } = new List<InfoItem>();
 
         public AddinLog()
         {

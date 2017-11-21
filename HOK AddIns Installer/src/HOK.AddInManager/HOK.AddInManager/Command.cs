@@ -25,26 +25,41 @@ namespace HOK.AddInManager
 
             try
             {
-                // (Konrad) We are gathering information about the addin use. This allows us to
-                // better maintain the most used plug-ins or discontiue the unused ones.
-                AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", commandData.Application.Application.VersionNumber));
-
                 var addins = AppCommand.thisApp.addins;
                 StoreTempCollection(addins.AddinCollection);
                 var viewModel = new AddInViewModel(addins);
                 var mainWindow = new MainWindow {DataContext = viewModel};
-                if (true == mainWindow.ShowDialog())
+                if (mainWindow.ShowDialog() == true)
                 {
-                    //write setting
-                    AppCommand.thisApp.addins = mainWindow.ViewModel.AddinsObj;
+                    try
+                    {
+                        // (Konrad) We are gathering information about the addin use. This allows us to
+                        // better maintain the most used plug-ins or discontiue the unused ones.
+                        // If Window was closed using the OK button we can collect more details about the app to publish.
+                        var log = new AddinLog("AddinManager", commandData.Application.Application.VersionNumber)
+                        {
+                            detailInfo = mainWindow.ViewModel.AddinsObj.AddinCollection
+                                .Select(x => new InfoItem { name = x.ToolName, value = x.ToolLoadType.ToString() })
+                                .ToList()
+                        };
+                        AddinUtilities.PublishAddinLog(log);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                    }
 
-                    //load addins
-                    AppCommand.thisApp.RemoveToolsBySettings();
-                    AppCommand.thisApp.AddToolsBySettings();
-                    AppCommand.thisApp.LoadToolsBySettings();
+                    // write setting and load addins.
+                    AppCommand.thisApp.addins = mainWindow.ViewModel.AddinsObj;
+                    AppCommand.thisApp.ProcessPlugins();
                 }
                 else
                 {
+                    // (Konrad) We are gathering information about the addin use. This allows us to
+                    // better maintain the most used plug-ins or discontiue the unused ones.
+                    // If user cancelled out of this window, we don't need to log all the details, other than that it was opened.
+                    AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", commandData.Application.Application.VersionNumber));
+
                     OverrideTempSettings();
                 }
             }
@@ -57,6 +72,10 @@ namespace HOK.AddInManager
             return Result.Succeeded;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="origCollection"></param>
         private void StoreTempCollection(ObservableCollection<AddinInfo> origCollection)
         {
             try
@@ -73,6 +92,9 @@ namespace HOK.AddInManager
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void OverrideTempSettings()
         {
             try
@@ -80,11 +102,10 @@ namespace HOK.AddInManager
                 foreach (var addinName in tempSettings.Keys)
                 {
                     var addinFound = AppCommand.thisApp.addins.AddinCollection
-                        .Where(x => x.ToolName == addinName)
-                        .ToList();
-                    if (!addinFound.Any()) continue;
+                        .FirstOrDefault(x => x.ToolName == addinName);
+                    if (addinFound == null) continue;
 
-                    var index = AppCommand.thisApp.addins.AddinCollection.IndexOf(addinFound.First());
+                    var index = AppCommand.thisApp.addins.AddinCollection.IndexOf(addinFound);
                     AppCommand.thisApp.addins.AddinCollection[index].ToolLoadType = tempSettings[addinName];
                 }
             }

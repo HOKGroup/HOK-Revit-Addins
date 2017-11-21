@@ -1,7 +1,5 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using HOK.AddInManager.UserControls;
-using HOK.Core.Utilities;
 
 namespace HOK.AddInManager
 {
@@ -15,7 +13,6 @@ namespace HOK.AddInManager
         public MainWindow()
         {
             InitializeComponent();
-            Title = "HOK Addin Manager v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -25,7 +22,6 @@ namespace HOK.AddInManager
 
         private void buttonOK_Click(object sender, RoutedEventArgs e)
         {
-
             DialogResult = true;
         }
 
@@ -36,18 +32,7 @@ namespace HOK.AddInManager
 
         private void hyperlinkHelp_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var ttt = AppCommand.thisApp.addinManagerToolTip;
-                if (!string.IsNullOrEmpty(ttt.HelpUrl))
-                {
-                    System.Diagnostics.Process.Start(ttt.HelpUrl);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
+            
         }
     }
 }

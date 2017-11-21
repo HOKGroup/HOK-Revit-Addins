@@ -1,49 +1,45 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Windows.Input;
 using HOK.AddInManager.Classes;
 using HOK.Core.Utilities;
-using HOK.Core.WpfUtilities;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.Command;
 
 namespace HOK.AddInManager.UserControls
 {
-    public class AddInViewModel : INotifyPropertyChanged
+    public class AddInViewModel : ViewModelBase
     {
         private Addins addins;
         private bool userChanged = true;
-
-        public Addins AddinsObj
-        {
-            get { return addins; }
-            set { addins = value; NotifyPropertyChanged("AddinsObj"); }
-        }
-
-        private ObservableCollection<AddinInfo> selectedAddins = new ObservableCollection<AddinInfo>();
-        public ObservableCollection<AddinInfo> SelectedAddins
-        {
-            get { return selectedAddins; }
-            set { selectedAddins = value; NotifyPropertyChanged("SelectedAddins"); }
-        }
-
-        private readonly RelayCommand openUrlCommand;
-        public ICommand OpenUrlCommand
-        {
-            get { return openUrlCommand; }
-        }
-
-        private readonly RelayCommand loadTypeCommand;
-        public ICommand LoadTypeCommand
-        {
-            get { return loadTypeCommand; }
-        }
+        public string Title { get; set; }
+        public RelayCommand Help { get; set; }
+        public RelayCommand<object> LoadTypeCommand { get; set; }
+        public RelayCommand<object> OpenUrlCommand { get; set; }
 
         public AddInViewModel(Addins addinsObj)
         {
             addins = addinsObj;
-            openUrlCommand = new RelayCommand(OpenUrlExecuted);
-            loadTypeCommand = new RelayCommand(LoadTypeExecuted);
+            Title = "HOK Addin Manager v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            Help = new RelayCommand(OnHelp);
+            OpenUrlCommand = new RelayCommand<object>(OpenUrlExecuted);
+            LoadTypeCommand = new RelayCommand<object>(LoadTypeExecuted);
+        }
+
+        private static void OnHelp()
+        {
+            try
+            {
+                var ttt = AppCommand.thisApp.addinManagerToolTip;
+                if (!string.IsNullOrEmpty(ttt.HelpUrl))
+                {
+                    System.Diagnostics.Process.Start(ttt.HelpUrl);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
         }
 
         public void OpenUrlExecuted(object param)
@@ -95,11 +91,17 @@ namespace HOK.AddInManager.UserControls
             }
         }
 
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void NotifyPropertyChanged(string info)
+        public Addins AddinsObj
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+            get { return addins; }
+            set { addins = value; RaisePropertyChanged(() => AddinsObj); }
+        }
+
+        private ObservableCollection<AddinInfo> selectedAddins = new ObservableCollection<AddinInfo>();
+        public ObservableCollection<AddinInfo> SelectedAddins
+        {
+            get { return selectedAddins; }
+            set { selectedAddins = value; RaisePropertyChanged(() => SelectedAddins); }
         }
     }
 

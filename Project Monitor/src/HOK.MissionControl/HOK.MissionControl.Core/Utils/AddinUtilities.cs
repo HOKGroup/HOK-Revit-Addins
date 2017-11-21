@@ -7,6 +7,11 @@ namespace HOK.MissionControl.Core.Utils
 {
     public static class AddinUtilities
     {
+        /// <summary>
+        /// Retrieves addins collection from MongoDB and posts new usage log.
+        /// </summary>
+        /// <typeparam name="T">AddinData type.</typeparam>
+        /// <param name="addinLog">AddinData object.</param>
         public static void PublishAddinLog<T>(T addinLog) where T: new()
         {
             try
@@ -22,14 +27,12 @@ namespace HOK.MissionControl.Core.Utils
                 {
                     collectionId = ServerUtilities.Post<AddinData>(new AddinData(), "addins").Id;
                 }
-
-                ServerUtilities.PostToMongoDB(addinLog, "addins", collectionId, "addlog");
+                ServerUtilities.Post<AddinData>(addinLog, "addins/" + collectionId + "/addlog");
             }
             catch (Exception e)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
             }
-            
         }
     }
 }

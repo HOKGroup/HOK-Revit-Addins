@@ -82,8 +82,6 @@ namespace HOK.AddInManager
         /// <summary>
         /// Reads in the XML Settings file.
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="args"></param>
         private void ReadAddinSettingsOnInitialized(object source, ApplicationInitializedEventArgs args)
         {
             try
@@ -101,7 +99,7 @@ namespace HOK.AddInManager
                 SettingUtil.ReadConfig(settingPath, ref addins);
 
                 //add addins
-                AddToolsBySettings();
+                addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Always).ToList().ForEach(AddPlugin);
             }
             catch (Exception ex)
             {
@@ -109,98 +107,101 @@ namespace HOK.AddInManager
             }
         }
 
-        public void RemoveToolsBySettings()
+        
+        /// <summary>
+        /// Goes through all plugins and applies appropriate action.
+        /// </summary>
+        public void ProcessPlugins()
         {
-            try
-            {
-                var toolsFound = addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Never).ToList();
-                if (!toolsFound.Any()) return;
+            if (!addins.AddinCollection.Any()) return;
 
-                foreach (var addin in toolsFound)
+            foreach (var addin in addins.AddinCollection)
+            {
+                switch (addin.ToolLoadType)
                 {
-                    foreach (var installPath in addin.InstallPaths)
-                    {
-                        if (File.Exists(installPath))
+                    case LoadType.Never:
+                        RemovePlugin(addin);
+                        break;
+                    case LoadType.ThisSessionOnly:
+                        foreach (var addinPath in addin.AddInPaths)
                         {
-                            File.Delete(installPath);
+                            try
+                            {
+                                m_app.LoadAddIn(addinPath);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                            }
                         }
+                        break;
+                    case LoadType.Always:
+                        AddPlugin(addin);
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds plugin.
+        /// </summary>
+        /// <param name="addin">Plugin information.</param>
+        private static void AddPlugin(AddinInfo addin)
+        {
+            for (var i = 0; i < addin.AddInPaths.Length; i++)
+            {
+                if (File.Exists(addin.AddInPaths[i]) && !File.Exists(addin.InstallPaths[i]))
+                {
+                    try
+                    {
+                        File.Copy(addin.AddInPaths[i], addin.InstallPaths[i], true);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
         }
 
-        public void AddToolsBySettings()
+        /// <summary>
+        /// Removes plugin.
+        /// </summary>
+        /// <param name="addin">Plugin information.</param>
+        private static void RemovePlugin(AddinInfo addin)
         {
-            try
+            foreach (var installPath in addin.InstallPaths)
             {
-                var toolsFound = addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Always).ToList();
-                if (!toolsFound.Any()) return;
-
-                foreach (var addin in toolsFound)
+                if (File.Exists(installPath))
                 {
-                    for (var i = 0; i < addin.AddInPaths.Length; i++)
+                    try
                     {
-                        if (File.Exists(addin.AddInPaths[i]) && !File.Exists(addin.InstallPaths[i]))
-                        {
-                            File.Copy(addin.AddInPaths[i], addin.InstallPaths[i], true);
-                        }
+                        File.Delete(installPath);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
         }
 
-        public void LoadToolsBySettings()
-        {
-            try
-            {
-                var toolsFound = addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.ThisSessionOnly).ToList();
-                if (!toolsFound.Any()) return;
-
-                foreach (var addin in toolsFound)
-                {
-                    foreach (var addinPath in addin.AddInPaths)
-                    {
-                        try
-                        {
-                            m_app.LoadAddIn(addinPath);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-        }
-
+        /// <summary>
+        /// Handler for ApplicationClosing event.
+        /// </summary>
         private void ApplicationOnClosing(object source, ApplicationClosingEventArgs args)
         {
             try
             {
                 //change InSessionOnly to Never
-                for (var i = 0; i < addins.AddinCollection.Count; i++)
+                foreach (var addin in addins.AddinCollection)
                 {
-                    var addin = addins.AddinCollection[i];
-                    if (addin.ToolLoadType == LoadType.ThisSessionOnly)
-                    {
-                        addins.AddinCollection[i].ToolLoadType = LoadType.Never;
-                    }
+                    if (addin.ToolLoadType != LoadType.ThisSessionOnly) continue;
+
+                    // (Konrad) Override plug-in settings, remove it from current session and serialize
+                    addin.ToolLoadType = LoadType.Never;
+                    RemovePlugin(addin);
                 }
-               
-                //write configuration
-                RemoveToolsBySettings();
                 SettingUtil.WriteConfig(settingPath, addins);
             }
             catch (Exception ex)

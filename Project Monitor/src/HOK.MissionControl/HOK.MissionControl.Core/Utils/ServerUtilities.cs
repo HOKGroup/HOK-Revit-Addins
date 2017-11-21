@@ -410,6 +410,7 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="collectionId">Id of the main collection.</param>
         /// <param name="route">Action/route to execute.</param>
         /// <returns>Data Schema object returned from database.</returns>
+        [Obsolete]
         public static T PostToMongoDB<T>(T dataSchema, string collectionName, string collectionId, string route) where T : new()
         {
             var output = new T();

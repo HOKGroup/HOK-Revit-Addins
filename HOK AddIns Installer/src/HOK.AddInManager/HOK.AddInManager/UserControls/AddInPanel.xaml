@@ -20,8 +20,14 @@
         <ut:ColorConverter x:Key="colorConverter"/>
     </UserControl.Resources>
     <Grid>
-        <DataGrid x:Name="dataGridAddins" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" ItemsSource="{Binding AddinsObj.AddinCollection}"
-                  CanUserAddRows="False" CanUserDeleteRows="False" ScrollViewer.CanContentScroll="False">
+        <DataGrid x:Name="dataGridAddins" 
+                  HorizontalAlignment="Stretch" 
+                  VerticalAlignment="Stretch" 
+                  Margin="10, 10, 10, 0" 
+                  ItemsSource="{Binding AddinsObj.AddinCollection}"
+                  CanUserAddRows="False" 
+                  CanUserDeleteRows="False" 
+                  ScrollViewer.CanContentScroll="False">
                 <DataGrid.Columns>
                 <DataGridTemplateColumn Header="More Info" Width="70">
                     <DataGridTemplateColumn.CellTemplate>
@@ -34,7 +40,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn IsReadOnly="True" Header="AddIn" Width="1*" CanUserSort="False">
+                <DataGridTemplateColumn IsReadOnly="True" Header="AddIn" Width="1*" CanUserSort="True" SortDirection="Descending" SortMemberPath="ToolName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding ToolName}" VerticalAlignment="Center" ToolTip="{Binding Tooltip}"/>
