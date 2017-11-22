@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows.Interop;
 using HOK.AddInManager.Classes;
 using HOK.Core.Utilities;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using HOK.Core.WpfUtilities.FeedbackUI;
 
 namespace HOK.AddInManager.UserControls
 {
@@ -14,6 +17,7 @@ namespace HOK.AddInManager.UserControls
         private bool userChanged = true;
         public string Title { get; set; }
         public RelayCommand Help { get; set; }
+        public RelayCommand SubmitComment { get; set; }
         public RelayCommand<object> LoadTypeCommand { get; set; }
         public RelayCommand<object> OpenUrlCommand { get; set; }
 
@@ -22,8 +26,26 @@ namespace HOK.AddInManager.UserControls
             addins = addinsObj;
             Title = "HOK Addin Manager v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             Help = new RelayCommand(OnHelp);
+            SubmitComment = new RelayCommand(OnSubmitComment);
             OpenUrlCommand = new RelayCommand<object>(OpenUrlExecuted);
             LoadTypeCommand = new RelayCommand<object>(LoadTypeExecuted);
+        }
+
+        private void OnSubmitComment()
+        {
+            var model = new FeedbackModel();
+            var viewModel = new FeedbackViewModel(model, Title);
+            var view = new FeedbackView
+            {
+                DataContext = viewModel
+            };
+
+            var unused = new WindowInteropHelper(view)
+            {
+                Owner = Process.GetCurrentProcess().MainWindowHandle
+            };
+
+            view.ShowDialog();
         }
 
         private static void OnHelp()
@@ -33,7 +55,7 @@ namespace HOK.AddInManager.UserControls
                 var ttt = AppCommand.thisApp.addinManagerToolTip;
                 if (!string.IsNullOrEmpty(ttt.HelpUrl))
                 {
-                    System.Diagnostics.Process.Start(ttt.HelpUrl);
+                    Process.Start(ttt.HelpUrl);
                 }
             }
             catch (Exception ex)
@@ -48,7 +70,7 @@ namespace HOK.AddInManager.UserControls
             {
                 if (null != param)
                 {
-                    System.Diagnostics.Process.Start(param.ToString());
+                    Process.Start(param.ToString());
                 }
             }
             catch (Exception ex)

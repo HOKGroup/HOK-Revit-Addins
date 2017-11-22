@@ -35,25 +35,40 @@
                             <Button Background="Transparent" BorderBrush="Transparent" 
                                     Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.OpenUrlCommand}"
                                     CommandParameter="{Binding Url}">
-                                <Image Height="32" Width="32" Source="{Binding ToolIcon}" ToolTip="{Binding Tooltip}"/>
+                                <Image Height="32" 
+                                       Width="32" 
+                                       Source="{Binding ToolIcon}" 
+                                       ToolTip="{Binding Tooltip}"/>
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn IsReadOnly="True" Header="AddIn" Width="1*" CanUserSort="True" SortDirection="Descending" SortMemberPath="ToolName">
+                <DataGridTemplateColumn IsReadOnly="True" 
+                                        Header="Addin" Width="1*" 
+                                        CanUserSort="True" 
+                                        SortDirection="Descending" 
+                                        SortMemberPath="ToolName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding ToolName}" VerticalAlignment="Center" ToolTip="{Binding Tooltip}"/>
+                            <TextBlock Text="{Binding ToolName}" 
+                                       VerticalAlignment="Center" 
+                                       ToolTip="{Binding Tooltip}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Loaded in Revit" Width="0.7*">
+                <DataGridTemplateColumn Header="Loaded in Revit" 
+                                        Width="0.7*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <ComboBox x:Name="comboBoxLoadType" SelectedValue="{Binding ToolLoadType, UpdateSourceTrigger=PropertyChanged}"
-                                      ItemsSource="{Binding LoadTypes}" Background="Transparent" BorderBrush="#cccccc" 
-                                      VerticalContentAlignment="Center" Foreground="{Binding ToolLoadType, Converter={StaticResource colorConverter}}"
-                                      ToolTip="{Binding Tooltip}" SelectionChanged="comboBoxLoadType_SelectionChanged" >
+                            <ComboBox x:Name="comboBoxLoadType" 
+                                      SelectedValue="{Binding ToolLoadType, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemsSource="{Binding LoadTypes}" 
+                                      Background="Transparent" 
+                                      BorderBrush="#cccccc" 
+                                      VerticalContentAlignment="Center" 
+                                      Foreground="{Binding ToolLoadType, Converter={StaticResource colorConverter}}"
+                                      ToolTip="{Binding Tooltip}" 
+                                      SelectionChanged="comboBoxLoadType_SelectionChanged" >
                             </ComboBox>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>

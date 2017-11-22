@@ -55,8 +55,6 @@ namespace HOK.AddInManager
                 }
                 else
                 {
-                    // (Konrad) We are gathering information about the addin use. This allows us to
-                    // better maintain the most used plug-ins or discontiue the unused ones.
                     // If user cancelled out of this window, we don't need to log all the details, other than that it was opened.
                     AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", commandData.Application.Application.VersionNumber));
 

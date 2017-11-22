@@ -19,9 +19,9 @@
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
             <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,10,10,0" TextWrapping="WrapWithOverflow">
-            Below is the list of available addins that you can control when and if to load in your Revit session, without closing the program.
+            Below is the list of available addins that you can control when/if to load into your Revit session, without closing the program.
             </TextBlock>
-            <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0,10,0" FontStyle="Italic">
+            <TextBlock Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="10,0,10,0" FontStyle="Italic" FontWeight="Bold">
              Note: Clicking on the icon will direct you to a support/resource page.
             </TextBlock>
         </Grid>
@@ -30,6 +30,7 @@
         </Grid>
         <Button x:Name="buttonCancel" 
                 Grid.Row="2" 
+                ToolTip="Disregard any changes."
                 HorizontalAlignment="Right" 
                 VerticalAlignment="Top"
                 Margin="0,10,10,0" 
@@ -37,6 +38,7 @@
                 Width="74" 
                 Click="buttonCancel_Click"/>
         <Button x:Name="buttonOK" 
+                ToolTip="Save current settings."
                 Grid.Row="2" 
                 HorizontalAlignment="Right" 
                 VerticalAlignment="Top" 
@@ -45,11 +47,37 @@
                 Width="74" 
                 Click="buttonOK_Click"/>
         <Button Content="?" 
+                ToolTip="Navigate to Support/Resource page for AddinManager."
                 Margin="0,10,168,0" 
                 Grid.Row="2" 
                 VerticalAlignment="Top" 
                 HorizontalAlignment="Right" 
                 Command="{Binding Help}"
                 Width="37"/>
+
+        <Button Grid.Row="2" 
+                Name="CheckAllButton" 
+                Command="{Binding SubmitComment, Mode=OneWay}" 
+                ToolTip="Submit Feedback!"
+                Margin="10,8,0,8" 
+                Cursor="Hand" 
+                Background="Transparent" 
+                Visibility="Visible" 
+                HorizontalAlignment="Left">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <StackPanel>
+                        <Image Name="image1" Source="Resources/comments_32x32.png" Width="24" Height="24" Visibility="Visible"/>
+                        <Image Name="image2" Source="Resources/commentsHover_32x32.png" Width="24" Height="24" Visibility="Collapsed"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="image1" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="image2" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
     </Grid>
 </Window>

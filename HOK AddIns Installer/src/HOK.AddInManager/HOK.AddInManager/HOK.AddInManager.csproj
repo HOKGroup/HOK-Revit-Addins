@@ -189,6 +189,8 @@
     <Content Include="HOK.AddInManager.addin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\commentsHover_32x32.png" />
+    <Resource Include="Resources\comments_32x32.png" />
     <EmbeddedResource Include="Resources\pluginManager_32.png" />
   </ItemGroup>
   <ItemGroup>
