@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Media.Imaging;
 using System.Reflection;
 using Autodesk.Revit.UI;
@@ -53,12 +54,13 @@ namespace HOK.Navigator
             CreatePushButton();
         }
 
-     
+        /// <summary>
+        /// Creates push button for Navigator.
+        /// </summary>
         private void CreatePushButton()
         {
             try
             {
-                //create a new button
                 try
                 {
                     m_app.CreateRibbonTab(tabName);
@@ -68,43 +70,18 @@ namespace HOK.Navigator
                     Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 }
 
-                foreach (var panel in m_app.GetRibbonPanels(tabName))
-                {
-                    if (panel.Name != "Help") continue;
-
-                    foreach (var ribbonItem in panel.GetItems())
-                    {
-                        if (!ribbonItem.ItemText.Equals("   Help   ") && !ribbonItem.ItemText.Equals("HOK Navigator")) continue;
-
-                        helpButton = ribbonItem as PushButton;
-                        break;
-                    }
-                }
-
+                var created = m_app.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Help");
+                var helpPanel = created ?? m_app.CreateRibbonPanel(tabName, "Help");
                 var assembly = Assembly.GetExecutingAssembly();
                 var hokImage = LoadBitmapImage(assembly, "hok.png");
 
-                if (null != helpButton)
+                var buttonData = new PushButtonData("HOK Navigator", "HOK" + Environment.NewLine + " Navigator ", currentAssembly, "HOK.Navigator.HelpCommand")
                 {
-                    //already exsit
-                    helpButton.ItemText = "HOK Navigator";
-                    helpButton.LargeImage = hokImage;
-                    helpButton.Image = hokImage;
-                    helpButton.AvailabilityClassName = "HOK.Navigator.Availability";
-                    helpButton.AssemblyName = currentAssembly;
-                    helpButton.ClassName = "HOK.Navigator.HelpCommand";
-                }
-                else
-                {
-                    var helpPanel = m_app.CreateRibbonPanel(tabName, "Help");
-                    var buttonData = new PushButtonData("HOK Navigator", "HOK" + Environment.NewLine + " Navigator ", currentAssembly, "HOK.Navigator.HelpCommand")
-                    {
-                        AvailabilityClassName = "HOK.Navigator.Availability",
-                        LargeImage = hokImage,
-                        Image = hokImage
-                    };
-                    helpButton = helpPanel.AddItem(buttonData) as PushButton;
-                }
+                    AvailabilityClassName = "HOK.Navigator.Availability",
+                    LargeImage = hokImage,
+                    Image = hokImage
+                };
+                helpButton = helpPanel.AddItem(buttonData) as PushButton;
             }
             catch (Exception ex)
             {

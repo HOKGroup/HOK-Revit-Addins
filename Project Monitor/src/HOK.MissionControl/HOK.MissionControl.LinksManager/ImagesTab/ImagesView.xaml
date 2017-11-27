@@ -51,7 +51,7 @@
                 <Style.Triggers>
                     <DataTrigger Binding="{Binding HasInstances}" Value="False">
                         <Setter Property="IsEnabled" Value="False"/>
-                        <Setter Property="Foreground" Value="Red"/>
+                        <Setter Property="Foreground" Value="#d9534f"/>
                         <Setter Property="FontWeight"  Value="Bold"/>
                     </DataTrigger>
                 </Style.Triggers>
@@ -61,17 +61,31 @@
             <RowDefinition/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="Imported Images" Margin="10">
+        <GroupBox Header="Imported Images" Margin="10,10,10,0">
             <Grid Background="Transparent">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
                 <wpfUtilities:DataGridExtension x:Name="DataGridImages" Grid.Row="0"
                                                 ItemsSource="{Binding Images, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 CellStyle="{StaticResource ContentDataGridCentering}"
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
                                                 SelectionUnit="FullRow"
-                                                Margin="10"
+                                                Margin="10,10,10,0"
                                                 SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <wpfUtilities:DataGridExtension.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="45">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.Check}"
+                                              CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"
+                                              HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                             Width="200" 
@@ -109,6 +123,22 @@
                         </DataGridTextColumn>
                     </wpfUtilities:DataGridExtension.Columns>
                 </wpfUtilities:DataGridExtension>
+                <Button Content="All" 
+                        Command="{Binding SelectAll, Mode=OneWay}"
+                        Margin="10,0,0,10" 
+                        Grid.Row="1" 
+                        Height="20" 
+                        VerticalAlignment="Bottom" 
+                        HorizontalAlignment="Left" 
+                        Width="75"/>
+                <Button Content="None" 
+                        Command="{Binding SelectNone, Mode=OneWay}"
+                        Margin="90,0,0,10" 
+                        Grid.Row="1" 
+                        Height="20" 
+                        VerticalAlignment="Bottom" 
+                        HorizontalAlignment="Left" 
+                        Width="75"/>
             </Grid>
         </GroupBox>
         <Button Content="Delete" 
@@ -119,6 +149,30 @@
                 CommandParameter="{Binding ElementName=Control}"
                 Margin="0,0,90,10" 
                 Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="75"/>
+        <Button Grid.Row="1" 
+                Name="CheckAllButton" 
+                Command="{Binding SubmitComment, Mode=OneWay}" 
+                ToolTip="Submit Feedback!"
+                Margin="10,8,0,8" 
+                Cursor="Hand" 
+                Background="Transparent" 
+                Visibility="Visible" 
+                HorizontalAlignment="Left">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <StackPanel>
+                        <Image Name="image1" Source="../Resources/comments_32x32.png"  Width="24" Height="24" Visibility="Visible"/>
+                        <Image Name="image2" Source="../Resources/commentsHover_32x32.png" Width="24" Height="24" Visibility="Collapsed"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="image1" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="image2" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
     </Grid>
 </UserControl>
 

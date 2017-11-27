@@ -27,7 +27,7 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
                 // password: Password123456
                 // token: fc396d894a4f27520b8ce85564c5fc2b2a15b88f
 
-                var baseUrl = "https://api.github.com";
+                const string baseUrl = "https://api.github.com";
                 var client = new RestClient(baseUrl);
 
                 var stringBuilder = new StringBuilder();

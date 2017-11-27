@@ -24,6 +24,13 @@ namespace HOK.Core.ElementWrapers
             Image = type.GetImage();
         }
 
+        private bool _isSelected;
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set { _isSelected = value; RaisePropertyChanged("IsSelected"); }
+        }
+
         private bool _hasInstances;
         public bool HasInstances
         {

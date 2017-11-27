@@ -6,8 +6,8 @@ using System.Windows.Media.Imaging;
 using System.Reflection;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
-using HOK.Core.Utilities;
 using Autodesk.Revit.DB;
+using HOK.Core.Utilities;
 
 namespace HOK.RibbonTab
 {
@@ -44,6 +44,7 @@ namespace HOK.RibbonTab
             var tooltipTxt = currentDirectory + "/Resources/" + tooltipFileName;
             ReadToolTips(tooltipTxt);
 
+            CreateFeedbackButtons();
             CreateHOKPushButtons();
             CreateCustomPushButtons();
             //CreateDataPushButtons();
@@ -90,32 +91,37 @@ namespace HOK.RibbonTab
             return Result.Succeeded;
         }
 
-        //private void CreateMissionControlPushButtons()
-        //{
-        //    try
-        //    {
-        //        // TODO: It would be nice to automatically prompt user once a week, to run this export.
-        //        var missionControlPanel = m_app.CreateRibbonPanel(tabName, "Mission Control");
-        //        var assemblyPath = currentDirectory + "/HOK.MissionControl.FamilyPublish.dll";
+        /// <summary>
+        /// Creates feedback button.
+        /// </summary>
+        private void CreateFeedbackButtons()
+        {
+            try
+            {
+                var fileExist = false;
+                var created = m_app.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Help");
+                var feedbackPanel = created ?? m_app.CreateRibbonPanel(tabName, "Help");
 
-        //        var pb1 = new PushButtonData(
-        //            "PublishFamilyDataCommand",
-        //            "Publish Family" + Environment.NewLine + "Data",
-        //            assemblyPath,
-        //            "HOK.MissionControl.FamilyPublish.FamilyPublishCommand")
-        //        {
-        //            ToolTip = "Mission Control Family Export Tool."
-        //        };
-        //        var fpAssembly = Assembly.LoadFrom(assemblyPath);
-        //        pb1.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl.FamilyPublish", "publishFamily_32x32.png");
+                if (File.Exists(currentDirectory + "/HOK.Core.dll"))
+                {
+                    var coreAssembly = Assembly.LoadFrom(currentDirectory + "/HOK.Core.dll");
+                    var pb = (PushButton)feedbackPanel.AddItem(new PushButtonData("SendFeedback_command", "Send" + Environment.NewLine + " Feedback", currentDirectory + "/HOK.Core.dll", "HOK.Core.WpfUtilities.FeedbackUI.FeedbackCommand"));
+                    pb.LargeImage = ButtonUtil.LoadBitmapImage(coreAssembly, "HOK.Core", "comments_32x32.png");
+                    pb.ToolTip = "Submit feedback to HOK developers.";
+                    AddToolTips(pb);
+                    fileExist = true;
+                }
 
-        //        missionControlPanel.AddItem(pb1);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-        //    }
-        //}
+                if (!fileExist)
+                {
+                    feedbackPanel.Visible = false;
+                }
+            }
+            catch (Exception e)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+            }
+        }
 
         /// <summary>
         /// Creates all of the Utilities buttons.
@@ -335,14 +341,12 @@ namespace HOK.RibbonTab
                     splitButton.SetContextualHelp(contextualHelp);
 
                     var pb8 = splitButton.AddPushButton(new PushButtonData("Create Mass", "Create Mass", currentDirectory + "/HOK.RoomsToMass.dll", "HOK.RoomsToMass.Command"));
-                    //pb8.LargeImage = LoadBitmapImage(assembly, "createMass_32.png");
                     pb8.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "createMass_32.png");
                     pb8.ToolTip = "Creates 3D Mass from rooms, areas and floors.";
                     pb8.ToolTipImage = LoadBitmapImage(assembly, "tooltip.png");
                     AddToolTips(pb8);
 
                     var pb10 = splitButton.AddPushButton(new PushButtonData("Mass Commands", "Mass Commands", currentDirectory + "/HOK.RoomsToMass.dll", "HOK.RoomsToMass.AssignerCommand"));
-                    //pb10.LargeImage = LoadBitmapImage(assembly, "massCommands_32.png");
                     pb10.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "massCommands_32.png");
                     pb10.ToolTip = "Assign parameters or split elements";
                     AddToolTips(pb10);
