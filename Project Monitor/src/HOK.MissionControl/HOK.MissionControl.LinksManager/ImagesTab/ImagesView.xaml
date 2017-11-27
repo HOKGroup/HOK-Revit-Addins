@@ -86,6 +86,14 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+                        <DataGridTemplateColumn Header="Image" Width="64"
+                                                IsReadOnly="True">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Image Source="{Binding BitmapImage}" Width="56" Height="56" Margin="4"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                             Width="200" 

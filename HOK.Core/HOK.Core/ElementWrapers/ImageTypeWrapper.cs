@@ -1,6 +1,9 @@
-﻿using System.ComponentModel;
-using System.Drawing;
+﻿using System;
+using System.ComponentModel;
+using System.IO;
+using System.Windows.Media.Imaging;
 using Autodesk.Revit.DB;
+using HOK.Core.Utilities;
 
 namespace HOK.Core.ElementWrapers
 {
@@ -9,8 +12,8 @@ namespace HOK.Core.ElementWrapers
         public string Name { get; set; }
         public string FilePath { get; set; }
         public int Instances { get; set; }
-        public Bitmap Image { get; set; }
         public ElementId Id { get; set; }
+        public BitmapImage BitmapImage { get; set; }
 
         public ImageTypeWrapper()
         {
@@ -21,7 +24,16 @@ namespace HOK.Core.ElementWrapers
             Name = type.Name;
             Id = type.Id;
             FilePath = type.Path;
-            Image = type.GetImage();
+
+            if (File.Exists(type.Path))
+            {
+                BitmapImage = new BitmapImage(new Uri(type.Path));
+            }
+            else
+            {
+                var bitmap = type.GetImage();
+                BitmapImage = ImageUtilities.BitmapToBitmapImage(bitmap);
+            }
         }
 
         private bool _isSelected;
