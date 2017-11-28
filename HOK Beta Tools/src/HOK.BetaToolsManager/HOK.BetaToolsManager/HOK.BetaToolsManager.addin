@@ -5,7 +5,7 @@
     <Assembly>HOK-Addin.bundle\Contents\HOK.BetaToolsManager.dll</Assembly>
     <AddInId>AD4E6C2C-286D-48A4-B11F-F9F4A5A5C802</AddInId>
     <FullClassName>HOK.BetaToolsManager.AppCommand</FullClassName>
-    <VendorId>JKIM</VendorId>
-    <VendorDescription>JKIM</VendorDescription>
+    <VendorId>HOK Group</VendorId>
+    <VendorDescription>Konrad K Sobon: konrad.sobon@hok.com</VendorDescription>
   </AddIn>
 </RevitAddIns>
