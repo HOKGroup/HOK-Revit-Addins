@@ -6,21 +6,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="500" MaxHeight="600">
+             d:DesignHeight="300" d:DesignWidth="600" MaxHeight="600">
     <UserControl.Resources>
-        <Style TargetType="{x:Type wpfUtilities:DataGridExtension}">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="AutoGenerateColumns" Value="False"/>
-            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
-            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
-            <Setter Property="HeadersVisibility" Value="Column"/>
-            <Setter Property="SelectionMode" Value="Extended"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Setter Property="HorizontalAlignment" Value="Stretch"/>
-            <Setter Property="BorderBrush" Value="LightGray"/>
-        </Style>
-        <Style x:Key="ContentDataGridCentering"
-               TargetType="{x:Type DataGridCell}">
+        <Style x:Key="ContentDataGridCentering" TargetType="{x:Type DataGridCell}">
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -41,21 +29,66 @@
         <GroupBox Header="Imported Styles" Margin="10,10,10,0">
             <Grid Background="Transparent">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="50"/>
                     <RowDefinition/>
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
                 <wpfUtilities:DataGridExtension x:Name="DataGridImages" 
-                                                Grid.Row="0"
+                                                Grid.Row="1"
                                                 ItemsSource="{Binding Styles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 CellStyle="{StaticResource ContentDataGridCentering}"
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
                                                 SelectionUnit="FullRow"
+                                                Background="White"
+                                                VerticalAlignment="Stretch"
+                                                HorizontalAlignment="Stretch"
                                                 SelectionMode="Extended"
+                                                GridLinesVisibility="None"
                                                 RowHeight="20"
                                                 MaxHeight="580"
+                                                AutoGenerateColumns="False"
+                                                BorderBrush="LightGray"
                                                 Margin="10,10,10,0"
+                                                HeadersVisibility="Column"
+                                                HorizontalScrollBarVisibility="Hidden"
                                                 SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <wpfUtilities:DataGridExtension.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Path=Name}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                <Expander IsExpanded="True">
+                                                    <Expander.Header>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Path=Name}" />
+                                                            <!--<TextBlock Text="{Binding Path=ItemCount}"/>
+                                                            <TextBlock Text="Items"/>-->
+                                                        </StackPanel>
+                                                    </Expander.Header>
+                                                    <ItemsPresenter />
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                            <GroupStyle.Panel>
+                                <ItemsPanelTemplate>
+                                    <DataGridRowsPresenter/>
+                                </ItemsPanelTemplate>
+                            </GroupStyle.Panel>
+                        </GroupStyle>
+                    </wpfUtilities:DataGridExtension.GroupStyle>
                     <wpfUtilities:DataGridExtension.Columns>
                         <DataGridTemplateColumn Header="Select" Width="45">
                             <DataGridTemplateColumn.CellTemplate>
@@ -82,7 +115,7 @@
                 <Button Content="All" 
                         Command="{Binding SelectAll, Mode=OneWay}"
                         Margin="10,0,0,10" 
-                        Grid.Row="1" 
+                        Grid.Row="2" 
                         Height="20" 
                         VerticalAlignment="Bottom" 
                         HorizontalAlignment="Left" 
@@ -90,11 +123,17 @@
                 <Button Content="None" 
                         Command="{Binding SelectNone, Mode=OneWay}"
                         Margin="90,0,0,10" 
-                        Grid.Row="1" 
+                        Grid.Row="2" 
                         Height="20" 
                         VerticalAlignment="Bottom" 
                         HorizontalAlignment="Left" 
                         Width="75"/>
+                <TextBlock Grid.Row="0" 
+                           HorizontalAlignment="Stretch" 
+                           Margin="10,10,10,0" 
+                           TextWrapping="Wrap" 
+                           VerticalAlignment="Stretch"
+                           Text="Below is the list of imported line styles. Deleting imported line style will reset style applied to all lines on that 'layer'. Default line style is Thin Lines/Black. Deleting line style will disable ability to override it."/>
             </Grid>
         </GroupBox>
         <Button Content="Delete" 

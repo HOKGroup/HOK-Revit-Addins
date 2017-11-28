@@ -5,6 +5,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Windows.Data;
 using System.Windows.Interop;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -17,7 +18,8 @@ namespace HOK.MissionControl.LinksManager.StylesTab
     {
         public IList SelectedRows { get; set; }
         public StylesModel Model { get; set; }
-        public ObservableCollection<CategoryWrapper> Styles { get; set; }
+        //public ObservableCollection<CategoryWrapper> Styles { get; set; }
+        public ListCollectionView Styles { get; set; }
         public RelayCommand Delete { get; }
         public RelayCommand<UserControl> Close { get; }
         public RelayCommand SubmitComment { get; set; }
@@ -25,10 +27,20 @@ namespace HOK.MissionControl.LinksManager.StylesTab
         public RelayCommand SelectNone { get; set; }
         public RelayCommand<bool> Check { get; set; }
 
+        private bool _expanded;
+        public bool Expanded
+        {
+            get { return _expanded; }
+            set { _expanded = value; RaisePropertyChanged(() => Expanded); }
+        }
+
         public StylesViewModel(StylesModel model)
         {
             Model = model;
-            Styles = Model.Styles;
+            Styles = new ListCollectionView(Model.Styles);
+            Styles.GroupDescriptions.Add(new PropertyGroupDescription("ParentName"));
+            //Styles = Model.Styles;
+            Expanded = true;
 
             Delete = new RelayCommand(OnDelete);
             Close = new RelayCommand<UserControl>(OnClose);
@@ -40,9 +52,9 @@ namespace HOK.MissionControl.LinksManager.StylesTab
 
         private void OnSelectNone()
         {
-            foreach (var wrapper in Styles)
+            foreach (var wrapper in Styles.SourceCollection)
             {
-                wrapper.IsSelected = false;
+                ((CategoryWrapper)wrapper).IsSelected = false;
             }
         }
 
@@ -50,7 +62,7 @@ namespace HOK.MissionControl.LinksManager.StylesTab
         {
             foreach (var wrapper in Styles)
             {
-                wrapper.IsSelected = true;
+                ((CategoryWrapper)wrapper).IsSelected = true;
             }
         }
 

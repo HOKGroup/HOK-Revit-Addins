@@ -7,6 +7,7 @@ namespace HOK.Core.ElementWrapers
     {
         public string Name { get; set; }
         public ElementId Id { get; set; }
+        public string ParentName { get; set; }
 
         public CategoryWrapper()
         {

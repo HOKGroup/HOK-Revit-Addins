@@ -75,7 +75,7 @@ namespace HOK.MissionControl.LinksManager.StylesTab
                     var subCats = style.GraphicsStyleCategory.SubCategories;
                     foreach (Category subCat in subCats)
                     {
-                        wrappers.Add(new CategoryWrapper(subCat));
+                        wrappers.Add(new CategoryWrapper(subCat){ ParentName = style.GraphicsStyleCategory.Name });
                     }
                 }
                 else if (style.Name == "Imports in Families")

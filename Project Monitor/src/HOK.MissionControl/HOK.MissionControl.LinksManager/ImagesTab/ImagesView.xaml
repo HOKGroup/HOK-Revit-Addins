@@ -67,12 +67,13 @@
                     <RowDefinition/>
                     <RowDefinition Height="40"/>
                 </Grid.RowDefinitions>
-                <wpfUtilities:DataGridExtension x:Name="DataGridImages" Grid.Row="0"
+                <wpfUtilities:DataGridExtension x:Name="DataGridImages"
                                                 ItemsSource="{Binding Images, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 CellStyle="{StaticResource ContentDataGridCentering}"
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
                                                 SelectionUnit="FullRow"
+                                                GridLinesVisibility="None"
                                                 Margin="10,10,10,0"
                                                 SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <wpfUtilities:DataGridExtension.Columns>
@@ -87,10 +88,11 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
                         <DataGridTemplateColumn Header="Image" Width="64"
-                                                IsReadOnly="True">
+                                                IsReadOnly="True"
+                                                HeaderStyle="{StaticResource CenterGridHeaderStyle}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Image Source="{Binding BitmapImage}" Width="56" Height="56" Margin="4"/>
+                                    <Image Source="{Binding BitmapImage}" Width="52" Height="52" Margin="6"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -134,7 +136,7 @@
                 <Button Content="All" 
                         Command="{Binding SelectAll, Mode=OneWay}"
                         Margin="10,0,0,10" 
-                        Grid.Row="1" 
+                        Grid.Row="2" 
                         Height="20" 
                         VerticalAlignment="Bottom" 
                         HorizontalAlignment="Left" 
@@ -142,7 +144,7 @@
                 <Button Content="None" 
                         Command="{Binding SelectNone, Mode=OneWay}"
                         Margin="90,0,0,10" 
-                        Grid.Row="1" 
+                        Grid.Row="2" 
                         Height="20" 
                         VerticalAlignment="Bottom" 
                         HorizontalAlignment="Left" 
