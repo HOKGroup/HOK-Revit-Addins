@@ -1,4 +1,7 @@
-﻿using Autodesk.Revit.UI;
+﻿using System.Diagnostics;
+using Autodesk.Revit.UI;
+using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Utils;
 
 namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
@@ -23,6 +26,21 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
             AppCommand.EnqueueTask(app =>
             {
                 app.PostCommand(addinId);
+            });
+        }
+
+        public void LaunchWebsite()
+        {
+            AppCommand.EnqueueTask(app =>
+            {
+                var doc = app.ActiveUIDocument.Document;
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                if (string.IsNullOrEmpty(centralPath)) return;
+
+                if (MissionControlSetup.Projects.ContainsKey(centralPath))
+                {
+                    Process.Start("http://missioncontrol.hok.com/#/projects/healthreport/" + MissionControlSetup.Projects[centralPath].Id);
+                }
             });
         }
     }

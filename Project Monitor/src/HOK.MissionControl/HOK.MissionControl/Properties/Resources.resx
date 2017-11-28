@@ -127,7 +127,7 @@
     <value>HOK.MissionControl.addin</value>
   </data>
   <data name="MissionControl_AdditionalButtons" xml:space="preserve">
-    <value>Communicator_Command</value>
+    <value>Communicator_Command;WebsiteLink_Command</value>
   </data>
   <data name="MissionControl_Desc" xml:space="preserve">
     <value>This plug-in allows Design Technology Group to collect valuable information about the model and its contents that are then reported back to the user via online dashboard.</value>

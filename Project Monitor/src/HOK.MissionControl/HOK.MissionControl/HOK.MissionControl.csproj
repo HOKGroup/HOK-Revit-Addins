@@ -210,6 +210,7 @@
     <Compile Include="Tools\HealthReport\WorksetOpenSynch.cs" />
     <Compile Include="Tools\SheetTracker\SheetTracker.cs" />
     <Compile Include="Tools\SheetTracker\SheetUpdater.cs" />
+    <Compile Include="Tools\WebsiteLink\WebsiteLinkCommand.cs" />
     <Compile Include="Utils\FailureProcessor.cs" />
     <Compile Include="Utils\FileInfoUtil.cs" />
   </ItemGroup>

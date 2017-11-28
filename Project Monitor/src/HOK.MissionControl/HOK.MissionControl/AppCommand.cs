@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Windows;
 using System.Windows.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
@@ -79,7 +78,7 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
                 application.ControlledApplication.DocumentCreated += OnDocumentCreated;
 
-                // (Konrad) Create Communicator button and register dockable panel.
+                // (Konrad) Create Communicator/WebsiteLink buttons and register dockable panel.
                 RegisterCommunicator(application);
                 try
                 {
@@ -90,11 +89,16 @@ namespace HOK.MissionControl
                     Log.AppendLog(LogMessageType.ERROR, "Ribbon tab was not created: " + tabName);
                 }
 
-                var currentAssembly = Assembly.GetAssembly(GetType()).Location;
+                var assembly = Assembly.GetAssembly(GetType());
                 var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
                             ?? application.CreateRibbonPanel(tabName, "Mission Control");
                 CommunicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
-                    currentAssembly, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
+                    assembly.Location, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
+
+                var webLinkButton = (PushButton)panel.AddItem(new PushButtonData("WebsiteLink_Command", "Launch" + Environment.NewLine + "MissionControl",
+                    assembly.Location, "HOK.MissionControl.Tools.WebsiteLink.WebsiteLinkCommand"));
+                webLinkButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "missionControl_32x32.png");
+                webLinkButton.ToolTip = "Launch Mission Control website.";
 
                 // (Konrad) Since Communicator Task Assistant offers to open Families for editing,
                 // it requires an External Event because new document cannot be opened from Idling Event

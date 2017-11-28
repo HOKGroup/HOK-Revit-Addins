@@ -88,7 +88,7 @@ namespace HOK.MissionControl.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Communicator_Command.
+        ///   Looks up a localized string similar to Communicator_Command;WebsiteLink_Command.
         /// </summary>
         internal static string MissionControl_AdditionalButtons {
             get {

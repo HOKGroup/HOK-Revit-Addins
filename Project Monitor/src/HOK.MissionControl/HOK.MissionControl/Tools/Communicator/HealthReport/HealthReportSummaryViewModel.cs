@@ -1,6 +1,8 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
@@ -8,11 +10,18 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
     {
         public HealthReportSummaryModel Model { get; set; }
         public RelayCommand<Button> LaunchTool { get; set; }
+        public RelayCommand LaunchWebsite { get; set; }
 
         public HealthReportSummaryViewModel()
         {
             Model = new HealthReportSummaryModel();
             LaunchTool = new RelayCommand<Button>(OnLaunchTool);
+            LaunchWebsite = new RelayCommand(OnLaunchWebsite);
+        }
+
+        private void OnLaunchWebsite()
+        {
+            Model.LaunchWebsite();
         }
 
         private void OnLaunchTool(Button tb)
