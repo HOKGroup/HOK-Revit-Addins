@@ -105,6 +105,8 @@ namespace HOK.BetaToolsManager
         {
             SerializeSetting(ViewModel.InstallDirectory + "BetaSettings.json");
 
+            application.Idling -= OnIdling;
+
             return Result.Succeeded;
         }
 

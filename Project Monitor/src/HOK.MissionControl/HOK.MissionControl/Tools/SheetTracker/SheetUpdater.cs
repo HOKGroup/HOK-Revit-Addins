@@ -37,7 +37,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
                 var configId = "";
                 if (MissionControlSetup.Configurations.ContainsKey(centralPath))
                 {
-                    configId = MissionControlSetup.Configurations[centralPath].Id;
+                    configId = MissionControlSetup.Configurations[centralPath]._id.ToString();
                 }
 
                 var addedElementIds = data.GetAddedElementIds().ToList();
@@ -152,7 +152,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
                 var configId = "";
                 if (MissionControlSetup.Configurations.ContainsKey(centralPath))
                 {
-                    configId = MissionControlSetup.Configurations[centralPath].Id;
+                    configId = MissionControlSetup.Configurations[centralPath]._id.ToString();
                 }
 
                 UpdaterRegistry.RemoveDocumentTriggers(_updaterId, doc);

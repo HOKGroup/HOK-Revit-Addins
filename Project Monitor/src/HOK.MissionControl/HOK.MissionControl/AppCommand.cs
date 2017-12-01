@@ -148,10 +148,11 @@ namespace HOK.MissionControl
                 if (!fileInfo.IsWorkshared) return;
 
                 var centralPath = fileInfo.CentralPath;
+
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 //search for config
-                var configFound = ServerUtilities.GetConfigurationByCentralPath(centralPath);
+                var configFound = ServerUtilities.GetByCentralPath<Configuration>(centralPath, "configurations/centralPath");
                 if (null != configFound)
                 {
                     if (MissionControlSetup.Configurations.ContainsKey(centralPath))
@@ -160,7 +161,7 @@ namespace HOK.MissionControl
                     }
                     MissionControlSetup.Configurations.Add(centralPath, configFound);
 
-                    var projectFound = ServerUtilities.GetProjectByConfigurationId(configFound.Id);
+                    var projectFound = ServerUtilities.GetProjectByConfigurationId(configFound._id);
                     if (null != projectFound)
                     {
                         if (MissionControlSetup.Projects.ContainsKey(centralPath))
@@ -245,7 +246,7 @@ namespace HOK.MissionControl
 
                     if (refreshProject)
                     {
-                        var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
+                        var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig._id.ToString());
                         if (null == projectFound) return;
                         MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
                     }

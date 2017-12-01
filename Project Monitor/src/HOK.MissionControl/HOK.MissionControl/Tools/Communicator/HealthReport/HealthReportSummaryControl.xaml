@@ -25,8 +25,15 @@
             <ColumnDefinition Width="1"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Ellipse Fill="{Binding FillColor, Converter={StaticResource ColorToBrushConverter}}"
-                 Margin="4"/>
+        <Button Grid.Column="0"
+                Cursor="Hand"
+                Command="{Binding LaunchWebsite, Mode=OneWay}">
+            <Button.Template>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Ellipse Fill="{Binding FillColor, Converter={StaticResource ColorToBrushConverter}}" Margin="4"/>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
         <Button Grid.Column="0"
                 Cursor="Hand"
                 Width="50"
@@ -35,7 +42,7 @@
                 Command="{Binding LaunchWebsite, Mode=OneWay}">
             <Button.Template>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <TextBlock Text="188" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="13" ></TextBlock>
+                    <TextBlock Text="188" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="13"/>
                 </ControlTemplate>
             </Button.Template>
         </Button>

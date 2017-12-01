@@ -58,51 +58,11 @@ namespace HOK.MissionControl.Core.Utils
         }
 
         /// <summary>
-        /// Retrieves a Mission Control Configuration that matches given Central File path.
-        /// </summary>
-        /// <param name="centralPath">Central File Path.</param>
-        /// <returns>Mission Control Configuration</returns>
-        public static Configuration GetConfigurationByCentralPath(string centralPath)
-        {
-            Configuration configFound = null;
-            try
-            {
-                var fileName = System.IO.Path.GetFileNameWithoutExtension(centralPath);
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/configurations/uri/{uri}", Method.GET);
-                request.AddUrlSegment("uri", fileName);
-
-                var response = client.Execute<List<Configuration>>(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError) return null;
-                if (response.Data != null)
-                {
-                    var items = response.Data;
-                    foreach (var config in items)
-                    {
-                        foreach (var file in config.files)
-                        {
-                            if (!string.Equals(file.centralPath.ToLower(), centralPath.ToLower(),
-                                StringComparison.Ordinal)) continue;
-                            configFound = config;
-
-                            Log.AppendLog(LogMessageType.INFO, "Configuration Found: " + configFound.Id);
-                            break;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return configFound;
-        }
-
-        /// <summary>
         /// 
         /// </summary>
         /// <param name="centralPath"></param>
         /// <returns></returns>
+        // TODO: This needs to be updated to use the method below.
         public static HealthReportData GetHealthRecordByCentralPath(string centralPath)
         {
             HealthReportData result = null;
@@ -149,15 +109,13 @@ namespace HOK.MissionControl.Core.Utils
                 var filePath = centralPath.Replace('\\', '|');
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET);
-
-
                 var response = client.Execute(request);
                 if (response.StatusCode == HttpStatusCode.InternalServerError) return result;
 
                 if (!string.IsNullOrEmpty(response.Content))
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
-                    if (data != null) result = data;
+                    if (data != null) Console.Write(data); result = data;
                     Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
                 }
             }
