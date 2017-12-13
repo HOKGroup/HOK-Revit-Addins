@@ -187,7 +187,7 @@
     </Compile>
     <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\SheetTaskAssistantViewModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\SheetTaskAssistant\Converters.cs" />
-    <Compile Include="Tools\Communicator\Tasks\StringToBoolConverter.cs" />
+    <Compile Include="Tools\Communicator\Tasks\TypeToResourceConverter.cs" />
     <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantView.xaml.cs">
       <DependentUpon>FamilyTaskAssistantView.xaml</DependentUpon>
@@ -300,6 +300,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\sheetPlaceholder_256x256.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\familyTask_24x24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\sheetTask_24x24.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

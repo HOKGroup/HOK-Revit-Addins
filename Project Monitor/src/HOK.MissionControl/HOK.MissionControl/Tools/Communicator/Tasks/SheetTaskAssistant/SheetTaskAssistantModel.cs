@@ -1,4 +1,5 @@
-﻿using HOK.MissionControl.Core.Schemas.Sheets;
+﻿using System;
+using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
@@ -12,7 +13,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         public void SubmitSheetTask(SheetTaskWrapper wrapper)
         {
             var item = (SheetItem)wrapper.Element;
-            var task = (SheetItem)wrapper.Task;
+            var task = (SheetTask)wrapper.Task;
             if (item == null && task.identifier == "")
             {
                 // (Konrad) It's a new sheet creation task.
@@ -35,10 +36,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         /// <param name="wrapper">Sheet Task Wrapper containing approved task.</param>
         public void Approve(SheetTaskWrapper wrapper)
         {
+            //TODO: This can potentially cause an issue. What if user opens multiple sessions of Revit all registered in MissionControl.
             var sheetsDataId = AppCommand.SheetsData.Id;
             if (string.IsNullOrEmpty(sheetsDataId)) return;
 
-            var t = wrapper.Task as SheetItem;
+            var t = (SheetTask)wrapper.Task;
             var e = wrapper.Element as SheetItem;
             
             if (e == null)
@@ -51,7 +53,10 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             }
             else
             {
-                ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/sheetchanges/approve");
+                t.completedBy = Environment.UserName.ToLower();
+                t.completedOn = DateTime.Now;
+                
+                ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/updatetasks");
             } 
         }
 

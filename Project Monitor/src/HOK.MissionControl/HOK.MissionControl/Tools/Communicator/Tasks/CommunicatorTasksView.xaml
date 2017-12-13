@@ -19,7 +19,7 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <UserControl.Resources>
-        <tasks:StringToBoolConverter x:Key="StringToBoolConverter"/>
+        <tasks:TypeToResourceConverter x:Key="TypeToResource"/>
     </UserControl.Resources>
     <Grid>
         <wpfUtilities:DataGridExtension x:Name="DataGridTasks"
@@ -85,7 +85,7 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <DockPanel Height="20" HorizontalAlignment="Stretch">
-                                <Image Width="12" Height="12" DockPanel.Dock="Left" Source="../../../Resources/taskIncomplete_24x24.png">
+                                <Image Width="12" Height="12" DockPanel.Dock="Left" Source="{Binding Task, Converter={StaticResource TypeToResource}}">
                                     <!--<Image.Style>
                                         <Style TargetType="{x:Type Image}">
                                             <Style.Triggers>

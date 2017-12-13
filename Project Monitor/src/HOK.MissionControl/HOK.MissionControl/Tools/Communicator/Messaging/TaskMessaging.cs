@@ -27,9 +27,16 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
         public bool IsClosed { get; set; }
     }
 
-    public class SheetsTaskUpdateMessage
+    public class SheetsTaskAddedMessage
     {
-        public SheetItem Task { get; set; }
+        public SheetItem Sheet { get; set; }
+        public SheetTask Task { get; set; }
+    }
+
+    public class SheetsTaskUpdatedMessage
+    {
+        public SheetItem Sheet { get; set; }
+        public SheetTask Task { get; set; }
     }
 
     public class SheetsTaskSheetAddedMessage
@@ -52,6 +59,7 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     public class SheetsTaskDeletedMessage
     {
         public string Identifier { get; set; }
+        public List<string> Deleted { get; set; }
     }
 
     public class TaskAssistantClosingMessage

@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Windows.Controls;
 using System.Windows.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
+using GalaSoft.MvvmLight;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas;
@@ -104,10 +106,6 @@ namespace HOK.MissionControl
                 // it requires an External Event because new document cannot be opened from Idling Event
                 CommunicatorHandler = new CommunicatorRequestHandler();
                 CommunicatorEvent = ExternalEvent.Create(CommunicatorHandler);
-
-                // (Konrad) in order not to become out of synch with the database we need a way
-                // to communicate live updates from the database to task assistant/communicator
-                new Thread( new MissionControlSocket().Main){ Priority = ThreadPriority.BelowNormal }.Start();
 
             }
             catch (Exception ex)
@@ -212,6 +210,10 @@ namespace HOK.MissionControl
                 // (Konrad) Register Updaters that are in the config file.
                 ApplyConfiguration(doc, currentConfig);
 
+                // (Konrad) in order not to become out of synch with the database we need a way
+                // to communicate live updates from the database to task assistant/communicator
+                new Thread(() => new MissionControlSocket().Main(doc)) { Priority = ThreadPriority.BelowNormal }.Start();
+
                 // (Konrad) It's possible that Health Report Document doesn't exist in database yet.
                 // Create it and set the reference to it in Project if that's the case.
                 if (MonitorUtilities.IsUpdaterOn(currentProject, currentConfig,
@@ -230,7 +232,6 @@ namespace HOK.MissionControl
                         else
                         {
                             MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
-                            //CommunicatorWindow.DataContext = new CommunicatorViewModel(); // create new communicator VM
                         }
                     }
 
@@ -268,14 +269,30 @@ namespace HOK.MissionControl
         }
 
         /// <summary>
-        /// 
+        /// Due to all asynch stuff some data might not be available right away so we use this callback to instantiate the Communicator.
+        /// It also get's called after synch to central is done to refresh the UI.
         /// </summary>
         public static void LunchCommunicator()
         {
-            var control = CommunicatorWindow.MainControl;
-            control.Dispatcher.Invoke(() =>
+            CommunicatorWindow.MainControl.Dispatcher.Invoke(() =>
             {
-                CommunicatorWindow.DataContext = new CommunicatorViewModel(); // create new communicator VM
+                // (Konrad) We have to make sure that we unregister from all Messaging before reloading UI.
+                if (CommunicatorWindow.DataContext != null)
+                {
+                    var tabItems = CommunicatorWindow.MainControl.Items.SourceCollection;
+                    foreach (var ti in tabItems)
+                    {
+                        var content = ((UserControl)((TabItem)ti).Content).DataContext as ViewModelBase;
+                        content?.Cleanup();
+                    }
+                }
+
+                // (Konrad) Now we can reset the ViewModel
+                CommunicatorWindow.DataContext = new CommunicatorViewModel();
+                if (CommunicatorWindow.MainControl.Items.Count > 0)
+                {
+                    CommunicatorWindow.MainControl.SelectedIndex = 0;
+                }
             }, DispatcherPriority.Normal);
         }
 
@@ -313,8 +330,9 @@ namespace HOK.MissionControl
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 // (Konrad) Setup Health Report Monitor
-                if (!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
-                if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
+                if (!MissionControlSetup.Projects.ContainsKey(centralPath) 
+                    || !MissionControlSetup.Configurations.ContainsKey(centralPath) 
+                    || !MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
                 var recordId = MissionControlSetup.HealthRecordIds[centralPath];
 
                 WorksetOpenSynch.PublishData(doc, recordId, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], WorksetMonitorState.onsynched);
@@ -329,28 +347,43 @@ namespace HOK.MissionControl
         /// <summary>
         /// Document Synchronized handler.
         /// </summary>
-        private static void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
+        private void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
         {
             try
             {
                 IsSynching = false; // enables DTM Tool again
-                if (args.Document == null) return;
+                var doc = args.Document;
+                if (doc == null) return;
 
-                var centralPath = FileInfoUtil.GetCentralFilePath(args.Document);
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 FailureProcessor.IsSynchronizing = false;
 
                 // (Konrad) If project is not registered with MongoDB let's skip this
                 if(!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
-                if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
-                var recordId = MissionControlSetup.HealthRecordIds[centralPath];
-
-                if (SynchTime.ContainsKey("from"))
+                if (MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
                 {
-                    ModelMonitor.PublishSynchTime(recordId);
+                    var recordId = MissionControlSetup.HealthRecordIds[centralPath];
+                    if (SynchTime.ContainsKey("from"))
+                    {
+                        ModelMonitor.PublishSynchTime(recordId);
+                    }
+                    ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentSynched);
                 }
-                ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentSynched);
+
+                // (Konrad) Publish Sheet data to sheet tracker
+                if (MissionControlSetup.SheetsIds.ContainsKey(centralPath))
+                {
+                    try
+                    {
+                        new Thread(() => new SheetTracker().SynchSheets(doc)) { Priority = ThreadPriority.BelowNormal }.Start();
+                    }
+                    catch (Exception e)
+                    {
+                        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                    }
+                }
             }
             catch (Exception ex)
             {

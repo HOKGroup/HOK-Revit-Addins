@@ -16,7 +16,6 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         public string Id { get; set; }
         public string centralPath { get; set; }
         public List<SheetItem> sheets { get; set; } = new List<SheetItem>();
-        public List<SheetItem> sheetsChanges { get; set; } = new List<SheetItem>();
         public List<RevisionItem> revisions { get; set; } = new List<RevisionItem>();
     }
 }

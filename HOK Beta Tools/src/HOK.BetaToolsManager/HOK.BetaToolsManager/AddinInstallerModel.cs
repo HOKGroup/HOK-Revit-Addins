@@ -360,7 +360,7 @@ namespace HOK.BetaToolsManager
                     var folder = Path.GetDirectoryName(dllPath);
                     try
                     {
-                        if (folder != null) Directory.Delete(Path.Combine(InstallDirectory, folder), true);
+                        if (Directory.Exists(folder)) Directory.Delete(Path.Combine(InstallDirectory, folder), true);
                         File.Delete(installedAddin);
                     }
                     catch (Exception e)

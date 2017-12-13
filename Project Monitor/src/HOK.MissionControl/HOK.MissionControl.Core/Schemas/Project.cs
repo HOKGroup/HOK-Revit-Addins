@@ -13,10 +13,10 @@ namespace HOK.MissionControl.Core.Schemas
         public string name { get; set; } = "";
         public string office { get; set; } = "";
         public ProjectAddress address { get; set; } = new ProjectAddress();
-        [BsonId]
+
         [BsonRepresentation(BsonType.ObjectId)]
         public List<string> configurations { get; set; } = new List<string>();
-        [BsonId]
+
         [BsonRepresentation(BsonType.ObjectId)]
         public List<string> healthrecords { get; set; } = new List<string>();
     }

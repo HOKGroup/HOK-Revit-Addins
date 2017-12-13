@@ -1,20 +1,27 @@
-﻿using System.ComponentModel;
-using Autodesk.Revit.DB;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using System;
+using System.ComponentModel;
 using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas.Sheets
 {
     /// <summary>
-    /// Class used when user submits proposed changes to Sheets.
+    /// Sheets Tasks schema
     /// </summary>
-    public class SheetItem : INotifyPropertyChanged
+    public class SheetTask : INotifyPropertyChanged
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
+        public string _id { get; set; }
+        public string identifier { get; set; }
+        public string uniqueId { get; set; }
+        public string revisionNumber { get; set; }
+        public string assignedTo { get; set; }
+        public DateTime? submittedOn { get; set; }
+        public DateTime? completedOn { get; set; }
+        public string submittedBy { get; set; }
+        public string completedBy { get; set; }
+
+        public string centralPath { get; set; }
+        public string collectionId { get; set; }
+        public string fileName { get; set; }
 
         private string _name;
         public string name
@@ -30,32 +37,11 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
             set { _number = value; RaisePropertyChanged("number"); }
         }
 
-        private string _uniqueId;
-        public string uniqueId
-        {
-            get { return _uniqueId; }
-            set { _uniqueId = value; RaisePropertyChanged("uniqueId"); }
-        }
-
-        private string _revisionNumber;
-        public string revisionNumber
-        {
-            get { return _revisionNumber; }
-            set { _revisionNumber = value; RaisePropertyChanged("revisionNumber"); }
-        }
-
         private bool _isSelected;
         public bool isSelected
         {
             get { return _isSelected; }
             set { _isSelected = value; RaisePropertyChanged("isSelected"); }
-        }
-
-        private string _identifier;
-        public string identifier
-        {
-            get { return _identifier; }
-            set { _identifier = value; RaisePropertyChanged("identifier"); }
         }
 
         private bool _isPlaceholder;
@@ -72,13 +58,6 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
             set { _isDeleted = value; RaisePropertyChanged("isDeleted"); }
         }
 
-        private string _assignedTo;
-        public string assignedTo
-        {
-            get { return _assignedTo; }
-            set { _assignedTo = value; RaisePropertyChanged("assignedTo"); }
-        }
-
         private string _message;
         public string message
         {
@@ -86,31 +65,51 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
             set { _message = value; RaisePropertyChanged("message"); }
         }
 
+        private string _comments;
+        public string comments
+        {
+            get { return _comments; }
+            set { _comments = value; RaisePropertyChanged("comments"); }
+        }
+
         [JsonConstructor]
-        public SheetItem()
+        public SheetTask()
         {
         }
 
-        public SheetItem(ViewSheet sheet, string centralPath)
+        /// <summary>
+        /// Utility method used to copy all properties from one object to another, and trigger PropertyChange for UI updates.
+        /// </summary>
+        /// <param name="other">Object to copy properties from.</param>
+        public void CopyProperties(SheetTask other)
         {
-            name = sheet.get_Parameter(BuiltInParameter.SHEET_NAME).AsString();
-            number = sheet.get_Parameter(BuiltInParameter.SHEET_NUMBER).AsString();
-            uniqueId = sheet.UniqueId;
-            revisionNumber = sheet.get_Parameter(BuiltInParameter.SHEET_CURRENT_REVISION).AsString();
-            identifier = centralPath.ToLower() + "-" + sheet.UniqueId; //prevents possibility of sheet being copied between models
-            isPlaceholder = sheet.IsPlaceholder;
+            _id = other._id;
+            identifier = other.identifier;
+            uniqueId = other.uniqueId;
+            revisionNumber = other.revisionNumber;
+            assignedTo = other.assignedTo;
+            submittedOn = other.submittedOn;
+            completedOn = other.completedOn;
+            submittedBy = other.submittedBy;
+            completedBy = other.completedBy;
+            name = other.name;
+            number = other.number;
+            isSelected = other.isSelected;
+            isPlaceholder = other.isSelected;
+            isDeleted = other.isDeleted;
+            message = other.message;
+            comments = other.message;
         }
 
-        // (Konrad) Comparison methods used when updating UI. IndexOf() uses it.
         public override bool Equals(object obj)
         {
-            var item = obj as SheetItem;
-            return item != null && identifier.Equals(item.identifier);
+            var item = obj as SheetTask;
+            return item != null && _id.Equals(item._id);
         }
 
         public override int GetHashCode()
         {
-            return identifier.GetHashCode();
+            return _id.GetHashCode();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

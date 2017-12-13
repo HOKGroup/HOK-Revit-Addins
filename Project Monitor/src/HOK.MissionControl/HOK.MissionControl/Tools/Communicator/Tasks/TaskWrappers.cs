@@ -11,9 +11,9 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
 
     public class SheetTaskWrapper : TaskWrapper
     {
-        public SheetTaskWrapper(SheetItem task, SheetItem sheet)
+        public SheetTaskWrapper(SheetItem element, SheetTask task)
         {
-            Element = sheet;
+            Element = element;
             Task = task;
         }
 

@@ -144,7 +144,6 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             if (FamiliesData != null)
             {
                 var familiesToWatch = new Dictionary<string, FamilyItem>();
-                //var familyTasks = new List<FamilyTaskWrapper>();
                 foreach (var family in FamiliesData.families)
                 {
                     // (Konrad) We are storing this Family Item for later so that if user makes any changes to this family
@@ -166,17 +165,18 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
 
             if (SheetsData != null)
             {
-                var sheetsToEdit = SheetsData.sheetsChanges;
-                if (!sheetsToEdit.Any()) return tasks;
+                if (!SheetsData.sheets.Any()) return tasks;
 
-                foreach (var sheetTask in sheetsToEdit)
+                foreach (var sheetItem in SheetsData.sheets)
                 {
-                    if (!string.Equals(sheetTask.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
+                    if (sheetItem.isDeleted || !sheetItem.tasks.Any()) continue;
+                    foreach (var sheetTask in sheetItem.tasks)
+                    {
+                        if (!string.IsNullOrEmpty(sheetTask.completedBy)) continue;
+                        if (!string.Equals(sheetTask.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
 
-                    // (Konrad) Let's match proposed sheet to a sheet existing in the model
-                    var sheetItem = AppCommand.SheetsData.sheets.FirstOrDefault(x => x.uniqueId == sheetTask.uniqueId);
-
-                    tasks.Add(new SheetTaskWrapper(sheetTask, sheetItem));
+                        tasks.Add(new SheetTaskWrapper(sheetItem, sheetTask));
+                    }
                 }
             }
 

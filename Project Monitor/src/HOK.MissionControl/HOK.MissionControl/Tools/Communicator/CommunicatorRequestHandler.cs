@@ -42,7 +42,7 @@ namespace HOK.MissionControl.Tools.Communicator
         public static bool IsUpdatingSheet { get; set; }
         public FamilyItem FamilyItem { get; set; }
         public SheetItem SheetItem { get; set; }
-        public SheetItem SheetTask { get; set; }
+        public SheetTask SheetTask { get; set; }
 
         public CommunicatorRequest Request { get; } = new CommunicatorRequest();
 
