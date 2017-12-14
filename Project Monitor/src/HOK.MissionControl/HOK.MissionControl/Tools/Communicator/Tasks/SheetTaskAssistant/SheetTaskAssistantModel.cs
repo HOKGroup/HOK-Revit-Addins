@@ -14,7 +14,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         {
             var item = (SheetItem)wrapper.Element;
             var task = (SheetTask)wrapper.Task;
-            if (item == null && task.identifier == "")
+            if (task.identifier == "")
             {
                 // (Konrad) It's a new sheet creation task.
                 AppCommand.CommunicatorHandler.SheetTask = task;
@@ -43,6 +43,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             var t = (SheetTask)wrapper.Task;
             var e = wrapper.Element as SheetItem;
             
+            //TODO: when approving a new sheet this is not null
+            //body needs to be updated with a new identifier object or mongo side will fail.
             if (e == null)
             {
                 // (Konrad) It's a create sheet task (element associated with task is null). Let's approve that.

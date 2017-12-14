@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Media;
-using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Families;
@@ -199,54 +197,6 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
                 return Color.FromRgb(240, 173, 78);
             }
             return Color.FromRgb(92, 182, 92);
-        }
-
-        /// <summary>
-        /// Shows or Hides the Communicator dockable pane.
-        /// </summary>
-        /// <param name="application">UIApp</param>
-        public void ToggleCommunicator(UIApplication application)
-        {
-            var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
-            var dp = application.GetDockablePane(dpid);
-            if (dp == null) return;
-
-            var assembly = Assembly.GetExecutingAssembly();
-            if (dp.IsShown())
-            {
-                dp.Hide();
-                AppCommand.Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "communicatorOff_32x32.png");
-                AppCommand.Instance.CommunicatorButton.ItemText = "Show" + Environment.NewLine + "Communicator";
-            }
-            else
-            {
-                dp.Show();
-                AppCommand.Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "communicatorOn_32x32.png");
-                AppCommand.Instance.CommunicatorButton.ItemText = "Hide" + Environment.NewLine + "Communicator";
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public void SetCommunicatorImage()
-        {
-            // (Konrad) This needs to run after the doc is opened, because UI elements don't get created until then.
-            AppCommand.EnqueueTask(app =>
-            {
-                var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
-                var dp = app.GetDockablePane(dpid);
-                var assembly = Assembly.GetExecutingAssembly();
-                if (dp != null)
-                {
-                    AppCommand.Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", dp.IsShown()
-                        ? "communicatorOn_32x32.png"
-                        : "communicatorOff_32x32.png");
-                    AppCommand.Instance.CommunicatorButton.ItemText = dp.IsShown()
-                        ? "Hide" + Environment.NewLine + "Communicator"
-                        : "Show" + Environment.NewLine + "Communicator";
-                }
-            });
         }
     }
 }

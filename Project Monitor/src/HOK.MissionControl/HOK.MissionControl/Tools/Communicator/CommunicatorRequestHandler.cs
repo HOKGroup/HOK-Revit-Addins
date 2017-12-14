@@ -5,10 +5,10 @@ using System.Threading;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
+using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Sheets;
-using GalaSoft.MvvmLight.Messaging;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 
 namespace HOK.MissionControl.Tools.Communicator
@@ -170,11 +170,19 @@ namespace HOK.MissionControl.Tools.Communicator
                 using (var trans = new Transaction(doc, "UpdateSheet"))
                 {
                     trans.Start();
-
+                    var action = "update";
                     try
                     {
-                        view.get_Parameter(BuiltInParameter.SHEET_NUMBER)?.Set(SheetTask.number);
-                        view.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.name);
+                        if (SheetTask.isDeleted)
+                        {
+                            action = "delete";
+                            doc.Delete(view.Id);
+                        }
+                        else
+                        {
+                            view.get_Parameter(BuiltInParameter.SHEET_NUMBER)?.Set(SheetTask.number);
+                            view.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.name);
+                        }
 
                         trans.Commit();
                         IsUpdatingSheet = false;
@@ -184,7 +192,7 @@ namespace HOK.MissionControl.Tools.Communicator
                         trans.RollBack();
                         IsUpdatingSheet = false;
 
-                        Log.AppendLog(LogMessageType.EXCEPTION, "Failed to update sheet.");
+                        Log.AppendLog(LogMessageType.EXCEPTION, "Failed to " + action + " sheet.");
                         Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = e.Message});
                     }
                 }
@@ -192,42 +200,6 @@ namespace HOK.MissionControl.Tools.Communicator
 
             // (Konrad) We don't want Revit to keep triggering this even when we are not processing updates.
             app.Application.FailuresProcessing -= FailureProcessing;
-        }
-
-        /// <summary>
-        /// Error handler if we cannot commit the transaction for some reason. It will return proper message to UI.
-        /// </summary>
-        private static void FailureProcessing(object sender, FailuresProcessingEventArgs args)
-        {
-            var fa = args.GetFailuresAccessor();
-            var fmas = fa.GetFailureMessages();
-            var count = 0;
-
-            if (fmas.Count == 0)
-            {
-                args.SetProcessingResult(FailureProcessingResult.Continue);
-                if(IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = true, Message = "Success!" });
-                return;
-            }
-
-            foreach (var fma in fmas)
-            {
-                if (fma.GetSeverity() == FailureSeverity.Warning)
-                {
-                    fa.DeleteWarning(fma);
-                }
-                else
-                {
-                    // (Konrad) Error is more than just a warning. Let's roll back.
-                    args.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
-                    count++;
-                }
-            }
-
-            if (count > 0)
-            {
-                if (IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = "Could not commit transaction. Try reloading latest." });
-            }
         }
 
         /// <summary>
@@ -276,6 +248,42 @@ namespace HOK.MissionControl.Tools.Communicator
                 ModelPathUtils.ConvertUserVisiblePathToModelPath(filePath),
                 new OpenOptions(),
                 false);
+        }
+
+        /// <summary>
+        /// Error handler if we cannot commit the transaction for some reason. It will return proper message to UI.
+        /// </summary>
+        private static void FailureProcessing(object sender, FailuresProcessingEventArgs args)
+        {
+            var fa = args.GetFailuresAccessor();
+            var fmas = fa.GetFailureMessages();
+            var count = 0;
+
+            if (fmas.Count == 0)
+            {
+                args.SetProcessingResult(FailureProcessingResult.Continue);
+                if (IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = true, Message = "Success!" });
+                return;
+            }
+
+            foreach (var fma in fmas)
+            {
+                if (fma.GetSeverity() == FailureSeverity.Warning)
+                {
+                    fa.DeleteWarning(fma);
+                }
+                else
+                {
+                    // (Konrad) Error is more than just a warning. Let's roll back.
+                    args.SetProcessingResult(FailureProcessingResult.ProceedWithRollBack);
+                    count++;
+                }
+            }
+
+            if (count > 0)
+            {
+                if (IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = "Could not commit transaction. Try reloading latest." });
+            }
         }
     }
 }

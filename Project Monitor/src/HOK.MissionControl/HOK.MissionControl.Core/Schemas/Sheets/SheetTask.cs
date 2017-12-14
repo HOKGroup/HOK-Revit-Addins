@@ -1,5 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Runtime.Serialization;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas.Sheets
@@ -7,23 +10,50 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
     /// <summary>
     /// Sheets Tasks schema
     /// </summary>
+    [DataContract]
     public class SheetTask : INotifyPropertyChanged
     {
-        public string _id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
+        [DataMember(Name = "_id")]
+        public string Id { get; set; }
+
+        [DataMember]
         public string identifier { get; set; }
+
+        [DataMember]
         public string uniqueId { get; set; }
+
+        [DataMember]
         public string revisionNumber { get; set; }
+
+        [DataMember]
         public string assignedTo { get; set; }
+
+        [DataMember]
         public DateTime? submittedOn { get; set; }
+
+        [DataMember]
         public DateTime? completedOn { get; set; }
+
+        [DataMember]
         public string submittedBy { get; set; }
+
+        [DataMember]
         public string completedBy { get; set; }
 
+        [DataMember]
         public string centralPath { get; set; }
+
+        [DataMember]
         public string collectionId { get; set; }
+
+        [DataMember]
         public string fileName { get; set; }
 
         private string _name;
+        [DataMember]
         public string name
         {
             get { return _name; }
@@ -31,6 +61,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private string _number;
+        [DataMember]
         public string number
         {
             get { return _number; }
@@ -38,6 +69,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private bool _isSelected;
+        [DataMember]
         public bool isSelected
         {
             get { return _isSelected; }
@@ -45,6 +77,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private bool _isPlaceholder;
+        [DataMember]
         public bool isPlaceholder
         {
             get { return _isPlaceholder; }
@@ -52,6 +85,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private bool _isDeleted;
+        [DataMember]
         public bool isDeleted
         {
             get { return _isDeleted; }
@@ -59,6 +93,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private string _message;
+        [DataMember]
         public string message
         {
             get { return _message; }
@@ -66,6 +101,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private string _comments;
+        [DataMember]
         public string comments
         {
             get { return _comments; }
@@ -83,7 +119,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         /// <param name="other">Object to copy properties from.</param>
         public void CopyProperties(SheetTask other)
         {
-            _id = other._id;
+            Id = other.Id;
             identifier = other.identifier;
             uniqueId = other.uniqueId;
             revisionNumber = other.revisionNumber;
@@ -104,12 +140,12 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         public override bool Equals(object obj)
         {
             var item = obj as SheetTask;
-            return item != null && _id.Equals(item._id);
+            return item != null && Id.Equals(item.Id);
         }
 
         public override int GetHashCode()
         {
-            return _id.GetHashCode();
+            return Id.GetHashCode();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

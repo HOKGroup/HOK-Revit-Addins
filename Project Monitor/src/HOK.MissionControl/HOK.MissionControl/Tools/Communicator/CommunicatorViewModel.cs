@@ -14,9 +14,8 @@ namespace HOK.MissionControl.Tools.Communicator
 
         public CommunicatorViewModel()
         {
-            FamilyData familyStats = null;
-
             //TODO: What happens when multiple MissionControl tracked models are open in the same session? Only one HrData/SheetsData is stored.
+            FamilyData familyStats = null;
             var familyStatsId = AppCommand.HrData.familyStats;
             var sheetsData = AppCommand.SheetsData;
             if (familyStatsId == null && sheetsData == null) return;
@@ -37,26 +36,15 @@ namespace HOK.MissionControl.Tools.Communicator
                     Header = "Health Report"
                 };
                 TabItems.Add(reportTab);
-
-                var taskTab = new TabItem
-                {
-                    Content = new CommunicatorTasksView
-                    {
-                        DataContext = new CommunicatorTasksViewModel(new CommunicatorTasksModel(familyStats, sheetsData))
-                    },
-                    Header = "Tasks"
-                };
-                TabItems.Add(taskTab);
-
-
             }
-            else if (sheetsData != null)
+
+            if (sheetsData != null)
             {
                 var taskTab = new TabItem
                 {
                     Content = new CommunicatorTasksView
                     {
-                        DataContext = new CommunicatorTasksViewModel(new CommunicatorTasksModel(null, sheetsData))
+                        DataContext = new CommunicatorTasksViewModel(new CommunicatorTasksModel(familyStats, sheetsData))
                     },
                     Header = "Tasks"
                 };

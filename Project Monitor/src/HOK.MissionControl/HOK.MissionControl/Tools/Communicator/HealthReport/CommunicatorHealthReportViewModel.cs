@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
-using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Families;
 
 namespace HOK.MissionControl.Tools.Communicator.HealthReport

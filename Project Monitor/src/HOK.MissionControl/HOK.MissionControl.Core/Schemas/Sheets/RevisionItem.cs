@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using System.Runtime.Serialization;
+using Autodesk.Revit.DB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
@@ -8,18 +9,34 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
     /// <summary>
     /// Class used to store Revisions in DB.
     /// </summary>
+    [DataContract]
     public class RevisionItem
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
+        [DataMember(Name = "_id")]
         public string Id { get; set; }
+
+        [DataMember]
         public string description { get; set; }
+
+        [DataMember]
         public int sequence { get; set; }
+
+        [DataMember]
         public string number { get; set; }
+
+        [DataMember]
         public string date { get; set; }
+
+        [DataMember]
         public string issuedTo { get; set; }
+
+        [DataMember]
         public string issuedBy { get; set; }
+
+        [DataMember]
         public string uniqueId { get; set; }
 
         [JsonConstructor]

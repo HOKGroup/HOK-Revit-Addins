@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Runtime.Serialization;
 using Autodesk.Revit.DB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -11,17 +12,26 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
     /// <summary>
     /// Class used when user submits proposed changes to Sheets.
     /// </summary>
+    [DataContract]
     public class SheetItem : INotifyPropertyChanged
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
+        [DataMember(Name = "_id")]
         public string Id { get; set; }
+
+        [DataMember]
         public string centralPath { get; set; }
+
+        [DataMember]
         public string collectionId { get; set; }
+
+        [DataMember]
         public string fileName { get; set; }
 
         private string _name;
+        [DataMember]
         public string name
         {
             get { return _name; }
@@ -29,6 +39,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private string _number;
+        [DataMember]
         public string number
         {
             get { return _number; }
@@ -36,6 +47,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private string _uniqueId;
+        [DataMember]
         public string uniqueId
         {
             get { return _uniqueId; }
@@ -43,6 +55,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private string _revisionNumber;
+        [DataMember]
         public string revisionNumber
         {
             get { return _revisionNumber; }
@@ -50,6 +63,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private bool _isSelected;
+        [DataMember]
         public bool isSelected
         {
             get { return _isSelected; }
@@ -57,6 +71,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private string _identifier;
+        [DataMember]
         public string identifier
         {
             get { return _identifier; }
@@ -64,6 +79,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private bool _isPlaceholder;
+        [DataMember]
         public bool isPlaceholder
         {
             get { return _isPlaceholder; }
@@ -71,12 +87,14 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         private bool _isDeleted;
+        [DataMember]
         public bool isDeleted
         {
             get { return _isDeleted; }
             set { _isDeleted = value; RaisePropertyChanged("isDeleted"); }
         }
 
+        [DataMember]
         public List<SheetTask> tasks { get; set; } = new List<SheetTask>();
 
         [JsonConstructor]

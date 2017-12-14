@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.Attributes;
+﻿using System;
+using System.Reflection;
+using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
@@ -21,10 +23,35 @@ namespace HOK.MissionControl.Tools.Communicator
             // better maintain the most used plug-ins or discontiue the unused ones.
             AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-Communicator", commandData.Application.Application.VersionNumber));
 
-            new CommunicatorHealthReportModel().ToggleCommunicator(commandData.Application);
+            ToggleCommunicator(commandData.Application);
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Shows or Hides the Communicator dockable pane.
+        /// </summary>
+        /// <param name="application">UIApp</param>
+        public void ToggleCommunicator(UIApplication application)
+        {
+            var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
+            var dp = application.GetDockablePane(dpid);
+            if (dp == null) return;
+
+            var assembly = Assembly.GetExecutingAssembly();
+            if (dp.IsShown())
+            {
+                dp.Hide();
+                AppCommand.Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "communicatorOff_32x32.png");
+                AppCommand.Instance.CommunicatorButton.ItemText = "Show" + Environment.NewLine + "Communicator";
+            }
+            else
+            {
+                dp.Show();
+                AppCommand.Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "communicatorOn_32x32.png");
+                AppCommand.Instance.CommunicatorButton.ItemText = "Hide" + Environment.NewLine + "Communicator";
+            }
         }
     }
 }

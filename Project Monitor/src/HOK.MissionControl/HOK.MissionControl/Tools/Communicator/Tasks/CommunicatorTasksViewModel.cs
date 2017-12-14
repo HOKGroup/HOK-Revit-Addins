@@ -44,6 +44,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             Messenger.Default.Register<SheetsTaskAddedMessage>(this, OnSheetTaskAdded);
             Messenger.Default.Register<SheetsTaskUpdatedMessage>(this, OnSheetTaskUpdated);
             Messenger.Default.Register<SheetsTaskDeletedMessage>(this, OnSheetsTaskDeleted);
+            Messenger.Default.Register<SheetTaskSheetsCreatedMessage>(this, OnSheetTaskSheetsCreated);
             //Messenger.Default.Register<SheetsTaskApprovedMessage>(this, OnSheetTaskApproved);
             //Messenger.Default.Register<SheetsTaskSheetAddedMessage>(this, OnSheetsTaskSheetAdded);
         }
@@ -120,22 +121,24 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         //    DeleteTask(msg.Identifier, msg.Sheet);
         //}
 
-        ///// <summary>
-        ///// Handles new sheets being added to DB.
-        ///// </summary>
-        ///// <param name="msg">Message from Mission Control.</param>
-        //private void OnSheetsTaskSheetAdded(SheetsTaskSheetAddedMessage msg)
-        //{
-        //    AppCommand.SheetsData.sheetsChanges.AddRange(msg.NewSheets.Where(x => string.Equals(x.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)));
+        /// <summary>
+        /// Handles creating a new sheet. New sheet has to have a matching centralPath and assignedTo to pass.
+        /// </summary>
+        /// <param name="msg">Message from Mission Control.</param>
+        private void OnSheetTaskSheetsCreated(SheetTaskSheetsCreatedMessage msg)
+        {
+            var assignedTo = msg.Sheets.FirstOrDefault()?.tasks.FirstOrDefault()?.assignedTo;
+            if (!string.IsNullOrEmpty(assignedTo) && !string.Equals(assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)) return;
 
-        //    lock (_lock)
-        //    {
-        //        foreach (var task in msg.NewSheets)
-        //        {
-        //            Tasks.Add(new SheetTaskWrapper(task, null));
-        //        }
-        //    }
-        //}
+            AppCommand.SheetsData.sheets.AddRange(msg.Sheets); // update stored sheets
+            lock (_lock)
+            {
+                foreach (var sheetItem in msg.Sheets)
+                {
+                    Tasks.Add(new SheetTaskWrapper(sheetItem, sheetItem.tasks.First()));
+                }
+            }
+        }
 
         /// <summary>
         /// Handles sheet changes being deleted in Mission Control
@@ -149,13 +152,13 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             foreach (var id in msg.Deleted)
             {
                 // (Konrad) Update SheetsData stored in AppCommand
-                var taskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => x._id == id);
+                var taskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => x.Id == id);
                 if(taskIndex == -1) continue;
 
                 AppCommand.SheetsData.sheets[existingIndex].tasks.RemoveAt(taskIndex);
 
                 // (Konrad) Update Tasks collection in UI
-                var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && ((SheetTask)x.Task)._id == id);
+                var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && ((SheetTask)x.Task).Id == id);
                 if (storedTask == null) continue;
 
                 lock (_lock)
@@ -185,7 +188,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         {
             var existingIndex = AppCommand.SheetsData.sheets.IndexOf(msg.Sheet);
             if (existingIndex == -1) return;
-            var existingTaskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => x._id == msg.Task._id);
+            var existingTaskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => x.Id == msg.Task.Id);
             if (existingTaskIndex == -1)
             {
                 if (string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(),StringComparison.CurrentCultureIgnoreCase))
@@ -210,7 +213,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
             else
             {
-                var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && ((SheetTask)x.Task)._id == msg.Task._id);
+                var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && ((SheetTask)x.Task).Id == msg.Task.Id);
                 if (storedTask == null)
                 {
                     lock (_lock)

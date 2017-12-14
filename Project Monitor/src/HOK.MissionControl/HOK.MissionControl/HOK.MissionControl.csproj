@@ -302,10 +302,10 @@
     <Resource Include="Resources\sheetPlaceholder_256x256.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\familyTask_24x24.png" />
+    <Resource Include="Resources\sheetTask_24x24.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\sheetTask_24x24.png" />
+    <Resource Include="Resources\familyTask_24x24.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

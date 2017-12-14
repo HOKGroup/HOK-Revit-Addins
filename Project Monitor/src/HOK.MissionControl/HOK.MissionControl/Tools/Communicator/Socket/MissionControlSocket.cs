@@ -53,6 +53,8 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     Log.AppendLog(LogMessageType.INFO, "Mission Control socket connection timed out.");
                 });
 
+                #region Family Tasks
+
                 socket.On("task_deleted", body =>
                 {
                     if (body == null)
@@ -109,6 +111,10 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     }
                 });
 
+                #endregion
+
+                #region Sheet Tasks
+
                 socket.On("sheetTask_added", body =>
                 {
                     if (body != null)
@@ -139,10 +145,24 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         var sheetsData = data["body"].ToObject<SheetData>();
                         var identifier = data["identifier"].ToObject<string>();
                         var _id = data["_id"].ToObject<string>();
-                        if (sheetsData == null || string.IsNullOrEmpty(identifier) || string.IsNullOrEmpty(_id)) return;
+                        if (sheetsData == null || string.IsNullOrEmpty(_id)) return;
 
-                        var sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal));
-                        var task = sheet?.tasks.FirstOrDefault(x => x._id == _id);
+                        SheetItem sheet;
+                        if (string.IsNullOrEmpty(identifier))
+                        {
+                            // (Konrad) We are possibly updating a "new sheet" that has no identifier.
+                            // For this case we can use sheetId property that was passed along.
+                            var sheetId = data["sheetId"].ToObject<string>();
+                            if (string.IsNullOrEmpty(sheetId)) return;
+
+                            sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(sheetId, x.Id, StringComparison.Ordinal));
+                        }
+                        else
+                        {
+                            sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal));
+                        }
+                        
+                        var task = sheet?.tasks.FirstOrDefault(x => x.Id == _id);
                         if (task == null || !string.Equals(task.centralPath.ToLower(), centralPath.ToLower(), StringComparison.Ordinal)) return;
 
                         Messenger.Default.Send(new SheetsTaskUpdatedMessage { Sheet = sheet, Task = task });
@@ -170,6 +190,25 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     }
                 });
 
+                socket.On("sheetTask_sheetsAdded", body =>
+                {
+                    if (body != null)
+                    {
+                        var data = JObject.FromObject(body);
+                        var sheetsData = data["body"].ToObject<SheetData>();
+                        var sheetsIds = data["sheetIds"].ToObject<List<string>>();
+                        if (sheetsData == null || !sheetsIds.Any() || !string.Equals(sheetsData.centralPath.ToLower(), centralPath.ToLower(), StringComparison.Ordinal)) return;
+
+                        Messenger.Default.Send(new SheetTaskSheetsCreatedMessage { Sheets = sheetsData.sheets.Where(x => sheetsIds.Contains(x.Id)).ToList() });
+                    }
+                    else
+                    {
+                        Log.AppendLog(LogMessageType.ERROR, "sheetTask_sheetsAdded: Data was null!");
+                    }
+                });
+
+
+
                 //socket.On("sheetTask_approved", body =>
                 //{
                 //    if (body == null)
@@ -186,6 +225,8 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                 //        Messenger.Default.Send(new SheetsTaskApprovedMessage { Identifier = identifier, Sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal)) });
                 //    }
                 //});
+
+                #endregion
 
                 while (true)
                 {

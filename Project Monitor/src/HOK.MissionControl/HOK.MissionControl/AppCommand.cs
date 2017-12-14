@@ -179,11 +179,34 @@ namespace HOK.MissionControl
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public static void SetCommunicatorImage()
+        {
+            // (Konrad) This needs to run after the doc is opened, because UI elements don't get created until then.
+            EnqueueTask(app =>
+            {
+                var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
+                var dp = app.GetDockablePane(dpid);
+                var assembly = Assembly.GetExecutingAssembly();
+                if (dp != null)
+                {
+                    Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", dp.IsShown()
+                        ? "communicatorOn_32x32.png"
+                        : "communicatorOff_32x32.png");
+                    Instance.CommunicatorButton.ItemText = dp.IsShown()
+                        ? "Hide" + Environment.NewLine + "Communicator"
+                        : "Show" + Environment.NewLine + "Communicator";
+                }
+            });
+        }
+
+        /// <summary>
         /// Handles Communicator button image setting.
         /// </summary>
         private static void OnDocumentCreated(object sender, DocumentCreatedEventArgs e)
         {
-            new CommunicatorHealthReportModel().SetCommunicatorImage();
+            SetCommunicatorImage();
         }
 
         /// <summary>
@@ -194,7 +217,7 @@ namespace HOK.MissionControl
             try
             {
                 // (Konrad) We need to set the Communicator Button image first, or it will be blank.
-                new CommunicatorHealthReportModel().SetCommunicatorImage();
+                SetCommunicatorImage();
 
                 var doc = args.Document;
                 if (doc == null || args.IsCancelled()) return;

@@ -42,7 +42,7 @@
                 Command="{Binding LaunchWebsite, Mode=OneWay}">
             <Button.Template>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <TextBlock Text="188" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="13"/>
+                    <TextBlock Text="{Binding Count}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="13"/>
                 </ControlTemplate>
             </Button.Template>
         </Button>
