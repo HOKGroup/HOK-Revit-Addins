@@ -14,20 +14,14 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         {
             var item = (SheetItem)wrapper.Element;
             var task = (SheetTask)wrapper.Task;
-            if (task.identifier == "")
-            {
-                // (Konrad) It's a new sheet creation task.
-                AppCommand.CommunicatorHandler.SheetTask = task;
-                AppCommand.CommunicatorHandler.Request.Make(RequestId.CreateSheet);
-                AppCommand.CommunicatorEvent.Raise();
-            }
-            else
-            {
-                AppCommand.CommunicatorHandler.SheetItem = item;
-                AppCommand.CommunicatorHandler.SheetTask = task;
-                AppCommand.CommunicatorHandler.Request.Make(RequestId.UpdateSheet);
-                AppCommand.CommunicatorEvent.Raise();
-            }
+
+            AppCommand.CommunicatorHandler.SheetItem = item;
+            AppCommand.CommunicatorHandler.SheetTask = task;
+            AppCommand.CommunicatorHandler.Request.Make(task.isNewSheet
+                ? RequestId.CreateSheet
+                : RequestId.UpdateSheet);
+
+            AppCommand.CommunicatorEvent.Raise();
         }
 
         /// <summary>
@@ -41,23 +35,30 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             if (string.IsNullOrEmpty(sheetsDataId)) return;
 
             var t = (SheetTask)wrapper.Task;
-            var e = wrapper.Element as SheetItem;
-            
-            //TODO: when approving a new sheet this is not null
-            //body needs to be updated with a new identifier object or mongo side will fail.
-            if (e == null)
+            var e = (SheetItem)wrapper.Element;
+
+            t.completedBy = Environment.UserName.ToLower();
+            t.completedOn = DateTime.Now;
+
+            // body needs to be updated with a new identifier object or mongo side will fail.
+            if (e.isNewSheet)
             {
                 // (Konrad) It's a create sheet task (element associated with task is null). Let's approve that.
                 var newSheet = AppCommand.CommunicatorHandler.SheetItem;
                 if (newSheet == null) return;
 
-                ServerUtilities.Post<SheetData>(newSheet, "sheets/" + sheetsDataId + "/sheetchanges/approvenewsheet");
+                wrapper.Element = newSheet;
+
+                // (Konrad) We don't have to update all properties of a Sheet in sheetsData because only identifier is used for comparison
+                // Full properties update will happen when user synchs to central anyways.
+                var existingSheet = AppCommand.SheetsData.sheets.FindIndex(x => string.Equals(x.Id, e.Id, StringComparison.Ordinal));
+                if(existingSheet != -1) AppCommand.SheetsData.sheets[existingSheet].identifier = newSheet.identifier; 
+
+                ServerUtilities.Post<SheetData>(wrapper, "sheets/" + sheetsDataId + "/approvenewsheet");
             }
             else
             {
-                t.completedBy = Environment.UserName.ToLower();
-                t.completedOn = DateTime.Now;
-                
+                t.sheetId = e.Id;
                 ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/updatetasks");
             } 
         }

@@ -119,6 +119,10 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                 {
                     if (body != null)
                     {
+                        //TODO: What happens when trying to mark newly created sheet for deletion?
+                        //TODO: Identifier will be empty.
+                        //TODO: It might be a good idea in general to always pass Sheet _id and Task _id 
+                        //TODO: Whether we are dealing with new sheet or edits, those are always true.
                         var data = JObject.FromObject(body);
                         var sheetsData = data["body"].ToObject<SheetData>();
                         var identifier = data["identifier"].ToObject<string>();

@@ -45,10 +45,8 @@ namespace HOK.MissionControl.Tools.SheetTracker
                     ServerUtilities.Put(currentProject, "projects/" + currentProject.Id + "/addsheets/" + AppCommand.SheetsData.Id);
                     refreshProject = true;
                 }
-                else
-                {
-                    MissionControlSetup.SheetsIds.Add(centralPath, AppCommand.SheetsData.Id); // store sheets record
-                }
+
+                if(!MissionControlSetup.SheetsIds.ContainsKey(centralPath)) MissionControlSetup.SheetsIds.Add(centralPath, AppCommand.SheetsData.Id); // store sheets record
             }
             else
             {
@@ -64,16 +62,26 @@ namespace HOK.MissionControl.Tools.SheetTracker
                             // sheet still exists in our model
                             // we can update it
                             var localSheet = sheets[ms.uniqueId];
-                            localSheet.tasks = ms.tasks; // first pull tasks from mongo
+                            localSheet.tasks = ms.tasks; // preserve mongo tasks
+                            localSheet.Id = ms.Id; // preserve mongoIds
+                            localSheet.collectionId = ms.collectionId; // preserve mongoIds
 
                             finalList.Add(localSheet);
                             sheets.Remove(ms.uniqueId);
                         }
                         else
                         {
-                            // sheet was deleted locally but still exists in mongo
-                            ms.isDeleted = true;
-                            finalList.Add(ms);
+                            var task = ms.tasks.LastOrDefault();
+                            if (task != null && task.isNewSheet)
+                            {
+                                finalList.Add(ms); // this already has the ids
+                            }
+                            else
+                            {
+                                // sheet was deleted locally but still exists in mongo
+                                ms.isDeleted = true;
+                                finalList.Add(ms);
+                            }
                         }
                     }
                     finalList.AddRange(sheets.Values); // add whatever was not stored in mongo before
@@ -86,7 +94,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
                         Id = mongoSheets.Id
                     };
 
-                    ServerUtilities.Put(data, "sheets/" + mongoSheets.Id);
+                    ServerUtilities.Post<SheetData>(data, "sheets/" + mongoSheets.Id);
                     AppCommand.SheetsData = data;
                 }
             }

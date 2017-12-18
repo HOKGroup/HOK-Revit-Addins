@@ -305,10 +305,18 @@ namespace HOK.MissionControl.Core.Utils
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
+                client.ClearHandlers();
+                client.AddHandler("application/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
+                client.AddHandler("*+json", new NewtonsoftJsonSerializer());
+
                 var request = new RestRequest(ApiVersion + "/"+ route, Method.POST);
                 request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
                 request.AddHeader("Content-type", "application/json");
                 request.RequestFormat = DataFormat.Json;
+                request.JsonSerializer = new NewtonsoftJsonSerializer();
                 request.AddBody(body);
 
                 var response = client.Execute<T>(request);

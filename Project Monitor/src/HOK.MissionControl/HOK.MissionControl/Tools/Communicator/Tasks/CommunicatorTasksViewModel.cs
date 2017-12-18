@@ -127,7 +127,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control.</param>
         private void OnSheetTaskSheetsCreated(SheetTaskSheetsCreatedMessage msg)
         {
-            var assignedTo = msg.Sheets.FirstOrDefault()?.tasks.FirstOrDefault()?.assignedTo;
+            var assignedTo = msg.Sheets.FirstOrDefault()?.tasks.FirstOrDefault()?.assignedTo; // all tasks will be assigned to one user only
             if (!string.IsNullOrEmpty(assignedTo) && !string.Equals(assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)) return;
 
             AppCommand.SheetsData.sheets.AddRange(msg.Sheets); // update stored sheets

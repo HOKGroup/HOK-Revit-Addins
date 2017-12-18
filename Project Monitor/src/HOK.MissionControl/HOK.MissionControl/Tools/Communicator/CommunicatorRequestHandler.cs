@@ -129,7 +129,14 @@ namespace HOK.MissionControl.Tools.Communicator
                     sheet.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.name);
 
                     // (Konrad) We can set this here and pick up in the UI before sending off to MongoDB.
-                    SheetItem = new SheetItem(sheet, AppCommand.SheetsData.centralPath);
+                    var newSheetItem = new SheetItem(sheet, SheetTask.centralPath)
+                    {
+                        tasks = SheetItem.tasks,
+                        collectionId = SheetItem.collectionId,
+                        Id = SheetItem.Id,
+                        isNewSheet = true // this was overriden to false by default constructor
+                    };
+                    SheetItem = newSheetItem;
 
                     trans.Commit();
                     IsUpdatingSheet = false;

@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 namespace HOK.MissionControl.Core.Schemas.Sheets
 {
     /// <summary>
-    /// Sheets Tasks schema
+    /// Sheet Task schema.
     /// </summary>
     [DataContract]
     public class SheetTask : INotifyPropertyChanged
@@ -18,6 +18,12 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         [JsonProperty("_id")]
         [DataMember(Name = "_id")]
         public string Id { get; set; }
+
+        [DataMember]
+        public bool isNewSheet { get; set; }
+
+        [DataMember]
+        public string sheetId { get; set; }
 
         [DataMember]
         public string identifier { get; set; }

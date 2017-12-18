@@ -147,6 +147,7 @@
     <Compile Include="Utils\AddinUtilities.cs" />
     <Compile Include="Utils\MissionControlSetup.cs" />
     <Compile Include="Utils\MonitorUtilities.cs" />
+    <Compile Include="Utils\RestSharpJsonNetSerializer.cs" />
     <Compile Include="Utils\ServerUtilities.cs" />
   </ItemGroup>
   <ItemGroup>

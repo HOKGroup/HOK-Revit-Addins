@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace HOK.MissionControl.Core.Schemas.Sheets
 {
     /// <summary>
-    /// Class used when user submits proposed changes to Sheets.
+    /// Sheet schema.
     /// </summary>
     [DataContract]
     public class SheetItem : INotifyPropertyChanged
@@ -29,6 +29,9 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         [DataMember]
         public string fileName { get; set; }
+
+        [DataMember]
+        public bool isNewSheet { get; set; }
 
         private string _name;
         [DataMember]
@@ -112,6 +115,9 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
             isPlaceholder = sheet.IsPlaceholder;
             centralPath = path;
             fileName = Path.GetFileNameWithoutExtension(path);
+            isNewSheet = false;
+            isDeleted = false;
+            isSelected = false;
         }
 
         // (Konrad) Comparison methods used when updating UI. IndexOf() uses it.
