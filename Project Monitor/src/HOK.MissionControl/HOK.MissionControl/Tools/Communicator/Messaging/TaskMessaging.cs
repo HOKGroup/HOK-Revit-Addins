@@ -51,8 +51,8 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     /// </summary>
     public class SheetsTaskDeletedMessage
     {
-        public string Identifier { get; set; }
-        public List<string> Deleted { get; set; }
+        public string SheetId { get; set; }
+        public List<string> DeletedIds { get; set; }
     }
 
     /// <summary>
@@ -61,6 +61,15 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     public class SheetTaskSheetsCreatedMessage
     {
         public List<SheetItem> Sheets { get; set; }
+    }
+    
+    /// <summary>
+    /// Message sent by the socket when new Sheet is deleted in Mission Control.
+    /// </summary>
+    public class SheetTaskSheetDeletedMessage
+    {
+        public string SheetId { get; set; }
+        public List<string> DeletedIds { get; set; }
     }
 
     /// <summary>
@@ -82,28 +91,4 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     {
         public bool IsClosed { get; set; }
     }
-
-    //public class SheetsTaskSheetAddedMessage
-    //{
-    //    public List<SheetItem> NewSheets { get; set; }
-    //}
-
-    //public class SheetsTaskApprovedMessage
-    //{
-    //    public string Identifier { get; set; }
-    //    public SheetItem Sheet { get; set; }
-    //}
-
-    ///// <summary>
-    ///// Message sent by the socket when sheet task is approved.
-    ///// </summary>
-    //public class SheetsTaskApprovedNewSheetMessage
-    //{
-    //    public string Identifier { get; set; }
-    //    public SheetItem Sheet { get; set; }
-    //}
-
-    //public class TaskAssistantClosingMessage
-    //{
-    //}
 }

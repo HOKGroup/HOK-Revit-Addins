@@ -119,19 +119,17 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                 {
                     if (body != null)
                     {
-                        //TODO: What happens when trying to mark newly created sheet for deletion?
-                        //TODO: Identifier will be empty.
-                        //TODO: It might be a good idea in general to always pass Sheet _id and Task _id 
-                        //TODO: Whether we are dealing with new sheet or edits, those are always true.
                         var data = JObject.FromObject(body);
                         var sheetsData = data["body"].ToObject<SheetData>();
-                        var identifier = data["identifier"].ToObject<string>();
-                        if (sheetsData == null || string.IsNullOrEmpty(identifier)) return;
+                        var sheetId = data["sheetId"].ToObject<string>();
+                        var taskId = data["taskId"].ToObject<string>();
+                        if (sheetsData == null || string.IsNullOrEmpty(sheetId) || string.IsNullOrEmpty(taskId)) return;
 
-                        var sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal));
-                        var task = sheet?.tasks.LastOrDefault();
-                        if (task == null || task.assignedTo != Environment.UserName.ToLower() 
-                        || !string.Equals(task.centralPath.ToLower(), centralPath.ToLower(), StringComparison.Ordinal)) return;
+                        var sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.Id, sheetId, StringComparison.Ordinal));
+                        var task = sheet?.tasks.FirstOrDefault(x => string.Equals(x.Id, taskId, StringComparison.Ordinal));
+                        if (task == null 
+                            || task.assignedTo != Environment.UserName.ToLower() 
+                            || !string.Equals(task.centralPath.ToLower(), centralPath.ToLower(), StringComparison.Ordinal)) return;
 
                         Messenger.Default.Send(new SheetsTaskAddedMessage { Sheet = sheet, Task = task });
                     }
@@ -147,26 +145,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     {
                         var data = JObject.FromObject(body);
                         var sheetsData = data["body"].ToObject<SheetData>();
-                        var identifier = data["identifier"].ToObject<string>();
-                        var _id = data["_id"].ToObject<string>();
-                        if (sheetsData == null || string.IsNullOrEmpty(_id)) return;
+                        var sheetId = data["sheetId"].ToObject<string>();
+                        var taskId = data["taskId"].ToObject<string>();
+                        if (sheetsData == null || string.IsNullOrEmpty(sheetId) || string.IsNullOrEmpty(taskId)) return;
 
-                        SheetItem sheet;
-                        if (string.IsNullOrEmpty(identifier))
-                        {
-                            // (Konrad) We are possibly updating a "new sheet" that has no identifier.
-                            // For this case we can use sheetId property that was passed along.
-                            var sheetId = data["sheetId"].ToObject<string>();
-                            if (string.IsNullOrEmpty(sheetId)) return;
-
-                            sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(sheetId, x.Id, StringComparison.Ordinal));
-                        }
-                        else
-                        {
-                            sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal));
-                        }
-                        
-                        var task = sheet?.tasks.FirstOrDefault(x => x.Id == _id);
+                        var sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(sheetId, x.Id, StringComparison.Ordinal));
+                        var task = sheet?.tasks.FirstOrDefault(x => string.Equals(x.Id, taskId, StringComparison.Ordinal));
                         if (task == null || !string.Equals(task.centralPath.ToLower(), centralPath.ToLower(), StringComparison.Ordinal)) return;
 
                         Messenger.Default.Send(new SheetsTaskUpdatedMessage { Sheet = sheet, Task = task });
@@ -182,11 +166,13 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var identifier = data["identifier"].ToObject<string>();
-                        var deleted = data["deleted"].ToObject<List<string>>();
-                        if (string.IsNullOrEmpty(identifier) || !deleted.Any()) return;
+                        var sheetId = data["sheetId"].ToObject<string>();
+                        var deletedIds = data["deletedIds"].ToObject<List<string>>();
+                        var path = data["centralPath"].ToObject<string>();
+                        if (string.IsNullOrEmpty(sheetId) || !deletedIds.Any() || string.IsNullOrEmpty(path)) return;
+                        if (!string.Equals(path.ToLower(), centralPath.ToLower(), StringComparison.Ordinal)) return;
 
-                        Messenger.Default.Send(new SheetsTaskDeletedMessage { Identifier = identifier, Deleted = deleted });
+                        Messenger.Default.Send(new SheetsTaskDeletedMessage { SheetId = sheetId, DeletedIds = deletedIds });
                     }
                     else
                     {
@@ -201,7 +187,8 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         var data = JObject.FromObject(body);
                         var sheetsData = data["body"].ToObject<SheetData>();
                         var sheetsIds = data["sheetIds"].ToObject<List<string>>();
-                        if (sheetsData == null || !sheetsIds.Any() || !string.Equals(sheetsData.centralPath.ToLower(), centralPath.ToLower(), StringComparison.Ordinal)) return;
+                        if (sheetsData == null || !sheetsIds.Any()) return;
+                        if (!string.Equals(sheetsData.centralPath.ToLower(), centralPath.ToLower(), StringComparison.Ordinal)) return;
 
                         Messenger.Default.Send(new SheetTaskSheetsCreatedMessage { Sheets = sheetsData.sheets.Where(x => sheetsIds.Contains(x.Id)).ToList() });
                     }
@@ -211,24 +198,24 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     }
                 });
 
+                socket.On("sheetTask_sheetDeleted", body =>
+                {
+                    if (body != null)
+                    {
+                        var data = JObject.FromObject(body);
+                        var sheetId = data["sheetId"].ToObject<string>();
+                        var deletedIds = data["deletedIds"].ToObject<List<string>>();
+                        var path = data["centralPath"].ToObject<string>();
+                        if (string.IsNullOrEmpty(sheetId) || string.IsNullOrEmpty(path) || !deletedIds.Any()) return;
+                        if (!string.Equals(path.ToLower(), centralPath.ToLower(), StringComparison.Ordinal)) return;
 
-
-                //socket.On("sheetTask_approved", body =>
-                //{
-                //    if (body == null)
-                //    {
-                //        Log.AppendLog(LogMessageType.ERROR, "sheetTask_approved: Data was null!");
-                //    }
-                //    else
-                //    {
-                //        var data = JObject.FromObject(body);
-                //        var sheetsData = data["body"].ToObject<SheetData>();
-                //        var identifier = data["identifier"].ToObject<string>();
-                //        if (sheetsData == null || string.IsNullOrEmpty(identifier)) return;
-
-                //        Messenger.Default.Send(new SheetsTaskApprovedMessage { Identifier = identifier, Sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.identifier, identifier, StringComparison.Ordinal)) });
-                //    }
-                //});
+                        Messenger.Default.Send(new SheetTaskSheetDeletedMessage { SheetId = sheetId, DeletedIds = deletedIds });
+                    }
+                    else
+                    {
+                        Log.AppendLog(LogMessageType.ERROR, "sheetTask_sheetDeleted: Data was null!");
+                    }
+                });
 
                 #endregion
 

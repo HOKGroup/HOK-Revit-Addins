@@ -45,8 +45,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             Messenger.Default.Register<SheetsTaskUpdatedMessage>(this, OnSheetTaskUpdated);
             Messenger.Default.Register<SheetsTaskDeletedMessage>(this, OnSheetsTaskDeleted);
             Messenger.Default.Register<SheetTaskSheetsCreatedMessage>(this, OnSheetTaskSheetsCreated);
-            //Messenger.Default.Register<SheetsTaskApprovedMessage>(this, OnSheetTaskApproved);
-            //Messenger.Default.Register<SheetsTaskSheetAddedMessage>(this, OnSheetsTaskSheetAdded);
+            Messenger.Default.Register<SheetTaskSheetDeletedMessage>(this, OnSheetTaskSheetDeleted);
         }
 
         private void OnWindowLoaded(UserControl win)
@@ -98,28 +97,27 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             Model.TaskView = null;
         }
 
-        ///// <summary>
-        ///// Handles sheet change being approved by user and updated in DB.
-        ///// </summary>
-        ///// <param name="msg">Message from Mission Control.</param>
-        //private void OnSheetTaskApproved(SheetsTaskApprovedMessage msg)
-        //{
-        //    // (Konrad) Update AppCommand sheets
-        //    var currentSheet = AppCommand.SheetsData.sheets.FirstOrDefault(x => x.identifier == msg.Identifier);
-        //    if (currentSheet != null)
-        //    {
-        //        // (Konrad) Update stored data.
-        //        currentSheet.name = msg.Sheet.name;
-        //        currentSheet.number = msg.Sheet.number;
-        //    }
-        //    else
-        //    {
-        //        // (Konrad) New Sheet would not be present in the storage yet. We can add it.
-        //        AppCommand.SheetsData.sheets.Add(msg.Sheet);
-        //    }
+        /// <summary>
+        /// Handles deleting of a new sheet. 
+        /// </summary>
+        /// <param name="msg"></param>
+        private void OnSheetTaskSheetDeleted(SheetTaskSheetDeletedMessage msg)
+        {
+            var existingIndex = AppCommand.SheetsData.sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
+            if (existingIndex == -1) return;
 
-        //    DeleteTask(msg.Identifier, msg.Sheet);
-        //}
+            // (Konrad) Update SheetsData stored in AppCommand
+            AppCommand.SheetsData.sheets.RemoveAt(existingIndex);
+
+            foreach (var id in msg.DeletedIds)
+            {
+                // (Konrad) Update Tasks collection in UI
+                var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && string.Equals(((SheetTask)x.Task).Id, id, StringComparison.Ordinal));
+                if (storedTask == null) continue;
+
+                LockRemoveClose(storedTask);
+            }
+        }
 
         /// <summary>
         /// Handles creating a new sheet. New sheet has to have a matching centralPath and assignedTo to pass.
@@ -146,37 +144,22 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control</param>
         private void OnSheetsTaskDeleted(SheetsTaskDeletedMessage msg)
         {
-            var existingIndex = AppCommand.SheetsData.sheets.FindIndex(x => x.identifier == msg.Identifier);
+            var existingIndex = AppCommand.SheetsData.sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
             if (existingIndex == -1) return;
 
-            foreach (var id in msg.Deleted)
+            foreach (var id in msg.DeletedIds)
             {
                 // (Konrad) Update SheetsData stored in AppCommand
-                var taskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => x.Id == id);
+                var taskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => string.Equals(x.Id, id, StringComparison.Ordinal));
                 if(taskIndex == -1) continue;
 
                 AppCommand.SheetsData.sheets[existingIndex].tasks.RemoveAt(taskIndex);
 
                 // (Konrad) Update Tasks collection in UI
-                var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && ((SheetTask)x.Task).Id == id);
+                var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && string.Equals(((SheetTask)x.Task).Id, id, StringComparison.Ordinal));
                 if (storedTask == null) continue;
 
-                lock (_lock)
-                {
-                    Tasks.Remove(storedTask);
-
-                    // (Konrad) Similarly to above. We are on a different thread. If we are deleting a task
-                    // that has the window currently open, we want to close the window. To do that we need
-                    // to get back on UI thread. Every Control has a dispatcher that can do that for us.
-                    if (SelectedTask == storedTask)
-                    {
-                        Control.Dispatcher.Invoke(() =>
-                        {
-                            Model.LaunchTaskAssistant(null);
-
-                        }, DispatcherPriority.Normal);
-                    }
-                }
+                LockRemoveClose(storedTask);
             }
         }
 
@@ -227,47 +210,19 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
 
                 if (!string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase))
                 {
-                    lock (_lock)
-                    {
-                        Tasks.Remove(storedTask); // it was assigned away from us
-
-                        // (Konrad) Similarly to above. We are on a different thread. If we are deleting a task
-                        // that has the window currently open, we want to close the window. To do that we need
-                        // to get back on UI thread. Every Control has a dispatcher that can do that for us.
-                        if (SelectedTask == storedTask)
-                        {
-                            Control.Dispatcher.Invoke(() =>
-                            {
-                                Model.LaunchTaskAssistant(null);
-
-                            }, DispatcherPriority.Normal);
-                        }
-                    }
+                    LockRemoveClose(storedTask);
                 }
                 else
                 {
-                    lock (_lock)
+                    var task = storedTask.Task as SheetTask;
+                    if (task == null) return;
+
+                    task.CopyProperties(msg.Task); // it's still ours, update it
+
+                    // (Konrad) We only get here when user hits "Approve"
+                    if (!string.IsNullOrEmpty(task.completedBy))
                     {
-                        var task = storedTask.Task as SheetTask;
-                        if (task == null) return;
-
-                        task.CopyProperties(msg.Task); // it's still ours, update it
-
-                        // (Konrad) We only get here when user hits "Approve"
-                        if (!string.IsNullOrEmpty(task.completedBy))
-                        {
-                            Tasks.Remove(storedTask);
-
-                            // close task assistant
-                            if (SelectedTask == storedTask)
-                            {
-                                Control.Dispatcher.Invoke(() =>
-                                {
-                                    Model.LaunchTaskAssistant(null);
-
-                                }, DispatcherPriority.Normal);
-                            }
-                        }
+                        LockRemoveClose(storedTask);
                     }
                 }
             }
@@ -422,24 +377,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                     var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTaskWrapper) && ((FamilyTask)x.Task).Id == id);
                     if (storedTask != null)
                     {
-                        // (Konrad) This message was spawned on another thread that Socket App runs
-                        // In order to manipulate a collection on UI thread we need to lock it first.
-                        lock (_lock)
-                        {
-                            Tasks.Remove(storedTask);
-                        }
-
-                        // (Konrad) Similarly to above. We are on a different thread. If we are deleting a task
-                        // that has the window currently open, we want to close the window. To do that we need
-                        // to get back on UI thread. Every Control has a dispatcher that can do that for us.
-                        if (SelectedTask == storedTask)
-                        {
-                            Control.Dispatcher.Invoke(() =>
-                            {
-                                Model.LaunchTaskAssistant(null);
-
-                            }, DispatcherPriority.Normal);
-                        }
+                        LockRemoveClose(storedTask);
                     }
                 }
             }
@@ -449,94 +387,29 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
 
         #region Utilities
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="identifier"></param>
-        ///// <param name="sheet"></param>
-        //private void DeleteTask(string identifier, SheetItem sheet = null)
-        //{
-        //    // (Konrad) Update AppCommand sheetsChanges
-        //    var approvedItem = AppCommand.SheetsData.sheetsChanges.FirstOrDefault(x => x.identifier == identifier);
-        //    if (approvedItem != null)
-        //    {
-        //        var index = AppCommand.SheetsData.sheetsChanges.IndexOf(approvedItem);
-        //        if (index != -1) AppCommand.SheetsData.sheetsChanges.RemoveAt(index);
-        //    }
-        //    else
-        //    {
-        //        // (Konrad) In this case the task approved was a new sheet task. It doesn't have identifier. 
-        //        // We are also using for loop here because SheetItem class compares two items using the identifier. 
-        //        // It would return true for all new sheets since they have no identifier.
-        //        var foundIndex = -1;
-        //        for (var i = 0; i < AppCommand.SheetsData.sheetsChanges.Count; i++)
-        //        {
-        //            var item = AppCommand.SheetsData.sheetsChanges[i];
-        //            if (item.identifier == "" && item.name == sheet?.name && item.number == sheet?.number)
-        //            {
-        //                foundIndex = i;
-        //                break;
-        //            }
-        //        }
-        //        if (foundIndex != -1)
-        //        {
-        //            AppCommand.SheetsData.sheetsChanges.RemoveAt(foundIndex);
-        //        }
-        //    }
+        /// <summary>
+        /// Locks the Tasks collection, Removes specified task and attempts to close the task window if open.
+        /// </summary>
+        /// <param name="task">Task object to be removed.</param>
+        private void LockRemoveClose(TaskWrapper task)
+        {
+            lock (_lock)
+            {
+                Tasks.Remove(task);
 
-        //    // (Konrad) Update Tasks UI
-        //    var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && ((SheetItem)x.Task).identifier == identifier);
-        //    if (storedTask != null)
-        //    {
-        //        var taskIndex = Tasks.IndexOf(storedTask);
-        //        lock (_lock)
-        //        {
-        //            Tasks.RemoveAt(taskIndex);
-        //        }
+                // (Konrad) Similarly to above. We are on a different thread. If we are deleting a task
+                // that has the window currently open, we want to close the window. To do that we need
+                // to get back on UI thread. Every Control has a dispatcher that can do that for us.
+                if (SelectedTask == task)
+                {
+                    Control.Dispatcher.Invoke(() =>
+                    {
+                        Model.LaunchTaskAssistant(null);
 
-        //        // (Konrad) If task is open let's close it 
-        //        if (SelectedTask == storedTask)
-        //        {
-        //            Control.Dispatcher.Invoke(() =>
-        //            {
-        //                Model.LaunchTaskAssistant(null);
-
-        //            }, DispatcherPriority.Normal);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // (Konrad) Same as above. If new sheet task was approved it will not have identifier on it.
-        //        var storedIndex = -1;
-        //        for (var i = 0; i < Tasks.Count; i++)
-        //        {
-        //            var task = (SheetItem)Tasks[i].Task;
-        //            if (task.identifier == "" && task.name == sheet?.name && task.number == sheet?.number)
-        //            {
-        //                storedIndex = i;
-        //                break;
-        //            }
-        //        }
-        //        if (storedIndex != -1)
-        //        {
-        //            lock (_lock)
-        //            {
-        //                Tasks.RemoveAt(storedIndex);
-        //            }
-        //        }
-
-        //        // (Konrad) If task is open let's close it 
-        //        var selected = SelectedTask?.Task as SheetItem;
-        //        if (selected?.identifier == "" && selected.name == sheet?.name && selected.number == sheet?.number)
-        //        {
-        //            Control.Dispatcher.Invoke(() =>
-        //            {
-        //                Model.LaunchTaskAssistant(null);
-
-        //            }, DispatcherPriority.Normal);
-        //        }
-        //    }
-        //}
+                    }, DispatcherPriority.Normal);
+                }
+            }
+        }
 
         #endregion
     }
