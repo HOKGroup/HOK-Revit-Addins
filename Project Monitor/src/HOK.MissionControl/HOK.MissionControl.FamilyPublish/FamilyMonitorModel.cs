@@ -165,18 +165,7 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                 }
 
-                var famData = ServerUtilities.GetDataByCentralPath<FamilyData>(CentralPath, "families");
-                FamilyData famStat = null;
-                if (famData.Any())
-                {
-                    foreach (var fam in famData)
-                    {
-                        if (!string.Equals(fam.centralPath.ToLower(), CentralPath.ToLower())) continue;
-                        famStat = fam;
-                        break;
-                    }
-                }
-
+                var famStat = ServerUtilities.GetByCentralPath<FamilyData>(CentralPath, "families/centralpath");
                 var famDict = new Dictionary<string, FamilyItem>();
                 if (famStat != null)
                 {

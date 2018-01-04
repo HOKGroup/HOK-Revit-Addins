@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas.Families
 {
@@ -15,6 +16,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [DataMember(Name = "_id")]
+        [JsonProperty("_id")]
         public string Id { get; set; }
 
         private string _name;

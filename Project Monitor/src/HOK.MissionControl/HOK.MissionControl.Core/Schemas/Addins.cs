@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -12,6 +13,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string name { get; set; }
         public string value { get; set; }
@@ -21,6 +23,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string pluginName { get; set; }
         public string user { get; set; }
@@ -82,6 +85,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public List<AddinLog> usageLogs { get; set; } = new List<AddinLog>();
     }

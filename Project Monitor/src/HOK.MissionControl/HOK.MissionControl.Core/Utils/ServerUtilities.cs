@@ -27,34 +27,29 @@ namespace HOK.MissionControl.Core.Utils
 
         #region GET
 
-        /// <summary>
-        /// Returns Project from a Configuration Id.
-        /// </summary>
-        /// <param name="configId">Configuration Id.</param>
-        /// <returns>Project class.</returns>
-        public static Project GetProjectByConfigurationId(string configId)
+        public static T Get<T>(string path)
         {
-            Project projectFound = null;
+            var result = default(T);
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/projects/configid/{configid}", Method.GET);
-                request.AddUrlSegment("configid", configId);
+                var request = new RestRequest(ApiVersion + "/" + path, Method.GET);
+                var response = client.Execute(request);
+                if (response.StatusCode == HttpStatusCode.InternalServerError) return result;
 
-                var response = client.Execute<List<Project>>(request);
-                if (response.Data != null)
+                if (!string.IsNullOrEmpty(response.Content))
                 {
-                    var items = response.Data;
-                    projectFound = items.First();
+                    var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
+                    if (data != null) result = data;
 
-                    Log.AppendLog(LogMessageType.INFO, "Project Found: " + projectFound.Id);
+                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
                 }
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return projectFound;
+            return result;
         }
 
         /// <summary>
@@ -82,38 +77,6 @@ namespace HOK.MissionControl.Core.Utils
                     if (data != null) result = data;
 
                     Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="centralPath"></param>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        // TODO: This needs to be redone!
-        public static List<T> GetDataByCentralPath<T>(string centralPath, string path)
-        {
-            var result = new List<T>();
-            try
-            {
-                var fileName = System.IO.Path.GetFileNameWithoutExtension(centralPath);
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/" + path + "/uri/{uri}", Method.GET);
-                request.AddUrlSegment("uri", fileName);
-
-                var response = client.Execute<List<T>>(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError) return result;
-                if (response.Data != null)
-                {
-                    var items = response.Data;
-                    return items;
                 }
             }
             catch (Exception ex)

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
+using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Core.Schemas.Sheets;
 
@@ -101,7 +102,8 @@ namespace HOK.MissionControl.Tools.SheetTracker
 
             if (refreshProject)
             {
-                var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
+                var projectFound = ServerUtilities.Get<Project>("projects/configid/" + currentConfig.Id);
+                //var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
                 if (null == projectFound) return;
                 MissionControlSetup.Projects[centralPath] = projectFound;
             }

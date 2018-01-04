@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -8,6 +9,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string number { get; set; } = "";
         public string name { get; set; } = "";
