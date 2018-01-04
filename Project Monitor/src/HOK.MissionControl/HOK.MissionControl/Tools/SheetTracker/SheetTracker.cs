@@ -101,7 +101,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
 
             if (refreshProject)
             {
-                var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig._id);
+                var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
                 if (null == projectFound) return;
                 MissionControlSetup.Projects[centralPath] = projectFound;
             }

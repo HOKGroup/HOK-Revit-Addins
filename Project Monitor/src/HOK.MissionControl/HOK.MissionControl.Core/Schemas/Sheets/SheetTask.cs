@@ -26,9 +26,6 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         public string sheetId { get; set; }
 
         [DataMember]
-        public string identifier { get; set; }
-
-        [DataMember]
         public string uniqueId { get; set; }
 
         [DataMember]
@@ -48,9 +45,6 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         [DataMember]
         public string completedBy { get; set; }
-
-        [DataMember]
-        public string centralPath { get; set; }
 
         [DataMember]
         public string collectionId { get; set; }
@@ -126,7 +120,6 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         public void CopyProperties(SheetTask other)
         {
             Id = other.Id;
-            identifier = other.identifier;
             uniqueId = other.uniqueId;
             revisionNumber = other.revisionNumber;
             assignedTo = other.assignedTo;

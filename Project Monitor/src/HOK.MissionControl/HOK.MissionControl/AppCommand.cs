@@ -19,7 +19,6 @@ using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
-using HOK.MissionControl.Tools.Communicator.HealthReport;
 using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
@@ -146,7 +145,6 @@ namespace HOK.MissionControl
                 if (!fileInfo.IsWorkshared) return;
 
                 var centralPath = fileInfo.CentralPath;
-
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 //search for config
@@ -159,7 +157,7 @@ namespace HOK.MissionControl
                     }
                     MissionControlSetup.Configurations.Add(centralPath, configFound);
 
-                    var projectFound = ServerUtilities.GetProjectByConfigurationId(configFound._id);
+                    var projectFound = ServerUtilities.GetProjectByConfigurationId(configFound.Id);
                     if (null != projectFound)
                     {
                         if (MissionControlSetup.Projects.ContainsKey(centralPath))
@@ -245,7 +243,7 @@ namespace HOK.MissionControl
                     var refreshProject = false;
                     if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
                     {
-                        HrData = ServerUtilities.GetHealthRecordByCentralPath(centralPath);
+                        HrData = ServerUtilities.GetByCentralPath<HealthReportData>(centralPath, "healthrecords/centralpath");
                         if (HrData == null)
                         {
                             HrData = ServerUtilities.Post<HealthReportData>(new HealthReportData { centralPath = centralPath }, "healthrecords");
@@ -270,7 +268,7 @@ namespace HOK.MissionControl
 
                     if (refreshProject)
                     {
-                        var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig._id.ToString());
+                        var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
                         if (null == projectFound) return;
                         MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
                     }
@@ -541,6 +539,8 @@ namespace HOK.MissionControl
                     else if (string.Equals(updater.updaterId.ToLower(),
                         SheetUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
+                        //TODO: I am using an updater here, but do I need to? We really don't care about sheet changes
+                        //TODO: until the moment that they are synched to central and we have that covered.
                         SheetUpdaterInstance.Register(doc, updater);
 
                         new Thread(() => new SheetTracker().SynchSheets(doc)) { Priority = ThreadPriority.BelowNormal }.Start();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -12,6 +13,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string user { get; set; } = "";
         public double opened { get; set; } = 0;
@@ -26,6 +28,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string name { get; set; }
         public double count { get; set; }
@@ -38,6 +41,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public List<Item> worksets { get; set; }
     }
@@ -49,6 +53,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public int totalViews { get; set; }
         public int totalSheets { get; set; }
@@ -67,6 +72,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string name { get; set; }
         public int elementId { get; set; }
@@ -82,6 +88,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public int totalImportedDwg { get; set; }
         public List<DwgFileInfo> importedDwgFiles { get; set; }
@@ -100,6 +107,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public long value { get; set; }
         public DateTime createdOn { get; set; } = DateTime.Now;
@@ -112,6 +120,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string user { get; set; }
         public DateTime? from { get; set; }
@@ -127,6 +136,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string centralPath { get; set; }
         public List<WorksetEvent> onOpened { get; set; } = new List<WorksetEvent>();

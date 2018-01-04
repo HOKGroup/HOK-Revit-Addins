@@ -48,12 +48,6 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
                 if (newSheet == null) return;
 
                 wrapper.Element = newSheet;
-
-                // (Konrad) We don't have to update all properties of a Sheet in sheetsData because only identifier is used for comparison
-                // Full properties update will happen when user synchs to central anyways.
-                var existingSheet = AppCommand.SheetsData.sheets.FindIndex(x => string.Equals(x.Id, e.Id, StringComparison.Ordinal));
-                if(existingSheet != -1) AppCommand.SheetsData.sheets[existingSheet].identifier = newSheet.identifier; 
-
                 ServerUtilities.Post<SheetData>(wrapper, "sheets/" + sheetsDataId + "/approvenewsheet");
             }
             else

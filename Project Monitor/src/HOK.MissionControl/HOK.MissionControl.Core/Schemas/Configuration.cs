@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -12,6 +13,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string monitorId { get; set; } = "";
         public string monitorName { get; set; } = "";
@@ -41,6 +43,7 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
         public string Id { get; set; }
         public string updaterId { get; set; } = "";
         public string updaterName { get; set; } = "";
@@ -56,7 +59,10 @@ namespace HOK.MissionControl.Core.Schemas
     /// </summary>
     public class Configuration
     {
-        public string _id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("_id")]
+        public string Id { get; set; }
         public string name { get; set; } = "";
         public List<RvtFile> files { get; set; } = new List<RvtFile>();
         public string sheetDatabase { get; set; } = "";

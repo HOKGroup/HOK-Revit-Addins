@@ -100,6 +100,7 @@ namespace HOK.MissionControl.Tools.Communicator
 
             app.Application.FailuresProcessing += FailureProcessing;
             var doc = app.ActiveUIDocument.Document;
+            var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
 
             using (var trans = new Transaction(doc, "CreateSheet"))
             {
@@ -129,7 +130,7 @@ namespace HOK.MissionControl.Tools.Communicator
                     sheet.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.name);
 
                     // (Konrad) We can set this here and pick up in the UI before sending off to MongoDB.
-                    var newSheetItem = new SheetItem(sheet, SheetTask.centralPath)
+                    var newSheetItem = new SheetItem(sheet, centralPath)
                     {
                         tasks = SheetItem.tasks,
                         collectionId = SheetItem.collectionId,

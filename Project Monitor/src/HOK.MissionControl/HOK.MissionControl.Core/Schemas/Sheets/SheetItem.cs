@@ -22,9 +22,6 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         public string Id { get; set; }
 
         [DataMember]
-        public string centralPath { get; set; }
-
-        [DataMember]
         public string collectionId { get; set; }
 
         [DataMember]
@@ -73,14 +70,6 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
             set { _isSelected = value; RaisePropertyChanged("isSelected"); }
         }
 
-        private string _identifier;
-        [DataMember]
-        public string identifier
-        {
-            get { return _identifier; }
-            set { _identifier = value; RaisePropertyChanged("identifier"); }
-        }
-
         private bool _isPlaceholder;
         [DataMember]
         public bool isPlaceholder
@@ -111,10 +100,8 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
             number = sheet.get_Parameter(BuiltInParameter.SHEET_NUMBER).AsString();
             uniqueId = sheet.UniqueId;
             revisionNumber = sheet.get_Parameter(BuiltInParameter.SHEET_CURRENT_REVISION).AsString();
-            identifier = path.ToLower() + "-" + sheet.UniqueId; //prevents possibility of sheet being copied between models
             isPlaceholder = sheet.IsPlaceholder;
-            centralPath = path;
-            fileName = Path.GetFileNameWithoutExtension(path);
+            fileName = !string.IsNullOrEmpty(path) ? Path.GetFileNameWithoutExtension(path) : string.Empty;
             isNewSheet = false;
             isDeleted = false;
             isSelected = false;
@@ -124,12 +111,12 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         public override bool Equals(object obj)
         {
             var item = obj as SheetItem;
-            return item != null && identifier.Equals(item.identifier);
+            return item != null && Id.Equals(item.Id);
         }
 
         public override int GetHashCode()
         {
-            return identifier.GetHashCode();
+            return Id.GetHashCode();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

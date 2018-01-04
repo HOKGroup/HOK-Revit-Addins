@@ -46,12 +46,12 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         public RevisionItem(Element rev)
         {
-            description = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_DESCRIPTION).AsString();
-            sequence = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_SEQUENCE_NUM).AsInteger();
-            number = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_NUM).AsString();
-            date = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_DATE).AsString();
-            issuedTo = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_ISSUED_TO).AsString();
-            issuedBy = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_ISSUED_BY).AsString();
+            description = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_DESCRIPTION)?.AsString();
+            sequence = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_SEQUENCE_NUM).AsInteger(); //TODO: Potentially an issue.
+            number = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_NUM)?.AsString();
+            date = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_DATE)?.AsString();
+            issuedTo = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_ISSUED_TO)?.AsString();
+            issuedBy = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_ISSUED_BY)?.AsString();
             uniqueId = rev.UniqueId;
         }
     }

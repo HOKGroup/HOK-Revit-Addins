@@ -58,42 +58,6 @@ namespace HOK.MissionControl.Core.Utils
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="centralPath"></param>
-        /// <returns></returns>
-        // TODO: This needs to be updated to use the method below.
-        public static HealthReportData GetHealthRecordByCentralPath(string centralPath)
-        {
-            HealthReportData result = null;
-            try
-            {
-                var fileName = System.IO.Path.GetFileNameWithoutExtension(centralPath);
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/healthrecords/uri/{uri}", Method.GET);
-                request.AddUrlSegment("uri", fileName);
-
-                var response = client.Execute<List<HealthReportData>>(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError) return null;
-                if (response.Data != null)
-                {
-                    var items = response.Data;
-                    foreach (var record in items)
-                    {
-                        if (!string.Equals(record.centralPath.ToLower(), centralPath.ToLower())) continue;
-                        result = record;
-                        break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Retrieves a document from collection by it's centralPath property.
         /// </summary>
         /// <param name="centralPath">Full file path with file extension.</param>
@@ -115,7 +79,8 @@ namespace HOK.MissionControl.Core.Utils
                 if (!string.IsNullOrEmpty(response.Content))
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
-                    if (data != null) Console.Write(data); result = data;
+                    if (data != null) result = data;
+
                     Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
                 }
             }
