@@ -58,49 +58,52 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
 
                 socket.On("task_deleted", body =>
                 {
-                    if (body == null)
+                    if (body != null)
                     {
-                        Log.AppendLog(LogMessageType.ERROR, "task_deleted: Data was null!");
+                        var data = JObject.FromObject(body);
+                        var deletedIds = data["deletedIds"].ToObject<List<string>>();
+                        var familyName = data["familyName"].ToObject<string>();
+                        var collId = data["collectionId"].ToObject<string>();
+                        if (!deletedIds.Any() || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(collId)) return;
+
+                        // (Konrad) We want to filter out tasks that don't belong to us or to this model.
+                        // We can use "collectionId" to identify the model since that is tied to centralPath.
+                        if (!IdsMatch(centralPath, collId, CollectionType.Families)) return;
+
+                        Messenger.Default.Send(new FamilyTaskDeletedMessage { FamilyName = familyName, DeletedIds = deletedIds });
                     }
                     else
                     {
-                        var data = JObject.FromObject(body);
-                        if (data == null) return;
-
-                        var ids = new List<string>();
-                        foreach (var i in data)
-                        {
-                            ids.Add((string)i.Value);
-                        }
-
-                        Messenger.Default.Send(new FamilyTaskDeletedMessage { DeletedIds = ids });
+                        Log.AppendLog(LogMessageType.ERROR, "task_deleted: Data was null!");
                     }
                 });
 
                 socket.On("familyTask_added", body =>
                 {
-                    if (body == null)
+                    if (body != null)
                     {
-                        Log.AppendLog(LogMessageType.ERROR, "familyTask_added: Data was null!");
+                        var data = JObject.FromObject(body);
+                        var familyName = data["familyName"].ToObject<string>();
+                        var task = data["task"].ToObject<FamilyTask>();
+                        var collId = data["collectionId"].ToObject<string>();
+                        if (string.IsNullOrEmpty(familyName) || task == null || string.IsNullOrEmpty(collId)) return;
+
+                        // (Konrad) We want to filter out tasks that don't belong to us or to this model.
+                        // We can use "collectionId" to identify the model since that is tied to centralPath.
+                        if (!string.Equals(task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase) ||
+                            !IdsMatch(centralPath, collId, CollectionType.Families)) return;
+
+                        Messenger.Default.Send(new FamilyTaskAddedMessage { FamilyName = familyName, Task = task });
                     }
                     else
                     {
-                        var data = JObject.FromObject(body);
-                        var familyStats = data["body"].ToObject<FamilyData>();
-                        var familyName = data["familyName"].ToObject<string>();
-                        if (familyStats == null || string.IsNullOrEmpty(familyName)) return;
-
-                        Messenger.Default.Send(new FamilyTaskAddedMessage { FamilyStat = familyStats, FamilyName = familyName });
+                        Log.AppendLog(LogMessageType.ERROR, "familyTask_added: Data was null!");
                     }
                 });
 
                 socket.On("familyTask_updated", body =>
                 {
-                    if (body == null)
-                    {
-                        Log.AppendLog(LogMessageType.ERROR, "familyTask_updated: Data was null!");
-                    }
-                    else
+                    if (body != null)
                     {
                         var data = JObject.FromObject(body);
                         var familyStats = data["body"].ToObject<FamilyData>();
@@ -109,6 +112,10 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         if (familyStats == null || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(oldTaskId)) return;
 
                         Messenger.Default.Send(new FamilyTaskUpdatedMessage { FamilyStat = familyStats, FamilyName = familyName, OldTaskId = oldTaskId });
+                    }
+                    else
+                    {
+                        Log.AppendLog(LogMessageType.ERROR, "familyTask_updated: Data was null!");
                     }
                 });
 
@@ -134,7 +141,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
                         if (task == null
                             || !string.Equals(task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)
-                            || !IdsMatch(centralPath, collId)) return;
+                            || !IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
                         Messenger.Default.Send(new SheetsTaskAddedMessage { Sheet = sheet, Task = task });
                     }
@@ -162,7 +169,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         // Here we will only filter out tasks that don't belong to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
                         // Tasks that are assigned to someone else will be dealt with in the handler.
-                        if (task == null || !IdsMatch(centralPath, collId)) return;
+                        if (task == null || !IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
                         Messenger.Default.Send(new SheetsTaskUpdatedMessage { Sheet = sheet, Task = task });
                     }
@@ -184,7 +191,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
-                        if (!IdsMatch(centralPath, collId)) return;
+                        if (!IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
                         Messenger.Default.Send(new SheetsTaskDeletedMessage { SheetId = sheetId, DeletedIds = deletedIds });
                     }
@@ -206,7 +213,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
-                        if (!IdsMatch(centralPath, collId)) return;
+                        if (!IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
                         Messenger.Default.Send(new SheetTaskSheetsCreatedMessage { Sheets = sheetsData.sheets.Where(x => sheetsIds.Contains(x.Id)).ToList() });
                     }
@@ -228,7 +235,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
-                        if (!IdsMatch(centralPath, collId)) return;
+                        if (!IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
                         Messenger.Default.Send(new SheetTaskSheetDeletedMessage { SheetId = sheetId, DeletedIds = deletedIds });
                     }
@@ -258,11 +265,30 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
         /// </summary>
         /// <param name="centralPath">Central Path to current model.</param>
         /// <param name="eventModelId">Collection Id of the model used by the event.</param>
+        /// <param name="type">Type of collection to check against.</param>
         /// <returns>True if models match otherwise False.</returns>
-        private static bool IdsMatch(string centralPath, string eventModelId)
+        private static bool IdsMatch(string centralPath, string eventModelId, CollectionType type)
         {
-            var currentModelId = MissionControlSetup.SheetsIds.ContainsKey(centralPath) ? MissionControlSetup.SheetsIds[centralPath] : string.Empty;
+            string currentModelId;
+            switch (type)
+            {
+                case CollectionType.Sheets:
+                    currentModelId = MissionControlSetup.SheetsIds.ContainsKey(centralPath) ? MissionControlSetup.SheetsIds[centralPath] : string.Empty;
+                    break;
+                case CollectionType.Families:
+                    currentModelId = MissionControlSetup.FamiliesIds.ContainsKey(centralPath) ? MissionControlSetup.FamiliesIds[centralPath] : string.Empty;
+                    break;
+                default:
+                    return false;
+            }
+            
             return !string.IsNullOrEmpty(currentModelId) && string.Equals(currentModelId.ToLower(), eventModelId.ToLower(), StringComparison.Ordinal);
         }
+    }
+
+    public enum CollectionType
+    {
+        Sheets,
+        Families
     }
 }

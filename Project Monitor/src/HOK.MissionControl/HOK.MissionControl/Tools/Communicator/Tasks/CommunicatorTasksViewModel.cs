@@ -325,18 +325,13 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control.</param>
         private void OnFamilyTaskAdded(FamilyTaskAddedMessage msg)
         {
-            FamilyTask task;
             FamilyItem family;
 
             // (Konrad) Updated globally stored families.
             if (AppCommand.FamiliesToWatch.ContainsKey(msg.FamilyName))
             {
                 var oldFamily = AppCommand.FamiliesToWatch[msg.FamilyName];
-                var newFamily = msg.FamilyStat.families.FirstOrDefault(x => x.name == msg.FamilyName);
-                if (newFamily == null) return;
-
-                task = newFamily.tasks[newFamily.tasks.Count - 1]; // latest task will be last on a list
-                oldFamily.tasks.Add(task);
+                oldFamily.tasks.Add(msg.Task);
 
                 AppCommand.FamiliesToWatch.Remove(msg.FamilyName);
                 AppCommand.FamiliesToWatch.Add(msg.FamilyName, oldFamily);
@@ -349,14 +344,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                 return;
             }
 
-            // (Konrad) Update Task UI
-            if (!string.Equals(task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) return;
-
             // (Konrad) This message was spawned on another thread that Socket App runs
             // In order to manipulate a collection on UI thread we need to lock it first.
             lock (_lock)
             {
-                Tasks.Add(new FamilyTaskWrapper(family, task));
+                Tasks.Add(new FamilyTaskWrapper(family, msg.Task));
             }
         }
 
@@ -366,6 +358,17 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from MissionControl.</param>
         private void OnFamilyTaskDeleted(FamilyTaskDeletedMessage msg)
         {
+            // (Konrad) Remove tasks from FamiliesToWatch
+            if (AppCommand.FamiliesToWatch.ContainsKey(msg.FamilyName))
+            {
+                var oldFamily = AppCommand.FamiliesToWatch[msg.FamilyName];
+                foreach (var id in msg.DeletedIds)
+                {
+                    var index = oldFamily.tasks.FindIndex(x => x.Id == id);
+                    if(index != -1) oldFamily.tasks.RemoveAt(index);
+                }
+            }
+
             var currentFamilyTasks = Tasks
                 .Where(x => x.GetType() == typeof(FamilyTaskWrapper))
                 .ToDictionary(x => ((FamilyTask)x.Task).Id, x => (FamilyTaskWrapper)x);

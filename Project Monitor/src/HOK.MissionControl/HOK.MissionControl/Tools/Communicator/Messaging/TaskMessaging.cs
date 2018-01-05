@@ -15,13 +15,14 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
 
     public class FamilyTaskDeletedMessage
     {
+        public string FamilyName { get; set; }
         public List<string> DeletedIds { get; set; }
     }
 
     public class FamilyTaskAddedMessage
     {
         public string FamilyName { get; set; }
-        public FamilyData FamilyStat { get; set; }
+        public FamilyTask Task { get; set; }
     }
 
     #endregion

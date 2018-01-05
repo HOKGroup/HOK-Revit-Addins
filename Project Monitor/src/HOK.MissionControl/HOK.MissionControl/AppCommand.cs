@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region References
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +27,8 @@ using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Tools.LinkUnloadMonitor;
 using HOK.MissionControl.Tools.SheetTracker;
 
+#endregion
+
 namespace HOK.MissionControl
 {
     [Name(nameof(Properties.Resources.MissionControl_Name), typeof(Properties.Resources))]
@@ -50,7 +54,6 @@ namespace HOK.MissionControl
         public LinkUnloadMonitor LinkUnloadInstance { get; set; }
         private const string tabName = "  HOK - Beta";
         public static bool IsSynching { get; set; }
-
         public static CommunicatorRequestHandler CommunicatorHandler { get; set; }
         public static ExternalEvent CommunicatorEvent { get; set; }
         public static Dictionary<string, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<string, FamilyItem>();
@@ -177,29 +180,6 @@ namespace HOK.MissionControl
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public static void SetCommunicatorImage()
-        {
-            // (Konrad) This needs to run after the doc is opened, because UI elements don't get created until then.
-            EnqueueTask(app =>
-            {
-                var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
-                var dp = app.GetDockablePane(dpid);
-                var assembly = Assembly.GetExecutingAssembly();
-                if (dp != null)
-                {
-                    Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", dp.IsShown()
-                        ? "communicatorOn_32x32.png"
-                        : "communicatorOff_32x32.png");
-                    Instance.CommunicatorButton.ItemText = dp.IsShown()
-                        ? "Hide" + Environment.NewLine + "Communicator"
-                        : "Show" + Environment.NewLine + "Communicator";
-                }
-            });
-        }
-
-        /// <summary>
         /// Handles Communicator button image setting.
         /// </summary>
         private static void OnDocumentCreated(object sender, DocumentCreatedEventArgs e)
@@ -253,6 +233,7 @@ namespace HOK.MissionControl
                         else
                         {
                             MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
+                            MissionControlSetup.FamiliesIds.Add(centralPath, HrData.familyStats); // store families record
                         }
                     }
 
@@ -287,34 +268,6 @@ namespace HOK.MissionControl
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-        }
-
-        /// <summary>
-        /// Due to all asynch stuff some data might not be available right away so we use this callback to instantiate the Communicator.
-        /// It also get's called after synch to central is done to refresh the UI.
-        /// </summary>
-        public static void LunchCommunicator()
-        {
-            CommunicatorWindow.MainControl.Dispatcher.Invoke(() =>
-            {
-                // (Konrad) We have to make sure that we unregister from all Messaging before reloading UI.
-                if (CommunicatorWindow.DataContext != null)
-                {
-                    var tabItems = CommunicatorWindow.MainControl.Items.SourceCollection;
-                    foreach (var ti in tabItems)
-                    {
-                        var content = ((UserControl)((TabItem)ti).Content).DataContext as ViewModelBase;
-                        content?.Cleanup();
-                    }
-                }
-
-                // (Konrad) Now we can reset the ViewModel
-                CommunicatorWindow.DataContext = new CommunicatorViewModel();
-                if (CommunicatorWindow.MainControl.Items.Count > 0)
-                {
-                    CommunicatorWindow.MainControl.SelectedIndex = 0;
-                }
-            }, DispatcherPriority.Normal);
         }
 
         /// <summary>
@@ -368,7 +321,7 @@ namespace HOK.MissionControl
         /// <summary>
         /// Document Synchronized handler.
         /// </summary>
-        private void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
+        private static void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
         {
             try
             {
@@ -472,40 +425,7 @@ namespace HOK.MissionControl
             if(o != null && ssWindow.IsActive) ssWindow.Close();
         }
 
-        /// <summary>
-        /// Registers Communicator Dockable Panel.
-        /// </summary>
-        /// <param name="application">UIControlledApp</param>
-        private void RegisterCommunicator(UIControlledApplication application)
-        {
-            var view = new CommunicatorView();
-            CommunicatorWindow = view;
-
-            var unused = new DockablePaneProviderData
-            {
-                FrameworkElement = CommunicatorWindow,
-                InitialState = new DockablePaneState
-                {
-                    DockPosition = DockPosition.Tabbed,
-                    TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
-                }
-            };
-
-            var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
-            application.RegisterDockablePane(dpid, "Mission Control", CommunicatorWindow);
-        }
-
-        /// <summary>
-        /// Adds action to task list.
-        /// </summary>
-        /// <param name="task">Task to be executed.</param>
-        public static void EnqueueTask(Action<UIApplication> task)
-        {
-            lock (Tasks)
-            {
-                Tasks.Enqueue(task);
-            }
-        }
+        #region Utilities
 
         /// <summary>
         /// Registers availble configuration based on Central Model path match.
@@ -561,40 +481,151 @@ namespace HOK.MissionControl
         {
             var centralPath = FileInfoUtil.GetCentralFilePath(doc);
             if (string.IsNullOrEmpty(centralPath)) return;
-            if (!MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
-
-            var currentConfig = MissionControlSetup.Configurations[centralPath];
-            foreach (var updater in currentConfig.updaters)
+            if (MissionControlSetup.Configurations.ContainsKey(centralPath))
             {
-                if (!updater.isUpdaterOn) { continue; }
-                if (string.Equals(updater.updaterId.ToLower(),
-                    DoorUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                var currentConfig = MissionControlSetup.Configurations[centralPath];
+                foreach (var updater in currentConfig.updaters)
                 {
-                    DoorUpdaterInstance.Unregister(doc);
+                    if (!updater.isUpdaterOn) { continue; }
+                    if (string.Equals(updater.updaterId.ToLower(),
+                        DoorUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    {
+                        DoorUpdaterInstance.Unregister(doc);
+                    }
+                    else if (string.Equals(updater.updaterId.ToLower(),
+                        DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    {
+                        DtmUpdaterInstance.Unregister(doc);
+                    }
+                    else if (string.Equals(updater.updaterId.ToLower(),
+                        SheetUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    {
+                        SheetUpdaterInstance.Unregister(doc);
+                    }
                 }
-                else if (string.Equals(updater.updaterId.ToLower(),
-                    DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+
+                // (Konrad) Make sure that Project and HealthRecords are specified.
+                if (MissionControlSetup.Projects.ContainsKey(centralPath) &&
+                    MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
                 {
-                    DtmUpdaterInstance.Unregister(doc);
-                }
-                else if (string.Equals(updater.updaterId.ToLower(),
-                    SheetUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                {
-                    SheetUpdaterInstance.Unregister(doc);
+                    var recordId = MissionControlSetup.HealthRecordIds[centralPath];
+                    var currentProject = MissionControlSetup.Projects[centralPath];
+
+                    WorksetItemCount.PublishData(doc, recordId, currentConfig, currentProject);
+                    ViewMonitor.PublishData(doc, recordId, currentConfig, currentProject);
+                    LinkMonitor.PublishData(doc, recordId, currentConfig, currentProject);
+                    ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentClosed);
                 }
             }
 
-            // (Konrad) Make sure that Project and HealthRecords are specified.
-            if (!MissionControlSetup.Projects.ContainsKey(centralPath)) return;
-            if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
-
-            var recordId = MissionControlSetup.HealthRecordIds[centralPath];
-            var currentProject = MissionControlSetup.Projects[centralPath];
-
-            WorksetItemCount.PublishData(doc, recordId, currentConfig, currentProject);
-            ViewMonitor.PublishData(doc, recordId, currentConfig, currentProject);
-            LinkMonitor.PublishData(doc, recordId, currentConfig, currentProject);
-            ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentClosed);
+            // (Konrad) Clean up all static classes that would be holding any relevant information. 
+            // This would cause issues in case that user closes a MissionControl registered project without
+            // closing Revit app. These static classes retain their values, and then would trick rest of app
+            // to think that it is registered in Mission Control.
+            MissionControlSetup.ClearAll();
+            ClearAll();
         }
+
+        /// <summary>
+        /// Registers Communicator Dockable Panel.
+        /// </summary>
+        /// <param name="application">UIControlledApp</param>
+        private static void RegisterCommunicator(UIControlledApplication application)
+        {
+            var view = new CommunicatorView();
+            CommunicatorWindow = view;
+
+            var unused = new DockablePaneProviderData
+            {
+                FrameworkElement = CommunicatorWindow,
+                InitialState = new DockablePaneState
+                {
+                    DockPosition = DockPosition.Tabbed,
+                    TabBehind = DockablePanes.BuiltInDockablePanes.ProjectBrowser
+                }
+            };
+
+            var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
+            application.RegisterDockablePane(dpid, "Mission Control", CommunicatorWindow);
+        }
+
+        /// <summary>
+        /// Communicator Image can only be set when we are done loading the app.
+        /// </summary>
+        public static void SetCommunicatorImage()
+        {
+            // (Konrad) This needs to run after the doc is opened, because UI elements don't get created until then.
+            EnqueueTask(app =>
+            {
+                var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
+                var dp = app.GetDockablePane(dpid);
+                var assembly = Assembly.GetExecutingAssembly();
+                if (dp != null)
+                {
+                    Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", dp.IsShown()
+                        ? "communicatorOn_32x32.png"
+                        : "communicatorOff_32x32.png");
+                    Instance.CommunicatorButton.ItemText = dp.IsShown()
+                        ? "Hide" + Environment.NewLine + "Communicator"
+                        : "Show" + Environment.NewLine + "Communicator";
+                }
+            });
+        }
+
+        /// <summary>
+        /// Due to all asynch stuff some data might not be available right away so we use this callback to instantiate the Communicator.
+        /// It also get's called after synch to central is done to refresh the UI.
+        /// </summary>
+        public static void LunchCommunicator()
+        {
+            CommunicatorWindow.MainControl.Dispatcher.Invoke(() =>
+            {
+                // (Konrad) We have to make sure that we unregister from all Messaging before reloading UI.
+                if (CommunicatorWindow.DataContext != null)
+                {
+                    var tabItems = CommunicatorWindow.MainControl.Items.SourceCollection;
+                    foreach (var ti in tabItems)
+                    {
+                        var content = ((UserControl)((TabItem)ti).Content).DataContext as ViewModelBase;
+                        content?.Cleanup();
+                    }
+                }
+
+                // (Konrad) Now we can reset the ViewModel
+                CommunicatorWindow.DataContext = new CommunicatorViewModel();
+                if (CommunicatorWindow.MainControl.Items.Count > 0)
+                {
+                    CommunicatorWindow.MainControl.SelectedIndex = 0;
+                }
+            }, DispatcherPriority.Normal);
+        }
+
+        /// <summary>
+        /// Adds action to task list.
+        /// </summary>
+        /// <param name="task">Task to be executed.</param>
+        public static void EnqueueTask(Action<UIApplication> task)
+        {
+            lock (Tasks)
+            {
+                Tasks.Enqueue(task);
+            }
+        }
+
+        /// <summary>
+        /// Removes all references to old data that might linger after document is closed.
+        /// </summary>
+        private static void ClearAll()
+        {
+            HrData = null;
+            SheetsData = null;
+            SessionInfo = null;
+            SynchTime = new Dictionary<string, DateTime>();
+            OpenTime = new Dictionary<string, DateTime>();
+            FamiliesToWatch = new Dictionary<string, FamilyItem>();
+            if (CommunicatorWindow != null) CommunicatorWindow.DataContext = null;
+        }
+
+        #endregion
     }
 }
