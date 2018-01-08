@@ -9,8 +9,7 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     public class FamilyTaskUpdatedMessage
     {
         public string FamilyName { get; set; }
-        public FamilyData FamilyStat { get; set; }
-        public string OldTaskId { get; set; }
+        public FamilyTask Task { get; set; }
     }
 
     public class FamilyTaskDeletedMessage

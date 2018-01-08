@@ -106,12 +106,16 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var familyStats = data["body"].ToObject<FamilyData>();
                         var familyName = data["familyName"].ToObject<string>();
-                        var oldTaskId = data["oldTaskId"].ToObject<string>();
-                        if (familyStats == null || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(oldTaskId)) return;
+                        var collId = data["collectionId"].ToObject<string>();
+                        var task = data["task"].ToObject<FamilyTask>();
+                        if (task == null || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(collId)) return;
 
-                        Messenger.Default.Send(new FamilyTaskUpdatedMessage { FamilyStat = familyStats, FamilyName = familyName, OldTaskId = oldTaskId });
+                        // (Konrad) We want to filter out tasks that don't belong to us or to this model.
+                        // We can use "collectionId" to identify the model since that is tied to centralPath.
+                        if (!IdsMatch(centralPath, collId, CollectionType.Families)) return;
+
+                        Messenger.Default.Send(new FamilyTaskUpdatedMessage { FamilyName = familyName, Task = task });
                     }
                     else
                     {

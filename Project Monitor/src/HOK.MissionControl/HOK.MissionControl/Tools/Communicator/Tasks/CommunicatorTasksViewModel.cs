@@ -260,21 +260,17 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control.</param>
         private void OnFamilyTaskUpdated(FamilyTaskUpdatedMessage msg)
         {
-            FamilyTask task;
             FamilyItem family;
 
             // (Konrad) Updated globally stored families.
             if (AppCommand.FamiliesToWatch.ContainsKey(msg.FamilyName))
             {
                 var oldFamily = AppCommand.FamiliesToWatch[msg.FamilyName];
-                var newFamily = msg.FamilyStat.families.FirstOrDefault(x => x.name == msg.FamilyName);
-                if (newFamily == null) return;
+                var taskIndex = oldFamily.tasks.FindIndex(x => x.Id == msg.Task.Id);
+                if (taskIndex == -1) return; 
 
-                task = newFamily.tasks[newFamily.tasks.Count - 1]; // latest task will be last on a list
-                oldFamily.tasks.Add(task);
-
-                AppCommand.FamiliesToWatch.Remove(msg.FamilyName);
-                AppCommand.FamiliesToWatch.Add(msg.FamilyName, oldFamily);
+                oldFamily.tasks.RemoveAt(taskIndex);
+                oldFamily.tasks.Add(msg.Task);
 
                 family = oldFamily;
             }
@@ -284,36 +280,35 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                 return;
             }
 
-            var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTaskWrapper) && ((FamilyTask)x.Task).Id == msg.OldTaskId);
+            var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTaskWrapper) && ((FamilyTask)x.Task).Id == msg.Task.Id);
             if (storedTask != null)
             {
-                if (task.assignedTo == Environment.UserName.ToLower() && string.IsNullOrEmpty(task.completedBy))
+                if (msg.Task.assignedTo == Environment.UserName.ToLower() && string.IsNullOrEmpty(msg.Task.completedBy))
                 {
                     // (Konrad) In order to trigger changes to UI, we need to update properties individually
                     // Only then do they fire proper events and update UI.
-                    var familyTask = (FamilyTask)storedTask.Task;
-                    familyTask.name = task.name;
-                    familyTask.assignedTo = task.assignedTo;
-                    familyTask.comments = task.comments;
-                    familyTask.message = task.message;
+                    var familyTask = storedTask.Task as FamilyTask;
+                    if (familyTask == null) return;
+
+                    familyTask.CopyProperties(msg.Task);
                 }
                 else
                 {
                     // (Konrad) Someone reassigned the task away from us.
                     lock (_lock)
                     {
-                        Tasks.Remove(storedTask);
+                        LockRemoveClose(storedTask);
                     }
                 }
             }
             else
             {
-                if (task.assignedTo == Environment.UserName.ToLower())
+                if (msg.Task.assignedTo == Environment.UserName.ToLower())
                 {
                     // (Konrad) Someone reassigned a task to us.
                     lock (_lock)
                     {
-                        Tasks.Add(new FamilyTaskWrapper(family, task));
+                        Tasks.Add(new FamilyTaskWrapper(family, msg.Task));
                     }
                 }
             }

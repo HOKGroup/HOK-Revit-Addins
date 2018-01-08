@@ -20,14 +20,14 @@ namespace HOK.MissionControl.Core.Schemas.Families
         public string Id { get; set; }
 
         private string _name;
-        [DataMember(Name = "name")]
+        [DataMember]
         public string name {
             get { return _name; }
             set { _name = value; RaisePropertyChanged("name"); }
         }
 
         private string _assignedTo;
-        [DataMember(Name = "assignedTo")]
+        [DataMember]
         public string assignedTo
         {
             get { return _assignedTo; }
@@ -35,7 +35,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
         }
 
         private string _message;
-        [DataMember(Name = "message")]
+        [DataMember]
         public string message
         {
             get { return _message; }
@@ -43,7 +43,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
         }
 
         private string _comments;
-        [DataMember(Name = "comments")]
+        [DataMember]
         public string comments
         {
             get { return _comments; }
@@ -51,7 +51,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
         }
 
         private string _submittedBy;
-        [DataMember(Name = "submittedBy")]
+        [DataMember]
         public string submittedBy
         {
             get { return _submittedBy; }
@@ -59,18 +59,35 @@ namespace HOK.MissionControl.Core.Schemas.Families
         }
 
         private string _completedBy;
-        [DataMember(Name = "completedBy")]
+        [DataMember]
         public string completedBy
         {
             get { return _completedBy; }
             set { _completedBy = value; RaisePropertyChanged("completedBy"); }
         }
 
-        [DataMember(Name = "submittedOn")]
+        [DataMember]
         public DateTime? submittedOn { get; set; }
 
-        [DataMember(Name = "completedOn")]
+        [DataMember]
         public DateTime? completedOn { get; set; }
+
+        /// <summary>
+        /// Utility method used to copy all properties from one object to another, and trigger PropertyChange for UI updates.
+        /// </summary>
+        /// <param name="other">Object to copy properties from.</param>
+        public void CopyProperties(FamilyTask other)
+        {
+            Id = other.Id;
+            assignedTo = other.assignedTo;
+            submittedOn = other.submittedOn;
+            completedOn = other.completedOn;
+            submittedBy = other.submittedBy;
+            completedBy = other.completedBy;
+            name = other.name;
+            message = other.message;
+            comments = other.message;
+        }
 
         // (Konrad) Comparison methods used when updating UI. IndexOf() uses it.
         // (Konrad) We can compare Tasks by their MongoDB id
