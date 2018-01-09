@@ -84,6 +84,15 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2016_Release|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2016_Release\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;Release16</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
@@ -92,7 +101,7 @@
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016' Or '$(Configuration)' == '2016_Release'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
@@ -107,7 +116,7 @@
     <Reference Include="HOK.MissionControl.Core" Condition=" '$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
-    <Reference Include="HOK.MissionControl.Core" Condition=" '$(Configuration)' == '2016'">
+    <Reference Include="HOK.MissionControl.Core" Condition=" '$(Configuration)' == '2016' Or '$(Configuration)' == '2016_Release'">
       <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2016\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition=" '$(Configuration)' == '2017' Or '$(Configuration)' == '2017_Release'">
@@ -130,11 +139,11 @@
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016'">
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016' Or '$(Configuration)' == '2016_Release'">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2016'">
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2016' Or '$(Configuration)' == '2016_Release'">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>

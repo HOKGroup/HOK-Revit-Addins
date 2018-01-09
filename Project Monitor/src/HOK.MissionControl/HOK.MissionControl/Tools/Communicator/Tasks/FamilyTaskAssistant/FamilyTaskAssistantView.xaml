@@ -23,8 +23,8 @@
             <RowDefinition Height="50"/>
             <RowDefinition Height="45"/>
             <RowDefinition Height="100"/>
-            <RowDefinition Height="100"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition/>
+            <RowDefinition Height="150"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Label Content="Family Info:" 
@@ -43,7 +43,7 @@
             <Label Content="{Binding Wrapper.Element.name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
-                   Margin="5,0,0,0" 
+                   Margin="5,0,5,0" 
                    Foreground="DarkGray"/>
         </Border>
         <Label Grid.Row="1" 
@@ -64,7 +64,7 @@
             <Label Content="{Binding Wrapper.Task.name}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
-                   Margin="5,0,0,0" 
+                   Margin="5,0,5,0" 
                    Foreground="DarkGray"/>
         </Border>
         <Label Grid.Row="1" 
@@ -85,7 +85,7 @@
             <Label Content="{Binding Wrapper.Task.assignedTo}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
-                   Margin="5,0,0,0" 
+                   Margin="5,0,5,0" 
                    Foreground="DarkGray"/>
         </Border>
         <Label Grid.Row="2" 
@@ -105,7 +105,7 @@
             <Label Content="{Binding Wrapper.Task.message}" 
                    VerticalContentAlignment="Top" 
                    Padding="0" 
-                   Margin="5,0,0,0" 
+                   Margin="5,0,5,0" 
                    Foreground="DarkGray"/>
         </Border>
         <Label Grid.Row="3" 
@@ -123,7 +123,7 @@
                 Grid.ColumnSpan="2"
                 CornerRadius="2">
             <TextBox Text="{Binding Wrapper.Task.comments}" 
-                     Margin="2"
+                     Margin="5,0,5,0" 
                      BorderThickness="0"/>
         </Border>
         <Label Grid.Row="4" 

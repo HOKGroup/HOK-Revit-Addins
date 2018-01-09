@@ -84,6 +84,7 @@ namespace HOK.MissionControl
 
                 // (Konrad) Create Communicator/WebsiteLink buttons and register dockable panel.
                 RegisterCommunicator(application);
+
                 try
                 {
                     application.CreateRibbonTab(tabName);
@@ -546,7 +547,16 @@ namespace HOK.MissionControl
             };
 
             var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
-            application.RegisterDockablePane(dpid, "Mission Control", CommunicatorWindow);
+            try
+            {
+                // (Konrad) It's possible that a dockable panel with the same id already exists
+                // This ensures that we don't get an exception here. 
+                application.RegisterDockablePane(dpid, "Mission Control", CommunicatorWindow);
+            }
+            catch (Exception e)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+            }
         }
 
         /// <summary>

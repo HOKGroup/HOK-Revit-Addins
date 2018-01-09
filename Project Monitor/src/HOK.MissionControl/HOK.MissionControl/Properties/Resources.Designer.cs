@@ -61,7 +61,7 @@ namespace HOK.MissionControl.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to D7C963CE-B7CA-426A-8D51-6E8254D21157.
+        ///   Looks up a localized string similar to f4621647-f928-422a-8afa-e08293305ec8.
         /// </summary>
         internal static string CommunicatorGuid {
             get {

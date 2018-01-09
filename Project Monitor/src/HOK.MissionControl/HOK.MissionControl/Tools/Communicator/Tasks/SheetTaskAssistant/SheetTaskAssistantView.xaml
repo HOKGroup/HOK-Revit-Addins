@@ -26,8 +26,8 @@
             <RowDefinition Height="100"/>
             <RowDefinition Height="45"/>
             <RowDefinition Height="45"/>
-            <RowDefinition Height="100"/>
-            <RowDefinition Height="161*"/>
+            <RowDefinition/>
+            <RowDefinition Height="150"/>
             <RowDefinition Height="34"/>
             <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
@@ -53,7 +53,7 @@
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        Padding="0"
-                       Margin="5,0,0,0"
+                       Margin="5,0,5,0"
                        Foreground="DarkGray"/>
         </Border>
         <Label Content="Name:" 
@@ -75,7 +75,7 @@
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        Padding="0"
-                       Margin="5,0,0,0"
+                       Margin="5,0,5,0"
                        Foreground="DarkGray"/>
         </Border>
         <Label Content="Proposed Number:" 
@@ -98,7 +98,7 @@
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        Padding="0"
-                       Margin="5,0,0,0">
+                       Margin="5,0,5,0">
                 <TextBlock.Foreground>
                     <MultiBinding Converter="{StaticResource StringToColorConverter}" ConverterParameter="Param1">
                         <Binding Path="Wrapper.Task.number"/>
@@ -127,7 +127,7 @@
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        Padding="0"
-                       Margin="5,0,0,0">
+                       Margin="5,0,5,0">
                 <TextBlock.Foreground>
                     <MultiBinding Converter="{StaticResource StringToColorConverter}" ConverterParameter="Param1">
                         <Binding Path="Wrapper.Task.name"/>
@@ -153,7 +153,7 @@
             <Label Content="{Binding Wrapper.Task.message}" 
                    VerticalContentAlignment="Top" 
                    Padding="0" 
-                   Margin="5,0,0,0" 
+                   Margin="5,0,5,0" 
                    Foreground="DarkGray"/>
         </Border>
         <Image Grid.Row="0" 

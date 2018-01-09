@@ -33,6 +33,8 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
                 var stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine("From: " + name);
                 stringBuilder.AppendLine("Email: " + email);
+                stringBuilder.AppendLine("User: " + Environment.UserName);
+                stringBuilder.AppendLine("Machine: " + Environment.MachineName);
                 stringBuilder.AppendLine("");
                 stringBuilder.AppendLine("Body: ");
                 stringBuilder.AppendLine(feedback);
@@ -47,7 +49,7 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
 
                 try
                 {
-                    var request = new RestRequest("/repos/HOKGroup/HOK-Revit-Addins/issues", Method.POST)
+                    var request = new RestRequest("/repos/HOKGroup/MissionControl_Issues/issues", Method.POST)
                     {
                         OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
                     };

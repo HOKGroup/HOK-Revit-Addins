@@ -66,7 +66,7 @@
             </GroupBox.Header>
             <Grid>
                 <AdornerDecorator Margin="10">
-                    <TextBox x:Name="SearchTextBox" BorderThickness="0" FontSize="16" Text="{Binding Feedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox x:Name="SearchTextBox" BorderThickness="0" FontSize="16" TextWrapping="Wrap" Text="{Binding Feedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </AdornerDecorator>
             </Grid>
         </GroupBox>
@@ -85,6 +85,7 @@
                 Command="{Binding Submit, Mode=OneWay}"
                 CommandParameter="{Binding ElementName=Win}"
                 Content="Submit" 
+                ToolTip="Submit a new Issue to GitHub page."
                 Margin="0,0,10,10" 
                 Grid.Row="3"
                 Width="74"
@@ -103,26 +104,20 @@
                 <ItemsPanelTemplate>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="168"/>
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
-            <StatusBarItem>
+            <StatusBarItem Margin="8,0,0,0">
                 <TextBlock Text="Ready" 
                            Name="statusLabel" 
                            Visibility="Visible" 
                            Foreground="#FF767474"/>
             </StatusBarItem>
-            <StatusBarItem Grid.Column="1">
-                <ProgressBar Value="0" 
-                             Width="150" 
-                             Height="16" 
-                             Name="progressBar" 
-                             Visibility="Hidden" 
-                             SmallChange="1" 
-                             IsIndeterminate="False" />
+            <StatusBarItem Grid.Column="1" Margin="0,0,8,0">
+                <ProgressBar Value="0" Width="150" Height="16" Name="progressBar" Visibility="Hidden" SmallChange="1" IsIndeterminate="False" />
             </StatusBarItem>
         </StatusBar>
 

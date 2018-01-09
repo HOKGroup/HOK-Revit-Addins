@@ -283,7 +283,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTaskWrapper) && ((FamilyTask)x.Task).Id == msg.Task.Id);
             if (storedTask != null)
             {
-                if (msg.Task.assignedTo == Environment.UserName.ToLower() && string.IsNullOrEmpty(msg.Task.completedBy))
+                if (string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(),
+                        StringComparison.Ordinal) && string.IsNullOrEmpty(msg.Task.completedBy))
                 {
                     // (Konrad) In order to trigger changes to UI, we need to update properties individually
                     // Only then do they fire proper events and update UI.
@@ -303,7 +304,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
             else
             {
-                if (msg.Task.assignedTo == Environment.UserName.ToLower())
+                if (string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(),
+                    StringComparison.Ordinal))
                 {
                     // (Konrad) Someone reassigned a task to us.
                     lock (_lock)
