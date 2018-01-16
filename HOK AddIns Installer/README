@@ -1,14 +1,8 @@
-v.2015.0.1.8
-- key files for service accounts added into smartBCF and Model Manager
+# HOK Addin Manager and Installer
 
-v.2015.0.1.7
-New
-- LEED View Analysis files added under Analysis Tool
+#### This tool dynamically generates Ribbon Tab items based on user selection.
 
-v.2015.0.1.0
-New
--If the Utility Tools is selected under beta files, it will distribute all the separate command dll files and the new Ribbon tab.
+###### Release 2018.0.0.5
 
-v.2014.0.1.2
-New
--smartBCF has been included under Beta
+* Fixed sorting
+* Added feedback tool.

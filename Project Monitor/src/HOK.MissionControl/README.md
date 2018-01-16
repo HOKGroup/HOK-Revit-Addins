@@ -7,6 +7,18 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.6
+
+* Fix to a bug in Server Utilities where file path was not generated properly. It led to wrong file being returned from DB.
+
+###### Release 2018.0.0.5
+
+* Actually connected and release Family Tasks. 
+* Also added Sheet Tasks and Sheet management tool.
+* Offloaded all tasks related stuff to another thread and integrated with Socket.io. 
+* New Button on the ribbon linking back to Mission Control website.
+* Bunch of bug fixes.
+
 ###### Release 2018.0.0.4
 
 * Added Tasks to Communicator Tab.

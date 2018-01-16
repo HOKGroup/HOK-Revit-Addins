@@ -2,6 +2,14 @@
 
 #### Library of commonly used methods and classes. Contains mostly utility methods shared across more than one plug-in. 
 
+###### Release 2018.0.0.6
+
+* Fixed PostBuild event to push RestSharp dependency out to Content folder. 
+
+###### Release 2018.0.0.5
+
+* Added Feedback tool for publishing bugs to GitHub
+
 ###### Release 2018.0.0.3
 
 * Added cancel method to Progress Bar manager class.
