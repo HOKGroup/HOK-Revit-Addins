@@ -2,6 +2,11 @@
 
 #### This tool dynamically generates Ribbon Tab items based on user selection.
 
+###### Release 2018.0.0.6
+
+* Bug fix where ResourceDictionary was causing exceptions because of duplicate keys.
+* Fixed Release_2016 configuration.
+
 ###### Release 2018.0.0.3
 
 * Bug fix where reading assembly file would cause the dll to be loaded into app domain and lock the file on sysvol. That in turn causes inability for me to swap the files etc. 
