@@ -226,6 +226,7 @@ echo Configuration: $(Configuration)
 
 if $(Configuration) == 2015 goto Build2015
 if $(Configuration) == 2016 goto Build2016
+if $(Configuration) == 2016_Release goto Build2016
 if $(Configuration) == 2017 goto Build2017
 if $(Configuration) == 2017_Release goto Build2017
 if $(Configuration) == 2018 goto Build2018

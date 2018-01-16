@@ -64,8 +64,17 @@ namespace HOK.MissionControl.Core.Utils
             try
             {
                 // (Konrad) Since we cannot pass file path with "\" they were replaced with illegal pipe char "|".
-                // Since pipe cannot be used in a legal file path, it's a good placeholder to use. 
-                var filePath = centralPath.Replace('\\', '|');
+                // Since pipe cannot be used in a legal file path, it's a good placeholder to use.
+                // File path can also contain forward slashes for RSN and A360 paths ex: RSN:// and A360://
+                string filePath;
+                if (centralPath.Contains('\\')) filePath = centralPath.Replace('\\', '|');
+                else if (centralPath.Contains('/')) filePath = centralPath.Replace('/', '|');
+                else
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Could not replace \\ or / with | in the file path. Exiting.");
+                    return result;
+                }
+
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET);
                 var response = client.Execute(request);
@@ -75,8 +84,7 @@ namespace HOK.MissionControl.Core.Utils
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
                     if (data != null) result = data;
-
-                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
+                    else Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
                 }
             }
             catch (Exception ex)

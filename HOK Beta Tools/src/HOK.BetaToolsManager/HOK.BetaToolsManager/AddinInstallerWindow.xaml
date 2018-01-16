@@ -28,10 +28,10 @@
             <Setter Property="VerticalAlignment" Value="Stretch"/>
             <Setter Property="BorderBrush" Value="LightGray"/>
         </Style>
-        <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
+        <Style x:Key="CenterGridHeaderStyle1" TargetType="DataGridColumnHeader">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
-        <Style x:Key="ContentDataGridCentering" TargetType="{x:Type DataGridCell}">
+        <Style x:Key="ContentDataGridCentering1" TargetType="{x:Type DataGridCell}">
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -46,7 +46,7 @@
     </Window.Resources>
     <Grid>
         <Grid.Resources>
-            <Style x:Key="dgCellStyle" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
+            <Style x:Key="dgCellStyle1" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
                 <Setter Property="Padding" Value="10"/>
                 <Setter Property="Template">
                     <Setter.Value>
@@ -77,7 +77,7 @@
                 </Grid.RowDefinitions>
                 <ex:DataGridExtension x:Name="DataGridPlugins" Grid.Row="0"
                                       ItemsSource="{Binding Addins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                      CellStyle="{StaticResource ContentDataGridCentering}"
+                                      CellStyle="{StaticResource ContentDataGridCentering1}"
                                       CanUserAddRows="False" 
                                       IsReadOnly="False" 
                                       SelectionUnit="FullRow" 
@@ -87,7 +87,7 @@
                                                 Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 IsReadOnly="False" 
                                                 Width="45"
-                                                HeaderStyle="{StaticResource CenterGridHeaderStyle}">
+                                                HeaderStyle="{StaticResource CenterGridHeaderStyle1}">
                         </DataGridCheckBoxColumn>
                         <DataGridTextColumn Header="Name" 
                                             Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
@@ -95,7 +95,7 @@
                                             IsReadOnly="True"/>
                         <DataGridTemplateColumn Header="Icon" 
                                                 Width="50"
-                                                HeaderStyle="{StaticResource CenterGridHeaderStyle}">
+                                                HeaderStyle="{StaticResource CenterGridHeaderStyle1}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <Image Source="{Binding Image}" 
@@ -121,7 +121,7 @@
                                             Binding="{Binding Version, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                             Width="110" 
                                             IsReadOnly="True"
-                                            HeaderStyle="{StaticResource CenterGridHeaderStyle}">
+                                            HeaderStyle="{StaticResource CenterGridHeaderStyle1}">
                             <DataGridTextColumn.ElementStyle>
                                 <Style>
                                     <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
@@ -131,10 +131,10 @@
                         </DataGridTextColumn>
                         <DataGridTextColumn Header="Installed Version" 
                                             Binding="{Binding InstalledVersion, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                            CellStyle="{StaticResource dgCellStyle}"
+                                            CellStyle="{StaticResource dgCellStyle1}"
                                             Width="110" 
                                             IsReadOnly="True"
-                                            HeaderStyle="{StaticResource CenterGridHeaderStyle}">
+                                            HeaderStyle="{StaticResource CenterGridHeaderStyle1}">
                             <DataGridTextColumn.ElementStyle>
                                 <Style>
                                     <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
