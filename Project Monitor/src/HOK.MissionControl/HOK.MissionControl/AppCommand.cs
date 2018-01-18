@@ -152,7 +152,7 @@ namespace HOK.MissionControl
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 //search for config
-                var configFound = ServerUtilities.GetByCentralPath<Configuration>(centralPath, "configurations/centralPath");
+                var configFound = ServerUtilities.GetByCentralPath<Configuration>(centralPath, "configurations/centralpath");
                 if (null != configFound)
                 {
                     if (MissionControlSetup.Configurations.ContainsKey(centralPath))
