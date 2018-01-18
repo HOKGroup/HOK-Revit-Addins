@@ -21,8 +21,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        public const string RestApiBaseUrl = "http://hok-184vs/";
-        //public const string RestApiBaseUrl = "http://localhost:8080/";
+        //public const string RestApiBaseUrl = "http://hok-184vs/";
+        public const string RestApiBaseUrl = "http://localhost:8080/";
         public const string ApiVersion = "api/v1";
 
         #region GET
@@ -67,8 +67,8 @@ namespace HOK.MissionControl.Core.Utils
                 // Since pipe cannot be used in a legal file path, it's a good placeholder to use.
                 // File path can also contain forward slashes for RSN and A360 paths ex: RSN:// and A360://
                 string filePath;
-                if (centralPath.Contains('\\')) filePath = centralPath.Replace('\\', '|');
-                else if (centralPath.Contains('/')) filePath = centralPath.Replace('/', '|');
+                if (centralPath.Contains(@"\")) filePath = centralPath.Replace(@"\", "|");
+                else if (centralPath.Contains(@"/")) filePath = centralPath.Replace(@"/", "|");
                 else
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Could not replace \\ or / with | in the file path. Exiting.");
