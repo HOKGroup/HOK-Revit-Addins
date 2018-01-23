@@ -40,8 +40,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     closed = closed
                 };
 
-                // (Konrad) Publish Workset information to database based on current state.
-                ServerUtilities.PostToMongoDB(worksetInfo, "healthrecords", recordId, state.ToString());
+                ServerUtilities.Post<WorksetEvent>(worksetInfo, "healthrecords/" + recordId + "/" + state);
             }
             catch (Exception ex)
             {

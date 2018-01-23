@@ -110,6 +110,7 @@ namespace HOK.MissionControl.Core.Schemas
         [JsonProperty("_id")]
         public string Id { get; set; }
         public long value { get; set; }
+        public string user { get; set; }
         public DateTime createdOn { get; set; } = DateTime.Now;
     }
 

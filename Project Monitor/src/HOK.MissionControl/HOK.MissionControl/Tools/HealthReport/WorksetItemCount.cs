@@ -35,8 +35,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     worksetInfo.Add(new Item { name = w.Name, count = count });
                 }
 
-                // (Konrad) Publish information about workset counts in the model.
-                ServerUtilities.PostToMongoDB(new WorksetItem {worksets = worksetInfo}, "healthrecords", recordId, "itemcount");
+                ServerUtilities.Post<WorksetItem>(new WorksetItem { worksets = worksetInfo }, "healthrecords/" + recordId + "/itemcount");
             }
             catch (Exception ex)
             {

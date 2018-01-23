@@ -86,7 +86,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     totalLinkedDwg = totalLinkedCad
                 };
 
-                ServerUtilities.PostToMongoDB(linkStats, "healthrecords", recordId, "linkstats");
+                ServerUtilities.Post<LinkStat>(linkStats, "healthrecords/" + recordId + "/linkstats");
             }
             catch (Exception ex)
             {
