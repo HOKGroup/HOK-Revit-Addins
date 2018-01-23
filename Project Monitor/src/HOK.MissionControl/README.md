@@ -7,6 +7,11 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.7
+
+* Remove obsolete PostToMongo class. 
+* Add user info to data posted for model open times, model synch times, session info etc.
+
 ###### Release 2018.0.0.6
 
 * Fix to a bug in Server Utilities where file path was not generated properly. It led to wrong file being returned from DB.
