@@ -1,23 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Windows.Documents;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.Core.Utilities;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
-    /// <summary>
-    /// Three different Document States that Model info gets updated during.
-    /// </summary>
-    public enum SessionEvent
-    {
-        documentOpened = 0,
-        documentSynched = 1,
-        documentClosed = 2
-    }
-
     public class ModelMonitor
     {
         public static Guid UpdaterGuid { get; set; } = new Guid(Properties.Resources.HealthReportTrackerGuid);
@@ -39,7 +27,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                             user = Environment.UserName,
                             from = DateTime.Now
                         };
-                        var guid = ServerUtilities.PostToMongoDB(AppCommand.SessionInfo, "healthrecords", recordId, "sessioninfo").Id;
+                        var guid = ServerUtilities.Post<SessionInfo>(AppCommand.SessionInfo, "healthrecords/" + recordId + "/sessioninfo").Id;
                         AppCommand.SessionInfo.Id = guid;
                         break;
                     case SessionEvent.documentSynched:
@@ -80,10 +68,11 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var eventItem = new EventData
                 {
-                    value = ms
+                    value = ms,
+                    user = Environment.UserName.ToLower()
                 };
 
-                ServerUtilities.PostToMongoDB(eventItem, "healthrecords", recordId, "modelsynchtime");
+                ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsynchtime");
             }
             catch (Exception ex)
             {
@@ -106,10 +95,11 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var eventItem = new EventData
                 {
-                    value = ms
+                    value = ms,
+                    user = Environment.UserName.ToLower()
                 };
 
-                ServerUtilities.PostToMongoDB(eventItem, "healthrecords", recordId, "modelopentime");
+                ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelopentime");
             }
             catch (Exception ex)
             {
@@ -165,15 +155,26 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var eventItem = new EventData
                 {
-                    value = fileSize
+                    value = fileSize,
+                    user = Environment.UserName.ToLower()
                 };
 
-                ServerUtilities.PostToMongoDB(eventItem, "healthrecords", recordId, "modelsize");
+                ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsize");
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
+    }
+
+    /// <summary>
+    /// Three different Document States that Model info gets updated during.
+    /// </summary>
+    public enum SessionEvent
+    {
+        documentOpened = 0,
+        documentSynched = 1,
+        documentClosed = 2
     }
 }

@@ -93,7 +93,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     unclippedViews = unclippedViews
                 };
 
-                ServerUtilities.PostToMongoDB(viewStats, "healthrecords", recordId, "viewstats");
+                ServerUtilities.Post<ViewStat>(viewStats, "healthrecords/" + recordId + "/viewstats");
             }
             catch (Exception ex)
             {

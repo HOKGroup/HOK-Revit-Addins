@@ -21,8 +21,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        //public const string RestApiBaseUrl = "http://hok-184vs/";
-        public const string RestApiBaseUrl = "http://localhost:8080/";
+        public const string RestApiBaseUrl = "http://hok-184vs/";
+        //public const string RestApiBaseUrl = "http://localhost:8080/";
         public const string ApiVersion = "api/v1";
 
         #region GET
@@ -301,42 +301,6 @@ namespace HOK.MissionControl.Core.Utils
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return httpStatusCode;
-        }
-
-        /// <summary>
-        /// POST Data object/Schema to MongoDB.
-        /// </summary>
-        /// <typeparam name="T">Data Scheme Type.</typeparam>
-        /// <param name="dataSchema">Data Schema object to post.</param>
-        /// <param name="collectionName">Main route name.</param>
-        /// <param name="collectionId">Id of the main collection.</param>
-        /// <param name="route">Action/route to execute.</param>
-        /// <returns>Data Schema object returned from database.</returns>
-        [Obsolete]
-        public static T PostToMongoDB<T>(T dataSchema, string collectionName, string collectionId, string route) where T : new()
-        {
-            var output = new T();
-            try
-            {
-                var restClient = new RestClient(RestApiBaseUrl);
-                var restRequest = new RestRequest(ApiVersion + "/" + collectionName+ "/" + collectionId + "/" + route, Method.POST)
-                {
-                    RequestFormat = DataFormat.Json
-                };
-                restRequest.AddBody(dataSchema);
-                var restResponse = restClient.Execute<T>(restRequest);
-                if (restResponse.Data != null)
-                {
-                    output = restResponse.Data;
-
-                    Log.AppendLog(LogMessageType.INFO, collectionName + "/" + route);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return output;
         }
 
         #endregion
