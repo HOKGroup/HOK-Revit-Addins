@@ -7,6 +7,14 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.9
+
+* Enhanced Website Link Tool to navigate to project if possible, rather than always navigating to home page.
+
+###### Release 2018.0.0.8
+
+* Fixed the issue with DTM where DTM Tool would show a warning on Synch to Central warning users of modifying View Templates.
+
 ###### Release 2018.0.0.7
 
 * Remove obsolete PostToMongo class. 
