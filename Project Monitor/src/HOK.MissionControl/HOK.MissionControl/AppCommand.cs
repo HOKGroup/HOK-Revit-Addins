@@ -43,20 +43,23 @@ namespace HOK.MissionControl
         public static SessionInfo SessionInfo { get; set; }
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
-        private static Queue<Action<UIApplication>> Tasks;
         public static HealthReportData HrData { get; set; }
         public static SheetData SheetsData { get; set; }
         public static CommunicatorView CommunicatorWindow { get; set; }
+        public static bool IsSynching { get; set; }
+        public static bool IsSynchOverriden { get; set; }
+        public static bool IsSynchNowOverriden { get; set; }
+        public static CommunicatorRequestHandler CommunicatorHandler { get; set; }
+        public static ExternalEvent CommunicatorEvent { get; set; }
+        public static Dictionary<string, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<string, FamilyItem>();
         public PushButton CommunicatorButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
         public SheetUpdater SheetUpdaterInstance { get; set; }
         public LinkUnloadMonitor LinkUnloadInstance { get; set; }
+
         private const string tabName = "  HOK - Beta";
-        public static bool IsSynching { get; set; }
-        public static CommunicatorRequestHandler CommunicatorHandler { get; set; }
-        public static ExternalEvent CommunicatorEvent { get; set; }
-        public static Dictionary<string, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<string, FamilyItem>();
+        private static Queue<Action<UIApplication>> Tasks;
 
         /// <summary>
         /// Registers all event handlers during startup.
@@ -336,7 +339,7 @@ namespace HOK.MissionControl
                 FailureProcessor.IsSynchronizing = false;
 
                 // (Konrad) If project is not registered with MongoDB let's skip this
-                if(!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
+                if (!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
                 if (MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
                 {
                     var recordId = MissionControlSetup.HealthRecordIds[centralPath];
@@ -415,7 +418,81 @@ namespace HOK.MissionControl
                 IsSynching = false;
             });
         }
-        
+
+        /// <summary>
+        /// Ovveride method for when user synchs to central.
+        /// The goal here is to disable the DTM Tool and prevent pop-ups while synching.
+        /// </summary>
+        public static void OnSynchToCentral(object sender, ExecutedEventArgs args, SynchType synchType)
+        {
+            // (Konrad) This will disable the DTM Tool when we are synching to central.
+            IsSynching = true;
+
+            RevitCommandId commandId;
+            switch (synchType)
+            {
+                case SynchType.Synch:
+                    commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER");
+                    break;
+                case SynchType.SynchNow:
+                    commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER_SHORTCUT");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(synchType), synchType, null);
+            }
+            if (commandId == null || !commandId.CanHaveBinding) return;
+
+            EnqueueTask(app =>
+            {
+                try
+                {
+                    app.RemoveAddInCommandBinding(commandId);
+
+                    switch (synchType)
+                    {
+                        case SynchType.Synch:
+                            IsSynchOverriden = false;
+                            break;
+                        case SynchType.SynchNow:
+                            IsSynchNowOverriden = false;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(synchType), synchType, null);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                }
+            });
+
+            EnqueueTask(app =>
+            {
+                // (Konrad) We can now post the same Command we were overriding since the override is OFF.
+                app.PostCommand(commandId);
+
+                // (Konrad) Once the command executes this will turn the override back ON.
+                IsSynching = false;
+
+                var doc = app.ActiveUIDocument.Document;
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                if (string.IsNullOrEmpty(centralPath)) return;
+
+                // (Konrad) Let's turn the synch command override back on.
+                var config = MissionControlSetup.Configurations[centralPath];
+                foreach (var updater in config.updaters)
+                {
+                    if (!updater.isUpdaterOn) continue;
+
+                    if (string.Equals(updater.updaterId.ToLower(),
+                        Instance.DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+                    {
+                        Instance.DtmUpdaterInstance.CreateSynchToCentralOverride();
+                    }
+                }
+            });
+        }
+
         /// <summary>
         /// Removes ability to Unload a link for All Users.
         /// </summary>
@@ -451,6 +528,7 @@ namespace HOK.MissionControl
                     {
                         DtmUpdaterInstance.Register(doc, updater);
                         DtmUpdaterInstance.CreateReloadLatestOverride();
+                        DtmUpdaterInstance.CreateSynchToCentralOverride();
                     }
                     else if (string.Equals(updater.updaterId.ToLower(),
                         LinkUnloadInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))

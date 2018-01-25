@@ -30,11 +30,11 @@ namespace HOK.MissionControl.Tools.DTMTool
         }
 
         /// <summary>
-        /// 
+        /// Registers the DTM Updater with the Revit Updater Registry.
         /// </summary>
-        /// <param name="doc"></param>
-        /// <param name="pUpdater"></param>
-        /// <returns></returns>
+        /// <param name="doc">Revit Document.</param>
+        /// <param name="pUpdater">Updater instance.</param>
+        /// <returns>True if registered successfully, otherwise false.</returns>
         public bool Register(Document doc, ProjectUpdater pUpdater)
         {
             var registered = false;
@@ -56,9 +56,9 @@ namespace HOK.MissionControl.Tools.DTMTool
         }
 
         /// <summary>
-        /// 
+        /// Removes DTM Updater from the Revit Updater Registry.
         /// </summary>
-        /// <param name="doc"></param>
+        /// <param name="doc">Revit Document.</param>
         public void Unregister(Document doc)
         {
             try
@@ -87,7 +87,7 @@ namespace HOK.MissionControl.Tools.DTMTool
                 var configId = "";
                 if (MissionControlSetup.Configurations.ContainsKey(centralPath))
                 {
-                    configId = MissionControlSetup.Configurations[centralPath].Id.ToString();
+                    configId = MissionControlSetup.Configurations[centralPath].Id;
                 }
 
                 UpdaterRegistry.RemoveDocumentTriggers(_updaterId, doc);
@@ -129,7 +129,14 @@ namespace HOK.MissionControl.Tools.DTMTool
                                 .ToElements();
                             foreach (var element in elements)
                             {
-                                var reportingInfo = new ReportingElementInfo(configId, UpdaterGuid.ToString(), centralPath, trigger.categoryName, trigger.description, element.Id, element.UniqueId);
+                                var reportingInfo = new ReportingElementInfo(
+                                    configId, 
+                                    UpdaterGuid.ToString(), 
+                                    centralPath, 
+                                    trigger.categoryName, 
+                                    trigger.description, 
+                                    element.Id, 
+                                    element.UniqueId);
                                 _reportingElements.Add(reportingInfo);
                             }
                         }
@@ -147,7 +154,14 @@ namespace HOK.MissionControl.Tools.DTMTool
                             {
                                 foreach (var view in viewTemplates)
                                 {
-                                    var reportingInfo = new ReportingElementInfo(configId, UpdaterGuid.ToString(), centralPath, trigger.categoryName, trigger.description, view.Id, view.UniqueId);
+                                    var reportingInfo = new ReportingElementInfo(
+                                        configId, 
+                                        UpdaterGuid.ToString(), 
+                                        centralPath, 
+                                        trigger.categoryName, 
+                                        trigger.description, 
+                                        view.Id, 
+                                        view.UniqueId);
                                     _reportingElements.Add(reportingInfo);
                                 }
                             }
@@ -161,7 +175,14 @@ namespace HOK.MissionControl.Tools.DTMTool
                                 .ToElements();
                             foreach (var element in elements)
                             {
-                                var reportingInfo = new ReportingElementInfo(configId, UpdaterGuid.ToString(), centralPath, trigger.categoryName, trigger.description, element.Id, element.UniqueId);
+                                var reportingInfo = new ReportingElementInfo(
+                                    configId, 
+                                    UpdaterGuid.ToString(), 
+                                    centralPath, 
+                                    trigger.categoryName, 
+                                    trigger.description, 
+                                    element.Id, 
+                                    element.UniqueId);
                                 _reportingElements.Add(reportingInfo);
                             }
                         }
@@ -186,29 +207,6 @@ namespace HOK.MissionControl.Tools.DTMTool
                 if (AppCommand.IsSynching) return;
                 var doc = data.GetDocument();
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                //var configId = "";
-                //if (MissionControlSetup.Configurations.ContainsKey(centralPath))
-                //{
-                //    configId = MissionControlSetup.Configurations[centralPath].Id;
-                //}
-
-                // (Konrad) We probably want to leave element adding alone.
-                //var addedElementIds = data.GetAddedElementIds().ToList();
-                //foreach (var id in addedElementIds)
-                //{
-                //    var element = doc.GetElement(id);
-                //    if (null == element) continue;
-
-                //    var bltCategory = (BuiltInCategory)element.Category.Id.IntegerValue;
-                //    if (bltCategory == BuiltInCategory.OST_RvtLinks)
-                //    {
-                //        RunCategoryActionItems(centralPath, data, element);
-                //    }
-                //    else
-                //    {
-                //        AddCategoryCache(configId, centralPath, element);
-                //    }
-                //}
 
                 foreach (var id in data.GetModifiedElementIds())
                 {
@@ -231,108 +229,6 @@ namespace HOK.MissionControl.Tools.DTMTool
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="configId"></param>
-        ///// <param name="centralPath"></param>
-        ///// <param name="element"></param>
-        //private void AddCategoryCache(string configId, string centralPath, Element element)
-        //{
-        //    try
-        //    {
-        //        switch (element.Category.Name)
-        //        {
-        //            case "Grids":
-        //                var grid = (Grid)element;
-        //                if (!GridUtils.gridExtents.ContainsKey(centralPath))
-        //                {
-        //                    var extents = new Dictionary<ElementId, Outline> {{grid.Id, grid.GetExtents()}};
-        //                    GridUtils.gridExtents.Add(centralPath, extents);
-        //                }
-        //                else
-        //                {
-        //                    GridUtils.gridExtents[centralPath].Add(grid.Id, grid.GetExtents());
-        //                }
-        //                AddElementToStorage(configId, centralPath, element);
-        //                break;
-        //            case "Views":
-        //                var view = (View)element;
-        //                if (view.IsTemplate)
-        //                {
-        //                    AddElementToStorage(configId, centralPath, element);
-        //                }
-        //                break;
-        //            default:
-        //                AddElementToStorage(configId, centralPath, element);
-        //                break;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="configId"></param>
-        ///// <param name="centralPath"></param>
-        ///// <param name="element"></param>
-        //private void AddElementToStorage(string configId, string centralPath, Element element)
-        //{
-        //    try
-        //    {
-        //        var categoryName = element.Category.Name;
-        //        var triggerMessage = GetTriggerMessage(configId, element);
-        //        var eInfo = new ReportingElementInfo(configId, UpdaterGuid.ToString(), centralPath, categoryName, triggerMessage, element.Id, element.UniqueId);
-        //        _reportingElements.Add(eInfo);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="configId"></param>
-        ///// <param name="element"></param>
-        ///// <returns></returns>
-        //private string GetTriggerMessage(string configId, Element element)
-        //{
-        //    var triggerMsg = "";
-        //    try
-        //    {
-        //        if (MissionControlSetup.Configurations.ContainsKey(configId))
-        //        {
-        //            var configFound = MissionControlSetup.Configurations[configId];
-
-        //            var updaterFound = configFound.updaters
-        //                .Where(x => string.Equals(x.updaterId.ToLower(), UpdaterGuid.ToString().ToLower()))
-        //                .ToList();
-        //            if (updaterFound.Any())
-        //            {
-        //                var dtmUpdater = updaterFound.First();
-        //                var triggerFound = dtmUpdater.CategoryTriggers
-        //                    .Where(x => x.categoryName == element.Category.Name)
-        //                    .ToList();
-        //                if (triggerFound.Any())
-        //                {
-        //                    triggerMsg = triggerFound.First().description;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-        //    }
-        //    return triggerMsg;
-        //}
 
         /// <summary>
         /// 
@@ -418,6 +314,41 @@ namespace HOK.MissionControl.Tools.DTMTool
             });
         }
 
+        /// <summary>
+        /// Creates and idling task that will bind our own Synch to Central command to existing one.
+        /// </summary>
+        public void CreateSynchToCentralOverride()
+        {
+            AppCommand.EnqueueTask(app =>
+            {
+                try
+                {
+                    var commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER");
+                    var commandId2 = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER_SHORTCUT");
+                    if (commandId == null || commandId2 == null || !commandId2.CanHaveBinding || !commandId.CanHaveBinding) return;
+
+                    // (Konrad) We shouldn't be registering the same event handler more than once. It will throw an exception if we do.
+                    // It would also potentially cause the event to be fired multiple times. 
+                    if (!AppCommand.IsSynchOverriden)
+                    {
+                        var binding = app.CreateAddInCommandBinding(commandId);
+                        binding.Executed += (sender, e) => AppCommand.OnSynchToCentral(sender, e, SynchType.Synch);
+                        AppCommand.IsSynchOverriden = true;
+                    }
+                    if (!AppCommand.IsSynchNowOverriden)
+                    {
+                        var binding2 = app.CreateAddInCommandBinding(commandId2);
+                        binding2.Executed += (sender, e) => AppCommand.OnSynchToCentral(sender, e, SynchType.SynchNow);
+                        AppCommand.IsSynchNowOverriden = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                }
+            });
+        }
+
         public string GetAdditionalInformation()
         {
             return "Monitor changes on elements of specific categories";
@@ -437,5 +368,11 @@ namespace HOK.MissionControl.Tools.DTMTool
         {
             return "DTMUpdater";
         }
+    }
+
+    public enum SynchType
+    {
+        Synch,
+        SynchNow
     }
 }
