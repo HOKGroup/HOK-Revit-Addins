@@ -16,6 +16,8 @@ namespace HOK.MissionControl.Tools.WebsiteLink
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
+            var uiApp = commandData.Application;
+            var doc = uiApp.ActiveUIDocument.Document;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
@@ -25,7 +27,25 @@ namespace HOK.MissionControl.Tools.WebsiteLink
                 AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-WebsiteLink",
                     commandData.Application.Application.VersionNumber));
 
-                Process.Start("http://missioncontrol.hok.com/#/home");
+                var launchHome = false;
+                var pathName = doc.PathName;
+                if (!string.IsNullOrEmpty(pathName))
+                {
+                    var centralPath = BasicFileInfo.Extract(pathName).CentralPath;
+                    if (!string.IsNullOrEmpty(centralPath))
+                    {
+                        if (MissionControlSetup.Projects.ContainsKey(centralPath))
+                        {
+                            var id = MissionControlSetup.Projects[centralPath].Id;
+                            Process.Start("http://missioncontrol.hok.com/#/projects/edit/" + id);
+                        }
+                        else launchHome = true;
+                    }
+                    else launchHome = true;
+                }
+                else launchHome = true;
+
+                if(launchHome) Process.Start("http://missioncontrol.hok.com/#/home");
             }
             catch (Exception e)
             {
