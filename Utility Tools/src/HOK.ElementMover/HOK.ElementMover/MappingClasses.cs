@@ -1,47 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
+using HOK.Core.Utilities;
 
 namespace HOK.ElementMover
 {
     public class LinkedInstanceProperties
     {
-        private RevitLinkInstance m_instance = null;
-        private ElementId instanceId = ElementId.InvalidElementId;
-        private string instanceName = "";
-        private Autodesk.Revit.DB.Transform transformValue = null;
-        private Document linkedDocument = null;
-        private string linkDocTitle = "";
-        private string displayName = "";
-        private Dictionary<ElementId, CategoryProperties> categories = new Dictionary<ElementId, CategoryProperties>();
-        private Dictionary<ElementId/*targetElementInHost*/, LinkedElementInfo> linkedElements = new Dictionary<ElementId, LinkedElementInfo>();
-        private Dictionary<ElementId/*ElementType in host*/, LinkedFamilyInfo> linkedFamilies = new Dictionary<ElementId, LinkedFamilyInfo>();
-        
-        private BuiltInCategory[] customCategories = new BuiltInCategory[] { BuiltInCategory.OST_Rooms, BuiltInCategory.OST_Levels, BuiltInCategory.OST_Grids, BuiltInCategory.OST_VolumeOfInterest };
+        private readonly BuiltInCategory[] customCategories =
+        {
+            BuiltInCategory.OST_Rooms,
+            BuiltInCategory.OST_Levels,
+            BuiltInCategory.OST_Grids,
+            BuiltInCategory.OST_VolumeOfInterest
+        };
 
-        public RevitLinkInstance Instance { get { return m_instance; } set { m_instance = value; } }
-        public ElementId InstanceId { get { return instanceId; } set { instanceId = value; } }
-        public string InstanceName { get { return instanceName; } set { instanceName = value; } }
-        public Autodesk.Revit.DB.Transform TransformValue { get { return transformValue; } set { transformValue = value; } }
-        public Document LinkedDocument { get { return linkedDocument; } set { linkedDocument = value; } }
-        public string LinkDocTitle { get { return linkDocTitle; } set { linkDocTitle = value; } }
-        public string DisplayName { get { return displayName; } set { displayName = value; } }
-        public Dictionary<ElementId, CategoryProperties> Categories { get { return categories; } set { categories = value; } }
-        public Dictionary<ElementId, LinkedElementInfo> LinkedElements { get { return linkedElements; } set { linkedElements = value; } }
-        public Dictionary<ElementId, LinkedFamilyInfo> LinkedFamilies { get { return linkedFamilies; } set { linkedFamilies = value; } }
-        
+        public RevitLinkInstance Instance { get; set; }
+        public ElementId InstanceId { get; set; }
+        public string InstanceName { get; set; } = "";
+        public Transform TransformValue { get; set; }
+        public Document LinkedDocument { get; set; }
+        public string LinkDocTitle { get; set; } = "";
+        public string DisplayName { get; set; } = "";
+        public Dictionary<ElementId, CategoryProperties> Categories { get; set; } = new Dictionary<ElementId, CategoryProperties>();
+        public Dictionary<ElementId, LinkedElementInfo> LinkedElements { get; set; } = new Dictionary<ElementId, LinkedElementInfo>();
+        public Dictionary<ElementId, LinkedFamilyInfo> LinkedFamilies { get; set; } = new Dictionary<ElementId, LinkedFamilyInfo>();
+
         public LinkedInstanceProperties(RevitLinkInstance instance)
         {
-            m_instance = instance;
-            instanceId = m_instance.Id;
+            Instance = instance;
+            InstanceId = Instance.Id;
 
             CollectLinkInstanceInfo();
-            if (null != linkedDocument)
+            if (LinkedDocument != null)
             {
                 CollectCategories(); //model element + Rooms, Levels, Grids
                 CollectElementMaps();
@@ -49,45 +42,45 @@ namespace HOK.ElementMover
             }
         }
 
+        /// <summary>
+        /// Collects basic info about the link instance (name/transform)
+        /// </summary>
         private void CollectLinkInstanceInfo()
         {
             try
             {
-                var param = m_instance.get_Parameter(BuiltInParameter.RVT_LINK_INSTANCE_NAME);
-                if (null != param)
-                {
-                    instanceName = param.AsString();
-                }
+                var param = Instance.get_Parameter(BuiltInParameter.RVT_LINK_INSTANCE_NAME);
+                if (param != null) InstanceName = param.AsString();
+                if (Instance.GetTotalTransform() != null) TransformValue = Instance.GetTotalTransform();
 
-                if (null != m_instance.GetTotalTransform())
-                {
-                    transformValue = m_instance.GetTotalTransform();
-                }
+                // (Konrad) If link instance is unloaded, the DOC will be null.
+                LinkedDocument = Instance.GetLinkDocument();
+                if (LinkedDocument != null) LinkDocTitle = LinkedDocument.Title;
 
-#if RELEASE2014||RELEASE2015||RELEASE2016 || RELEASE2017
-                linkedDocument = m_instance.GetLinkDocument();
-                if (null != linkedDocument)
+                if (!string.IsNullOrEmpty(InstanceName) && !string.IsNullOrEmpty(LinkDocTitle))
                 {
-                    linkDocTitle = linkedDocument.Title;
+                    DisplayName = LinkDocTitle + " - " + InstanceName;
                 }
-#endif
-                if (!string.IsNullOrEmpty(instanceName) && !string.IsNullOrEmpty(linkDocTitle))
+                else
                 {
-                    displayName = linkDocTitle + " - " + instanceName;
+                    DisplayName = "Unloaded Link - " + InstanceName;
                 }
             }
             catch (Exception ex)
             {
-                var message = ex.Message;
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void CollectCategories()
         {
             try
             {
                 //Categories that have material quantities
-                var collector = new FilteredElementCollector(linkedDocument);
+                var collector = new FilteredElementCollector(LinkedDocument);
                 var elements = collector.WhereElementIsNotElementType().ToElements().ToList();
                 var elementCategories = from element in elements where null != element.Category select element.Category;
                 var modelCategories = from category in elementCategories where  category.HasMaterialQuantities && category.CategoryType == CategoryType.Model select category;
@@ -95,7 +88,7 @@ namespace HOK.ElementMover
                 var categoryNames = from category in modelCategories select category.Name;
                 var categoryNameList = categoryNames.Distinct().ToList();
 
-                var categoryObjects = linkedDocument.Settings.Categories;
+                var categoryObjects = LinkedDocument.Settings.Categories;
                 foreach (var catName in categoryNameList)
                 {
                     if (!categoryObjects.Contains(catName)) { continue; }
@@ -109,16 +102,16 @@ namespace HOK.ElementMover
                         if (itemCount > 0)
                         {
                             catProperties.ItemCount = itemCount;
-                            if (!categories.ContainsKey(catProperties.CategoryId))
+                            if (!Categories.ContainsKey(catProperties.CategoryId))
                             {
-                                categories.Add(catProperties.CategoryId, catProperties);
+                                Categories.Add(catProperties.CategoryId, catProperties);
                             }
                         }
                     }
                 }
 
                 //Categories that belongs to MEP curves
-                collector = new FilteredElementCollector(linkedDocument);
+                collector = new FilteredElementCollector(LinkedDocument);
                 var mepCurves = collector.OfClass(typeof(MEPCurve)).ToElements().ToList();
                 if (mepCurves.Count > 0)
                 {
@@ -137,9 +130,9 @@ namespace HOK.ElementMover
                             if (itemCount > 0)
                             {
                                 catProperties.ItemCount = itemCount;
-                                if (!categories.ContainsKey(catProperties.CategoryId))
+                                if (!Categories.ContainsKey(catProperties.CategoryId))
                                 {
-                                    categories.Add(catProperties.CategoryId, catProperties);
+                                    Categories.Add(catProperties.CategoryId, catProperties);
                                 }
                             }
                         }
@@ -151,7 +144,7 @@ namespace HOK.ElementMover
                     var catPriority = 0;
                     if (bltCategory == BuiltInCategory.OST_Rooms) { catPriority = 2; }
 
-                    collector = new FilteredElementCollector(linkedDocument);
+                    collector = new FilteredElementCollector(LinkedDocument);
                     var customCatElements = collector.OfCategory(bltCategory).ToElementIds();
                     if (customCatElements.Count > 0)
                     {
@@ -161,9 +154,9 @@ namespace HOK.ElementMover
                             var catProperties = new CategoryProperties(category);
                             catProperties.Priority = catPriority;
                             catProperties.ItemCount = customCatElements.Count;
-                            if (!categories.ContainsKey(catProperties.CategoryId))
+                            if (!Categories.ContainsKey(catProperties.CategoryId))
                             {
-                                categories.Add(catProperties.CategoryId, catProperties);
+                                Categories.Add(catProperties.CategoryId, catProperties);
                             }
                         }
                     }
@@ -179,8 +172,8 @@ namespace HOK.ElementMover
         {
             try
             {
-                var hostDoc = m_instance.Document;
-                var categoryIds = categories.Keys.ToList();
+                var hostDoc = Instance.Document;
+                var categoryIds = Categories.Keys.ToList();
                 foreach (var catId in categoryIds)
                 {
                     var collector = new FilteredElementCollector(hostDoc);
@@ -198,16 +191,16 @@ namespace HOK.ElementMover
                         var linkInfo = MoverDataStorageUtil.GetLinkedElementInfo(element);
                         if (null != linkInfo)
                         {
-                            if (linkInfo.SourceLinkInstanceId != instanceId) { continue; }
+                            if (linkInfo.SourceLinkInstanceId != InstanceId) { continue; }
                             if (element.Id != linkInfo.LinkedElementId) { continue; }
 
-                            var sourceElement = linkedDocument.GetElement(linkInfo.SourceElementId);
+                            var sourceElement = LinkedDocument.GetElement(linkInfo.SourceElementId);
                             if (null != sourceElement)
                             {
-                                linkInfo = new LinkedElementInfo(linkInfo.LinkElementType, sourceElement, element, instanceId, transformValue);
-                                if (!linkedElements.ContainsKey(linkInfo.LinkedElementId))
+                                linkInfo = new LinkedElementInfo(linkInfo.LinkElementType, sourceElement, element, InstanceId, TransformValue);
+                                if (!LinkedElements.ContainsKey(linkInfo.LinkedElementId))
                                 {
-                                    linkedElements.Add(linkInfo.LinkedElementId, linkInfo);
+                                    LinkedElements.Add(linkInfo.LinkedElementId, linkInfo);
                                 }
                             }
                         }
@@ -224,8 +217,8 @@ namespace HOK.ElementMover
         {
             try
             {
-                var hostDoc = m_instance.Document;
-                var categoryIds = categories.Keys.ToList();
+                var hostDoc = Instance.Document;
+                var categoryIds = Categories.Keys.ToList();
                 foreach (var catId in categoryIds)
                 {
                     var collector = new FilteredElementCollector(hostDoc);
@@ -238,19 +231,19 @@ namespace HOK.ElementMover
                             var familyInfo = MoverDataStorageUtil.GetLinkedFamilyInfo(elementType);
                             if (null != familyInfo)
                             {
-                                if (familyInfo.SourceLinkInstanceId != instanceId) { continue; }
+                                if (familyInfo.SourceLinkInstanceId != InstanceId) { continue; }
                                 if (element.Id != familyInfo.TargetTypeId) { continue; }
 
-                                var sourceType = linkedDocument.GetElement(familyInfo.SourceTypeId) as ElementType;
+                                var sourceType = LinkedDocument.GetElement(familyInfo.SourceTypeId) as ElementType;
                                 if (null != sourceType)
                                 {
                                     var sourceTypeInfo = new ElementTypeInfo(sourceType);
                                     var targetTypeInfo = new ElementTypeInfo(elementType);
 
                                     familyInfo = new LinkedFamilyInfo(familyInfo.SourceLinkInstanceId, sourceTypeInfo, targetTypeInfo);
-                                    if (!linkedFamilies.ContainsKey(familyInfo.TargetTypeId))
+                                    if (!LinkedFamilies.ContainsKey(familyInfo.TargetTypeId))
                                     {
-                                        linkedFamilies.Add(familyInfo.TargetTypeId, familyInfo);
+                                        LinkedFamilies.Add(familyInfo.TargetTypeId, familyInfo);
                                     }
                                 }
                             }
@@ -267,27 +260,22 @@ namespace HOK.ElementMover
 
     public class CategoryProperties
     {
-        private bool selected = false;
-        private ElementId categoryId = ElementId.InvalidElementId;
-        private string categoryName = "";
-        private int itemCount = 0;
-        private int priority = 1;
         //priority 0: Levels, Grids, Scope Boxes
         //priority 1: Floors, Walls
         //priority 2: Ceilings, Roofs, Stairs
         //priority 4: Family Instances
         //priority 5: Rooms
 
-        public bool Selected { get { return selected; } set { selected = value; } }
-        public ElementId CategoryId { get { return categoryId; } set { categoryId = value; } }
-        public string CategoryName { get { return categoryName; } set { categoryName = value; } }
-        public int ItemCount { get { return itemCount; } set { itemCount = value; } }
-        public int Priority { get { return priority; } set { priority = value; } }
+        public bool Selected { get; set; } = false;
+        public ElementId CategoryId { get; set; } = ElementId.InvalidElementId;
+        public string CategoryName { get; set; } = "";
+        public int ItemCount { get; set; } = 0;
+        public int Priority { get; set; } = 1;
 
         public CategoryProperties(Category category)
         {
-            categoryId = category.Id;
-            categoryName = category.Name;
+            CategoryId = category.Id;
+            CategoryName = category.Name;
         }
     }
 
@@ -298,37 +286,25 @@ namespace HOK.ElementMover
 
     public class LinkedElementInfo
     {
-        private LinkType linkElementType = LinkType.None;
-        private ElementId sourceElementId = ElementId.InvalidElementId; //source element in links
-        private string sourceUniqueId = "";
-        private ElementId linkedElementId = ElementId.InvalidElementId; //linked element in the host model
-        private string linkedUniqueId = "";
-        private ElementId sourceLinkInstanceId = ElementId.InvalidElementId;
-
         //For Tree View
-        private string categoryName = "";
-        private string familyName = "";
-        private string familyTypeName = "";
-        private string linkDisplayText = "";
-        private string tooltipText = "";
-        private bool matched = false;
 
         private int[] customCategories = new int[] { (int)BuiltInCategory.OST_Rooms, (int)BuiltInCategory.OST_Levels, (int)BuiltInCategory.OST_Grids, (int)BuiltInCategory.OST_VolumeOfInterest };
 
-        public LinkType LinkElementType { get { return linkElementType; } set { linkElementType = value; } }
-        public ElementId SourceElementId { get { return sourceElementId; } set { sourceElementId = value; } }
-        public string SourceUniqueId { get { return sourceUniqueId; } set { sourceUniqueId = value; } }
-        public ElementId LinkedElementId { get { return linkedElementId; } set { linkedElementId = value; } }
-        public string LinkedUniqueId { get { return linkedUniqueId; } set { linkedUniqueId = value; } }
-        public ElementId SourceLinkInstanceId { get { return sourceLinkInstanceId; } set { sourceLinkInstanceId = value; } }
+        public LinkType LinkElementType { get; set; } = LinkType.None;
+        public ElementId SourceElementId { get; set; } = ElementId.InvalidElementId;
+        public string SourceUniqueId { get; set; } = "";
+        public ElementId LinkedElementId { get; set; } = ElementId.InvalidElementId;
+        public string LinkedUniqueId { get; set; } = "";
+        public ElementId SourceLinkInstanceId { get; set; } = ElementId.InvalidElementId;
 
         //For Tree View
-        public string CategoryName { get { return categoryName; } set { categoryName = value; } }
-        public string FamilyName { get { return familyName; } set { familyName = value; } }
-        public string FamilyTypeName { get { return familyTypeName; } set { familyTypeName = value; } }
-        public string LinkDisplayText { get { return linkDisplayText; } set { linkDisplayText = value; } }
-        public string ToolTipText { get { return tooltipText; } set { tooltipText = value; } }
-        public bool Matched { get { return matched; } set { matched = value; } }
+        public string CategoryName { get; set; } = "";
+
+        public string FamilyName { get; set; } = "";
+        public string FamilyTypeName { get; set; } = "";
+        public string LinkDisplayText { get; set; } = "";
+        public string ToolTipText { get; set; } = "";
+        public bool Matched { get; set; } = false;
 
         public LinkedElementInfo()
         {
@@ -336,20 +312,20 @@ namespace HOK.ElementMover
 
         public LinkedElementInfo(LinkType linkType, Element sourceElement, Element linkedElement, ElementId linkInstanceId, Transform transform)
         {
-            linkElementType = linkType;
+            LinkElementType = linkType;
 
-            sourceElementId = sourceElement.Id;
-            sourceUniqueId = sourceElement.UniqueId;
-            linkedElementId = linkedElement.Id;
-            linkedUniqueId = linkedElement.UniqueId;
-            sourceLinkInstanceId = linkInstanceId;
-            matched = CompareLocation(sourceElement, linkedElement, transform);
+            SourceElementId = sourceElement.Id;
+            SourceUniqueId = sourceElement.UniqueId;
+            LinkedElementId = linkedElement.Id;
+            LinkedUniqueId = linkedElement.UniqueId;
+            SourceLinkInstanceId = linkInstanceId;
+            Matched = CompareLocation(sourceElement, linkedElement, transform);
 
             //tree view
-            categoryName = linkedElement.Category.Name;
+            CategoryName = linkedElement.Category.Name;
             if (customCategories.Contains(linkedElement.Category.Id.IntegerValue))
             {
-                linkDisplayText = "Source Element: " + sourceElement.Name + ", Target Element: " + linkedElement.Name;
+                LinkDisplayText = "Source Element: " + sourceElement.Name + ", Target Element: " + linkedElement.Name;
             }
             else
             {
@@ -360,13 +336,13 @@ namespace HOK.ElementMover
                     if (null != elementType)
                     {
                         var typeInfo = new ElementTypeInfo(elementType);
-                        familyName = typeInfo.FamilyName;
-                        familyTypeName = typeInfo.Name;
-                        linkDisplayText = "Source Id: " + sourceElementId.IntegerValue + ", Target Id: " + linkedElementId.IntegerValue;
+                        FamilyName = typeInfo.FamilyName;
+                        FamilyTypeName = typeInfo.Name;
+                        LinkDisplayText = "Source Id: " + SourceElementId.IntegerValue + ", Target Id: " + LinkedElementId.IntegerValue;
                     }
                 }
             }
-            tooltipText = (linkType == LinkType.ByCopy) ? "Created by Duplication" : "Defined by Users";
+            ToolTipText = (linkType == LinkType.ByCopy) ? "Created by Duplication" : "Defined by Users";
             
         }
 
@@ -458,25 +434,14 @@ namespace HOK.ElementMover
 
     public class LinkedFamilyInfo
     {
-        private ElementId sourceLinkInstanceId = ElementId.InvalidElementId;
-        private ElementId sourceTypeId = ElementId.InvalidElementId;
-        private ElementId targetTypeId = ElementId.InvalidElementId;
-
-        private string categoryName = "";
-        private string sourceFamilyName = "";
-        private string sourceTypeName = "";
-        private string targetFamilyName = "";
-        private string targetTypeName = "";
-
-        public ElementId SourceLinkInstanceId { get { return sourceLinkInstanceId; } set { sourceLinkInstanceId = value; } }
-        public ElementId SourceTypeId { get { return sourceTypeId; } set { sourceTypeId = value; } }
-        public ElementId TargetTypeId { get { return targetTypeId; } set { targetTypeId = value; } }
-        
-        public string CategoryName { get { return categoryName; } set { categoryName = value; } }
-        public string SourceFamilyName { get { return sourceFamilyName; } set { sourceFamilyName = value; } }
-        public string SourceTypeName { get { return sourceTypeName; } set { sourceTypeName = value; } }
-        public string TargetFamilyName { get { return targetFamilyName; } set { targetFamilyName = value; } }
-        public string TargetTypeName { get { return targetTypeName; } set { targetTypeName = value; } }
+        public ElementId SourceLinkInstanceId { get; set; } = ElementId.InvalidElementId;
+        public ElementId SourceTypeId { get; set; } = ElementId.InvalidElementId;
+        public ElementId TargetTypeId { get; set; } = ElementId.InvalidElementId;
+        public string CategoryName { get; set; } = "";
+        public string SourceFamilyName { get; set; } = "";
+        public string SourceTypeName { get; set; } = "";
+        public string TargetFamilyName { get; set; } = "";
+        public string TargetTypeName { get; set; } = "";
 
         public LinkedFamilyInfo()
         {
@@ -484,48 +449,42 @@ namespace HOK.ElementMover
 
         public LinkedFamilyInfo(ElementId linkInstanceId, ElementTypeInfo sourceType, ElementTypeInfo targetType)
         {
-            sourceLinkInstanceId = linkInstanceId;
-            sourceTypeId = sourceType.Id;
-            targetTypeId = targetType.Id;
+            SourceLinkInstanceId = linkInstanceId;
+            SourceTypeId = sourceType.Id;
+            TargetTypeId = targetType.Id;
 
-            categoryName = sourceType.CategoryName;
-            sourceFamilyName = sourceType.FamilyName;
-            sourceTypeName = sourceType.Name;
-            targetFamilyName = targetType.FamilyName;
-            targetTypeName = targetType.Name;
+            CategoryName = sourceType.CategoryName;
+            SourceFamilyName = sourceType.FamilyName;
+            SourceTypeName = sourceType.Name;
+            TargetFamilyName = targetType.FamilyName;
+            TargetTypeName = targetType.Name;
         }
     }
 
     public class ElementTypeInfo
     {
-        private ElementId id = ElementId.InvalidElementId;
-        private string name = "";
-        private string familyName = "";
-        private string categoryName = "";
-
-        public ElementId Id { get { return id; } set { id = value; } }
-        public string Name { get { return name; } set { name = value; } }
-        public string FamilyName { get { return familyName; } set { familyName = value; } }
-        public string CategoryName { get { return categoryName; } set { categoryName = value; } }
+        public ElementId Id { get; set; }
+        public string Name { get; set; }
+        public string FamilyName { get; set; }
+        public string CategoryName { get; set; } = "";
 
         public ElementTypeInfo(ElementType elementType)
         {
-            id = elementType.Id;
-            name = elementType.Name;
+            Id = elementType.Id;
+            Name = elementType.Name;
 #if RELEASE2014
             Parameter param = elementType.get_Parameter(BuiltInParameter.ALL_MODEL_FAMILY_NAME);
             if (null != param)
             {
-                familyName = param.AsString();
+                FamilyName = param.AsString();
             }
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
-            familyName = elementType.FamilyName;
+#else
+            FamilyName = elementType.FamilyName;
 #endif
             if (null != elementType.Category)
             {
-                categoryName = elementType.Category.Name;
+                CategoryName = elementType.Category.Name;
             }
         }
     }
-
 }
