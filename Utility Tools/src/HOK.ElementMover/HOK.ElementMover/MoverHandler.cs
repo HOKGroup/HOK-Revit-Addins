@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
@@ -14,40 +12,27 @@ namespace HOK.ElementMover
 {
     public class MoverHandler:IExternalEventHandler
     {
-        private UIApplication m_app = null;
-        private Document m_doc = null;
-        private MainWindow mainWindow = null;
-        private MappingWindow mappingWindow = null;
-        private FamilyWindow familyWindow = null;
-        private Request m_request = new Request();
-
-        private Dictionary<ElementId, LinkedInstanceProperties> linkInstances = new Dictionary<ElementId, LinkedInstanceProperties>();
-        private LinkedInstanceProperties selectedLink = null;
-        private List<LinkedElementInfo> linkedElementToDelete = new List<LinkedElementInfo>();
-        private List<LinkedFamilyInfo> linkedFamilyToDelete = new List<LinkedFamilyInfo>();
-        private LinkedElementInfo selectedLinkedInfo = null;
-        private LinkedFamilyInfo selectedFamilyInfo = null;
-        private UpdateMode selectedUpdateMode = UpdateMode.None;
-
-        public Document CurrentDocument { get { return m_doc; } }
-        public MainWindow MainWindowInstance { get { return mainWindow; } set { mainWindow = value; } }
-        public MappingWindow MappingWindowInstance { get { return mappingWindow; } set { mappingWindow = value; } }
-        public FamilyWindow FamilyWindowInstance { get { return familyWindow; } set { familyWindow = value; } }
-        public Request MoverRequest { get { return m_request; } }
-        public Dictionary<ElementId, LinkedInstanceProperties> LinkInstances { get { return linkInstances; } set { linkInstances = value; } }
+        private UIApplication m_app;
+        private LinkedInstanceProperties selectedLink;
+        public Document CurrentDocument { get; private set; }
+        public MainWindow MainWindowInstance { get; set; } = null;
+        public MappingWindow MappingWindowInstance { get; set; } = null;
+        public FamilyWindow FamilyWindowInstance { get; set; } = null;
+        public Request MoverRequest { get; } = new Request();
+        public Dictionary<ElementId, LinkedInstanceProperties> LinkInstances { get; set; } = new Dictionary<ElementId, LinkedInstanceProperties>();
         public LinkedInstanceProperties SelectedLink { get { return selectedLink; } set { selectedLink = value; } }
-        public List<LinkedElementInfo> LinkedElementToDelete { get { return linkedElementToDelete; } set { linkedElementToDelete = value; } }
-        public List<LinkedFamilyInfo> LinkedFamilyToDelete { get { return linkedFamilyToDelete; } set { linkedFamilyToDelete = value; } }
-        public LinkedElementInfo SelectedLinkedInfo { get { return selectedLinkedInfo; } set { selectedLinkedInfo = value; } }
-        public LinkedFamilyInfo SelectedFamilyInfo { get { return selectedFamilyInfo; } set { selectedFamilyInfo = value; } }
-        public UpdateMode SelectedUpdateMode { get { return selectedUpdateMode; } set { selectedUpdateMode = value; } }
-    
+        public List<LinkedElementInfo> LinkedElementToDelete { get; set; } = new List<LinkedElementInfo>();
+        public List<LinkedFamilyInfo> LinkedFamilyToDelete { get; set; } = new List<LinkedFamilyInfo>();
+        public LinkedElementInfo SelectedLinkedInfo { get; set; } = null;
+        public LinkedFamilyInfo SelectedFamilyInfo { get; set; } = null;
+        public UpdateMode SelectedUpdateMode { get; set; } = UpdateMode.None;
+
         public MoverHandler(UIApplication uiapp)
         {
             try
             {
                 m_app = uiapp;
-                m_doc = uiapp.ActiveUIDocument.Document;
+                CurrentDocument = uiapp.ActiveUIDocument.Document;
 
                 CollectRvtLinks();
             }
@@ -61,16 +46,16 @@ namespace HOK.ElementMover
         {
             try
             {
-                var collector = new FilteredElementCollector(m_doc);
+                var collector = new FilteredElementCollector(CurrentDocument);
                 var instances = collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().Cast<RevitLinkInstance>().ToList();
                 if (instances.Count > 0)
                 {
                     foreach (var instance in instances)
                     {
                         var lip = new LinkedInstanceProperties(instance);
-                        if (!linkInstances.ContainsKey(lip.InstanceId))
+                        if (!LinkInstances.ContainsKey(lip.InstanceId))
                         {
-                            linkInstances.Add(lip.InstanceId, lip);
+                            LinkInstances.Add(lip.InstanceId, lip);
                         }
                     }
                 }
@@ -89,68 +74,68 @@ namespace HOK.ElementMover
         {
             try
             {
-                m_doc = app.ActiveUIDocument.Document;
+                CurrentDocument = app.ActiveUIDocument.Document;
 
                 switch (MoverRequest.Take())
                 {
                     case RequestId.SelectLinkInstance:
-                        mainWindow.DozeOff();
+                        MainWindowInstance.DozeOff();
                         var picked = PickLinkInstance(out selectedLink);
                         if (picked)
                         {
-                            mainWindow.DisplayCategories(selectedLink);
+                            MainWindowInstance.DisplayCategories(selectedLink);
                         }
-                        mainWindow.WakeUp();
+                        MainWindowInstance.WakeUp();
                         break;
                     case RequestId.DuplicateElements:
-                        mainWindow.DozeOff();
+                        MainWindowInstance.DozeOff();
                         try
                         {
-                            selectedLink = ElementMoverUtil.DuplicateSelectedCategories(selectedLink, m_doc, selectedUpdateMode);
-                            if (linkInstances.ContainsKey(selectedLink.InstanceId))
+                            selectedLink = ElementMoverUtil.DuplicateSelectedCategories(selectedLink, CurrentDocument, SelectedUpdateMode);
+                            if (LinkInstances.ContainsKey(selectedLink.InstanceId))
                             {
-                                linkInstances.Remove(selectedLink.InstanceId);
+                                LinkInstances.Remove(selectedLink.InstanceId);
                             }
-                            linkInstances.Add(selectedLink.InstanceId, selectedLink);
-                            mainWindow.UpdateLinkedInstanceProperties();
+                            LinkInstances.Add(selectedLink.InstanceId, selectedLink);
+                            MainWindowInstance.UpdateLinkedInstanceProperties();
                         }
                         catch (Exception ex)
                         {
                             var message = ex.Message;
                         }
-                        mainWindow.WakeUp();
+                        MainWindowInstance.WakeUp();
                         break;
                     case RequestId.SelectMappingElements:
-                        mappingWindow.DozeOff();
+                        MappingWindowInstance.DozeOff();
                         Element sourceElement = null;
                         Element targetElement = null;
                         var pickedMap = PickMappingElements(out sourceElement, out targetElement);
                         if (pickedMap)
                         {
-                            if (linkInstances.ContainsKey(selectedLink.InstanceId))
+                            if (LinkInstances.ContainsKey(selectedLink.InstanceId))
                             {
-                                linkInstances.Remove(selectedLink.InstanceId);
+                                LinkInstances.Remove(selectedLink.InstanceId);
                             }
-                            linkInstances.Add(selectedLink.InstanceId, selectedLink);
-                            mappingWindow.RefreshLinkInstance();
+                            LinkInstances.Add(selectedLink.InstanceId, selectedLink);
+                            MappingWindowInstance.RefreshLinkInstance();
                         }
-                        mappingWindow.WakeUp();
+                        MappingWindowInstance.WakeUp();
                         break;
                     case RequestId.DeleteMappingElements:
-                        mappingWindow.DozeOff();
-                        if (linkedElementToDelete.Count > 0)
+                        MappingWindowInstance.DozeOff();
+                        if (LinkedElementToDelete.Count > 0)
                         {
-                            using (var trans = new Transaction(m_doc))
+                            using (var trans = new Transaction(CurrentDocument))
                             {
                                 trans.Start("Delete Element Maps");
                                 try
                                 {
-                                    foreach (var linkedInfo in linkedElementToDelete)
+                                    foreach (var linkedInfo in LinkedElementToDelete)
                                     {
                                         if (selectedLink.LinkedElements.ContainsKey(linkedInfo.LinkedElementId))
                                         {
                                             selectedLink.LinkedElements.Remove(linkedInfo.LinkedElementId);
-                                            var linkedElement = m_doc.GetElement(linkedInfo.LinkedElementId);
+                                            var linkedElement = CurrentDocument.GetElement(linkedInfo.LinkedElementId);
                                             if (null != linkedElement)
                                             {
                                                 var removed = MoverDataStorageUtil.RemoveLinkedElementInfo(linkedElement);
@@ -158,10 +143,10 @@ namespace HOK.ElementMover
                                         }
                                     }
                                     trans.Commit();
-                                    if (linkInstances.ContainsKey(selectedLink.InstanceId))
+                                    if (LinkInstances.ContainsKey(selectedLink.InstanceId))
                                     {
-                                        linkInstances.Remove(selectedLink.InstanceId);
-                                        linkInstances.Add(selectedLink.InstanceId, selectedLink);
+                                        LinkInstances.Remove(selectedLink.InstanceId);
+                                        LinkInstances.Add(selectedLink.InstanceId, selectedLink);
                                     }
                                 }
                                 catch (Exception ex)
@@ -170,48 +155,48 @@ namespace HOK.ElementMover
                                     MessageBox.Show("Failed to delete element maps.\n"+ex.Message, "Delete Element Maps", MessageBoxButton.OK, MessageBoxImage.Warning);
                                 }
                             }
-                            mappingWindow.RefreshLinkInstance();
+                            MappingWindowInstance.RefreshLinkInstance();
                         }
-                        mappingWindow.WakeUp();
+                        MappingWindowInstance.WakeUp();
                         break;
                     case RequestId.ShowElement:
-                        mappingWindow.DozeOff();
-                        if (null != selectedLinkedInfo)
+                        MappingWindowInstance.DozeOff();
+                        if (null != SelectedLinkedInfo)
                         {
-                            if (null != m_doc.GetElement(selectedLinkedInfo.LinkedElementId))
+                            if (null != CurrentDocument.GetElement(SelectedLinkedInfo.LinkedElementId))
                             {
                                 HighlightElement();
                             }
                         }
-                        mappingWindow.WakeUp();
+                        MappingWindowInstance.WakeUp();
                         break;
                     case RequestId.AddFamilyMapping:
-                        familyWindow.DozeOff();
-                        if (null != selectedFamilyInfo)
+                        FamilyWindowInstance.DozeOff();
+                        if (null != SelectedFamilyInfo)
                         {
-                            var tType = m_doc.GetElement(selectedFamilyInfo.TargetTypeId) as ElementType;
+                            var tType = CurrentDocument.GetElement(SelectedFamilyInfo.TargetTypeId) as ElementType;
                             if (null != tType)
                             {
-                                using (var trans = new Transaction(m_doc))
+                                using (var trans = new Transaction(CurrentDocument))
                                 {
                                     trans.Start("Add Family Map");
                                     try
                                     {
-                                        if (selectedLink.LinkedFamilies.ContainsKey(selectedFamilyInfo.TargetTypeId))
+                                        if (selectedLink.LinkedFamilies.ContainsKey(SelectedFamilyInfo.TargetTypeId))
                                         {
-                                            selectedLink.LinkedFamilies.Remove(selectedFamilyInfo.TargetTypeId);
+                                            selectedLink.LinkedFamilies.Remove(SelectedFamilyInfo.TargetTypeId);
                                         }
-                                        selectedLink.LinkedFamilies.Add(selectedFamilyInfo.TargetTypeId, selectedFamilyInfo);
+                                        selectedLink.LinkedFamilies.Add(SelectedFamilyInfo.TargetTypeId, SelectedFamilyInfo);
 
-                                        var updated = MoverDataStorageUtil.UpdateLinkedFamilyInfo(selectedFamilyInfo, tType);
+                                        var updated = MoverDataStorageUtil.UpdateLinkedFamilyInfo(SelectedFamilyInfo, tType);
 
-                                        if (linkInstances.ContainsKey(selectedLink.InstanceId))
+                                        if (LinkInstances.ContainsKey(selectedLink.InstanceId))
                                         {
-                                            linkInstances.Remove(selectedLink.InstanceId);
-                                            linkInstances.Add(selectedLink.InstanceId, selectedLink);
+                                            LinkInstances.Remove(selectedLink.InstanceId);
+                                            LinkInstances.Add(selectedLink.InstanceId, selectedLink);
                                         }
                                         trans.Commit();
-                                        mappingWindow.RefreshLinkInstance();
+                                        MappingWindowInstance.RefreshLinkInstance();
                                     }
                                     catch (Exception ex)
                                     {
@@ -222,23 +207,23 @@ namespace HOK.ElementMover
                             }
                         }
                       
-                        familyWindow.WakeUp();
+                        FamilyWindowInstance.WakeUp();
                         break;
                     case RequestId.DeleteFamilyMapping:
-                        mappingWindow.DozeOff();
-                        if (null != selectedFamilyInfo)
+                        MappingWindowInstance.DozeOff();
+                        if (null != SelectedFamilyInfo)
                         {
-                            using (var trans = new Transaction(m_doc))
+                            using (var trans = new Transaction(CurrentDocument))
                             {
                                 trans.Start("Delete Family Map");
                                 try
                                 {
-                                    foreach (var familyInfo in linkedFamilyToDelete)
+                                    foreach (var familyInfo in LinkedFamilyToDelete)
                                     {
                                         if (selectedLink.LinkedFamilies.ContainsKey(familyInfo.TargetTypeId))
                                         {
                                             selectedLink.LinkedFamilies.Remove(familyInfo.TargetTypeId);
-                                            var tType = m_doc.GetElement(familyInfo.TargetTypeId) as ElementType;
+                                            var tType = CurrentDocument.GetElement(familyInfo.TargetTypeId) as ElementType;
                                             if (null != tType)
                                             {
                                                 var removed = MoverDataStorageUtil.RemoveLinkedFamilyInfo(tType);
@@ -246,12 +231,12 @@ namespace HOK.ElementMover
                                         }
                                     }
                                     trans.Commit();
-                                    if (linkInstances.ContainsKey(selectedLink.InstanceId))
+                                    if (LinkInstances.ContainsKey(selectedLink.InstanceId))
                                     {
-                                        linkInstances.Remove(selectedLink.InstanceId);
-                                        linkInstances.Add(selectedLink.InstanceId, selectedLink);
+                                        LinkInstances.Remove(selectedLink.InstanceId);
+                                        LinkInstances.Add(selectedLink.InstanceId, selectedLink);
                                     }
-                                    mappingWindow.RefreshLinkInstance();
+                                    MappingWindowInstance.RefreshLinkInstance();
                                 }
                                 catch (Exception ex)
                                 {
@@ -260,7 +245,7 @@ namespace HOK.ElementMover
                                 }
                             }
                         }
-                        mappingWindow.WakeUp();
+                        MappingWindowInstance.WakeUp();
                         break;
                     case RequestId.None:
                         return;
@@ -276,7 +261,7 @@ namespace HOK.ElementMover
         {
             var picked = false;
             lip = null;
-            using (var trans = new Transaction(m_doc))
+            using (var trans = new Transaction(CurrentDocument))
             {
                 trans.Start("Pick Revit Link");
                 try
@@ -287,9 +272,9 @@ namespace HOK.ElementMover
                     if (null != reference)
                     {
                         var elementId = reference.ElementId;
-                        if (linkInstances.ContainsKey(elementId))
+                        if (LinkInstances.ContainsKey(elementId))
                         {
-                            lip = linkInstances[elementId];
+                            lip = LinkInstances[elementId];
                             picked = true;
                         }
                     }
@@ -309,7 +294,7 @@ namespace HOK.ElementMover
             var picked = false;
             sourceElement = null;
             targetElement = null; 
-            using (var trans = new Transaction(m_doc))
+            using (var trans = new Transaction(CurrentDocument))
             {
                 trans.Start("Pick Mapping Elements");
                 try
@@ -319,9 +304,9 @@ namespace HOK.ElementMover
                     if (null != reference)
                     {
                         var linkedInstanceId = reference.ElementId;
-                        if (linkInstances.ContainsKey(linkedInstanceId) && reference.LinkedElementId!=ElementId.InvalidElementId)
+                        if (LinkInstances.ContainsKey(linkedInstanceId) && reference.LinkedElementId!=ElementId.InvalidElementId)
                         {
-                            var lip = linkInstances[linkedInstanceId];
+                            var lip = LinkInstances[linkedInstanceId];
                             var linkedDoc = lip.LinkedDocument;
 
                             var linkedElement = linkedDoc.GetElement(reference.LinkedElementId); //element in linked model
@@ -336,7 +321,7 @@ namespace HOK.ElementMover
                                     if (null != secondReference)
                                     {
                                         var eId = secondReference.ElementId;
-                                        var element = m_doc.GetElement(eId);
+                                        var element = CurrentDocument.GetElement(eId);
                                         if (null != element)
                                         {
                                             ElementTypeInfo sourceTypeInfo = null;
@@ -349,7 +334,7 @@ namespace HOK.ElementMover
 
                                             ElementTypeInfo targetTypeInfo = null;
                                             var targetTypeId = element.GetTypeId();
-                                            var targetType = m_doc.GetElement(targetTypeId) as ElementType;
+                                            var targetType = CurrentDocument.GetElement(targetTypeId) as ElementType;
                                             if (null != targetType)
                                             {
                                                 targetTypeInfo = new ElementTypeInfo(targetType);
@@ -419,21 +404,16 @@ namespace HOK.ElementMover
                 reference = selection.PickObject(ObjectType.LinkedElement, "Pick a linked element in a linked instance " + selectedLink.DisplayName);
                 if (null != reference)
                 {
-                    if (reference.ElementId == selectedLink.InstanceId)
+                    if (reference.ElementId == selectedLink.InstanceId) return reference;
+
+                    var msgResult = MessageBox.Show("Please select a linked element from the selected link instance.\n" + selectedLink.DisplayName, "Linked Instance Mismatch", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+                    switch (msgResult)
                     {
-                        return reference;
-                    }
-                    else
-                    {
-                        var msgResult = MessageBox.Show("Please select a linked element from the selected link instance.\n" + selectedLink.DisplayName, "Linked Instance Mismatch", MessageBoxButton.OKCancel, MessageBoxImage.Warning);
-                        if (msgResult == MessageBoxResult.OK)
-                        {
+                        case MessageBoxResult.OK:
                             PickLinkedElement();
-                        }
-                        else if (msgResult == MessageBoxResult.Cancel)
-                        {
+                            break;
+                        case MessageBoxResult.Cancel:
                             return null;
-                        }
                     }
                 }
             }
@@ -446,12 +426,12 @@ namespace HOK.ElementMover
 
         private void HighlightElement()
         {
-            using (var trans = new Transaction(m_doc))
+            using (var trans = new Transaction(CurrentDocument))
             {
                 trans.Start("Select Element");
                 try
                 {
-                    var uidoc = new UIDocument(m_doc);
+                    var uidoc = new UIDocument(CurrentDocument);
 #if RELEASE2014
                     Element element = m_doc.GetElement(selectedLinkedInfo.LinkedElementId);
                     if(null!=element)
@@ -461,13 +441,14 @@ namespace HOK.ElementMover
 
                         uidoc.Selection.Elements = selElements;
                     }
-#elif RELEASE2015||RELEASE2016 || RELEASE2017
-                    List<ElementId> selectedIds = new List<ElementId>();
-                    selectedIds.Add(selectedLinkedInfo.LinkedElementId);
+#else
+                    var selectedIds = new List<ElementId>
+                    {
+                        SelectedLinkedInfo.LinkedElementId
+                    };
                     uidoc.Selection.SetElementIds(selectedIds);
 #endif
-
-                    uidoc.ShowElements(selectedLinkedInfo.LinkedElementId);
+                    uidoc.ShowElements(SelectedLinkedInfo.LinkedElementId);
                     trans.Commit();
                 }
                 catch (Exception ex)
@@ -482,11 +463,11 @@ namespace HOK.ElementMover
         {
             try
             {
-                if (null != mappingWindow)
+                if (null != MappingWindowInstance)
                 {
-                    mappingWindow.DozeOff();
-                    mappingWindow.RefreshLinkInstance();
-                    mappingWindow.WakeUp();
+                    MappingWindowInstance.DozeOff();
+                    MappingWindowInstance.RefreshLinkInstance();
+                    MappingWindowInstance.WakeUp();
                 }
             }
             catch (Exception ex)
@@ -501,22 +482,15 @@ namespace HOK.ElementMover
         }
     }
 
-    public enum RequestId : int
+    public enum RequestId
     {
         None = 0,
-
         SelectLinkInstance = 1,
-
         DuplicateElements = 2,
-
         SelectMappingElements = 3,
-
         DeleteMappingElements = 4,
-
         ShowElement = 5,
-
         AddFamilyMapping = 6,
-
         DeleteFamilyMapping =7
     }
 
@@ -537,14 +511,9 @@ namespace HOK.ElementMover
 
     public class LinkInstanceSelectionFilter : ISelectionFilter
     {
-
         public bool AllowElement(Element elem)
         {
-            if (elem.Category.Id.IntegerValue == (int)BuiltInCategory.OST_RvtLinks)
-            {
-                return true;
-            }
-            return false;
+            return elem.Category.Id.IntegerValue == (int)BuiltInCategory.OST_RvtLinks;
         }
 
         public bool AllowReference(Reference reference, XYZ position)
@@ -555,7 +524,7 @@ namespace HOK.ElementMover
 
     public class TargetElementSelectionFilter : ISelectionFilter
     {
-        private ElementId categoryId = ElementId.InvalidElementId;
+        private readonly ElementId categoryId;
 
         public TargetElementSelectionFilter(ElementId catId)
         {
@@ -564,17 +533,12 @@ namespace HOK.ElementMover
 
         public bool AllowElement(Element elem)
         {
-            if (elem.Category.Id == categoryId)
-            {
-                return true;
-            }
-            return false;
+            return elem.Category.Id == categoryId;
         }
 
         public bool AllowReference(Reference reference, XYZ position)
         {
             return false;
         }
-    }
-        
+    }   
 }
