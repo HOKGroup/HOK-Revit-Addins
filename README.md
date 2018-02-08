@@ -1,4 +1,4 @@
-HOK-Revit-Addins 2018.0.0.
+HOK-Revit-Addins 2018.0.0.X
 ================
 
 This repository will include all documentation files and source codes for HOK Revit Addins
