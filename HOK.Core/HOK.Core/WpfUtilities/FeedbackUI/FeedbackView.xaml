@@ -5,15 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-        mc:Ignorable="d" 
+        xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command"
+        xmlns:feedbackUi="clr-namespace:HOK.Core.WpfUtilities.FeedbackUI"
+        mc:Ignorable="d"
         d:DesignHeight="300" d:DesignWidth="300" Icon="../../Resources/hoklogo.ico" Width="524" Height="500" MinWidth="524" MinHeight="500"
         Title="{Binding Title}" WindowStartupLocation="CenterScreen" BorderThickness="0,5,0,0" BorderBrush="#C45C44">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="PreviewKeyDown">
+            <cmd:EventToCommand PassEventArgsToCommand="True" Command="{Binding WindowKeyDown}"/>
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
+        <Grid.Resources>
+            <feedbackUi:FilePathToFileNameConverter x:Key="FilePathConverter"/>
+        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
@@ -21,7 +29,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="150"/>
             <RowDefinition Height="50"/>
-            <RowDefinition/>
+            <RowDefinition Height="21*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
@@ -60,7 +69,7 @@
                 </AdornerDecorator>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="GroupBox3" Margin="10,0,10,0" Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
+        <GroupBox x:Name="GroupBox3" Margin="10,0" Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0">
             <GroupBox.Header>
                 <TextBlock FontWeight="Bold">Feedback</TextBlock>
             </GroupBox.Header>
@@ -75,8 +84,8 @@
                 Command="{Binding Cancel, Mode=OneWay}"
                 CommandParameter="{Binding ElementName=Win}"
                 Grid.Column="1" 
-                Margin="0,0,89,10" 
-                Grid.Row="3" 
+                Margin="0,0,91,10" 
+                Grid.Row="4" 
                 Height="20" 
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Right" 
@@ -86,13 +95,13 @@
                 CommandParameter="{Binding ElementName=Win}"
                 Content="Submit" 
                 ToolTip="Submit a new Issue to GitHub page."
-                Margin="0,0,10,10" 
-                Grid.Row="3"
+                Margin="0,0,12,10" 
+                Grid.Row="4"
                 Width="74"
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Right"
                 Grid.Column="1"/>
-        <StatusBar Grid.Row="4" 
+        <StatusBar Grid.Row="5" 
                    Height="23" 
                    HorizontalAlignment="Stretch" 
                    Margin="0,0,0,0" 
@@ -120,6 +129,31 @@
                 <ProgressBar Value="0" Width="150" Height="16" Name="progressBar" Visibility="Hidden" SmallChange="1" IsIndeterminate="False" />
             </StatusBarItem>
         </StatusBar>
-
+        <ItemsControl ItemsSource="{Binding Attachments}" 
+                      Grid.Row="3" 
+                      Grid.Column="0"
+                      Grid.ColumnSpan="2" 
+                      Margin="12,10,12,10">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Left"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type feedbackUi:AttachmentView}">
+                    <feedbackUi:AttachmentView Margin="0, 4, 0, 0"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Button x:Name="ChooseFileButton" 
+            Content="Choose File" 
+            Command="{Binding ChooseFile, Mode=OneWay}"
+            Margin="12,0,0,10" 
+            Grid.Row="4"
+            Grid.Column="0"
+            Height="20" 
+            VerticalAlignment="Bottom" 
+            HorizontalAlignment="Left" 
+            Width="74"/>
     </Grid>
 </Window>

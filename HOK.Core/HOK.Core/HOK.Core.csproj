@@ -100,10 +100,12 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -131,12 +133,18 @@
     <Compile Include="WpfUtilities\Converters.cs" />
     <Compile Include="WpfUtilities\DataGridUtilities.cs" />
     <Compile Include="WpfUtilities\DataGridExtension.cs" />
+    <Compile Include="WpfUtilities\EventToCommand.cs" />
+    <Compile Include="WpfUtilities\FeedbackUI\AttachmentView.xaml.cs">
+      <DependentUpon>AttachmentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WpfUtilities\FeedbackUI\AttachmentViewModel.cs" />
     <Compile Include="WpfUtilities\FeedbackUI\FeedbackCommand.cs" />
     <Compile Include="WpfUtilities\FeedbackUI\FeedbackModel.cs" />
     <Compile Include="WpfUtilities\FeedbackUI\FeedbackView.xaml.cs">
       <DependentUpon>FeedbackView.xaml</DependentUpon>
     </Compile>
     <Compile Include="WpfUtilities\FeedbackUI\FeedbackViewModel.cs" />
+    <Compile Include="WpfUtilities\IEventArgsConverter.cs" />
     <Compile Include="WpfUtilities\ProgressManager.cs" />
     <Compile Include="WpfUtilities\RelayCommand.cs" />
   </ItemGroup>
@@ -144,6 +152,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="WpfUtilities\FeedbackUI\AttachmentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WpfUtilities\FeedbackUI\FeedbackView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -154,6 +166,13 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\comments_32x32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\commentsAttachment_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\deleteAttachmentHover_16x16.png" />
+    <Resource Include="Resources\deleteAttachment_16x16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -171,6 +190,8 @@ xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\T
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.CitrixTools"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
+xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2016
@@ -181,6 +202,8 @@ xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\T
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.CitrixTools"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.LinksManager"
+xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2017
@@ -191,17 +214,20 @@ xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\T
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.CitrixTools"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
+xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2018
 echo Copying results to Build2018
 xcopy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetPath)Octokit.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 xcopy /Y "$(TargetDir)RestSharp.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.FamilyPublish"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.CitrixTools"
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
+xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>
