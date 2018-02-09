@@ -8,7 +8,7 @@
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command"
         xmlns:feedbackUi="clr-namespace:HOK.Core.WpfUtilities.FeedbackUI"
         mc:Ignorable="d"
-        d:DesignHeight="300" d:DesignWidth="300" Icon="../../Resources/hoklogo.ico" Width="524" Height="500" MinWidth="524" MinHeight="500"
+        d:DesignHeight="300" d:DesignWidth="300" Icon="../../Resources/hoklogo.ico" Width="600" MinWidth="600" MinHeight="380" SizeToContent="Height"
         Title="{Binding Title}" WindowStartupLocation="CenterScreen" BorderThickness="0,5,0,0" BorderBrush="#C45C44">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
@@ -19,9 +19,6 @@
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
-        <Grid.Resources>
-            <feedbackUi:FilePathToFileNameConverter x:Key="FilePathConverter"/>
-        </Grid.Resources>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
@@ -29,7 +26,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="150"/>
             <RowDefinition Height="50"/>
-            <RowDefinition Height="21*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="40"/>
             <RowDefinition Height="24"/>
@@ -75,7 +72,12 @@
             </GroupBox.Header>
             <Grid>
                 <AdornerDecorator Margin="10">
-                    <TextBox x:Name="SearchTextBox" BorderThickness="0" FontSize="16" TextWrapping="Wrap" Text="{Binding Feedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox x:Name="SearchTextBox" 
+                             BorderThickness="0" 
+                             AcceptsReturn="True"
+                             AcceptsTab="True"
+                             TextWrapping="Wrap" 
+                             Text="{Binding Feedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 </AdornerDecorator>
             </Grid>
         </GroupBox>

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GalaSoft.MvvmLight;
+﻿using GalaSoft.MvvmLight;
 
 namespace HOK.Core.WpfUtilities.FeedbackUI
 {
@@ -11,6 +6,8 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
     {
         public GalaSoft.MvvmLight.Command.RelayCommand Delete { get; set; }
         public FeedbackViewModel ViewModel { get; set; }
+        public string HtmlLink { get; set; }
+        public UploadImageContent UploadImageContent { get; set; }
 
         public AttachmentViewModel(FeedbackViewModel vm)
         {
@@ -23,10 +20,11 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
             ViewModel.DeleteAttachment(this);
         }
 
-        private string _name;
-        public string Name {
-            get { return _name; }
-            set { _name = value; RaisePropertyChanged(() => Name); }
+        private string _filePath;
+        public string FilePath
+        {
+            get { return _filePath; }
+            set { _filePath = value; RaisePropertyChanged(() => FilePath); }
         }
     }
 }

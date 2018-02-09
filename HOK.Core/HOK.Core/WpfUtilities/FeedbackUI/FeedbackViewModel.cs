@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using Microsoft.Win32;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.Win32;
 
 namespace HOK.Core.WpfUtilities.FeedbackUI
 {
@@ -55,78 +52,89 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
             ChooseFile = new GalaSoft.MvvmLight.Command.RelayCommand(OnChooseFile);
         }
 
-        public void DeleteAttachment(AttachmentViewModel vm)
+        public async void DeleteAttachment(AttachmentViewModel vm)
         {
             Attachments.Remove(vm);
+            var currentState = string.Copy(Feedback);
+
+            var response = await Model.RemoveImage<Response>(vm);
+            if (response.commit == null)
+            {
+                Attachments.Add(vm);
+                Feedback = currentState;
+                StatusBarManager.StatusLabel.Text = "Failed to remove image. Please try again.";
+                return;
+            }
+
+            StatusBarManager.StatusLabel.Text = "Successfully removed: " + vm.UploadImageContent.name;
         }
 
-        private void OnChooseFile()
+        private async void OnChooseFile()
         {
             var file = SelectImageFile();
             if (string.IsNullOrEmpty(file)) return;
 
             var attachment = new AttachmentViewModel(this)
             {
-                Name = Path.GetFileName(file)
+                FilePath = file
             };
 
-            Attachments.Add(attachment);
-        }
+            Attachments.Add(attachment); // updates UI
 
-        public static string SelectImageFile()
-        {
-            var dialog = new OpenFileDialog
+            var response = await Model.PostImage<Response>(attachment, true);
+            if (response.content == null)
             {
-                DefaultExt = ".jpg",
-                Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png"
-            };
-            var result = dialog.ShowDialog();
-
-            return result != true ? string.Empty : dialog.FileName;
-        }
-
-        private void OnWindowKeyDown(KeyEventArgs args)
-        {
-            if (args.Key == Key.V && Keyboard.Modifiers == ModifierKeys.Control)
-            {
-                if (Clipboard.ContainsImage())
-                {
-                    var clipboardData = Clipboard.GetDataObject();
-                    if (clipboardData != null)
-                    {
-                        if (clipboardData.GetDataPresent(DataFormats.Bitmap))
-                        {
-                            var bitmap = GetBitmap((BitmapSource)clipboardData.GetData(DataFormats.Bitmap));
-                            if (bitmap != null)
-                            {
-                                var hBitmap = bitmap.GetHbitmap();
-                                try
-                                {
-                                    var source = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                                }
-                                finally
-                                {
-                                    DeleteObject(hBitmap);
-                                }
-                            }
-                        }
-                    }
-                }
+                StatusBarManager.StatusLabel.Text = "Failed to upload. Please try again.";
+                Attachments.Remove(attachment);
+                return;
             }
+
+            StatusBarManager.StatusLabel.Text = "Successfully uploaded: " + response.content.name;
+            attachment.HtmlLink = "\n![image](" + response.content.html_url + "?raw=true)\n";
+            attachment.UploadImageContent = response.content;
+
+            Feedback += attachment.HtmlLink;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        private static Bitmap GetBitmap(BitmapSource source)
+        private async void OnWindowKeyDown(KeyEventArgs args)
         {
-            var bmp = new Bitmap(source.PixelWidth, source.PixelHeight, PixelFormat.Format32bppPArgb);
-            var data = bmp.LockBits(new Rectangle(System.Drawing.Point.Empty, bmp.Size), ImageLockMode.WriteOnly, PixelFormat.Format32bppPArgb);
-            source.CopyPixels(Int32Rect.Empty, data.Scan0, data.Height * data.Stride, data.Stride);
-            bmp.UnlockBits(data);
-            return bmp;
+            // (Konrad) Only handle CTRL + V
+            if (args.Key != Key.V || Keyboard.Modifiers != ModifierKeys.Control) return;
+            if (!Clipboard.ContainsImage()) return;
+
+            var image = Clipboard.GetImage();
+            if (image == null) return;
+
+            var tempFile = Path.Combine(Path.GetTempPath(), DateTime.Now.ToString("yyyyMMddTHHmmss") + "_ClipboardFile.jpg");
+            using (var fileStream = new FileStream(tempFile, FileMode.Create))
+            {
+                BitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(image));
+                encoder.Save(fileStream);
+            }
+
+            if (!File.Exists(tempFile)) return;
+
+            var attachment = new AttachmentViewModel(this)
+            {
+                FilePath = tempFile
+            };
+
+            Attachments.Add(attachment); // updates UI
+
+            var response = await Model.PostImage<Response>(attachment, false);
+            if (response.content == null)
+            {
+                StatusBarManager.StatusLabel.Text = "Failed to upload. Please try again.";
+                Attachments.Remove(attachment);
+                return;
+            }
+
+            StatusBarManager.StatusLabel.Text = "Successfully uploaded: " + response.content.name;
+            attachment.HtmlLink = "\n![image](" + response.content.html_url + "?raw=true)\n";
+            attachment.UploadImageContent = response.content;
+
+            Feedback += attachment.HtmlLink;
         }
 
         private static void OnCancel(Window win)
@@ -166,7 +174,7 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
             }
         }
 
-        private static void OnWindowLoaded(Window win)
+        private void OnWindowLoaded(Window win)
         {
             StatusBarManager.StatusLabel = ((FeedbackView)win).statusLabel;
         }
@@ -190,6 +198,22 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
         {
             get { return _name; }
             set { _name = value; RaisePropertyChanged(() => Name); }
+        }
+
+        /// <summary>
+        /// Opens Dialog with filters to allow image selection only.
+        /// </summary>
+        /// <returns></returns>
+        public static string SelectImageFile()
+        {
+            var dialog = new OpenFileDialog
+            {
+                DefaultExt = ".jpg",
+                Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png"
+            };
+            var result = dialog.ShowDialog();
+
+            return result != true ? string.Empty : dialog.FileName;
         }
 
         /// <summary>
