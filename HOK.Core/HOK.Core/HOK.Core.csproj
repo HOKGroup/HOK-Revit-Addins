@@ -144,6 +144,7 @@
       <DependentUpon>FeedbackView.xaml</DependentUpon>
     </Compile>
     <Compile Include="WpfUtilities\FeedbackUI\FeedbackViewModel.cs" />
+    <Compile Include="WpfUtilities\FeedbackUI\GitHubWrappers.cs" />
     <Compile Include="WpfUtilities\IEventArgsConverter.cs" />
     <Compile Include="WpfUtilities\ProgressManager.cs" />
     <Compile Include="WpfUtilities\RelayCommand.cs" />

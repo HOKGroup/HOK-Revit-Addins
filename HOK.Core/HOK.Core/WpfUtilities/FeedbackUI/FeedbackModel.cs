@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -11,63 +9,21 @@ using HOK.Core.Utilities;
 
 namespace HOK.Core.WpfUtilities.FeedbackUI
 {
-    public class Response
-    {
-        public UploadImageContent content { get; set; }
-        public UploadCommit commit { get; set; }
-    }
-
-    public class UploadCommit
-    {
-        public string sha { get; set; }
-    }
-
-    public class UploadImageContent
-    {
-        public string path { get; set; }
-        public string sha { get; set; }
-        public string name { get; set; }
-        public string html_url { get; set; }
-    }
-
-    public class DeleteObject
-    {
-        public string path { get; set; }
-        public string message { get; set; }
-        public string sha { get; set; }
-        public string branch { get; set; }
-    }
-
-    public class UploadObject
-    {
-        public string path { get; set; }
-        public string message { get; set; }
-        public string content { get; set; }
-        public string branch { get; set; }
-    }
-
-    public static class ImageExtensions
-    {
-        public static byte[] ToByteArray(this Image image, ImageFormat format)
-        {
-            using (var ms = new MemoryStream())
-            {
-                image.Save(ms, format);
-                return ms.ToArray();
-            }
-        }
-    }
-
     public class FeedbackModel
     {
+        // (Konrad) This is a token and credentials for the github user we use here
+        // username: hokfeedback
+        // password: Password123456
+        // token: fc396d894a4f27520b8ce85564c5fc2b2a15b88f
+
         private const string baseUrl = "https://api.github.com";
 
         /// <summary>
-        /// 
+        /// Async call to GitHub that removes an image.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="att"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">Type of response object.</typeparam>
+        /// <param name="att">Attachment object to be removed.</param>
+        /// <returns>Response object.</returns>
         public async Task<T> RemoveImage<T>(AttachmentViewModel att) where T : new()
         {
             var client = new RestClient(baseUrl);
@@ -98,12 +54,12 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
         }
 
         /// <summary>
-        /// 
+        /// Async call to GitHub that adds an image.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="att"></param>
+        /// <typeparam name="T">Type of response object.</typeparam>
+        /// <param name="att">Attachment object to be added.</param>
         /// <param name="createTemp"></param>
-        /// <returns></returns>
+        /// <returns>Response object.</returns>
         public async Task<T> PostImage<T>(AttachmentViewModel att, bool createTemp) where T: new()
         {
             string tempFile;
@@ -177,10 +133,6 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
         {
             try
             {
-                // (Konrad) This is a token and credentials for the github user we use here
-                // username: hokfeedback
-                // password: Password123456
-                // token: fc396d894a4f27520b8ce85564c5fc2b2a15b88f
                 var client = new RestClient(baseUrl);
 
                 var stringBuilder = new StringBuilder();
@@ -226,14 +178,5 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
                 return e.Message;
             }
         }
-    }
-
-    public class Issue
-    {
-        public string title { get; set; }
-        public string body { get; set; }
-        public string milestone { get; set; }
-        public List<string> assignees { get; set; }
-        public List<string> labels { get; set; }
     }
 }
