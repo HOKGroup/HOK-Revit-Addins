@@ -2,7 +2,7 @@
 
 #### Library of commonly used methods and classes. Contains mostly utility methods shared across more than one plug-in. 
 
-###### Release 2018.0.0.6
+###### Release 2018.0.0.7
 
 * Added async code for GitHub interactions. 
 * Added ability to add images as attachments.
