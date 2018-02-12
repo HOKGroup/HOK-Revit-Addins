@@ -4,6 +4,12 @@
 
 ###### Release 2018.0.0.6
 
+* Added async code for GitHub interactions. 
+* Added ability to add images as attachments.
+* Added Watermark Service for Text Box greyed out text.
+
+###### Release 2018.0.0.6
+
 * Fixed PostBuild event to push RestSharp dependency out to Content folder. 
 
 ###### Release 2018.0.0.5
