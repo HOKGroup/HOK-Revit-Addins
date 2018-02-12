@@ -123,12 +123,14 @@
     <Compile Include="Utilities\Button.cs" />
     <Compile Include="Utilities\CommandAttributes.cs" />
     <Compile Include="ElementWrapers\ImageTypeWrapper.cs" />
+    <Compile Include="Utilities\Dialogs.cs" />
     <Compile Include="Utilities\ImageUtilities.cs" />
     <Compile Include="Utilities\Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\RevitDocument.cs" />
     <Compile Include="Utilities\SelectionFilters.cs" />
     <Compile Include="Utilities\StringUtilities.cs" />
+    <Compile Include="Utilities\Validations.cs" />
     <Compile Include="WpfUtilities\BooleanConverter.cs" />
     <Compile Include="WpfUtilities\Converters.cs" />
     <Compile Include="WpfUtilities\DataGridUtilities.cs" />
@@ -148,6 +150,8 @@
     <Compile Include="WpfUtilities\IEventArgsConverter.cs" />
     <Compile Include="WpfUtilities\ProgressManager.cs" />
     <Compile Include="WpfUtilities\RelayCommand.cs" />
+    <Compile Include="WpfUtilities\WatermarkAdorner.cs" />
+    <Compile Include="WpfUtilities\WatermarkService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

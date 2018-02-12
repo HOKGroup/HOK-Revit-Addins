@@ -17,6 +17,7 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
         // token: fc396d894a4f27520b8ce85564c5fc2b2a15b88f
 
         private const string baseUrl = "https://api.github.com";
+        private const string token = "fc396d894a4f27520b8ce85564c5fc2b2a15b88f";
 
         /// <summary>
         /// Async call to GitHub that removes an image.
@@ -32,7 +33,7 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
                 OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
             };
             request.AddHeader("Content-type", "application/json");
-            request.AddHeader("Authorization", "Token fc396d894a4f27520b8ce85564c5fc2b2a15b88f");
+            request.AddHeader("Authorization", "Token " + token);
             request.RequestFormat = DataFormat.Json;
 
             request.AddBody(new DeleteObject
@@ -98,7 +99,7 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
                 OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
             };
             request.AddHeader("Content-type", "application/json");
-            request.AddHeader("Authorization", "Token fc396d894a4f27520b8ce85564c5fc2b2a15b88f");
+            request.AddHeader("Authorization", "Token " + token);
             request.RequestFormat = DataFormat.Json;
             request.AddBody(body);
 
@@ -129,54 +130,44 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
         /// <param name="feedback">Feedback/Comments</param>
         /// <param name="toolname">Name and version of tool used to submit.</param>
         /// <returns>Message</returns>
-        public string Submit(string name, string email, string feedback, string toolname)
+        public async Task<T> Submit<T>(string name, string email, string feedback, string toolname) where T: new()
         {
-            try
+            var client = new RestClient(baseUrl);
+
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("From: " + name);
+            stringBuilder.AppendLine("Email: " + email);
+            stringBuilder.AppendLine("User: " + Environment.UserName);
+            stringBuilder.AppendLine("Machine: " + Environment.MachineName);
+            stringBuilder.AppendLine("");
+            stringBuilder.AppendLine("Body: ");
+            stringBuilder.AppendLine(feedback);
+
+            var body = new Issue
             {
-                var client = new RestClient(baseUrl);
+                title = "hokfeedback - " + toolname,
+                body = stringBuilder.ToString(),
+                assignees = new List<string>(),
+                labels = new List<string>()
+            };
 
-                var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine("From: " + name);
-                stringBuilder.AppendLine("Email: " + email);
-                stringBuilder.AppendLine("User: " + Environment.UserName);
-                stringBuilder.AppendLine("Machine: " + Environment.MachineName);
-                stringBuilder.AppendLine("");
-                stringBuilder.AppendLine("Body: ");
-                stringBuilder.AppendLine(feedback);
-
-                var body = new Issue
-                {
-                    title = "hokfeedback - " + toolname,
-                    body = stringBuilder.ToString(),
-                    assignees = new List<string>(),
-                    labels = new List<string>()
-                };
-
-                try
-                {
-                    var request = new RestRequest("/repos/HOKGroup/MissionControl_Issues/issues", Method.POST)
-                    {
-                        OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
-                    };
-                    request.AddHeader("Content-type", "application/json");
-                    request.AddHeader("Authorization", "Token fc396d894a4f27520b8ce85564c5fc2b2a15b88f");
-                    request.RequestFormat = DataFormat.Json;
-                    request.AddBody(body);
-
-                    var response = client.Execute<Issue>(request);
-                    return response.StatusCode == HttpStatusCode.Created ? "Success" : "Failed to create GitHub issue. Try again.";
-                }
-                catch (Exception ex)
-                {
-                    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-                    return ex.Message;
-                }
-            }
-            catch (Exception e)
+            var request = new RestRequest("/repos/HOKGroup/MissionControl_Issues/issues", Method.POST)
             {
-                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-                return e.Message;
+                OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
+            };
+            request.AddHeader("Content-type", "application/json");
+            request.AddHeader("Authorization", "Token " + token);
+            request.RequestFormat = DataFormat.Json;
+            request.AddBody(body);
+
+            var response = await client.ExecuteTaskAsync<T>(request);
+            if (response.StatusCode != HttpStatusCode.Created)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, response.StatusDescription);
+                return new T();
             }
+
+            return response.Data;
         }
     }
 }

@@ -7,9 +7,10 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:cmd="clr-namespace:GalaSoft.MvvmLight.Command"
         xmlns:feedbackUi="clr-namespace:HOK.Core.WpfUtilities.FeedbackUI"
+        xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities"
         mc:Ignorable="d"
         d:DesignHeight="300" d:DesignWidth="300" Icon="../../Resources/hoklogo.ico" Width="600" MinWidth="600" MinHeight="380" SizeToContent="Height"
-        Title="{Binding Title}" WindowStartupLocation="CenterScreen" BorderThickness="0,5,0,0" BorderBrush="#C45C44">
+        Title="{Binding Title}" WindowStartupLocation="CenterScreen" BorderThickness="0,5,0,0" BorderBrush="#C45C44" ResizeMode="NoResize">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
@@ -77,7 +78,13 @@
                              AcceptsReturn="True"
                              AcceptsTab="True"
                              TextWrapping="Wrap" 
-                             Text="{Binding Feedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                             Text="{Binding Feedback, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <wpfUtilities:WatermarkService.Watermark>
+                            <TextBlock Padding="0">
+                                Please leave a message. Use CTRL + V or "Add Image" button to attach files.
+                            </TextBlock>
+                        </wpfUtilities:WatermarkService.Watermark>
+                    </TextBox>
                 </AdornerDecorator>
             </Grid>
         </GroupBox>
@@ -148,7 +155,7 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
         <Button x:Name="ChooseFileButton" 
-            Content="Choose File" 
+            Content="Add Image" 
             Command="{Binding ChooseFile, Mode=OneWay}"
             Margin="12,0,0,10" 
             Grid.Row="4"

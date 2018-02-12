@@ -1,35 +1,17 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.IO;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using Microsoft.Win32;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using HOK.Core.Utilities;
 
 namespace HOK.Core.WpfUtilities.FeedbackUI
 {
-    public class FilePathToFileNameConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            return Path.GetFileName(System.Convert.ToString(value));
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class FeedbackViewModel : ViewModelBase
     {
-        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-        public static extern bool DeleteObject(IntPtr hObject);
-
         public string ToolName { get; set; }
         public string Title { get; set; }
         public FeedbackModel Model { get; set; }
@@ -52,10 +34,16 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
             ChooseFile = new GalaSoft.MvvmLight.Command.RelayCommand(OnChooseFile);
         }
 
+        private static void OnWindowLoaded(Window win)
+        {
+            StatusBarManager.StatusLabel = ((FeedbackView)win).statusLabel;
+        }
+
         public async void DeleteAttachment(AttachmentViewModel vm)
         {
             Attachments.Remove(vm);
             var currentState = string.Copy(Feedback);
+            Feedback = Feedback.Replace(vm.HtmlLink.Replace(Environment.NewLine, ""), "");
 
             var response = await Model.RemoveImage<Response>(vm);
             if (response.commit == null)
@@ -65,13 +53,13 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
                 StatusBarManager.StatusLabel.Text = "Failed to remove image. Please try again.";
                 return;
             }
-
+            
             StatusBarManager.StatusLabel.Text = "Successfully removed: " + vm.UploadImageContent.name;
         }
 
         private async void OnChooseFile()
         {
-            var file = SelectImageFile();
+            var file = Dialogs.SelectImageFile();
             if (string.IsNullOrEmpty(file)) return;
 
             var attachment = new AttachmentViewModel(this)
@@ -142,44 +130,33 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
             win.Close();
         }
 
-        private void OnSubmit(Window win)
+        private async void OnSubmit(Window win)
         {
-            var result = string.Empty;
+            Issue response = null;
 
             if (string.IsNullOrEmpty(Name))
             {
                 StatusBarManager.StatusLabel.Text = "Please provide your name.";
             }
-            else if (!IsValidEmail(Email))
+            else if (!Validations.IsValidEmail(Email))
             {
                 StatusBarManager.StatusLabel.Text = "Please provide valid email address.";
             }
             else
             {
-                result = Model.Submit(Name, Email, Feedback, ToolName);
+                response = await Model.Submit<Issue>(Name, Email, Feedback, ToolName);
             }
 
-            if (string.IsNullOrEmpty(result))
+            if (response != null && response.body == null)
             {
-                // form validation failed just display the message on status bar
+                StatusBarManager.StatusLabel.Text = "Failed to post an issue. Please try again.";
+                return;
             }
-            else if (result == "Success")
-            {
-                win.Close();
-            }
-            else
-            {
-                // show the error
-                StatusBarManager.StatusLabel.Text = result;
-            }
+
+            win.Close();
         }
 
-        private void OnWindowLoaded(Window win)
-        {
-            StatusBarManager.StatusLabel = ((FeedbackView)win).statusLabel;
-        }
-
-        private string _feedback = "Please leave a message...";
+        private string _feedback;
         public string Feedback
         {
             get { return _feedback; }
@@ -198,40 +175,6 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
         {
             get { return _name; }
             set { _name = value; RaisePropertyChanged(() => Name); }
-        }
-
-        /// <summary>
-        /// Opens Dialog with filters to allow image selection only.
-        /// </summary>
-        /// <returns></returns>
-        public static string SelectImageFile()
-        {
-            var dialog = new OpenFileDialog
-            {
-                DefaultExt = ".jpg",
-                Filter = "Image files (*.jpg, *.jpeg, *.jpe, *.jfif, *.png) | *.jpg; *.jpeg; *.jpe; *.jfif; *.png"
-            };
-            var result = dialog.ShowDialog();
-
-            return result != true ? string.Empty : dialog.FileName;
-        }
-
-        /// <summary>
-        /// This is a basic email address validation check.
-        /// </summary>
-        /// <param name="email">Email to check.</param>
-        /// <returns>True if email address is valid.</returns>
-        public static bool IsValidEmail(string email)
-        {
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }
