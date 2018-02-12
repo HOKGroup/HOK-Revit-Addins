@@ -3,6 +3,7 @@ using System.Windows.Input;
 
 namespace HOK.Core.WpfUtilities
 {
+    [Obsolete]
     public class RelayCommand : ICommand
     {
         private Action<object> execute;
