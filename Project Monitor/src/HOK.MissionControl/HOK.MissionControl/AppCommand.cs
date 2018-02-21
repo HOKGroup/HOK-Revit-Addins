@@ -230,7 +230,7 @@ namespace HOK.MissionControl
                         HrData = ServerUtilities.GetByCentralPath<HealthReportData>(centralPath, "healthrecords/centralpath");
                         if (HrData == null)
                         {
-                            HrData = ServerUtilities.Post<HealthReportData>(new HealthReportData { centralPath = centralPath }, "healthrecords");
+                            HrData = ServerUtilities.Post<HealthReportData>(new HealthReportData { centralPath = centralPath.ToLower() }, "healthrecords");
                             ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
                             refreshProject = true;
                         }

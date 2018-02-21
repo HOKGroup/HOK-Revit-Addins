@@ -193,7 +193,7 @@ namespace HOK.MissionControl.FamilyPublish
 
                 var familyStats = new FamilyData
                 {
-                    centralPath = CentralPath,
+                    centralPath = CentralPath.ToLower(),
                     totalFamilies = famOutput.Count,
                     unusedFamilies = unusedFamilies,
                     inPlaceFamilies = inPlaceFamilies,
