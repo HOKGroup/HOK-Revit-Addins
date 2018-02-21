@@ -7,8 +7,8 @@
         xmlns:ex="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d" Title="{Binding Title, Mode=OneWay}" Icon="Resources/hoklogo.ico"
-        BorderThickness="0,5,0,0" BorderBrush="#C45C44"
-        d:DesignHeight="300" d:DesignWidth="852" Width="885" MinWidth="885" SizeToContent="Height">
+        BorderThickness="0,5,0,0" BorderBrush="#C45C44" WindowStartupLocation="CenterOwner"
+        d:DesignHeight="360" d:DesignWidth="885" Width="885" MinWidth="885" SizeToContent="Height">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
@@ -56,8 +56,9 @@
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="40"/>
+            <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="Beta Tools" Margin="10">
+        <GroupBox Header="Beta Tools" Margin="10,10,10,0">
             <Grid Margin="0,10,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
@@ -216,5 +217,32 @@
                 </ControlTemplate>
             </Button.Template>
         </Button>
+        <StatusBar Grid.Row="1" 
+                   Height="23" 
+                   HorizontalAlignment="Stretch" 
+                   Margin="0,0,0,0" 
+                   Name="statusBar" 
+                   VerticalAlignment="Bottom"
+                   Grid.Column="0" Grid.RowSpan="2">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="168"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem Margin="8,0,0,0">
+                <TextBlock Text="Ready" 
+                           Name="statusLabel" 
+                           Visibility="Visible" 
+                           Foreground="#FF767474"/>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="1" Margin="0,0,8,0">
+                <ProgressBar Value="0" Width="150" Height="16" Name="progressBar" Visibility="Hidden" SmallChange="1" IsIndeterminate="False" />
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>

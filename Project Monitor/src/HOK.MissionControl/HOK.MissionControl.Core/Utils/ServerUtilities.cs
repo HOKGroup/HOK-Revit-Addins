@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using RestSharp;
 using Newtonsoft.Json;
 using HOK.Core.Utilities;
@@ -95,12 +96,34 @@ namespace HOK.MissionControl.Core.Utils
         }
 
         /// <summary>
+        /// Retrieves all objects in a collection by route.
+        /// </summary>
+        /// <typeparam name="T">Type to be returned.</typeparam>
+        /// <param name="route">Route to make the request to.</param>
+        /// <returns>A List of Type objects if any were found.</returns>
+        public static async Task<List<T>> FindAll<T>(string route) where T : new()
+        {
+            var client = new RestClient(RestApiBaseUrl);
+            var request = new RestRequest(ApiVersion + "/" + route, Method.GET);
+            var response = await client.ExecuteTaskAsync<List<T>>(request);
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, response.StatusDescription);
+                return new List<T>();
+            }
+
+            Log.AppendLog(LogMessageType.INFO, response.StatusDescription + "-" + route);
+            return response.Data;
+        }
+
+        /// <summary>
         /// Retrieves a Collection from MongoDB.
         /// </summary>
         /// <typeparam name="T">Type of response class.</typeparam>
         /// <param name="responseType">Response object type.</param>
         /// <param name="route">Route to post request to.</param>
         /// <returns></returns>
+        [Obsolete]
         public static List<T> FindAll<T>(T responseType, string route) where T : new()
         {
             var items = new List<T>();
@@ -234,7 +257,43 @@ namespace HOK.MissionControl.Core.Utils
         /// <summary>
         /// POSTs any new data Schema. Creates new Collection in MongoDB.
         /// </summary>
+        /// <typeparam name="T">Type of return data.</typeparam>
+        /// <param name="body">Body of rest call.</param>
+        /// <param name="route">Route to be called.</param>
         /// <returns>Newly created Collection Schema with MongoDB assigned Id.</returns>
+        public static async Task<T> POST<T>(object body, string route) where T : new()
+        {
+            var client = new RestClient(RestApiBaseUrl);
+            client.ClearHandlers();
+            client.AddHandler("application/json", new NewtonsoftJsonSerializer());
+            client.AddHandler("text/json", new NewtonsoftJsonSerializer());
+            client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
+            client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
+            client.AddHandler("*+json", new NewtonsoftJsonSerializer());
+
+            var request = new RestRequest(ApiVersion + "/" + route, Method.POST);
+            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            request.AddHeader("Content-type", "application/json");
+            request.RequestFormat = DataFormat.Json;
+            request.JsonSerializer = new NewtonsoftJsonSerializer();
+            request.AddBody(body);
+
+            var response = await client.ExecuteTaskAsync<T>(request);
+            if (response.StatusCode != HttpStatusCode.Created)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, response.StatusDescription);
+                return new T();
+            }
+
+            Log.AppendLog(LogMessageType.INFO, response.StatusDescription + "-" + route);
+            return response.Data;
+        }
+
+        /// <summary>
+        /// POSTs any new data Schema. Creates new Collection in MongoDB.
+        /// </summary>
+        /// <returns>Newly created Collection Schema with MongoDB assigned Id.</returns>
+        [Obsolete]
         public static T Post<T>(object body, string route) where T : new()
         {
             var resresponse = default(T);

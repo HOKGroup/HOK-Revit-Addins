@@ -7,7 +7,9 @@ using System.Windows.Interop;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.Core.Utilities;
+using HOK.Core.WpfUtilities;
 using HOK.Core.WpfUtilities.FeedbackUI;
+using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
 
 namespace HOK.BetaToolsManager
 {
@@ -70,6 +72,7 @@ namespace HOK.BetaToolsManager
         {
             OnCheckNone();
             AutoUpdateStatus = Addins.FirstOrDefault()?.AutoUpdate;
+            StatusBarManager.StatusLabel = ((AddinInstallerWindow)win).statusLabel;
         }
 
         private void OnUninstall(Window win)
@@ -114,7 +117,7 @@ namespace HOK.BetaToolsManager
             set { _addins = value; RaisePropertyChanged(() => Addins); }
         }
 
-        private bool? _autoUpdateStatus = true;
+        private bool? _autoUpdateStatus;
         public bool? AutoUpdateStatus
         {
             get { return _autoUpdateStatus; }
