@@ -215,6 +215,8 @@
     <Content Include="HOK.BetaToolsManager.addin">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\commentsHover_32x32.png" />
+    <Resource Include="Resources\comments_32x32.png" />
     <EmbeddedResource Include="Resources\betaPluginManager_32x32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -17,35 +17,23 @@
             <i:InvokeCommandAction Command="{Binding WindowClosing}" CommandParameter="{Binding ElementName=Win}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Window.Resources>
-        <Style TargetType="{x:Type ex:DataGridExtension}">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="AutoGenerateColumns" Value="False"/>
-            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
-            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
-            <Setter Property="HeadersVisibility" Value="Column"/>
-            <Setter Property="SelectionMode" Value="Extended"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Setter Property="BorderBrush" Value="LightGray"/>
-        </Style>
-        <Style x:Key="CenterGridHeaderStyle1" TargetType="DataGridColumnHeader">
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        </Style>
-        <Style x:Key="ContentDataGridCentering1" TargetType="{x:Type DataGridCell}">
-            <Setter Property="Padding" Value="10"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type DataGridCell}">
-                        <Grid Background="{TemplateBinding Background}">
-                            <ContentPresenter VerticalAlignment="Center"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
     <Grid>
         <Grid.Resources>
+            <Style x:Key="CenterGridHeaderStyle1" TargetType="DataGridColumnHeader">
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            </Style>
+            <Style x:Key="ContentDataGridCentering1" TargetType="{x:Type DataGridCell}">
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                            <Grid Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
             <Style x:Key="dgCellStyle1" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
                 <Setter Property="Padding" Value="10"/>
                 <Setter Property="Template">
@@ -81,6 +69,14 @@
                                       CanUserAddRows="False" 
                                       IsReadOnly="False" 
                                       SelectionUnit="FullRow" 
+                                      Background="White"
+                                      AutoGenerateColumns="False"
+                                      HorizontalGridLinesBrush="LightGray"
+                                      VerticalGridLinesBrush="LightGray"
+                                      HeadersVisibility="Column"
+                                      SelectionMode="Extended"
+                                      VerticalAlignment="Stretch"
+                                      BorderBrush="LightGray"
                                       SelectedItemsList="{Binding SelectedAddins, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" RenderTransformOrigin="0.5,0.5" Margin="10,0">
                     <ex:DataGridExtension.Columns>
                         <DataGridCheckBoxColumn Header="Select" 
@@ -100,6 +96,7 @@
                                 <DataTemplate>
                                     <Image Source="{Binding Image}" 
                                            Width="32" 
+                                           Margin="4"
                                            Height="32" 
                                            Stretch="None" 
                                            HorizontalAlignment="Center"/>
@@ -144,8 +141,32 @@
                         </DataGridTextColumn>
                     </ex:DataGridExtension.Columns>
                 </ex:DataGridExtension>
-                <Button Content="All" Command="{Binding CheckAll}" Margin="10,0,0,10" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
-                <Button Content="None" Command="{Binding CheckNone}" Margin="90,0,0,10" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
+                <Button Content="All" 
+                        Command="{Binding CheckAll}" 
+                        Margin="10,0,0,10" 
+                        Grid.Row="1" 
+                        Height="20" 
+                        VerticalAlignment="Bottom" 
+                        HorizontalAlignment="Left" 
+                        Width="75"/>
+                <Button Content="None" 
+                        Command="{Binding CheckNone}" 
+                        Margin="90,0,0,10" 
+                        Grid.Row="1" 
+                        Height="20" 
+                        VerticalAlignment="Bottom" 
+                        HorizontalAlignment="Left" 
+                        Width="75"/>
+                <CheckBox Content="Auto Update" 
+                          ToolTip="Keeps all beta plug-ins always up to date." 
+                          IsChecked="{Binding AutoUpdateStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Margin="170,0,-5,0" 
+                          Grid.Row="1" 
+                          Width="103" 
+                          Height="20" 
+                          VerticalContentAlignment="Center"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center"/>
             </Grid>
         </GroupBox>
         <Button Content="Install"
@@ -155,7 +176,8 @@
                 Height="20" 
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Right" 
-                Width="100" Grid.Row="1" />
+                Width="100" 
+                Grid.Row="1" />
         <Button Content="Close" 
                 Command="{Binding CloseCommand, Mode=OneWay}" 
                 CommandParameter="{Binding ElementName=Win}" 
@@ -170,14 +192,29 @@
                 Margin="0,0,90,10" 
                 Height="20" 
                 VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="100" Grid.Row="1" />
-        <CheckBox Content="Auto Update" 
-                  ToolTip="Keeps all beta plug-ins always up to date." 
-                  Margin="10,0,0,10" 
-                  Grid.Row="1" 
-                  IsChecked="{Binding AutoUpdateStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  HorizontalAlignment="Left"
-                  Width="103" 
-                  Height="20" 
-                  VerticalAlignment="Bottom"/>
+        <Button Grid.Row="1" 
+                Name="CheckAllButton" 
+                Command="{Binding SubmitComment, Mode=OneWay}" 
+                ToolTip="Submit Feedback!"
+                Margin="10,8,0,8" 
+                Cursor="Hand" 
+                Background="Transparent" 
+                Visibility="Visible" 
+                HorizontalAlignment="Left">
+            <Button.Template>
+                <ControlTemplate TargetType="Button">
+                    <StackPanel>
+                        <Image Name="image1" Source="Resources/comments_32x32.png"  Width="24" Height="24" Visibility="Visible"/>
+                        <Image Name="image2" Source="Resources/commentsHover_32x32.png" Width="24" Height="24" Visibility="Collapsed"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="image1" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="image2" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
     </Grid>
 </Window>
