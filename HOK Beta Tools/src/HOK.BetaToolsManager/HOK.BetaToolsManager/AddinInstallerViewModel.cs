@@ -1,10 +1,15 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Interop;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.Core.Utilities;
+using HOK.Core.WpfUtilities;
+using HOK.Core.WpfUtilities.FeedbackUI;
+using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
 
 namespace HOK.BetaToolsManager
 {
@@ -12,13 +17,14 @@ namespace HOK.BetaToolsManager
     {
         public AddinInstallerModel Model;
         public string Title { get; set; }
-        public RelayCommand<Window> CloseCommand { get; }
-        public RelayCommand CheckAll { get; }
-        public RelayCommand CheckNone { get; }
-        public RelayCommand<Window> InstallCommand { get; }
-        public RelayCommand<Window> UninstallCommand { get; }
-        public RelayCommand<Window> WindowLoaded { get; }
-        public RelayCommand<Window> WindowClosing { get; }
+        public RelayCommand<Window> CloseCommand { get; set; }
+        public RelayCommand CheckAll { get; set; }
+        public RelayCommand CheckNone { get; set; }
+        public RelayCommand<Window> InstallCommand { get; set; }
+        public RelayCommand<Window> UninstallCommand { get; set; }
+        public RelayCommand<Window> WindowLoaded { get; set; }
+        public RelayCommand<Window> WindowClosing { get; set; }
+        public RelayCommand SubmitComment { get; set; }
 
         public AddinInstallerViewModel(AddinInstallerModel model)
         {
@@ -33,6 +39,25 @@ namespace HOK.BetaToolsManager
             UninstallCommand = new RelayCommand<Window>(OnUninstall);
             WindowLoaded = new RelayCommand<Window>(OnWindowLoaded);
             WindowClosing = new RelayCommand<Window>(OnWindowClosing);
+            SubmitComment = new RelayCommand(OnSubmitComment);
+        }
+
+        private static void OnSubmitComment()
+        {
+            var title = "Beta Tools - Beta Installer v." + Assembly.GetExecutingAssembly().GetName().Version;
+            var model = new FeedbackModel();
+            var viewModel = new FeedbackViewModel(model, title);
+            var view = new FeedbackView
+            {
+                DataContext = viewModel
+            };
+
+            var unused = new WindowInteropHelper(view)
+            {
+                Owner = Process.GetCurrentProcess().MainWindowHandle
+            };
+
+            view.ShowDialog();
         }
 
         private void OnWindowClosing(Window obj)
@@ -47,6 +72,7 @@ namespace HOK.BetaToolsManager
         {
             OnCheckNone();
             AutoUpdateStatus = Addins.FirstOrDefault()?.AutoUpdate;
+            StatusBarManager.StatusLabel = ((AddinInstallerWindow)win).statusLabel;
         }
 
         private void OnUninstall(Window win)
