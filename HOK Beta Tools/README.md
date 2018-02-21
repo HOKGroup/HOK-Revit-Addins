@@ -7,7 +7,9 @@
 * Bug fix where ResourceDictionary was causing exceptions because of duplicate keys. It appears that it resurfaced again. This time I have removed the Window.Resources all together and used in-line resources for the grid. There is no way that they are duplicated keys across these resources.
 * Added Feedback button tool. 
 * Added margins around the icons.
-* Moved the Auto update checkbox and made it checked by default.
+* Moved the Auto update checkbox. 
+* Added status bar to display messages to user if something fails. 
+* Implemented asynch addin logging. 
 
 ###### Release 2018.0.0.6
 
