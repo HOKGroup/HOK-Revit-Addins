@@ -41,7 +41,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
                         // (Konrad) This route executes only when we are posting Sheets data for the first time.
                         var data = new SheetData
                         {
-                            centralPath = centralPath,
+                            centralPath = centralPath.ToLower(),
                             sheets = sheets.Values.ToList(),
                             revisions = revisions.Values.ToList()
                         };
@@ -93,7 +93,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
 
                         var data = new SheetData
                         {
-                            centralPath = centralPath,
+                            centralPath = centralPath.ToLower(),
                             sheets = finalList,
                             revisions = revisions.Values.ToList(),
                             Id = mongoSheets.Id
