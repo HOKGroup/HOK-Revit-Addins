@@ -22,8 +22,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        public const string RestApiBaseUrl = "http://hok-184vs/";
-        //public const string RestApiBaseUrl = "http://localhost:8080/";
+        //public const string RestApiBaseUrl = "http://hok-184vs/";
+        public const string RestApiBaseUrl = "http://localhost:8080/";
         public const string ApiVersion = "api/v1";
 
         #region GET
@@ -261,7 +261,7 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="body">Body of rest call.</param>
         /// <param name="route">Route to be called.</param>
         /// <returns>Newly created Collection Schema with MongoDB assigned Id.</returns>
-        public static async Task<T> POST<T>(object body, string route) where T : new()
+        public static async Task<T> PostAsync<T>(object body, string route) where T : new()
         {
             var client = new RestClient(RestApiBaseUrl);
             client.ClearHandlers();
@@ -293,7 +293,6 @@ namespace HOK.MissionControl.Core.Utils
         /// POSTs any new data Schema. Creates new Collection in MongoDB.
         /// </summary>
         /// <returns>Newly created Collection Schema with MongoDB assigned Id.</returns>
-        [Obsolete]
         public static T Post<T>(object body, string route) where T : new()
         {
             var resresponse = default(T);

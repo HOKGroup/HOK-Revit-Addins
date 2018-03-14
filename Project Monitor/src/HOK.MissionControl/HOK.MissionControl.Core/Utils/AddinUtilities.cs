@@ -57,11 +57,11 @@ namespace HOK.MissionControl.Core.Utils
                 }
                 if (collections.Count == 0)
                 {
-                    var result = await ServerUtilities.POST<AddinData>(new AddinData(), "addins");
+                    var result = await ServerUtilities.PostAsync<AddinData>(new AddinData(), "addins");
                     if (!string.IsNullOrEmpty(result.Id)) collectionId = result.Id;
                 }
 
-                var response = await ServerUtilities.POST<AddinData>(addinLog, "addins/" + collectionId + "/addlog");
+                var response = await ServerUtilities.PostAsync<AddinData>(addinLog, "addins/" + collectionId + "/addlog");
                 callback(response);
             }
             catch (Exception e)

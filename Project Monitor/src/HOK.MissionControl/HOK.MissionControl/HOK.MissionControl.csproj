@@ -202,6 +202,7 @@
     </Compile>
     <Compile Include="Tools\DTMTool\ReportingElementInfo.cs" />
     <Compile Include="Tools\HealthReport\ModelMonitor.cs" />
+    <Compile Include="Tools\HealthReport\StylesMonitor.cs" />
     <Compile Include="Tools\LinkUnloadMonitor\LinkUnloadMonitor.cs" />
     <Compile Include="Tools\LinkUnloadMonitor\LinkUnloadMonitorView.xaml.cs">
       <DependentUpon>LinkUnloadMonitorView.xaml</DependentUpon>

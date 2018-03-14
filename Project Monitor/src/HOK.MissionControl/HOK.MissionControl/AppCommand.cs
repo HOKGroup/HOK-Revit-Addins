@@ -243,6 +243,9 @@ namespace HOK.MissionControl
 
                     var recordId = MissionControlSetup.HealthRecordIds[centralPath];
 
+                    // (Konrad) Publish info about Text, Dimension and Line Styles
+                    new Thread(() => new StylesMonitor().PublishStylesInfo(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+
                     WorksetOpenSynch.PublishData(doc, recordId, currentConfig, currentProject, WorksetMonitorState.onopened);
                     ModelMonitor.PublishModelSize(centralPath, recordId, currentConfig, currentProject, doc.Application.VersionNumber);
                     ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentOpened);

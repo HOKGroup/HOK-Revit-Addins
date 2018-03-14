@@ -8,8 +8,6 @@ namespace HOK.MissionControl.Tools.HealthReport
 {
     public class ModelMonitor
     {
-        public static Guid UpdaterGuid { get; set; } = new Guid(Properties.Resources.HealthReportTrackerGuid);
-
         /// <summary>
         /// Publishes data about Session duration and Synch intervals.
         /// </summary>
