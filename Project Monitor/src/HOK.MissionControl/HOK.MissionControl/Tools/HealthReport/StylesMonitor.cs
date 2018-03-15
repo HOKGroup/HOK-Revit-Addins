@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Windows.Interop;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Tools.Communicator;
+using HOK.MissionControl.Utils.StatusReporter;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -69,7 +73,12 @@ namespace HOK.MissionControl.Tools.HealthReport
                         Log.AppendLog(LogMessageType.INFO, "Givent TextNoteType Id doesn't exist in the model. It will be skipped.");
                     }
 
-                    dimSegmentStats.AddRange(from DimensionSegment s in d.Segments select new DimensionSegmentInfo(s));
+                    foreach (DimensionSegment s in d.Segments)
+                    {
+                        if (string.IsNullOrEmpty(s.ValueOverride)) continue;
+
+                        dimSegmentStats.Add(new DimensionSegmentInfo(s));
+                    }
                 }
 
                 var dimStats = dimTypes.Select(x => new DimensionTypeInfo(x.Value.Item1) { instances = x.Value.Item2 })
@@ -92,7 +101,21 @@ namespace HOK.MissionControl.Tools.HealthReport
                 };
 
 
-                ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
+                var result = ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
+                if (result.Id == null)
+                {
+                    AppCommand.CommunicatorHandler.Status = Status.Error;
+                    AppCommand.CommunicatorHandler.Message = "Styles Info failed to post.";
+                    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
+                    AppCommand.CommunicatorEvent.Raise();
+                }
+                else
+                {
+                    AppCommand.CommunicatorHandler.Status = Status.Success;
+                    AppCommand.CommunicatorHandler.Message = "Styles Info posted successfully!";
+                    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
+                    AppCommand.CommunicatorEvent.Raise();
+                }
             }
             catch (Exception e)
             {

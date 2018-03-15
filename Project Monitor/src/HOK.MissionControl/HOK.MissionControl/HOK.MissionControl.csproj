@@ -216,6 +216,11 @@
     <Compile Include="Tools\WebsiteLink\WebsiteLinkCommand.cs" />
     <Compile Include="Utils\FailureProcessor.cs" />
     <Compile Include="Utils\FileInfoUtil.cs" />
+    <Compile Include="Utils\StatusReporter\Converters.cs" />
+    <Compile Include="Utils\StatusReporter\StatusReporterView.xaml.cs">
+      <DependentUpon>StatusReporterView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Utils\StatusReporter\StatusReporterViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Tools\DTMTool\Images\dtm.png" />
@@ -253,6 +258,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tools\LinkUnloadMonitor\LinkUnloadMonitorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Utils\StatusReporter\StatusReporterView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -306,6 +315,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\familyTask_24x24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\statusError_48x48.png" />
+    <Resource Include="Resources\statusInfo_48x48.png" />
+    <Resource Include="Resources\statusSuccess_48x48.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

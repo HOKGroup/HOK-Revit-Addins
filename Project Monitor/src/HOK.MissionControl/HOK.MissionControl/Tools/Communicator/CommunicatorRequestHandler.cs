@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Windows.Interop;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
@@ -10,6 +12,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Tools.Communicator.Messaging;
+using HOK.MissionControl.Utils.StatusReporter;
 
 namespace HOK.MissionControl.Tools.Communicator
 {
@@ -19,7 +22,15 @@ namespace HOK.MissionControl.Tools.Communicator
         EditFamily = 1,
         OpenView = 2,
         UpdateSheet = 3,
-        CreateSheet = 4
+        CreateSheet = 4,
+        ReportStatus = 5
+    }
+
+    public enum Status
+    {
+        Success,
+        Error,
+        Info
     }
 
     public class CommunicatorRequest
@@ -39,12 +50,13 @@ namespace HOK.MissionControl.Tools.Communicator
 
     public class CommunicatorRequestHandler : IExternalEventHandler
     {
-        public static bool IsUpdatingSheet { get; set; }
+        public Status Status { get; set; }
+        public string Message { get; set; }
         public FamilyItem FamilyItem { get; set; }
         public SheetItem SheetItem { get; set; }
         public SheetTask SheetTask { get; set; }
-
-        public CommunicatorRequest Request { get; } = new CommunicatorRequest();
+        public static bool IsUpdatingSheet { get; set; }
+        public CommunicatorRequest Request { get; set; } = new CommunicatorRequest();
 
         public string GetName()
         {
@@ -81,6 +93,11 @@ namespace HOK.MissionControl.Tools.Communicator
                         CreateSheet(app);
                         break;
                     }
+                    case RequestId.ReportStatus:
+                    {
+                        ReportStatus();
+                        break;
+                    }
                 }
             }
             catch (Exception e)
@@ -88,6 +105,24 @@ namespace HOK.MissionControl.Tools.Communicator
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// We are calling this method likely from another thread. You can't open a new Window and attach it to 
+        /// Revit window as it's owner from another thread that is not STAT. 
+        /// </summary>
+        private void ReportStatus()
+        {
+            var viewModel = new StatusReporterViewModel(Status, Message);
+            var view = new StatusReporterView
+            {
+                DataContext = viewModel
+            };
+            var unused = new WindowInteropHelper(view)
+            {
+                Owner = Process.GetCurrentProcess().MainWindowHandle
+            };
+            view.ShowDialog();
         }
 
         /// <summary>
