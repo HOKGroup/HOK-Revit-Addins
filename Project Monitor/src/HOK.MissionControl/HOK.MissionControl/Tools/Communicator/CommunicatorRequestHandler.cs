@@ -122,7 +122,7 @@ namespace HOK.MissionControl.Tools.Communicator
             {
                 Owner = Process.GetCurrentProcess().MainWindowHandle
             };
-            view.ShowDialog();
+            view.Show();
         }
 
         /// <summary>

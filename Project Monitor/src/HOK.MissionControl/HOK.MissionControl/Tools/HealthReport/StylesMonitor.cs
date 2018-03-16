@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Windows.Interop;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator;
-using HOK.MissionControl.Utils.StatusReporter;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -52,6 +49,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var dimTypes = new FilteredElementCollector(doc)
                     .OfClass(typeof(DimensionType))
                     .Cast<DimensionType>()
+                    .Where(x => !string.IsNullOrEmpty(x.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString()))
                     .ToDictionary(x => x.Id.IntegerValue, x => new Tuple<DimensionType, int>(x, 0));
 
                 var dimInstances = new FilteredElementCollector(doc)
@@ -104,6 +102,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var result = ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
                 if (result.Id == null)
                 {
+                    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Error.");
                     AppCommand.CommunicatorHandler.Status = Status.Error;
                     AppCommand.CommunicatorHandler.Message = "Styles Info failed to post.";
                     AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
@@ -111,6 +110,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 }
                 else
                 {
+                    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Success.");
                     AppCommand.CommunicatorHandler.Status = Status.Success;
                     AppCommand.CommunicatorHandler.Message = "Styles Info posted successfully!";
                     AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);

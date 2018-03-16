@@ -65,6 +65,7 @@ namespace HOK.MissionControl.Core.Schemas
         public string textFont { get; set; }
         public string textSize { get; set; }
         public bool underline { get; set; }
+        public string styleType { get; set; }
 
         [JsonConstructor]
         public DimensionTypeInfo()
@@ -83,9 +84,10 @@ namespace HOK.MissionControl.Core.Schemas
             leaderType = dt.get_Parameter(BuiltInParameter.DIM_LEADER_TYPE).AsValueString();
             lineWeight = dt.get_Parameter(BuiltInParameter.LINE_PEN).AsInteger();
             textFont = dt.get_Parameter(BuiltInParameter.TEXT_FONT).AsString();
-            textSize = dt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsString();
+            textSize = dt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsValueString();
             underline = ElementUtilities.RevitBoolToBool(
                 (int)ElementUtilities.GetParameterValue(dt.get_Parameter(BuiltInParameter.TEXT_STYLE_UNDERLINE)));
+            styleType = dt.StyleType.ToString();
         }
     }
 
@@ -123,7 +125,7 @@ namespace HOK.MissionControl.Core.Schemas
             leaderArrowhead = tnt.get_Parameter(BuiltInParameter.LEADER_ARROWHEAD).AsValueString();
             lineWeight = tnt.get_Parameter(BuiltInParameter.LINE_PEN).AsInteger();
             textFont = tnt.get_Parameter(BuiltInParameter.TEXT_FONT).AsString();
-            textSize = tnt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsString();
+            textSize = tnt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsValueString();
             underline = ElementUtilities.RevitBoolToBool(
                 (int)ElementUtilities.GetParameterValue(tnt.get_Parameter(BuiltInParameter.TEXT_STYLE_UNDERLINE)));
         }
