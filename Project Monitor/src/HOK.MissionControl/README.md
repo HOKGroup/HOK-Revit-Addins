@@ -7,6 +7,17 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.12
+
+* Adds Styles to Health Report. That includes updates to Communicator tool to get styles graphics up on the dockable window, as well as new methods to collect and publish Styles info from the model. 
+* Adds Status Reported tool. It's a small WPF utility window that pops up a 100 X 50 px message bubble in the bottom/right corner of the screen. It automatically dissapears after 5s. For now it's reporting status of the Styles getting posted to DB, but later it can be used for other purposes. 
+* Adds ability to post styles Async from another thread. To do that we had to start a new thread, and to integrate Status Reporter there was an extension added to External Event Handler for Revit. 
+* Fixed small bug in the Health Report data collection where it was getting the wrong data set for Model Stats. 
+
+###### Release 2018.0.0.11
+
+* ?
+
 ###### Release 2018.0.0.10
 
 * Fixed a bug where central file path for health records and sheets was not getting published with lower case. That caused issues with it not getting properly recognized on server side.
