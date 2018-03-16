@@ -13,43 +13,6 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         public ObservableCollection<HealthReportSummaryViewModel> ProcessData(HealthReportData data, FamilyData familyStats)
         {
             var output = new ObservableCollection<HealthReportSummaryViewModel>();
-            if (familyStats != null)
-            {
-                var passingChecks = 0;
-                if (familyStats.oversizedFamilies <= 20) passingChecks += 2;
-                else
-                {
-                    if (familyStats.oversizedFamilies > 10 && familyStats.oversizedFamilies < 20) passingChecks += 1;
-                }
-                var misnamed = familyStats.families.Count(f => f.isFailingChecks && !f.name.Contains("_HOK_I") && !f.name.Contains("_HOK_M"));
-                if (misnamed < 10) passingChecks += 2;
-                else
-                {
-                    if (misnamed > 10 && misnamed < 20) passingChecks += 1;
-                }
-                if (familyStats.unusedFamilies <= 10) passingChecks += 2;
-                else
-                {
-                    if (familyStats.unusedFamilies > 10 && familyStats.unusedFamilies < 20) passingChecks += 1;
-                }
-                if (familyStats.inPlaceFamilies <= 5) passingChecks += 2;
-                else
-                {
-                    if (familyStats.inPlaceFamilies > 5 && familyStats.inPlaceFamilies < 10) passingChecks += 1;
-                }
-
-                const int maxScore = 8;
-                var vm = new HealthReportSummaryViewModel
-                {
-                    Count = familyStats.totalFamilies.ToString(),
-                    Title = "Families:",
-                    ToolName = string.Empty,
-                    ShowButton = false,
-                    Score = passingChecks + "/" + maxScore,
-                    FillColor = GetColor(passingChecks, maxScore)
-                };
-                output.Add(vm);
-            }
 
             var worksetStats = data.itemCount.LastOrDefault();
             if (worksetStats != null)
@@ -161,7 +124,55 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
                 output.Add(vm);
             }
 
-            var modelStats = data.modelSizes.FirstOrDefault();
+            var stylesStats = data.styleStats.LastOrDefault();
+            if (stylesStats != null)
+            {
+                var overridenDimensions = stylesStats.dimSegmentStats.Count;
+
+                var passingChecks = 0;
+                if (overridenDimensions <= 10) passingChecks += 2;
+                else if (overridenDimensions > 10 && overridenDimensions <= 20) passingChecks += 1;
+
+                var unusedTextTypes = true;
+                var unusedDimensionTypes = true;
+                var usesProjectUnits = true;
+                var unusedTypes = 0;
+                foreach (var ds in stylesStats.dimStats)
+                {
+                    if (ds.instances == 0)
+                    {
+                        unusedTypes += 1;
+                        unusedDimensionTypes = false;
+                    }
+                    if (!ds.usesProjectUnits) usesProjectUnits = false;
+                }
+                foreach (var ts in stylesStats.textStats)
+                {
+                    if (ts.instances == 0)
+                    {
+                        unusedTypes += 1;
+                        unusedTextTypes = false;
+                    }
+                }
+
+                if (usesProjectUnits) passingChecks += 2;
+                if (unusedDimensionTypes) passingChecks += 2;
+                if (unusedTextTypes) passingChecks += 2;
+
+                const int maxScore = 8;
+                var vm = new HealthReportSummaryViewModel
+                {
+                    Count = unusedTypes.ToString(),
+                    Title = "Styles:",
+                    ToolName = string.Empty,
+                    ShowButton = false,
+                    Score = passingChecks + "/" + maxScore,
+                    FillColor = GetColor(passingChecks, maxScore)
+                };
+                output.Add(vm);
+            }
+
+            var modelStats = data.modelSizes.LastOrDefault();
             if (modelStats != null)
             {
                 var vm = new HealthReportSummaryViewModel
@@ -171,6 +182,44 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
                     ToolName = string.Empty,
                     Score = "0/0",
                     FillColor = Color.FromRgb(119, 119, 119)
+                };
+                output.Add(vm);
+            }
+
+            if (familyStats != null)
+            {
+                var passingChecks = 0;
+                if (familyStats.oversizedFamilies <= 20) passingChecks += 2;
+                else
+                {
+                    if (familyStats.oversizedFamilies > 10 && familyStats.oversizedFamilies < 20) passingChecks += 1;
+                }
+                var misnamed = familyStats.families.Count(f => f.isFailingChecks && !f.name.Contains("_HOK_I") && !f.name.Contains("_HOK_M"));
+                if (misnamed < 10) passingChecks += 2;
+                else
+                {
+                    if (misnamed > 10 && misnamed < 20) passingChecks += 1;
+                }
+                if (familyStats.unusedFamilies <= 10) passingChecks += 2;
+                else
+                {
+                    if (familyStats.unusedFamilies > 10 && familyStats.unusedFamilies < 20) passingChecks += 1;
+                }
+                if (familyStats.inPlaceFamilies <= 5) passingChecks += 2;
+                else
+                {
+                    if (familyStats.inPlaceFamilies > 5 && familyStats.inPlaceFamilies < 10) passingChecks += 1;
+                }
+
+                const int maxScore = 8;
+                var vm = new HealthReportSummaryViewModel
+                {
+                    Count = familyStats.totalFamilies.ToString(),
+                    Title = "Families:",
+                    ToolName = string.Empty,
+                    ShowButton = false,
+                    Score = passingChecks + "/" + maxScore,
+                    FillColor = GetColor(passingChecks, maxScore)
                 };
                 output.Add(vm);
             }

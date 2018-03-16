@@ -144,6 +144,7 @@ namespace HOK.MissionControl.Core.Schemas
         public List<WorksetEvent> onSynched { get; set; } = new List<WorksetEvent>();
         public List<WorksetItem> itemCount { get; set; } = new List<WorksetItem>();
         public List<ViewStat> viewStats { get; set; } = new List<ViewStat>();
+        public List<StylesStat> styleStats { get; set; } = new List<StylesStat>();
         public List<LinkStat> linkStats { get; set; } = new List<LinkStat>();
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
