@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.Exceptions;
 
 namespace HOK.MissionControl.Utils
 {
     public static class ElementUtilities
     {
+        public static Document Doc { get; set; }
+
         /// <summary>
         /// Converts Revit Color parameter stored as integer to RGB array.
         /// </summary>
