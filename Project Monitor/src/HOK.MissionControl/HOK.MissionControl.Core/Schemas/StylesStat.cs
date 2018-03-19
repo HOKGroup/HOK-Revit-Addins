@@ -29,7 +29,8 @@ namespace HOK.MissionControl.Core.Schemas
         public string Id { get; set; }
         public DateTime createdOn { get; set; } = DateTime.Now;
         public bool isOverriden { get; set; }
-        public string value { get; set; }
+        public double? value { get; set; }
+        public string valueString { get; set; }
         public string valueOverride { get; set; }
         public bool isLocked { get; set; }
 
@@ -41,7 +42,7 @@ namespace HOK.MissionControl.Core.Schemas
         public DimensionSegmentInfo(DimensionSegment dim)
         {
             isOverriden = !string.IsNullOrEmpty(dim.ValueOverride);
-            value = dim.ValueString;
+            value = dim.Value;
             valueOverride = dim.ValueOverride;
             isLocked = dim.IsLocked;
         }
@@ -75,7 +76,12 @@ namespace HOK.MissionControl.Core.Schemas
         public DimensionTypeInfo(DimensionType dt)
         {
             name = dt.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString();
+#if RELEASE2016 || RELEASE2015
+            // (Konrad) Revit 2016 API doesn't have that info exposed.
+            usesProjectUnits = false;
+#else
             usesProjectUnits = dt.GetUnitsFormatOptions().UseDefault;
+#endif
             bold = ElementUtilities.RevitBoolToBool(
                 (int)ElementUtilities.GetParameterValue(dt.get_Parameter(BuiltInParameter.TEXT_STYLE_BOLD)));
             color = ElementUtilities.RevitColorIntegerToRGBA(dt.get_Parameter(BuiltInParameter.LINE_COLOR).AsInteger());
@@ -106,7 +112,8 @@ namespace HOK.MissionControl.Core.Schemas
         public string leaderArrowhead { get; set; }
         public int lineWeight { get; set; }
         public string textFont { get; set; }
-        public string textSize { get; set; }
+        public double textSize { get; set; }
+        public string textSizeString { get; set; }
         public bool underline { get; set; }
 
         [JsonConstructor]
@@ -125,7 +132,8 @@ namespace HOK.MissionControl.Core.Schemas
             leaderArrowhead = tnt.get_Parameter(BuiltInParameter.LEADER_ARROWHEAD).AsValueString();
             lineWeight = tnt.get_Parameter(BuiltInParameter.LINE_PEN).AsInteger();
             textFont = tnt.get_Parameter(BuiltInParameter.TEXT_FONT).AsString();
-            textSize = tnt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsValueString();
+            textSize = tnt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsDouble();
+            textSizeString = tnt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsValueString();
             underline = ElementUtilities.RevitBoolToBool(
                 (int)ElementUtilities.GetParameterValue(tnt.get_Parameter(BuiltInParameter.TEXT_STYLE_UNDERLINE)));
         }

@@ -11,10 +11,14 @@ namespace HOK.MissionControl.Tools.HealthReport
 {
     public class StylesMonitor
     {
+        private static Document _doc { get; set; }
+
         public void PublishStylesInfo(Document doc, string recordId)
         {
             try
             {
+                _doc = doc;
+
                 #region Text Note Type stats
 
                 var textTypes = new FilteredElementCollector(doc)
@@ -60,11 +64,13 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var dimSegmentStats = new List<DimensionSegmentInfo>();
                 foreach (var d in dimInstances)
                 {
+                    DimensionType dType = null;
                     var key = d.GetTypeId().IntegerValue;
                     if (dimTypes.ContainsKey(key))
                     {
                         // increment instance count
                         dimTypes[key] = new Tuple<DimensionType, int>(dimTypes[key].Item1, dimTypes[key].Item2 + 1);
+                        dType = dimTypes[key].Item1;
                     }
                     else
                     {
@@ -74,8 +80,36 @@ namespace HOK.MissionControl.Tools.HealthReport
                     foreach (DimensionSegment s in d.Segments)
                     {
                         if (string.IsNullOrEmpty(s.ValueOverride)) continue;
+                        if (dType == null) continue;
 
-                        dimSegmentStats.Add(new DimensionSegmentInfo(s));
+                        UnitType ut;
+                        switch (dType.StyleType)
+                        {
+                            case DimensionStyleType.Linear:
+                            case DimensionStyleType.ArcLength:
+                            case DimensionStyleType.Diameter:
+                            case DimensionStyleType.LinearFixed:
+                            case DimensionStyleType.SpotElevation:
+                            case DimensionStyleType.Radial:
+                                ut = UnitType.UT_Length;
+                                break;
+                            case DimensionStyleType.Angular:
+                                ut = UnitType.UT_Angle;
+                                break;
+                            case DimensionStyleType.SpotCoordinate:
+                                ut = UnitType.UT_Undefined;
+                                break;
+                            case DimensionStyleType.SpotSlope:
+                                ut = UnitType.UT_Slope;
+                                break;
+                            default:
+                                ut = UnitType.UT_Undefined;
+                                break;
+                        }
+                        dimSegmentStats.Add(new DimensionSegmentInfo(s)
+                        {
+                            valueString = InternalUnitsToProjectUnits(s.Value, ut)
+                        });
                     }
                 }
 
@@ -121,6 +155,19 @@ namespace HOK.MissionControl.Tools.HealthReport
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static string InternalUnitsToProjectUnits(double? value, UnitType type)
+        {
+            return value == null
+                ? string.Empty
+                : UnitFormatUtils.Format(_doc.GetUnits(), type, (double)value, false, false);
         }
     }
 }
