@@ -7,6 +7,16 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.14
+
+* Fix to Family Task window and how text was wrappinh. 
+* Small easthetic upgrades to improve spacing.
+* Fixed bug where comments were getting assigned value from the message. 
+
+###### Release 2018.0.0.13
+
+* Small bug fixes to Dimension Styles and how units are converted.
+
 ###### Release 2018.0.0.12
 
 * Adds Styles to Health Report. That includes updates to Communicator tool to get styles graphics up on the dockable window, as well as new methods to collect and publish Styles info from the model. 
