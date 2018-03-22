@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
@@ -194,7 +196,25 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
                 {
                     if (familyStats.oversizedFamilies > 10 && familyStats.oversizedFamilies < 20) passingChecks += 1;
                 }
-                var misnamed = familyStats.families.Count(f => f.isFailingChecks && !f.name.Contains("_HOK_I") && !f.name.Contains("_HOK_M"));
+
+                var config = MissionControlSetup.Configurations.ContainsKey(familyStats.centralPath)
+                    ? MissionControlSetup.Configurations[familyStats.centralPath]
+                    : null;
+
+                var familyNameCheck = new List<string> {"HOK_I", "HOK_M"}; //defaults
+                if (config != null)
+                {
+                    familyNameCheck = config.updaters.First(x => string.Equals(x.updaterId,
+                        Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).userOverrides.familyNameCheck.values;
+                }
+
+                var misnamed = 0;
+                foreach (var family in familyStats.families)
+                {
+                    if (!family.isFailingChecks) continue;
+                    if (!familyNameCheck.Any(family.name.Contains)) misnamed++;
+                }
+
                 if (misnamed < 10) passingChecks += 2;
                 else
                 {

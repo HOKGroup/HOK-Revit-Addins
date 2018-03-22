@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Autodesk.Revit.DB;
+using HOK.Core.Utilities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using HOK.MissionControl.Utils;
+using Newtonsoft.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -45,6 +48,13 @@ namespace HOK.MissionControl.Core.Schemas
             value = dim.Value;
             valueOverride = dim.ValueOverride;
             isLocked = dim.IsLocked;
+        }
+
+        [OnError]
+        internal void OnError(StreamingContext context, ErrorContext errorContext)
+        {
+            Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
+            errorContext.Handled = true;
         }
     }
 
@@ -95,6 +105,13 @@ namespace HOK.MissionControl.Core.Schemas
                 (int)ElementUtilities.GetParameterValue(dt.get_Parameter(BuiltInParameter.TEXT_STYLE_UNDERLINE)));
             styleType = dt.StyleType.ToString();
         }
+
+        [OnError]
+        internal void OnError(StreamingContext context, ErrorContext errorContext)
+        {
+            Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
+            errorContext.Handled = true;
+        }
     }
 
     public class TextNoteTypeInfo
@@ -136,6 +153,13 @@ namespace HOK.MissionControl.Core.Schemas
             textSizeString = tnt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsValueString();
             underline = ElementUtilities.RevitBoolToBool(
                 (int)ElementUtilities.GetParameterValue(tnt.get_Parameter(BuiltInParameter.TEXT_STYLE_UNDERLINE)));
+        }
+
+        [OnError]
+        internal void OnError(StreamingContext context, ErrorContext errorContext)
+        {
+            Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
+            errorContext.Handled = true;
         }
     }
 }
