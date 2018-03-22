@@ -20,8 +20,8 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="55"/>
             <RowDefinition Height="50"/>
-            <RowDefinition Height="45"/>
             <RowDefinition Height="100"/>
             <RowDefinition/>
             <RowDefinition Height="150"/>
@@ -102,11 +102,11 @@
                 Margin="10,21,10,10"
                 Grid.ColumnSpan="2"
                 CornerRadius="2">
-            <Label Content="{Binding Wrapper.Task.message}" 
-                   VerticalContentAlignment="Top" 
-                   Padding="0" 
-                   Margin="5,0,5,0" 
-                   Foreground="DarkGray"/>
+            <TextBox Text="{Binding Wrapper.Task.message}" 
+                     Margin="5,0,5,0" 
+                     TextWrapping="Wrap"
+                     Foreground="DarkGray"
+                     BorderThickness="0"/>
         </Border>
         <Label Grid.Row="3" 
                Grid.Column="0"
@@ -124,6 +124,7 @@
                 CornerRadius="2">
             <TextBox Text="{Binding Wrapper.Task.comments}" 
                      Margin="5,0,5,0" 
+                     TextWrapping="Wrap"
                      BorderThickness="0"/>
         </Border>
         <Label Grid.Row="4" 

@@ -86,7 +86,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
             completedBy = other.completedBy;
             name = other.name;
             message = other.message;
-            comments = other.message;
+            comments = other.comments;
         }
 
         // (Konrad) Comparison methods used when updating UI. IndexOf() uses it.
