@@ -61,10 +61,23 @@ namespace HOK.MissionControl.Tools.HealthReport
                     .WhereElementIsNotElementType()
                     .Cast<Dimension>();
 
+                // (Konrad) There is a user override in Configuration that controls what dimension overrides are ignored
+                var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
+                var config = MissionControlSetup.Configurations.ContainsKey(centralPath)
+                    ? MissionControlSetup.Configurations[centralPath]
+                    : null;
+
+                var dimensionValueCheck = new List<string> { "EQ" }; //defaults
+                if (config != null)
+                {
+                    dimensionValueCheck = config.updaters.First(x => string.Equals(x.updaterId,
+                        Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).userOverrides.dimensionValueCheck.values;
+                }
+
                 var dimSegmentStats = new List<DimensionSegmentInfo>();
                 foreach (var d in dimInstances)
                 {
-                    DimensionType dType = null;
+                    DimensionType dType;
                     var key = d.GetTypeId().IntegerValue;
                     if (dimTypes.ContainsKey(key))
                     {
@@ -74,43 +87,44 @@ namespace HOK.MissionControl.Tools.HealthReport
                     }
                     else
                     {
-                        Log.AppendLog(LogMessageType.INFO, "Givent TextNoteType Id doesn't exist in the model. It will be skipped.");
+                        Log.AppendLog(LogMessageType.INFO, "Given Dimension Type Id doesn't exist in the model. It will be skipped.");
+                        continue; //without dimension type we can't get units so just break out
                     }
 
-                    foreach (DimensionSegment s in d.Segments)
+                    var ut = GetUnitType(dType);
+                    if (d.Segments.Size == 0 && 
+                        !string.IsNullOrEmpty(d.ValueOverride) && 
+                        !dimensionValueCheck.Any(d.ValueOverride.Contains))
                     {
-                        if (string.IsNullOrEmpty(s.ValueOverride)) continue;
-                        if (dType == null) continue;
-
-                        UnitType ut;
-                        switch (dType.StyleType)
+                        // dim w/ zero segments
+                        dimSegmentStats.Add(new DimensionSegmentInfo(d)
                         {
-                            case DimensionStyleType.Linear:
-                            case DimensionStyleType.ArcLength:
-                            case DimensionStyleType.Diameter:
-                            case DimensionStyleType.LinearFixed:
-                            case DimensionStyleType.SpotElevation:
-                            case DimensionStyleType.Radial:
-                                ut = UnitType.UT_Length;
-                                break;
-                            case DimensionStyleType.Angular:
-                                ut = UnitType.UT_Angle;
-                                break;
-                            case DimensionStyleType.SpotCoordinate:
-                                ut = UnitType.UT_Undefined;
-                                break;
-                            case DimensionStyleType.SpotSlope:
-                                ut = UnitType.UT_Slope;
-                                break;
-                            default:
-                                ut = UnitType.UT_Undefined;
-                                break;
-                        }
-                        dimSegmentStats.Add(new DimensionSegmentInfo(s)
-                        {
-                            valueString = InternalUnitsToProjectUnits(s.Value, ut)
+                            valueString = InternalUnitsToProjectUnits(d.Value, ut),
+                            ownerViewType = d.ViewSpecific 
+                                ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
+                                : string.Empty,
+                            ownerViewId = d.OwnerViewId.IntegerValue
                         });
                     }
+                    else
+                    {
+                        // dim w/ multiple segments
+                        foreach (DimensionSegment s in d.Segments)
+                        {
+                            if (string.IsNullOrEmpty(s.ValueOverride)) continue;
+                            if (dimensionValueCheck.Any(s.ValueOverride.Contains)) continue;
+
+                            dimSegmentStats.Add(new DimensionSegmentInfo(s)
+                            {
+                                valueString = InternalUnitsToProjectUnits(s.Value, ut),
+                                ownerViewType = d.ViewSpecific 
+                                    ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
+                                    : string.Empty,
+                                ownerViewId = d.OwnerViewId.IntegerValue
+                            });
+                        }
+                    }
+                    
                 }
 
                 var dimStats = dimTypes.Select(x => new DimensionTypeInfo(x.Value.Item1) { instances = x.Value.Item2 })
@@ -158,11 +172,45 @@ namespace HOK.MissionControl.Tools.HealthReport
         }
 
         /// <summary>
-        /// 
+        /// Get UnitType from DimensionType.
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <param name="dType">Dimension Type.</param>
+        /// <returns>Unit Type.</returns>
+        private static UnitType GetUnitType(DimensionType dType)
+        {
+            UnitType ut;
+            switch (dType.StyleType)
+            {
+                case DimensionStyleType.Linear:
+                case DimensionStyleType.ArcLength:
+                case DimensionStyleType.Diameter:
+                case DimensionStyleType.LinearFixed:
+                case DimensionStyleType.SpotElevation:
+                case DimensionStyleType.Radial:
+                    ut = UnitType.UT_Length;
+                    break;
+                case DimensionStyleType.Angular:
+                    ut = UnitType.UT_Angle;
+                    break;
+                case DimensionStyleType.SpotCoordinate:
+                    ut = UnitType.UT_Undefined;
+                    break;
+                case DimensionStyleType.SpotSlope:
+                    ut = UnitType.UT_Slope;
+                    break;
+                default:
+                    ut = UnitType.UT_Undefined;
+                    break;
+            }
+            return ut;
+        }
+
+        /// <summary>
+        /// Formats values from internal units to project units.
+        /// </summary>
+        /// <param name="value">Numerical value to format./</param>
+        /// <param name="type">Unit Type to convert to.</param>
+        /// <returns>String representation of the value.</returns>
         public static string InternalUnitsToProjectUnits(double? value, UnitType type)
         {
             return value == null

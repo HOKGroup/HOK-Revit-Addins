@@ -33,9 +33,11 @@ namespace HOK.MissionControl.Core.Schemas
         public DateTime createdOn { get; set; } = DateTime.Now;
         public bool isOverriden { get; set; }
         public double? value { get; set; }
-        public string valueString { get; set; }
+        public string valueString { get; set; } //not set in constructor
         public string valueOverride { get; set; }
         public bool isLocked { get; set; }
+        public int ownerViewId { get; set; } //not set in constructor
+        public string ownerViewType { get; set; } //not set in constructor
 
         [JsonConstructor]
         public DimensionSegmentInfo()
@@ -43,6 +45,14 @@ namespace HOK.MissionControl.Core.Schemas
         }
 
         public DimensionSegmentInfo(DimensionSegment dim)
+        {
+            isOverriden = !string.IsNullOrEmpty(dim.ValueOverride);
+            value = dim.Value;
+            valueOverride = dim.ValueOverride;
+            isLocked = dim.IsLocked;
+        }
+
+        public DimensionSegmentInfo(Dimension dim)
         {
             isOverriden = !string.IsNullOrEmpty(dim.ValueOverride);
             value = dim.Value;
