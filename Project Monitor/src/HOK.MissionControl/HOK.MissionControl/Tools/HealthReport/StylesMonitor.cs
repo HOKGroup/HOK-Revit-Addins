@@ -77,9 +77,23 @@ namespace HOK.MissionControl.Tools.HealthReport
                         Log.AppendLog(LogMessageType.INFO, "Givent TextNoteType Id doesn't exist in the model. It will be skipped.");
                     }
 
+                    // (Konrad) There is a user override in Configuration that controls what dimension overrides are ignored
+                    var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
+                    var config = MissionControlSetup.Configurations.ContainsKey(centralPath)
+                        ? MissionControlSetup.Configurations[centralPath]
+                        : null;
+
+                    var dimensionValueCheck = new List<string> { "EQ" }; //defaults
+                    if (config != null)
+                    {
+                        dimensionValueCheck = config.updaters.First(x => string.Equals(x.updaterId,
+                            Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).userOverrides.dimensionValueCheck.values;
+                    }
+
                     foreach (DimensionSegment s in d.Segments)
                     {
                         if (string.IsNullOrEmpty(s.ValueOverride)) continue;
+                        if (dimensionValueCheck.Any(s.ValueOverride.Contains)) continue;
                         if (dType == null) continue;
 
                         UnitType ut;
