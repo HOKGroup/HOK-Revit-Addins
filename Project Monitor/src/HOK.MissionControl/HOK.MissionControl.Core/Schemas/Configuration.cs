@@ -52,6 +52,34 @@ namespace HOK.MissionControl.Core.Schemas
         public string addInName { get; set; } = "";
         public bool isUpdaterOn { get; set; } = false;
         public List<CategoryTrigger> CategoryTriggers { get; set; } = new List<CategoryTrigger>();
+        public UserOverrides userOverrides { get; set; }
+    }
+
+    /// <summary>
+    /// Class holding all different possible user overrides for health checks.
+    /// </summary>
+    public class UserOverrides
+    {
+        public DimensionValueCheck dimensionValueCheck { get; set; }
+        public FamilyNameCheck familyNameCheck { get; set; }
+    }
+
+    /// <summary>
+    /// Override for Family Name.
+    /// </summary>
+    public class FamilyNameCheck
+    {
+        public string description { get; set; }
+        public List<string> values { get; set; } = new List<string>();
+    }
+
+    /// <summary>
+    /// Override for Dimension Values.
+    /// </summary>
+    public class DimensionValueCheck
+    {
+        public string description { get; set; }
+        public List<string> values { get; set; } = new List<string>();
     }
 
     /// <summary>
