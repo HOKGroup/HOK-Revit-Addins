@@ -74,7 +74,8 @@ namespace HOK.MissionControl.Core.Schemas
         public string leaderType { get; set; }
         public int lineWeight { get; set; }
         public string textFont { get; set; }
-        public string textSize { get; set; }
+        public double textSize { get; set; }
+        public string textSizeString { get; set; }
         public bool underline { get; set; }
         public string styleType { get; set; }
 
@@ -100,7 +101,8 @@ namespace HOK.MissionControl.Core.Schemas
             leaderType = dt.get_Parameter(BuiltInParameter.DIM_LEADER_TYPE).AsValueString();
             lineWeight = dt.get_Parameter(BuiltInParameter.LINE_PEN).AsInteger();
             textFont = dt.get_Parameter(BuiltInParameter.TEXT_FONT).AsString();
-            textSize = dt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsValueString();
+            textSize = dt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsDouble();
+            textSizeString = dt.get_Parameter(BuiltInParameter.TEXT_SIZE).AsValueString();
             underline = ElementUtilities.RevitBoolToBool(
                 (int)ElementUtilities.GetParameterValue(dt.get_Parameter(BuiltInParameter.TEXT_STYLE_UNDERLINE)));
             styleType = dt.StyleType.ToString();
