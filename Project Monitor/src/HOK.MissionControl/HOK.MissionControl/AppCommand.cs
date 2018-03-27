@@ -1,5 +1,4 @@
 ﻿#region References
-
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -26,7 +25,6 @@ using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Tools.LinkUnloadMonitor;
 using HOK.MissionControl.Tools.SheetTracker;
-
 #endregion
 
 namespace HOK.MissionControl
@@ -40,7 +38,6 @@ namespace HOK.MissionControl
     public class AppCommand : IExternalApplication
     {
         public static AppCommand Instance { get; private set; }
-        public static SessionInfo SessionInfo { get; set; }
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
         public static HealthReportData HrData { get; set; }
@@ -174,7 +171,7 @@ namespace HOK.MissionControl
                         MissionControlSetup.Projects.Add(centralPath, projectFound);
                     }
 
-                    OpenTime["from"] = DateTime.Now;
+                    OpenTime["from"] = DateTime.UtcNow;
                 }
             }
             catch (Exception ex)
@@ -241,17 +238,20 @@ namespace HOK.MissionControl
                         }
                     }
 
+                    // (Konrad) Publish info about model to Health Report. If we toss them onto a new Thread
+                    // we won't be slowing the open time and since we are not returning any of this into to the user
+                    // there is no reason to run this synchronously.
                     var recordId = MissionControlSetup.HealthRecordIds[centralPath];
-
-                    // (Konrad) Publish info about Text, Dimension and Line Styles
                     new Thread(() => new StylesMonitor().PublishStylesInfo(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+                    new Thread(() => new LinkMonitor().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+                    new Thread(() => new WorksetItemCount().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+                    new Thread(() => new ViewMonitor().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+                    new Thread(() => new WorksetOpenSynch().PublishData(doc, recordId, WorksetMonitorState.onopened)) { Priority = ThreadPriority.BelowNormal }.Start();
+                    new Thread(() => new ModelMonitor().PublishModelSize(centralPath, recordId, doc.Application.VersionNumber)) { Priority = ThreadPriority.BelowNormal }.Start();
 
-                    WorksetOpenSynch.PublishData(doc, recordId, currentConfig, currentProject, WorksetMonitorState.onopened);
-                    ModelMonitor.PublishModelSize(centralPath, recordId, currentConfig, currentProject, doc.Application.VersionNumber);
-                    ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentOpened);
                     if (OpenTime.ContainsKey("from"))
                     {
-                        ModelMonitor.PublishOpenTime(recordId);
+                        new Thread(() => new ModelMonitor().PublishOpenTime(recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
                     }
 
                     if (refreshProject)
@@ -316,8 +316,8 @@ namespace HOK.MissionControl
                     || !MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
                 var recordId = MissionControlSetup.HealthRecordIds[centralPath];
 
-                WorksetOpenSynch.PublishData(doc, recordId, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], WorksetMonitorState.onsynched);
-                SynchTime["from"] = DateTime.Now;
+                new Thread(() => new WorksetOpenSynch().PublishData(doc, recordId, WorksetMonitorState.onsynched)) { Priority = ThreadPriority.BelowNormal }.Start();
+                SynchTime["from"] = DateTime.UtcNow;
             }
             catch (Exception ex)
             {
@@ -348,9 +348,8 @@ namespace HOK.MissionControl
                     var recordId = MissionControlSetup.HealthRecordIds[centralPath];
                     if (SynchTime.ContainsKey("from"))
                     {
-                        ModelMonitor.PublishSynchTime(recordId);
+                        new Thread(() => new ModelMonitor().PublishSynchTime(recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
                     }
-                    ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentSynched);
                 }
 
                 // (Konrad) Publish Sheet data to sheet tracker
@@ -563,6 +562,7 @@ namespace HOK.MissionControl
         {
             var centralPath = FileInfoUtil.GetCentralFilePath(doc);
             if (string.IsNullOrEmpty(centralPath)) return;
+
             if (MissionControlSetup.Configurations.ContainsKey(centralPath))
             {
                 var currentConfig = MissionControlSetup.Configurations[centralPath];
@@ -584,19 +584,6 @@ namespace HOK.MissionControl
                     {
                         SheetUpdaterInstance.Unregister(doc);
                     }
-                }
-
-                // (Konrad) Make sure that Project and HealthRecords are specified.
-                if (MissionControlSetup.Projects.ContainsKey(centralPath) &&
-                    MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
-                {
-                    var recordId = MissionControlSetup.HealthRecordIds[centralPath];
-                    var currentProject = MissionControlSetup.Projects[centralPath];
-
-                    WorksetItemCount.PublishData(doc, recordId, currentConfig, currentProject);
-                    ViewMonitor.PublishData(doc, recordId, currentConfig, currentProject);
-                    LinkMonitor.PublishData(doc, recordId, currentConfig, currentProject);
-                    ModelMonitor.PublishSessionInfo(recordId, SessionEvent.documentClosed);
                 }
             }
 
@@ -710,7 +697,6 @@ namespace HOK.MissionControl
         {
             HrData = null;
             SheetsData = null;
-            SessionInfo = null;
             SynchTime = new Dictionary<string, DateTime>();
             OpenTime = new Dictionary<string, DateTime>();
             FamiliesToWatch = new Dictionary<string, FamilyItem>();

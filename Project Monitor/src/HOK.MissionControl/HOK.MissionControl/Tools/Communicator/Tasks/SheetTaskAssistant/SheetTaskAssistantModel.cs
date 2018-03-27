@@ -38,7 +38,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             var e = (SheetItem)wrapper.Element;
 
             t.completedBy = Environment.UserName.ToLower();
-            t.completedOn = DateTime.Now;
+            t.completedOn = DateTime.UtcNow;
 
             // body needs to be updated with a new identifier object or mongo side will fail.
             if (e.isNewSheet)

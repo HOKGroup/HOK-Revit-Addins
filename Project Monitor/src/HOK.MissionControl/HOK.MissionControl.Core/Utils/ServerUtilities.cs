@@ -22,8 +22,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        public const string RestApiBaseUrl = "http://hok-184vs/";
-        //public const string RestApiBaseUrl = "http://localhost:8080/";
+        //public const string RestApiBaseUrl = "http://hok-184vs/";
+        public const string RestApiBaseUrl = "http://localhost:8080/";
         public const string ApiVersion = "api/v1";
 
         #region GET
@@ -332,34 +332,34 @@ namespace HOK.MissionControl.Core.Utils
             return resresponse;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="worksetDocumentId"></param>
-        /// <param name="objectId"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public static HttpStatusCode UpdateSessionInfo(string worksetDocumentId, string objectId, string action)
-        {
-            var httpStatusCode = HttpStatusCode.Unused;
-            try
-            {
-                var restClient = new RestClient(RestApiBaseUrl);
-                var restRequest = new RestRequest(ApiVersion + "/healthrecords/" + worksetDocumentId + "/sessioninfo/" + objectId, Method.PUT)
-                {
-                    RequestFormat = DataFormat.Json
-                };
-                restRequest.AddQueryParameter("action", action);
-                httpStatusCode = restClient.Execute(restRequest).StatusCode;
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="worksetDocumentId"></param>
+        ///// <param name="objectId"></param>
+        ///// <param name="action"></param>
+        ///// <returns></returns>
+        //public static HttpStatusCode UpdateSessionInfo(string worksetDocumentId, string objectId, string action)
+        //{
+        //    var httpStatusCode = HttpStatusCode.Unused;
+        //    try
+        //    {
+        //        var restClient = new RestClient(RestApiBaseUrl);
+        //        var restRequest = new RestRequest(ApiVersion + "/healthrecords/" + worksetDocumentId + "/sessioninfo/" + objectId, Method.PUT)
+        //        {
+        //            RequestFormat = DataFormat.Json
+        //        };
+        //        restRequest.AddQueryParameter("action", action);
+        //        httpStatusCode = restClient.Execute(restRequest).StatusCode;
 
-                Log.AppendLog(LogMessageType.INFO, httpStatusCode + "-sessioninfo-" + action);
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return httpStatusCode;
-        }
+        //        Log.AppendLog(LogMessageType.INFO, httpStatusCode + "-sessioninfo-" + action);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+        //    }
+        //    return httpStatusCode;
+        //}
 
         #endregion
 

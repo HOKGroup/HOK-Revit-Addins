@@ -9,7 +9,7 @@ namespace HOK.MissionControl.Core.Schemas
         public string updaterId { get; set; } = "";
         public string categoryName { get; set; } = "";
         public string elementUniqueId { get; set; } = "";
-        public DateTime edited { get; set; } = DateTime.Now;
+        public DateTime edited { get; set; } = DateTime.UtcNow;
         public string editedBy { get; set; } = "";
     }
 }

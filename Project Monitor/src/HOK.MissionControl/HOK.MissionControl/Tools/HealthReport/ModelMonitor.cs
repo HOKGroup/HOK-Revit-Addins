@@ -9,58 +9,14 @@ namespace HOK.MissionControl.Tools.HealthReport
     public class ModelMonitor
     {
         /// <summary>
-        /// Publishes data about Session duration and Synch intervals.
-        /// </summary>
-        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
-        /// <param name="state">Current document state.</param>
-        public static void PublishSessionInfo(string recordId, SessionEvent state)
-        {
-            try
-            {
-                switch (state)
-                {
-                    case SessionEvent.documentOpened:
-                        AppCommand.SessionInfo = new SessionInfo
-                        {
-                            user = Environment.UserName,
-                            from = DateTime.Now
-                        };
-                        var guid = ServerUtilities.Post<SessionInfo>(AppCommand.SessionInfo, "healthrecords/" + recordId + "/sessioninfo").Id;
-                        AppCommand.SessionInfo.Id = guid;
-                        break;
-                    case SessionEvent.documentSynched:
-                        if (AppCommand.SessionInfo != null)
-                        {
-                            var objectId = AppCommand.SessionInfo.Id;
-                            ServerUtilities.UpdateSessionInfo(recordId, objectId, "putSynchTime");
-                        }
-                        break;
-                    case SessionEvent.documentClosed:
-                        if (AppCommand.SessionInfo != null)
-                        {
-                            var objectId = AppCommand.SessionInfo.Id;
-                            ServerUtilities.UpdateSessionInfo(recordId, objectId, "putToTime");
-                        }
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(state), state, null);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-        }
-
-        /// <summary>
         /// Publishes data about Model Synch duration.
         /// </summary>
-        public static void PublishSynchTime(string recordId)
+        public void PublishSynchTime(string recordId)
         {
             try
             {
                 var from = AppCommand.SynchTime["from"];
-                var to = DateTime.Now;
+                var to = DateTime.UtcNow;
                 var span = to - from;
                 var ms = (int)span.TotalMilliseconds;
 
@@ -70,7 +26,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     user = Environment.UserName.ToLower()
                 };
 
-                ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsynchtime");
+                var unused = ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsynchtime");
             }
             catch (Exception ex)
             {
@@ -82,12 +38,12 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// Publishes data about Model Opening duration.
         /// </summary>
         /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
-        public static void PublishOpenTime(string recordId)
+        public void PublishOpenTime(string recordId)
         {
             try
             {
                 var from = AppCommand.OpenTime["from"];
-                var to = DateTime.Now;
+                var to = DateTime.UtcNow;
                 var span = to - from;
                 var ms = (int)span.TotalMilliseconds;
 
@@ -97,7 +53,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     user = Environment.UserName.ToLower()
                 };
 
-                ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelopentime");
+                var unused = ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelopentime");
             }
             catch (Exception ex)
             {
@@ -110,10 +66,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// </summary>
         /// <param name="filePath">Revit Document central file path.</param>
         /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
-        /// <param name="config">Configuration for the model.</param>
-        /// <param name="project">Project for the model.</param>
         /// <param name="version">Revit file version.</param>
-        public static void PublishModelSize(string filePath, string recordId, Configuration config, Project project, string version)
+        public void PublishModelSize(string filePath, string recordId, string version)
         {
             try
             {
@@ -164,15 +118,5 @@ namespace HOK.MissionControl.Tools.HealthReport
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
         }
-    }
-
-    /// <summary>
-    /// Three different Document States that Model info gets updated during.
-    /// </summary>
-    public enum SessionEvent
-    {
-        documentOpened = 0,
-        documentSynched = 1,
-        documentClosed = 2
     }
 }

@@ -14,9 +14,7 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// </summary>
         /// <param name="doc">Revit Document.</param>
         /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
-        /// <param name="config">Configuration for the model.</param>
-        /// <param name="project">Project for the model.</param>
-        public static void PublishData(Document doc, string recordId, Configuration config, Project project)
+        public void PublishData(Document doc, string recordId)
         {
             try
             {
@@ -86,7 +84,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     totalLinkedDwg = totalLinkedCad
                 };
 
-                ServerUtilities.Post<LinkStat>(linkStats, "healthrecords/" + recordId + "/linkstats");
+                var unused = ServerUtilities.Post<LinkStat>(linkStats, "healthrecords/" + recordId + "/linkstats");
             }
             catch (Exception ex)
             {

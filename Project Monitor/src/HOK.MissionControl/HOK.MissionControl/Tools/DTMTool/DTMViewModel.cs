@@ -81,7 +81,7 @@ namespace HOK.MissionControl.Tools.DTMTool
                         updaterId = reportingInfo.UpdaterId,
                         categoryName = reportingInfo.CategoryName,
                         elementUniqueId = reportingInfo.ReportingUniqueId,
-                        edited = DateTime.Now,
+                        edited = DateTime.UtcNow,
                         editedBy = Environment.UserName
                     };
 

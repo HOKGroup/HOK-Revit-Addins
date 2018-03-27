@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
-using HOK.MissionControl.Tools.Communicator;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -146,24 +145,23 @@ namespace HOK.MissionControl.Tools.HealthReport
                     dimSegmentStats = dimSegmentStats
                 };
 
-
-                var result = ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
-                if (result.Id == null)
-                {
-                    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Error.");
-                    AppCommand.CommunicatorHandler.Status = Status.Error;
-                    AppCommand.CommunicatorHandler.Message = "Styles Info failed to post.";
-                    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
-                    AppCommand.CommunicatorEvent.Raise();
-                }
-                else
-                {
-                    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Success.");
-                    AppCommand.CommunicatorHandler.Status = Status.Success;
-                    AppCommand.CommunicatorHandler.Message = "Styles Info posted successfully!";
-                    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
-                    AppCommand.CommunicatorEvent.Raise();
-                }
+                var unused = ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
+                //if (result.Id == null)
+                //{
+                //    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Error.");
+                //    AppCommand.CommunicatorHandler.Status = Status.Error;
+                //    AppCommand.CommunicatorHandler.Message = "Styles Info failed to post.";
+                //    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
+                //    AppCommand.CommunicatorEvent.Raise();
+                //}
+                //else
+                //{
+                //    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Success.");
+                //    AppCommand.CommunicatorHandler.Status = Status.Success;
+                //    AppCommand.CommunicatorHandler.Message = "Styles Info posted successfully!";
+                //    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
+                //    AppCommand.CommunicatorEvent.Raise();
+                //}
             }
             catch (Exception e)
             {
