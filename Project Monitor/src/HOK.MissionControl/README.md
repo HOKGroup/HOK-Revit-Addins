@@ -7,6 +7,12 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.17
+
+* As Mark reported we were not storing date and time in MongoDB using UTC time, so depending on user location some dates might be all over the place. This fixes that issue making sure all timestamps are always in UTC. 
+* Converted all Health Report publish methods to be executed at startup and are now using new Thread(). This should speed things up and free up post processing when model is being closed. This will also prevent any data being published to DB that was not saved. We are no longer publishing anything onDocumentClosing()
+* Removed data that was being published about Session Logs etc. It was not being used by Mission Control and was clogging up the pipeline for no reason. It should speed things up a little.
+
 ###### Release 2018.0.0.16
 
 * Adds info about views to health report dimension segments
