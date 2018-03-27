@@ -348,6 +348,7 @@ namespace HOK.MissionControl
                     var recordId = MissionControlSetup.HealthRecordIds[centralPath];
                     if (SynchTime.ContainsKey("from"))
                     {
+                        Log.AppendLog(LogMessageType.INFO, "Finished Synching. Publishing Synch Time data.");
                         new Thread(() => new ModelMonitor().PublishSynchTime(recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
                     }
                 }
@@ -400,6 +401,8 @@ namespace HOK.MissionControl
             {
                 try
                 {
+                    Log.AppendLog(LogMessageType.INFO, "Reloading Latest...");
+
                     var reloadOptions = new ReloadLatestOptions();
                     var doc = app.ActiveUIDocument.Document;
                     doc.ReloadLatest(reloadOptions);
