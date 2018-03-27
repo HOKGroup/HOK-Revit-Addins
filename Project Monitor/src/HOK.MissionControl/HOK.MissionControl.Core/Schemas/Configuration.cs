@@ -33,7 +33,7 @@ namespace HOK.MissionControl.Core.Schemas
         public bool isEnabled { get; set; } = false;
         public bool locked { get; set; } = false;
         public string modifiedBy { get; set; } = "";
-        public DateTime modified { get; set; } = DateTime.Now;
+        public DateTime modified { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>

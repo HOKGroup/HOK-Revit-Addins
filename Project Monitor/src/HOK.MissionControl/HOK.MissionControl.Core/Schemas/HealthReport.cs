@@ -18,7 +18,7 @@ namespace HOK.MissionControl.Core.Schemas
         public string user { get; set; } = "";
         public double opened { get; set; } = 0;
         public double closed { get; set; } = 0;
-        public DateTime createdOn { get; set; } = DateTime.Now;
+        public DateTime createdOn { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ namespace HOK.MissionControl.Core.Schemas
         public int viewsOnSheetWithTemplate { get; set; }
         public int schedulesOnSheet { get; set; }
         public int unclippedViews { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.Now;
+        public DateTime createdOn { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ namespace HOK.MissionControl.Core.Schemas
         public int totalImportedStyles { get; set; }
         public int totalLinkedModels { get; set; }
         public int totalLinkedDwg { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.Now;
+        public DateTime createdOn { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -111,23 +111,7 @@ namespace HOK.MissionControl.Core.Schemas
         public string Id { get; set; }
         public long value { get; set; }
         public string user { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.Now;
-    }
-
-    /// <summary>
-    /// Session monitoring data.
-    /// </summary>
-    public class SessionInfo
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public string user { get; set; }
-        public DateTime? from { get; set; }
-        public DateTime? to { get; set; }
-        public List<DateTime> synched { get; set; } = new List<DateTime>();
-        public DateTime createdOn { get; set; } = DateTime.Now;
+        public DateTime createdOn { get; set; } = DateTime.UtcNow;
     }
 
     /// <summary>
@@ -152,6 +136,5 @@ namespace HOK.MissionControl.Core.Schemas
         public List<EventData> openTimes { get; set; } = new List<EventData>();
         public List<EventData> synchTimes { get; set; } = new List<EventData>();
         public List<EventData> modelSizes { get; set; } = new List<EventData>();
-        public List<SessionInfo> sessionLogs { get; set; } = new List<SessionInfo>();
     }
 }

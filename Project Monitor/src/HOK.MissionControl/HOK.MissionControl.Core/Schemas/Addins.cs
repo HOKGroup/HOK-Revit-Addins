@@ -29,7 +29,7 @@ namespace HOK.MissionControl.Core.Schemas
         public string user { get; set; }
         public string revitVersion { get; set; }
         public string office { get; set; }
-        public DateTime createdOn { get; set; } = new DateTime();
+        public DateTime createdOn { get; set; } = DateTime.UtcNow;
         public List<InfoItem> detailInfo { get; set; } = new List<InfoItem>();
 
         public AddinLog()

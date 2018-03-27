@@ -67,7 +67,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
             var familyStatsId = AppCommand.HrData.familyStats;
             if (string.IsNullOrEmpty(familyStatsId)) return;
 
-            t.completedOn = DateTime.Now;
+            t.completedOn = DateTime.UtcNow;
             t.completedBy = Environment.UserName.ToLower();
 
             ServerUtilities.Post<FamilyData>(wrapper.Task, "families/" + familyStatsId + "/family/" + e.name + "/updatetask/" + t.Id);

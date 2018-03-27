@@ -17,7 +17,7 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
         public string Id { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.Now;
+        public DateTime createdOn { get; set; } = DateTime.UtcNow;
         public string user { get; set; }
         public List<TextNoteTypeInfo> textStats { get; set; } = new List<TextNoteTypeInfo>();
         public List<DimensionTypeInfo> dimStats { get; set; } = new List<DimensionTypeInfo>();
@@ -30,7 +30,7 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
         public string Id { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.Now;
+        public DateTime createdOn { get; set; } = DateTime.UtcNow;
         public bool isOverriden { get; set; }
         public double? value { get; set; }
         public string valueString { get; set; } //not set in constructor
@@ -74,7 +74,7 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
         public string Id { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.Now;
+        public DateTime createdOn { get; set; } = DateTime.UtcNow;
         public string name { get; set; }
         public int instances { get; set; }
         public bool usesProjectUnits { get; set; }
@@ -132,7 +132,7 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
         public string Id { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.Now;
+        public DateTime createdOn { get; set; } = DateTime.UtcNow;
         public string name { get; set; }
         public int instances { get; set; }
         public bool bold { get; set; }

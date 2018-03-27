@@ -199,7 +199,7 @@ namespace HOK.MissionControl.FamilyPublish
                     inPlaceFamilies = inPlaceFamilies,
                     oversizedFamilies = oversizedFamilies,
                     createdBy = Environment.UserName.ToLower(),
-                    createdOn = DateTime.Now,
+                    createdOn = DateTime.UtcNow,
                     families = famOutput
                 };
 

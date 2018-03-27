@@ -5,7 +5,6 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
-using HOK.MissionControl.Tools.Communicator;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -36,10 +35,6 @@ namespace HOK.MissionControl.Tools.HealthReport
                     {
                         // increment instance count
                         textTypes[key] = new Tuple<Element, int>(textTypes[key].Item1, textTypes[key].Item2 + 1);
-                    }
-                    else
-                    {
-                        Log.AppendLog(LogMessageType.INFO, "Givent TextNoteType Id doesn't exist in the model. It will be skipped.");
                     }
                 }
 
@@ -87,7 +82,6 @@ namespace HOK.MissionControl.Tools.HealthReport
                     }
                     else
                     {
-                        Log.AppendLog(LogMessageType.INFO, "Given Dimension Type Id doesn't exist in the model. It will be skipped.");
                         continue; //without dimension type we can't get units so just break out
                     }
 
@@ -146,24 +140,25 @@ namespace HOK.MissionControl.Tools.HealthReport
                     dimSegmentStats = dimSegmentStats
                 };
 
-
-                var result = ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
-                if (result.Id == null)
-                {
-                    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Error.");
-                    AppCommand.CommunicatorHandler.Status = Status.Error;
-                    AppCommand.CommunicatorHandler.Message = "Styles Info failed to post.";
-                    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
-                    AppCommand.CommunicatorEvent.Raise();
-                }
-                else
-                {
-                    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Success.");
-                    AppCommand.CommunicatorHandler.Status = Status.Success;
-                    AppCommand.CommunicatorHandler.Message = "Styles Info posted successfully!";
-                    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
-                    AppCommand.CommunicatorEvent.Raise();
-                }
+                var unused = ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
+                
+                //TODO: I can do a notification when all data is published, and another when user gets a Task assigned. 
+                //if (result.Id == null)
+                //{
+                //    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Error.");
+                //    AppCommand.CommunicatorHandler.Status = Status.Error;
+                //    AppCommand.CommunicatorHandler.Message = "Styles Info failed to post.";
+                //    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
+                //    AppCommand.CommunicatorEvent.Raise();
+                //}
+                //else
+                //{
+                //    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Success.");
+                //    AppCommand.CommunicatorHandler.Status = Status.Success;
+                //    AppCommand.CommunicatorHandler.Message = "Styles Info posted successfully!";
+                //    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
+                //    AppCommand.CommunicatorEvent.Raise();
+                //}
             }
             catch (Exception e)
             {
