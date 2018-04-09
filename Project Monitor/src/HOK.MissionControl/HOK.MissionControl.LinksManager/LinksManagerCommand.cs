@@ -31,8 +31,8 @@ namespace HOK.MissionControl.LinksManager
             {
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
-                AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-LinksManager",
-                    commandData.Application.Application.VersionNumber));
+                var unused1 = AddinUtilities.PublishAddinLog(
+                    new AddinLog("MissionControl-LinksManager", commandData.Application.Application.VersionNumber), LogPosted);
 
                 var viewModel = new LinksManagerViewModel(doc);
                 var view = new LinksManagerView
@@ -54,6 +54,16 @@ namespace HOK.MissionControl.LinksManager
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Callback method for when Addin-info is published.
+        /// </summary>
+        /// <param name="data"></param>
+        private static void LogPosted(AddinData data)
+        {
+            Log.AppendLog(LogMessageType.INFO, "Addin info was published: " 
+                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
     }
 }
