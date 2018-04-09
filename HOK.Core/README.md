@@ -6,6 +6,7 @@
 
 * Windows updates changed the SSL encryption for HTTP requests. I had to add a specific SSL version to each request to make sure it's compatible with GitHub. 
 * Also added settings to store AccessToken for GitHub so it's not available while decompiling.
+* Changed addin info publishing to use Asynch. Window was taking too long to open. 
 
 ###### Release 2018.0.0.7
 
