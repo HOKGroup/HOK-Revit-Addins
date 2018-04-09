@@ -7,6 +7,10 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.18
+
+* Use asynch methods to publish plug-in info. That speeds up UI display, and finishes publishing in the background.
+
 ###### Release 2018.0.0.17
 
 * As Mark reported we were not storing date and time in MongoDB using UTC time, so depending on user location some dates might be all over the place. This fixes that issue making sure all timestamps are always in UTC. 
