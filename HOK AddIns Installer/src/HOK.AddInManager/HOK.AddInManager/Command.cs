@@ -42,7 +42,7 @@ namespace HOK.AddInManager
                                 .Select(x => new InfoItem { name = x.ToolName, value = x.ToolLoadType.ToString() })
                                 .ToList()
                         };
-                        AddinUtilities.PublishAddinLog(log);
+                        var unused1 = AddinUtilities.PublishAddinLog(log, LogPosted);
                     }
                     catch (Exception e)
                     {
@@ -56,7 +56,8 @@ namespace HOK.AddInManager
                 else
                 {
                     // If user cancelled out of this window, we don't need to log all the details, other than that it was opened.
-                    AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", commandData.Application.Application.VersionNumber));
+                    var unused1 = AddinUtilities.PublishAddinLog(
+                        new AddinLog("AddinManager", commandData.Application.Application.VersionNumber), LogPosted);
 
                     OverrideTempSettings();
                 }
@@ -68,6 +69,16 @@ namespace HOK.AddInManager
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Callback method for when Addin-info is published.
+        /// </summary>
+        /// <param name="data"></param>
+        private static void LogPosted(AddinData data)
+        {
+            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
+                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
 
         /// <summary>
