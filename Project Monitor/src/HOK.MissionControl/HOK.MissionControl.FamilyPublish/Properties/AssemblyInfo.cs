@@ -8,10 +8,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("HOK.MissionControl.FamilyPublish")]
 [assembly: AssemblyDescription("Publishes information about Families to Mission Control server.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("HOK")]
+[assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.MissionControl.FamilyPublish")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2018")]
+[assembly: AssemblyTrademark("Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -34,5 +34,5 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 //[assembly: AssemblyVersion("2018.0.0.2")]
 //[assembly: AssemblyVersion("2018.0.*")]
-[assembly: AssemblyVersion("2018.0.0.17")]
+[assembly: AssemblyVersion("2018.0.0.18")]
 //[assembly: AssemblyFileVersion("2018.0.0.2")]

@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("HOK.MissionControl.LinksManager")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("This application allows you to manage the links, imports, and object styles in the model.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.MissionControl.LinksManager")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2018")]
+[assembly: AssemblyTrademark("Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -33,5 +33,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 //[assembly: AssemblyVersion("2018.0.*")]
-[assembly: AssemblyVersion("2018.0.0.17")]
+[assembly: AssemblyVersion("2018.0.0.18")]
 //[assembly: AssemblyFileVersion("0.0.0.0")]
