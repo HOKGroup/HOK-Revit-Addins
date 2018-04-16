@@ -11,13 +11,7 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
 {
     public class FeedbackModel
     {
-        // (Konrad) This is a token and credentials for the github user we use here
-        // username: hokfeedback
-        // password: Password123456
-        // token: fc396d894a4f27520b8ce85564c5fc2b2a15b88f
-
         private const string baseUrl = "https://api.github.com";
-        private const string token = "fc396d894a4f27520b8ce85564c5fc2b2a15b88f";
 
         /// <summary>
         /// Async call to GitHub that removes an image.
@@ -27,6 +21,13 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
         /// <returns>Response object.</returns>
         public async Task<T> RemoveImage<T>(AttachmentViewModel att) where T : new()
         {
+            // (Konrad) Apparently it's possible that new Windows updates change the standard 
+            // SSL protocol to SSL3. RestSharp uses whatever current one is while GitHub server 
+            // is not ready for it yet, so we have to use TLS1.2 explicitly.
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            var token = Properties.Settings.Default.GitHubToken;
             var client = new RestClient(baseUrl);
             var request = new RestRequest("/repos/HOKGroup/MissionControl_Issues/contents/" + att.UploadImageContent.path, Method.DELETE)
             {
@@ -93,6 +94,13 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
                 branch = "master"
             };
 
+            // (Konrad) Apparently it's possible that new Windows updates change the standard 
+            // SSL protocol to SSL3. RestSharp uses whatever current one is while GitHub server 
+            // is not ready for it yet, so we have to use TLS1.2 explicitly.
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            var token = Properties.Settings.Default.GitHubToken;
             var client = new RestClient(baseUrl);
             var request = new RestRequest("/repos/HOKGroup/MissionControl_Issues/contents/" + body.path, Method.PUT)
             {
@@ -132,8 +140,6 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
         /// <returns>Message</returns>
         public async Task<T> Submit<T>(string name, string email, string feedback, string toolname) where T: new()
         {
-            var client = new RestClient(baseUrl);
-
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("From: " + name);
             stringBuilder.AppendLine("Email: " + email);
@@ -151,6 +157,14 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
                 labels = new List<string>()
             };
 
+            // (Konrad) Apparently it's possible that new Windows updates change the standard 
+            // SSL protocol to SSL3. RestSharp uses whatever current one is while GitHub server 
+            // is not ready for it yet, so we have to use TLS1.2 explicitly.
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+            var token = Properties.Settings.Default.GitHubToken;
+            var client = new RestClient(baseUrl);
             var request = new RestRequest("/repos/HOKGroup/MissionControl_Issues/issues", Method.POST)
             {
                 OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
