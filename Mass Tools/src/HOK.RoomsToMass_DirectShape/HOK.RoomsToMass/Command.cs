@@ -35,7 +35,8 @@ namespace HOK.RoomsToMass
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
-                AddinUtilities.PublishAddinLog(new AddinLog("MassTools-CreateMass", m_app.Application.VersionNumber));
+                var unused1 = AddinUtilities.PublishAddinLog(
+                    new AddinLog("MassTools-CreateMass", commandData.Application.Application.VersionNumber), LogPosted);
 
                 GetModelInformation();
                 var sourceWindow = new MassSourceWindow(m_app, modelDictionary);
@@ -70,6 +71,16 @@ namespace HOK.RoomsToMass
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return Result.Failed;
             }
+        }
+
+        /// <summary>
+        /// Callback method for when Addin-info is published.
+        /// </summary>
+        /// <param name="data"></param>
+        private static void LogPosted(AddinData data)
+        {
+            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
+                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
 
         private void GetModelInformation()
