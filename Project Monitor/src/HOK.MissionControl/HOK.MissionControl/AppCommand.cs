@@ -143,13 +143,21 @@ namespace HOK.MissionControl
             try
             {
                 var pathName = args.PathName;
+                string centralPath;
                 if (string.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
 
-                var fileInfo = BasicFileInfo.Extract(pathName);
-                if (!fileInfo.IsWorkshared) return;
+                if (!pathName.StartsWith("BIM 360://"))
+                {
+                    var fileInfo = BasicFileInfo.Extract(pathName);
+                    if (!fileInfo.IsWorkshared) return;
 
-                var centralPath = fileInfo.CentralPath;
-                if (string.IsNullOrEmpty(centralPath)) return;
+                    centralPath = fileInfo.CentralPath;
+                    if (string.IsNullOrEmpty(centralPath)) return;
+                }
+                else
+                {
+                    centralPath = pathName;
+                }
 
                 //search for config
                 var configFound = ServerUtilities.GetByCentralPath<Configuration>(centralPath, "configurations/centralpath");
@@ -202,7 +210,7 @@ namespace HOK.MissionControl
                 if (doc == null || args.IsCancelled()) return;
                 if (!doc.IsWorkshared) return;
 
-                var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 if (!MissionControlSetup.Projects.ContainsKey(centralPath)) return;
                 if (!MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
 
@@ -221,7 +229,6 @@ namespace HOK.MissionControl
                 if (MonitorUtilities.IsUpdaterOn(currentProject, currentConfig,
                     new Guid(Properties.Resources.HealthReportTrackerGuid)))
                 {
-                    var refreshProject = false;
                     if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
                     {
                         HrData = ServerUtilities.GetByCentralPath<HealthReportData>(centralPath, "healthrecords/centralpath");
@@ -229,7 +236,14 @@ namespace HOK.MissionControl
                         {
                             HrData = ServerUtilities.Post<HealthReportData>(new HealthReportData { centralPath = centralPath.ToLower() }, "healthrecords");
                             ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
-                            refreshProject = true;
+                            
+
+                            var projectFound = ServerUtilities.Get<Project>("projects/configid/" + currentConfig.Id);
+                            if (null == projectFound) return;
+                            MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
+
+                            MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
+                            MissionControlSetup.FamiliesIds.Add(centralPath, HrData.familyStats); // store families record
                         }
                         else
                         {
@@ -252,13 +266,6 @@ namespace HOK.MissionControl
                     if (OpenTime.ContainsKey("from"))
                     {
                         new Thread(() => new ModelMonitor().PublishOpenTime(recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    }
-
-                    if (refreshProject)
-                    {
-                        var projectFound = ServerUtilities.Get<Project>("projects/configid/" + currentConfig.Id);
-                        if (null == projectFound) return;
-                        MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
                     }
                 }
 

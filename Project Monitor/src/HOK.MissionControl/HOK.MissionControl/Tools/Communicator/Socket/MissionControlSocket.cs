@@ -13,6 +13,7 @@ using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
+using HOK.MissionControl.Utils;
 
 namespace HOK.MissionControl.Tools.Communicator.Socket
 {
@@ -23,7 +24,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
 
         public void Main(Document doc)
         {
-            var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
+            var centralPath = FileInfoUtil.GetCentralFilePath(doc);
 
             try
             {

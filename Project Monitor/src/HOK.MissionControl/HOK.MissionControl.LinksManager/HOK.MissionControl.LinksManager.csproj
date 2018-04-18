@@ -130,6 +130,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="ImagesTab\ImagesModel.cs" />
     <Compile Include="ImagesTab\ImagesView.xaml.cs">
       <DependentUpon>ImagesView.xaml</DependentUpon>

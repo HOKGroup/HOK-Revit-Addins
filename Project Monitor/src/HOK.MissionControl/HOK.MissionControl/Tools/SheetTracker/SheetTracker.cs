@@ -6,6 +6,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Core.Schemas.Sheets;
+using HOK.MissionControl.Utils;
 
 namespace HOK.MissionControl.Tools.SheetTracker
 {
@@ -15,7 +16,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
         {
             try
             {
-                var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 var currentProject = MissionControlSetup.Projects[centralPath];
                 var currentConfig = MissionControlSetup.Configurations[centralPath];
 

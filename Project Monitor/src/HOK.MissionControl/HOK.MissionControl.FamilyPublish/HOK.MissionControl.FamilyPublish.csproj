@@ -131,6 +131,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AppCommand.cs" />
     <Compile Include="FamilyMonitorModel.cs" />
     <Compile Include="FamilyMonitorView.xaml.cs">

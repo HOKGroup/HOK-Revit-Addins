@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Utils;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -57,7 +58,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     .Cast<Dimension>();
 
                 // (Konrad) There is a user override in Configuration that controls what dimension overrides are ignored
-                var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 var config = MissionControlSetup.Configurations.ContainsKey(centralPath)
                     ? MissionControlSetup.Configurations[centralPath]
                     : null;

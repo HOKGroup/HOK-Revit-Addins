@@ -55,8 +55,11 @@ namespace HOK.MissionControl.FamilyPublish
                     return Result.Failed;
                 }
 
+                //TODO: There is a utility method that could be used here instead.
+                var centralPath = doc.PathName.StartsWith("BIM 360://")
+                    ? doc.PathName
+                    : BasicFileInfo.Extract(doc.PathName).CentralPath;
 
-                var centralPath = BasicFileInfo.Extract(pathName).CentralPath;
                 if (string.IsNullOrEmpty(centralPath))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Could not get Central Path.");
