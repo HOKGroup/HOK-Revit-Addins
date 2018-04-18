@@ -1,7 +1,7 @@
-##Description
+## Description
 
-##Tasks
-- [x] Submited PR
+## Tasks
+- [x] Submitted PR
 - [ ] Published to BIM Staging
 - [ ] Tested by David
 - [ ] Published to BIM Master

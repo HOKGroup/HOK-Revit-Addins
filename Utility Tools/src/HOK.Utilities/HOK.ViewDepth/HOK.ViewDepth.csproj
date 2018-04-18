@@ -138,6 +138,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="OverrideViewDepth.cs" />
     <Compile Include="ViewCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

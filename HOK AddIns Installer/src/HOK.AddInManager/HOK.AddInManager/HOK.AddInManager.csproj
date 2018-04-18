@@ -209,26 +209,8 @@
 
 echo Configuration: $(Configuration)
 
-if $(Configuration) == 2015 goto Build2015
-if $(Configuration) == 2016 goto Build2016
 if $(Configuration) == 2017 goto Build2017
 if $(Configuration) == 2018 goto Build2018
-
-:Build2015
-echo Copying results to Build2015
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)HOK.AddInManager.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015"
-goto exit
-
-:Build2016
-echo Copying results to Build2016
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetDir)HOK.AddInManager.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016"
-goto exit
 
 :Build2017
 echo Copying results to Build2017

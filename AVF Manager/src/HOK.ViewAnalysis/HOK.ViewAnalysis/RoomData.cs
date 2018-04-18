@@ -308,35 +308,33 @@ namespace HOK.ViewAnalysis
 
     public class SegmentData
     {
-        public BoundarySegment SegmentObj { get; set; }
+        public Autodesk.Revit.DB.BoundarySegment SegmentObj { get; set; }
         public Curve BoundaryCurve { get; set; }
         public ElementId WallId { get; set; } = ElementId.InvalidElementId;
         public bool IsExteriror { get; set; }
         public List<Curve> VisibleCurves { get; set; } = new List<Curve>();
         public List<XYZ> ViewPoints { get; set; } = new List<XYZ>();
 
-        public SegmentData(BoundarySegment segment)
+        public SegmentData(Autodesk.Revit.DB.BoundarySegment segment)
         {
             SegmentObj = segment;
-#if RELEASE2017
-            BoundaryCurve = segment.GetCurve();
-#else
+#if RELEASE2015
             BoundaryCurve = segment.Curve;
+#else
+            BoundaryCurve = segment.GetCurve();
 #endif
 
 #if RELEASE2015
             if (null == segment.Element)
             {
-                visibleCurves.Add(boundaryCurve);
+                VisibleCurves.Add(BoundaryCurve);
             }
 #else
-            if (ElementId.InvalidElementId!=segment.ElementId)
+            if (ElementId.InvalidElementId != segment.ElementId)
             {
                 VisibleCurves.Add(BoundaryCurve);
             }
 #endif
-
-            
         }
 
         public void GetViewPoints(bool isCurtainWall)

@@ -35,6 +35,11 @@ namespace HOK.ViewAnalysis
             m_doc = m_app.ActiveUIDocument.Document;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
+            // (Konrad) We are gathering information about the addin use. This allows us to
+            // better maintain the most used plug-ins or discontiue the unused ones.
+            var unused1 = AddinUtilities.PublishAddinLog(
+                new AddinLog("ViewAnalysis-LEED Analysis", commandData.Application.Application.VersionNumber), LogPosted);
+
             if (AddSharedParameters() == false)
             {
                 MessageBox.Show("LEED Parameters cannot be found.\n" + LEEDParameters .LEED_AreaWithViews + "\n" + LEEDParameters.LEED_NonRegularyOccupied, 
@@ -91,12 +96,18 @@ namespace HOK.ViewAnalysis
                     MessageBoxIcon.Warning);
             }
 
-            // (Konrad) We are gathering information about the addin use. This allows us to
-            // better maintain the most used plug-ins or discontiue the unused ones.
-            AddinUtilities.PublishAddinLog(new AddinLog("ViewAnalysis-LEED Analysis", commandData.Application.Application.VersionNumber));
-
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Callback method for when Addin-info is published.
+        /// </summary>
+        /// <param name="data"></param>
+        private static void LogPosted(AddinData data)
+        {
+            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
+                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
 
         private bool IsViewForAnalysis(Autodesk.Revit.DB.View activeView)
