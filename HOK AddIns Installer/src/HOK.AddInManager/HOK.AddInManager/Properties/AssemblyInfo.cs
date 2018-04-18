@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -10,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.AddInManager")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2016")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2018")]
 [assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +31,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2018.0.0.5")]
-[assembly: AssemblyFileVersion("2018.0.0.5")]
+[assembly: AssemblyVersion("2018.0.0.6")]
+[assembly: AssemblyFileVersion("2018.0.0.6")]

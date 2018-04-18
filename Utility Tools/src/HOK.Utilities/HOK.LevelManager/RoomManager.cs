@@ -51,7 +51,11 @@ namespace HOK.LevelManager
                             {
                                 foreach (var segment in boundaryList)
                                 {
+#if RELEASE2015
+                                    var element = segment.Element;
+#else
                                     var element = m_doc.GetElement(segment.ElementId);
+#endif
                                     if (null != element)
                                     {
                                         if (element.Category.Id.IntegerValue == (int)BuiltInCategory.OST_RoomSeparationLines)
