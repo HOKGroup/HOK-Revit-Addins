@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.Core.Utilities;
+using Autodesk.Revit.DB;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -64,10 +66,11 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes information about linked models/images/object styles in the model.
         /// </summary>
+        /// <param name="doc">Revit Document.</param>
         /// <param name="filePath">Revit Document central file path.</param>
         /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
         /// <param name="version">Revit file version.</param>
-        public void PublishModelSize(string filePath, string recordId, string version)
+        public void PublishModelSize(Document doc, string filePath, string recordId, string version)
         {
             try
             {
@@ -92,6 +95,22 @@ namespace HOK.MissionControl.Tools.HealthReport
                                           subfolder + "/modelinfo";
 
                         fileSize = ServerUtilities.GetFileInfoFromRevitServer(clientPath, requestPath);
+                    }
+                    else if (filePath.StartsWith("BIM 360://"))
+                    {
+                        // (Konrad) For BIM 360 files, we can just pull the file size from local cached file.
+                        // It's pretty much what is stored in the web, so will work for our purpose.
+                        var fileName = doc.WorksharingCentralGUID + ".rvt";
+                        var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                        var collaborationDir = Path.Combine(localAppData,
+                            "Autodesk\\Revit\\Autodesk Revit " + doc.Application.VersionNumber, "CollaborationCache");
+
+                        var file = Directory.GetFiles(collaborationDir, fileName, SearchOption.AllDirectories)
+                            .FirstOrDefault(x => new FileInfo(x).Directory?.Name != "CentralCache");
+                        if (file == null) return;
+
+                        var fileInfo = new FileInfo(file);
+                        fileSize = fileInfo.Length;
                     }
                     else
                     {
