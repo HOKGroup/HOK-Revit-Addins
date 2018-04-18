@@ -12,6 +12,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Tools.Communicator.Messaging;
+using HOK.MissionControl.Utils;
 using HOK.MissionControl.Utils.StatusReporter;
 
 namespace HOK.MissionControl.Tools.Communicator
@@ -135,7 +136,7 @@ namespace HOK.MissionControl.Tools.Communicator
 
             app.Application.FailuresProcessing += FailureProcessing;
             var doc = app.ActiveUIDocument.Document;
-            var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
+            var centralPath = FileInfoUtil.GetCentralFilePath(doc);
 
             using (var trans = new Transaction(doc, "CreateSheet"))
             {

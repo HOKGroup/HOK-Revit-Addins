@@ -6,7 +6,6 @@ using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
-using HOK.MissionControl.Tools.Communicator.HealthReport;
 
 namespace HOK.MissionControl.Tools.Communicator
 {
@@ -21,12 +20,23 @@ namespace HOK.MissionControl.Tools.Communicator
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
-            AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-Communicator", commandData.Application.Application.VersionNumber));
+            var unused1 = AddinUtilities.PublishAddinLog(
+                new AddinLog("MissionControl-Communicator", commandData.Application.Application.VersionNumber), LogPosted);
 
             ToggleCommunicator(commandData.Application);
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
+        }
+
+        /// <summary>
+        /// Callback method for when Addin-info is published.
+        /// </summary>
+        /// <param name="data"></param>
+        private static void LogPosted(AddinData data)
+        {
+            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
+                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
 
         /// <summary>

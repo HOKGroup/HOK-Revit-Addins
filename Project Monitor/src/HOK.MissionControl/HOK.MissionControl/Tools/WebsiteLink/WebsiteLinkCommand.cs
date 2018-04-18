@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Utils;
 
 namespace HOK.MissionControl.Tools.WebsiteLink
 {
@@ -28,10 +29,9 @@ namespace HOK.MissionControl.Tools.WebsiteLink
                     new AddinLog("MissionControl-WebsiteLink", commandData.Application.Application.VersionNumber), LogPosted);
 
                 var launchHome = false;
-                var pathName = doc.PathName;
-                if (!string.IsNullOrEmpty(pathName))
+                if (!string.IsNullOrEmpty(doc.PathName))
                 {
-                    var centralPath = BasicFileInfo.Extract(pathName).CentralPath;
+                    var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                     if (!string.IsNullOrEmpty(centralPath))
                     {
                         if (MissionControlSetup.Projects.ContainsKey(centralPath))

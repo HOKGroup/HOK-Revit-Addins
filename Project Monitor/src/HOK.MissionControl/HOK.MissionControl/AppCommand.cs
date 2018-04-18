@@ -143,13 +143,21 @@ namespace HOK.MissionControl
             try
             {
                 var pathName = args.PathName;
+                string centralPath;
                 if (string.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
 
-                var fileInfo = BasicFileInfo.Extract(pathName);
-                if (!fileInfo.IsWorkshared) return;
+                if (!pathName.StartsWith("BIM 360://"))
+                {
+                    var fileInfo = BasicFileInfo.Extract(pathName);
+                    if (!fileInfo.IsWorkshared) return;
 
-                var centralPath = fileInfo.CentralPath;
-                if (string.IsNullOrEmpty(centralPath)) return;
+                    centralPath = fileInfo.CentralPath;
+                    if (string.IsNullOrEmpty(centralPath)) return;
+                }
+                else
+                {
+                    centralPath = pathName;
+                }
 
                 //search for config
                 var configFound = ServerUtilities.GetByCentralPath<Configuration>(centralPath, "configurations/centralpath");
@@ -202,7 +210,7 @@ namespace HOK.MissionControl
                 if (doc == null || args.IsCancelled()) return;
                 if (!doc.IsWorkshared) return;
 
-                var centralPath = BasicFileInfo.Extract(doc.PathName).CentralPath;
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 if (!MissionControlSetup.Projects.ContainsKey(centralPath)) return;
                 if (!MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
 

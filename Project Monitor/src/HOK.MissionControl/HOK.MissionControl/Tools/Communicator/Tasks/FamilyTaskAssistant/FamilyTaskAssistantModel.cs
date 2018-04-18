@@ -14,6 +14,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
                 new CheckWrapper
                 {
                     CheckName = $"Name: {family.name}",
+                    //TODO: This needs to implement the extra property stored on the settings file
                     IsCheckPassing = family.name.Contains("_HOK_I") || family.name.Contains("_HOK_M"),
                     ToolTipText = "Check will fail if Family name does not contain \"_HOK_I\" or \"_HOK_M\"."
                 },

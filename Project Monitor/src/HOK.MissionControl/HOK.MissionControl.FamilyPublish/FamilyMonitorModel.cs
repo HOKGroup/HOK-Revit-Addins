@@ -137,6 +137,7 @@ namespace HOK.MissionControl.FamilyPublish
                             oversizedFamilies++; // >1MB
                             sizeCheck = true;
                         }
+                        //TODO: This should use the settings from mongoDB
                         if (!family.Name.Contains("_HOK_I") && !family.Name.Contains("_HOK_M")) nameCheck = true;
 
                         var famItem = new FamilyItem

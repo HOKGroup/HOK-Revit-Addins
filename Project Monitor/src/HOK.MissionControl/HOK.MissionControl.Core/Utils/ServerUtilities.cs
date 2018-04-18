@@ -66,7 +66,7 @@ namespace HOK.MissionControl.Core.Utils
             {
                 // (Konrad) Since we cannot pass file path with "\" they were replaced with illegal pipe char "|".
                 // Since pipe cannot be used in a legal file path, it's a good placeholder to use.
-                // File path can also contain forward slashes for RSN and A360 paths ex: RSN:// and A360://
+                // File path can also contain forward slashes for RSN and BIM 360 paths ex: RSN:// and BIM 360://
                 string filePath;
                 if (centralPath.Contains(@"\")) filePath = centralPath.Replace(@"\", "|");
                 else if (centralPath.Contains(@"/")) filePath = centralPath.Replace(@"/", "|");

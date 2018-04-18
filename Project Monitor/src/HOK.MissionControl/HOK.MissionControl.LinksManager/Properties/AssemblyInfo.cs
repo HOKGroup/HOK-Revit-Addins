@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
@@ -7,12 +6,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("HOK.MissionControl.LinksManager")]
 [assembly: AssemblyDescription("This application allows you to manage the links, imports, and object styles in the model.")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.MissionControl.LinksManager")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2018")]
-[assembly: AssemblyTrademark("Konrad K Sobon")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
@@ -21,17 +15,3 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("e991eb9a-f941-4d5f-800b-70256741ab0e")]
-
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Build and Revision Numbers
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-//[assembly: AssemblyVersion("2018.0.*")]
-[assembly: AssemblyVersion("2018.0.0.18")]
-//[assembly: AssemblyFileVersion("0.0.0.0")]
