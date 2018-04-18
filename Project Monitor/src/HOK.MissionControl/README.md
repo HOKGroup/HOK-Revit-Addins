@@ -7,6 +7,14 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.0.20
+
+* Fixed a bug in how Model Size was being obtained so that BIM 360 files are also covered here. It uses cached file size which is not always 100% accurate but it's good for monitoring changes.  
+
+###### Release 2018.0.0.19
+
+* Added support for BIM 360 files so that they can be added to Mission Control.
+
 ###### Release 2018.0.0.18
 
 * Use asynch methods to publish plug-in info. That speeds up UI display, and finishes publishing in the background.
