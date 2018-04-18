@@ -229,7 +229,6 @@ namespace HOK.MissionControl
                 if (MonitorUtilities.IsUpdaterOn(currentProject, currentConfig,
                     new Guid(Properties.Resources.HealthReportTrackerGuid)))
                 {
-                    var refreshProject = false;
                     if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
                     {
                         HrData = ServerUtilities.GetByCentralPath<HealthReportData>(centralPath, "healthrecords/centralpath");
@@ -237,7 +236,14 @@ namespace HOK.MissionControl
                         {
                             HrData = ServerUtilities.Post<HealthReportData>(new HealthReportData { centralPath = centralPath.ToLower() }, "healthrecords");
                             ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
-                            refreshProject = true;
+                            
+
+                            var projectFound = ServerUtilities.Get<Project>("projects/configid/" + currentConfig.Id);
+                            if (null == projectFound) return;
+                            MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
+
+                            MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
+                            MissionControlSetup.FamiliesIds.Add(centralPath, HrData.familyStats); // store families record
                         }
                         else
                         {
@@ -260,13 +266,6 @@ namespace HOK.MissionControl
                     if (OpenTime.ContainsKey("from"))
                     {
                         new Thread(() => new ModelMonitor().PublishOpenTime(recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    }
-
-                    if (refreshProject)
-                    {
-                        var projectFound = ServerUtilities.Get<Project>("projects/configid/" + currentConfig.Id);
-                        if (null == projectFound) return;
-                        MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
                     }
                 }
 

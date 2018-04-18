@@ -48,10 +48,14 @@ namespace HOK.MissionControl.FamilyPublish
                     .Cast<Family>()
                     .ToList();
 
+                //var count = 0;
                 var famOutput = new List<FamilyItem>();
                 StatusBarManager.InitializeProgress("Exporting Family Info:", families.Count);
                 foreach (var family in families)
                 {
+                    // (Konrad) Uncomment for Debug. 
+                    //count++;
+                    //if (count > 5) continue;
                     if (StatusBarManager.Cancel)
                     {
                         StatusBarManager.CancelProgress();
@@ -109,6 +113,7 @@ namespace HOK.MissionControl.FamilyPublish
                             new ElementClassFilter(typeof(LinearArray)),
                             new ElementClassFilter(typeof(RadialArray))
                         });
+
                         var arrays = new FilteredElementCollector(famDoc)
                             .WherePasses(filter)
                             .GetElementCount();
