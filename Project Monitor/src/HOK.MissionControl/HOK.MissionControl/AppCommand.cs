@@ -261,7 +261,7 @@ namespace HOK.MissionControl
                     new Thread(() => new WorksetItemCount().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
                     new Thread(() => new ViewMonitor().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
                     new Thread(() => new WorksetOpenSynch().PublishData(doc, recordId, WorksetMonitorState.onopened)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    new Thread(() => new ModelMonitor().PublishModelSize(centralPath, recordId, doc.Application.VersionNumber)) { Priority = ThreadPriority.BelowNormal }.Start();
+                    new Thread(() => new ModelMonitor().PublishModelSize(doc, centralPath, recordId, doc.Application.VersionNumber)) { Priority = ThreadPriority.BelowNormal }.Start();
 
                     if (OpenTime.ContainsKey("from"))
                     {
