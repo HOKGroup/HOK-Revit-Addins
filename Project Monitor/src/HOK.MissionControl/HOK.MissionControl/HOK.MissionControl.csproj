@@ -214,6 +214,7 @@
     <Compile Include="Tools\HealthReport\ViewMonitor.cs" />
     <Compile Include="Tools\HealthReport\WorksetItemCount.cs" />
     <Compile Include="Tools\HealthReport\WorksetOpenSynch.cs" />
+    <Compile Include="Tools\MissionControl\MissionControl.cs" />
     <Compile Include="Tools\SheetTracker\SheetTracker.cs" />
     <Compile Include="Tools\SheetTracker\SheetUpdater.cs" />
     <Compile Include="Tools\WebsiteLink\WebsiteLinkCommand.cs" />

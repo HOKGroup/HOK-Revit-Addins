@@ -24,7 +24,8 @@ namespace HOK.MissionControl.Tools.Communicator
         OpenView = 2,
         UpdateSheet = 3,
         CreateSheet = 4,
-        ReportStatus = 5
+        ReportStatus = 5,
+        Disable = 6
     }
 
     public enum Status
@@ -99,6 +100,11 @@ namespace HOK.MissionControl.Tools.Communicator
                         ReportStatus();
                         break;
                     }
+                    case RequestId.Disable:
+                    {
+                        DisableCommunicator(app);
+                        break;
+                    }
                 }
             }
             catch (Exception e)
@@ -106,6 +112,19 @@ namespace HOK.MissionControl.Tools.Communicator
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Disables Mission Control Communicator docable panel and button.
+        /// </summary>
+        private static void DisableCommunicator(UIApplication app)
+        {
+            var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
+            var dp = app.GetDockablePane(dpid);
+            if (dp == null) return;
+
+            dp.Hide();
+            AppCommand.Instance.CommunicatorButton.Enabled = false;
         }
 
         /// <summary>

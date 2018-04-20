@@ -140,52 +140,52 @@ namespace HOK.MissionControl
         /// </summary>
         private static void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
         {
-            try
-            {
-                var pathName = args.PathName;
-                string centralPath;
-                if (string.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
+            //try
+            //{
+            //    var pathName = args.PathName;
+            //    string centralPath;
+            //    if (string.IsNullOrEmpty(pathName) || args.DocumentType != DocumentType.Project) return;
 
-                if (!pathName.StartsWith("BIM 360://"))
-                {
-                    var fileInfo = BasicFileInfo.Extract(pathName);
-                    if (!fileInfo.IsWorkshared) return;
+            //    if (!pathName.StartsWith("BIM 360://"))
+            //    {
+            //        var fileInfo = BasicFileInfo.Extract(pathName);
+            //        if (!fileInfo.IsWorkshared) return;
 
-                    centralPath = fileInfo.CentralPath;
-                    if (string.IsNullOrEmpty(centralPath)) return;
-                }
-                else
-                {
-                    centralPath = pathName;
-                }
+            //        centralPath = fileInfo.CentralPath;
+            //        if (string.IsNullOrEmpty(centralPath)) return;
+            //    }
+            //    else
+            //    {
+            //        centralPath = pathName;
+            //    }
 
-                //search for config
-                var configFound = ServerUtilities.GetByCentralPath<Configuration>(centralPath, "configurations/centralpath");
-                if (null != configFound)
-                {
-                    if (MissionControlSetup.Configurations.ContainsKey(centralPath))
-                    {
-                        MissionControlSetup.Configurations.Remove(centralPath);
-                    }
-                    MissionControlSetup.Configurations.Add(centralPath, configFound);
+            //    //search for config
+            //    var configFound = ServerUtilities.GetByCentralPath<Configuration>(centralPath, "configurations/centralpath");
+            //    if (null != configFound)
+            //    {
+            //        if (MissionControlSetup.Configurations.ContainsKey(centralPath))
+            //        {
+            //            MissionControlSetup.Configurations.Remove(centralPath);
+            //        }
+            //        MissionControlSetup.Configurations.Add(centralPath, configFound);
 
-                    var projectFound = ServerUtilities.Get<Project>("projects/configid/" + configFound.Id);
-                    if (null != projectFound)
-                    {
-                        if (MissionControlSetup.Projects.ContainsKey(centralPath))
-                        {
-                            MissionControlSetup.Projects.Remove(centralPath);
-                        }
-                        MissionControlSetup.Projects.Add(centralPath, projectFound);
-                    }
+            //        var projectFound = ServerUtilities.Get<Project>("projects/configid/" + configFound.Id);
+            //        if (null != projectFound)
+            //        {
+            //            if (MissionControlSetup.Projects.ContainsKey(centralPath))
+            //            {
+            //                MissionControlSetup.Projects.Remove(centralPath);
+            //            }
+            //            MissionControlSetup.Projects.Add(centralPath, projectFound);
+            //        }
 
-                    OpenTime["from"] = DateTime.UtcNow;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
+            //        OpenTime["from"] = DateTime.UtcNow;
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            //}
         }
 
         /// <summary>
@@ -203,80 +203,89 @@ namespace HOK.MissionControl
         {
             try
             {
+                var doc = args.Document;
+                if (doc == null || args.IsCancelled()) return;
+
+                new Thread(() => new Tools.MissionControl.MissionControl().CheckIn(doc))
+                {
+                    Priority = ThreadPriority.BelowNormal,
+                    IsBackground = true
+                }.Start();
+
                 // (Konrad) We need to set the Communicator Button image first, or it will be blank.
                 SetCommunicatorImage();
 
-                var doc = args.Document;
-                if (doc == null || args.IsCancelled()) return;
-                if (!doc.IsWorkshared) return;
+                //var doc = args.Document;
+                //if (doc == null || args.IsCancelled()) return;
+                //if (!doc.IsWorkshared) return;
 
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (!MissionControlSetup.Projects.ContainsKey(centralPath)) return;
-                if (!MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
+                //var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                //if (!MissionControlSetup.Projects.ContainsKey(centralPath)) return;
+                //if (!MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
 
-                var currentConfig = MissionControlSetup.Configurations[centralPath];
-                var currentProject = MissionControlSetup.Projects[centralPath];
+                //var currentConfig = MissionControlSetup.Configurations[centralPath];
+                //var currentProject = MissionControlSetup.Projects[centralPath];
 
-                // (Konrad) Register Updaters that are in the config file.
-                ApplyConfiguration(doc, currentConfig);
+                //// (Konrad) Register Updaters that are in the config file.
+                //ApplyConfiguration(doc, currentConfig);
 
-                // (Konrad) in order not to become out of synch with the database we need a way
-                // to communicate live updates from the database to task assistant/communicator
-                new Thread(() => new MissionControlSocket().Main(doc)) { Priority = ThreadPriority.BelowNormal }.Start();
+                //// (Konrad) in order not to become out of synch with the database we need a way
+                //// to communicate live updates from the database to task assistant/communicator
+                //new Thread(() => new MissionControlSocket().Main(doc)) { Priority = ThreadPriority.BelowNormal }.Start();
 
-                // (Konrad) It's possible that Health Report Document doesn't exist in database yet.
-                // Create it and set the reference to it in Project if that's the case.
-                if (MonitorUtilities.IsUpdaterOn(currentProject, currentConfig,
-                    new Guid(Properties.Resources.HealthReportTrackerGuid)))
-                {
-                    if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
-                    {
-                        HrData = ServerUtilities.GetByCentralPath<HealthReportData>(centralPath, "healthrecords/centralpath");
-                        if (HrData == null)
-                        {
-                            HrData = ServerUtilities.Post<HealthReportData>(new HealthReportData { centralPath = centralPath.ToLower() }, "healthrecords");
-                            ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
+                //// (Konrad) It's possible that Health Report Document doesn't exist in database yet.
+                //// Create it and set the reference to it in Project if that's the case.
+                //if (MonitorUtilities.IsUpdaterOn(currentProject, currentConfig,
+                //    new Guid(Properties.Resources.HealthReportTrackerGuid)))
+                //{
+                //    if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
+                //    {
+                //        HrData = ServerUtilities.GetByCentralPath<HealthReportData>(centralPath, "healthrecords/centralpath");
+                //        if (HrData == null)
+                //        {
+                //            HrData = ServerUtilities.Post<HealthReportData>(new HealthReportData { centralPath = centralPath.ToLower() }, "healthrecords");
+                //            ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
                             
 
-                            var projectFound = ServerUtilities.Get<Project>("projects/configid/" + currentConfig.Id);
-                            if (null == projectFound) return;
-                            MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
+                //            var projectFound = ServerUtilities.Get<Project>("projects/configid/" + currentConfig.Id);
+                //            if (null == projectFound) return;
+                //            MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
 
-                            MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
-                            MissionControlSetup.FamiliesIds.Add(centralPath, HrData.familyStats); // store families record
-                        }
-                        else
-                        {
-                            MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
-                            MissionControlSetup.FamiliesIds.Add(centralPath, HrData.familyStats); // store families record
-                        }
-                    }
+                //            MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
+                //            MissionControlSetup.FamiliesIds.Add(centralPath, HrData.familyStats); // store families record
+                //        }
+                //        else
+                //        {
+                //            MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
+                //            MissionControlSetup.FamiliesIds.Add(centralPath, HrData.familyStats); // store families record
+                //        }
+                //    }
 
-                    // (Konrad) Publish info about model to Health Report. If we toss them onto a new Thread
-                    // we won't be slowing the open time and since we are not returning any of this into to the user
-                    // there is no reason to run this synchronously.
-                    var recordId = MissionControlSetup.HealthRecordIds[centralPath];
-                    new Thread(() => new StylesMonitor().PublishStylesInfo(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    new Thread(() => new LinkMonitor().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    new Thread(() => new WorksetItemCount().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    new Thread(() => new ViewMonitor().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    new Thread(() => new WorksetOpenSynch().PublishData(doc, recordId, WorksetMonitorState.onopened)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    new Thread(() => new ModelMonitor().PublishModelSize(doc, centralPath, recordId, doc.Application.VersionNumber)) { Priority = ThreadPriority.BelowNormal }.Start();
+                //    // (Konrad) Publish info about model to Health Report. If we toss them onto a new Thread
+                //    // we won't be slowing the open time and since we are not returning any of this into to the user
+                //    // there is no reason to run this synchronously.
+                //    var recordId = MissionControlSetup.HealthRecordIds[centralPath];
+                //    new Thread(() => new StylesMonitor().PublishStylesInfo(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+                //    new Thread(() => new LinkMonitor().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+                //    new Thread(() => new WorksetItemCount().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+                //    new Thread(() => new ViewMonitor().PublishData(doc, recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+                //    new Thread(() => new WorksetOpenSynch().PublishData(doc, recordId, WorksetMonitorState.onopened)) { Priority = ThreadPriority.BelowNormal }.Start();
+                //    new Thread(() => new ModelMonitor().PublishModelSize(doc, centralPath, recordId, doc.Application.VersionNumber)) { Priority = ThreadPriority.BelowNormal }.Start();
 
-                    if (OpenTime.ContainsKey("from"))
-                    {
-                        new Thread(() => new ModelMonitor().PublishOpenTime(recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    }
-                }
+                //    if (OpenTime.ContainsKey("from"))
+                //    {
+                //        new Thread(() => new ModelMonitor().PublishOpenTime(recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+                //    }
+                //}
 
-                // (Konrad) This tool will reset Shared Parameters Location to one specified in Mission Control
-                if (currentConfig.GetType().GetProperty("sharedParamMonitor") != null && currentConfig.sharedParamMonitor.isMonitorOn)
-                {
-                    if (File.Exists(currentConfig.sharedParamMonitor.filePath))
-                    {
-                        doc.Application.SharedParametersFilename = currentConfig.sharedParamMonitor.filePath;
-                    }
-                }
+                //// (Konrad) This tool will reset Shared Parameters Location to one specified in Mission Control
+                //if (currentConfig.GetType().GetProperty("sharedParamMonitor") != null && currentConfig.sharedParamMonitor.isMonitorOn)
+                //{
+                //    if (File.Exists(currentConfig.sharedParamMonitor.filePath))
+                //    {
+                //        doc.Application.SharedParametersFilename = currentConfig.sharedParamMonitor.filePath;
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -289,17 +298,17 @@ namespace HOK.MissionControl
         /// </summary>
         private void OnDocumentClosing(object source, DocumentClosingEventArgs args)
         {
-            try
-            {
-                var doc = args.Document;
-                if (!doc.IsWorkshared) return;
+            //try
+            //{
+            //    var doc = args.Document;
+            //    if (!doc.IsWorkshared) return;
 
-                UnregisterUpdaters(doc);
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
+            //    UnregisterUpdaters(doc);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            //}
         }
 
         /// <summary>
@@ -307,29 +316,29 @@ namespace HOK.MissionControl
         /// </summary>
         private static void OnDocumentSynchronizing(object source, DocumentSynchronizingWithCentralEventArgs args)
         {
-            try
-            {
-                IsSynching = true; // disables DTM Tool
-                FailureProcessor.IsSynchronizing = true;
-                if (args.Document == null) return;
+            //try
+            //{
+            //    IsSynching = true; // disables DTM Tool
+            //    FailureProcessor.IsSynchronizing = true;
+            //    if (args.Document == null) return;
 
-                var doc = args.Document;
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (string.IsNullOrEmpty(centralPath)) return;
+            //    var doc = args.Document;
+            //    var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+            //    if (string.IsNullOrEmpty(centralPath)) return;
 
-                // (Konrad) Setup Health Report Monitor
-                if (!MissionControlSetup.Projects.ContainsKey(centralPath) 
-                    || !MissionControlSetup.Configurations.ContainsKey(centralPath) 
-                    || !MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
-                var recordId = MissionControlSetup.HealthRecordIds[centralPath];
+            //    // (Konrad) Setup Health Report Monitor
+            //    if (!MissionControlSetup.Projects.ContainsKey(centralPath) 
+            //        || !MissionControlSetup.Configurations.ContainsKey(centralPath) 
+            //        || !MissionControlSetup.HealthRecordIds.ContainsKey(centralPath)) return;
+            //    var recordId = MissionControlSetup.HealthRecordIds[centralPath];
 
-                new Thread(() => new WorksetOpenSynch().PublishData(doc, recordId, WorksetMonitorState.onsynched)) { Priority = ThreadPriority.BelowNormal }.Start();
-                SynchTime["from"] = DateTime.UtcNow;
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
+            //    new Thread(() => new WorksetOpenSynch().PublishData(doc, recordId, WorksetMonitorState.onsynched)) { Priority = ThreadPriority.BelowNormal }.Start();
+            //    SynchTime["from"] = DateTime.UtcNow;
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            //}
         }
 
         /// <summary>
@@ -337,46 +346,46 @@ namespace HOK.MissionControl
         /// </summary>
         private static void OnDocumentSynchronized(object source, DocumentSynchronizedWithCentralEventArgs args)
         {
-            try
-            {
-                IsSynching = false; // enables DTM Tool again
-                var doc = args.Document;
-                if (doc == null) return;
+            //try
+            //{
+            //    IsSynching = false; // enables DTM Tool again
+            //    var doc = args.Document;
+            //    if (doc == null) return;
 
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (string.IsNullOrEmpty(centralPath)) return;
+            //    var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+            //    if (string.IsNullOrEmpty(centralPath)) return;
 
-                FailureProcessor.IsSynchronizing = false;
+            //    FailureProcessor.IsSynchronizing = false;
 
-                // (Konrad) If project is not registered with MongoDB let's skip this
-                if (!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
-                if (MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
-                {
-                    var recordId = MissionControlSetup.HealthRecordIds[centralPath];
-                    if (SynchTime.ContainsKey("from"))
-                    {
-                        Log.AppendLog(LogMessageType.INFO, "Finished Synching. Publishing Synch Time data.");
-                        new Thread(() => new ModelMonitor().PublishSynchTime(recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    }
-                }
+            //    // (Konrad) If project is not registered with MongoDB let's skip this
+            //    if (!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath)) return;
+            //    if (MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
+            //    {
+            //        var recordId = MissionControlSetup.HealthRecordIds[centralPath];
+            //        if (SynchTime.ContainsKey("from"))
+            //        {
+            //            Log.AppendLog(LogMessageType.INFO, "Finished Synching. Publishing Synch Time data.");
+            //            new Thread(() => new ModelMonitor().PublishSynchTime(recordId)) { Priority = ThreadPriority.BelowNormal }.Start();
+            //        }
+            //    }
 
-                // (Konrad) Publish Sheet data to sheet tracker
-                if (MissionControlSetup.SheetsIds.ContainsKey(centralPath))
-                {
-                    try
-                    {
-                        new Thread(() => new SheetTracker().SynchSheets(doc)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    }
-                    catch (Exception e)
-                    {
-                        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
+            //    // (Konrad) Publish Sheet data to sheet tracker
+            //    if (MissionControlSetup.SheetsIds.ContainsKey(centralPath))
+            //    {
+            //        try
+            //        {
+            //            new Thread(() => new SheetTracker().SynchSheets(doc)) { Priority = ThreadPriority.BelowNormal }.Start();
+            //        }
+            //        catch (Exception e)
+            //        {
+            //            Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+            //        }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            //}
         }
 
         /// <summary>
@@ -400,35 +409,35 @@ namespace HOK.MissionControl
         /// </summary>
         public static void OnReloadLatest(object sender, ExecutedEventArgs args)
         {
-            // (Konrad) This will disable the DTM Tool when we are reloading latest.
-            IsSynching = true;
+            //// (Konrad) This will disable the DTM Tool when we are reloading latest.
+            //IsSynching = true;
 
-            // (Konrad) Reloads Latest.
-            EnqueueTask(app =>
-            {
-                try
-                {
-                    Log.AppendLog(LogMessageType.INFO, "Reloading Latest...");
+            //// (Konrad) Reloads Latest.
+            //EnqueueTask(app =>
+            //{
+            //    try
+            //    {
+            //        Log.AppendLog(LogMessageType.INFO, "Reloading Latest...");
 
-                    var reloadOptions = new ReloadLatestOptions();
-                    var doc = app.ActiveUIDocument.Document;
-                    doc.ReloadLatest(reloadOptions);
-                    if (!doc.HasAllChangesFromCentral())
-                    {
-                        doc.ReloadLatest(reloadOptions);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-                }
-            });
+            //        var reloadOptions = new ReloadLatestOptions();
+            //        var doc = app.ActiveUIDocument.Document;
+            //        doc.ReloadLatest(reloadOptions);
+            //        if (!doc.HasAllChangesFromCentral())
+            //        {
+            //            doc.ReloadLatest(reloadOptions);
+            //        }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+            //    }
+            //});
 
-            // (Konrad) Turns the DTM Tool back on when reload is done.
-            EnqueueTask(app =>
-            {
-                IsSynching = false;
-            });
+            //// (Konrad) Turns the DTM Tool back on when reload is done.
+            //EnqueueTask(app =>
+            //{
+            //    IsSynching = false;
+            //});
         }
 
         /// <summary>
@@ -437,72 +446,72 @@ namespace HOK.MissionControl
         /// </summary>
         public static void OnSynchToCentral(object sender, ExecutedEventArgs args, SynchType synchType)
         {
-            // (Konrad) This will disable the DTM Tool when we are synching to central.
-            IsSynching = true;
+            //// (Konrad) This will disable the DTM Tool when we are synching to central.
+            //IsSynching = true;
 
-            RevitCommandId commandId;
-            switch (synchType)
-            {
-                case SynchType.Synch:
-                    commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER");
-                    break;
-                case SynchType.SynchNow:
-                    commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER_SHORTCUT");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(synchType), synchType, null);
-            }
-            if (commandId == null || !commandId.CanHaveBinding) return;
+            //RevitCommandId commandId;
+            //switch (synchType)
+            //{
+            //    case SynchType.Synch:
+            //        commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER");
+            //        break;
+            //    case SynchType.SynchNow:
+            //        commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER_SHORTCUT");
+            //        break;
+            //    default:
+            //        throw new ArgumentOutOfRangeException(nameof(synchType), synchType, null);
+            //}
+            //if (commandId == null || !commandId.CanHaveBinding) return;
 
-            EnqueueTask(app =>
-            {
-                try
-                {
-                    app.RemoveAddInCommandBinding(commandId);
+            //EnqueueTask(app =>
+            //{
+            //    try
+            //    {
+            //        app.RemoveAddInCommandBinding(commandId);
 
-                    switch (synchType)
-                    {
-                        case SynchType.Synch:
-                            IsSynchOverriden = false;
-                            break;
-                        case SynchType.SynchNow:
-                            IsSynchNowOverriden = false;
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(synchType), synchType, null);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-                }
-            });
+            //        switch (synchType)
+            //        {
+            //            case SynchType.Synch:
+            //                IsSynchOverriden = false;
+            //                break;
+            //            case SynchType.SynchNow:
+            //                IsSynchNowOverriden = false;
+            //                break;
+            //            default:
+            //                throw new ArgumentOutOfRangeException(nameof(synchType), synchType, null);
+            //        }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+            //    }
+            //});
 
-            EnqueueTask(app =>
-            {
-                // (Konrad) We can now post the same Command we were overriding since the override is OFF.
-                app.PostCommand(commandId);
+            //EnqueueTask(app =>
+            //{
+            //    // (Konrad) We can now post the same Command we were overriding since the override is OFF.
+            //    app.PostCommand(commandId);
 
-                // (Konrad) Once the command executes this will turn the override back ON.
-                IsSynching = false;
+            //    // (Konrad) Once the command executes this will turn the override back ON.
+            //    IsSynching = false;
 
-                var doc = app.ActiveUIDocument.Document;
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (string.IsNullOrEmpty(centralPath)) return;
+            //    var doc = app.ActiveUIDocument.Document;
+            //    var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+            //    if (string.IsNullOrEmpty(centralPath)) return;
 
-                // (Konrad) Let's turn the synch command override back on.
-                var config = MissionControlSetup.Configurations[centralPath];
-                foreach (var updater in config.updaters)
-                {
-                    if (!updater.isUpdaterOn) continue;
+            //    // (Konrad) Let's turn the synch command override back on.
+            //    var config = MissionControlSetup.Configurations[centralPath];
+            //    foreach (var updater in config.updaters)
+            //    {
+            //        if (!updater.isUpdaterOn) continue;
 
-                    if (string.Equals(updater.updaterId.ToLower(),
-                        Instance.DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        Instance.DtmUpdaterInstance.CreateSynchToCentralOverride();
-                    }
-                }
-            });
+            //        if (string.Equals(updater.updaterId.ToLower(),
+            //            Instance.DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
+            //        {
+            //            Instance.DtmUpdaterInstance.CreateSynchToCentralOverride();
+            //        }
+            //    }
+            //});
         }
 
         /// <summary>
@@ -510,9 +519,9 @@ namespace HOK.MissionControl
         /// </summary>
         public static void OnUnloadForAllUsers(object sender, ExecutedEventArgs args)
         {
-            var ssWindow = new LinkUnloadMonitorView();
-            var o = ssWindow.ShowDialog();
-            if(o != null && ssWindow.IsActive) ssWindow.Close();
+            //var ssWindow = new LinkUnloadMonitorView();
+            //var o = ssWindow.ShowDialog();
+            //if(o != null && ssWindow.IsActive) ssWindow.Close();
         }
 
         #region Utilities
