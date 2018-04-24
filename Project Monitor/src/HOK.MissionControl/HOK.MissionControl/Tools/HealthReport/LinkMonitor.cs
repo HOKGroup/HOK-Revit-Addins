@@ -84,7 +84,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     totalLinkedDwg = totalLinkedCad
                 };
 
-                var unused = ServerUtilities.Post<LinkStat>(linkStats, "healthrecords/" + recordId + "/linkstats");
+                //var unused = ServerUtilities.Post<LinkStat>(linkStats, "healthrecords/" + recordId + "/linkstats");
             }
             catch (Exception ex)
             {

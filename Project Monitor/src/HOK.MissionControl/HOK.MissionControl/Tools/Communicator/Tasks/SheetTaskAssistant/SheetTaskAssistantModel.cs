@@ -48,12 +48,12 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
                 if (newSheet == null) return;
 
                 wrapper.Element = newSheet;
-                ServerUtilities.Post<SheetData>(wrapper, "sheets/" + sheetsDataId + "/approvenewsheet");
+                //ServerUtilities.Post<SheetData>(wrapper, "sheets/" + sheetsDataId + "/approvenewsheet");
             }
             else
             {
                 t.sheetId = e.Id;
-                ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/updatetasks");
+                //ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/updatetasks");
             } 
         }
 

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {

@@ -11,11 +11,11 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
 
         public CommunicatorHealthReportViewModel(FamilyData famStat)
         {
-            var hrData = AppCommand.HrData;
-            if (hrData == null) return;
+            //var hrData = AppCommand.HrData;
+            //if (hrData == null) return;
 
-            Model = new CommunicatorHealthReportModel();
-            HealthReports = Model.ProcessData(hrData, famStat);
+            //Model = new CommunicatorHealthReportModel();
+            //HealthReports = Model.ProcessData(hrData, famStat);
         }
     }
 }

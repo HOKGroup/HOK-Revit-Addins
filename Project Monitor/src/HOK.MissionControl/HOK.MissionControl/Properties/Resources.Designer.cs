@@ -149,5 +149,14 @@ namespace HOK.MissionControl.Properties {
                 return ResourceManager.GetString("SharedParameterTrackerGuid", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0504A758-BF15-4C90-B996-A795D92B42DB.
+        /// </summary>
+        internal static string SheetsTrackerGuid {
+            get {
+                return ResourceManager.GetString("SheetsTrackerGuid", resourceCulture);
+            }
+        }
     }
 }

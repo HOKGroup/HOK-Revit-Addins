@@ -141,7 +141,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     dimSegmentStats = dimSegmentStats
                 };
 
-                var unused = ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
+                //var unused = ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
                 
                 //TODO: I can do a notification when all data is published, and another when user gets a Task assigned. 
                 //if (result.Id == null)

@@ -28,29 +28,42 @@ namespace HOK.MissionControl.Core.Utils
 
         #region GET
 
-        public static T Get<T>(string path)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool Get<T>(string path, out T result) where T : new()
         {
-            var result = default(T);
+            result = default(T);
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(ApiVersion + "/" + path, Method.GET);
                 var response = client.Execute(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError) return result;
+                if (response.StatusCode != HttpStatusCode.OK) return false;
 
                 if (!string.IsNullOrEmpty(response.Content))
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
-                    if (data != null) result = data;
+                    if (data != null)
+                    {
+                        result = data;
+                        return true;
+                    }
 
                     Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
                 }
+
+                return false;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
             }
-            return result;
         }
 
         /// <summary>
@@ -58,10 +71,11 @@ namespace HOK.MissionControl.Core.Utils
         /// </summary>
         /// <param name="centralPath">Full file path with file extension.</param>
         /// <param name="path">HTTP request url.</param>
+        /// <param name="result"></param>
         /// <returns>Document if found matching central path or type.</returns>
-        public static T GetByCentralPath<T>(string centralPath, string path)
+        public static bool GetByCentralPath<T>(string centralPath, string path, out T result) where T : new()
         {
-            var result = default(T);
+            result = new T();
             try
             {
                 // (Konrad) Since we cannot pass file path with "\" they were replaced with illegal pipe char "|".
@@ -73,26 +87,31 @@ namespace HOK.MissionControl.Core.Utils
                 else
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Could not replace \\ or / with | in the file path. Exiting.");
-                    return result;
+                    return false;
                 }
 
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET);
                 var response = client.Execute(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError) return result;
-
+                if (response.StatusCode != HttpStatusCode.OK) return false;
                 if (!string.IsNullOrEmpty(response.Content))
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
-                    if (data != null) result = data;
-                    else Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
+                    if (data != null)
+                    {
+                        result = data;
+                        return true;
+                    }
+
+                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
                 }
+                return false;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
             }
-            return result;
         }
 
         /// <summary>
@@ -234,7 +253,7 @@ namespace HOK.MissionControl.Core.Utils
         /// </summary>
         /// <param name="body"></param>
         /// <param name="route"></param>
-        public static void Put<T>(T body, string route)
+        public static bool Put<T>(T body, string route)
         {
             try
             {
@@ -246,11 +265,18 @@ namespace HOK.MissionControl.Core.Utils
                 };
                 request.AddBody(body);
                 var response = client.Execute(request);
-                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + route);
+                if (response.StatusCode != HttpStatusCode.Created)
+                {
+                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + route);
+                    return false;
+                }
+                
+                return true;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
             }
         }
 
@@ -289,13 +315,18 @@ namespace HOK.MissionControl.Core.Utils
             return response.Data;
         }
 
+
         /// <summary>
-        /// POSTs any new data Schema. Creates new Collection in MongoDB.
+        /// 
         /// </summary>
-        /// <returns>Newly created Collection Schema with MongoDB assigned Id.</returns>
-        public static T Post<T>(object body, string route) where T : new()
+        /// <typeparam name="T"></typeparam>
+        /// <param name="body"></param>
+        /// <param name="route"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool Post<T>(object body, string route, out T result) where T : new()
         {
-            var resresponse = default(T);
+            result = default(T);
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
@@ -314,22 +345,19 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddBody(body);
 
                 var response = client.Execute<T>(request);
+                if (response.StatusCode != HttpStatusCode.Created) return false;
                 if (response.Data != null)
                 {
-                    resresponse = response.Data;
-                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
+                    result = response.Data;
+                    return true;
                 }
-                else
-                {
-                    resresponse = default(T);
-                    Log.AppendLog(LogMessageType.ERROR, response.ResponseStatus + "-" + route);
-                }
+                return false;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
             }
-            return resresponse;
         }
 
         #endregion

@@ -147,21 +147,21 @@ namespace HOK.MissionControl.FamilyPublish
 
                         var famItem = new FamilyItem
                         {
-                            name = family.Name,
-                            elementId = family.Id.IntegerValue,
-                            size = sizeStr,
-                            sizeValue = size,
-                            instances = instances,
-                            arrayCount = arrays,
-                            refPlaneCount = refPlanes,
-                            voidCount = voids,
-                            nestedFamilyCount = nestedFamilies,
-                            parametersCount = parameters,
-                            tasks = new List<FamilyTask>()
+                            Name = family.Name,
+                            ElementId = family.Id.IntegerValue,
+                            Size = sizeStr,
+                            SizeValue = size,
+                            Instances = instances,
+                            ArrayCount = arrays,
+                            RefPlaneCount = refPlanes,
+                            VoidCount = voids,
+                            NestedFamilyCount = nestedFamilies,
+                            ParametersCount = parameters,
+                            Tasks = new List<FamilyTask>()
                         };
                         
-                        if (nameCheck || sizeCheck || instanceCheck) famItem.isFailingChecks = true;
-                        else famItem.isFailingChecks = false;
+                        if (nameCheck || sizeCheck || instanceCheck) famItem.IsFailingChecks = true;
+                        else famItem.IsFailingChecks = false;
 
                         famOutput.Add(famItem);
                     }
@@ -171,11 +171,13 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                 }
 
-                var famStat = ServerUtilities.GetByCentralPath<FamilyData>(CentralPath, "families/centralpath");
+                //TODO: Cleanup
+                //var famStat = ServerUtilities.GetByCentralPath<FamilyData>(CentralPath, "families/centralpath");
+                ServerUtilities.GetByCentralPath<FamilyData>(CentralPath, "families/centralpath", out FamilyData famStat);
                 var famDict = new Dictionary<string, FamilyItem>();
                 if (famStat != null)
                 {
-                    famDict = famStat.families.ToDictionary(x => x.name, x => x);
+                    famDict = famStat.Families.ToDictionary(x => x.Name, x => x);
                 }
 
                 // (Konrad) I know it's not efficient to iterate this list yet again, but
@@ -184,35 +186,36 @@ namespace HOK.MissionControl.FamilyPublish
                 // we are exporting and hence losing them after the export.
                 foreach (var family in famOutput)
                 {
-                    if (famDict.ContainsKey(family.name))
+                    if (famDict.ContainsKey(family.Name))
                     {
-                        family.tasks.AddRange(famDict[family.name].tasks);
-                        famDict.Remove(family.name);
+                        family.Tasks.AddRange(famDict[family.Name].Tasks);
+                        famDict.Remove(family.Name);
                     }
                 }
 
                 foreach (var item in famDict.Values.ToList())
                 {
-                    item.isDeleted = true;
+                    item.IsDeleted = true;
                     famOutput.Add(item);
                 }
 
                 var familyStats = new FamilyData
                 {
-                    centralPath = CentralPath.ToLower(),
-                    totalFamilies = famOutput.Count,
-                    unusedFamilies = unusedFamilies,
-                    inPlaceFamilies = inPlaceFamilies,
-                    oversizedFamilies = oversizedFamilies,
-                    createdBy = Environment.UserName.ToLower(),
-                    createdOn = DateTime.UtcNow,
-                    families = famOutput
+                    CentralPath = CentralPath.ToLower(),
+                    TotalFamilies = famOutput.Count,
+                    UnusedFamilies = unusedFamilies,
+                    InPlaceFamilies = inPlaceFamilies,
+                    OversizedFamilies = oversizedFamilies,
+                    CreatedBy = Environment.UserName.ToLower(),
+                    CreatedOn = DateTime.UtcNow,
+                    Families = famOutput
                 };
 
                 if (famStat == null)
                 {
-                    famStat = ServerUtilities.Post<FamilyData>(familyStats, "families");
-                    ServerUtilities.Put(new {key = famStat.Id}, "healthrecords/" + RecordId + "/addfamilies");
+                    //TODO: Fix this too
+                    //ServerUtilities.Post(familyStats, "families", out FamilyData famStat);
+                    //ServerUtilities.Put(new {key = famStat.Id}, "healthrecords/" + RecordId + "/addfamilies");
                 }
                 else
                 {

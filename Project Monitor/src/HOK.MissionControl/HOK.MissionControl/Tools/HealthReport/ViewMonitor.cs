@@ -91,7 +91,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     unclippedViews = unclippedViews
                 };
 
-                var unused = ServerUtilities.Post<ViewStat>(viewStats, "healthrecords/" + recordId + "/viewstats");
+                //var unused = ServerUtilities.Post<ViewStat>(viewStats, "healthrecords/" + recordId + "/viewstats");
             }
             catch (Exception ex)
             {

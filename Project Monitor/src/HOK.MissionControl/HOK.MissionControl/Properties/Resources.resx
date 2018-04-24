@@ -147,4 +147,7 @@
   <data name="SharedParameterTrackerGuid" xml:space="preserve">
     <value>32d44b45-7bf6-49f1-9b81-f41ae929cfcb</value>
   </data>
+  <data name="SheetsTrackerGuid" xml:space="preserve">
+    <value>0504A758-BF15-4C90-B996-A795D92B42DB</value>
+  </data>
 </root>

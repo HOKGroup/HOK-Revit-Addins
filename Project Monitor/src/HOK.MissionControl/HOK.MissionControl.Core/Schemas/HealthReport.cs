@@ -6,45 +6,7 @@ using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas
 {
-    /// <summary>
-    /// Event Object stored for each OnOpened/OnSynched events.
-    /// </summary>
-    public class WorksetEvent
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public string user { get; set; } = "";
-        public double opened { get; set; } = 0;
-        public double closed { get; set; } = 0;
-        public DateTime createdOn { get; set; } = DateTime.UtcNow;
-    }
 
-    /// <summary>
-    /// Individual Workset object stored inside WorksetItem.
-    /// </summary>
-    public class Item
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public string name { get; set; }
-        public double count { get; set; }
-    }
-
-    /// <summary>
-    /// Workset contained stored for each OnClosed event.
-    /// </summary>
-    public class WorksetItem
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public List<Item> worksets { get; set; }
-    }
 
     /// <summary>
     /// View Stats Data Collection
@@ -114,27 +76,27 @@ namespace HOK.MissionControl.Core.Schemas
         public DateTime createdOn { get; set; } = DateTime.UtcNow;
     }
 
-    /// <summary>
-    /// Main MongoDB Collection for Health Report Data.
-    /// </summary>
-    public class HealthReportData
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public string centralPath { get; set; }
-        public List<WorksetEvent> onOpened { get; set; } = new List<WorksetEvent>();
-        public List<WorksetEvent> onSynched { get; set; } = new List<WorksetEvent>();
-        public List<WorksetItem> itemCount { get; set; } = new List<WorksetItem>();
-        public List<ViewStat> viewStats { get; set; } = new List<ViewStat>();
-        public List<StylesStat> styleStats { get; set; } = new List<StylesStat>();
-        public List<LinkStat> linkStats { get; set; } = new List<LinkStat>();
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string familyStats { get; set; }
-        public List<EventData> openTimes { get; set; } = new List<EventData>();
-        public List<EventData> synchTimes { get; set; } = new List<EventData>();
-        public List<EventData> modelSizes { get; set; } = new List<EventData>();
-    }
+    ///// <summary>
+    ///// Main MongoDB Collection for Health Report Data.
+    ///// </summary>
+    //public class HealthReportData
+    //{
+    //    [BsonId]
+    //    [BsonRepresentation(BsonType.ObjectId)]
+    //    [JsonProperty("_id")]
+    //    public string Id { get; set; }
+    //    public string centralPath { get; set; }
+    //    public List<WorksetEvent> onOpened { get; set; } = new List<WorksetEvent>();
+    //    public List<WorksetEvent> onSynched { get; set; } = new List<WorksetEvent>();
+    //    public List<WorksetItem> itemCount { get; set; } = new List<WorksetItem>();
+    //    public List<ViewStat> viewStats { get; set; } = new List<ViewStat>();
+    //    public List<StylesStat> styleStats { get; set; } = new List<StylesStat>();
+    //    public List<LinkStat> linkStats { get; set; } = new List<LinkStat>();
+    //    [BsonId]
+    //    [BsonRepresentation(BsonType.ObjectId)]
+    //    public string familyStats { get; set; }
+    //    public List<EventData> openTimes { get; set; } = new List<EventData>();
+    //    public List<EventData> synchTimes { get; set; } = new List<EventData>();
+    //    public List<EventData> modelSizes { get; set; } = new List<EventData>();
+    //}
 }

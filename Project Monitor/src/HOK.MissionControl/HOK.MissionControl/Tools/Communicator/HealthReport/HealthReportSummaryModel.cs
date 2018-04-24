@@ -7,6 +7,10 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
     public class HealthReportSummaryModel
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
         public void LaunchCommand(string text)
         {
             var commandName = string.Empty;
@@ -29,6 +33,9 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
             });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void LaunchWebsite()
         {
             AppCommand.EnqueueTask(app =>

@@ -288,7 +288,7 @@ namespace HOK.MissionControl.Tools.Communicator
             var doc = app.ActiveUIDocument.Document;
             if (doc == null || doc.IsFamilyDocument) return;
 
-            var family = new FilteredElementCollector(doc).OfClass(typeof(Family)).FirstOrDefault(x => x.Id.IntegerValue == FamilyItem.elementId);
+            var family = new FilteredElementCollector(doc).OfClass(typeof(Family)).FirstOrDefault(x => x.Id.IntegerValue == FamilyItem.ElementId);
             if (family == null) return;
 
             var famDoc = doc.EditFamily((Family)family);

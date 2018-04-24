@@ -18,19 +18,20 @@ namespace HOK.MissionControl.Core.Utils
         {
             try
             {
-                var collections = ServerUtilities.FindAll(new AddinData(), "addins");
-                var c = collections.FirstOrDefault();
-                var collectionId = "";
-                if (c != null)
-                {
-                    collectionId = c.Id;
-                }
-                if (collections.Count == 0)
-                {
-                    collectionId = ServerUtilities.Post<AddinData>(new AddinData(), "addins").Id;
-                }
+                //TODO: Fix this
+                //var collections = ServerUtilities.FindAll(new AddinData(), "addins");
+                //var c = collections.FirstOrDefault();
+                //var collectionId = "";
+                //if (c != null)
+                //{
+                //    collectionId = c.Id;
+                //}
+                //if (collections.Count == 0)
+                //{
+                //    ServerUtilities.Post(new AddinData(), "addins", out AddinData addinData);
+                //}
                 
-                ServerUtilities.Post<AddinData>(addinLog, "addins/" + collectionId + "/addlog");
+                //ServerUtilities.Post<AddinData>(addinLog, "addins/" + addinData.Id + "/addlog");
             }
             catch (Exception e)
             {

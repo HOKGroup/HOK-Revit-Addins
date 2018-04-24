@@ -28,7 +28,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     user = Environment.UserName.ToLower()
                 };
 
-                var unused = ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsynchtime");
+                //var unused = ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsynchtime");
             }
             catch (Exception ex)
             {
@@ -55,7 +55,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     user = Environment.UserName.ToLower()
                 };
 
-                var unused = ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelopentime");
+                //var unused = ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelopentime");
             }
             catch (Exception ex)
             {
@@ -130,7 +130,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     user = Environment.UserName.ToLower()
                 };
 
-                ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsize");
+                //ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsize");
             }
             catch (Exception ex)
             {

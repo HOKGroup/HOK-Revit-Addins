@@ -40,7 +40,7 @@ namespace HOK.MissionControl
         public static AppCommand Instance { get; private set; }
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
-        public static HealthReportData HrData { get; set; }
+        //public static HealthReportData HrData { get; set; }
         public static SheetData SheetsData { get; set; }
         public static CommunicatorView CommunicatorWindow { get; set; }
         public static bool IsSynching { get; set; }
@@ -50,9 +50,9 @@ namespace HOK.MissionControl
         public static ExternalEvent CommunicatorEvent { get; set; }
         public static Dictionary<string, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<string, FamilyItem>();
         public PushButton CommunicatorButton { get; set; }
+        public PushButton WebsiteButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
-        public SheetUpdater SheetUpdaterInstance { get; set; }
         public LinkUnloadMonitor LinkUnloadInstance { get; set; }
 
         private const string tabName = "  HOK - Beta";
@@ -69,7 +69,6 @@ namespace HOK.MissionControl
                 var appId = application.ActiveAddInId;
                 DoorUpdaterInstance = new DoorUpdater(appId);
                 DtmUpdaterInstance = new DtmUpdater(appId);
-                SheetUpdaterInstance = new SheetUpdater(appId);
                 LinkUnloadInstance = new LinkUnloadMonitor();
                 Tasks = new Queue<Action<UIApplication>>();
 
@@ -100,10 +99,10 @@ namespace HOK.MissionControl
                 CommunicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
                     assembly.Location, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
 
-                var webLinkButton = (PushButton)panel.AddItem(new PushButtonData("WebsiteLink_Command", "Launch" + Environment.NewLine + "MissionControl",
+                WebsiteButton = (PushButton)panel.AddItem(new PushButtonData("WebsiteLink_Command", "Launch" + Environment.NewLine + "MissionControl",
                     assembly.Location, "HOK.MissionControl.Tools.WebsiteLink.WebsiteLinkCommand"));
-                webLinkButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "missionControl_32x32.png");
-                webLinkButton.ToolTip = "Launch Mission Control website.";
+                WebsiteButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "missionControl_32x32.png");
+                WebsiteButton.ToolTip = "Launch Mission Control website.";
 
                 // (Konrad) Since Communicator Task Assistant offers to open Families for editing,
                 // it requires an External Event because new document cannot be opened from Idling Event
@@ -203,6 +202,9 @@ namespace HOK.MissionControl
         {
             try
             {
+                // (Konrad) We need to set the Communicator Button image first, or it will be blank.
+                SetCommunicatorImage();
+
                 var doc = args.Document;
                 if (doc == null || args.IsCancelled()) return;
 
@@ -211,9 +213,6 @@ namespace HOK.MissionControl
                     Priority = ThreadPriority.BelowNormal,
                     IsBackground = true
                 }.Start();
-
-                // (Konrad) We need to set the Communicator Button image first, or it will be blank.
-                SetCommunicatorImage();
 
                 //var doc = args.Document;
                 //if (doc == null || args.IsCancelled()) return;
@@ -527,53 +526,6 @@ namespace HOK.MissionControl
         #region Utilities
 
         /// <summary>
-        /// Registers availble configuration based on Central Model path match.
-        /// </summary>
-        /// <param name="doc">Revit Document</param>
-        /// <param name="config">Mission Control Configuration</param>
-        private void ApplyConfiguration(Document doc, Configuration config)
-        {
-            try
-            {
-                foreach (var updater in config.updaters)
-                {
-                    if (!updater.isUpdaterOn) continue;
-
-                    if (string.Equals(updater.updaterId.ToLower(),
-                        DoorUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        DoorUpdaterInstance.Register(doc, updater);
-                    }
-                    else if (string.Equals(updater.updaterId.ToLower(),
-                        DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        DtmUpdaterInstance.Register(doc, updater);
-                        DtmUpdaterInstance.CreateReloadLatestOverride();
-                        DtmUpdaterInstance.CreateSynchToCentralOverride();
-                    }
-                    else if (string.Equals(updater.updaterId.ToLower(),
-                        LinkUnloadInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        LinkUnloadInstance.CreateLinkUnloadOverride();
-                    }
-                    else if (string.Equals(updater.updaterId.ToLower(),
-                        SheetUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        //TODO: I am using an updater here, but do I need to? We really don't care about sheet changes
-                        //TODO: until the moment that they are synched to central and we have that covered.
-                        SheetUpdaterInstance.Register(doc, updater);
-
-                        new Thread(() => new SheetTracker().SynchSheets(doc)) { Priority = ThreadPriority.BelowNormal }.Start();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-        }
-
-        /// <summary>
         /// Unregisters all updaters as well as posts data.
         /// </summary>
         /// <param name="doc">Revit Document</param>
@@ -597,11 +549,6 @@ namespace HOK.MissionControl
                         DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
                         DtmUpdaterInstance.Unregister(doc);
-                    }
-                    else if (string.Equals(updater.updaterId.ToLower(),
-                        SheetUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
-                    {
-                        SheetUpdaterInstance.Unregister(doc);
                     }
                 }
             }
@@ -714,7 +661,7 @@ namespace HOK.MissionControl
         /// </summary>
         private static void ClearAll()
         {
-            HrData = null;
+            //HrData = null;
             SheetsData = null;
             SynchTime = new Dictionary<string, DateTime>();
             OpenTime = new Dictionary<string, DateTime>();

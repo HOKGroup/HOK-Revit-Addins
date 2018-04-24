@@ -144,17 +144,17 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             if (FamiliesData != null)
             {
                 var familiesToWatch = new Dictionary<string, FamilyItem>();
-                foreach (var family in FamiliesData.families)
+                foreach (var family in FamiliesData.Families)
                 {
                     // (Konrad) We are storing this Family Item for later so that if user makes any changes to this family
                     // and reloads it back into the model, we can capture that and post to MongoDB at the end of the session.
-                    if (!familiesToWatch.ContainsKey(family.name)) familiesToWatch.Add(family.name, family);
+                    if (!familiesToWatch.ContainsKey(family.Name)) familiesToWatch.Add(family.Name, family);
 
-                    if (!family.tasks.Any()) continue;
-                    foreach (var task in family.tasks)
+                    if (!family.Tasks.Any()) continue;
+                    foreach (var task in family.Tasks)
                     {
-                        if (!string.IsNullOrEmpty(task.completedBy)) continue;
-                        if (!string.Equals(task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
+                        if (!string.IsNullOrEmpty(task.CompletedBy)) continue;
+                        if (!string.Equals(task.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
 
                         tasks.Add(new FamilyTaskWrapper(family, task));
                     }

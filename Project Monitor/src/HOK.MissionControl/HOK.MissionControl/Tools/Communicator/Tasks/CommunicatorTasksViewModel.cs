@@ -266,11 +266,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             if (AppCommand.FamiliesToWatch.ContainsKey(msg.FamilyName))
             {
                 var oldFamily = AppCommand.FamiliesToWatch[msg.FamilyName];
-                var taskIndex = oldFamily.tasks.FindIndex(x => x.Id == msg.Task.Id);
+                var taskIndex = oldFamily.Tasks.FindIndex(x => x.Id == msg.Task.Id);
                 if (taskIndex == -1) return; 
 
-                oldFamily.tasks.RemoveAt(taskIndex);
-                oldFamily.tasks.Add(msg.Task);
+                oldFamily.Tasks.RemoveAt(taskIndex);
+                oldFamily.Tasks.Add(msg.Task);
 
                 family = oldFamily;
             }
@@ -283,8 +283,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTaskWrapper) && ((FamilyTask)x.Task).Id == msg.Task.Id);
             if (storedTask != null)
             {
-                if (string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(),
-                        StringComparison.Ordinal) && string.IsNullOrEmpty(msg.Task.completedBy))
+                if (string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(),
+                        StringComparison.Ordinal) && string.IsNullOrEmpty(msg.Task.CompletedBy))
                 {
                     // (Konrad) In order to trigger changes to UI, we need to update properties individually
                     // Only then do they fire proper events and update UI.
@@ -304,7 +304,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
             else
             {
-                if (string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(),
+                if (string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(),
                     StringComparison.Ordinal))
                 {
                     // (Konrad) Someone reassigned a task to us.
@@ -328,7 +328,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             if (AppCommand.FamiliesToWatch.ContainsKey(msg.FamilyName))
             {
                 var oldFamily = AppCommand.FamiliesToWatch[msg.FamilyName];
-                oldFamily.tasks.Add(msg.Task);
+                oldFamily.Tasks.Add(msg.Task);
 
                 AppCommand.FamiliesToWatch.Remove(msg.FamilyName);
                 AppCommand.FamiliesToWatch.Add(msg.FamilyName, oldFamily);
@@ -361,8 +361,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                 var oldFamily = AppCommand.FamiliesToWatch[msg.FamilyName];
                 foreach (var id in msg.DeletedIds)
                 {
-                    var index = oldFamily.tasks.FindIndex(x => x.Id == id);
-                    if(index != -1) oldFamily.tasks.RemoveAt(index);
+                    var index = oldFamily.Tasks.FindIndex(x => x.Id == id);
+                    if(index != -1) oldFamily.Tasks.RemoveAt(index);
                 }
             }
 

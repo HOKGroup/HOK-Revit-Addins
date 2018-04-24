@@ -19,27 +19,35 @@ namespace HOK.MissionControl.Core.Schemas.Families
         public string Id { get; set; }
 
         [DataMember(Name = "centralPath")]
-        public string centralPath { get; set; }
+        [JsonProperty("centralPath")]
+        public string CentralPath { get; set; }
 
         [DataMember(Name = "totalFamilies")]
-        public int totalFamilies { get; set; }
+        [JsonProperty("totalFamilies")]
+        public int TotalFamilies { get; set; }
 
         [DataMember(Name = "unusedFamilies")]
-        public int unusedFamilies { get; set; }
+        [JsonProperty("unusedFamilies")]
+        public int UnusedFamilies { get; set; }
 
         [DataMember(Name = "oversizedFamilies")]
-        public int oversizedFamilies { get; set; }
+        [JsonProperty("oversizedFamilies")]
+        public int OversizedFamilies { get; set; }
 
         [DataMember(Name = "inPlaceFamilies")]
-        public int inPlaceFamilies { get; set; }
+        [JsonProperty("inPlaceFamilies")]
+        public int InPlaceFamilies { get; set; }
 
         [DataMember(Name = "createdBy")]
-        public string createdBy { get; set; }
+        [JsonProperty("createdBy")]
+        public string CreatedBy { get; set; }
 
         [DataMember(Name = "createdOn")]
-        public DateTime? createdOn { get; set; }
+        [JsonProperty("createdOn")]
+        public DateTime? CreatedOn { get; set; }
 
         [DataMember(Name = "families")]
-        public List<FamilyItem> families { get; set; } = new List<FamilyItem>();
+        [JsonProperty("families")]
+        public List<FamilyItem> Families { get; set; } = new List<FamilyItem>();
     }
 }

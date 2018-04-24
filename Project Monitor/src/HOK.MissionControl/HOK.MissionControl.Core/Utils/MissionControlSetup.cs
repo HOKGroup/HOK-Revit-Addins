@@ -16,6 +16,7 @@ namespace HOK.MissionControl.Core.Utils
             HealthRecordIds.Clear();
             FamiliesIds.Clear();
             SheetsIds.Clear();
+            WorksetsIds.Clear();
         }
 
         /// <summary>
@@ -43,5 +44,10 @@ namespace HOK.MissionControl.Core.Utils
         /// Key is Central Path of Document.
         /// </summary>
         public static Dictionary<string, string> SheetsIds { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Key is Central Path of Document.
+        /// </summary>
+        public static Dictionary<string, string> WorksetsIds { get; set; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     }
 }

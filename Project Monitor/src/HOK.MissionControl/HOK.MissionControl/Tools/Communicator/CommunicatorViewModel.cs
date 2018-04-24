@@ -16,7 +16,8 @@ namespace HOK.MissionControl.Tools.Communicator
         {
             //TODO: What happens when multiple MissionControl tracked models are open in the same session? Only one HrData/SheetsData is stored.
             FamilyData familyStats = null;
-            var familyStatsId = AppCommand.HrData.familyStats;
+            //var familyStatsId = AppCommand.HrData.familyStats;
+            string familyStatsId = null;
             var sheetsData = AppCommand.SheetsData;
             if (familyStatsId == null && sheetsData == null) return;
 

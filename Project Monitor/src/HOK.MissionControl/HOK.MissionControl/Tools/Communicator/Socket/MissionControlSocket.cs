@@ -91,7 +91,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
-                        if (!string.Equals(task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase) ||
+                        if (!string.Equals(task.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase) ||
                             !IdsMatch(centralPath, collId, CollectionType.Families)) return;
 
                         Messenger.Default.Send(new FamilyTaskAddedMessage { FamilyName = familyName, Task = task });

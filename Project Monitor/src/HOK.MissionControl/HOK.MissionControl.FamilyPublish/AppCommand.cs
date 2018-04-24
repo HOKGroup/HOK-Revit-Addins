@@ -40,6 +40,9 @@ namespace HOK.MissionControl.FamilyPublish
             return Result.Succeeded;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void CreateMissionControlPushButtons()
         {
             try
