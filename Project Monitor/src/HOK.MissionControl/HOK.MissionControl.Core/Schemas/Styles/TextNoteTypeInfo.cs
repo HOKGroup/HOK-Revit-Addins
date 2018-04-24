@@ -11,6 +11,9 @@ using Newtonsoft.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Styles
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class TextNoteTypeInfo
     {
         [BsonId]

@@ -46,17 +46,17 @@ namespace HOK.MissionControl.Utils
                 var match = regex.Match(centralPath);
                 if (match.Success)
                 {
-                    projectInfo.number = match.Groups[1].Value;
-                    projectInfo.name = match.Groups[2].Value;
+                    projectInfo.Number = match.Groups[1].Value;
+                    projectInfo.Name = match.Groups[2].Value;
                 }
 
-                if (string.IsNullOrEmpty(projectInfo.number))
+                if (string.IsNullOrEmpty(projectInfo.Number))
                 {
-                    projectInfo.number = "00.00000.00";
-                    projectInfo.name = GetProjectName(centralPath);
+                    projectInfo.Number = "00.00000.00";
+                    projectInfo.Name = GetProjectName(centralPath);
                 }
 
-                projectInfo.office = GetFileLocation(centralPath);
+                projectInfo.Office = GetFileLocation(centralPath);
             }
             catch (Exception ex)
             {

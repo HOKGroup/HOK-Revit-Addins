@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas.Styles
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class StylesData
     {
         [BsonId]

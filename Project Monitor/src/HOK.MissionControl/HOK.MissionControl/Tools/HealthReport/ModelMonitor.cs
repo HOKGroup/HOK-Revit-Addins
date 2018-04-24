@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.Core.Utilities;
 using Autodesk.Revit.DB;
+using HOK.MissionControl.Core.Schemas.Models;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -22,13 +22,16 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var span = to - from;
                 var ms = (int)span.TotalMilliseconds;
 
-                var eventItem = new EventData
+                var eventItem = new ModelEventData
                 {
-                    value = ms,
-                    user = Environment.UserName.ToLower()
+                    Value = ms,
+                    User = Environment.UserName.ToLower()
                 };
 
-                //var unused = ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsynchtime");
+                if (!ServerUtilities.Post(eventItem, "models/" + recordId + "/modelsynchtime", out ModelData unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Model Synch Times Data.");
+                }
             }
             catch (Exception ex)
             {
@@ -39,8 +42,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes data about Model Opening duration.
         /// </summary>
-        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
-        public void PublishOpenTime(string recordId)
+        /// <param name="modelsId">Id of the HealthRecord in MongoDB.</param>
+        public void PublishOpenTime(string modelsId)
         {
             try
             {
@@ -49,13 +52,16 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var span = to - from;
                 var ms = (int)span.TotalMilliseconds;
 
-                var eventItem = new EventData
+                var eventItem = new ModelEventData
                 {
-                    value = ms,
-                    user = Environment.UserName.ToLower()
+                    Value = ms,
+                    User = Environment.UserName.ToLower()
                 };
 
-                //var unused = ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelopentime");
+                if (!ServerUtilities.Post(eventItem, "models/" + modelsId + "/modelopentime", out ModelData unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Model Open Times Data.");
+                }
             }
             catch (Exception ex)
             {
@@ -124,13 +130,17 @@ namespace HOK.MissionControl.Tools.HealthReport
                     Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 }
 
-                var eventItem = new EventData
+                var eventItem = new ModelEventData
                 {
-                    value = fileSize,
-                    user = Environment.UserName.ToLower()
+                    Value = fileSize,
+                    User = Environment.UserName.ToLower()
                 };
 
-                //ServerUtilities.Post<EventData>(eventItem, "healthrecords/" + recordId + "/modelsize");
+                if (!ServerUtilities.Post(eventItem, "models/" + recordId + "/modelsize", 
+                    out ModelData unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Model Size Data.");
+                }
             }
             catch (Exception ex)
             {

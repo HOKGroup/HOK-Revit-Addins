@@ -5,7 +5,9 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Links;
+using HOK.MissionControl.Core.Schemas.Models;
 using HOK.MissionControl.Core.Schemas.Styles;
+using HOK.MissionControl.Core.Schemas.Views;
 using HOK.MissionControl.Core.Schemas.Worksets;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator;
@@ -101,6 +103,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                     else if (string.Equals(updater.updaterId, Properties.Resources.SheetsTrackerGuid, 
                         StringComparison.OrdinalIgnoreCase))
                     {
+                        //TODO: Refactor this! 
                         //new Thread(() => new SheetTracker.SheetTracker().SynchSheets(doc))
                         //{
                         //    Priority = ThreadPriority.BelowNormal,
@@ -110,12 +113,12 @@ namespace HOK.MissionControl.Tools.MissionControl
                     else if (string.Equals(updater.updaterId, Properties.Resources.HealthReportTrackerGuid, 
                         StringComparison.OrdinalIgnoreCase))
                     {
+                        ProcessModels();
                         ProcessWorksets();
                         ProcessFamilies();
                         ProcessStyle();
                         ProcessLinks();
-
-                        AppCommand.OpenTime["from"] = DateTime.UtcNow;
+                        ProcessViews();
 
                         // (Konrad) in order not to become out of synch with the database we need a way
                         // to communicate live updates from the database to task assistant/communicator
@@ -133,6 +136,31 @@ namespace HOK.MissionControl.Tools.MissionControl
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ProcessViews()
+        {
+            if (!ServerUtilities.GetByCentralPath(CentralPath, "views/centralpath", out ViewsData vData))
+            {
+                if (ServerUtilities.Post(new WorksetData { CentralPath = CentralPath.ToLower() }, "views", out vData))
+                {
+                    ServerUtilities.Put(new { id = vData.Id }, "projects/" + Project.Id + "/addview");
+                }
+            }
+            if (vData != null)
+            {
+                new Thread(() => new ViewMonitor().PublishData(Doc, vData.Id))
+                {
+                    Priority = ThreadPriority.BelowNormal,
+                    IsBackground = true
+                }.Start();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void ProcessWorksets()
         {
             if (!ServerUtilities.GetByCentralPath(CentralPath, "worksets/centralpath", out WorksetData wData))
@@ -160,6 +188,9 @@ namespace HOK.MissionControl.Tools.MissionControl
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ProcessFamilies()
         {
             // (Konrad) For families we only need to make sure that we have the collection id. It will be used 
@@ -200,6 +231,9 @@ namespace HOK.MissionControl.Tools.MissionControl
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void ProcessLinks()
         {
             if (!ServerUtilities.GetByCentralPath(CentralPath, "links/centralpath", out LinkData lData))
@@ -216,6 +250,37 @@ namespace HOK.MissionControl.Tools.MissionControl
                     Priority = ThreadPriority.BelowNormal,
                     IsBackground = true
                 }.Start();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ProcessModels()
+        {
+            if (!ServerUtilities.GetByCentralPath(CentralPath, "models/centralpath", out ModelData mData))
+            {
+                if (ServerUtilities.Post(new ModelData { CentralPath = CentralPath.ToLower() }, "models", out mData))
+                {
+                    ServerUtilities.Put(new { id = mData.Id }, "projects/" + Project.Id + "/addmodel");
+                }
+            }
+            if (mData != null)
+            {
+                new Thread(() => new ModelMonitor().PublishModelSize(Doc, CentralPath, mData.Id, Doc.Application.VersionNumber))
+                {
+                    Priority = ThreadPriority.BelowNormal,
+                    IsBackground = true
+                }.Start();
+
+                if (AppCommand.OpenTime.ContainsKey("from"))
+                {
+                    new Thread(() => new ModelMonitor().PublishOpenTime(mData.Id))
+                    {
+                        Priority = ThreadPriority.BelowNormal,
+                        IsBackground = true
+                    }.Start();
+                }
             }
         }
 

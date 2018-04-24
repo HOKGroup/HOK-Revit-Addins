@@ -84,7 +84,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     TotalLinkedDwg = totalLinkedCad
                 };
 
-                if (ServerUtilities.Post(linkStats, "links/" + linksId + "/linkstats", 
+                if (!ServerUtilities.Post(linkStats, "links/" + linksId + "/linkstats", 
                     out LinkDataItem unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Links Data.");

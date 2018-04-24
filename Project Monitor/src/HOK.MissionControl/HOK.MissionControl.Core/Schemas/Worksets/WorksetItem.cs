@@ -4,6 +4,9 @@ using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas.Worksets
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class WorksetItem
     {
         [BsonId]

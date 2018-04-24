@@ -232,7 +232,7 @@ namespace HOK.MissionControl.Tools.CADoor
                                 if (MissionControlSetup.Projects.ContainsKey(centralPath))
                                 {
                                     var project = MissionControlSetup.Projects[centralPath];
-                                    if (project.address.state == "CA")
+                                    if (project.Address.state == "CA")
                                     {
                                         caParameter.Set(1);
                                     }
@@ -258,7 +258,7 @@ namespace HOK.MissionControl.Tools.CADoor
                             if (MissionControlSetup.Projects.ContainsKey(centralPath))
                             {
                                 var project = MissionControlSetup.Projects[centralPath];
-                                if (project.address.state == "CA")
+                                if (project.Address.state == "CA")
                                 {
                                     caParameter.Set(1);
                                 }

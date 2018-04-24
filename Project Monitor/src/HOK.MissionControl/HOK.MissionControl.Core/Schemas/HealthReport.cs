@@ -6,41 +6,6 @@ using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas
 {
-
-
-    /// <summary>
-    /// View Stats Data Collection
-    /// </summary>
-    public class ViewStat
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public int totalViews { get; set; }
-        public int totalSheets { get; set; }
-        public int totalSchedules { get; set; }
-        public int viewsOnSheet { get; set; }
-        public int viewsOnSheetWithTemplate { get; set; }
-        public int schedulesOnSheet { get; set; }
-        public int unclippedViews { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.UtcNow;
-    }
-
-    /// <summary>
-    /// Model size data, model session event data.
-    /// </summary>
-    public class EventData
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public long value { get; set; }
-        public string user { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.UtcNow;
-    }
-
     ///// <summary>
     ///// Main MongoDB Collection for Health Report Data.
     ///// </summary>

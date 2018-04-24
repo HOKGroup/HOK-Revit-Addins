@@ -146,7 +146,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     DimSegmentStats = dimSegmentStats
                 };
 
-                if (ServerUtilities.Post(stylesStats, "styles/" + stylesId + "/stylestats",
+                if (!ServerUtilities.Post(stylesStats, "styles/" + stylesId + "/stylestats",
                     out StylesDataItem unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Styles Data.");

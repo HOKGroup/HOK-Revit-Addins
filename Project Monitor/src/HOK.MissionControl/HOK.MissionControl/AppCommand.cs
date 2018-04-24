@@ -139,6 +139,8 @@ namespace HOK.MissionControl
         /// </summary>
         private static void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
         {
+            OpenTime["from"] = DateTime.UtcNow;
+
             //try
             //{
             //    var pathName = args.PathName;
