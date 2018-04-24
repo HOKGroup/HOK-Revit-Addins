@@ -13,7 +13,6 @@ namespace HOK.MissionControl.Core.Utils
         {
             Configurations.Clear();
             Projects.Clear();
-            HealthRecordIds.Clear();
             FamiliesIds.Clear();
             SheetsIds.Clear();
             WorksetsIds.Clear();

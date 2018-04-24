@@ -22,7 +22,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     .OfKind(WorksetKind.UserWorkset)
                     .ToWorksets();
 
-                var worksetInfo = new List<Item>();
+                var worksetInfo = new List<WorksetItem>();
                 foreach (var w in worksets)
                 {
                     var worksetFilter = new ElementWorksetFilter(w.Id, false);
@@ -30,11 +30,11 @@ namespace HOK.MissionControl.Tools.HealthReport
                         .WherePasses(worksetFilter)
                         .GetElementCount();
 
-                    worksetInfo.Add(new Item { Name = w.Name, Count = count });
+                    worksetInfo.Add(new WorksetItem { Name = w.Name, Count = count });
                 }
 
-                if (!ServerUtilities.Post(new WorksetItem { Worksets = worksetInfo },
-                    "worksets/" + worksetsId + "/itemcount", out WorksetItem unused))
+                if (!ServerUtilities.Post(new WorksetItemData { Worksets = worksetInfo },
+                    "worksets/" + worksetsId + "/itemcount", out WorksetItemData unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Worksets Data.");
                 }

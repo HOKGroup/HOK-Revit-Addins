@@ -28,41 +28,6 @@ namespace HOK.MissionControl.Core.Schemas
     }
 
     /// <summary>
-    /// Imported DWG File info.
-    /// </summary>
-    public class DwgFileInfo
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public string name { get; set; }
-        public int elementId { get; set; }
-        public int instances { get; set; }
-        public bool isViewSpecific { get; set; }
-        public bool isLinked { get; set; }
-    }
-
-    /// <summary>
-    /// Link Stats Data Collection.
-    /// </summary>
-    public class LinkStat
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public int totalImportedDwg { get; set; }
-        public List<DwgFileInfo> importedDwgFiles { get; set; }
-        public int unusedLinkedImages { get; set; }
-        public int totalDwgStyles { get; set; }
-        public int totalImportedStyles { get; set; }
-        public int totalLinkedModels { get; set; }
-        public int totalLinkedDwg { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.UtcNow;
-    }
-
-    /// <summary>
     /// Model size data, model session event data.
     /// </summary>
     public class EventData

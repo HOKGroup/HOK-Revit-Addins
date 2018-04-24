@@ -4,6 +4,8 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.Links;
+using HOK.MissionControl.Core.Schemas.Styles;
 using HOK.MissionControl.Core.Schemas.Worksets;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator;
@@ -15,16 +17,23 @@ namespace HOK.MissionControl.Tools.MissionControl
 {
     public class MissionControl
     {
+        public Document Doc { get; set; }
+        public string CentralPath { get; set; }
+        public Project Project { get; set; }
+        public Configuration Configuration { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="doc"></param>
         public void CheckIn(Document doc)
         {
+            Doc = doc;
+            CentralPath = FileInfoUtil.GetCentralFilePath(doc);
             try
             {
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (!ServerUtilities.GetByCentralPath(centralPath, "configurations/centralpath", out Configuration configFound))
+                
+                if (!ServerUtilities.GetByCentralPath(CentralPath, "configurations/centralpath", out Configuration configFound))
                 {
                     DisableMissionControl();
                     return;
@@ -36,11 +45,13 @@ namespace HOK.MissionControl.Tools.MissionControl
                     return;
                 }
 
-                if (MissionControlSetup.Configurations.ContainsKey(centralPath)) MissionControlSetup.Configurations.Remove(centralPath);
-                MissionControlSetup.Configurations.Add(centralPath, configFound);
+                if (MissionControlSetup.Configurations.ContainsKey(CentralPath)) MissionControlSetup.Configurations.Remove(CentralPath);
+                MissionControlSetup.Configurations.Add(CentralPath, configFound);
+                Configuration = configFound;
 
-                if (MissionControlSetup.Projects.ContainsKey(centralPath)) MissionControlSetup.Projects.Remove(centralPath);
-                MissionControlSetup.Projects.Add(centralPath, projectFound);
+                if (MissionControlSetup.Projects.ContainsKey(CentralPath)) MissionControlSetup.Projects.Remove(CentralPath);
+                MissionControlSetup.Projects.Add(CentralPath, projectFound);
+                Project = projectFound;
 
                 // (Konrad) This might be a good time to let users know that Mission Control is ready to go.
                 AppCommand.CommunicatorHandler.Status = Status.Success;
@@ -49,7 +60,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                 AppCommand.CommunicatorEvent.Raise();
 
                 // (Konrad) Register Updaters that are in the config file.
-                ApplyConfiguration(doc, configFound, projectFound);
+                ApplyConfiguration();
 
                 Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Success. Message: Mission Control check in succeeded.");
             }
@@ -62,27 +73,23 @@ namespace HOK.MissionControl.Tools.MissionControl
         /// <summary>
         /// Registers availble configuration based on Central Model path match.
         /// </summary>
-        /// <param name="doc">Revit Document</param>
-        /// <param name="config">Mission Control Configuration</param>
-        /// <param name="project"></param>
-        private static void ApplyConfiguration(Document doc, Configuration config, Project project)
+        private void ApplyConfiguration()
         {
             try
             {
-                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                foreach (var updater in config.updaters)
+                foreach (var updater in Configuration.updaters)
                 {
                     if (!updater.isUpdaterOn) continue;
 
                     if (string.Equals(updater.updaterId, AppCommand.Instance.DoorUpdaterInstance.UpdaterGuid.ToString(),
                         StringComparison.OrdinalIgnoreCase))
                     {
-                        AppCommand.Instance.DoorUpdaterInstance.Register(doc, updater);
+                        AppCommand.Instance.DoorUpdaterInstance.Register(Doc, updater);
                     }
                     else if (string.Equals(updater.updaterId, AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(), 
                         StringComparison.OrdinalIgnoreCase))
                     {
-                        AppCommand.Instance.DtmUpdaterInstance.Register(doc, updater);
+                        AppCommand.Instance.DtmUpdaterInstance.Register(Doc, updater);
                         AppCommand.Instance.DtmUpdaterInstance.CreateReloadLatestOverride();
                         AppCommand.Instance.DtmUpdaterInstance.CreateSynchToCentralOverride();
                     }
@@ -103,69 +110,16 @@ namespace HOK.MissionControl.Tools.MissionControl
                     else if (string.Equals(updater.updaterId, Properties.Resources.HealthReportTrackerGuid, 
                         StringComparison.OrdinalIgnoreCase))
                     {
-                        if (!ServerUtilities.GetByCentralPath(centralPath, "worksets/centralpath", out WorksetData wData))
-                        {
-                            if (ServerUtilities.Post(new WorksetData { CentralPath = centralPath.ToLower() }, "worksets", out wData))
-                            {
-                                ServerUtilities.Put(new { id = wData.Id }, "projects/" + project.Id + "/addworkset");
-                                MissionControlSetup.WorksetsIds.Add(centralPath, wData.Id); // store workset record
-                            }
-                        }
-                        if (wData != null)
-                        {
-                            MissionControlSetup.WorksetsIds.Add(centralPath, wData.Id); // store workset record
-                            new Thread(() => new WorksetItemCount().PublishData(doc, wData.Id))
-                            {
-                                Priority = ThreadPriority.BelowNormal,
-                                IsBackground = true
-                            }.Start();
-
-                            new Thread(() => new WorksetOpenSynch().PublishData(doc, wData.Id, WorksetMonitorState.onopened))
-                            {
-                                Priority = ThreadPriority.BelowNormal,
-                                IsBackground = true
-                            }.Start();
-                        }
-
-                        if (!ServerUtilities.GetByCentralPath(centralPath, "families/centralpath", out FamilyData fData))
-                        {
-                            if (ServerUtilities.Post(new FamilyData { CentralPath = centralPath.ToLower() }, "families", out fData))
-                            {
-                                ServerUtilities.Put(new { id = fData.Id }, "projects/" + project.Id + "/addfamilies");
-                                MissionControlSetup.FamiliesIds.Add(centralPath, fData.Id); // store families record
-                            }
-                        }
-
-                        //if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
-                        //{
-                        //    HrData = ServerUtilities.GetByCentralPath<HealthReportData>(centralPath, "healthrecords/centralpath");
-                        //    if (HrData == null)
-                        //    {
-                        //        HrData = ServerUtilities.Post<HealthReportData>(new HealthReportData { centralPath = centralPath.ToLower() }, "healthrecords");
-                        //        ServerUtilities.AddHealthRecordToProject(currentProject, HrData.Id);
-
-
-                        //        var projectFound = ServerUtilities.Get<Project>("projects/configid/" + currentConfig.Id);
-                        //        if (null == projectFound) return;
-                        //        MissionControlSetup.Projects[centralPath] = projectFound; // this won't be null since we checked before.
-
-                        //        MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
-                        //        MissionControlSetup.FamiliesIds.Add(centralPath, HrData.familyStats); // store families record
-                        //    }
-                        //    else
-                        //    {
-                        //        MissionControlSetup.HealthRecordIds.Add(centralPath, HrData.Id); // store health record
-                        //        MissionControlSetup.FamiliesIds.Add(centralPath, HrData.familyStats); // store families record
-                        //    }
-                        //}
-
-
+                        ProcessWorksets();
+                        ProcessFamilies();
+                        ProcessStyle();
+                        ProcessLinks();
 
                         AppCommand.OpenTime["from"] = DateTime.UtcNow;
 
                         // (Konrad) in order not to become out of synch with the database we need a way
                         // to communicate live updates from the database to task assistant/communicator
-                        new Thread(() => new MissionControlSocket().Main(doc))
+                        new Thread(() => new MissionControlSocket().Main(Doc))
                         {
                             Priority = ThreadPriority.BelowNormal,
                             IsBackground = true
@@ -176,6 +130,92 @@ namespace HOK.MissionControl.Tools.MissionControl
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+        }
+
+        private void ProcessWorksets()
+        {
+            if (!ServerUtilities.GetByCentralPath(CentralPath, "worksets/centralpath", out WorksetData wData))
+            {
+                if (ServerUtilities.Post(new WorksetData { CentralPath = CentralPath.ToLower() }, "worksets", out wData))
+                {
+                    ServerUtilities.Put(new { id = wData.Id }, "projects/" + Project.Id + "/addworkset");
+                    MissionControlSetup.WorksetsIds.Add(CentralPath, wData.Id); // store workset record
+                }
+            }
+            if (wData != null)
+            {
+                MissionControlSetup.WorksetsIds.Add(CentralPath, wData.Id); // store workset record
+                new Thread(() => new WorksetItemCount().PublishData(Doc, wData.Id))
+                {
+                    Priority = ThreadPriority.BelowNormal,
+                    IsBackground = true
+                }.Start();
+
+                new Thread(() => new WorksetOpenSynch().PublishData(Doc, wData.Id, WorksetMonitorState.onopened))
+                {
+                    Priority = ThreadPriority.BelowNormal,
+                    IsBackground = true
+                }.Start();
+            }
+        }
+
+        private void ProcessFamilies()
+        {
+            // (Konrad) For families we only need to make sure that we have the collection id. It will be used 
+            // by the Tasks. The actual data gets posted by FamilyPublis Tool.
+            if (!ServerUtilities.GetByCentralPath(CentralPath, "families/centralpath", out FamilyData fData))
+            {
+                if (ServerUtilities.Post(new FamilyData { CentralPath = CentralPath.ToLower() }, "families", out fData))
+                {
+                    ServerUtilities.Put(new { id = fData.Id }, "projects/" + Project.Id + "/addfamilies");
+                    MissionControlSetup.FamiliesIds.Add(CentralPath, fData.Id); // store families record
+                }
+            }
+            else
+            {
+                MissionControlSetup.FamiliesIds.Add(CentralPath, fData.Id); // store families record
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void ProcessStyle()
+        {
+            if (!ServerUtilities.GetByCentralPath(CentralPath, "styles/centralpath", out StylesData sData))
+            {
+                if (ServerUtilities.Post(new StylesData { CentralPath = CentralPath.ToLower() }, "styles", out sData))
+                {
+                    ServerUtilities.Put(new { id = sData.Id }, "projects/" + Project.Id + "/addstyle");
+                }
+            }
+            if (sData != null)
+            {
+                new Thread(() => new StylesMonitor().PublishData(Doc, sData.Id))
+                {
+                    Priority = ThreadPriority.BelowNormal,
+                    IsBackground = true
+                }.Start();
+            }
+        }
+
+        private void ProcessLinks()
+        {
+            if (!ServerUtilities.GetByCentralPath(CentralPath, "links/centralpath", out LinkData lData))
+            {
+                if (ServerUtilities.Post(new LinkData { CentralPath = CentralPath.ToLower() }, "links", out lData))
+                {
+                    ServerUtilities.Put(new { id = lData.Id }, "projects/" + Project.Id + "/addlink");
+                }
+            }
+            if (lData != null)
+            {
+                new Thread(() => new LinkMonitor().PublishData(Doc, lData.Id))
+                {
+                    Priority = ThreadPriority.BelowNormal,
+                    IsBackground = true
+                }.Start();
             }
         }
 

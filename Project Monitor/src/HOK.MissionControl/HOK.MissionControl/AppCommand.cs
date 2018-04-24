@@ -297,17 +297,17 @@ namespace HOK.MissionControl
         /// </summary>
         private void OnDocumentClosing(object source, DocumentClosingEventArgs args)
         {
-            //try
-            //{
-            //    var doc = args.Document;
-            //    if (!doc.IsWorkshared) return;
+            try
+            {
+                var doc = args.Document;
+                if (!doc.IsWorkshared) return;
 
-            //    UnregisterUpdaters(doc);
-            //}
-            //catch (Exception ex)
-            //{
-            //    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            //}
+                UnregisterUpdaters(doc);
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
         }
 
         /// <summary>
