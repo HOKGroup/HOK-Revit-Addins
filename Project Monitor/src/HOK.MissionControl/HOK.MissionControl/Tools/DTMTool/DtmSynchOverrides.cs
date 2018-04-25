@@ -162,11 +162,11 @@ namespace HOK.MissionControl.Tools.DTMTool
 
                 // (Konrad) Let's turn the synch command override back on.
                 var config = MissionControlSetup.Configurations[centralPath];
-                foreach (var updater in config.updaters)
+                foreach (var updater in config.Updaters)
                 {
-                    if (!updater.isUpdaterOn) continue;
+                    if (!updater.IsUpdaterOn) continue;
 
-                    if (string.Equals(updater.updaterId,
+                    if (string.Equals(updater.UpdaterId,
                         AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(), StringComparison.OrdinalIgnoreCase))
                     {
                         CreateSynchToCentralOverride(app);

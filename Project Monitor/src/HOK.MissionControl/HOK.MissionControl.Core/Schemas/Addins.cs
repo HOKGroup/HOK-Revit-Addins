@@ -38,6 +38,7 @@ namespace HOK.MissionControl.Core.Schemas
 
         // TODO: We should NOT be passing a document into the constructor here.
         // TODO: Apps in a "zero doc" state will fail to initialize.
+        [Obsolete]
         public AddinLog(string name, Document doc)
         {
             pluginName = name;

@@ -46,25 +46,25 @@ namespace HOK.MissionControl.Tools.DTMTool
                 if (MissionControlSetup.Configurations.ContainsKey(centralPath))
                 {
                     var config = MissionControlSetup.Configurations[centralPath];
-                    var updaterFound = config.updaters
-                        .FirstOrDefault(x => string.Equals(x.updaterId, reportingInfo.UpdaterId,
+                    var updaterFound = config.Updaters
+                        .FirstOrDefault(x => string.Equals(x.UpdaterId, reportingInfo.UpdaterId,
                             StringComparison.OrdinalIgnoreCase));
                     if (updaterFound != null)
                     {
-                        var updaterIndex = config.updaters.IndexOf(updaterFound);
+                        var updaterIndex = config.Updaters.IndexOf(updaterFound);
                         var triggerFound = updaterFound.CategoryTriggers
-                            .FirstOrDefault(x => x.categoryName == reportingInfo.CategoryName);
+                            .FirstOrDefault(x => x.CategoryName == reportingInfo.CategoryName);
                         if (triggerFound != null)
                         {
                             var triggerIndex = updaterFound.CategoryTriggers.IndexOf(triggerFound);
-                            config.updaters[updaterIndex].CategoryTriggers[triggerIndex].isEnabled = false;
+                            config.Updaters[updaterIndex].CategoryTriggers[triggerIndex].IsEnabled = false;
 
                             MissionControlSetup.Configurations.Remove(centralPath);
                             MissionControlSetup.Configurations.Add(centralPath, config);
 
                             //refresh category trigger
                             AppCommand.Instance.DtmUpdaterInstance.Unregister(Doc);
-                            AppCommand.Instance.DtmUpdaterInstance.Register(Doc, config.updaters[updaterIndex]);
+                            AppCommand.Instance.DtmUpdaterInstance.Register(Doc, config.Updaters[updaterIndex]);
 
                             settingsUpdated = true;
                         }

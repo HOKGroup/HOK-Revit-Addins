@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.FamilyPublish.Properties;

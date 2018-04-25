@@ -71,8 +71,8 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var dimensionValueCheck = new List<string> { "EQ" }; //defaults
                 if (config != null)
                 {
-                    dimensionValueCheck = config.updaters.First(x => string.Equals(x.updaterId,
-                        Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).userOverrides.dimensionValueCheck.values;
+                    dimensionValueCheck = config.Updaters.First(x => string.Equals(x.UpdaterId,
+                        Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.DimensionValueCheck.Values;
                 }
 
                 var dimSegmentStats = new List<DimensionSegmentInfo>();

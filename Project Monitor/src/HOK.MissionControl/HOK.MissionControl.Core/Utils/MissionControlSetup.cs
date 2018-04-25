@@ -1,6 +1,7 @@
 ﻿using System;
 using HOK.MissionControl.Core.Schemas;
 using System.Collections.Generic;
+using HOK.MissionControl.Core.Schemas.Configurations;
 
 namespace HOK.MissionControl.Core.Utils
 {

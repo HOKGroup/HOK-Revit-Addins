@@ -132,7 +132,11 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="Schemas\Addins.cs" />
-    <Compile Include="Schemas\Configuration.cs" />
+    <Compile Include="Schemas\Configurations\CategoryTrigger.cs" />
+    <Compile Include="Schemas\Configurations\Configuration.cs" />
+    <Compile Include="Schemas\Configurations\ProjectUpdater.cs" />
+    <Compile Include="Schemas\Configurations\SharedParameterMonitor.cs" />
+    <Compile Include="Schemas\Configurations\UserOverrides.cs" />
     <Compile Include="Schemas\Families\FamilyData.cs" />
     <Compile Include="Schemas\Families\FamilyItem.cs" />
     <Compile Include="Schemas\Families\FamilyTask.cs" />
@@ -142,9 +146,9 @@
     <Compile Include="Schemas\Models\ModelData.cs" />
     <Compile Include="Schemas\Models\ModelEventData.cs" />
     <Compile Include="Schemas\Project\Project.cs" />
-    <Compile Include="Schemas\ProjectAddress.cs" />
+    <Compile Include="Schemas\Project\ProjectAddress.cs" />
     <Compile Include="Schemas\RevitServer.cs" />
-    <Compile Include="Schemas\RvtFile.cs" />
+    <Compile Include="Schemas\Configurations\RvtFile.cs" />
     <Compile Include="Schemas\Sheets\SheetsData.cs" />
     <Compile Include="Schemas\Sheets\RevisionItem.cs" />
     <Compile Include="Schemas\Sheets\SheetItem.cs" />

@@ -5,6 +5,7 @@ using System.Threading;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Links;
 using HOK.MissionControl.Core.Schemas.Models;
@@ -76,11 +77,11 @@ namespace HOK.MissionControl.Tools.MissionControl
             {
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 var config = MissionControlSetup.Configurations[centralPath];
-                foreach (var updater in config.updaters)
+                foreach (var updater in config.Updaters)
                 {
-                    if (!updater.isUpdaterOn) continue;
+                    if (!updater.IsUpdaterOn) continue;
 
-                    if (string.Equals(updater.updaterId, AppCommand.Instance.DoorUpdaterInstance.UpdaterGuid.ToString(),
+                    if (string.Equals(updater.UpdaterId, AppCommand.Instance.DoorUpdaterInstance.UpdaterGuid.ToString(),
                         StringComparison.OrdinalIgnoreCase))
                     {
                         // (Konrad) We need to register updaters from within Revit context.
@@ -90,7 +91,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                             AppCommand.Instance.DoorUpdaterInstance.Register(doc, updater);
                         });
                     }
-                    else if (string.Equals(updater.updaterId, AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(), 
+                    else if (string.Equals(updater.UpdaterId, AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(), 
                         StringComparison.OrdinalIgnoreCase))
                     {
                         ProcessTriggerRecords(centralPath);
@@ -102,7 +103,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                             DTMTool.DtmSynchOverrides.CreateSynchToCentralOverride(app);
                         });
                     }
-                    else if (string.Equals(updater.updaterId, Properties.Resources.LinkUnloadTrackerGuid, 
+                    else if (string.Equals(updater.UpdaterId, Properties.Resources.LinkUnloadTrackerGuid, 
                         StringComparison.OrdinalIgnoreCase))
                     {
                         AppCommand.EnqueueTask(app =>
@@ -110,12 +111,12 @@ namespace HOK.MissionControl.Tools.MissionControl
                             LinkUnloadMonitor.LinkUnloadMonitor.CreateLinkUnloadOverride(app);
                         });
                     }
-                    else if (string.Equals(updater.updaterId, Properties.Resources.SheetsTrackerGuid, 
+                    else if (string.Equals(updater.UpdaterId, Properties.Resources.SheetsTrackerGuid, 
                         StringComparison.OrdinalIgnoreCase))
                     {
                         ProcessSheets(ActionType.CheckIn, doc, centralPath);
                     }
-                    else if (string.Equals(updater.updaterId, Properties.Resources.HealthReportTrackerGuid, 
+                    else if (string.Equals(updater.UpdaterId, Properties.Resources.HealthReportTrackerGuid, 
                         StringComparison.OrdinalIgnoreCase))
                     {
                         // (Konrad) These are read-only methods so they don't need to run in Revit context.
@@ -138,11 +139,11 @@ namespace HOK.MissionControl.Tools.MissionControl
 
                 // (Konrad) This tool will reset Shared Parameters Location to one specified in Mission Control
                 if (config.GetType().GetProperty("sharedParamMonitor") != null && 
-                    config.sharedParamMonitor.isMonitorOn)
+                    config.SharedParamMonitor.IsMonitorOn)
                 {
-                    if (File.Exists(config.sharedParamMonitor.filePath))
+                    if (File.Exists(config.SharedParamMonitor.FilePath))
                     {
-                        doc.Application.SharedParametersFilename = config.sharedParamMonitor.filePath;
+                        doc.Application.SharedParametersFilename = config.SharedParamMonitor.FilePath;
                     }
                     else
                     {
@@ -465,16 +466,16 @@ namespace HOK.MissionControl.Tools.MissionControl
             if (MissionControlSetup.Configurations.ContainsKey(centralPath))
             {
                 var currentConfig = MissionControlSetup.Configurations[centralPath];
-                foreach (var updater in currentConfig.updaters)
+                foreach (var updater in currentConfig.Updaters)
                 {
-                    if (!updater.isUpdaterOn) continue;
+                    if (!updater.IsUpdaterOn) continue;
 
-                    if (string.Equals(updater.updaterId,
+                    if (string.Equals(updater.UpdaterId,
                         AppCommand.Instance.DoorUpdaterInstance.UpdaterGuid.ToString(), StringComparison.OrdinalIgnoreCase))
                     {
                         AppCommand.Instance.DoorUpdaterInstance.Unregister(doc);
                     }
-                    else if (string.Equals(updater.updaterId,
+                    else if (string.Equals(updater.UpdaterId,
                         AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(), StringComparison.OrdinalIgnoreCase))
                     {
                         AppCommand.Instance.DtmUpdaterInstance.Unregister(doc);

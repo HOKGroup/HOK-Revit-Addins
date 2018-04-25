@@ -10,6 +10,8 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
         public string Id { get; set; }
-        public string centralPath { get; set; } = "";
+
+        [JsonProperty("centralPath")]
+        public string CentralPath { get; set; }
     }
 }

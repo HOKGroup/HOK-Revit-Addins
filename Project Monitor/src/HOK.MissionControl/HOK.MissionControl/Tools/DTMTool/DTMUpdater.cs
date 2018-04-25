@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Tools.DTMTool.DTMUtils;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Utils;
@@ -102,14 +102,14 @@ namespace HOK.MissionControl.Tools.DTMTool
 
                 foreach (var trigger in pUpdater.CategoryTriggers)
                 {
-                    if (!trigger.isEnabled) continue;
+                    if (!trigger.IsEnabled) continue;
 
-                    var catFilter = new ElementCategoryFilter(_catDictionary[trigger.categoryName]);
+                    var catFilter = new ElementCategoryFilter(_catDictionary[trigger.CategoryName]);
                     UpdaterRegistry.AddTrigger(_updaterId, catFilter, Element.GetChangeTypeAny());
                     UpdaterRegistry.AddTrigger(_updaterId, catFilter, Element.GetChangeTypeElementAddition());
                     UpdaterRegistry.AddTrigger(_updaterId, catFilter, Element.GetChangeTypeElementDeletion());
  
-                    switch (trigger.categoryName)
+                    switch (trigger.CategoryName)
                     {
                         case "Grids":
                         {
@@ -132,8 +132,8 @@ namespace HOK.MissionControl.Tools.DTMTool
                                     configId, 
                                     UpdaterGuid.ToString(), 
                                     centralPath, 
-                                    trigger.categoryName, 
-                                    trigger.description, 
+                                    trigger.CategoryName, 
+                                    trigger.Description, 
                                     element.Id, 
                                     element.UniqueId);
                                 _reportingElements.Add(reportingInfo);
@@ -157,8 +157,8 @@ namespace HOK.MissionControl.Tools.DTMTool
                                         configId, 
                                         UpdaterGuid.ToString(), 
                                         centralPath, 
-                                        trigger.categoryName, 
-                                        trigger.description, 
+                                        trigger.CategoryName, 
+                                        trigger.Description, 
                                         view.Id, 
                                         view.UniqueId);
                                     _reportingElements.Add(reportingInfo);
@@ -178,8 +178,8 @@ namespace HOK.MissionControl.Tools.DTMTool
                                     configId, 
                                     UpdaterGuid.ToString(), 
                                     centralPath, 
-                                    trigger.categoryName, 
-                                    trigger.description, 
+                                    trigger.CategoryName, 
+                                    trigger.Description, 
                                     element.Id, 
                                     element.UniqueId);
                                 _reportingElements.Add(reportingInfo);
