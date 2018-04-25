@@ -26,7 +26,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             Model = new SheetTaskAssistantModel();
             Wrapper = wrapper;
             Title = "Mission Control - Sheet Task Assistant v." + Assembly.GetExecutingAssembly().GetName().Version;
-            OkText = ((SheetItem)wrapper.Element).isNewSheet ? "Create" : "Approve";
+            OkText = ((SheetItem)wrapper.Element).IsNewSheet ? "Create" : "Approve";
 
             OpenView = new RelayCommand(OnOpenView);
             Close = new RelayCommand<Window>(OnClose);

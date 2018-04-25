@@ -103,11 +103,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg"></param>
         private void OnSheetTaskSheetDeleted(SheetTaskSheetDeletedMessage msg)
         {
-            var existingIndex = AppCommand.SheetsData.sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
+            var existingIndex = AppCommand.SheetsData.Sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
             if (existingIndex == -1) return;
 
             // (Konrad) Update SheetsData stored in AppCommand
-            AppCommand.SheetsData.sheets.RemoveAt(existingIndex);
+            AppCommand.SheetsData.Sheets.RemoveAt(existingIndex);
 
             foreach (var id in msg.DeletedIds)
             {
@@ -125,15 +125,15 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control.</param>
         private void OnSheetTaskSheetsCreated(SheetTaskSheetsCreatedMessage msg)
         {
-            var assignedTo = msg.Sheets.FirstOrDefault()?.tasks.FirstOrDefault()?.assignedTo; // all tasks will be assigned to one user only
+            var assignedTo = msg.Sheets.FirstOrDefault()?.Tasks.FirstOrDefault()?.AssignedTo; // all tasks will be assigned to one user only
             if (!string.IsNullOrEmpty(assignedTo) && !string.Equals(assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)) return;
 
-            AppCommand.SheetsData.sheets.AddRange(msg.Sheets); // update stored sheets
+            AppCommand.SheetsData.Sheets.AddRange(msg.Sheets); // update stored sheets
             lock (_lock)
             {
                 foreach (var sheetItem in msg.Sheets)
                 {
-                    Tasks.Add(new SheetTaskWrapper(sheetItem, sheetItem.tasks.First()));
+                    Tasks.Add(new SheetTaskWrapper(sheetItem, sheetItem.Tasks.First()));
                 }
             }
         }
@@ -144,16 +144,16 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control</param>
         private void OnSheetsTaskDeleted(SheetsTaskDeletedMessage msg)
         {
-            var existingIndex = AppCommand.SheetsData.sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
+            var existingIndex = AppCommand.SheetsData.Sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
             if (existingIndex == -1) return;
 
             foreach (var id in msg.DeletedIds)
             {
                 // (Konrad) Update SheetsData stored in AppCommand
-                var taskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => string.Equals(x.Id, id, StringComparison.Ordinal));
+                var taskIndex = AppCommand.SheetsData.Sheets[existingIndex].Tasks.FindIndex(x => string.Equals(x.Id, id, StringComparison.Ordinal));
                 if(taskIndex == -1) continue;
 
-                AppCommand.SheetsData.sheets[existingIndex].tasks.RemoveAt(taskIndex);
+                AppCommand.SheetsData.Sheets[existingIndex].Tasks.RemoveAt(taskIndex);
 
                 // (Konrad) Update Tasks collection in UI
                 var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && string.Equals(((SheetTask)x.Task).Id, id, StringComparison.Ordinal));
@@ -169,26 +169,26 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control.</param>
         private void OnSheetTaskUpdated(SheetsTaskUpdatedMessage msg)
         {
-            var existingIndex = AppCommand.SheetsData.sheets.IndexOf(msg.Sheet);
+            var existingIndex = AppCommand.SheetsData.Sheets.IndexOf(msg.Sheet);
             if (existingIndex == -1) return;
-            var existingTaskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => x.Id == msg.Task.Id);
+            var existingTaskIndex = AppCommand.SheetsData.Sheets[existingIndex].Tasks.FindIndex(x => x.Id == msg.Task.Id);
             if (existingTaskIndex == -1)
             {
-                if (string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(),StringComparison.CurrentCultureIgnoreCase))
+                if (string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(),StringComparison.CurrentCultureIgnoreCase))
                 {
                     lock (_lock)
                     {
                         Tasks.Add(new SheetTaskWrapper(msg.Sheet, msg.Task)); // task wasn't ours but was re-assigned to us
                     }
-                    AppCommand.SheetsData.sheets[existingIndex].tasks.Add(msg.Task);
+                    AppCommand.SheetsData.Sheets[existingIndex].Tasks.Add(msg.Task);
                 }
                 return;
             }
 
-            var existingTask = AppCommand.SheetsData.sheets[existingIndex].tasks[existingTaskIndex];
-            if (!string.Equals(existingTask.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase))
+            var existingTask = AppCommand.SheetsData.Sheets[existingIndex].Tasks[existingTaskIndex];
+            if (!string.Equals(existingTask.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase))
             {
-                if (!string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) return; // it still doesn't belong to us.
+                if (!string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) return; // it still doesn't belong to us.
                 lock (_lock)
                 {
                     Tasks.Add(new SheetTaskWrapper(msg.Sheet, msg.Task)); // old task was re-assigned to us, so we can add it
@@ -204,11 +204,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                         Tasks.Add(new SheetTaskWrapper(msg.Sheet, msg.Task)); // task might have been closed and someone is re-opening it
                     }
 
-                    AppCommand.SheetsData.sheets[existingIndex].tasks[existingTaskIndex] = msg.Task;
+                    AppCommand.SheetsData.Sheets[existingIndex].Tasks[existingTaskIndex] = msg.Task;
                     return;
                 }
 
-                if (!string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase))
+                if (!string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase))
                 {
                     LockRemoveClose(storedTask);
                 }
@@ -220,7 +220,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                     task.CopyProperties(msg.Task); // it's still ours, update it
 
                     // (Konrad) We only get here when user hits "Approve"
-                    if (!string.IsNullOrEmpty(task.completedBy))
+                    if (!string.IsNullOrEmpty(task.CompletedBy))
                     {
                         LockRemoveClose(storedTask);
                     }
@@ -228,7 +228,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
 
             // replace existing task
-            AppCommand.SheetsData.sheets[existingIndex].tasks[existingTaskIndex] = msg.Task;
+            AppCommand.SheetsData.Sheets[existingIndex].Tasks[existingTaskIndex] = msg.Task;
         }
 
         /// <summary>
@@ -237,11 +237,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control.</param>
         private void OnSheetTaskAdded(SheetsTaskAddedMessage msg)
         {
-            var existingIndex = AppCommand.SheetsData.sheets.IndexOf(msg.Sheet);
+            var existingIndex = AppCommand.SheetsData.Sheets.IndexOf(msg.Sheet);
             if (existingIndex != -1)
             {
                 // Update existing sheet
-                AppCommand.SheetsData.sheets[existingIndex].tasks.Add(msg.Task);
+                AppCommand.SheetsData.Sheets[existingIndex].Tasks.Add(msg.Task);
 
                 lock (_lock)
                 {

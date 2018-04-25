@@ -139,13 +139,13 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         var collId = data["collectionId"].ToObject<string>();
                         if (sheetsData == null || string.IsNullOrEmpty(sheetId) || string.IsNullOrEmpty(taskId) || string.IsNullOrEmpty(collId)) return;
 
-                        var sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(x.Id, sheetId, StringComparison.Ordinal));
-                        var task = sheet?.tasks.FirstOrDefault(x => string.Equals(x.Id, taskId, StringComparison.Ordinal));
+                        var sheet = sheetsData.Sheets.FirstOrDefault(x => string.Equals(x.Id, sheetId, StringComparison.Ordinal));
+                        var task = sheet?.Tasks.FirstOrDefault(x => string.Equals(x.Id, taskId, StringComparison.Ordinal));
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
                         if (task == null
-                            || !string.Equals(task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)
+                            || !string.Equals(task.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)
                             || !IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
                         Messenger.Default.Send(new SheetsTaskAddedMessage { Sheet = sheet, Task = task });
@@ -167,8 +167,8 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         var collId = data["collectionId"].ToObject<string>();
                         if (sheetsData == null || string.IsNullOrEmpty(sheetId) || string.IsNullOrEmpty(taskId) || string.IsNullOrEmpty(collId)) return;
 
-                        var sheet = sheetsData.sheets.FirstOrDefault(x => string.Equals(sheetId, x.Id, StringComparison.Ordinal));
-                        var task = sheet?.tasks.FirstOrDefault(x => string.Equals(x.Id, taskId, StringComparison.Ordinal));
+                        var sheet = sheetsData.Sheets.FirstOrDefault(x => string.Equals(sheetId, x.Id, StringComparison.Ordinal));
+                        var task = sheet?.Tasks.FirstOrDefault(x => string.Equals(x.Id, taskId, StringComparison.Ordinal));
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // Here we will only filter out tasks that don't belong to this model.
@@ -220,7 +220,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
                         if (!IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
-                        Messenger.Default.Send(new SheetTaskSheetsCreatedMessage { Sheets = sheetsData.sheets.Where(x => sheetsIds.Contains(x.Id)).ToList() });
+                        Messenger.Default.Send(new SheetTaskSheetsCreatedMessage { Sheets = sheetsData.Sheets.Where(x => sheetsIds.Contains(x.Id)).ToList() });
                     }
                     else
                     {

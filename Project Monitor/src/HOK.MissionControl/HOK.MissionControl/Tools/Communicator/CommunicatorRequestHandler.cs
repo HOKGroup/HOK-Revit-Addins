@@ -164,7 +164,7 @@ namespace HOK.MissionControl.Tools.Communicator
                 try
                 {
                     ViewSheet sheet;
-                    if (SheetTask.isPlaceholder)
+                    if (SheetTask.IsPlaceholder)
                     {
                         sheet = ViewSheet.CreatePlaceholder(doc);
                     }
@@ -181,16 +181,16 @@ namespace HOK.MissionControl.Tools.Communicator
                         sheet = ViewSheet.Create(doc, titleblock.Id);
                     }
 
-                    sheet.get_Parameter(BuiltInParameter.SHEET_NUMBER)?.Set(SheetTask.number);
-                    sheet.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.name);
+                    sheet.get_Parameter(BuiltInParameter.SHEET_NUMBER)?.Set(SheetTask.Number);
+                    sheet.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.Name);
 
                     // (Konrad) We can set this here and pick up in the UI before sending off to MongoDB.
                     var newSheetItem = new SheetItem(sheet, centralPath)
                     {
-                        tasks = SheetItem.tasks,
-                        collectionId = SheetItem.collectionId,
+                        Tasks = SheetItem.Tasks,
+                        CollectionId = SheetItem.CollectionId,
                         Id = SheetItem.Id,
-                        isNewSheet = true // this was overriden to false by default constructor
+                        IsNewSheet = true // this was overriden to false by default constructor
                     };
                     SheetItem = newSheetItem;
 
@@ -221,7 +221,7 @@ namespace HOK.MissionControl.Tools.Communicator
 
             app.Application.FailuresProcessing += FailureProcessing;
             var doc = app.ActiveUIDocument.Document;
-            var view = doc.GetElement(SheetItem.uniqueId) as ViewSheet;
+            var view = doc.GetElement(SheetItem.UniqueId) as ViewSheet;
             if (view != null)
             {
                 if (WorksharingUtils.GetCheckoutStatus(doc, view.Id) == CheckoutStatus.OwnedByOtherUser)
@@ -236,15 +236,15 @@ namespace HOK.MissionControl.Tools.Communicator
                     var action = "update";
                     try
                     {
-                        if (SheetTask.isDeleted)
+                        if (SheetTask.IsDeleted)
                         {
                             action = "delete";
                             doc.Delete(view.Id);
                         }
                         else
                         {
-                            view.get_Parameter(BuiltInParameter.SHEET_NUMBER)?.Set(SheetTask.number);
-                            view.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.name);
+                            view.get_Parameter(BuiltInParameter.SHEET_NUMBER)?.Set(SheetTask.Number);
+                            view.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.Name);
                         }
 
                         trans.Commit();
@@ -272,7 +272,7 @@ namespace HOK.MissionControl.Tools.Communicator
         private void OpenView(UIApplication app)
         {
             var doc = app.ActiveUIDocument.Document;
-            var view = doc.GetElement(SheetItem.uniqueId) as ViewSheet;
+            var view = doc.GetElement(SheetItem.UniqueId) as ViewSheet;
             if (view != null)
             {
                 app.ActiveUIDocument.ActiveView = view;

@@ -165,15 +165,15 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
 
             if (SheetsData != null)
             {
-                if (!SheetsData.sheets.Any()) return tasks;
+                if (!SheetsData.Sheets.Any()) return tasks;
 
-                foreach (var sheetItem in SheetsData.sheets)
+                foreach (var sheetItem in SheetsData.Sheets)
                 {
-                    if (sheetItem.isDeleted || !sheetItem.tasks.Any()) continue;
-                    foreach (var sheetTask in sheetItem.tasks)
+                    if (sheetItem.IsDeleted || !sheetItem.Tasks.Any()) continue;
+                    foreach (var sheetTask in sheetItem.Tasks)
                     {
-                        if (!string.IsNullOrEmpty(sheetTask.completedBy)) continue;
-                        if (!string.Equals(sheetTask.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
+                        if (!string.IsNullOrEmpty(sheetTask.CompletedBy)) continue;
+                        if (!string.Equals(sheetTask.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
 
                         tasks.Add(new SheetTaskWrapper(sheetItem, sheetTask));
                     }

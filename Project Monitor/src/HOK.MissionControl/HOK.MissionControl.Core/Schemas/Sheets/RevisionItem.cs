@@ -14,30 +14,37 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
         [DataMember(Name = "_id")]
+        [JsonProperty("_id")]
         public string Id { get; set; }
 
-        [DataMember]
-        public string description { get; set; }
+        [DataMember(Name = "description")]
+        [JsonProperty("description")]
+        public string Description { get; set; }
 
-        [DataMember]
-        public int sequence { get; set; }
+        [DataMember(Name = "sequence")]
+        [JsonProperty("sequence")]
+        public int Sequence { get; set; }
 
-        [DataMember]
-        public string number { get; set; }
+        [DataMember(Name = "number")]
+        [JsonProperty("number")]
+        public string Number { get; set; }
 
-        [DataMember]
-        public string date { get; set; }
+        [DataMember(Name = "date")]
+        [JsonProperty("date")]
+        public string Date { get; set; }
 
-        [DataMember]
-        public string issuedTo { get; set; }
+        [DataMember(Name = "issuedTo")]
+        [JsonProperty("issuedTo")]
+        public string IssuedTo { get; set; }
 
-        [DataMember]
-        public string issuedBy { get; set; }
+        [DataMember(Name = "issuedBy")]
+        [JsonProperty("issuedBy")]
+        public string IssuedBy { get; set; }
 
-        [DataMember]
-        public string uniqueId { get; set; }
+        [DataMember(Name = "uniqueId")]
+        [JsonProperty("uniqueId")]
+        public string UniqueId { get; set; }
 
         [JsonConstructor]
         public RevisionItem()
@@ -46,13 +53,13 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         public RevisionItem(Element rev)
         {
-            description = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_DESCRIPTION)?.AsString();
-            sequence = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_SEQUENCE_NUM).AsInteger(); //TODO: Potentially an issue.
-            number = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_NUM)?.AsString();
-            date = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_DATE)?.AsString();
-            issuedTo = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_ISSUED_TO)?.AsString();
-            issuedBy = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_ISSUED_BY)?.AsString();
-            uniqueId = rev.UniqueId;
+            Description = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_DESCRIPTION)?.AsString();
+            Sequence = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_SEQUENCE_NUM).AsInteger(); //TODO: Potentially an issue.
+            Number = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_NUM)?.AsString();
+            Date = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_DATE)?.AsString();
+            IssuedTo = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_ISSUED_TO)?.AsString();
+            IssuedBy = rev.get_Parameter(BuiltInParameter.PROJECT_REVISION_REVISION_ISSUED_BY)?.AsString();
+            UniqueId = rev.UniqueId;
         }
     }
 }

@@ -47,8 +47,8 @@ namespace HOK.MissionControl.Tools.DTMTool
                 {
                     var config = MissionControlSetup.Configurations[centralPath];
                     var updaterFound = config.updaters
-                        .FirstOrDefault(x => string.Equals(x.updaterId.ToLower(), reportingInfo.UpdaterId.ToLower(),
-                            StringComparison.Ordinal));
+                        .FirstOrDefault(x => string.Equals(x.updaterId, reportingInfo.UpdaterId,
+                            StringComparison.OrdinalIgnoreCase));
                     if (updaterFound != null)
                     {
                         var updaterIndex = config.updaters.IndexOf(updaterFound);
@@ -73,19 +73,25 @@ namespace HOK.MissionControl.Tools.DTMTool
 
                 if (settingsUpdated)
                 {
-                    //database updated
-                    var record = new TriggerRecord
+                    if (MissionControlSetup.TriggerRecords.ContainsKey(centralPath))
                     {
-                        configId = reportingInfo.ConfigId,
-                        centralPath = reportingInfo.CentralPath,
-                        updaterId = reportingInfo.UpdaterId,
-                        categoryName = reportingInfo.CategoryName,
-                        elementUniqueId = reportingInfo.ReportingUniqueId,
-                        edited = DateTime.UtcNow,
-                        editedBy = Environment.UserName
-                    };
+                        var trId = MissionControlSetup.TriggerRecords[centralPath];
+                        var record = new TriggerRecordItem
+                        {
+                            UpdaterId = reportingInfo.UpdaterId,
+                            CategoryName = reportingInfo.CategoryName,
+                            ElementUniqueId = reportingInfo.ReportingUniqueId,
+                            CreatedOn = DateTime.UtcNow,
+                            User = Environment.UserName
+                        };
 
-                    ServerUtilities.PostTriggerRecords(record);
+                        if (!ServerUtilities.Post(record, "triggerrecords/" + trId + "/add",
+                            out TriggerRecordData unused))
+                        {
+                            Log.AppendLog(LogMessageType.ERROR, "Failed to post Trigger Record Data.");
+                        }
+                    }
+                    
 
                     window.DialogResult = false;
                 }

@@ -13,7 +13,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes data about Model Synch duration.
         /// </summary>
-        public void PublishSynchTime(string recordId)
+        /// <param name="modelsId"></param>
+        public void PublishSynchTime(string modelsId)
         {
             try
             {
@@ -28,7 +29,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     User = Environment.UserName.ToLower()
                 };
 
-                if (!ServerUtilities.Post(eventItem, "models/" + recordId + "/modelsynchtime", out ModelData unused))
+                if (!ServerUtilities.Post(eventItem, "models/" + modelsId + "/modelsynchtime", out ModelData unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Model Synch Times Data.");
                 }

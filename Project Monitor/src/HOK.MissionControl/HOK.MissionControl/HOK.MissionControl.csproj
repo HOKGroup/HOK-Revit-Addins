@@ -160,6 +160,7 @@
     </Compile>
     <Compile Include="Tools\CADoor\DoorFailure.cs" />
     <Compile Include="Tools\CADoor\DoorUpdater.cs" />
+    <Compile Include="Tools\Communicator\CommunicatorUtilities.cs" />
     <Compile Include="Tools\Communicator\CommunicatorCommand.cs" />
     <Compile Include="Tools\Communicator\CommunicatorView.xaml.cs">
       <DependentUpon>CommunicatorView.xaml</DependentUpon>
@@ -197,6 +198,7 @@
     <Compile Include="Tools\Communicator\Tasks\FamilyTaskAssistant\FamilyTaskAssistantViewModel.cs" />
     <Compile Include="Tools\Communicator\Tasks\TaskWrappers.cs" />
     <Compile Include="Tools\DTMTool\DTMFailure.cs" />
+    <Compile Include="Tools\DTMTool\DtmSynchOverrides.cs" />
     <Compile Include="Tools\DTMTool\DTMUpdater.cs" />
     <Compile Include="Tools\DTMTool\DTMUtils\GridUtils.cs" />
     <Compile Include="Tools\DTMTool\DTMViewModel.cs" />

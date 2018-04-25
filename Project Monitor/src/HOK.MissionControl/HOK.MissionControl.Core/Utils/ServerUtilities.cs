@@ -197,56 +197,56 @@ namespace HOK.MissionControl.Core.Utils
 
         #region POST
 
-        /// <summary>
-        /// Posts Trigger Records to MongoDB. Trigger records are created when users override DTM Tools.
-        /// </summary>
-        /// <param name="record">Record to post.</param>
-        public static HttpStatusCode PostTriggerRecords(TriggerRecord record)
-        {
-            var status = HttpStatusCode.Unused;
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request =
-                    new RestRequest(ApiVersion + "/triggerrecords", Method.POST) { RequestFormat = DataFormat.Json };
-                request.AddBody(record);
+        ///// <summary>
+        ///// Posts Trigger Records to MongoDB. Trigger records are created when users override DTM Tools.
+        ///// </summary>
+        ///// <param name="record">Record to post.</param>
+        //public static HttpStatusCode PostTriggerRecords(TriggerRecordItem record)
+        //{
+        //    var status = HttpStatusCode.Unused;
+        //    try
+        //    {
+        //        var client = new RestClient(RestApiBaseUrl);
+        //        var request =
+        //            new RestRequest(ApiVersion + "/triggerrecords", Method.POST) { RequestFormat = DataFormat.Json };
+        //        request.AddBody(record);
 
-                var response = client.Execute<TriggerRecord>(request);
-                status = response.StatusCode;
+        //        var response = client.Execute<TriggerRecordItem>(request);
+        //        status = response.StatusCode;
 
-                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-triggerrecords");
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return status;
-        }
+        //        Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-triggerrecords");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+        //    }
+        //    return status;
+        //}
 
-        /// <summary>
-        /// PUTs created Health Record Id into Project's healthrecords array.
-        /// </summary>
-        /// <param name="project">Project class.</param>
-        /// <param name="id"></param>
-        public static void AddHealthRecordToProject(Project project, string id)
-        {
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(
-                    ApiVersion + "/projects/" + project.Id + "/addhealthrecord/" + id, Method.PUT)
-                {
-                    RequestFormat = DataFormat.Json
-                };
-                request.AddBody(project);
-                var response = client.Execute(request);
-                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-addhealthrecord");
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-        }
+        ///// <summary>
+        ///// PUTs created Health Record Id into Project's healthrecords array.
+        ///// </summary>
+        ///// <param name="project">Project class.</param>
+        ///// <param name="id"></param>
+        //public static void AddHealthRecordToProject(Project project, string id)
+        //{
+        //    try
+        //    {
+        //        var client = new RestClient(RestApiBaseUrl);
+        //        var request = new RestRequest(
+        //            ApiVersion + "/projects/" + project.Id + "/addhealthrecord/" + id, Method.PUT)
+        //        {
+        //            RequestFormat = DataFormat.Json
+        //        };
+        //        request.AddBody(project);
+        //        var response = client.Execute(request);
+        //        Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-addhealthrecord");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+        //    }
+        //}
 
         /// <summary>
         /// PUTs body

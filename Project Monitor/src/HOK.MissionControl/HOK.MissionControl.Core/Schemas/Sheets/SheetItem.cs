@@ -17,77 +17,88 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
         [DataMember(Name = "_id")]
+        [JsonProperty("_id")]
         public string Id { get; set; }
 
-        [DataMember]
-        public string collectionId { get; set; }
+        [DataMember(Name = "collectionId")]
+        [JsonProperty("collectionId")]
+        public string CollectionId { get; set; }
 
-        [DataMember]
-        public string fileName { get; set; }
+        [DataMember(Name = "fileName")]
+        [JsonProperty("fileName")]
+        public string FileName { get; set; }
 
-        [DataMember]
-        public bool isNewSheet { get; set; }
+        [DataMember(Name = "isNewSheet")]
+        [JsonProperty("isNewSheet")]
+        public bool IsNewSheet { get; set; }
 
         private string _name;
-        [DataMember]
-        public string name
+        [DataMember(Name = "name")]
+        [JsonProperty("name")]
+        public string Name
         {
             get { return _name; }
-            set { _name = value; RaisePropertyChanged("name"); }
+            set { _name = value; RaisePropertyChanged("Name"); }
         }
 
         private string _number;
-        [DataMember]
-        public string number
+        [DataMember(Name = "number")]
+        [JsonProperty("number")]
+        public string Number
         {
             get { return _number; }
-            set { _number = value; RaisePropertyChanged("number"); }
+            set { _number = value; RaisePropertyChanged("Number"); }
         }
 
         private string _uniqueId;
-        [DataMember]
-        public string uniqueId
+        [DataMember(Name = "uniqueId")]
+        [JsonProperty("uniqueId")]
+        public string UniqueId
         {
             get { return _uniqueId; }
-            set { _uniqueId = value; RaisePropertyChanged("uniqueId"); }
+            set { _uniqueId = value; RaisePropertyChanged("UniqueId"); }
         }
 
         private string _revisionNumber;
-        [DataMember]
-        public string revisionNumber
+        [DataMember(Name = "revisionNumber")]
+        [JsonProperty("revisionNumber")]
+        public string RevisionNumber
         {
             get { return _revisionNumber; }
-            set { _revisionNumber = value; RaisePropertyChanged("revisionNumber"); }
+            set { _revisionNumber = value; RaisePropertyChanged("RevisionNumber"); }
         }
 
         private bool _isSelected;
-        [DataMember]
-        public bool isSelected
+        [DataMember(Name = "isSelected")]
+        [JsonProperty("isSelected")]
+        public bool IsSelected
         {
             get { return _isSelected; }
-            set { _isSelected = value; RaisePropertyChanged("isSelected"); }
+            set { _isSelected = value; RaisePropertyChanged("IsSelected"); }
         }
 
         private bool _isPlaceholder;
-        [DataMember]
-        public bool isPlaceholder
+        [DataMember(Name = "isPlaceholder")]
+        [JsonProperty("isPlaceholder")]
+        public bool IsPlaceholder
         {
             get { return _isPlaceholder; }
-            set { _isPlaceholder = value; RaisePropertyChanged("isPlaceholder"); }
+            set { _isPlaceholder = value; RaisePropertyChanged("IsPlaceholder"); }
         }
 
         private bool _isDeleted;
-        [DataMember]
-        public bool isDeleted
+        [DataMember(Name = "isDeleted")]
+        [JsonProperty("isDeleted")]
+        public bool IsDeleted
         {
             get { return _isDeleted; }
-            set { _isDeleted = value; RaisePropertyChanged("isDeleted"); }
+            set { _isDeleted = value; RaisePropertyChanged("IsDeleted"); }
         }
 
-        [DataMember]
-        public List<SheetTask> tasks { get; set; } = new List<SheetTask>();
+        [DataMember(Name = "tasks")]
+        [JsonProperty("tasks")]
+        public List<SheetTask> Tasks { get; set; } = new List<SheetTask>();
 
         [JsonConstructor]
         public SheetItem()
@@ -96,15 +107,15 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         public SheetItem(ViewSheet sheet, string path)
         {
-            name = sheet.get_Parameter(BuiltInParameter.SHEET_NAME).AsString();
-            number = sheet.get_Parameter(BuiltInParameter.SHEET_NUMBER).AsString();
-            uniqueId = sheet.UniqueId;
-            revisionNumber = sheet.get_Parameter(BuiltInParameter.SHEET_CURRENT_REVISION).AsString();
-            isPlaceholder = sheet.IsPlaceholder;
-            fileName = !string.IsNullOrEmpty(path) ? Path.GetFileNameWithoutExtension(path) : string.Empty;
-            isNewSheet = false;
-            isDeleted = false;
-            isSelected = false;
+            Name = sheet.get_Parameter(BuiltInParameter.SHEET_NAME).AsString();
+            Number = sheet.get_Parameter(BuiltInParameter.SHEET_NUMBER).AsString();
+            UniqueId = sheet.UniqueId;
+            RevisionNumber = sheet.get_Parameter(BuiltInParameter.SHEET_CURRENT_REVISION).AsString();
+            IsPlaceholder = sheet.IsPlaceholder;
+            FileName = !string.IsNullOrEmpty(path) ? Path.GetFileNameWithoutExtension(path) : string.Empty;
+            IsNewSheet = false;
+            IsDeleted = false;
+            IsSelected = false;
         }
 
         // (Konrad) Comparison methods used when updating UI. IndexOf() uses it.

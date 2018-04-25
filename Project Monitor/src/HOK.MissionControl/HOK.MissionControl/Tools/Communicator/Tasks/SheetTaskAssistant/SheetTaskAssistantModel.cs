@@ -17,7 +17,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
 
             AppCommand.CommunicatorHandler.SheetItem = item;
             AppCommand.CommunicatorHandler.SheetTask = task;
-            AppCommand.CommunicatorHandler.Request.Make(task.isNewSheet
+            AppCommand.CommunicatorHandler.Request.Make(task.IsNewSheet
                 ? RequestId.CreateSheet
                 : RequestId.UpdateSheet);
 
@@ -37,11 +37,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             var t = (SheetTask)wrapper.Task;
             var e = (SheetItem)wrapper.Element;
 
-            t.completedBy = Environment.UserName.ToLower();
-            t.completedOn = DateTime.UtcNow;
+            t.CompletedBy = Environment.UserName.ToLower();
+            t.CompletedOn = DateTime.UtcNow;
 
             // body needs to be updated with a new identifier object or mongo side will fail.
-            if (e.isNewSheet)
+            if (e.IsNewSheet)
             {
                 // (Konrad) It's a create sheet task (element associated with task is null). Let's approve that.
                 var newSheet = AppCommand.CommunicatorHandler.SheetItem;
@@ -52,7 +52,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             }
             else
             {
-                t.sheetId = e.Id;
+                t.SheetId = e.Id;
                 //ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/updatetasks");
             } 
         }

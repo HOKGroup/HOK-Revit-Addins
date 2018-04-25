@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Tools.DTMTool.DTMUtils;
@@ -292,63 +291,6 @@ namespace HOK.MissionControl.Tools.DTMTool
             }
         }
 
-        /// <summary>
-        /// Creates an idling task that will bind our own Reload Latest command to existing one.
-        /// </summary>
-        public void CreateReloadLatestOverride()
-        {
-            AppCommand.EnqueueTask(app =>
-            {
-                try
-                {
-                    var commandId = RevitCommandId.LookupCommandId("ID_WORKSETS_RELOAD_LATEST");
-                    if (commandId == null || !commandId.CanHaveBinding) return;
-
-                    var binding = app.CreateAddInCommandBinding(commandId);
-                    binding.Executed += AppCommand.OnReloadLatest;
-                }
-                catch (Exception e)
-                {
-                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-                }
-            });
-        }
-
-        /// <summary>
-        /// Creates and idling task that will bind our own Synch to Central command to existing one.
-        /// </summary>
-        public void CreateSynchToCentralOverride()
-        {
-            AppCommand.EnqueueTask(app =>
-            {
-                try
-                {
-                    var commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER");
-                    var commandId2 = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER_SHORTCUT");
-                    if (commandId == null || commandId2 == null || !commandId2.CanHaveBinding || !commandId.CanHaveBinding) return;
-
-                    // (Konrad) We shouldn't be registering the same event handler more than once. It will throw an exception if we do.
-                    // It would also potentially cause the event to be fired multiple times. 
-                    if (!AppCommand.IsSynchOverriden)
-                    {
-                        var binding = app.CreateAddInCommandBinding(commandId);
-                        binding.Executed += (sender, e) => AppCommand.OnSynchToCentral(sender, e, SynchType.Synch);
-                        AppCommand.IsSynchOverriden = true;
-                    }
-                    if (!AppCommand.IsSynchNowOverriden)
-                    {
-                        var binding2 = app.CreateAddInCommandBinding(commandId2);
-                        binding2.Executed += (sender, e) => AppCommand.OnSynchToCentral(sender, e, SynchType.SynchNow);
-                        AppCommand.IsSynchNowOverriden = true;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-                }
-            });
-        }
-
         public string GetAdditionalInformation()
         {
             return "Monitor changes on elements of specific categories";
@@ -368,11 +310,5 @@ namespace HOK.MissionControl.Tools.DTMTool
         {
             return "DTMUpdater";
         }
-    }
-
-    public enum SynchType
-    {
-        Synch,
-        SynchNow
     }
 }

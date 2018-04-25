@@ -32,6 +32,10 @@ namespace HOK.MissionControl.Core.Schemas
         public List<string> Configurations { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("triggerRecords")]
+        public List<string> TriggerRecords { get; set; } = new List<string>();
+
+        [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("sheets")]
         public List<string> Sheets { get; set; } = new List<string>();
 
