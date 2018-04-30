@@ -95,7 +95,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
 
                 Control.Dispatcher.Invoke(() =>
                 {
-                    Model.Approve(Wrapper);
+                    Model.Approve(Wrapper, msg.CentralPath);
                 }, DispatcherPriority.Normal);
             }
             else

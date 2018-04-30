@@ -40,7 +40,7 @@
                 CornerRadius="2" 
                 Height="20" 
                 VerticalAlignment="Bottom" Grid.ColumnSpan="2" Grid.Column="0">
-            <Label Content="{Binding Wrapper.Element.name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+            <Label Content="{Binding Wrapper.Element.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
                    Margin="5,0,5,0" 
@@ -61,7 +61,7 @@
                 CornerRadius="2" 
                 Height="20" 
                 VerticalAlignment="Bottom">
-            <Label Content="{Binding Wrapper.Task.name}" 
+            <Label Content="{Binding Wrapper.Task.Name}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
                    Margin="5,0,5,0" 
@@ -82,7 +82,7 @@
                 CornerRadius="2" 
                 Height="20" 
                 VerticalAlignment="Bottom">
-            <Label Content="{Binding Wrapper.Task.assignedTo}" 
+            <Label Content="{Binding Wrapper.Task.AssignedTo}" 
                    VerticalContentAlignment="Center" 
                    Padding="0" 
                    Margin="5,0,5,0" 
@@ -102,7 +102,7 @@
                 Margin="10,21,10,10"
                 Grid.ColumnSpan="2"
                 CornerRadius="2">
-            <TextBox Text="{Binding Wrapper.Task.message}" 
+            <TextBox Text="{Binding Wrapper.Task.Message}" 
                      Margin="5,0,5,0" 
                      TextWrapping="Wrap"
                      Foreground="DarkGray"
@@ -122,7 +122,7 @@
                 Margin="10,21,10,10"
                 Grid.ColumnSpan="2"
                 CornerRadius="2">
-            <TextBox Text="{Binding Wrapper.Task.comments}" 
+            <TextBox Text="{Binding Wrapper.Task.Comments}" 
                      Margin="5,0,5,0" 
                      TextWrapping="Wrap"
                      BorderThickness="0"/>

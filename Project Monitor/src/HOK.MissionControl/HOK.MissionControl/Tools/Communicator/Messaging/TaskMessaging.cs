@@ -35,6 +35,7 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     {
         public SheetItem Sheet { get; set; }
         public SheetTask Task { get; set; }
+        public string CentralPath { get; set; }
     }
 
     /// <summary>
@@ -44,6 +45,7 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     {
         public SheetItem Sheet { get; set; }
         public SheetTask Task { get; set; }
+        public string CentralPath { get; set; }
     }
 
     /// <summary>
@@ -53,6 +55,7 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     {
         public string SheetId { get; set; }
         public List<string> DeletedIds { get; set; }
+        public string CentralPath { get; set; }
     }
 
     /// <summary>
@@ -61,6 +64,7 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     public class SheetTaskSheetsCreatedMessage
     {
         public List<SheetItem> Sheets { get; set; }
+        public string CentralPath { get; set; }
     }
     
     /// <summary>
@@ -70,6 +74,7 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     {
         public string SheetId { get; set; }
         public List<string> DeletedIds { get; set; }
+        public string CentralPath { get; set; }
     }
 
     /// <summary>
@@ -79,6 +84,7 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
     {
         public bool Completed { get; set; }
         public string Message { get; set; }
+        public string CentralPath { get; set; }
     }
 
     #endregion

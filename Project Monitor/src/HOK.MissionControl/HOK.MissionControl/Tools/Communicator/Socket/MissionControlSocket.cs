@@ -148,7 +148,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                             || !string.Equals(task.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)
                             || !IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
-                        Messenger.Default.Send(new SheetsTaskAddedMessage { Sheet = sheet, Task = task });
+                        Messenger.Default.Send(new SheetsTaskAddedMessage
+                        {
+                            Sheet = sheet,
+                            Task = task,
+                            CentralPath = centralPath
+                        });
                     }
                     else
                     {
@@ -176,7 +181,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         // Tasks that are assigned to someone else will be dealt with in the handler.
                         if (task == null || !IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
-                        Messenger.Default.Send(new SheetsTaskUpdatedMessage { Sheet = sheet, Task = task });
+                        Messenger.Default.Send(new SheetsTaskUpdatedMessage
+                        {
+                            Sheet = sheet,
+                            Task = task,
+                            CentralPath = centralPath
+                        });
                     }
                     else
                     {
@@ -198,7 +208,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
                         if (!IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
-                        Messenger.Default.Send(new SheetsTaskDeletedMessage { SheetId = sheetId, DeletedIds = deletedIds });
+                        Messenger.Default.Send(new SheetsTaskDeletedMessage
+                        {
+                            SheetId = sheetId,
+                            DeletedIds = deletedIds,
+                            CentralPath = centralPath
+                        });
                     }
                     else
                     {
@@ -220,7 +235,11 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
                         if (!IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
-                        Messenger.Default.Send(new SheetTaskSheetsCreatedMessage { Sheets = sheetsData.Sheets.Where(x => sheetsIds.Contains(x.Id)).ToList() });
+                        Messenger.Default.Send(new SheetTaskSheetsCreatedMessage
+                        {
+                            Sheets = sheetsData.Sheets.Where(x => sheetsIds.Contains(x.Id)).ToList(),
+                            CentralPath = centralPath
+                        });
                     }
                     else
                     {
@@ -242,7 +261,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
                         if (!IdsMatch(centralPath, collId, CollectionType.Sheets)) return;
 
-                        Messenger.Default.Send(new SheetTaskSheetDeletedMessage { SheetId = sheetId, DeletedIds = deletedIds });
+                        Messenger.Default.Send(new SheetTaskSheetDeletedMessage
+                        {
+                            SheetId = sheetId,
+                            DeletedIds = deletedIds,
+                            CentralPath = centralPath
+                        });
                     }
                     else
                     {
@@ -278,10 +302,10 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
             switch (type)
             {
                 case CollectionType.Sheets:
-                    currentModelId = MissionControlSetup.SheetsIds.ContainsKey(centralPath) ? MissionControlSetup.SheetsIds[centralPath] : string.Empty;
+                    currentModelId = MissionControlSetup.SheetsData.ContainsKey(centralPath) ? MissionControlSetup.SheetsData[centralPath].Id : string.Empty;
                     break;
                 case CollectionType.Families:
-                    currentModelId = MissionControlSetup.FamiliesIds.ContainsKey(centralPath) ? MissionControlSetup.FamiliesIds[centralPath] : string.Empty;
+                    currentModelId = MissionControlSetup.FamilyData.ContainsKey(centralPath) ? MissionControlSetup.FamilyData[centralPath].Id : string.Empty;
                     break;
                 default:
                     return false;

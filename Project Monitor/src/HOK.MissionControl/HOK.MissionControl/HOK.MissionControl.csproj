@@ -167,6 +167,8 @@
     </Compile>
     <Compile Include="Tools\Communicator\CommunicatorViewModel.cs" />
     <Compile Include="Tools\Communicator\CommunicatorRequestHandler.cs" />
+    <Compile Include="Tools\Communicator\Messaging\CommunicatorMessaging.cs" />
+    <Compile Include="Tools\Communicator\Messaging\HealthReportMessaging.cs" />
     <Compile Include="Tools\Communicator\Messaging\TaskMessaging.cs" />
     <Compile Include="Tools\Communicator\Socket\MissionControlSocket.cs" />
     <Compile Include="Tools\Communicator\Tasks\CommunicatorTasksModel.cs" />

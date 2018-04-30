@@ -20,6 +20,11 @@ namespace HOK.MissionControl.Tools.SheetTracker
             try
             {
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+                var sheetsData = MissionControlSetup.SheetsData.ContainsKey(centralPath)
+                    ? MissionControlSetup.SheetsData[centralPath]
+                    : null;
+                if (sheetsData == null) return;
+
                 var sheets = new FilteredElementCollector(doc)
                     .OfCategory(BuiltInCategory.OST_Sheets)
                     .WhereElementIsNotElementType()
@@ -34,7 +39,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
                     .ToDictionary(key => key.UniqueId, value => value);
 
                 var finalList = new List<SheetItem>();
-                foreach (var ms in AppCommand.SheetsData.Sheets)
+                foreach (var ms in sheetsData.Sheets)
                 {
                     if (sheets.ContainsKey(ms.UniqueId))
                     {
@@ -70,17 +75,18 @@ namespace HOK.MissionControl.Tools.SheetTracker
                     CentralPath = centralPath.ToLower(),
                     Sheets = finalList,
                     Revisions = revisions.Values.ToList(),
-                    Id = AppCommand.SheetsData.Id
+                    Id = sheetsData.Id
                 };
 
-                if (!ServerUtilities.Post(data, "sheets/" + AppCommand.SheetsData.Id, 
+                if (!ServerUtilities.Post(data, "sheets/" + sheetsData.Id, 
                     out SheetData unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Sheets.");
                 }
 
-                AppCommand.SheetsData = data;
-                Communicator.CommunicatorUtilities.LaunchCommunicator();
+                if (MissionControlSetup.SheetsData.ContainsKey(centralPath))
+                    MissionControlSetup.SheetsData.Remove(centralPath);
+                MissionControlSetup.SheetsData.Add(centralPath, data); // store sheets record
             }
             catch (Exception e)
             {

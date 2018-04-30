@@ -44,7 +44,6 @@ namespace HOK.MissionControl.Tools.Communicator
 
         /// <summary>
         /// Due to all asynch stuff some data might not be available right away so we use this callback to instantiate the Communicator.
-        /// It also get's called after synch to central is done to refresh the UI.
         /// </summary>
         public static void LaunchCommunicator()
         {

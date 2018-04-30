@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Utils;
 
@@ -7,6 +8,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
 {
     public class FamilyTaskAssistantModel
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="family"></param>
+        /// <returns></returns>
         public ObservableCollection<CheckWrapper> CollectChecks(FamilyItem family)
         {
             var output = new ObservableCollection<CheckWrapper>
@@ -53,6 +59,10 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
             return output;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="family"></param>
         public void EditFamily(FamilyItem family)
         {
             AppCommand.CommunicatorHandler.FamilyItem = family;
@@ -60,18 +70,19 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
             AppCommand.CommunicatorEvent.Raise();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="wrapper"></param>
         public void Submit(FamilyTaskWrapper wrapper)
         {
-            //var t = (FamilyTask) wrapper.Task;
-            //var e = (FamilyItem) wrapper.Element;
+            var t = (FamilyTask)wrapper.Task;
+            var e = (FamilyItem)wrapper.Element;
 
-            //var familyStatsId = AppCommand.HrData.familyStats;
-            //if (string.IsNullOrEmpty(familyStatsId)) return;
-
-            //t.completedOn = DateTime.UtcNow;
-            //t.completedBy = Environment.UserName.ToLower();
-
-            //ServerUtilities.Post<FamilyData>(wrapper.Task, "families/" + familyStatsId + "/family/" + e.name + "/updatetask/" + t.Id);
+            AppCommand.CommunicatorHandler.FamilyItem = e;
+            AppCommand.CommunicatorHandler.FamilyTask = t;
+            AppCommand.CommunicatorHandler.Request.Make(RequestId.SubmitFamily);
+            AppCommand.CommunicatorEvent.Raise();
         }
     }
 

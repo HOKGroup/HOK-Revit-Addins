@@ -9,6 +9,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
     /// <summary>
     /// Individual Family object data.
     /// </summary>
+    [DataContract]
     public class FamilyItem
     {
         [BsonId]

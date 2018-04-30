@@ -10,6 +10,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
     /// <summary>
     /// Summarized Family stats for Dashbord generation.
     /// </summary>
+    [DataContract]
     public class FamilyData
     {
         [BsonId]

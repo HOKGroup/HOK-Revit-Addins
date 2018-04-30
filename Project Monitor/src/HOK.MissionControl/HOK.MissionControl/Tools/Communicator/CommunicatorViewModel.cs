@@ -1,56 +1,27 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using GalaSoft.MvvmLight;
-using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Tools.Communicator.HealthReport;
 using HOK.MissionControl.Tools.Communicator.Tasks;
-using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.Communicator
 {
     public class CommunicatorViewModel : ViewModelBase
     {
-        public ObservableCollection<TabItem> TabItems { get; set; }
+        public ObservableCollection<TabItem> TabItems { get; set; } = new ObservableCollection<TabItem>();
 
         public CommunicatorViewModel()
         {
-            //TODO: What happens when multiple MissionControl tracked models are open in the same session? Only one HrData/SheetsData is stored.
-            FamilyData familyStats = null;
-            //var familyStatsId = AppCommand.HrData.familyStats;
-            string familyStatsId = null;
-            var sheetsData = AppCommand.SheetsData;
-            if (familyStatsId == null && sheetsData == null) return;
-
-            if (familyStatsId != null)
+            TabItems.Add(new TabItem
             {
-                familyStats = ServerUtilities.FindOne<FamilyData>("families/" + familyStatsId);
-            }
-
-            TabItems = new ObservableCollection<TabItem>();
-
-            if (familyStats != null)
+                Content = new CommunicatorHealthReportView { DataContext = new CommunicatorHealthReportViewModel() },
+                Header = "Health Report"
+            });
+            TabItems.Add(new TabItem
             {
-                var reportTab = new TabItem
-                {
-                    Content =
-                        new CommunicatorHealthReportView { DataContext = new CommunicatorHealthReportViewModel(familyStats) },
-                    Header = "Health Report"
-                };
-                TabItems.Add(reportTab);
-            }
-
-            if (sheetsData != null)
-            {
-                var taskTab = new TabItem
-                {
-                    Content = new CommunicatorTasksView
-                    {
-                        DataContext = new CommunicatorTasksViewModel(new CommunicatorTasksModel(familyStats, sheetsData))
-                    },
-                    Header = "Tasks"
-                };
-                TabItems.Add(taskTab);
-            }
+                Content = new CommunicatorTasksView { DataContext = new CommunicatorTasksViewModel(new CommunicatorTasksModel()) },
+                Header = "Tasks"
+            });
         }
     }
 }

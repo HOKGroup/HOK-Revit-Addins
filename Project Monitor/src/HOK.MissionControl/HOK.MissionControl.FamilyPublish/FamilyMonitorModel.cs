@@ -19,15 +19,15 @@ namespace HOK.MissionControl.FamilyPublish
         public static Document Doc { get; set; }
         public Configuration Config { get; set; }
         public Project Project { get; set; }
-        private string RecordId { get; }
+        private string FamiliesId { get; }
         private string CentralPath { get; }
 
-        public FamilyMonitorModel(Document doc, Configuration config, Project project, string recordId, string centralPath)
+        public FamilyMonitorModel(Document doc, Configuration config, Project project, string familiesId, string centralPath)
         {
             Doc = doc;
             Config = config;
             Project = project;
-            RecordId = recordId;
+            FamiliesId = familiesId;
             CentralPath = centralPath;
         }
 
@@ -39,7 +39,7 @@ namespace HOK.MissionControl.FamilyPublish
             try
             {
                 if (!MonitorUtilities.IsUpdaterOn(Project, Config, UpdaterGuid)) return;
-                if (string.IsNullOrEmpty(RecordId)) return;
+                if (string.IsNullOrEmpty(FamiliesId)) return;
 
                 var unusedFamilies = 0;
                 var oversizedFamilies = 0;
@@ -172,9 +172,12 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                 }
 
-                //TODO: Cleanup
-                //var famStat = ServerUtilities.GetByCentralPath<FamilyData>(CentralPath, "families/centralpath");
-                ServerUtilities.GetByCentralPath<FamilyData>(CentralPath, "families/centralpath", out FamilyData famStat);
+                if (!ServerUtilities.GetByCentralPath(CentralPath, "families/centralpath", out FamilyData famStat))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to retrieve Families data.");
+                    return;
+                }
+                
                 var famDict = new Dictionary<string, FamilyItem>();
                 if (famStat != null)
                 {
@@ -212,17 +215,10 @@ namespace HOK.MissionControl.FamilyPublish
                     Families = famOutput
                 };
 
-                if (famStat == null)
+                if (!ServerUtilities.Put(familyStats, "families/" + famStat.Id))
                 {
-                    //TODO: Fix this too
-                    //ServerUtilities.Post(familyStats, "families", out FamilyData famStat);
-                    //ServerUtilities.Put(new {key = famStat.Id}, "healthrecords/" + RecordId + "/addfamilies");
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Families data.");
                 }
-                else
-                {
-                    ServerUtilities.Put(familyStats, "families/" + famStat.Id);
-                }
-
                 StatusBarManager.FinalizeProgress();
             }
             catch (Exception ex)

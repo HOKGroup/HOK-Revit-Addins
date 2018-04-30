@@ -11,6 +11,7 @@ using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Sheets;
+using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Utils.StatusReporter;
@@ -19,13 +20,14 @@ namespace HOK.MissionControl.Tools.Communicator
 {
     public enum RequestId
     {
-        None = 0,
-        EditFamily = 1,
-        OpenView = 2,
-        UpdateSheet = 3,
-        CreateSheet = 4,
-        ReportStatus = 5,
-        Disable = 6
+        None,
+        EditFamily,
+        SubmitFamily,
+        OpenView,
+        UpdateSheet,
+        CreateSheet,
+        ReportStatus,
+        Disable
     }
 
     public enum Status
@@ -55,10 +57,12 @@ namespace HOK.MissionControl.Tools.Communicator
         public Status Status { get; set; }
         public string Message { get; set; }
         public FamilyItem FamilyItem { get; set; }
+        public FamilyTask FamilyTask { get; set; }
         public SheetItem SheetItem { get; set; }
         public SheetTask SheetTask { get; set; }
         public static bool IsUpdatingSheet { get; set; }
         public CommunicatorRequest Request { get; set; } = new CommunicatorRequest();
+        public static string CentralPath { get; set; }
 
         public string GetName()
         {
@@ -78,6 +82,11 @@ namespace HOK.MissionControl.Tools.Communicator
                     case RequestId.EditFamily:
                     {
                         EditFamily(app);
+                        break;
+                    }
+                    case RequestId.SubmitFamily:
+                    {
+                        SubmitFamily(app);
                         break;
                     }
                     case RequestId.OpenView:
@@ -151,12 +160,12 @@ namespace HOK.MissionControl.Tools.Communicator
         /// <param name="app"></param>
         private void CreateSheet(UIApplication app)
         {
-            IsUpdatingSheet = true;
-
-            app.Application.FailuresProcessing += FailureProcessing;
             var doc = app.ActiveUIDocument.Document;
-            var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+            CentralPath = FileInfoUtil.GetCentralFilePath(doc);
 
+            IsUpdatingSheet = true;
+            app.Application.FailuresProcessing += FailureProcessing;
+            
             using (var trans = new Transaction(doc, "CreateSheet"))
             {
                 trans.Start();
@@ -175,7 +184,12 @@ namespace HOK.MissionControl.Tools.Communicator
                         if (titleblock == null)
                         {
                             IsUpdatingSheet = false;
-                            Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = "Could not find a valid TitleBlock." });
+                            Messenger.Default.Send(new SheetTaskCompletedMessage
+                            {
+                                Completed = false,
+                                Message = "Could not find a valid TitleBlock.",
+                                CentralPath = CentralPath
+                            });
                             return;
                         }
                         sheet = ViewSheet.Create(doc, titleblock.Id);
@@ -185,7 +199,7 @@ namespace HOK.MissionControl.Tools.Communicator
                     sheet.get_Parameter(BuiltInParameter.SHEET_NAME)?.Set(SheetTask.Name);
 
                     // (Konrad) We can set this here and pick up in the UI before sending off to MongoDB.
-                    var newSheetItem = new SheetItem(sheet, centralPath)
+                    var newSheetItem = new SheetItem(sheet, CentralPath)
                     {
                         Tasks = SheetItem.Tasks,
                         CollectionId = SheetItem.CollectionId,
@@ -203,7 +217,12 @@ namespace HOK.MissionControl.Tools.Communicator
                     IsUpdatingSheet = false;
 
                     Log.AppendLog(LogMessageType.EXCEPTION, "Failed to create sheet.");
-                    Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = e.Message });
+                    Messenger.Default.Send(new SheetTaskCompletedMessage
+                    {
+                        Completed = false,
+                        Message = e.Message,
+                        CentralPath = CentralPath
+                    });
                 }
             }
 
@@ -217,17 +236,24 @@ namespace HOK.MissionControl.Tools.Communicator
         /// <param name="app"></param>
         private void UpdateSheet(UIApplication app)
         {
-            IsUpdatingSheet = true;
-
-            app.Application.FailuresProcessing += FailureProcessing;
             var doc = app.ActiveUIDocument.Document;
+            CentralPath = FileInfoUtil.GetCentralFilePath(doc);
+
+            IsUpdatingSheet = true;
+            app.Application.FailuresProcessing += FailureProcessing;
+            
             var view = doc.GetElement(SheetItem.UniqueId) as ViewSheet;
             if (view != null)
             {
                 if (WorksharingUtils.GetCheckoutStatus(doc, view.Id) == CheckoutStatus.OwnedByOtherUser)
                 {
                     IsUpdatingSheet = false;
-                    Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = "Element owned by another user. Try reloading latest." });
+                    Messenger.Default.Send(new SheetTaskCompletedMessage
+                    {
+                        Completed = false,
+                        Message = "Element owned by another user. Try reloading latest.",
+                        CentralPath = CentralPath
+                    });
                     return;
                 }
                 using (var trans = new Transaction(doc, "UpdateSheet"))
@@ -256,7 +282,12 @@ namespace HOK.MissionControl.Tools.Communicator
                         IsUpdatingSheet = false;
 
                         Log.AppendLog(LogMessageType.EXCEPTION, "Failed to " + action + " sheet.");
-                        Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = e.Message});
+                        Messenger.Default.Send(new SheetTaskCompletedMessage
+                        {
+                            Completed = false,
+                            Message = e.Message,
+                            CentralPath = CentralPath
+                        });
                     }
                 }
             }
@@ -314,6 +345,30 @@ namespace HOK.MissionControl.Tools.Communicator
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="app"></param>
+        public void SubmitFamily(UIApplication app)
+        {
+            //TODO: Test that this works like its supposed to.
+            var doc = app.ActiveUIDocument.Document;
+            if (doc == null || doc.IsFamilyDocument) return;
+
+            var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+            var familyStatsId = MissionControlSetup.FamilyData[centralPath].Id;
+            if (string.IsNullOrEmpty(familyStatsId)) return;
+
+            FamilyTask.CompletedOn = DateTime.UtcNow;
+            FamilyTask.CompletedBy = Environment.UserName.ToLower();
+
+            if (!ServerUtilities.Post(FamilyTask,
+                "families/" + familyStatsId + "/family/" + FamilyItem.Name + "/updatetask/" + FamilyTask.Id, out FamilyData unused))
+            {
+                Log.AppendLog(LogMessageType.ERROR, "Failed to submit Family Task Completed update.");
+            }
+        }
+
+        /// <summary>
         /// Error handler if we cannot commit the transaction for some reason. It will return proper message to UI.
         /// </summary>
         private static void FailureProcessing(object sender, FailuresProcessingEventArgs args)
@@ -325,7 +380,12 @@ namespace HOK.MissionControl.Tools.Communicator
             if (fmas.Count == 0)
             {
                 args.SetProcessingResult(FailureProcessingResult.Continue);
-                if (IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = true, Message = "Success!" });
+                if (IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage
+                {
+                    Completed = true,
+                    Message = "Success!",
+                    CentralPath = CentralPath
+                });
                 return;
             }
 
@@ -345,7 +405,12 @@ namespace HOK.MissionControl.Tools.Communicator
 
             if (count > 0)
             {
-                if (IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage { Completed = false, Message = "Could not commit transaction. Try reloading latest." });
+                if (IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage
+                {
+                    Completed = false,
+                    Message = "Could not commit transaction. Try reloading latest.",
+                    CentralPath = CentralPath
+                });
             }
         }
     }

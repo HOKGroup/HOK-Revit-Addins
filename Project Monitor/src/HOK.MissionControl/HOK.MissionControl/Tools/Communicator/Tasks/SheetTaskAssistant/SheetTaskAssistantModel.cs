@@ -28,10 +28,12 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         /// Posts approved changes to MongoDB. Mongo will fire socket event when complete.
         /// </summary>
         /// <param name="wrapper">Sheet Task Wrapper containing approved task.</param>
-        public void Approve(SheetTaskWrapper wrapper)
+        /// <param name="centralPath"></param>
+        public void Approve(SheetTaskWrapper wrapper, string centralPath)
         {
-            //TODO: This can potentially cause an issue. What if user opens multiple sessions of Revit all registered in MissionControl.
-            var sheetsDataId = AppCommand.SheetsData.Id;
+            var sheetsDataId = string.Empty;
+            if (MissionControlSetup.SheetsData.ContainsKey(centralPath))
+                sheetsDataId = MissionControlSetup.SheetsData[centralPath].Id;
             if (string.IsNullOrEmpty(sheetsDataId)) return;
 
             var t = (SheetTask)wrapper.Task;

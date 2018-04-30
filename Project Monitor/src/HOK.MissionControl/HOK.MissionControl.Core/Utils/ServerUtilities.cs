@@ -91,7 +91,19 @@ namespace HOK.MissionControl.Core.Utils
                 }
 
                 var client = new RestClient(RestApiBaseUrl);
+                client.ClearHandlers();
+                client.AddHandler("application/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
+                client.AddHandler("*+json", new NewtonsoftJsonSerializer());
+
                 var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET);
+                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+                request.AddHeader("Content-type", "application/json");
+                request.RequestFormat = DataFormat.Json;
+                request.JsonSerializer = new NewtonsoftJsonSerializer();
+
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.OK) return false;
                 if (!string.IsNullOrEmpty(response.Content))
@@ -258,12 +270,20 @@ namespace HOK.MissionControl.Core.Utils
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(
-                    ApiVersion + "/" + route, Method.PUT)
-                {
-                    RequestFormat = DataFormat.Json
-                };
+                client.ClearHandlers();
+                client.AddHandler("application/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
+                client.AddHandler("*+json", new NewtonsoftJsonSerializer());
+
+                var request = new RestRequest(ApiVersion + "/" + route, Method.PUT);
+                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+                request.AddHeader("Content-type", "application/json");
+                request.RequestFormat = DataFormat.Json;
+                request.JsonSerializer = new NewtonsoftJsonSerializer();
                 request.AddBody(body);
+
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.Created)
                 {

@@ -137,6 +137,7 @@
     <Compile Include="Schemas\Configurations\ProjectUpdater.cs" />
     <Compile Include="Schemas\Configurations\SharedParameterMonitor.cs" />
     <Compile Include="Schemas\Configurations\UserOverrides.cs" />
+    <Compile Include="Schemas\DataRange.cs" />
     <Compile Include="Schemas\Families\FamilyData.cs" />
     <Compile Include="Schemas\Families\FamilyItem.cs" />
     <Compile Include="Schemas\Families\FamilyTask.cs" />

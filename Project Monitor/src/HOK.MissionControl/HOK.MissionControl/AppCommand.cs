@@ -10,7 +10,6 @@ using Autodesk.Revit.UI.Events;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas.Families;
-using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.DTMTool;
@@ -31,7 +30,6 @@ namespace HOK.MissionControl
         public static AppCommand Instance { get; private set; }
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
-        public static SheetData SheetsData { get; set; }
         public static CommunicatorView CommunicatorWindow { get; set; }
         public static bool IsSynching { get; set; }
         public static bool IsSynchOverriden { get; set; }
@@ -67,6 +65,7 @@ namespace HOK.MissionControl
 
                 // (Konrad) Create Communicator/WebsiteLink buttons and register dockable panel.
                 CommunicatorUtilities.RegisterCommunicator(application);
+                CommunicatorUtilities.LaunchCommunicator();
 
                 try
                 {
@@ -257,7 +256,6 @@ namespace HOK.MissionControl
         /// </summary>
         public static void ClearAll()
         {
-            SheetsData = null;
             SynchTime = new Dictionary<string, DateTime>();
             OpenTime = new Dictionary<string, DateTime>();
             FamiliesToWatch = new Dictionary<string, FamilyItem>();

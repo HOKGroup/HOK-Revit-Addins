@@ -8,6 +8,7 @@ using Autodesk.Revit.DB.Events;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.FamilyPublish.Utilities;
 using Visibility = System.Windows.Visibility;
 
 namespace HOK.MissionControl.FamilyPublish
@@ -55,11 +56,7 @@ namespace HOK.MissionControl.FamilyPublish
                     return Result.Failed;
                 }
 
-                //TODO: There is a utility method that could be used here instead.
-                var centralPath = doc.PathName.StartsWith("BIM 360://")
-                    ? doc.PathName
-                    : BasicFileInfo.Extract(doc.PathName).CentralPath;
-
+                var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 if (string.IsNullOrEmpty(centralPath))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Could not get Central Path.");
@@ -75,7 +72,9 @@ namespace HOK.MissionControl.FamilyPublish
                     return Result.Failed;
                 }
 
-                if (!MissionControlSetup.Projects.ContainsKey(centralPath) || !MissionControlSetup.Configurations.ContainsKey(centralPath))
+                if (!MissionControlSetup.Projects.ContainsKey(centralPath) || 
+                    !MissionControlSetup.Configurations.ContainsKey(centralPath) || 
+                    !MissionControlSetup.FamilyData.ContainsKey(centralPath))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "No Config Found.");
                     var dialog = new FamilyMonitorView
@@ -88,26 +87,14 @@ namespace HOK.MissionControl.FamilyPublish
                     dialog.ShowDialog();
 
                     return Result.Failed;
-                }
 
-                if (!MissionControlSetup.HealthRecordIds.ContainsKey(centralPath))
-                {
-                    Log.AppendLog(LogMessageType.ERROR, "Health Record Id not found.");
-                    var dialog = new FamilyMonitorView
-                    {
-                        DataContext =
-                            new FamilyMonitorViewModel(null,
-                                "...find the Health Monitor data for this project. Please make sure that Health Monitor is turned on."),
-                        CancelButton = { Visibility = Visibility.Collapsed }
-                    };
-                    dialog.ShowDialog();
-
-                    return Result.Failed;
+                    //TODO: Disable the button?
+                    //TODO: You would have to press the button to disable the button? Mhmmm weird. 
                 }
 
                 uiApp.Application.FailuresProcessing += FailureProcessing;
-                var recordId = MissionControlSetup.HealthRecordIds[centralPath];
-                var model = new FamilyMonitorModel(doc, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], recordId, centralPath);
+                var familiesId = MissionControlSetup.FamilyData[centralPath].Id;
+                var model = new FamilyMonitorModel(doc, MissionControlSetup.Configurations[centralPath], MissionControlSetup.Projects[centralPath], familiesId, centralPath);
                 var viewModel = new FamilyMonitorViewModel(model, "...make this any faster. Hang in there!")
                 {
                     ExecuteFamilyPublish = true

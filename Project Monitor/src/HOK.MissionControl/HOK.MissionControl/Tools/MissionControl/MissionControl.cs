@@ -1,8 +1,11 @@
 ﻿#region References
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Autodesk.Revit.DB;
+using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Configurations;
@@ -15,6 +18,7 @@ using HOK.MissionControl.Core.Schemas.Views;
 using HOK.MissionControl.Core.Schemas.Worksets;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator;
+using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Utils;
@@ -60,7 +64,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                 // (Konrad) Register Updaters that are in the config file.
                 ApplyConfiguration(doc);
 
-                Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Success. Message: Mission Control check in succeeded.");
+                Log.AppendLog(LogMessageType.INFO, "Mission Control check in succeeded.");
             }
             catch (Exception ex)
             {
@@ -198,18 +202,23 @@ namespace HOK.MissionControl.Tools.MissionControl
                         if (ServerUtilities.Post(new SheetData { CentralPath = centralPath.ToLower() }, "sheets", out sData))
                         {
                             ServerUtilities.Put(new { id = sData.Id }, "projects/" + project.Id + "/addsheet");
-                            AppCommand.SheetsData = sData;
-                            if (MissionControlSetup.SheetsIds.ContainsKey(centralPath))
-                                MissionControlSetup.SheetsIds.Remove(centralPath);
-                            MissionControlSetup.SheetsIds.Add(centralPath, sData.Id); // store sheets record
+
+                            if (MissionControlSetup.SheetsData.ContainsKey(centralPath))
+                                MissionControlSetup.SheetsData.Remove(centralPath);
+                            MissionControlSetup.SheetsData.Add(centralPath, sData); // store sheets record
                         }
                     }
                     if (sData != null)
                     {
-                        AppCommand.SheetsData = sData;
-                        if (MissionControlSetup.SheetsIds.ContainsKey(centralPath))
-                            MissionControlSetup.SheetsIds.Remove(centralPath);
-                        MissionControlSetup.SheetsIds.Add(centralPath, sData.Id); // store sheets record
+                        if (MissionControlSetup.SheetsData.ContainsKey(centralPath))
+                            MissionControlSetup.SheetsData.Remove(centralPath);
+                        MissionControlSetup.SheetsData.Add(centralPath, sData); // store sheets record
+
+                        Messenger.Default.Send(new CommunicatorDataDownloaded
+                        {
+                            CentralPath = centralPath,
+                            Type = DataType.Sheets
+                        });
 
                         new Thread(() => new SheetTracker.SheetTracker().SynchSheets(doc))
                         {
@@ -219,7 +228,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                     }
                     break;
                 case ActionType.Synch:
-                    if (MissionControlSetup.SheetsIds.ContainsKey(centralPath))
+                    if (MissionControlSetup.SheetsData.ContainsKey(centralPath))
                     {
                         new Thread(() => new SheetTracker.SheetTracker().SynchSheets(doc))
                         {
@@ -239,16 +248,26 @@ namespace HOK.MissionControl.Tools.MissionControl
         private static void ProcessViews(Document doc, string centralPath)
         {
             var project = MissionControlSetup.Projects[centralPath];
-            if (!ServerUtilities.GetByCentralPath(centralPath, "views/centralpath", out ViewsData vData))
+            var data = new DataRangeRequest(centralPath.ToLower());
+            if (!ServerUtilities.Post(data, "views/viewstats", out List<ViewsData> vData))
             {
-                if (ServerUtilities.Post(new WorksetData { CentralPath = centralPath.ToLower() }, "views", out vData))
+                if (ServerUtilities.Post(new ViewsData { CentralPath = centralPath.ToLower() }, "views", out vData))
                 {
-                    ServerUtilities.Put(new { id = vData.Id }, "projects/" + project.Id + "/addview");
+                    ServerUtilities.Put(new { id = vData.First().Id }, "projects/" + project.Id + "/addview");
                 }
+                if (MissionControlSetup.ViewsData.ContainsKey(centralPath))
+                    MissionControlSetup.ViewsData.Remove(centralPath);
+                MissionControlSetup.ViewsData.Add(centralPath, vData.First()); // store views record
             }
             if (vData != null)
             {
-                new Thread(() => new ViewMonitor().PublishData(doc, vData.Id))
+                if (MissionControlSetup.ViewsData.ContainsKey(centralPath))
+                    MissionControlSetup.ViewsData.Remove(centralPath);
+                MissionControlSetup.ViewsData.Add(centralPath, vData.First()); // store views record
+
+                Messenger.Default.Send(new HealthReportSummaryAdded { Data = vData.First(), Type = SummaryType.Views });
+
+                new Thread(() => new ViewMonitor().PublishData(doc, vData.First().Id))
                 {
                     Priority = ThreadPriority.BelowNormal,
                     IsBackground = true
@@ -262,32 +281,35 @@ namespace HOK.MissionControl.Tools.MissionControl
         public static void ProcessWorksets(ActionType action, Document doc, string centralPath)
         {
             var project = MissionControlSetup.Projects[centralPath];
+            var data = new DataRangeRequest(centralPath.ToLower());
             switch (action)
             {
                 case ActionType.CheckIn:
-                    if (!ServerUtilities.GetByCentralPath(centralPath, "worksets/centralpath", out WorksetData wData))
+                    if (!ServerUtilities.Post(data, "worksets/worksetstats", out List<WorksetData> wData))
                     {
                         if (ServerUtilities.Post(new WorksetData { CentralPath = centralPath.ToLower() }, "worksets", out wData))
                         {
-                            ServerUtilities.Put(new { id = wData.Id }, "projects/" + project.Id + "/addworkset");
-                            if (MissionControlSetup.WorksetsIds.ContainsKey(centralPath))
-                                MissionControlSetup.WorksetsIds.Remove(centralPath);
-                            MissionControlSetup.WorksetsIds.Add(centralPath, wData.Id); // store workset record
+                            ServerUtilities.Put(new { id = wData.First().Id }, "projects/" + project.Id + "/addworkset");
+                            if (MissionControlSetup.WorksetsData.ContainsKey(centralPath))
+                                MissionControlSetup.WorksetsData.Remove(centralPath);
+                            MissionControlSetup.WorksetsData.Add(centralPath, wData.First()); // store workset record
                         }
                     }
                     if (wData != null)
                     {
-                        if (MissionControlSetup.WorksetsIds.ContainsKey(centralPath))
-                            MissionControlSetup.WorksetsIds.Remove(centralPath);
-                        MissionControlSetup.WorksetsIds.Add(centralPath, wData.Id); // store workset record
+                        if (MissionControlSetup.WorksetsData.ContainsKey(centralPath))
+                            MissionControlSetup.WorksetsData.Remove(centralPath);
+                        MissionControlSetup.WorksetsData.Add(centralPath, wData.First()); // store workset record
 
-                        new Thread(() => new WorksetItemCount().PublishData(doc, wData.Id))
+                        Messenger.Default.Send(new HealthReportSummaryAdded { Data = wData.First(), Type = SummaryType.Worksets });
+
+                        new Thread(() => new WorksetItemCount().PublishData(doc, wData.First().Id))
                         {
                             Priority = ThreadPriority.BelowNormal,
                             IsBackground = true
                         }.Start();
 
-                        new Thread(() => new WorksetOpenSynch().PublishData(doc, wData.Id, WorksetMonitorState.onopened))
+                        new Thread(() => new WorksetOpenSynch().PublishData(doc, wData.First().Id, WorksetMonitorState.onopened))
                         {
                             Priority = ThreadPriority.BelowNormal,
                             IsBackground = true
@@ -295,9 +317,9 @@ namespace HOK.MissionControl.Tools.MissionControl
                     }
                     break;
                 case ActionType.Synch:
-                    if (MissionControlSetup.WorksetsIds.ContainsKey(centralPath))
+                    if (MissionControlSetup.WorksetsData.ContainsKey(centralPath))
                     {
-                        var worksetsId = MissionControlSetup.WorksetsIds[centralPath];
+                        var worksetsId = MissionControlSetup.WorksetsData[centralPath].Id;
                         new Thread(() => new WorksetOpenSynch().PublishData(doc, worksetsId, WorksetMonitorState.onsynched))
                         {
                             Priority = ThreadPriority.BelowNormal,
@@ -324,16 +346,20 @@ namespace HOK.MissionControl.Tools.MissionControl
                 if (ServerUtilities.Post(new FamilyData { CentralPath = centralPath.ToLower() }, "families", out fData))
                 {
                     ServerUtilities.Put(new { id = fData.Id }, "projects/" + project.Id + "/addfamilies");
-                    if (MissionControlSetup.FamiliesIds.ContainsKey(centralPath))
-                        MissionControlSetup.FamiliesIds.Remove(centralPath);
-                    MissionControlSetup.FamiliesIds.Add(centralPath, fData.Id); // store families record
+
+                    if (MissionControlSetup.FamilyData.ContainsKey(centralPath))
+                        MissionControlSetup.FamilyData.Remove(centralPath);
+                    MissionControlSetup.FamilyData.Add(centralPath, fData); // store families record
                 }
             }
             else
             {
-                if (MissionControlSetup.FamiliesIds.ContainsKey(centralPath))
-                    MissionControlSetup.FamiliesIds.Remove(centralPath);
-                MissionControlSetup.FamiliesIds.Add(centralPath, fData.Id); // store families record
+                if (MissionControlSetup.FamilyData.ContainsKey(centralPath))
+                    MissionControlSetup.FamilyData.Remove(centralPath);
+                MissionControlSetup.FamilyData.Add(centralPath, fData); // store families record
+
+                Messenger.Default.Send(new HealthReportSummaryAdded { Data = fData, Type = SummaryType.Families });
+                Messenger.Default.Send(new CommunicatorDataDownloaded { CentralPath = centralPath, Type = DataType.Families });
             }
         }
 
@@ -343,16 +369,27 @@ namespace HOK.MissionControl.Tools.MissionControl
         private static void ProcessStyle(Document doc, string centralPath)
         {
             var project = MissionControlSetup.Projects[centralPath];
-            if (!ServerUtilities.GetByCentralPath(centralPath, "styles/centralpath", out StylesData sData))
+            var data = new DataRangeRequest(centralPath.ToLower());
+            if (!ServerUtilities.Post(data, "styles/stylestats", out List<StylesData> sData))
             {
                 if (ServerUtilities.Post(new StylesData { CentralPath = centralPath.ToLower() }, "styles", out sData))
                 {
-                    ServerUtilities.Put(new { id = sData.Id }, "projects/" + project.Id + "/addstyle");
+                    ServerUtilities.Put(new { id = sData.First().Id }, "projects/" + project.Id + "/addstyle");
+
+                    if (MissionControlSetup.StylesData.ContainsKey(centralPath))
+                        MissionControlSetup.StylesData.Remove(centralPath);
+                    MissionControlSetup.StylesData.Add(centralPath, sData.First()); // store styles record
                 }
             }
             if (sData != null)
             {
-                new Thread(() => new StylesMonitor().PublishData(doc, sData.Id))
+                if (MissionControlSetup.StylesData.ContainsKey(centralPath))
+                    MissionControlSetup.StylesData.Remove(centralPath);
+                MissionControlSetup.StylesData.Add(centralPath, sData.First()); // store styles record
+
+                Messenger.Default.Send(new HealthReportSummaryAdded { Data = sData.First(), Type = SummaryType.Styles });
+
+                new Thread(() => new StylesMonitor().PublishData(doc, sData.First().Id))
                 {
                     Priority = ThreadPriority.BelowNormal,
                     IsBackground = true
@@ -366,16 +403,27 @@ namespace HOK.MissionControl.Tools.MissionControl
         private static void ProcessLinks(Document doc, string centralPath)
         {
             var project = MissionControlSetup.Projects[centralPath];
-            if (!ServerUtilities.GetByCentralPath(centralPath, "links/centralpath", out LinkData lData))
+            var data = new DataRangeRequest(centralPath.ToLower());
+            if (!ServerUtilities.Post(data, "links/linkstats", out List<LinkData> lData))
             {
                 if (ServerUtilities.Post(new LinkData { CentralPath = centralPath.ToLower() }, "links", out lData))
                 {
-                    ServerUtilities.Put(new { id = lData.Id }, "projects/" + project.Id + "/addlink");
+                    ServerUtilities.Put(new { id = lData.First().Id }, "projects/" + project.Id + "/addlink");
+
+                    if (MissionControlSetup.LinksData.ContainsKey(centralPath))
+                        MissionControlSetup.LinksData.Remove(centralPath);
+                    MissionControlSetup.LinksData.Add(centralPath, lData.First()); // store links record
                 }
             }
             if (lData != null)
             {
-                new Thread(() => new LinkMonitor().PublishData(doc, lData.Id))
+                if (MissionControlSetup.LinksData.ContainsKey(centralPath))
+                    MissionControlSetup.LinksData.Remove(centralPath);
+                MissionControlSetup.LinksData.Add(centralPath, lData.First()); // store links record
+
+                Messenger.Default.Send(new HealthReportSummaryAdded { Data = lData.First(), Type = SummaryType.Links });
+
+                new Thread(() => new LinkMonitor().PublishData(doc, lData.First().Id))
                 {
                     Priority = ThreadPriority.BelowNormal,
                     IsBackground = true
@@ -389,26 +437,30 @@ namespace HOK.MissionControl.Tools.MissionControl
         public static void ProcessModels(ActionType action, Document doc, string centralPath)
         {
             var project = MissionControlSetup.Projects[centralPath];
+            var data = new DataRangeRequest(centralPath.ToLower());
             switch (action)
             {
                 case ActionType.CheckIn:
-                    if (!ServerUtilities.GetByCentralPath(centralPath, "models/centralpath", out ModelData mData))
+                    if (!ServerUtilities.Post(data, "models/modelstats", out List<ModelData> mData))
                     {
                         if (ServerUtilities.Post(new ModelData { CentralPath = centralPath.ToLower() }, "models", out mData))
                         {
-                            ServerUtilities.Put(new { id = mData.Id }, "projects/" + project.Id + "/addmodel");
-                            if (MissionControlSetup.ModelsIds.ContainsKey(centralPath))
-                                MissionControlSetup.ModelsIds.Remove(centralPath);
-                            MissionControlSetup.ModelsIds.Add(centralPath, mData.Id); // store model record
+                            ServerUtilities.Put(new { id = mData.First().Id }, "projects/" + project.Id + "/addmodel");
+
+                            if (MissionControlSetup.ModelsData.ContainsKey(centralPath))
+                                MissionControlSetup.ModelsData.Remove(centralPath);
+                            MissionControlSetup.ModelsData.Add(centralPath, mData.First()); // store model record
                         }
                     }
                     if (mData != null)
                     {
-                        if (MissionControlSetup.ModelsIds.ContainsKey(centralPath))
-                            MissionControlSetup.ModelsIds.Remove(centralPath);
-                        MissionControlSetup.ModelsIds.Add(centralPath, mData.Id); // store model record
+                        if (MissionControlSetup.ModelsData.ContainsKey(centralPath))
+                            MissionControlSetup.ModelsData.Remove(centralPath);
+                        MissionControlSetup.ModelsData.Add(centralPath, mData.First()); // store model record
 
-                        new Thread(() => new ModelMonitor().PublishModelSize(doc, centralPath, mData.Id, doc.Application.VersionNumber))
+                        Messenger.Default.Send(new HealthReportSummaryAdded { Data = mData.First(), Type = SummaryType.Models });
+
+                        new Thread(() => new ModelMonitor().PublishModelSize(doc, centralPath, mData.First().Id, doc.Application.VersionNumber))
                         {
                             Priority = ThreadPriority.BelowNormal,
                             IsBackground = true
@@ -416,7 +468,7 @@ namespace HOK.MissionControl.Tools.MissionControl
 
                         if (AppCommand.OpenTime.ContainsKey("from"))
                         {
-                            new Thread(() => new ModelMonitor().PublishOpenTime(mData.Id))
+                            new Thread(() => new ModelMonitor().PublishOpenTime(mData.First().Id))
                             {
                                 Priority = ThreadPriority.BelowNormal,
                                 IsBackground = true
@@ -425,9 +477,9 @@ namespace HOK.MissionControl.Tools.MissionControl
                     }
                     break;
                 case ActionType.Synch:
-                    if (MissionControlSetup.ModelsIds.ContainsKey(centralPath))
+                    if (MissionControlSetup.ModelsData.ContainsKey(centralPath))
                     {
-                        var modelsId = MissionControlSetup.ModelsIds[centralPath];
+                        var modelsId = MissionControlSetup.ModelsData[centralPath].Id;
                         if (AppCommand.SynchTime.ContainsKey("from"))
                         {
                             new Thread(() => new ModelMonitor().PublishSynchTime(modelsId))
