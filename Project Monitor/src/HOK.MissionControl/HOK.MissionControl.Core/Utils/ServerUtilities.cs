@@ -6,19 +6,9 @@ using System.Threading.Tasks;
 using RestSharp;
 using Newtonsoft.Json;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
 
 namespace HOK.MissionControl.Core.Utils
 {
-    /// <summary>
-    /// Different states of the Revit model.
-    /// </summary>
-    public enum WorksetMonitorState
-    {
-        onopened,
-        onsynched
-    }
-
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
@@ -147,118 +137,9 @@ namespace HOK.MissionControl.Core.Utils
             return response.Data;
         }
 
-        /// <summary>
-        /// Retrieves a Collection from MongoDB.
-        /// </summary>
-        /// <typeparam name="T">Type of response class.</typeparam>
-        /// <param name="responseType">Response object type.</param>
-        /// <param name="route">Route to post request to.</param>
-        /// <returns></returns>
-        [Obsolete]
-        public static List<T> FindAll<T>(T responseType, string route) where T : new()
-        {
-            var items = new List<T>();
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/" + route, Method.GET);
-                var response = client.Execute<List<T>>(request);
-                if (response.Data != null)
-                {
-                    items = response.Data;
-
-                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return items;
-        }
-
-        /// <summary>
-        /// Retrieves a Collection from MongoDB.
-        /// </summary>
-        /// <typeparam name="T">Type of response class.</typeparam>
-        /// <param name="route">Route to post request to.</param>
-        /// <returns></returns>
-        public static T FindOne<T>(string route) where T : new()
-        {
-            var items = default(T);
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/" + route, Method.GET);
-                var response = client.Execute<T>(request);
-                if (response.Data != null)
-                {
-                    items = response.Data;
-
-                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return items;
-        }
-
         #endregion
 
         #region POST
-
-        ///// <summary>
-        ///// Posts Trigger Records to MongoDB. Trigger records are created when users override DTM Tools.
-        ///// </summary>
-        ///// <param name="record">Record to post.</param>
-        //public static HttpStatusCode PostTriggerRecords(TriggerRecordItem record)
-        //{
-        //    var status = HttpStatusCode.Unused;
-        //    try
-        //    {
-        //        var client = new RestClient(RestApiBaseUrl);
-        //        var request =
-        //            new RestRequest(ApiVersion + "/triggerrecords", Method.POST) { RequestFormat = DataFormat.Json };
-        //        request.AddBody(record);
-
-        //        var response = client.Execute<TriggerRecordItem>(request);
-        //        status = response.StatusCode;
-
-        //        Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-triggerrecords");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-        //    }
-        //    return status;
-        //}
-
-        ///// <summary>
-        ///// PUTs created Health Record Id into Project's healthrecords array.
-        ///// </summary>
-        ///// <param name="project">Project class.</param>
-        ///// <param name="id"></param>
-        //public static void AddHealthRecordToProject(Project project, string id)
-        //{
-        //    try
-        //    {
-        //        var client = new RestClient(RestApiBaseUrl);
-        //        var request = new RestRequest(
-        //            ApiVersion + "/projects/" + project.Id + "/addhealthrecord/" + id, Method.PUT)
-        //        {
-        //            RequestFormat = DataFormat.Json
-        //        };
-        //        request.AddBody(project);
-        //        var response = client.Execute(request);
-        //        Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-addhealthrecord");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-        //    }
-        //}
 
         /// <summary>
         /// PUTs body
@@ -390,9 +271,9 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="clientPath">Base URL to the Revit Server.</param>
         /// <param name="requestPath">Request string.</param>
         /// <returns>File size in bytes.</returns>
-        public static int GetFileInfoFromRevitServer(string clientPath, string requestPath)
+        public static T GetFileInfoFromRevitServer<T>(string clientPath, string requestPath) where T : new()
         {
-            var size = 0;
+            var result = default(T);
             try
             {
                 var client = new RestClient(clientPath);
@@ -401,19 +282,28 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddHeader("User-Machine-Name", Environment.UserName + "PC");
                 request.AddHeader("Operation-GUID", Guid.NewGuid().ToString());
 
-                var response = client.Execute<RsFileInfo>(request);
+                var response = client.Execute<T>(request);
                 if (response.Data != null)
                 {
-                    size = response.Data.ModelSize;
+                    return response.Data;
                 }
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return size;
+            return result;
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Different states of the Revit model.
+    /// </summary>
+    public enum WorksetMonitorState
+    {
+        onopened,
+        onsynched
     }
 }

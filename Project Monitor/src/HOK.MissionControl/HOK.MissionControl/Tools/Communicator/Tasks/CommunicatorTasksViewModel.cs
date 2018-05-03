@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -15,6 +16,7 @@ using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Utils;
+#endregion
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {
@@ -48,34 +50,6 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             Messenger.Default.Register<SheetsTaskDeletedMessage>(this, OnSheetsTaskDeleted);
             Messenger.Default.Register<SheetTaskSheetsCreatedMessage>(this, OnSheetTaskSheetsCreated);
             Messenger.Default.Register<SheetTaskSheetDeletedMessage>(this, OnSheetTaskSheetDeleted);
-        }
-
-        private void OnCommunicatorDataDownloaded(CommunicatorDataDownloaded obj)
-        {
-            List<TaskWrapper> tasks;
-            switch (obj.Type)
-            {
-                case DataType.Sheets:
-                    Model.SheetsData = MissionControlSetup.SheetsData[obj.CentralPath];
-                    tasks = Model.ProcessSheetsData();
-                    break;
-                case DataType.Families:
-                    Model.FamiliesData = MissionControlSetup.FamilyData[obj.CentralPath];
-                    tasks = Model.ProcessFamiliesData();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            if (tasks == null) return;
-
-            lock (_lock)
-            {
-                foreach (var task in tasks)
-                {
-                    Tasks.Add(task);
-                }
-            }
         }
 
         private void OnWindowLoaded(UserControl win)
@@ -116,6 +90,38 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         }
 
         #region Message Handlers
+
+        /// <summary>
+        /// Handles a message emitted when stats are done downloading.
+        /// </summary>
+        /// <param name="obj"></param>
+        private void OnCommunicatorDataDownloaded(CommunicatorDataDownloaded obj)
+        {
+            List<TaskWrapper> tasks;
+            switch (obj.Type)
+            {
+                case DataType.Sheets:
+                    Model.SheetsData = MissionControlSetup.SheetsData[obj.CentralPath];
+                    tasks = Model.ProcessSheetsData();
+                    break;
+                case DataType.Families:
+                    Model.FamiliesData = MissionControlSetup.FamilyData[obj.CentralPath];
+                    tasks = Model.ProcessFamiliesData();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            if (tasks == null) return;
+
+            lock (_lock)
+            {
+                foreach (var task in tasks)
+                {
+                    Tasks.Add(task);
+                }
+            }
+        }
 
         /// <summary>
         /// Handles a message emmited by Closing a Family Task.

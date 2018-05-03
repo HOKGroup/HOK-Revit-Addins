@@ -73,7 +73,7 @@ namespace HOK.MissionControl.Core.Schemas.Styles
             Name = dt.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString();
 #if RELEASE2016 || RELEASE2015
 // (Konrad) Revit 2016 API doesn't have that info exposed.
-            usesProjectUnits = false;
+            UsesProjectUnits = false;
 #else
             UsesProjectUnits = dt.GetUnitsFormatOptions().UseDefault;
 #endif

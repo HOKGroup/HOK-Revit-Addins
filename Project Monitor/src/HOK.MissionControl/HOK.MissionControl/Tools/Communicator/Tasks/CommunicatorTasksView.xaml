@@ -6,7 +6,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
              xmlns:tasks="clr-namespace:HOK.MissionControl.Tools.Communicator.Tasks"
-             xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
@@ -84,27 +83,21 @@
                 <DataGridTemplateColumn Width="20">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <DockPanel Height="20" HorizontalAlignment="Stretch">
-                                <Image Width="12" Height="12" DockPanel.Dock="Left" Source="{Binding Task, Converter={StaticResource TypeToResource}}">
-                                    <!--<Image.Style>
-                                        <Style TargetType="{x:Type Image}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Task.completedBy, Converter={StaticResource StringToBoolConverter}, diag:PresentationTraceSources.TraceLevel=High}" Value="True">
-                                                    <Setter Property="Source" Value="../../../Resources/taskComplete_24x24.png"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Task.completedBy, Converter={StaticResource StringToBoolConverter}}" Value="False">
-                                                    <Setter Property="Source" Value="../../../Resources/taskIncomplete_24x24.png"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Image.Style>-->
-                                </Image>
-                                <Rectangle Fill="LightGray" Width="1" Height="16" DockPanel.Dock="Right"/>
+                            <DockPanel Height="20" 
+                                       HorizontalAlignment="Stretch">
+                                <Image Width="12" 
+                                       Height="12" 
+                                       DockPanel.Dock="Left" 
+                                       Source="{Binding Task, Converter={StaticResource TypeToResource}}"/>
+                                <Rectangle Fill="LightGray" 
+                                           Width="1" 
+                                           Height="16" 
+                                           DockPanel.Dock="Right"/>
                             </DockPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Binding="{Binding Task.name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                <DataGridTextColumn Binding="{Binding Task.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                     Width="*"
                                     IsReadOnly="True">
                     <DataGridTextColumn.ElementStyle>

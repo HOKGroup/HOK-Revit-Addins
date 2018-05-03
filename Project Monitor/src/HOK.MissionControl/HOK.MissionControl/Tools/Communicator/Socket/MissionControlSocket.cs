@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region References
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -14,6 +15,7 @@ using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Utils;
+#endregion
 
 namespace HOK.MissionControl.Tools.Communicator.Socket
 {
@@ -62,10 +64,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var deletedIds = data["deletedIds"].ToObject<List<string>>();
-                        var familyName = data["familyName"].ToObject<string>();
-                        var collId = data["collectionId"].ToObject<string>();
-                        if (!deletedIds.Any() || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(collId)) return;
+                        var deletedIds = data.Property("deletedIds") != null ? data["deletedIds"].ToObject<List<string>>() : new List<string>();
+                        var familyName = data.Property("familyName") != null ? data["familyName"].ToObject<string>() : string.Empty;
+                        var collId = data.Property("collectionId") != null ? data["collectionId"].ToObject<string>() : string.Empty;
+                        if (!deletedIds.Any() || 
+                            string.IsNullOrEmpty(familyName) || 
+                            string.IsNullOrEmpty(collId)) return;
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
@@ -84,10 +88,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var familyName = data["familyName"].ToObject<string>();
-                        var task = data["task"].ToObject<FamilyTask>();
-                        var collId = data["collectionId"].ToObject<string>();
-                        if (string.IsNullOrEmpty(familyName) || task == null || string.IsNullOrEmpty(collId)) return;
+                        var familyName = data.Property("familyName") != null ? data["familyName"].ToObject<string>() : string.Empty;
+                        var task = data.Property("task") != null ? data["task"].ToObject<FamilyTask>() : null;
+                        var collId = data.Property("collectionId") != null ? data["collectionId"].ToObject<string>() : string.Empty;
+                        if (string.IsNullOrEmpty(familyName) || 
+                            task == null || 
+                            string.IsNullOrEmpty(collId)) return;
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
@@ -107,9 +113,9 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var familyName = data["familyName"].ToObject<string>();
-                        var collId = data["collectionId"].ToObject<string>();
-                        var task = data["task"].ToObject<FamilyTask>();
+                        var familyName = data.Property("familyName") != null ? data["familyName"].ToObject<string>() : string.Empty;
+                        var collId = data.Property("collectionId") != null ? data["collectionId"].ToObject<string>() : string.Empty;
+                        var task = data.Property("task") != null ? data["task"].ToObject<FamilyTask>() : null;
                         if (task == null || string.IsNullOrEmpty(familyName) || string.IsNullOrEmpty(collId)) return;
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
@@ -133,11 +139,14 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var sheetsData = data["body"].ToObject<SheetData>();
-                        var sheetId = data["sheetId"].ToObject<string>();
-                        var taskId = data["taskId"].ToObject<string>();
-                        var collId = data["collectionId"].ToObject<string>();
-                        if (sheetsData == null || string.IsNullOrEmpty(sheetId) || string.IsNullOrEmpty(taskId) || string.IsNullOrEmpty(collId)) return;
+                        var sheetsData = data.Property("body") != null ? data["body"].ToObject<SheetData>() : null;
+                        var sheetId = data.Property("sheetId") != null ? data["sheetId"].ToObject<string>() : string.Empty;
+                        var taskId = data.Property("taskId") != null ? data["taskId"].ToObject<string>() : string.Empty;
+                        var collId = data.Property("collectionId") != null ? data["collectionId"].ToObject<string>() : string.Empty;
+                        if (sheetsData == null || 
+                            string.IsNullOrEmpty(sheetId) || 
+                            string.IsNullOrEmpty(taskId) || 
+                            string.IsNullOrEmpty(collId)) return;
 
                         var sheet = sheetsData.Sheets.FirstOrDefault(x => string.Equals(x.Id, sheetId, StringComparison.Ordinal));
                         var task = sheet?.Tasks.FirstOrDefault(x => string.Equals(x.Id, taskId, StringComparison.Ordinal));
@@ -166,11 +175,14 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var sheetsData = data["body"].ToObject<SheetData>();
-                        var sheetId = data["sheetId"].ToObject<string>();
-                        var taskId = data["taskId"].ToObject<string>();
-                        var collId = data["collectionId"].ToObject<string>();
-                        if (sheetsData == null || string.IsNullOrEmpty(sheetId) || string.IsNullOrEmpty(taskId) || string.IsNullOrEmpty(collId)) return;
+                        var sheetsData = data.Property("body") != null ? data["body"].ToObject<SheetData>() : null;
+                        var sheetId = data.Property("sheetId") != null ? data["sheetId"].ToObject<string>() : string.Empty;
+                        var taskId = data.Property("taskId") != null ? data["taskId"].ToObject<string>() : string.Empty;
+                        var collId = data.Property("collectionId") != null ? data["collectionId"].ToObject<string>() : string.Empty;
+                        if (sheetsData == null || 
+                            string.IsNullOrEmpty(sheetId) || 
+                            string.IsNullOrEmpty(taskId) || 
+                            string.IsNullOrEmpty(collId)) return;
 
                         var sheet = sheetsData.Sheets.FirstOrDefault(x => string.Equals(sheetId, x.Id, StringComparison.Ordinal));
                         var task = sheet?.Tasks.FirstOrDefault(x => string.Equals(x.Id, taskId, StringComparison.Ordinal));
@@ -199,10 +211,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var sheetId = data["sheetId"].ToObject<string>();
-                        var deletedIds = data["deletedIds"].ToObject<List<string>>();
-                        var collId = data["collectionId"].ToObject<string>();
-                        if (string.IsNullOrEmpty(sheetId) || !deletedIds.Any() || string.IsNullOrEmpty(collId)) return;
+                        var sheetId = data.Property("sheetId") != null ? data["sheetId"].ToObject<string>() : string.Empty;
+                        var deletedIds = data.Property("deletedIds") != null ? data["deletedIds"].ToObject<List<string>>() : new List<string>();
+                        var collId = data.Property("collectionId") != null ? data["collectionId"].ToObject<string>() : string.Empty;
+                        if (string.IsNullOrEmpty(sheetId) || 
+                            !deletedIds.Any() || 
+                            string.IsNullOrEmpty(collId)) return;
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
@@ -226,10 +240,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var sheetsData = data["body"].ToObject<SheetData>();
-                        var sheetsIds = data["sheetIds"].ToObject<List<string>>();
-                        var collId = data["collectionId"].ToObject<string>();
-                        if (sheetsData == null || string.IsNullOrEmpty(collId) || !sheetsIds.Any()) return;
+                        var sheetsData = data.Property("body") != null ? data["body"].ToObject<SheetData>() : null;
+                        var sheetsIds = data.Property("sheetIds") != null ? data["sheetIds"].ToObject<List<string>>() : new List<string>();
+                        var collId = data.Property("collectionId") != null ? data["collectionId"].ToObject<string>() : String.Empty;
+                        if (sheetsData == null || 
+                            string.IsNullOrEmpty(collId) || 
+                            !sheetsIds.Any()) return;
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.
@@ -252,10 +268,12 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                     if (body != null)
                     {
                         var data = JObject.FromObject(body);
-                        var sheetId = data["sheetId"].ToObject<string>();
-                        var deletedIds = data["deletedIds"].ToObject<List<string>>();
-                        var collId = data["collectionId"].ToObject<string>();
-                        if (string.IsNullOrEmpty(sheetId) || string.IsNullOrEmpty(collId) || !deletedIds.Any()) return;
+                        var sheetId = data.Property("sheetId") != null ? data["sheetId"].ToObject<string>() : string.Empty;
+                        var deletedIds = data.Property("deletedIds") != null ? data["deletedIds"].ToObject<List<string>>() : new List<string>();
+                        var collId = data.Property("collectionId") != null ? data["collectionId"].ToObject<string>() : string.Empty;
+                        if (string.IsNullOrEmpty(sheetId) || 
+                            string.IsNullOrEmpty(collId) || 
+                            !deletedIds.Any()) return;
 
                         // (Konrad) We want to filter out tasks that don't belong to us or to this model.
                         // We can use "collectionId" to identify the model since that is tied to centralPath.

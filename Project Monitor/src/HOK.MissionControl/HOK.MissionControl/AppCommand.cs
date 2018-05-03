@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
@@ -65,7 +66,6 @@ namespace HOK.MissionControl
 
                 // (Konrad) Create Communicator/WebsiteLink buttons and register dockable panel.
                 CommunicatorUtilities.RegisterCommunicator(application);
-                CommunicatorUtilities.LaunchCommunicator();
 
                 try
                 {
@@ -119,25 +119,29 @@ namespace HOK.MissionControl
             OpenTime["from"] = DateTime.UtcNow;
         }
 
-        private static void OnDocumentCreated(object sender, DocumentCreatedEventArgs e)
+        private static void OnDocumentCreated(object sender, DocumentCreatedEventArgs args)
         {
-            CommunicatorUtilities.SetCommunicatorImage();
+            try
+            {
+                var doc = args.Document;
+                if (doc == null || args.IsCancelled()) return;
+
+                CheckIn(doc);
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
         }
 
         private static void OnDocumentOpened(object source, DocumentOpenedEventArgs args)
         {
             try
             {
-                CommunicatorUtilities.SetCommunicatorImage();
-
                 var doc = args.Document;
                 if (doc == null || args.IsCancelled()) return;
 
-                new Thread(() => new Tools.MissionControl.MissionControl().CheckIn(doc))
-                {
-                    Priority = ThreadPriority.BelowNormal,
-                    IsBackground = true
-                }.Start();
+                CheckIn(doc);
             }
             catch (Exception ex)
             {
@@ -238,6 +242,21 @@ namespace HOK.MissionControl
         }
 
         #region Utilities
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
+        private static void CheckIn(Document doc)
+        {
+            CommunicatorUtilities.SetCommunicatorImage();
+
+            new Thread(() => new Tools.MissionControl.MissionControl().CheckIn(doc))
+            {
+                Priority = ThreadPriority.BelowNormal,
+                IsBackground = true
+            }.Start();
+        }
 
         /// <summary>
         /// Adds action to task list.

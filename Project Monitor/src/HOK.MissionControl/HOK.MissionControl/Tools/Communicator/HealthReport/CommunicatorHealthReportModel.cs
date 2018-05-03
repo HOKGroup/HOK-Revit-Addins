@@ -19,9 +19,9 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
     public class CommunicatorHealthReportModel
     {
         /// <summary>
-        /// 
+        /// Creates graphics for Health Report Summary as they are getting downloaded from internet.
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="obj">Health Report Added Message object.</param>
         /// <returns></returns>
         public HealthReportSummaryViewModel CreateSummary(HealthReportSummaryAdded obj)
         {
@@ -51,9 +51,9 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         }
 
         /// <summary>
-        /// 
+        /// Processes View Stats to create Summary.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Views Data</param>
         /// <returns></returns>
         private static HealthReportSummaryViewModel ProcessViews(ViewsData data)
         {
@@ -102,9 +102,9 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         }
 
         /// <summary>
-        /// 
+        /// Processes Worksets Stats to create Summary.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Worksets Data</param>
         /// <returns></returns>
         private static HealthReportSummaryViewModel ProcessWorksets(WorksetData data)
         {
@@ -146,9 +146,9 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         }
 
         /// <summary>
-        /// 
+        /// Processes Families Stats to create Summary.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Family Data</param>
         /// <returns></returns>
         private static HealthReportSummaryViewModel ProcessFamilies(FamilyData data)
         {
@@ -210,9 +210,9 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         }
 
         /// <summary>
-        /// 
+        /// Processes Styles Stats to create Summary.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Styles Data</param>
         /// <returns></returns>
         private static HealthReportSummaryViewModel ProcessStyles(StylesData data)
         {
@@ -266,9 +266,9 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         }
 
         /// <summary>
-        /// 
+        /// Processes Links Stats to create Summary.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Links Data</param>
         /// <returns></returns>
         private static HealthReportSummaryViewModel ProcessLinks(LinkData data)
         {
@@ -304,9 +304,9 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         }
 
         /// <summary>
-        /// 
+        /// Processes Models Stats to create Summary.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">Models Data</param>
         /// <returns></returns>
         private static HealthReportSummaryViewModel ProcessModels(ModelData data)
         {

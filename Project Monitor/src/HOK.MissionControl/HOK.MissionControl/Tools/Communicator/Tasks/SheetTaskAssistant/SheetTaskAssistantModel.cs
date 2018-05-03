@@ -1,4 +1,5 @@
 ﻿using System;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Utils;
 
@@ -50,12 +51,18 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
                 if (newSheet == null) return;
 
                 wrapper.Element = newSheet;
-                //ServerUtilities.Post<SheetData>(wrapper, "sheets/" + sheetsDataId + "/approvenewsheet");
+                if (!ServerUtilities.Post(wrapper, "sheets/" + sheetsDataId + "/approvenewsheet", out SheetData unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to approve creation of new Sheet.");
+                }
             }
             else
             {
                 t.SheetId = e.Id;
-                //ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/updatetasks");
+                if (!ServerUtilities.Post(t, "sheets/" + sheetsDataId + "/updatetasks", out SheetData unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to approve changes to Sheet.");
+                }
             } 
         }
 

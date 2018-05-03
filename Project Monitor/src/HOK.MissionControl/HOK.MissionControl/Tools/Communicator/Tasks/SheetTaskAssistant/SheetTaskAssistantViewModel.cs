@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿#region References
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -7,6 +8,7 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Tools.Communicator.Messaging;
+#endregion
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region References
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -15,43 +16,10 @@ using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Utils.StatusReporter;
+#endregion
 
 namespace HOK.MissionControl.Tools.Communicator
 {
-    public enum RequestId
-    {
-        None,
-        EditFamily,
-        SubmitFamily,
-        OpenView,
-        UpdateSheet,
-        CreateSheet,
-        ReportStatus,
-        Disable
-    }
-
-    public enum Status
-    {
-        Success,
-        Error,
-        Info
-    }
-
-    public class CommunicatorRequest
-    {
-        private int _request = (int) RequestId.None;
-
-        public RequestId Take()
-        {
-            return (RequestId) Interlocked.Exchange(ref _request, (int) RequestId.None);
-        }
-
-        public void Make(RequestId request)
-        {
-            Interlocked.Exchange(ref _request, (int) request);
-        }
-    }
-
     public class CommunicatorRequestHandler : IExternalEventHandler
     {
         public Status Status { get; set; }
@@ -345,12 +313,11 @@ namespace HOK.MissionControl.Tools.Communicator
         }
 
         /// <summary>
-        /// 
+        /// If Family is marked as Completed it will post the data to MC.
         /// </summary>
         /// <param name="app"></param>
         public void SubmitFamily(UIApplication app)
         {
-            //TODO: Test that this works like its supposed to.
             var doc = app.ActiveUIDocument.Document;
             if (doc == null || doc.IsFamilyDocument) return;
 
@@ -413,5 +380,39 @@ namespace HOK.MissionControl.Tools.Communicator
                 });
             }
         }
+    }
+
+    public class CommunicatorRequest
+    {
+        private int _request = (int)RequestId.None;
+
+        public RequestId Take()
+        {
+            return (RequestId)Interlocked.Exchange(ref _request, (int)RequestId.None);
+        }
+
+        public void Make(RequestId request)
+        {
+            Interlocked.Exchange(ref _request, (int)request);
+        }
+    }
+
+    public enum RequestId
+    {
+        None,
+        EditFamily,
+        SubmitFamily,
+        OpenView,
+        UpdateSheet,
+        CreateSheet,
+        ReportStatus,
+        Disable
+    }
+
+    public enum Status
+    {
+        Success,
+        Error,
+        Info
     }
 }

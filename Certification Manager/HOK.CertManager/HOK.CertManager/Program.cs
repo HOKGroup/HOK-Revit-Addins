@@ -16,12 +16,12 @@ namespace HOK.CertManager
             try
             {
                 X509Certificate2 certificate = new X509Certificate2(@"hokaddin.pfx", "hokaddin", X509KeyStorageFlags.DefaultKeySet);
-                X509Store store = new X509Store(StoreName.TrustedPublisher, StoreLocation.LocalMachine);
+                X509Store store = new X509Store(StoreName.TrustedPublisher, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadWrite);
                 store.Add(certificate);
                 store.Close();
 
-                X509Store rootStore = new X509Store(StoreName.Root, StoreLocation.LocalMachine);
+                X509Store rootStore = new X509Store(StoreName.Root, StoreLocation.CurrentUser);
                 rootStore.Open(OpenFlags.ReadWrite);
                 rootStore.Add(certificate);
                 rootStore.Close();

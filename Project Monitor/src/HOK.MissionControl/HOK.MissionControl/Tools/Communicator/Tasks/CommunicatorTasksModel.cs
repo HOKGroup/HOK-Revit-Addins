@@ -1,15 +1,15 @@
-﻿using System;
+﻿#region References
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Interop;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Sheets;
-using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant;
 using HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant;
+#endregion
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {
@@ -20,9 +20,9 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         public object TaskView { get; set; }
 
         /// <summary>
-        /// 
+        /// Collects all unfinished tasks for Sheets.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of Sheet Tasks.</returns>
         public List<TaskWrapper> ProcessSheetsData()
         {
             if (SheetsData == null) return null;
@@ -45,9 +45,9 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         }
 
         /// <summary>
-        /// 
+        /// Collects all unfinished tasks for Families.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of Family Tasks.</returns>
         public List<TaskWrapper> ProcessFamiliesData()
         {
             if (FamiliesData == null) return null;

@@ -4,6 +4,7 @@ using System.Linq;
 using HOK.MissionControl.Core.Utils;
 using HOK.Core.Utilities;
 using Autodesk.Revit.DB;
+using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Models;
 
 namespace HOK.MissionControl.Tools.HealthReport
@@ -101,7 +102,8 @@ namespace HOK.MissionControl.Tools.HealthReport
                         var requestPath = "RevitServerAdminRestService" + version + "/" + "AdminRestService.svc/" +
                                           subfolder + "/modelinfo";
 
-                        fileSize = ServerUtilities.GetFileInfoFromRevitServer(clientPath, requestPath);
+                        var result = ServerUtilities.GetFileInfoFromRevitServer<RsFileInfo>(clientPath, requestPath);
+                        fileSize = result.ModelSize - result.SupportSize;
                     }
                     else if (filePath.StartsWith("BIM 360://"))
                     {

@@ -49,6 +49,17 @@ namespace HOK.MissionControl.FamilyPublish
                     .Cast<Family>()
                     .ToList();
 
+                var config = MissionControlSetup.Configurations.ContainsKey(CentralPath)
+                    ? MissionControlSetup.Configurations[CentralPath]
+                    : null;
+
+                var familyNameCheck = new List<string> { "HOK_I", "HOK_M" }; //defaults
+                if (config != null)
+                {
+                    familyNameCheck = config.Updaters.First(x => string.Equals(x.UpdaterId,
+                        Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.FamilyNameCheck.Values;
+                }
+
                 //var count = 0;
                 var famOutput = new List<FamilyItem>();
                 StatusBarManager.InitializeProgress("Exporting Family Info:", families.Count);
@@ -143,8 +154,7 @@ namespace HOK.MissionControl.FamilyPublish
                             oversizedFamilies++; // >1MB
                             sizeCheck = true;
                         }
-                        //TODO: This should use the settings from mongoDB
-                        if (!family.Name.Contains("_HOK_I") && !family.Name.Contains("_HOK_M")) nameCheck = true;
+                        if (!familyNameCheck.Any(family.Name.Contains)) nameCheck = true;
 
                         var famItem = new FamilyItem
                         {
