@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region References
+using System;
 using System.Windows.Interop;
 using System.Diagnostics;
 using Autodesk.Revit.Attributes;
@@ -10,6 +11,7 @@ using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.FamilyPublish.Utilities;
 using Visibility = System.Windows.Visibility;
+#endregion
 
 namespace HOK.MissionControl.FamilyPublish
 {
@@ -87,9 +89,6 @@ namespace HOK.MissionControl.FamilyPublish
                     dialog.ShowDialog();
 
                     return Result.Failed;
-
-                    //TODO: Disable the button?
-                    //TODO: You would have to press the button to disable the button? Mhmmm weird. 
                 }
 
                 uiApp.Application.FailuresProcessing += FailureProcessing;

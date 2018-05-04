@@ -30,7 +30,7 @@ namespace HOK.MissionControl.Utils.StatusReporter
 
             var desktopWorkingArea = SystemParameters.WorkArea;
             obj.Left = desktopWorkingArea.Right - obj.Width - 20;
-            obj.Top = desktopWorkingArea.Bottom - obj.Height - 20;
+            obj.Top = desktopWorkingArea.Bottom - obj.Height - 40;
 
             StartTimer();
 

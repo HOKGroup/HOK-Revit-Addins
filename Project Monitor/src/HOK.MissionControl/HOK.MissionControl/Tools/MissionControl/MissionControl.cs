@@ -1,8 +1,6 @@
 ﻿#region References
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using Autodesk.Revit.DB;
 using GalaSoft.MvvmLight.Messaging;
@@ -350,7 +348,7 @@ namespace HOK.MissionControl.Tools.MissionControl
         {
             var project = MissionControlSetup.Projects[centralPath];
             // (Konrad) For families we only need to make sure that we have the collection id. It will be used 
-            // by the Tasks. The actual data gets posted by FamilyPublis Tool.
+            // by the Tasks. The actual data gets posted by FamilyPublish Tool.
             if (!ServerUtilities.GetByCentralPath(centralPath, "families/centralpath", out FamilyData fData))
             {
                 if (ServerUtilities.Post(new FamilyData { CentralPath = centralPath.ToLower() }, "families", out fData))

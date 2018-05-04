@@ -116,6 +116,8 @@ namespace HOK.MissionControl
 
         private static void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
         {
+            if (args.DocumentType != DocumentType.Project) return;
+
             OpenTime["from"] = DateTime.UtcNow;
         }
 
@@ -124,7 +126,7 @@ namespace HOK.MissionControl
             try
             {
                 var doc = args.Document;
-                if (doc == null || args.IsCancelled()) return;
+                if (doc == null || args.IsCancelled() || doc.IsFamilyDocument) return;
 
                 CheckIn(doc);
             }
@@ -139,7 +141,7 @@ namespace HOK.MissionControl
             try
             {
                 var doc = args.Document;
-                if (doc == null || args.IsCancelled()) return;
+                if (doc == null || args.IsCancelled() || doc.IsFamilyDocument) return;
 
                 CheckIn(doc);
             }
@@ -154,7 +156,7 @@ namespace HOK.MissionControl
             try
             {
                 var doc = args.Document;
-                if (!doc.IsWorkshared) return;
+                if (doc == null || args.IsCancelled() || doc.IsFamilyDocument) return;
 
                 Tools.MissionControl.MissionControl.UnregisterUpdaters(doc);
             }

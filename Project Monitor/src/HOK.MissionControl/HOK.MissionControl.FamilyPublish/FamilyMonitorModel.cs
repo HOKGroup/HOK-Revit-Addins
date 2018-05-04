@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region References
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +11,7 @@ using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.FamilyPublish.Properties;
+#endregion
 
 namespace HOK.MissionControl.FamilyPublish
 {
@@ -57,7 +59,7 @@ namespace HOK.MissionControl.FamilyPublish
                 if (config != null)
                 {
                     familyNameCheck = config.Updaters.First(x => string.Equals(x.UpdaterId,
-                        Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.FamilyNameCheck.Values;
+                        Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.FamilyNameCheck.Values;
                 }
 
                 //var count = 0;
