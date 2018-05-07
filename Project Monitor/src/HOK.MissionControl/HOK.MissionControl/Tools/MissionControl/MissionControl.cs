@@ -27,7 +27,7 @@ namespace HOK.MissionControl.Tools.MissionControl
     public class MissionControl
     {
         /// <summary>
-        /// 
+        /// Method to "check into" mission control. It posts all initial data, and stores all needed references.
         /// </summary>
         /// <param name="doc"></param>
         public void CheckIn(Document doc)
@@ -104,9 +104,10 @@ namespace HOK.MissionControl.Tools.MissionControl
                         AppCommand.EnqueueTask(app =>
                         {
                             AppCommand.Instance.DtmUpdaterInstance.Register(doc, updater);
-                            DTMTool.DtmSynchOverrides.CreateReloadLatestOverride(app);
-                            DTMTool.DtmSynchOverrides.CreateSynchToCentralOverride(app);
                         });
+
+                        DTMTool.DtmSynchOverrides.CreateReloadLatestOverride();
+                        DTMTool.DtmSynchOverrides.CreateSynchToCentralOverride();
                     }
                     else if (string.Equals(updater.UpdaterId, Properties.Resources.LinkUnloadTrackerGuid, 
                         StringComparison.OrdinalIgnoreCase))

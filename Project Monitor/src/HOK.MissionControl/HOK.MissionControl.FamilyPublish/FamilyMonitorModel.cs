@@ -75,9 +75,7 @@ namespace HOK.MissionControl.FamilyPublish
                         StatusBarManager.CancelProgress();
                         return;
                     }
-
                     StatusBarManager.StepForward();
-                    if (!family.IsEditable) continue;
 
                     var sizeCheck = false;
                     var instanceCheck = false;
@@ -91,9 +89,15 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                     if (family.IsInPlace) inPlaceFamilies++;
 
+                    long size = 0;
+                    var refPlanes = 0;
+                    var arrays = 0;
+                    var voids = 0;
+                    var nestedFamilies = 0;
+                    var parameters = 0;
+                    var sizeStr = "0Kb";
                     try
                     {
-                        long size;
                         var famDoc = Doc.EditFamily(family);
 
                         var storedPath = famDoc.PathName;
@@ -118,7 +122,7 @@ namespace HOK.MissionControl.FamilyPublish
                             TryToDelete(path);
                         }
 
-                        var refPlanes = new FilteredElementCollector(famDoc)
+                        refPlanes = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(ReferencePlane))
                             .GetElementCount();
 
@@ -128,60 +132,62 @@ namespace HOK.MissionControl.FamilyPublish
                             new ElementClassFilter(typeof(RadialArray))
                         });
 
-                        var arrays = new FilteredElementCollector(famDoc)
+                        arrays = new FilteredElementCollector(famDoc)
                             .WherePasses(filter)
                             .GetElementCount();
 
-                        var voids = new FilteredElementCollector(famDoc)
+                        voids = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(Extrusion))
                             .Cast<Extrusion>()
                             .Count(x => !x.IsSolid);
 
-                        var nestedFamilies = new FilteredElementCollector(famDoc)
+                        nestedFamilies = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(Family))
                             .GetElementCount();
 #if RELEASE2015
                         //(Konrad) Since Revit 2015 API doesn't support this we will just skip it.
-                        const int parameters = 0; 
+                        parameters = 0; 
 #else
-                        var parameters = new FilteredElementCollector(famDoc)
+                        parameters = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(ParameterElement))
                             .GetElementCount();
 #endif
                         famDoc.Close(false);
 
-                        var sizeStr = StringUtilities.BytesToString(size);
+                        sizeStr = StringUtilities.BytesToString(size);
                         if (size > 1000000)
                         {
                             oversizedFamilies++; // >1MB
                             sizeCheck = true;
                         }
-                        if (!familyNameCheck.Any(family.Name.Contains)) nameCheck = true;
-
-                        var famItem = new FamilyItem
-                        {
-                            Name = family.Name,
-                            ElementId = family.Id.IntegerValue,
-                            Size = sizeStr,
-                            SizeValue = size,
-                            Instances = instances,
-                            ArrayCount = arrays,
-                            RefPlaneCount = refPlanes,
-                            VoidCount = voids,
-                            NestedFamilyCount = nestedFamilies,
-                            ParametersCount = parameters,
-                            Tasks = new List<FamilyTask>()
-                        };
-                        
-                        if (nameCheck || sizeCheck || instanceCheck) famItem.IsFailingChecks = true;
-                        else famItem.IsFailingChecks = false;
-
-                        famOutput.Add(famItem);
                     }
                     catch (Exception ex)
                     {
                         Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                        Log.AppendLog(LogMessageType.ERROR, "Failed to retrieve size, refPlanes, arrays, voids...");
                     }
+
+                    if (!familyNameCheck.Any(family.Name.Contains)) nameCheck = true;
+
+                    var famItem = new FamilyItem
+                    {
+                        Name = family.Name,
+                        ElementId = family.Id.IntegerValue,
+                        Size = sizeStr,
+                        SizeValue = size,
+                        Instances = instances,
+                        ArrayCount = arrays,
+                        RefPlaneCount = refPlanes,
+                        VoidCount = voids,
+                        NestedFamilyCount = nestedFamilies,
+                        ParametersCount = parameters,
+                        Tasks = new List<FamilyTask>()
+                    };
+
+                    if (nameCheck || sizeCheck || instanceCheck) famItem.IsFailingChecks = true;
+                    else famItem.IsFailingChecks = false;
+
+                    famOutput.Add(famItem);
                 }
 
                 if (!ServerUtilities.GetByCentralPath(CentralPath, "families/centralpath", out FamilyData famStat))

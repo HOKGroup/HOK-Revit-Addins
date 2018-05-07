@@ -1,10 +1,12 @@
-﻿using System;
+﻿#region References
+using System;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
+#endregion
 
 namespace HOK.MissionControl.Tools.DTMTool
 {
@@ -13,21 +15,23 @@ namespace HOK.MissionControl.Tools.DTMTool
         /// <summary>
         /// Creates an idling task that will bind our own Reload Latest command to existing one.
         /// </summary>
-        /// <param name="app"></param>
-        public static void CreateReloadLatestOverride(UIApplication app)
+        public static void CreateReloadLatestOverride()
         {
-            try
+            AppCommand.EnqueueTask(app =>
             {
-                var commandId = RevitCommandId.LookupCommandId("ID_WORKSETS_RELOAD_LATEST");
-                if (commandId == null || !commandId.CanHaveBinding) return;
+                try
+                {
+                    var commandId = RevitCommandId.LookupCommandId("ID_WORKSETS_RELOAD_LATEST");
+                    if (commandId == null || !commandId.CanHaveBinding) return;
 
-                var binding = app.CreateAddInCommandBinding(commandId);
-                binding.Executed += OnReloadLatest;
-            }
-            catch (Exception e)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-            }
+                    var binding = app.CreateAddInCommandBinding(commandId);
+                    binding.Executed += OnReloadLatest;
+                }
+                catch (Exception e)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                }
+            });
         }
 
         /// <summary>
@@ -60,8 +64,6 @@ namespace HOK.MissionControl.Tools.DTMTool
             });
 
             // (Konrad) Turns the DTM Tool back on when reload is done.
-            // We put it into the queue because that ensures it gets run
-            // after the previous task. It's not about context.
             AppCommand.EnqueueTask(app =>
             {
                 AppCommand.IsSynching = false;
@@ -71,34 +73,36 @@ namespace HOK.MissionControl.Tools.DTMTool
         /// <summary>
         /// Creates and idling task that will bind our own Synch to Central command to existing one.
         /// </summary>
-        /// <param name="app"></param>
-        public static void CreateSynchToCentralOverride(UIApplication app)
+        public static void CreateSynchToCentralOverride()
         {
-            try
+            AppCommand.EnqueueTask(app =>
             {
-                var commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER");
-                var commandId2 = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER_SHORTCUT");
-                if (commandId == null || commandId2 == null || !commandId2.CanHaveBinding || !commandId.CanHaveBinding) return;
+                try
+                {
+                    var commandId = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER");
+                    var commandId2 = RevitCommandId.LookupCommandId("ID_FILE_SAVE_TO_MASTER_SHORTCUT");
+                    if (commandId == null || commandId2 == null || !commandId2.CanHaveBinding || !commandId.CanHaveBinding) return;
 
-                // (Konrad) We shouldn't be registering the same event handler more than once. It will throw an exception if we do.
-                // It would also potentially cause the event to be fired multiple times. 
-                if (!AppCommand.IsSynchOverriden)
-                {
-                    var binding = app.CreateAddInCommandBinding(commandId);
-                    binding.Executed += (sender, e) => OnSynchToCentral(sender, e, SynchType.Synch);
-                    AppCommand.IsSynchOverriden = true;
+                    // (Konrad) We shouldn't be registering the same event handler more than once. It will throw an exception if we do.
+                    // It would also potentially cause the event to be fired multiple times. 
+                    if (!AppCommand.IsSynchOverriden)
+                    {
+                        var binding = app.CreateAddInCommandBinding(commandId);
+                        binding.Executed += (sender, e) => OnSynchToCentral(sender, e, SynchType.Synch);
+                        AppCommand.IsSynchOverriden = true;
+                    }
+                    if (!AppCommand.IsSynchNowOverriden)
+                    {
+                        var binding2 = app.CreateAddInCommandBinding(commandId2);
+                        binding2.Executed += (sender, e) => OnSynchToCentral(sender, e, SynchType.SynchNow);
+                        AppCommand.IsSynchNowOverriden = true;
+                    }
                 }
-                if (!AppCommand.IsSynchNowOverriden)
+                catch (Exception e)
                 {
-                    var binding2 = app.CreateAddInCommandBinding(commandId2);
-                    binding2.Executed += (sender, e) => OnSynchToCentral(sender, e, SynchType.SynchNow);
-                    AppCommand.IsSynchNowOverriden = true;
+                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
                 }
-            }
-            catch (Exception e)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-            }
+            });
         }
 
         /// <summary>
@@ -166,10 +170,10 @@ namespace HOK.MissionControl.Tools.DTMTool
                 {
                     if (!updater.IsUpdaterOn) continue;
 
-                    if (string.Equals(updater.UpdaterId,
-                        AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(), StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(updater.UpdaterId.ToLower(),
+                        AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString().ToLower(), StringComparison.Ordinal))
                     {
-                        CreateSynchToCentralOverride(app);
+                        CreateSynchToCentralOverride();
                     }
                 }
             });
