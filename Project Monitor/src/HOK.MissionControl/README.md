@@ -7,6 +7,18 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.1.00
+
+* Major data base refactor. 
+* All database calls were moved to be on background threads. This allows us to open the model without waiting for DB to accept all of our requests. It also moves all data posting to DocumentOpened and DocumentSynched events rather then on DocumentClosing. 
+* Implemented additional user overrides for family names and styles. 
+* Implemented a method for closing all tasks windows when Revit document is closed. 
+* Implemented a method for closing Socket channel when Revit document is closed so that we don't subscribe to it multipe times.
+* MC buttons on Revit ribbon will be now disabled unless there was a successful connection to MC. 
+* Data can now be posted to MC right away. There is no need to restart Revit anymore (that still needs to be addressed for tasks).
+* Bug fixes to Family publish where data about in place families was not published. 
+* Many more....
+
 ###### Release 2018.0.0.20
 
 * Fixed a bug in how Model Size was being obtained so that BIM 360 files are also covered here. It uses cached file size which is not always 100% accurate but it's good for monitoring changes.  
