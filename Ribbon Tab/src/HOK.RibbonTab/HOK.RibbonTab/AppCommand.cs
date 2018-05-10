@@ -28,7 +28,7 @@ namespace HOK.RibbonTab
             application.ControlledApplication.DocumentCreating += OnDocumentCreating;
             m_app = application;
             tabName = "   HOK   ";
-
+            
             try
             {
                 m_app.CreateRibbonTab(tabName);
@@ -48,7 +48,7 @@ namespace HOK.RibbonTab
             CreateHOKPushButtons();
             CreateCustomPushButtons();
             //CreateDataPushButtons();
-            CreateAVFPushButtons();
+            CreateAvfPushButtons();
             //CreateMissionControlPushButtons();
 
             return Result.Succeeded;
@@ -396,26 +396,17 @@ namespace HOK.RibbonTab
         /// <summary>
         /// Creates all Analysis related buttons.
         /// </summary>
-        private void CreateAVFPushButtons()
+        private void CreateAvfPushButtons()
         {
             try
             {
-                if (!File.Exists(currentDirectory + "/HOK.AVFManager.dll") &&
-                    !File.Exists(currentDirectory + "/HOK.LPDCalculator.dll") &&
+                if (!File.Exists(currentDirectory + "/HOK.LPDCalculator.dll") &&
                     !File.Exists(currentDirectory + "/HOK.ViewAnalysis.dll")) return;
                 var avfPanel = m_app.CreateRibbonPanel(tabName, "Analysis");
 
                 var splitButtonData = new SplitButtonData("HOKAnalysis", "HOK Analysis");
                 var splitButton = (SplitButton)avfPanel.AddItem(splitButtonData);
                 splitButton.IsSynchronizedWithCurrentItem = true;
-
-                if (File.Exists(currentDirectory + "/HOK.AVFManager.dll"))
-                {
-                    var pb14 = splitButton.AddPushButton(new PushButtonData("AVF", "  AVF  ", currentDirectory + "/HOK.AVFManager.dll", "HOK.AVFManager.Command"));
-                    pb14.LargeImage = LoadBitmapImage(assembly, "chart.ico");
-                    pb14.ToolTip = "Analysis Visualization Framework";
-                    AddToolTips(pb14);
-                }
 
                 if (File.Exists(currentDirectory + "/HOK.LPDCalculator.dll"))
                 {

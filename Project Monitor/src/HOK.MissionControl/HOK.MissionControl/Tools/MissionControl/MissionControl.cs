@@ -157,11 +157,9 @@ namespace HOK.MissionControl.Tools.MissionControl
                 {
                     // (Konrad) in order not to become out of synch with the database we need a way
                     // to communicate live updates from the database to task assistant/communicator
-                    new Thread(() => new MissionControlSocket().Main(doc))
-                    {
-                        Priority = ThreadPriority.BelowNormal,
-                        IsBackground = true
-                    }.Start();
+                    var socket = new MissionControlSocket(doc);
+                    socket.Start();
+                    AppCommand.Socket = socket;
                 }
             }
             catch (Exception ex)

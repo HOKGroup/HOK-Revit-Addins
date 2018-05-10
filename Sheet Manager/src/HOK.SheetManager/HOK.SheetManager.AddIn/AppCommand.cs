@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Utils;
 using HOK.SheetManager.AddIn.Classes;
 using HOK.SheetManager.AddIn.Updaters;
@@ -148,14 +149,15 @@ namespace HOK.SheetManager.AddIn
                 var sheetConfig = new SheetManagerConfiguration(doc);
                 if (doc.IsWorkshared)
                 {
-                    var configFound = ServerUtilities.GetConfigurationByCentralPath(sheetConfig.CentralPath);
+                    if (!ServerUtilities.GetByCentralPath(sheetConfig.CentralPath, "configurations/centralpath",
+                        out Configuration configFound)) return;
                     if (null != configFound)
                     {
-                        foreach (var updater in configFound.updaters)
+                        foreach (var updater in configFound.Updaters)
                         {
-                            if (updater.updaterName != "Sheet Tracker") continue;
+                            if (updater.UpdaterName != "Sheet Tracker") continue;
 
-                            sheetConfig.AutoUpdate = updater.isUpdaterOn;
+                            sheetConfig.AutoUpdate = updater.IsUpdaterOn;
                             sheetConfig.DatabaseFile = configFound.SheetDatabase;
                             break;
                         }

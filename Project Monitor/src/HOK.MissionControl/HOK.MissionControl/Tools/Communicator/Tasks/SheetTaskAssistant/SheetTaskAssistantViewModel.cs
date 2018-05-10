@@ -16,12 +16,13 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
     {
         public string Title { get; set; }
         public SheetTaskAssistantModel Model { get; set; }
+        public TextBlock Control { get; set; }
+        public Window Win { get; set; }
         public RelayCommand OpenView { get; set; }
         public RelayCommand<Window> Close { get; set; }
         public RelayCommand<Window> Approve { get; set; }
-        public RelayCommand<Window> WindowLoaded { get; }
+        public RelayCommand<Window> WindowLoaded { get; set; }
         public RelayCommand<Window> WindowClosed { get; set; }
-        public TextBlock Control { get; set; }
 
         public SheetTaskAssistantViewModel(SheetTaskWrapper wrapper)
         {
@@ -36,7 +37,9 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             WindowLoaded = new RelayCommand<Window>(OnWindowLoaded);
             WindowClosed = new RelayCommand<Window>(OnWindowClosed);
 
+            // (Konrad) Event handlers for when Revit finishes approving a sheet task, or when document is closed.
             Messenger.Default.Register<SheetTaskCompletedMessage>(this, OnSheetTaskCompleted);
+            Messenger.Default.Register<DocumentClosed>(this, OnDocumentClosed);
         }
 
         private void OnWindowClosed(Window win)
@@ -50,6 +53,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
 
         private void OnWindowLoaded(Window win)
         {
+            Win = win;
             HOK.Core.WpfUtilities.StatusBarManager.StatusLabel = Control = ((SheetTaskAssistantView)win).statusLabel;
         }
 
@@ -83,6 +87,15 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         }
 
         #region Message Handlers
+
+        /// <summary>
+        /// Event raised when Revit Document is closed. We need to make sure that task window is also closed.
+        /// </summary>
+        /// <param name="msg">Message object.</param>
+        private void OnDocumentClosed(DocumentClosed msg)
+        {
+            Win?.Close();
+        }
 
         /// <summary>
         /// Event raised when External Command finishes making proposed changes to the sheet.

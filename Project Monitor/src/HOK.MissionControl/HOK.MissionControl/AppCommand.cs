@@ -8,6 +8,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
+using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas.Families;
@@ -15,6 +16,8 @@ using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Tools.Communicator.Messaging;
+using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.MissionControl;
 #endregion
 
@@ -32,6 +35,7 @@ namespace HOK.MissionControl
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
         public static CommunicatorView CommunicatorWindow { get; set; }
+        public static MissionControlSocket Socket { get; set; }
         public static bool IsSynching { get; set; }
         public static bool IsSynchOverriden { get; set; }
         public static bool IsSynchNowOverriden { get; set; }
@@ -158,7 +162,14 @@ namespace HOK.MissionControl
                 var doc = args.Document;
                 if (doc == null || args.IsCancelled() || doc.IsFamilyDocument) return;
 
+                // (Konrad) Cleanup updaters.
                 Tools.MissionControl.MissionControl.UnregisterUpdaters(doc);
+
+                // (Konrad) Disconnect from Sockets.
+                Socket?.Kill();
+
+                // (Konrad) If any task windows are still open, let's shut them down.
+                Messenger.Default.Send(new DocumentClosed { CloseWindow = true });
             }
             catch (Exception ex)
             {

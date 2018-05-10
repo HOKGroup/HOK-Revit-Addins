@@ -246,13 +246,6 @@
     <Resource Include="Windows\Editor\Images\checkbox_yes.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.105.2\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net45\System.Data.SQLite.Core.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.105.2\build\net45\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.105.2\build\net45\System.Data.SQLite.Core.targets'))" />
-  </Target>
   <PropertyGroup>
     <PostBuildEvent>echo Configuration: $(Configuration)
 
@@ -263,26 +256,26 @@ if $(Configuration) == 2018 goto Build2018
 
 :Build2015
 echo Copying results to Build2015
-if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2016
 echo Copying results to Build2016
-if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2017
 echo Copying results to Build2017
-if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2018
 echo Copying results to Build2018
-if not exist "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents" mkdir "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%2525ALLUSERSPROFILE%2525\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>

@@ -82,6 +82,11 @@ namespace HOK.MissionControl.Tools.Communicator
                         DisableCommunicator(app);
                         break;
                     }
+                    case RequestId.GetCentralPath:
+                    {
+                        GetCentralPath(app);
+                        break;
+                    }
                 }
             }
             catch (Exception e)
@@ -89,6 +94,21 @@ namespace HOK.MissionControl.Tools.Communicator
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="app"></param>
+        private static void GetCentralPath(UIApplication app)
+        {
+            var doc = app.ActiveUIDocument.Document;
+            CentralPath = FileInfoUtil.GetCentralFilePath(doc);
+
+            Messenger.Default.Send(new CentralPathObtained
+            {
+                CentralPath = CentralPath
+            });
         }
 
         /// <summary>
@@ -406,7 +426,8 @@ namespace HOK.MissionControl.Tools.Communicator
         UpdateSheet,
         CreateSheet,
         ReportStatus,
-        Disable
+        Disable,
+        GetCentralPath
     }
 
     public enum Status

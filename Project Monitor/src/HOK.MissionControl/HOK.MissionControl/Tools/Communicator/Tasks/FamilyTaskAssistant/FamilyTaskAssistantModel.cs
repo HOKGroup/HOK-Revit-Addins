@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using HOK.Core.Utilities;
+using System.Linq;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.Properties;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
 {
     public class FamilyTaskAssistantModel
     {
+        public string CentralPath { get; set; }
+
         /// <summary>
         /// 
         /// </summary>
@@ -15,13 +19,23 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
         /// <returns></returns>
         public ObservableCollection<CheckWrapper> CollectChecks(FamilyItem family)
         {
+            var config = MissionControlSetup.Configurations.ContainsKey(CentralPath)
+                ? MissionControlSetup.Configurations[CentralPath]
+                : null;
+
+            var familyNameCheck = new List<string> { "HOK_I", "HOK_M" }; //defaults
+            if (config != null)
+            {
+                familyNameCheck = config.Updaters.First(x => string.Equals(x.UpdaterId,
+                    Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.FamilyNameCheck.Values;
+            }
+
             var output = new ObservableCollection<CheckWrapper>
             {
                 new CheckWrapper
                 {
                     CheckName = $"Name: {family.Name}",
-                    //TODO: This needs to implement the extra property stored on the settings file
-                    IsCheckPassing = family.Name.Contains("_HOK_I") || family.Name.Contains("_HOK_M"),
+                    IsCheckPassing = familyNameCheck.Any(family.Name.Contains),
                     ToolTipText = "Check will fail if Family name does not contain \"_HOK_I\" or \"_HOK_M\"."
                 },
                 new CheckWrapper

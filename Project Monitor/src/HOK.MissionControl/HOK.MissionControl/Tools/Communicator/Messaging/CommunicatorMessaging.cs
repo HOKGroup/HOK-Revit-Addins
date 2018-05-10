@@ -16,4 +16,20 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
         public DataType Type { get; set; }
         public string CentralPath { get; set; }
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class CentralPathObtained
+    {
+        public string CentralPath { get; set; }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class DocumentClosed
+    {
+        public bool CloseWindow { get; set; }
+    }
 }

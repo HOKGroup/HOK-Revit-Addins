@@ -10,6 +10,9 @@
         d:DesignHeight="400" d:DesignWidth="400" Title="{Binding Title, Mode=OneWay}" Icon="../../../../Resources/hoklogo.ico" WindowStartupLocation="CenterOwner"
         BorderThickness="0,5,0,0" BorderBrush="#E6E3DB" Width="700" SizeToContent="Height" MinWidth="700" MinHeight="525">
     <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
+        </i:EventTrigger>
         <i:EventTrigger EventName="Closed">
             <i:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Win}"/>
         </i:EventTrigger>
@@ -26,6 +29,7 @@
             <RowDefinition/>
             <RowDefinition Height="150"/>
             <RowDefinition Height="40"/>
+            <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
         <Label Content="Family Info:" 
                Margin="10,5,10,0" 
@@ -248,5 +252,40 @@
                 HorizontalAlignment="Right" 
                 Width="75"
                 Grid.Column="1" />
+        <StatusBar Grid.Row="6" 
+                   Grid.ColumnSpan="2" 
+                   Grid.Column="0" 
+                   Height="23" 
+                   HorizontalAlignment="Stretch"
+                   Margin="0,0,0,0" 
+                   Name="statusBar" 
+                   VerticalAlignment="Bottom">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="168"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem Margin="8,0,0,0">
+                <TextBlock Text="Ready" 
+                           Name="statusLabel" 
+                           Visibility="Visible" 
+                           Foreground="#FF767474"/>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="1" 
+                           Margin="0,0,8,0">
+                <ProgressBar Value="0" 
+                             Width="150" 
+                             Height="16" 
+                             Name="progressBar" 
+                             Visibility="Hidden" 
+                             SmallChange="1" 
+                             IsIndeterminate="False" />
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>
