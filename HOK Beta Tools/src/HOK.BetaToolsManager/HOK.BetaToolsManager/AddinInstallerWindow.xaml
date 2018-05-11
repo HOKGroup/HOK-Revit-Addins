@@ -160,7 +160,8 @@
                         Width="75"/>
                 <CheckBox Content="Auto Update" 
                           ToolTip="Keeps all beta plug-ins always up to date." 
-                          IsChecked="{Binding AutoUpdateStatus, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          IsChecked="True"
+                          IsEnabled="false"
                           Margin="170,0,-5,0" 
                           Grid.Row="1" 
                           Width="103" 

@@ -260,21 +260,14 @@ namespace HOK.BetaToolsManager
                             (BitmapSource) ButtonUtil.LoadBitmapImage(assembly, namespaceAttr.Namespace,
                                 imageAttr.ImageName);
                         var version = assembly.GetName().Version.ToString();
-
-                        var installedVersion = "Not installed";
                         var installed = false;
-                        var autoUpdate = false;
-
                         var addin = addins?.FirstOrDefault(x => x.DllRelativePath == dllRelativePath);
                         if (addin != null)
                         {
                             installed = addin.IsInstalled;
-                            autoUpdate = addin.AutoUpdate;
 
                             if (installed)
                             {
-                                installedVersion = addin.AutoUpdate ? version : addin.InstalledVersion;
-
                                 // if directory doesn't exist in "installed" it means that it was not yet installed before.
                                 if (!Directory.Exists(
                                     InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name))
@@ -286,15 +279,12 @@ namespace HOK.BetaToolsManager
                                 }
                                 else
                                 {
-                                    // directory exists, which means it was installed before, let's check if its on autoupdate
-                                    if (addin.AutoUpdate)
-                                    {
-                                        // let's automatically copy the latest version in
-                                        // we can use temp directory here since it was already either updated with latest
-                                        // or is the only source of files (no network drive)
-                                        CopyAll(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
-                                            InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
-                                    }
+                                    // directory exists, which means it was installed before
+                                    // let's automatically copy the latest version in
+                                    // we can use temp directory here since it was already either updated with latest
+                                    // or is the only source of files (no network drive)
+                                    CopyAll(TempDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name,
+                                        InstallDirectory + new DirectoryInfo(addin.BetaResourcesPath).Name);
                                 }
                             }
                         }
@@ -308,11 +298,11 @@ namespace HOK.BetaToolsManager
                             CommandNamespace = t.FullName,
                             Version = version,
                             IsInstalled = installed,
-                            InstalledVersion = installedVersion,
+                            InstalledVersion = version,
                             BetaResourcesPath = Path.GetDirectoryName(dllPath),
                             AddinFilePath = file,
                             DllRelativePath = dllRelativePath,
-                            AutoUpdate = autoUpdate,
+                            AutoUpdate = true,
                             Panel = panelNameAttr.PanelName
                         };
 
