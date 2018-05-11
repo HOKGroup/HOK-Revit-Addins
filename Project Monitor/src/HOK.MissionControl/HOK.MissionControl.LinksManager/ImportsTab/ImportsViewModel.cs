@@ -85,8 +85,8 @@ namespace HOK.MissionControl.LinksManager.ImportsTab
 
         private void OnDelete()
         {
-            var wrappers = SelectedRows.Cast<CadLinkTypeWrapper>().ToList();
-            var deleted = Model.Delete(wrappers);
+            var selected = (from CadLinkTypeWrapper s in Imports where s.IsSelected select s).ToList();
+            var deleted = Model.Delete(selected);
 
             foreach (var i in deleted)
             {
