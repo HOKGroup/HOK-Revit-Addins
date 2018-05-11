@@ -15,97 +15,115 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
         [DataMember(Name = "_id")]
+        [JsonProperty("_id")]
         public string Id { get; set; }
 
-        [DataMember]
-        public bool isNewSheet { get; set; }
+        [DataMember(Name = "isNewSheet")]
+        [JsonProperty("isNewSheet")]
+        public bool IsNewSheet { get; set; }
 
-        [DataMember]
-        public string sheetId { get; set; }
+        [DataMember(Name = "sheetId")]
+        [JsonProperty("sheetId")]
+        public string SheetId { get; set; }
 
-        [DataMember]
-        public string uniqueId { get; set; }
+        [DataMember(Name = "uniqueId")]
+        [JsonProperty("uniqueId")]
+        public string UniqueId { get; set; }
 
-        [DataMember]
-        public string revisionNumber { get; set; }
+        [DataMember(Name = "revisionNumber")]
+        [JsonProperty("revisionNumber")]
+        public string RevisionNumber { get; set; }
 
-        [DataMember]
-        public string assignedTo { get; set; }
+        [DataMember(Name = "assignedTo")]
+        [JsonProperty("assignedTo")]
+        public string AssignedTo { get; set; }
 
-        [DataMember]
-        public DateTime? submittedOn { get; set; }
+        [DataMember(Name = "submittedOn")]
+        [JsonProperty("submittedOn")]
+        public DateTime? SubmittedOn { get; set; }
 
-        [DataMember]
-        public DateTime? completedOn { get; set; }
+        [DataMember(Name = "completedOn")]
+        [JsonProperty("completedOn")]
+        public DateTime? CompletedOn { get; set; }
 
-        [DataMember]
-        public string submittedBy { get; set; }
+        [DataMember(Name = "submittedBy")]
+        [JsonProperty("submittedBy")]
+        public string SubmittedBy { get; set; }
 
-        [DataMember]
-        public string completedBy { get; set; }
+        [DataMember(Name = "completedBy")]
+        [JsonProperty("completedBy")]
+        public string CompletedBy { get; set; }
 
-        [DataMember]
-        public string collectionId { get; set; }
+        [DataMember(Name = "collectionId")]
+        [JsonProperty("collectionId")]
+        public string CollectionId { get; set; }
 
-        [DataMember]
-        public string fileName { get; set; }
+        [DataMember(Name = "fileName")]
+        [JsonProperty("fileName")]
+        public string FileName { get; set; }
 
         private string _name;
-        [DataMember]
-        public string name
+        [DataMember(Name = "name")]
+        [JsonProperty("name")]
+        public string Name
         {
             get { return _name; }
-            set { _name = value; RaisePropertyChanged("name"); }
+            set { _name = value; RaisePropertyChanged("Name"); }
         }
 
         private string _number;
-        [DataMember]
-        public string number
+        [DataMember(Name = "number")]
+        [JsonProperty("number")]
+        public string Number
         {
             get { return _number; }
-            set { _number = value; RaisePropertyChanged("number"); }
+            set { _number = value; RaisePropertyChanged("Number"); }
         }
 
         private bool _isSelected;
-        [DataMember]
-        public bool isSelected
+        [DataMember(Name = "isSelected")]
+        [JsonProperty("isSelected")]
+        public bool IsSelected
         {
             get { return _isSelected; }
-            set { _isSelected = value; RaisePropertyChanged("isSelected"); }
+            set { _isSelected = value; RaisePropertyChanged("IsSelected"); }
         }
 
         private bool _isPlaceholder;
-        [DataMember]
-        public bool isPlaceholder
+        [DataMember(Name = "isPlaceholder")]
+        [JsonProperty("isPlaceholder")]
+        public bool IsPlaceholder
         {
             get { return _isPlaceholder; }
-            set { _isPlaceholder = value; RaisePropertyChanged("isPlaceholder"); }
+            set { _isPlaceholder = value; RaisePropertyChanged("IsPlaceholder"); }
         }
 
         private bool _isDeleted;
-        [DataMember]
-        public bool isDeleted
+        [DataMember(Name = "isDeleted")]
+        [JsonProperty("isDeleted")]
+        public bool IsDeleted
         {
             get { return _isDeleted; }
-            set { _isDeleted = value; RaisePropertyChanged("isDeleted"); }
+            set { _isDeleted = value; RaisePropertyChanged("IsDeleted"); }
         }
 
         private string _message;
-        [DataMember]
-        public string message
+        [DataMember(Name = "message")]
+        [JsonProperty("message")]
+        public string Message
         {
             get { return _message; }
-            set { _message = value; RaisePropertyChanged("message"); }
+            set { _message = value; RaisePropertyChanged("Message"); }
         }
 
         private string _comments;
-        [DataMember]
-        public string comments
+        [DataMember(Name = "comments")]
+        [JsonProperty("comments")]
+        public string Comments
         {
             get { return _comments; }
-            set { _comments = value; RaisePropertyChanged("comments"); }
+            set { _comments = value; RaisePropertyChanged("Comments"); }
         }
 
         [JsonConstructor]
@@ -120,20 +138,20 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         public void CopyProperties(SheetTask other)
         {
             Id = other.Id;
-            uniqueId = other.uniqueId;
-            revisionNumber = other.revisionNumber;
-            assignedTo = other.assignedTo;
-            submittedOn = other.submittedOn;
-            completedOn = other.completedOn;
-            submittedBy = other.submittedBy;
-            completedBy = other.completedBy;
-            name = other.name;
-            number = other.number;
-            isSelected = other.isSelected;
-            isPlaceholder = other.isSelected;
-            isDeleted = other.isDeleted;
-            message = other.message;
-            comments = other.message;
+            UniqueId = other.UniqueId;
+            RevisionNumber = other.RevisionNumber;
+            AssignedTo = other.AssignedTo;
+            SubmittedOn = other.SubmittedOn;
+            CompletedOn = other.CompletedOn;
+            SubmittedBy = other.SubmittedBy;
+            CompletedBy = other.CompletedBy;
+            Name = other.Name;
+            Number = other.Number;
+            IsSelected = other.IsSelected;
+            IsPlaceholder = other.IsSelected;
+            IsDeleted = other.IsDeleted;
+            Message = other.Message;
+            Comments = other.Message;
         }
 
         public override bool Equals(object obj)

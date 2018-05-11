@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Styles;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
 
@@ -13,7 +13,12 @@ namespace HOK.MissionControl.Tools.HealthReport
     {
         private static Document _doc { get; set; }
 
-        public void PublishStylesInfo(Document doc, string recordId)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
+        /// <param name="stylesId"></param>
+        public void PublishData(Document doc, string stylesId)
         {
             try
             {
@@ -39,7 +44,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     }
                 }
 
-                var textStats = textTypes.Select(x => new TextNoteTypeInfo(x.Value.Item1) {instances = x.Value.Item2})
+                var textStats = textTypes.Select(x => new TextNoteTypeInfo(x.Value.Item1) {Instances = x.Value.Item2})
                     .ToList();
 
                 #endregion
@@ -66,8 +71,8 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var dimensionValueCheck = new List<string> { "EQ" }; //defaults
                 if (config != null)
                 {
-                    dimensionValueCheck = config.updaters.First(x => string.Equals(x.updaterId,
-                        Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).userOverrides.dimensionValueCheck.values;
+                    dimensionValueCheck = config.Updaters.First(x => string.Equals(x.UpdaterId,
+                        Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.DimensionValueCheck.Values;
                 }
 
                 var dimSegmentStats = new List<DimensionSegmentInfo>();
@@ -94,11 +99,11 @@ namespace HOK.MissionControl.Tools.HealthReport
                         // dim w/ zero segments
                         dimSegmentStats.Add(new DimensionSegmentInfo(d)
                         {
-                            valueString = InternalUnitsToProjectUnits(d.Value, ut),
-                            ownerViewType = d.ViewSpecific 
+                            ValueString = InternalUnitsToProjectUnits(d.Value, ut),
+                            OwnerViewType = d.ViewSpecific 
                                 ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
                                 : string.Empty,
-                            ownerViewId = d.OwnerViewId.IntegerValue
+                            OwnerViewId = d.OwnerViewId.IntegerValue
                         });
                     }
                     else
@@ -111,18 +116,18 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                             dimSegmentStats.Add(new DimensionSegmentInfo(s)
                             {
-                                valueString = InternalUnitsToProjectUnits(s.Value, ut),
-                                ownerViewType = d.ViewSpecific 
+                                ValueString = InternalUnitsToProjectUnits(s.Value, ut),
+                                OwnerViewType = d.ViewSpecific 
                                     ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
                                     : string.Empty,
-                                ownerViewId = d.OwnerViewId.IntegerValue
+                                OwnerViewId = d.OwnerViewId.IntegerValue
                             });
                         }
                     }
                     
                 }
 
-                var dimStats = dimTypes.Select(x => new DimensionTypeInfo(x.Value.Item1) { instances = x.Value.Item2 })
+                var dimStats = dimTypes.Select(x => new DimensionTypeInfo(x.Value.Item1) { Instances = x.Value.Item2 })
                     .ToList();
 
                 #endregion
@@ -133,33 +138,19 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 #endregion
 
-                var stylesStats = new StylesStat
+                var stylesStats = new StylesDataItem
                 {
-                    user = Environment.UserName.ToLower(),
-                    textStats = textStats,
-                    dimStats = dimStats,
-                    dimSegmentStats = dimSegmentStats
+                    User = Environment.UserName.ToLower(),
+                    TextStats = textStats,
+                    DimStats = dimStats,
+                    DimSegmentStats = dimSegmentStats
                 };
 
-                var unused = ServerUtilities.Post<StylesStat>(stylesStats, "healthrecords/" + recordId + "/stylestats");
-                
-                //TODO: I can do a notification when all data is published, and another when user gets a Task assigned. 
-                //if (result.Id == null)
-                //{
-                //    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Error.");
-                //    AppCommand.CommunicatorHandler.Status = Status.Error;
-                //    AppCommand.CommunicatorHandler.Message = "Styles Info failed to post.";
-                //    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
-                //    AppCommand.CommunicatorEvent.Raise();
-                //}
-                //else
-                //{
-                //    Log.AppendLog(LogMessageType.INFO, "Raising Status Window event. Status: Success.");
-                //    AppCommand.CommunicatorHandler.Status = Status.Success;
-                //    AppCommand.CommunicatorHandler.Message = "Styles Info posted successfully!";
-                //    AppCommand.CommunicatorHandler.Request.Make(RequestId.ReportStatus);
-                //    AppCommand.CommunicatorEvent.Raise();
-                //}
+                if (!ServerUtilities.Post(stylesStats, "styles/" + stylesId + "/stylestats",
+                    out StylesDataItem unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Styles Data.");
+                }
             }
             catch (Exception e)
             {

@@ -6,51 +6,54 @@ using System.Threading.Tasks;
 using RestSharp;
 using Newtonsoft.Json;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
 
 namespace HOK.MissionControl.Core.Utils
 {
-    /// <summary>
-    /// Different states of the Revit model.
-    /// </summary>
-    public enum WorksetMonitorState
-    {
-        onopened,
-        onsynched
-    }
-
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
         public const string RestApiBaseUrl = "http://hok-184vs/";
         //public const string RestApiBaseUrl = "http://localhost:8080/";
-        public const string ApiVersion = "api/v1";
+        public const string ApiVersion = "api/v2";
 
         #region GET
 
-        public static T Get<T>(string path)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool Get<T>(string path, out T result) where T : new()
         {
-            var result = default(T);
+            result = default(T);
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(ApiVersion + "/" + path, Method.GET);
                 var response = client.Execute(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError) return result;
+                if (response.StatusCode != HttpStatusCode.OK) return false;
 
                 if (!string.IsNullOrEmpty(response.Content))
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
-                    if (data != null) result = data;
+                    if (data != null)
+                    {
+                        result = data;
+                        return true;
+                    }
 
                     Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
                 }
+
+                return false;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
             }
-            return result;
         }
 
         /// <summary>
@@ -58,10 +61,11 @@ namespace HOK.MissionControl.Core.Utils
         /// </summary>
         /// <param name="centralPath">Full file path with file extension.</param>
         /// <param name="path">HTTP request url.</param>
+        /// <param name="result"></param>
         /// <returns>Document if found matching central path or type.</returns>
-        public static T GetByCentralPath<T>(string centralPath, string path)
+        public static bool GetByCentralPath<T>(string centralPath, string path, out T result) where T : new()
         {
-            var result = default(T);
+            result = new T();
             try
             {
                 // (Konrad) Since we cannot pass file path with "\" they were replaced with illegal pipe char "|".
@@ -73,26 +77,43 @@ namespace HOK.MissionControl.Core.Utils
                 else
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Could not replace \\ or / with | in the file path. Exiting.");
-                    return result;
+                    return false;
                 }
 
                 var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET);
-                var response = client.Execute(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError) return result;
+                client.ClearHandlers();
+                client.AddHandler("application/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
+                client.AddHandler("*+json", new NewtonsoftJsonSerializer());
 
+                var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET);
+                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+                request.AddHeader("Content-type", "application/json");
+                request.RequestFormat = DataFormat.Json;
+                request.JsonSerializer = new NewtonsoftJsonSerializer();
+
+                var response = client.Execute(request);
+                if (response.StatusCode != HttpStatusCode.OK) return false;
                 if (!string.IsNullOrEmpty(response.Content))
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
-                    if (data != null) result = data;
-                    else Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
+                    if (data != null)
+                    {
+                        result = data;
+                        return true;
+                    }
+
+                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
                 }
+                return false;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
             }
-            return result;
         }
 
         /// <summary>
@@ -116,141 +137,47 @@ namespace HOK.MissionControl.Core.Utils
             return response.Data;
         }
 
-        /// <summary>
-        /// Retrieves a Collection from MongoDB.
-        /// </summary>
-        /// <typeparam name="T">Type of response class.</typeparam>
-        /// <param name="responseType">Response object type.</param>
-        /// <param name="route">Route to post request to.</param>
-        /// <returns></returns>
-        [Obsolete]
-        public static List<T> FindAll<T>(T responseType, string route) where T : new()
-        {
-            var items = new List<T>();
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/" + route, Method.GET);
-                var response = client.Execute<List<T>>(request);
-                if (response.Data != null)
-                {
-                    items = response.Data;
-
-                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return items;
-        }
-
-        /// <summary>
-        /// Retrieves a Collection from MongoDB.
-        /// </summary>
-        /// <typeparam name="T">Type of response class.</typeparam>
-        /// <param name="route">Route to post request to.</param>
-        /// <returns></returns>
-        public static T FindOne<T>(string route) where T : new()
-        {
-            var items = default(T);
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/" + route, Method.GET);
-                var response = client.Execute<T>(request);
-                if (response.Data != null)
-                {
-                    items = response.Data;
-
-                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return items;
-        }
-
         #endregion
 
         #region POST
-
-        /// <summary>
-        /// Posts Trigger Records to MongoDB. Trigger records are created when users override DTM Tools.
-        /// </summary>
-        /// <param name="record">Record to post.</param>
-        public static HttpStatusCode PostTriggerRecords(TriggerRecord record)
-        {
-            var status = HttpStatusCode.Unused;
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request =
-                    new RestRequest(ApiVersion + "/triggerrecords", Method.POST) { RequestFormat = DataFormat.Json };
-                request.AddBody(record);
-
-                var response = client.Execute<TriggerRecord>(request);
-                status = response.StatusCode;
-
-                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-triggerrecords");
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-            return status;
-        }
-
-        /// <summary>
-        /// PUTs created Health Record Id into Project's healthrecords array.
-        /// </summary>
-        /// <param name="project">Project class.</param>
-        /// <param name="id"></param>
-        public static void AddHealthRecordToProject(Project project, string id)
-        {
-            try
-            {
-                var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(
-                    ApiVersion + "/projects/" + project.Id + "/addhealthrecord/" + id, Method.PUT)
-                {
-                    RequestFormat = DataFormat.Json
-                };
-                request.AddBody(project);
-                var response = client.Execute(request);
-                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-addhealthrecord");
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-            }
-        }
 
         /// <summary>
         /// PUTs body
         /// </summary>
         /// <param name="body"></param>
         /// <param name="route"></param>
-        public static void Put<T>(T body, string route)
+        public static bool Put<T>(T body, string route)
         {
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(
-                    ApiVersion + "/" + route, Method.PUT)
-                {
-                    RequestFormat = DataFormat.Json
-                };
+                client.ClearHandlers();
+                client.AddHandler("application/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
+                client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
+                client.AddHandler("*+json", new NewtonsoftJsonSerializer());
+
+                var request = new RestRequest(ApiVersion + "/" + route, Method.PUT);
+                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+                request.AddHeader("Content-type", "application/json");
+                request.RequestFormat = DataFormat.Json;
+                request.JsonSerializer = new NewtonsoftJsonSerializer();
                 request.AddBody(body);
+
                 var response = client.Execute(request);
-                Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + route);
+                if (response.StatusCode != HttpStatusCode.Created)
+                {
+                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + route);
+                    return false;
+                }
+                
+                return true;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
             }
         }
 
@@ -289,13 +216,18 @@ namespace HOK.MissionControl.Core.Utils
             return response.Data;
         }
 
+
         /// <summary>
-        /// POSTs any new data Schema. Creates new Collection in MongoDB.
+        /// 
         /// </summary>
-        /// <returns>Newly created Collection Schema with MongoDB assigned Id.</returns>
-        public static T Post<T>(object body, string route) where T : new()
+        /// <typeparam name="T"></typeparam>
+        /// <param name="body"></param>
+        /// <param name="route"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool Post<T>(object body, string route, out T result) where T : new()
         {
-            var resresponse = default(T);
+            result = default(T);
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
@@ -314,22 +246,19 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddBody(body);
 
                 var response = client.Execute<T>(request);
+                if (response.StatusCode != HttpStatusCode.Created) return false;
                 if (response.Data != null)
                 {
-                    resresponse = response.Data;
-                    Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + "-" + route);
+                    result = response.Data;
+                    return true;
                 }
-                else
-                {
-                    resresponse = default(T);
-                    Log.AppendLog(LogMessageType.ERROR, response.ResponseStatus + "-" + route);
-                }
+                return false;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
             }
-            return resresponse;
         }
 
         #endregion
@@ -342,9 +271,9 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="clientPath">Base URL to the Revit Server.</param>
         /// <param name="requestPath">Request string.</param>
         /// <returns>File size in bytes.</returns>
-        public static int GetFileInfoFromRevitServer(string clientPath, string requestPath)
+        public static T GetFileInfoFromRevitServer<T>(string clientPath, string requestPath) where T : new()
         {
-            var size = 0;
+            var result = default(T);
             try
             {
                 var client = new RestClient(clientPath);
@@ -353,19 +282,28 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddHeader("User-Machine-Name", Environment.UserName + "PC");
                 request.AddHeader("Operation-GUID", Guid.NewGuid().ToString());
 
-                var response = client.Execute<RsFileInfo>(request);
+                var response = client.Execute<T>(request);
                 if (response.Data != null)
                 {
-                    size = response.Data.ModelSize;
+                    return response.Data;
                 }
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return size;
+            return result;
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Different states of the Revit model.
+    /// </summary>
+    public enum WorksetMonitorState
+    {
+        onopened,
+        onsynched
     }
 }

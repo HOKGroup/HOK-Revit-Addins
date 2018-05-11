@@ -123,6 +123,9 @@
   <data name="HealthReportTrackerGuid" xml:space="preserve">
     <value>56603be6-aeb2-45d0-9ebc-2830fad6368b</value>
   </data>
+  <data name="LinkUnloadTrackerGuid" xml:space="preserve">
+    <value>90391154-67BB-452E-A1A7-A07A98B94F86</value>
+  </data>
   <data name="MissionControl_AddinName" xml:space="preserve">
     <value>HOK.MissionControl.addin</value>
   </data>
@@ -146,5 +149,8 @@
   </data>
   <data name="SharedParameterTrackerGuid" xml:space="preserve">
     <value>32d44b45-7bf6-49f1-9b81-f41ae929cfcb</value>
+  </data>
+  <data name="SheetsTrackerGuid" xml:space="preserve">
+    <value>0504A758-BF15-4C90-B996-A795D92B42DB</value>
   </data>
 </root>

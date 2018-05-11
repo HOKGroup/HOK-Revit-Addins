@@ -1,7 +1,7 @@
 ﻿using System;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Worksets;
 using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.HealthReport
@@ -12,9 +12,9 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// Publishes Workset Open Data to database for onOpened/onSynched events.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
-        /// <param name="recordId">Health Record Document Id.</param>
+        /// <param name="worksetsId">Worksets Document Id.</param>
         /// <param name="state">State of the Revit model.</param>
-        public void PublishData(Document doc, string recordId, WorksetMonitorState state)
+        public void PublishData(Document doc, string worksetsId, WorksetMonitorState state)
         {
             try
             {
@@ -32,12 +32,16 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var worksetInfo = new WorksetEvent
                 {
-                    user = Environment.UserName.ToLower(),
-                    opened = opened,
-                    closed = closed
+                    User = Environment.UserName.ToLower(),
+                    Opened = opened,
+                    Closed = closed
                 };
 
-                var unused = ServerUtilities.Post<WorksetEvent>(worksetInfo, "healthrecords/" + recordId + "/" + state);
+                if (!ServerUtilities.Post(worksetInfo, "worksets/" + worksetsId + "/" + state,
+                    out WorksetEvent unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Worksets Data: " + state + ".");
+                }
             }
             catch (Exception ex)
             {

@@ -27,7 +27,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
     }
 
     /// <summary>
-    /// Checks if identifier is null or empty string and returns boolean. Used by UI to disabled OpenSheet button.
+    /// Checks if identifier is null or empty string and returns boolean. Used by UI to disable OpenSheet button.
     /// </summary>
     public class IdentifierToBoolConverter : IValueConverter
     {

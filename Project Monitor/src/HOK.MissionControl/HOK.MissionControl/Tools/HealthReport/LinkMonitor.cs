@@ -2,7 +2,7 @@
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Links;
 using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.HealthReport
@@ -13,8 +13,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// Publishes information about linked models/images/object styles in the model.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
-        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
-        public void PublishData(Document doc, string recordId)
+        /// <param name="linksId">Id of the Links Document in MongoDB.</param>
+        public void PublishData(Document doc, string linksId)
         {
             try
             {
@@ -55,8 +55,8 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var cadLinksDic = new FilteredElementCollector(doc)
                     .OfClass(typeof(CADLinkType))
-                    .Select(x => new DwgFileInfo { name = x.Name, elementId = x.Id.IntegerValue })
-                    .ToDictionary(key => key.elementId, value => value);
+                    .Select(x => new DwgFileInfo { Name = x.Name, ElementId = x.Id.IntegerValue })
+                    .ToDictionary(key => key.ElementId, value => value);
 
                 var totalImportInstance = 0;
                 foreach (var ii in new FilteredElementCollector(doc).OfClass(typeof(ImportInstance)))
@@ -65,26 +65,30 @@ namespace HOK.MissionControl.Tools.HealthReport
                     var id = ii.GetTypeId().IntegerValue;
                     if (!cadLinksDic.ContainsKey(id)) continue;
 
-                    if (cadLinksDic[id].instances == 0)
+                    if (cadLinksDic[id].Instances == 0)
                     {
-                        cadLinksDic[id].isViewSpecific = ii.ViewSpecific;
-                        cadLinksDic[id].isLinked = ((ImportInstance)ii).IsLinked;
+                        cadLinksDic[id].IsViewSpecific = ii.ViewSpecific;
+                        cadLinksDic[id].IsLinked = ((ImportInstance)ii).IsLinked;
                     }
-                    cadLinksDic[id].instances = cadLinksDic[id].instances + 1;
+                    cadLinksDic[id].Instances = cadLinksDic[id].Instances + 1;
                 }
 
-                var linkStats = new LinkStat
+                var linkStats = new LinkDataItem
                 {
-                    totalImportedDwg = totalImportInstance,
-                    importedDwgFiles = cadLinksDic.Values.ToList(),
-                    unusedLinkedImages = totalUnusedImages,
-                    totalDwgStyles = totalDwgStyles,
-                    totalImportedStyles = totalImportedStyles,
-                    totalLinkedModels = totalLinkedCad + totalLinkedRvt,
-                    totalLinkedDwg = totalLinkedCad
+                    TotalImportedDwg = totalImportInstance,
+                    ImportedDwgFiles = cadLinksDic.Values.ToList(),
+                    UnusedLinkedImages = totalUnusedImages,
+                    TotalDwgStyles = totalDwgStyles,
+                    TotalImportedStyles = totalImportedStyles,
+                    TotalLinkedModels = totalLinkedCad + totalLinkedRvt,
+                    TotalLinkedDwg = totalLinkedCad
                 };
 
-                var unused = ServerUtilities.Post<LinkStat>(linkStats, "healthrecords/" + recordId + "/linkstats");
+                if (!ServerUtilities.Post(linkStats, "links/" + linksId + "/linkstats", 
+                    out LinkDataItem unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Links Data.");
+                }
             }
             catch (Exception ex)
             {

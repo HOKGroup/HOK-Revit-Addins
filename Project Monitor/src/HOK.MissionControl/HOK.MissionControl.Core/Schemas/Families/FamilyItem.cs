@@ -9,6 +9,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
     /// <summary>
     /// Individual Family object data.
     /// </summary>
+    [DataContract]
     public class FamilyItem
     {
         [BsonId]
@@ -18,42 +19,55 @@ namespace HOK.MissionControl.Core.Schemas.Families
         public string Id { get; set; }
 
         [DataMember(Name = "name")]
-        public string name { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
         [DataMember(Name = "size")]
-        public string size { get; set; }
+        [JsonProperty("size")]
+        public string Size { get; set; }
 
         [DataMember(Name = "sizeValue")]
-        public long sizeValue { get; set; }
+        [JsonProperty("sizeValue")]
+        public long SizeValue { get; set; }
 
         [DataMember(Name = "instances")]
-        public int instances { get; set; }
+        [JsonProperty("instances")]
+        public int Instances { get; set; }
 
         [DataMember(Name = "elementId")]
-        public int elementId { get; set; }
+        [JsonProperty("elementId")]
+        public int ElementId { get; set; }
 
         [DataMember(Name = "refPlaneCount")]
-        public int refPlaneCount { get; set; }
+        [JsonProperty("refPlaneCount")]
+        public int RefPlaneCount { get; set; }
 
         [DataMember(Name = "arrayCount")]
-        public int arrayCount { get; set; }
+        [JsonProperty("arrayCount")]
+        public int ArrayCount { get; set; }
 
         [DataMember(Name = "voidCount")]
-        public int voidCount { get; set; }
+        [JsonProperty("voidCount")]
+        public int VoidCount { get; set; }
 
         [DataMember(Name = "nestedFamilyCount")]
-        public int nestedFamilyCount { get; set; }
+        [JsonProperty("nestedFamilyCount")]
+        public int NestedFamilyCount { get; set; }
 
         [DataMember(Name = "parametersCount")]
-        public int parametersCount { get; set; }
+        [JsonProperty("parametersCount")]
+        public int ParametersCount { get; set; }
 
         [DataMember(Name = "isFailingChecks")]
-        public bool isFailingChecks { get; set; }
+        [JsonProperty("isFailingChecks")]
+        public bool IsFailingChecks { get; set; }
 
         [DataMember(Name = "isDeleted")]
-        public bool isDeleted { get; set; }
+        [JsonProperty("isDeleted")]
+        public bool IsDeleted { get; set; }
 
         [DataMember(Name = "tasks")]
-        public List<FamilyTask> tasks { get; set; } = new List<FamilyTask>();
+        [JsonProperty("tasks")]
+        public List<FamilyTask> Tasks { get; set; } = new List<FamilyTask>();
     }
 }

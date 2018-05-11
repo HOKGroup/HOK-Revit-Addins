@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
 
@@ -232,7 +232,7 @@ namespace HOK.MissionControl.Tools.CADoor
                                 if (MissionControlSetup.Projects.ContainsKey(centralPath))
                                 {
                                     var project = MissionControlSetup.Projects[centralPath];
-                                    if (project.address.state == "CA")
+                                    if (project.Address.State == "CA")
                                     {
                                         caParameter.Set(1);
                                     }
@@ -258,7 +258,7 @@ namespace HOK.MissionControl.Tools.CADoor
                             if (MissionControlSetup.Projects.ContainsKey(centralPath))
                             {
                                 var project = MissionControlSetup.Projects[centralPath];
-                                if (project.address.state == "CA")
+                                if (project.Address.State == "CA")
                                 {
                                     caParameter.Set(1);
                                 }

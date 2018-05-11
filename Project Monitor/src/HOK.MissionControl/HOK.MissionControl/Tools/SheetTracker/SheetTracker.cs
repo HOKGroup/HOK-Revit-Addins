@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Utils;
@@ -12,108 +11,82 @@ namespace HOK.MissionControl.Tools.SheetTracker
 {
     public class SheetTracker
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc"></param>
         public void SynchSheets(Document doc)
         {
             try
             {
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                var currentProject = MissionControlSetup.Projects[centralPath];
-                var currentConfig = MissionControlSetup.Configurations[centralPath];
+                var sheetsData = MissionControlSetup.SheetsData.ContainsKey(centralPath)
+                    ? MissionControlSetup.SheetsData[centralPath]
+                    : null;
+                if (sheetsData == null) return;
 
                 var sheets = new FilteredElementCollector(doc)
                     .OfCategory(BuiltInCategory.OST_Sheets)
                     .WhereElementIsNotElementType()
                     .Cast<ViewSheet>()
                     .Select(x => new SheetItem(x, centralPath))
-                    .ToDictionary(key => key.uniqueId, value => value);
+                    .ToDictionary(key => key.UniqueId, value => value);
 
                 var revisions = new FilteredElementCollector(doc)
                     .OfCategory(BuiltInCategory.OST_Revisions)
                     .WhereElementIsNotElementType()
                     .Select(x => new RevisionItem(x))
-                    .ToDictionary(key => key.uniqueId, value => value);
+                    .ToDictionary(key => key.UniqueId, value => value);
 
-                var refreshProject = false;
-                if (!MissionControlSetup.SheetsIds.ContainsKey(centralPath))
+                var finalList = new List<SheetItem>();
+                foreach (var ms in sheetsData.Sheets)
                 {
-                    AppCommand.SheetsData = ServerUtilities.GetByCentralPath<SheetData>(centralPath, "sheets/centralpath");
-                    if (AppCommand.SheetsData == null)
+                    if (sheets.ContainsKey(ms.UniqueId))
                     {
-                        // (Konrad) This route executes only when we are posting Sheets data for the first time.
-                        var data = new SheetData
-                        {
-                            centralPath = centralPath.ToLower(),
-                            sheets = sheets.Values.ToList(),
-                            revisions = revisions.Values.ToList()
-                        };
+                        // sheet still exists in our model
+                        // we can update it
+                        var localSheet = sheets[ms.UniqueId];
+                        localSheet.Tasks = ms.Tasks; // preserve mongo tasks
+                        localSheet.Id = ms.Id; // preserve mongoIds
+                        localSheet.CollectionId = ms.CollectionId; // preserve mongoIds
 
-                        AppCommand.SheetsData = ServerUtilities.Post<SheetData>(data, "sheets");
-                        ServerUtilities.Put(currentProject, "projects/" + currentProject.Id + "/addsheets/" + AppCommand.SheetsData.Id);
-                        refreshProject = true;
+                        finalList.Add(localSheet);
+                        sheets.Remove(ms.UniqueId);
                     }
-
-                    if (!MissionControlSetup.SheetsIds.ContainsKey(centralPath)) MissionControlSetup.SheetsIds.Add(centralPath, AppCommand.SheetsData.Id); // store sheets record
-                }
-                else
-                {
-                    // (Konrad) This route executes when we are synching sheet updates.
-                    var mongoSheets = ServerUtilities.GetByCentralPath<SheetData>(centralPath, "sheets/centralpath");
-                    if (mongoSheets != null)
+                    else
                     {
-                        var finalList = new List<SheetItem>();
-                        foreach (var ms in mongoSheets.sheets)
+                        var task = ms.Tasks.LastOrDefault();
+                        if (task != null && task.IsNewSheet)
                         {
-                            if (sheets.ContainsKey(ms.uniqueId))
-                            {
-                                // sheet still exists in our model
-                                // we can update it
-                                var localSheet = sheets[ms.uniqueId];
-                                localSheet.tasks = ms.tasks; // preserve mongo tasks
-                                localSheet.Id = ms.Id; // preserve mongoIds
-                                localSheet.collectionId = ms.collectionId; // preserve mongoIds
-
-                                finalList.Add(localSheet);
-                                sheets.Remove(ms.uniqueId);
-                            }
-                            else
-                            {
-                                var task = ms.tasks.LastOrDefault();
-                                if (task != null && task.isNewSheet)
-                                {
-                                    finalList.Add(ms); // this already has the ids
-                                }
-                                else
-                                {
-                                    // sheet was deleted locally but still exists in mongo
-                                    ms.isDeleted = true;
-                                    finalList.Add(ms);
-                                }
-                            }
+                            finalList.Add(ms); // this already has the ids
                         }
-                        finalList.AddRange(sheets.Values); // add whatever was not stored in mongo before
-
-                        var data = new SheetData
+                        else
                         {
-                            centralPath = centralPath.ToLower(),
-                            sheets = finalList,
-                            revisions = revisions.Values.ToList(),
-                            Id = mongoSheets.Id
-                        };
-
-                        ServerUtilities.Post<SheetData>(data, "sheets/" + mongoSheets.Id);
-                        AppCommand.SheetsData = data;
+                            // sheet was deleted locally but still exists in mongo
+                            ms.IsDeleted = true;
+                            finalList.Add(ms);
+                        }
                     }
                 }
+                finalList.AddRange(sheets.Values); // add whatever was not stored in mongo before
 
-                if (refreshProject)
+                var data = new SheetData
                 {
-                    var projectFound = ServerUtilities.Get<Project>("projects/configid/" + currentConfig.Id);
-                    //var projectFound = ServerUtilities.GetProjectByConfigurationId(currentConfig.Id);
-                    if (null == projectFound) return;
-                    MissionControlSetup.Projects[centralPath] = projectFound;
+                    CentralPath = centralPath.ToLower(),
+                    Sheets = finalList,
+                    Revisions = revisions.Values.ToList(),
+                    Id = sheetsData.Id
+                };
+
+                if (!ServerUtilities.Post(data, "sheets/" + sheetsData.Id, 
+                    out SheetData unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Sheets.");
                 }
 
-                AppCommand.LunchCommunicator();
+                if (MissionControlSetup.SheetsData.ContainsKey(centralPath))
+                    MissionControlSetup.SheetsData.Remove(centralPath);
+                MissionControlSetup.SheetsData.Add(centralPath, data); // store sheets record
             }
             catch (Exception e)
             {

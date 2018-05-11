@@ -48,8 +48,8 @@
                 CornerRadius="2" 
                 Height="20" 
                 VerticalAlignment="Bottom" Grid.Column="0">
-            <TextBlock Text="{Binding Wrapper.Element.number, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                       ToolTip="{Binding Wrapper.Element.number}"
+            <TextBlock Text="{Binding Wrapper.Element.Number, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                       ToolTip="{Binding Wrapper.Element.Number}"
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        Padding="0"
@@ -70,8 +70,8 @@
                 CornerRadius="2" 
                 Height="20" 
                 VerticalAlignment="Bottom" Grid.Column="0">
-            <TextBlock Text="{Binding Wrapper.Element.name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                       ToolTip="{Binding Wrapper.Element.name}"
+            <TextBlock Text="{Binding Wrapper.Element.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                       ToolTip="{Binding Wrapper.Element.Name}"
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        Padding="0"
@@ -93,16 +93,16 @@
                 Height="20" 
                 VerticalAlignment="Bottom" 
                 Grid.Column="1">
-            <TextBlock Text="{Binding Wrapper.Task.number, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                       ToolTip="{Binding Wrapper.Task.number}"
+            <TextBlock Text="{Binding Wrapper.Task.Number, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                       ToolTip="{Binding Wrapper.Task.Number}"
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        Padding="0"
                        Margin="5,0,5,0">
                 <TextBlock.Foreground>
                     <MultiBinding Converter="{StaticResource StringToColorConverter}" ConverterParameter="Param1">
-                        <Binding Path="Wrapper.Task.number"/>
-                        <Binding Path="Wrapper.Element.number"/>
+                        <Binding Path="Wrapper.Task.Number"/>
+                        <Binding Path="Wrapper.Element.Number"/>
                     </MultiBinding>
                 </TextBlock.Foreground>
             </TextBlock>
@@ -122,16 +122,16 @@
                 Height="20" 
                 VerticalAlignment="Bottom" 
                 Grid.Column="1">
-            <TextBlock Text="{Binding Wrapper.Task.name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                       ToolTip="{Binding Wrapper.Task.name}"
+            <TextBlock Text="{Binding Wrapper.Task.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                       ToolTip="{Binding Wrapper.Task.Name}"
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        Padding="0"
                        Margin="5,0,5,0">
                 <TextBlock.Foreground>
                     <MultiBinding Converter="{StaticResource StringToColorConverter}" ConverterParameter="Param1">
-                        <Binding Path="Wrapper.Task.name"/>
-                        <Binding Path="Wrapper.Element.name"/>
+                        <Binding Path="Wrapper.Task.Name"/>
+                        <Binding Path="Wrapper.Element.Name"/>
                     </MultiBinding>
                 </TextBlock.Foreground>
             </TextBlock>
@@ -150,7 +150,7 @@
                 Margin="10,21,10,10"
                 Grid.ColumnSpan="2"
                 CornerRadius="2">
-            <Label Content="{Binding Wrapper.Task.message}" 
+            <Label Content="{Binding Wrapper.Task.Message}" 
                    VerticalContentAlignment="Top" 
                    Padding="0" 
                    Margin="5,0,5,0" 
@@ -164,13 +164,13 @@
             <Image.Style>
                 <Style TargetType="{x:Type Image}">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Wrapper.Element.isPlaceholder}" Value="True">
+                        <DataTrigger Binding="{Binding Wrapper.Element.IsPlaceholder}" Value="True">
                             <Setter Property="Source" Value="../../../../Resources/sheetPlaceholder_256x256.png"/>
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding Wrapper.Element.isPlaceholder}" Value="False">
+                        <DataTrigger Binding="{Binding Wrapper.Element.IsPlaceholder}" Value="False">
                             <Setter Property="Source" Value="../../../../Resources/sheet_256x256.png"/>
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding Wrapper.Task.identifier, Converter={StaticResource IdentifierToBoolConverter}}" Value="True">
+                        <DataTrigger Binding="{Binding Wrapper.Task.Identifier, Converter={StaticResource IdentifierToBoolConverter}}" Value="True">
                             <Setter Property="Visibility" Value="Collapsed"/>
                         </DataTrigger>
                     </Style.Triggers>
@@ -206,10 +206,10 @@
                 <Style TargetType="Button">
                     <Setter Property="IsEnabled" Value="True"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Wrapper.Element.isPlaceholder}" Value="True">
+                        <DataTrigger Binding="{Binding Wrapper.Element.IsPlaceholder}" Value="True">
                             <Setter Property="IsEnabled" Value="False"/>
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding Wrapper.Task.identifier, Converter={StaticResource IdentifierToBoolConverter}}" Value="True">
+                        <DataTrigger Binding="{Binding Wrapper.Task.IsNewSheet}" Value="True">
                             <Setter Property="IsEnabled" Value="False"/>
                         </DataTrigger>
                     </Style.Triggers>

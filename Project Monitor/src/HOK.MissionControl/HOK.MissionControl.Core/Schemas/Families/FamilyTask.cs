@@ -20,57 +20,65 @@ namespace HOK.MissionControl.Core.Schemas.Families
         public string Id { get; set; }
 
         private string _name;
-        [DataMember]
-        public string name {
+        [DataMember(Name = "name")]
+        [JsonProperty("name")]
+        public string Name {
             get { return _name; }
-            set { _name = value; RaisePropertyChanged("name"); }
+            set { _name = value; RaisePropertyChanged("Name"); }
         }
 
         private string _assignedTo;
-        [DataMember]
-        public string assignedTo
+        [DataMember(Name = "assignedTo")]
+        [JsonProperty("assignedTo")]
+        public string AssignedTo
         {
             get { return _assignedTo; }
-            set { _assignedTo = value; RaisePropertyChanged("assignedTo"); }
+            set { _assignedTo = value; RaisePropertyChanged("AssignedTo"); }
         }
 
         private string _message;
-        [DataMember]
-        public string message
+        [DataMember(Name = "message")]
+        [JsonProperty("message")]
+        public string Message
         {
             get { return _message; }
-            set { _message = value; RaisePropertyChanged("message"); }
+            set { _message = value; RaisePropertyChanged("Message"); }
         }
 
         private string _comments;
-        [DataMember]
-        public string comments
+        [DataMember(Name = "comments")]
+        [JsonProperty("comments")]
+        public string Comments
         {
             get { return _comments; }
-            set { _comments = value; RaisePropertyChanged("comments"); }
+            set { _comments = value; RaisePropertyChanged("Comments"); }
         }
 
         private string _submittedBy;
-        [DataMember]
-        public string submittedBy
+        [DataMember(Name = "submittedBy")]
+        [JsonProperty("submittedBy")]
+        public string SubmittedBy
         {
             get { return _submittedBy; }
-            set { _submittedBy = value; RaisePropertyChanged("submittedBy"); }
+            set { _submittedBy = value; RaisePropertyChanged("SubmittedBy"); }
         }
 
         private string _completedBy;
-        [DataMember]
-        public string completedBy
+        [DataMember(Name = "completedBy")]
+        [JsonProperty("completedBy")]
+        public string CompletedBy
         {
             get { return _completedBy; }
-            set { _completedBy = value; RaisePropertyChanged("completedBy"); }
+            set { _completedBy = value; RaisePropertyChanged("CompletedBy"); }
         }
 
-        [DataMember]
-        public DateTime? submittedOn { get; set; }
+        [DataMember(Name = "submittedOn")]
+        [JsonProperty("submittedOn")]
+        public DateTime? SubmittedOn { get; set; }
 
-        [DataMember]
-        public DateTime? completedOn { get; set; }
+        [DataMember(Name = "completedOn")]
+        [JsonProperty("completedOn")]
+        public DateTime? CompletedOn { get; set; }
 
         /// <summary>
         /// Utility method used to copy all properties from one object to another, and trigger PropertyChange for UI updates.
@@ -79,14 +87,14 @@ namespace HOK.MissionControl.Core.Schemas.Families
         public void CopyProperties(FamilyTask other)
         {
             Id = other.Id;
-            assignedTo = other.assignedTo;
-            submittedOn = other.submittedOn;
-            completedOn = other.completedOn;
-            submittedBy = other.submittedBy;
-            completedBy = other.completedBy;
-            name = other.name;
-            message = other.message;
-            comments = other.comments;
+            AssignedTo = other.AssignedTo;
+            SubmittedOn = other.SubmittedOn;
+            CompletedOn = other.CompletedOn;
+            SubmittedBy = other.SubmittedBy;
+            CompletedBy = other.CompletedBy;
+            Name = other.Name;
+            Message = other.Message;
+            Comments = other.Comments;
         }
 
         // (Konrad) Comparison methods used when updating UI. IndexOf() uses it.

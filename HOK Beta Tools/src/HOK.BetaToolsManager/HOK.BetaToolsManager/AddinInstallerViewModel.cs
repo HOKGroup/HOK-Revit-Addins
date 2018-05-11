@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
@@ -64,14 +63,13 @@ namespace HOK.BetaToolsManager
         {
             foreach (var addin in Addins)
             {
-                if (AutoUpdateStatus != null) addin.AutoUpdate = (bool) AutoUpdateStatus;
+                addin.AutoUpdate = true;
             }
         }
 
         private void OnWindowLoaded(Window win)
         {
             OnCheckNone();
-            AutoUpdateStatus = Addins.FirstOrDefault()?.AutoUpdate;
             StatusBarManager.StatusLabel = ((AddinInstallerWindow)win).statusLabel;
         }
 
@@ -115,13 +113,6 @@ namespace HOK.BetaToolsManager
         {
             get { return _addins; }
             set { _addins = value; RaisePropertyChanged(() => Addins); }
-        }
-
-        private bool? _autoUpdateStatus;
-        public bool? AutoUpdateStatus
-        {
-            get { return _autoUpdateStatus; }
-            set { _autoUpdateStatus = value; RaisePropertyChanged(() => AutoUpdateStatus); }
         }
     }
 }

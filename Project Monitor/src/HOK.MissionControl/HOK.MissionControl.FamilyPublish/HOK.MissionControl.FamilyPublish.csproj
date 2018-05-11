@@ -134,7 +134,6 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="AppCommand.cs" />
     <Compile Include="FamilyMonitorModel.cs" />
     <Compile Include="FamilyMonitorView.xaml.cs">
       <DependentUpon>FamilyMonitorView.xaml</DependentUpon>
@@ -147,6 +146,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\FileInfoUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HOK.MissionControl.Core\HOK.MissionControl.Core.csproj">

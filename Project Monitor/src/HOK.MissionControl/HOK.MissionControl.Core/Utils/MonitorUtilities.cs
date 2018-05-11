@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Configurations;
 
 namespace HOK.MissionControl.Core.Utils
 {
@@ -15,11 +16,11 @@ namespace HOK.MissionControl.Core.Utils
         /// <returns>True if updater exists and is on.</returns>
         public static bool IsUpdaterOn(Project project, Configuration config, Guid updaterId)
         {
-            var updaterFound = config.updaters
-                .FirstOrDefault(x => string.Equals(x.updaterId.ToLower(), updaterId.ToString().ToLower(),
-                    StringComparison.Ordinal));
+            var updaterFound = config.Updaters
+                .FirstOrDefault(x => string.Equals(x.UpdaterId, updaterId.ToString(),
+                    StringComparison.OrdinalIgnoreCase));
 
-            return updaterFound?.isUpdaterOn ?? false;
+            return updaterFound?.IsUpdaterOn ?? false;
         }
     }
 }

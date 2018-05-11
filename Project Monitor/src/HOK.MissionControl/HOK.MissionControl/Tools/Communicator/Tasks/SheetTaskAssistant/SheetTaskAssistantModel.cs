@@ -1,4 +1,5 @@
 ﻿using System;
+using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Utils;
 
@@ -17,7 +18,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
 
             AppCommand.CommunicatorHandler.SheetItem = item;
             AppCommand.CommunicatorHandler.SheetTask = task;
-            AppCommand.CommunicatorHandler.Request.Make(task.isNewSheet
+            AppCommand.CommunicatorHandler.Request.Make(task.IsNewSheet
                 ? RequestId.CreateSheet
                 : RequestId.UpdateSheet);
 
@@ -28,32 +29,40 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         /// Posts approved changes to MongoDB. Mongo will fire socket event when complete.
         /// </summary>
         /// <param name="wrapper">Sheet Task Wrapper containing approved task.</param>
-        public void Approve(SheetTaskWrapper wrapper)
+        /// <param name="centralPath"></param>
+        public void Approve(SheetTaskWrapper wrapper, string centralPath)
         {
-            //TODO: This can potentially cause an issue. What if user opens multiple sessions of Revit all registered in MissionControl.
-            var sheetsDataId = AppCommand.SheetsData.Id;
+            var sheetsDataId = string.Empty;
+            if (MissionControlSetup.SheetsData.ContainsKey(centralPath))
+                sheetsDataId = MissionControlSetup.SheetsData[centralPath].Id;
             if (string.IsNullOrEmpty(sheetsDataId)) return;
 
             var t = (SheetTask)wrapper.Task;
             var e = (SheetItem)wrapper.Element;
 
-            t.completedBy = Environment.UserName.ToLower();
-            t.completedOn = DateTime.UtcNow;
+            t.CompletedBy = Environment.UserName.ToLower();
+            t.CompletedOn = DateTime.UtcNow;
 
             // body needs to be updated with a new identifier object or mongo side will fail.
-            if (e.isNewSheet)
+            if (e.IsNewSheet)
             {
                 // (Konrad) It's a create sheet task (element associated with task is null). Let's approve that.
                 var newSheet = AppCommand.CommunicatorHandler.SheetItem;
                 if (newSheet == null) return;
 
                 wrapper.Element = newSheet;
-                ServerUtilities.Post<SheetData>(wrapper, "sheets/" + sheetsDataId + "/approvenewsheet");
+                if (!ServerUtilities.Post(wrapper, "sheets/" + sheetsDataId + "/approvenewsheet", out SheetData unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to approve creation of new Sheet.");
+                }
             }
             else
             {
-                t.sheetId = e.Id;
-                ServerUtilities.Post<SheetData>(t, "sheets/" + sheetsDataId + "/updatetasks");
+                t.SheetId = e.Id;
+                if (!ServerUtilities.Post(t, "sheets/" + sheetsDataId + "/updatetasks", out SheetData unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to approve changes to Sheet.");
+                }
             } 
         }
 

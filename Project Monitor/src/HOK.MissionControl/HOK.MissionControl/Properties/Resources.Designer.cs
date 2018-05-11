@@ -79,6 +79,15 @@ namespace HOK.MissionControl.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 90391154-67BB-452E-A1A7-A07A98B94F86.
+        /// </summary>
+        internal static string LinkUnloadTrackerGuid {
+            get {
+                return ResourceManager.GetString("LinkUnloadTrackerGuid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HOK.MissionControl.addin.
         /// </summary>
         internal static string MissionControl_AddinName {
@@ -147,6 +156,15 @@ namespace HOK.MissionControl.Properties {
         internal static string SharedParameterTrackerGuid {
             get {
                 return ResourceManager.GetString("SharedParameterTrackerGuid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0504A758-BF15-4C90-B996-A795D92B42DB.
+        /// </summary>
+        internal static string SheetsTrackerGuid {
+            get {
+                return ResourceManager.GetString("SheetsTrackerGuid", resourceCulture);
             }
         }
     }

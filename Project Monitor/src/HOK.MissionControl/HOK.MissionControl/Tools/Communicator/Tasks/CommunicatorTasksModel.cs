@@ -1,6 +1,6 @@
-﻿using System;
+﻿#region References
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -9,19 +9,70 @@ using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant;
 using HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant;
+#endregion
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {
     public class CommunicatorTasksModel
     {
-        private FamilyData FamiliesData { get; }
-        private SheetData SheetsData { get; }
+        public FamilyData FamiliesData { get; set; }
+        public SheetData SheetsData { get; set; }
         public object TaskView { get; set; }
 
-        public CommunicatorTasksModel(FamilyData famStat = null, SheetData sheetData = null)
+        /// <summary>
+        /// Collects all unfinished tasks for Sheets.
+        /// </summary>
+        /// <returns>List of Sheet Tasks.</returns>
+        public List<TaskWrapper> ProcessSheetsData()
         {
-            FamiliesData = famStat;
-            SheetsData = sheetData;
+            if (SheetsData == null) return null;
+            if (!SheetsData.Sheets.Any()) return null;
+
+            var tasks = new List<TaskWrapper>();
+            foreach (var sheetItem in SheetsData.Sheets)
+            {
+                if (sheetItem.IsDeleted || !sheetItem.Tasks.Any()) continue;
+                foreach (var sheetTask in sheetItem.Tasks)
+                {
+                    if (!string.IsNullOrEmpty(sheetTask.CompletedBy)) continue;
+                    if (!string.Equals(sheetTask.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
+
+                    tasks.Add(new SheetTaskWrapper(sheetItem, sheetTask));
+                }
+            }
+
+            return tasks;
+        }
+
+        /// <summary>
+        /// Collects all unfinished tasks for Families.
+        /// </summary>
+        /// <returns>List of Family Tasks.</returns>
+        public List<TaskWrapper> ProcessFamiliesData()
+        {
+            if (FamiliesData == null) return null;
+            if (!FamiliesData.Families.Any()) return null;
+
+            var tasks = new List<TaskWrapper>();
+            var familiesToWatch = new Dictionary<string, FamilyItem>();
+            foreach (var family in FamiliesData.Families)
+            {
+                // (Konrad) We are storing this Family Item for later so that if user makes any changes to this family
+                // and reloads it back into the model, we can capture that and post to MongoDB at the end of the session.
+                if (!familiesToWatch.ContainsKey(family.Name)) familiesToWatch.Add(family.Name, family);
+
+                if (!family.Tasks.Any()) continue;
+                foreach (var task in family.Tasks)
+                {
+                    if (!string.IsNullOrEmpty(task.CompletedBy)) continue;
+                    if (!string.Equals(task.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
+
+                    tasks.Add(new FamilyTaskWrapper(family, task));
+                }
+            }
+
+            AppCommand.FamiliesToWatch = familiesToWatch;
+            return tasks;
         }
 
         /// <summary>
@@ -131,56 +182,6 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                     ((SheetTaskAssistantView)TaskView).Show();
                 }
             }
-        }
-
-        /// <summary>
-        /// Collects all tasks (Sheets, Families) to be displayed.
-        /// </summary>
-        /// <returns></returns>
-        public ObservableCollection<TaskWrapper> GetTasks()
-        {
-            var tasks = new ObservableCollection<TaskWrapper>();
-
-            if (FamiliesData != null)
-            {
-                var familiesToWatch = new Dictionary<string, FamilyItem>();
-                foreach (var family in FamiliesData.families)
-                {
-                    // (Konrad) We are storing this Family Item for later so that if user makes any changes to this family
-                    // and reloads it back into the model, we can capture that and post to MongoDB at the end of the session.
-                    if (!familiesToWatch.ContainsKey(family.name)) familiesToWatch.Add(family.name, family);
-
-                    if (!family.tasks.Any()) continue;
-                    foreach (var task in family.tasks)
-                    {
-                        if (!string.IsNullOrEmpty(task.completedBy)) continue;
-                        if (!string.Equals(task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
-
-                        tasks.Add(new FamilyTaskWrapper(family, task));
-                    }
-                }
-
-                AppCommand.FamiliesToWatch = familiesToWatch;
-            }
-
-            if (SheetsData != null)
-            {
-                if (!SheetsData.sheets.Any()) return tasks;
-
-                foreach (var sheetItem in SheetsData.sheets)
-                {
-                    if (sheetItem.isDeleted || !sheetItem.tasks.Any()) continue;
-                    foreach (var sheetTask in sheetItem.tasks)
-                    {
-                        if (!string.IsNullOrEmpty(sheetTask.completedBy)) continue;
-                        if (!string.Equals(sheetTask.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) continue;
-
-                        tasks.Add(new SheetTaskWrapper(sheetItem, sheetTask));
-                    }
-                }
-            }
-
-            return tasks;
         }
     }
 }

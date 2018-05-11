@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Controls;
@@ -13,6 +15,8 @@ using HOK.Core.WpfUtilities;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Core.Schemas.Sheets;
+using HOK.MissionControl.Core.Utils;
+#endregion
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {
@@ -29,7 +33,6 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         public CommunicatorTasksViewModel(CommunicatorTasksModel model)
         {
             Model = model;
-            Tasks = Model.GetTasks();
             BindingOperations.EnableCollectionSynchronization(_tasks, _lock);
 
             LaunchTaskAssistant = new RelayCommand<TaskWrapper>(OnLaunchTaskAssistant);
@@ -37,6 +40,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             WindowLoaded = new RelayCommand<UserControl>(OnWindowLoaded);
             WindowClosed = new RelayCommand<UserControl>(OnWindowClosed);
 
+            Messenger.Default.Register<CommunicatorDataDownloaded>(this, OnCommunicatorDataDownloaded);
             Messenger.Default.Register<FamilyTaskDeletedMessage>(this, OnFamilyTaskDeleted);
             Messenger.Default.Register<FamilyTaskAddedMessage>(this, OnFamilyTaskAdded);
             Messenger.Default.Register<FamilyTaskUpdatedMessage>(this, OnFamilyTaskUpdated);
@@ -71,7 +75,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             Model.LaunchTaskAssistant(task);
         }
 
-        private ObservableCollection<TaskWrapper> _tasks;
+        private ObservableCollection<TaskWrapper> _tasks = new ObservableCollection<TaskWrapper>();
         public ObservableCollection<TaskWrapper> Tasks
         {
             get { return _tasks; }
@@ -86,6 +90,38 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         }
 
         #region Message Handlers
+
+        /// <summary>
+        /// Handles a message emitted when stats are done downloading.
+        /// </summary>
+        /// <param name="obj"></param>
+        private void OnCommunicatorDataDownloaded(CommunicatorDataDownloaded obj)
+        {
+            List<TaskWrapper> tasks;
+            switch (obj.Type)
+            {
+                case DataType.Sheets:
+                    Model.SheetsData = MissionControlSetup.SheetsData[obj.CentralPath];
+                    tasks = Model.ProcessSheetsData();
+                    break;
+                case DataType.Families:
+                    Model.FamiliesData = MissionControlSetup.FamilyData[obj.CentralPath];
+                    tasks = Model.ProcessFamiliesData();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            if (tasks == null) return;
+
+            lock (_lock)
+            {
+                foreach (var task in tasks)
+                {
+                    Tasks.Add(task);
+                }
+            }
+        }
 
         /// <summary>
         /// Handles a message emmited by Closing a Family Task.
@@ -103,11 +139,12 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg"></param>
         private void OnSheetTaskSheetDeleted(SheetTaskSheetDeletedMessage msg)
         {
-            var existingIndex = AppCommand.SheetsData.sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
+            var sheetsData = MissionControlSetup.SheetsData[msg.CentralPath];
+            var existingIndex = sheetsData.Sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
             if (existingIndex == -1) return;
 
             // (Konrad) Update SheetsData stored in AppCommand
-            AppCommand.SheetsData.sheets.RemoveAt(existingIndex);
+            sheetsData.Sheets.RemoveAt(existingIndex);
 
             foreach (var id in msg.DeletedIds)
             {
@@ -125,15 +162,16 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control.</param>
         private void OnSheetTaskSheetsCreated(SheetTaskSheetsCreatedMessage msg)
         {
-            var assignedTo = msg.Sheets.FirstOrDefault()?.tasks.FirstOrDefault()?.assignedTo; // all tasks will be assigned to one user only
+            var sheetsData = MissionControlSetup.SheetsData[msg.CentralPath];
+            var assignedTo = msg.Sheets.FirstOrDefault()?.Tasks.FirstOrDefault()?.AssignedTo; // all tasks will be assigned to one user only
             if (!string.IsNullOrEmpty(assignedTo) && !string.Equals(assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.Ordinal)) return;
 
-            AppCommand.SheetsData.sheets.AddRange(msg.Sheets); // update stored sheets
+            sheetsData.Sheets.AddRange(msg.Sheets); // update stored sheets
             lock (_lock)
             {
                 foreach (var sheetItem in msg.Sheets)
                 {
-                    Tasks.Add(new SheetTaskWrapper(sheetItem, sheetItem.tasks.First()));
+                    Tasks.Add(new SheetTaskWrapper(sheetItem, sheetItem.Tasks.First()));
                 }
             }
         }
@@ -144,16 +182,17 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control</param>
         private void OnSheetsTaskDeleted(SheetsTaskDeletedMessage msg)
         {
-            var existingIndex = AppCommand.SheetsData.sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
+            var sheetsData = MissionControlSetup.SheetsData[msg.CentralPath];
+            var existingIndex = sheetsData.Sheets.FindIndex(x => string.Equals(x.Id, msg.SheetId, StringComparison.Ordinal));
             if (existingIndex == -1) return;
 
             foreach (var id in msg.DeletedIds)
             {
                 // (Konrad) Update SheetsData stored in AppCommand
-                var taskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => string.Equals(x.Id, id, StringComparison.Ordinal));
+                var taskIndex = sheetsData.Sheets[existingIndex].Tasks.FindIndex(x => string.Equals(x.Id, id, StringComparison.Ordinal));
                 if(taskIndex == -1) continue;
 
-                AppCommand.SheetsData.sheets[existingIndex].tasks.RemoveAt(taskIndex);
+                sheetsData.Sheets[existingIndex].Tasks.RemoveAt(taskIndex);
 
                 // (Konrad) Update Tasks collection in UI
                 var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(SheetTaskWrapper) && string.Equals(((SheetTask)x.Task).Id, id, StringComparison.Ordinal));
@@ -169,26 +208,27 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control.</param>
         private void OnSheetTaskUpdated(SheetsTaskUpdatedMessage msg)
         {
-            var existingIndex = AppCommand.SheetsData.sheets.IndexOf(msg.Sheet);
+            var sheetsData = MissionControlSetup.SheetsData[msg.CentralPath];
+            var existingIndex = sheetsData.Sheets.IndexOf(msg.Sheet);
             if (existingIndex == -1) return;
-            var existingTaskIndex = AppCommand.SheetsData.sheets[existingIndex].tasks.FindIndex(x => x.Id == msg.Task.Id);
+            var existingTaskIndex = sheetsData.Sheets[existingIndex].Tasks.FindIndex(x => x.Id == msg.Task.Id);
             if (existingTaskIndex == -1)
             {
-                if (string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(),StringComparison.CurrentCultureIgnoreCase))
+                if (string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(),StringComparison.CurrentCultureIgnoreCase))
                 {
                     lock (_lock)
                     {
                         Tasks.Add(new SheetTaskWrapper(msg.Sheet, msg.Task)); // task wasn't ours but was re-assigned to us
                     }
-                    AppCommand.SheetsData.sheets[existingIndex].tasks.Add(msg.Task);
+                    sheetsData.Sheets[existingIndex].Tasks.Add(msg.Task);
                 }
                 return;
             }
 
-            var existingTask = AppCommand.SheetsData.sheets[existingIndex].tasks[existingTaskIndex];
-            if (!string.Equals(existingTask.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase))
+            var existingTask = sheetsData.Sheets[existingIndex].Tasks[existingTaskIndex];
+            if (!string.Equals(existingTask.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase))
             {
-                if (!string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) return; // it still doesn't belong to us.
+                if (!string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase)) return; // it still doesn't belong to us.
                 lock (_lock)
                 {
                     Tasks.Add(new SheetTaskWrapper(msg.Sheet, msg.Task)); // old task was re-assigned to us, so we can add it
@@ -204,11 +244,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                         Tasks.Add(new SheetTaskWrapper(msg.Sheet, msg.Task)); // task might have been closed and someone is re-opening it
                     }
 
-                    AppCommand.SheetsData.sheets[existingIndex].tasks[existingTaskIndex] = msg.Task;
+                    sheetsData.Sheets[existingIndex].Tasks[existingTaskIndex] = msg.Task;
                     return;
                 }
 
-                if (!string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase))
+                if (!string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(), StringComparison.CurrentCultureIgnoreCase))
                 {
                     LockRemoveClose(storedTask);
                 }
@@ -220,7 +260,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                     task.CopyProperties(msg.Task); // it's still ours, update it
 
                     // (Konrad) We only get here when user hits "Approve"
-                    if (!string.IsNullOrEmpty(task.completedBy))
+                    if (!string.IsNullOrEmpty(task.CompletedBy))
                     {
                         LockRemoveClose(storedTask);
                     }
@@ -228,7 +268,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
 
             // replace existing task
-            AppCommand.SheetsData.sheets[existingIndex].tasks[existingTaskIndex] = msg.Task;
+            sheetsData.Sheets[existingIndex].Tasks[existingTaskIndex] = msg.Task;
         }
 
         /// <summary>
@@ -237,11 +277,12 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         /// <param name="msg">Message from Mission Control.</param>
         private void OnSheetTaskAdded(SheetsTaskAddedMessage msg)
         {
-            var existingIndex = AppCommand.SheetsData.sheets.IndexOf(msg.Sheet);
+            var sheetsData = MissionControlSetup.SheetsData[msg.CentralPath];
+            var existingIndex = sheetsData.Sheets.IndexOf(msg.Sheet);
             if (existingIndex != -1)
             {
                 // Update existing sheet
-                AppCommand.SheetsData.sheets[existingIndex].tasks.Add(msg.Task);
+                sheetsData.Sheets[existingIndex].Tasks.Add(msg.Task);
 
                 lock (_lock)
                 {
@@ -266,11 +307,11 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             if (AppCommand.FamiliesToWatch.ContainsKey(msg.FamilyName))
             {
                 var oldFamily = AppCommand.FamiliesToWatch[msg.FamilyName];
-                var taskIndex = oldFamily.tasks.FindIndex(x => x.Id == msg.Task.Id);
+                var taskIndex = oldFamily.Tasks.FindIndex(x => x.Id == msg.Task.Id);
                 if (taskIndex == -1) return; 
 
-                oldFamily.tasks.RemoveAt(taskIndex);
-                oldFamily.tasks.Add(msg.Task);
+                oldFamily.Tasks.RemoveAt(taskIndex);
+                oldFamily.Tasks.Add(msg.Task);
 
                 family = oldFamily;
             }
@@ -283,8 +324,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             var storedTask = Tasks.FirstOrDefault(x => x.GetType() == typeof(FamilyTaskWrapper) && ((FamilyTask)x.Task).Id == msg.Task.Id);
             if (storedTask != null)
             {
-                if (string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(),
-                        StringComparison.Ordinal) && string.IsNullOrEmpty(msg.Task.completedBy))
+                if (string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(),
+                        StringComparison.Ordinal) && string.IsNullOrEmpty(msg.Task.CompletedBy))
                 {
                     // (Konrad) In order to trigger changes to UI, we need to update properties individually
                     // Only then do they fire proper events and update UI.
@@ -304,7 +345,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             }
             else
             {
-                if (string.Equals(msg.Task.assignedTo.ToLower(), Environment.UserName.ToLower(),
+                if (string.Equals(msg.Task.AssignedTo.ToLower(), Environment.UserName.ToLower(),
                     StringComparison.Ordinal))
                 {
                     // (Konrad) Someone reassigned a task to us.
@@ -328,7 +369,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             if (AppCommand.FamiliesToWatch.ContainsKey(msg.FamilyName))
             {
                 var oldFamily = AppCommand.FamiliesToWatch[msg.FamilyName];
-                oldFamily.tasks.Add(msg.Task);
+                oldFamily.Tasks.Add(msg.Task);
 
                 AppCommand.FamiliesToWatch.Remove(msg.FamilyName);
                 AppCommand.FamiliesToWatch.Add(msg.FamilyName, oldFamily);
@@ -361,8 +402,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
                 var oldFamily = AppCommand.FamiliesToWatch[msg.FamilyName];
                 foreach (var id in msg.DeletedIds)
                 {
-                    var index = oldFamily.tasks.FindIndex(x => x.Id == id);
-                    if(index != -1) oldFamily.tasks.RemoveAt(index);
+                    var index = oldFamily.Tasks.FindIndex(x => x.Id == id);
+                    if(index != -1) oldFamily.Tasks.RemoveAt(index);
                 }
             }
 

@@ -8,7 +8,7 @@
         xmlns:statusReporter="clr-namespace:HOK.MissionControl.Utils.StatusReporter"
         mc:Ignorable="d" 
         d:DesignHeight="100" d:DesignWidth="400" WindowStyle="None" WindowStartupLocation="Manual" ResizeMode="NoResize" AllowsTransparency="True"
-        Width="400" Height="100" Background="Transparent" BorderThickness="0" BorderBrush="Transparent">
+        Width="350" Height="75" Background="Transparent" BorderThickness="0" BorderBrush="Transparent">
     <Window.Resources>
         <statusReporter:StatusToColorConverter x:Key="BackgroundConverter"/>
         <statusReporter:StatusToTextConverter x:Key="TextConverter"/>
@@ -21,14 +21,14 @@
     </i:Interaction.Triggers>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="15"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="15"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="15"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="15"/>
         </Grid.RowDefinitions>
         <Border Grid.Column="0" 
                 Grid.ColumnSpan="3" 
@@ -39,10 +39,10 @@
                 BorderBrush="White">
         </Border>
         <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="1">
-            <Image Source="{Binding Status, Converter={StaticResource ImageConverter}}" Width="45" Height="45"></Image>
+            <Image Source="{Binding Status, Converter={StaticResource ImageConverter}}" Width="35" Height="35"></Image>
             <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="15,0,0,0">
-                <TextBlock Text="{Binding Status, Converter={StaticResource TextConverter}}" Foreground="White" FontSize="16" FontWeight="SemiBold"></TextBlock>
-                <TextBlock Text="{Binding Message}" Foreground="White" FontSize="16"></TextBlock>
+                <TextBlock Text="{Binding Status, Converter={StaticResource TextConverter}}" Foreground="White" FontSize="14" FontWeight="SemiBold"></TextBlock>
+                <TextBlock Text="{Binding Message}" Foreground="White" FontSize="14"></TextBlock>
             </StackPanel>
         </StackPanel>
     </Grid>

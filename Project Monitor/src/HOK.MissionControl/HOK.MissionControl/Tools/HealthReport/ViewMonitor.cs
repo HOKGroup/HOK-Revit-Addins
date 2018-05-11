@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Views;
 using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.HealthReport
@@ -14,8 +14,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// Publishes View count data when Document is closed.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
-        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
-        public void PublishData(Document doc, string recordId)
+        /// <param name="viewsId">Id of the Views Document in MongoDB.</param>
+        public void PublishData(Document doc, string viewsId)
         {
             try
             {
@@ -80,18 +80,22 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var schedulesOnSheet = scheduleSet.Count;
                 viewsOnSheet += schedulesOnSheet;
 
-                var viewStats = new ViewStat
+                var viewStats = new ViewsDataItem
                 {
-                    totalViews = viewTotalCount,
-                    totalSheets = sheetTotalCount,
-                    totalSchedules = scheduleTotalCount,
-                    viewsOnSheet = viewsOnSheet,
-                    viewsOnSheetWithTemplate = viewsOnSheetWithTemplate,
-                    schedulesOnSheet = schedulesOnSheet,
-                    unclippedViews = unclippedViews
+                    TotalViews = viewTotalCount,
+                    TotalSheets = sheetTotalCount,
+                    TotalSchedules = scheduleTotalCount,
+                    ViewsOnSheet = viewsOnSheet,
+                    ViewsOnSheetWithTemplate = viewsOnSheetWithTemplate,
+                    SchedulesOnSheet = schedulesOnSheet,
+                    UnclippedViews = unclippedViews
                 };
 
-                var unused = ServerUtilities.Post<ViewStat>(viewStats, "healthrecords/" + recordId + "/viewstats");
+                if (!ServerUtilities.Post(viewStats, "views/" + viewsId + "/viewstats", 
+                    out ViewsData unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Views Data.");
+                }
             }
             catch (Exception ex)
             {

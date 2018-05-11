@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region References
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,9 +7,11 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.FamilyPublish.Properties;
+#endregion
 
 namespace HOK.MissionControl.FamilyPublish
 {
@@ -18,15 +21,15 @@ namespace HOK.MissionControl.FamilyPublish
         public static Document Doc { get; set; }
         public Configuration Config { get; set; }
         public Project Project { get; set; }
-        private string RecordId { get; }
+        private string FamiliesId { get; }
         private string CentralPath { get; }
 
-        public FamilyMonitorModel(Document doc, Configuration config, Project project, string recordId, string centralPath)
+        public FamilyMonitorModel(Document doc, Configuration config, Project project, string familiesId, string centralPath)
         {
             Doc = doc;
             Config = config;
             Project = project;
-            RecordId = recordId;
+            FamiliesId = familiesId;
             CentralPath = centralPath;
         }
 
@@ -38,7 +41,7 @@ namespace HOK.MissionControl.FamilyPublish
             try
             {
                 if (!MonitorUtilities.IsUpdaterOn(Project, Config, UpdaterGuid)) return;
-                if (string.IsNullOrEmpty(RecordId)) return;
+                if (string.IsNullOrEmpty(FamiliesId)) return;
 
                 var unusedFamilies = 0;
                 var oversizedFamilies = 0;
@@ -47,6 +50,17 @@ namespace HOK.MissionControl.FamilyPublish
                     .OfClass(typeof(Family))
                     .Cast<Family>()
                     .ToList();
+
+                var config = MissionControlSetup.Configurations.ContainsKey(CentralPath)
+                    ? MissionControlSetup.Configurations[CentralPath]
+                    : null;
+
+                var familyNameCheck = new List<string> { "HOK_I", "HOK_M" }; //defaults
+                if (config != null)
+                {
+                    familyNameCheck = config.Updaters.First(x => string.Equals(x.UpdaterId,
+                        Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.FamilyNameCheck.Values;
+                }
 
                 //var count = 0;
                 var famOutput = new List<FamilyItem>();
@@ -61,9 +75,7 @@ namespace HOK.MissionControl.FamilyPublish
                         StatusBarManager.CancelProgress();
                         return;
                     }
-
                     StatusBarManager.StepForward();
-                    if (!family.IsEditable) continue;
 
                     var sizeCheck = false;
                     var instanceCheck = false;
@@ -77,9 +89,15 @@ namespace HOK.MissionControl.FamilyPublish
                     }
                     if (family.IsInPlace) inPlaceFamilies++;
 
+                    long size = 0;
+                    var refPlanes = 0;
+                    var arrays = 0;
+                    var voids = 0;
+                    var nestedFamilies = 0;
+                    var parameters = 0;
+                    var sizeStr = "0Kb";
                     try
                     {
-                        long size;
                         var famDoc = Doc.EditFamily(family);
 
                         var storedPath = famDoc.PathName;
@@ -104,7 +122,7 @@ namespace HOK.MissionControl.FamilyPublish
                             TryToDelete(path);
                         }
 
-                        var refPlanes = new FilteredElementCollector(famDoc)
+                        refPlanes = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(ReferencePlane))
                             .GetElementCount();
 
@@ -114,68 +132,74 @@ namespace HOK.MissionControl.FamilyPublish
                             new ElementClassFilter(typeof(RadialArray))
                         });
 
-                        var arrays = new FilteredElementCollector(famDoc)
+                        arrays = new FilteredElementCollector(famDoc)
                             .WherePasses(filter)
                             .GetElementCount();
 
-                        var voids = new FilteredElementCollector(famDoc)
+                        voids = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(Extrusion))
                             .Cast<Extrusion>()
                             .Count(x => !x.IsSolid);
 
-                        var nestedFamilies = new FilteredElementCollector(famDoc)
+                        nestedFamilies = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(Family))
                             .GetElementCount();
 #if RELEASE2015
                         //(Konrad) Since Revit 2015 API doesn't support this we will just skip it.
-                        const int parameters = 0; 
+                        parameters = 0; 
 #else
-                        var parameters = new FilteredElementCollector(famDoc)
+                        parameters = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(ParameterElement))
                             .GetElementCount();
 #endif
                         famDoc.Close(false);
 
-                        var sizeStr = StringUtilities.BytesToString(size);
+                        sizeStr = StringUtilities.BytesToString(size);
                         if (size > 1000000)
                         {
                             oversizedFamilies++; // >1MB
                             sizeCheck = true;
                         }
-                        //TODO: This should use the settings from mongoDB
-                        if (!family.Name.Contains("_HOK_I") && !family.Name.Contains("_HOK_M")) nameCheck = true;
-
-                        var famItem = new FamilyItem
-                        {
-                            name = family.Name,
-                            elementId = family.Id.IntegerValue,
-                            size = sizeStr,
-                            sizeValue = size,
-                            instances = instances,
-                            arrayCount = arrays,
-                            refPlaneCount = refPlanes,
-                            voidCount = voids,
-                            nestedFamilyCount = nestedFamilies,
-                            parametersCount = parameters,
-                            tasks = new List<FamilyTask>()
-                        };
-                        
-                        if (nameCheck || sizeCheck || instanceCheck) famItem.isFailingChecks = true;
-                        else famItem.isFailingChecks = false;
-
-                        famOutput.Add(famItem);
                     }
                     catch (Exception ex)
                     {
                         Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                        Log.AppendLog(LogMessageType.ERROR, "Failed to retrieve size, refPlanes, arrays, voids...");
                     }
+
+                    if (!familyNameCheck.Any(family.Name.Contains)) nameCheck = true;
+
+                    var famItem = new FamilyItem
+                    {
+                        Name = family.Name,
+                        ElementId = family.Id.IntegerValue,
+                        Size = sizeStr,
+                        SizeValue = size,
+                        Instances = instances,
+                        ArrayCount = arrays,
+                        RefPlaneCount = refPlanes,
+                        VoidCount = voids,
+                        NestedFamilyCount = nestedFamilies,
+                        ParametersCount = parameters,
+                        Tasks = new List<FamilyTask>()
+                    };
+
+                    if (nameCheck || sizeCheck || instanceCheck) famItem.IsFailingChecks = true;
+                    else famItem.IsFailingChecks = false;
+
+                    famOutput.Add(famItem);
                 }
 
-                var famStat = ServerUtilities.GetByCentralPath<FamilyData>(CentralPath, "families/centralpath");
+                if (!ServerUtilities.GetByCentralPath(CentralPath, "families/centralpath", out FamilyData famStat))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to retrieve Families data.");
+                    return;
+                }
+                
                 var famDict = new Dictionary<string, FamilyItem>();
                 if (famStat != null)
                 {
-                    famDict = famStat.families.ToDictionary(x => x.name, x => x);
+                    famDict = famStat.Families.ToDictionary(x => x.Name, x => x);
                 }
 
                 // (Konrad) I know it's not efficient to iterate this list yet again, but
@@ -184,41 +208,35 @@ namespace HOK.MissionControl.FamilyPublish
                 // we are exporting and hence losing them after the export.
                 foreach (var family in famOutput)
                 {
-                    if (famDict.ContainsKey(family.name))
+                    if (famDict.ContainsKey(family.Name))
                     {
-                        family.tasks.AddRange(famDict[family.name].tasks);
-                        famDict.Remove(family.name);
+                        family.Tasks.AddRange(famDict[family.Name].Tasks);
+                        famDict.Remove(family.Name);
                     }
                 }
 
                 foreach (var item in famDict.Values.ToList())
                 {
-                    item.isDeleted = true;
+                    item.IsDeleted = true;
                     famOutput.Add(item);
                 }
 
                 var familyStats = new FamilyData
                 {
-                    centralPath = CentralPath.ToLower(),
-                    totalFamilies = famOutput.Count,
-                    unusedFamilies = unusedFamilies,
-                    inPlaceFamilies = inPlaceFamilies,
-                    oversizedFamilies = oversizedFamilies,
-                    createdBy = Environment.UserName.ToLower(),
-                    createdOn = DateTime.UtcNow,
-                    families = famOutput
+                    CentralPath = CentralPath.ToLower(),
+                    TotalFamilies = famOutput.Count,
+                    UnusedFamilies = unusedFamilies,
+                    InPlaceFamilies = inPlaceFamilies,
+                    OversizedFamilies = oversizedFamilies,
+                    CreatedBy = Environment.UserName.ToLower(),
+                    CreatedOn = DateTime.UtcNow,
+                    Families = famOutput
                 };
 
-                if (famStat == null)
+                if (!ServerUtilities.Put(familyStats, "families/" + famStat.Id))
                 {
-                    famStat = ServerUtilities.Post<FamilyData>(familyStats, "families");
-                    ServerUtilities.Put(new {key = famStat.Id}, "healthrecords/" + RecordId + "/addfamilies");
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish Families data.");
                 }
-                else
-                {
-                    ServerUtilities.Put(familyStats, "families/" + famStat.Id);
-                }
-
                 StatusBarManager.FinalizeProgress();
             }
             catch (Exception ex)
