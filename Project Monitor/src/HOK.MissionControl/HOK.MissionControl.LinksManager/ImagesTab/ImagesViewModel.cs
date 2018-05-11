@@ -85,8 +85,8 @@ namespace HOK.MissionControl.LinksManager.ImagesTab
 
         private void OnDelete()
         {
-            var wrappers = SelectedRows.Cast<ImageTypeWrapper>().ToList();
-            var deleted = Model.Delete(wrappers);
+            var selected = (from ImageTypeWrapper s in Images where s.IsSelected select s).ToList();
+            var deleted = Model.Delete(selected);
 
             foreach (var i in deleted)
             {

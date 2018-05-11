@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿#region References
 using System.Windows;
 using System.Windows.Controls;
 using System.Collections;
@@ -11,6 +11,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.Core.ElementWrapers;
 using HOK.Core.WpfUtilities.FeedbackUI;
+#endregion
 
 namespace HOK.MissionControl.LinksManager.StylesTab
 {
@@ -18,7 +19,6 @@ namespace HOK.MissionControl.LinksManager.StylesTab
     {
         public IList SelectedRows { get; set; }
         public StylesModel Model { get; set; }
-        //public ObservableCollection<CategoryWrapper> Styles { get; set; }
         public ListCollectionView Styles { get; set; }
         public RelayCommand Delete { get; }
         public RelayCommand<UserControl> Close { get; }
@@ -39,7 +39,6 @@ namespace HOK.MissionControl.LinksManager.StylesTab
             Model = model;
             Styles = new ListCollectionView(Model.Styles);
             Styles.GroupDescriptions.Add(new PropertyGroupDescription("ParentName"));
-            //Styles = Model.Styles;
             Expanded = true;
 
             Delete = new RelayCommand(OnDelete);
@@ -97,9 +96,8 @@ namespace HOK.MissionControl.LinksManager.StylesTab
 
         private void OnDelete()
         {
-            var wrappers = SelectedRows.Cast<CategoryWrapper>().ToList();
-            var deleted = Model.Delete(wrappers);
-
+            var selected = (from CategoryWrapper s in Styles.SourceCollection where s.IsSelected select s).ToList();
+            var deleted = Model.Delete(selected);
             foreach (var i in deleted)
             {
                 Styles.Remove(i);

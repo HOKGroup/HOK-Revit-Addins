@@ -71,8 +71,6 @@
                                                     <Expander.Header>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="{Binding Path=Name}" />
-                                                            <!--<TextBlock Text="{Binding Path=ItemCount}"/>
-                                                            <TextBlock Text="Items"/>-->
                                                         </StackPanel>
                                                     </Expander.Header>
                                                     <ItemsPresenter />
