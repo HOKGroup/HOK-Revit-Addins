@@ -1,34 +1,60 @@
-﻿using System;
+﻿#region References
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows;
 using System.Windows.Interop;
 using HOK.AddInManager.Classes;
 using HOK.Core.Utilities;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using HOK.Core.WpfUtilities;
 using HOK.Core.WpfUtilities.FeedbackUI;
+using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
+#endregion
 
 namespace HOK.AddInManager.UserControls
 {
     public class AddInViewModel : ViewModelBase
     {
-        private Addins addins;
-        private bool userChanged = true;
+        private bool _userChanged = true;
         public string Title { get; set; }
         public RelayCommand Help { get; set; }
         public RelayCommand SubmitComment { get; set; }
         public RelayCommand<object> LoadTypeCommand { get; set; }
         public RelayCommand<object> OpenUrlCommand { get; set; }
+        public RelayCommand<Window> WindowLoaded { get; set; }
+        public RelayCommand<Window> Cancel { get; set; }
+        public RelayCommand<Window> Ok { get; set; }
 
         public AddInViewModel(Addins addinsObj)
         {
-            addins = addinsObj;
+            _addins = addinsObj;
             Title = "HOK Addin Manager v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             Help = new RelayCommand(OnHelp);
             SubmitComment = new RelayCommand(OnSubmitComment);
             OpenUrlCommand = new RelayCommand<object>(OpenUrlExecuted);
             LoadTypeCommand = new RelayCommand<object>(LoadTypeExecuted);
+            WindowLoaded = new RelayCommand<Window>(OnWindowLoaded);
+            Cancel = new RelayCommand<Window>(OnCancel);
+            Ok = new RelayCommand<Window>(OnOk);
+        }
+
+        private static void OnWindowLoaded(Window win)
+        {
+            StatusBarManager.StatusLabel = ((MainWindow)win).statusLabel;
+        }
+
+        private static void OnCancel(Window win)
+        {
+            win.Close();
+        }
+
+        private static void OnOk(Window win)
+        {
+            win.DialogResult = true;
+            win.Close();
         }
 
         private void OnSubmitComment()
@@ -83,29 +109,29 @@ namespace HOK.AddInManager.UserControls
         {
             try
             {
-                if (param == null || !userChanged) return;
+                if (param == null || !_userChanged) return;
 
                 var parameters = param as DataGridParameters;
                 if (parameters == null || parameters.SelectedCollection.Count <= 1) return;
 
-                userChanged = false;
+                _userChanged = false;
                 foreach (var obj in parameters.SelectedCollection)
                 {
                     var info = obj as AddinInfo;
                     if (info == null) continue;
 
-                    var addinFound = addins.AddinCollection
+                    var addinFound = _addins.AddinCollection
                         .Where(x => x.ToolName == info.ToolName)
                         .ToList();
                     if (!addinFound.Any()) continue;
 
-                    var addinIndex = addins.AddinCollection.IndexOf(addinFound.First());
+                    var addinIndex = _addins.AddinCollection.IndexOf(addinFound.First());
                     if (addinIndex > -1)
                     {
-                        addins.AddinCollection[addinIndex].ToolLoadType = parameters.SelectedLoadType;
+                        _addins.AddinCollection[addinIndex].ToolLoadType = parameters.SelectedLoadType;
                     }
                 }
-                userChanged = true;
+                _userChanged = true;
             }
             catch (Exception ex)
             {
@@ -113,17 +139,18 @@ namespace HOK.AddInManager.UserControls
             }
         }
 
+        private Addins _addins;
         public Addins AddinsObj
         {
-            get { return addins; }
-            set { addins = value; RaisePropertyChanged(() => AddinsObj); }
+            get { return _addins; }
+            set { _addins = value; RaisePropertyChanged(() => AddinsObj); }
         }
 
-        private ObservableCollection<AddinInfo> selectedAddins = new ObservableCollection<AddinInfo>();
+        private ObservableCollection<AddinInfo> _selectedAddins = new ObservableCollection<AddinInfo>();
         public ObservableCollection<AddinInfo> SelectedAddins
         {
-            get { return selectedAddins; }
-            set { selectedAddins = value; RaisePropertyChanged(() => SelectedAddins); }
+            get { return _selectedAddins; }
+            set { _selectedAddins = value; RaisePropertyChanged(() => SelectedAddins); }
         }
     }
 
