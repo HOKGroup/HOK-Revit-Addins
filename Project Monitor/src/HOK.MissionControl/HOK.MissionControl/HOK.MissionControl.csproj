@@ -208,6 +208,7 @@
       <DependentUpon>DTMWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\DTMTool\ReportingElementInfo.cs" />
+    <Compile Include="Tools\HealthReport\GroupMonitor.cs" />
     <Compile Include="Tools\HealthReport\ModelMonitor.cs" />
     <Compile Include="Tools\HealthReport\StylesMonitor.cs" />
     <Compile Include="Tools\LinkUnloadMonitor\LinkUnloadMonitor.cs" />
