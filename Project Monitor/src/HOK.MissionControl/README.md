@@ -7,6 +7,10 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.1.01
+
+* Added export functionality for Groups. That includes data publishing as well health report summary tab. 
+
 ###### Release 2018.0.1.00
 
 * Major data base refactor. 
