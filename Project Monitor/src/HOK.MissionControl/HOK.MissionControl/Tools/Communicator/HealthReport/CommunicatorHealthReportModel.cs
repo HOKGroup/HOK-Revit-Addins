@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Media;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.Groups;
 using HOK.MissionControl.Core.Schemas.Links;
 using HOK.MissionControl.Core.Schemas.Models;
 using HOK.MissionControl.Core.Schemas.Styles;
@@ -45,9 +46,51 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
                 case SummaryType.Models:
                     var mData = (ModelData)obj.Data;
                     return ProcessModels(mData);
+                case SummaryType.Groups:
+                    var gData = (GroupsData)obj.Data;
+                    return ProcessGroups(gData);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        /// <summary>
+        /// Processes Group Stats to create Summary.
+        /// </summary>
+        /// <param name="data">Groups Data</param>
+        /// <returns></returns>
+        private static HealthReportSummaryViewModel ProcessGroups(GroupsData data)
+        {
+            var groupStats = data.GroupStats.FirstOrDefault();
+            if (groupStats == null) return null;
+
+            var unused = groupStats.Groups.Any(x => x.Instances.Count == 0);
+            var mGroups = 0;
+            var dGroups = 0;
+            foreach (var g in groupStats.Groups)
+            {
+                if (g.Type == "Model Group") mGroups++;
+                else dGroups++;
+            }
+
+            var passingChecks = 0;
+            if (!unused) passingChecks += 2;
+            if (mGroups <= 10) passingChecks += 2;
+            else if (mGroups > 10 && mGroups <= 20) passingChecks += 1;
+            if (dGroups <= 10) passingChecks += 2;
+            else if (dGroups > 10 && dGroups <= 20) passingChecks += 1;
+
+            const int maxScore = 6;
+            var vm = new HealthReportSummaryViewModel
+            {
+                Count = groupStats.Groups.Count.ToString(),
+                Title = "Groups:",
+                ToolName = string.Empty,
+                ShowButton = false,
+                Score = passingChecks + "/" + maxScore,
+                FillColor = GetColor(passingChecks, maxScore)
+            };
+            return vm;
         }
 
         /// <summary>

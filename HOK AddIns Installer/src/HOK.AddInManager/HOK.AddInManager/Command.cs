@@ -28,9 +28,10 @@ namespace HOK.AddInManager
                 var addins = AppCommand.thisApp.addins;
                 StoreTempCollection(addins.AddinCollection);
                 var viewModel = new AddInViewModel(addins);
-                var mainWindow = new MainWindow {DataContext = viewModel};
+                var mainWindow = new MainWindow { DataContext = viewModel };
                 if (mainWindow.ShowDialog() == true)
                 {
+                    var vm = (AddInViewModel)mainWindow.DataContext;
                     try
                     {
                         // (Konrad) We are gathering information about the addin use. This allows us to
@@ -38,7 +39,7 @@ namespace HOK.AddInManager
                         // If Window was closed using the OK button we can collect more details about the app to publish.
                         var log = new AddinLog("AddinManager", commandData.Application.Application.VersionNumber)
                         {
-                            detailInfo = mainWindow.ViewModel.AddinsObj.AddinCollection
+                            detailInfo = vm.AddinsObj.AddinCollection
                                 .Select(x => new InfoItem { name = x.ToolName, value = x.ToolLoadType.ToString() })
                                 .ToList()
                         };
@@ -50,7 +51,7 @@ namespace HOK.AddInManager
                     }
 
                     // write setting and load addins.
-                    AppCommand.thisApp.addins = mainWindow.ViewModel.AddinsObj;
+                    AppCommand.thisApp.addins = vm.AddinsObj;
                     AppCommand.thisApp.ProcessPlugins();
                 }
                 else

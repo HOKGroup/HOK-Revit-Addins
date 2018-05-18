@@ -141,6 +141,10 @@
     <Compile Include="Schemas\Families\FamilyData.cs" />
     <Compile Include="Schemas\Families\FamilyItem.cs" />
     <Compile Include="Schemas\Families\FamilyTask.cs" />
+    <Compile Include="Schemas\Groups\GroupDataItem.cs" />
+    <Compile Include="Schemas\Groups\GroupInstanceItem.cs" />
+    <Compile Include="Schemas\Groups\GroupItem.cs" />
+    <Compile Include="Schemas\Groups\GroupsData.cs" />
     <Compile Include="Schemas\Links\DwgFileInfo.cs" />
     <Compile Include="Schemas\Links\LinkData.cs" />
     <Compile Include="Schemas\Links\LinkDataItem.cs" />

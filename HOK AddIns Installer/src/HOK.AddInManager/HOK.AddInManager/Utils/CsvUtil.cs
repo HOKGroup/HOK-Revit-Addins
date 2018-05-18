@@ -10,8 +10,18 @@ namespace HOK.AddInManager.Utils
 {
     public static class CsvUtil
     {
-        public static string[] columnNames = { "icon", "name", "addin", "order", "tooltip", "url"};
+        public static string[] ColumnNames =
+        {
+            "icon", "name", "addin", "order", "tooltip", "url", "requiresRestart"
+        };
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="csvFile"></param>
+        /// <param name="sourceDirectory"></param>
+        /// <param name="installDirectory"></param>
+        /// <returns></returns>
         public static ObservableCollection<AddinInfo> ReadAddInList(string csvFile, string sourceDirectory, string installDirectory)
         {
             var addinCollection = new ObservableCollection<AddinInfo>();
@@ -33,9 +43,9 @@ namespace HOK.AddInManager.Utils
                         // (Konrad) We first verify that our CSV file has the same headers as anticipated.
                         if (firstRow)
                         {
-                            for (var i = 0; i < columnNames.Length; ++i)
+                            for (var i = 0; i < ColumnNames.Length; ++i)
                             {
-                                if (fields[i] == columnNames[i]) continue;
+                                if (fields[i] == ColumnNames[i]) continue;
                                 formatMatched = false;
                                 break;
                             }
@@ -43,14 +53,18 @@ namespace HOK.AddInManager.Utils
                         }
                         else if (formatMatched)
                         {
+                            var restart = bool.Parse(fields[6]);
                             var addinInfo = new AddinInfo
                             {
                                 IconName = fields[0],
                                 ToolName = fields[1],
-
                                 Index = int.Parse(fields[3]),
                                 Tooltip = fields[4],
-                                Url = fields[5]
+                                Url = fields[5],
+                                RequiresRestart = restart,
+                                LoadTypes = restart 
+                                    ? new[]{LoadType.Always, LoadType.Never} 
+                                    : new[]{LoadType.Never, LoadType.Always, LoadType.ThisSessionOnly} 
                             };
 
                             var names = fields[2];
