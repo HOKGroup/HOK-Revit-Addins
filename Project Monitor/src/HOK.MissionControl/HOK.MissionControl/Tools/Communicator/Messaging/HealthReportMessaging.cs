@@ -8,7 +8,8 @@ namespace HOK.MissionControl.Tools.Communicator.Messaging
         Families,
         Styles,
         Links,
-        Models
+        Models,
+        Groups
     }
 
     public class HealthReportSummaryAdded

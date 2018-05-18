@@ -8,6 +8,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.Groups;
 using HOK.MissionControl.Core.Schemas.Links;
 using HOK.MissionControl.Core.Schemas.Models;
 using HOK.MissionControl.Core.Schemas.Sheets;
@@ -134,6 +135,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                         ProcessStyle(doc, centralPath);
                         ProcessLinks(doc, centralPath);
                         ProcessViews(doc, centralPath);
+                        ProcessGroups(doc, centralPath);
 
                         launchSockets = true;
                     }
@@ -275,6 +277,37 @@ namespace HOK.MissionControl.Tools.MissionControl
                 Messenger.Default.Send(new HealthReportSummaryAdded { Data = vData, Type = SummaryType.Views });
 
                 new Thread(() => new ViewMonitor().PublishData(doc, vData.Id))
+                {
+                    Priority = ThreadPriority.BelowNormal,
+                    IsBackground = true
+                }.Start();
+            }
+        }
+
+        /// <summary>
+        /// Adds Groups data to collection if such exists, otherwise creates a new one.
+        /// </summary>
+        private static void ProcessGroups(Document doc, string centralPath)
+        {
+            var project = MissionControlSetup.Projects[centralPath];
+            var data = new DataRangeRequest(centralPath.ToLower());
+            if (!ServerUtilities.Post(data, "groups/groupstats", out GroupsData gData))
+            {
+                if (ServerUtilities.Post(new GroupsData { CentralPath = centralPath.ToLower() }, "groups", out gData))
+                {
+                    ServerUtilities.Put(new { id = gData.Id }, "projects/" + project.Id + "/addgroup");
+                }
+            }
+
+            if (gData != null)
+            {
+                if (MissionControlSetup.GroupsData.ContainsKey(centralPath))
+                    MissionControlSetup.GroupsData.Remove(centralPath);
+                MissionControlSetup.GroupsData.Add(centralPath, gData); // store groups record
+
+                Messenger.Default.Send(new HealthReportSummaryAdded { Data = gData, Type = SummaryType.Groups }); //TODO: Track this back up to where summaries are created!
+
+                new Thread(() => new GroupMonitor().PublishData(doc, gData.Id))
                 {
                     Priority = ThreadPriority.BelowNormal,
                     IsBackground = true

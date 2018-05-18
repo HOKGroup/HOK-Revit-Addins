@@ -1,14 +1,17 @@
-﻿using System;
+﻿#region References
+using System;
 using HOK.MissionControl.Core.Schemas;
 using System.Collections.Generic;
 using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.Groups;
 using HOK.MissionControl.Core.Schemas.Links;
 using HOK.MissionControl.Core.Schemas.Models;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Schemas.Styles;
 using HOK.MissionControl.Core.Schemas.Views;
 using HOK.MissionControl.Core.Schemas.Worksets;
+#endregion
 
 namespace HOK.MissionControl.Core.Utils
 {
@@ -29,6 +32,7 @@ namespace HOK.MissionControl.Core.Utils
             ViewsData.Clear();
             StylesData.Clear();
             LinksData.Clear();
+            GroupsData.Clear();
         }
 
         /// <summary>
@@ -91,5 +95,11 @@ namespace HOK.MissionControl.Core.Utils
         /// </summary>
         public static Dictionary<string, LinkData> LinksData { get; set; }
             = new Dictionary<string, LinkData>(StringComparer.OrdinalIgnoreCase);
+        
+        /// <summary>
+        /// Key is Central Path of Document.
+        /// </summary>
+        public static Dictionary<string, GroupsData> GroupsData { get; set; }
+            = new Dictionary<string, GroupsData>(StringComparer.OrdinalIgnoreCase);
     }
 }

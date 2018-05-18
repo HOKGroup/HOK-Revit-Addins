@@ -3,19 +3,22 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
-namespace HOK.MissionControl.Core.Schemas.Worksets
+namespace HOK.MissionControl.Core.Schemas.Groups
 {
     /// <summary>
     /// 
     /// </summary>
-    public class WorksetItemData
+    public class GroupsData
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("worksets")]
-        public List<WorksetItem> Worksets { get; set; } = new List<WorksetItem>();
+        [JsonProperty("centralPath")]
+        public string CentralPath { get; set; }
+
+        [JsonProperty("groupStats")]
+        public List<GroupDataItem> GroupStats { get; set; } = new List<GroupDataItem>();
     }
 }
