@@ -206,7 +206,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo Signing...
-"C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"
 
 echo Configuration: $(Configuration)
 
@@ -218,7 +218,6 @@ echo Copying results to Build2017
 if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 copy /Y "$(TargetDir)HOK.AddInManager.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017"
 goto exit
 
 :Build2018
@@ -226,7 +225,6 @@ echo Copying results to Build2018
 if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 copy /Y "$(TargetDir)HOK.AddInManager.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018"
 goto exit
 
 :exit</PostBuildEvent>
