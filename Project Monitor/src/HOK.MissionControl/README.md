@@ -7,11 +7,15 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
-###### Release 2018.0.1.01
+###### Release 2018.0.1.2
+
+* Added username conversion to Groups publishing. It will now convert emails into usernames. 
+
+###### Release 2018.0.1.1
 
 * Added export functionality for Groups. That includes data publishing as well health report summary tab. 
 
-###### Release 2018.0.1.00
+###### Release 2018.0.1.0
 
 * Major data base refactor. 
 * All database calls were moved to be on background threads. This allows us to open the model without waiting for DB to accept all of our requests. It also moves all data posting to DocumentOpened and DocumentSynched events rather then on DocumentClosing. 
