@@ -1,4 +1,5 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using Autodesk.Revit.DB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
@@ -6,7 +7,7 @@ using Newtonsoft.Json;
 namespace HOK.MissionControl.Core.Schemas.Groups
 {
     /// <summary>
-    /// 
+    /// Wrapper class for individual Group objects.
     /// </summary>
     public class GroupInstanceItem
     {
@@ -32,17 +33,27 @@ namespace HOK.MissionControl.Core.Schemas.Groups
         public GroupInstanceItem(Element group)
         {
             var doc = group.Document;
-            var created = WorksharingUtils.GetWorksharingTooltipInfo(doc, group.Id).Creator.ToLower();
-            var levelId = group.LevelId == null ? ElementId.InvalidElementId : group.LevelId;
+            var created = VerifyUsername(WorksharingUtils.GetWorksharingTooltipInfo(doc, group.Id).Creator);
+            var levelId = group.LevelId == null 
+                ? ElementId.InvalidElementId 
+                : group.LevelId;
             var levelName = string.Empty;
-            if (levelId != ElementId.InvalidElementId)
-                levelName = doc.GetElement(levelId).Name;
-
+            if (levelId != ElementId.InvalidElementId) levelName = doc.GetElement(levelId).Name;
             CreatedBy = created;
             Level = levelName;
             OwnerViewId = group.OwnerViewId == null 
                 ? -1 
                 : group.OwnerViewId.IntegerValue;
+        }
+
+        /// <summary>
+        /// Removes email address from username.
+        /// </summary>
+        /// <param name="name">Username in current Revit session.</param>
+        /// <returns></returns>
+        private static string VerifyUsername(string name)
+        {
+            return name.Substring(0, name.IndexOf("@", StringComparison.Ordinal)).ToLower();
         }
     }
 }
