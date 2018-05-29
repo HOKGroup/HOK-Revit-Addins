@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Windows.Interop;
 using System.Diagnostics;
+using System.Windows.Interop;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
@@ -8,21 +8,21 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
-namespace HOK.MissionControl.LinksManager
+namespace HOK.MissionControl.GroupsManager
 {
     /// <summary>
     /// Class attributes are used for beta tools management.
     /// </summary>
-    [Name(nameof(Properties.Resources.LinksManager_Name), typeof(Properties.Resources))]
-    [Description(nameof(Properties.Resources.LinksManager_Description), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.LInksManager_ImageName), typeof(Properties.Resources))]
-    [PanelName(nameof(Properties.Resources.LinksManager_PanelName), typeof(Properties.Resources))]
-    [ButtonText(nameof(Properties.Resources.LinksManager_ButtonText), typeof(Properties.Resources))]
-    [Namespace(nameof(Properties.Resources.LinksManager_Namespace), typeof(Properties.Resources))]
+    [Name(nameof(Properties.Resources.GroupsManager_Name), typeof(Properties.Resources))]
+    [Description(nameof(Properties.Resources.GroupsManager_Description), typeof(Properties.Resources))]
+    [Image(nameof(Properties.Resources.GroupsManager_ImageName), typeof(Properties.Resources))]
+    [PanelName(nameof(Properties.Resources.GroupsManager_PanelName), typeof(Properties.Resources))]
+    [ButtonText(nameof(Properties.Resources.GroupsManager_ButtonText), typeof(Properties.Resources))]
+    [Namespace(nameof(Properties.Resources.GroupsManager_Namespace), typeof(Properties.Resources))]
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class LinksManagerCommand : IExternalCommand
+    public class GroupsManagerCommand : IExternalCommand
     {
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
@@ -35,10 +35,11 @@ namespace HOK.MissionControl.LinksManager
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 var unused1 = AddinUtilities.PublishAddinLog(
-                    new AddinLog("MissionControl-LinksManager", commandData.Application.Application.VersionNumber), LogPosted);
+                    new AddinLog("MissionControl-GroupsManager", commandData.Application.Application.VersionNumber), LogPosted);
 
-                var viewModel = new LinksManagerViewModel(doc);
-                var view = new LinksManagerView
+                var model = new GroupsManagerModel(doc);
+                var viewModel = new GroupsManagerViewModel(model);
+                var view = new GroupsManagerView
                 {
                     DataContext = viewModel
                 };
@@ -65,8 +66,8 @@ namespace HOK.MissionControl.LinksManager
         /// <param name="data"></param>
         private static void LogPosted(AddinData data)
         {
-            Log.AppendLog(LogMessageType.INFO, "Addin info was published: " 
-                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
+            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
+                                               + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
     }
 }
