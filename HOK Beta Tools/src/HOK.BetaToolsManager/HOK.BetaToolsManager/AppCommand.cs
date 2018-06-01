@@ -63,6 +63,11 @@ namespace HOK.BetaToolsManager
 
                         if (addin.AdditionalButtonNames != null)
                         {
+                            if (panelsVisibility.ContainsKey(addin.Panel))
+                            {
+                                panelsVisibility.Remove(addin.Panel);
+                            }
+
                             panelsVisibility.Add(addin.Panel, true);
                         }
                     }

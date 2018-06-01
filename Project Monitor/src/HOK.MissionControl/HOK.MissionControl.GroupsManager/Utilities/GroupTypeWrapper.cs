@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using Autodesk.Revit.DB;
 
 namespace HOK.MissionControl.GroupsManager.Utilities
@@ -6,16 +7,14 @@ namespace HOK.MissionControl.GroupsManager.Utilities
     public sealed class GroupTypeWrapper : INotifyPropertyChanged
     {
         public string Name { get; set; }
+        public string Type { get; set; }
         public ElementId Id { get; set; }
+        public int MemberCount { get; set; }
+        public List<ElementId> Instances { get; set; } = new List<ElementId>();
+        public bool IsArray { get; set; }
 
         public GroupTypeWrapper()
         {
-        }
-
-        public GroupTypeWrapper(GroupType g)
-        {
-            Name = g.Name;
-            Id = g.Id;
         }
 
         private bool _isSelected;

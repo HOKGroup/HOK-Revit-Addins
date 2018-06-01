@@ -4,7 +4,7 @@
     <Name>Groups Manager</Name>
     <Assembly>HOK.MissionControl.GroupsManager\HOK.MissionControl.GroupsManager.dll</Assembly>
     <AddInId>86210193-8787-48fc-9dcf-2b7555b87fd6</AddInId>
-    <FullClassName>HOK.MissionControl.GroupsManager.GroupsManagerCommand</FullClassName>
+    <FullClassName>HOK.MissionControl.GroupsManager.AppCommand</FullClassName>
     <VendorId>Konrad K Sobon</VendorId>
     <VendorDescription>HOK</VendorDescription>
   </AddIn>

@@ -6,6 +6,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:groupsManager="clr-namespace:HOK.MissionControl.GroupsManager"
         mc:Ignorable="d" 
         d:DesignHeight="300" d:DesignWidth="500" Width="1000"
         Title="{Binding Title, Mode=OneWay}" Icon="Resources/hoklogo.ico"  WindowStartupLocation="CenterOwner"
@@ -14,8 +15,13 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Win}"/>
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Resources>
+        <groupsManager:InstanceCountToStatusConverter x:Key="InstanceCountToStatusConverter"/>
+        <groupsManager:BooleanConverter x:Key="BooleanConverter"/>
         <Style x:Key="ContentDataGridCentering" TargetType="{x:Type DataGridCell}">
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Template">
@@ -28,6 +34,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -35,7 +44,7 @@
             <RowDefinition Height="40"/>
             <RowDefinition Height="24"/>
         </Grid.RowDefinitions>
-        <GroupBox Header="Imported Styles" Margin="10,10,10,0">
+        <GroupBox Header="Groups" Margin="10,10,10,0">
             <Grid Background="Transparent">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -44,22 +53,31 @@
                 <wpfUtilities:DataGridExtension x:Name="DataGridImages"
                                                 ItemsSource="{Binding Groups, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                                 CellStyle="{StaticResource ContentDataGridCentering}"
+                                                AutoGenerateColumns="False"
+                                                HeadersVisibility="Column"
                                                 CanUserAddRows="False" 
                                                 IsReadOnly="False" 
                                                 SelectionUnit="FullRow"
-                                                Background="White"
+                                                SelectionMode="Extended"
                                                 VerticalAlignment="Stretch"
                                                 HorizontalAlignment="Stretch"
-                                                SelectionMode="Extended"
-                                                GridLinesVisibility="None"
-                                                RowHeight="20"
-                                                MaxHeight="580"
-                                                AutoGenerateColumns="False"
-                                                BorderBrush="LightGray"
-                                                Margin="10,10,10,0"
-                                                HeadersVisibility="Column"
                                                 HorizontalScrollBarVisibility="Hidden"
+                                                Background="White"
+                                                HorizontalGridLinesBrush="LightGray"
+                                                VerticalGridLinesBrush="LightGray"
+                                                BorderBrush="LightGray"
+                                                RowHeight="20"
+                                                MaxHeight="566"
+                                                Margin="10,10,10,0"
+                                                Padding="0"
                                                 SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <wpfUtilities:DataGridExtension.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Find in View"
+                                      Command="{Binding FindGroup}"
+                                      CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}"/>
+                        </ContextMenu>
+                    </wpfUtilities:DataGridExtension.ContextMenu>
                     <wpfUtilities:DataGridExtension.Columns>
                         <DataGridTemplateColumn Header="Select" Width="45">
                             <DataGridTemplateColumn.CellTemplate>
@@ -77,7 +95,80 @@
                                             IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style>
+                                    <Setter Property="TextBlock.TextWrapping" Value="WrapWithOverflow"/>
                                     <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                                    <Setter Property="TextBlock.Padding" Value="5,0,0,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Type" 
+                                            Binding="{Binding Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="150" 
+                                            IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style>
+                                    <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                                    <Setter Property="TextBlock.Padding" Value="5,0,0,0"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Instances" 
+                                            Binding="{Binding Instances.Count}" 
+                                            HeaderStyle="{StaticResource CenterGridHeaderStyle}"
+                                            Width="80" 
+                                            IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Instances.Count, Converter={StaticResource InstanceCountToStatusConverter}}" Value="Red">
+                                            <Setter Property="Foreground" Value="#d9534f"/>
+                                            <Setter Property="FontWeight"  Value="Bold"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Instances.Count, Converter={StaticResource InstanceCountToStatusConverter}}" Value="Orange">
+                                            <Setter Property="Foreground" Value="#EAAC44"/>
+                                            <Setter Property="FontWeight"  Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style>
+                                    <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+                                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Member Count" 
+                                            Binding="{Binding MemberCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                            HeaderStyle="{StaticResource CenterGridHeaderStyle}"
+                                            Width="100" 
+                                            IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style>
+                                    <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+                                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="IsArray?" 
+                                            Binding="{Binding IsArray, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanConverter}}" 
+                                            HeaderStyle="{StaticResource CenterGridHeaderStyle}"
+                                            Width="80" 
+                                            IsReadOnly="True">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsArray}" Value="True">
+                                            <Setter Property="Foreground" Value="#d9534f"/>
+                                            <Setter Property="FontWeight"  Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                            <DataGridTextColumn.ElementStyle>
+                                <Style>
+                                    <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+                                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
@@ -103,7 +194,17 @@
         </GroupBox>
         <Button Content="Delete" 
                 Command="{Binding Delete, Mode=OneWay}"
-                Margin="0,0,10,10" 
+                ToolTip="Deletes all Instances of this Group and its Type."
+                Margin="0,0,95,10" 
+                Grid.Row="1" 
+                Height="20" 
+                VerticalAlignment="Bottom" 
+                HorizontalAlignment="Right"
+                Width="75"/>
+        <Button Content="Ungroup" 
+                Command="{Binding Ungroup, Mode=OneWay}"
+                ToolTip="Ungroups all Instances of this Group, and deletes the Type."
+                Margin="0,0,180,10" 
                 Grid.Row="1" 
                 Height="20" 
                 VerticalAlignment="Bottom" 
@@ -112,7 +213,7 @@
         <Button Content="Close" 
                 Command="{Binding Close, Mode=OneWay}"
                 CommandParameter="{Binding ElementName=Win}"
-                Margin="0,0,90,10" 
+                Margin="0,0,10,10" 
                 Grid.Row="1" 
                 Height="20" 
                 VerticalAlignment="Bottom" 

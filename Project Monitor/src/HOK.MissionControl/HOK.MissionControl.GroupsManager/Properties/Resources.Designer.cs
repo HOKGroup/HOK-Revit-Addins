@@ -61,6 +61,15 @@ namespace HOK.MissionControl.GroupsManager.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to GroupManager_Command.
+        /// </summary>
+        internal static string GroupsManager_AdditionalButtonNames {
+            get {
+                return ResourceManager.GetString("GroupsManager_AdditionalButtonNames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Groups
         ///Manager.
         /// </summary>

@@ -1,12 +1,17 @@
-﻿using System.Collections.ObjectModel;
+﻿#region References
+
+using System.Collections.ObjectModel;
+using System.Linq;
 using Autodesk.Revit.DB;
 using HOK.MissionControl.GroupsManager.Utilities;
+
+#endregion
 
 namespace HOK.MissionControl.GroupsManager
 {
     public class GroupsManagerModel
     {
-        private Document Doc { get; set; }
+        private Document Doc { get; }
 
         public GroupsManagerModel(Document doc)
         {
@@ -19,7 +24,28 @@ namespace HOK.MissionControl.GroupsManager
         /// <returns></returns>
         public ObservableCollection<GroupTypeWrapper> CollectGroups()
         {
-            return new ObservableCollection<GroupTypeWrapper>();
+            var gTypes = new FilteredElementCollector(Doc)
+                .OfClass(typeof(GroupType))
+                .Cast<GroupType>()
+                .ToDictionary(x => x.Id, x => new GroupTypeWrapper
+                {
+                    Name = x.Name,
+                    Type = x.FamilyName,
+                    Id = x.Id,
+                    IsArray = !x.CanBeCopied
+                });
+
+            foreach (var gi in new FilteredElementCollector(Doc).OfClass(typeof(Group)).Cast<Group>())
+            {
+                var gTypeId = gi.GroupType.Id;
+                if (!gTypes.ContainsKey(gTypeId)) continue;
+
+                var gType = gTypes[gTypeId];
+                gType.MemberCount = gi.GetMemberIds().Count;
+                gType.Instances.Add(gi.Id);
+            }
+
+            return new ObservableCollection<GroupTypeWrapper>(gTypes.Values.ToList().OrderBy(x => x.Name));
         }
     }
 }

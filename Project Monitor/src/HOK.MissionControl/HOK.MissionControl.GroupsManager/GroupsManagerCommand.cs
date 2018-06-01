@@ -10,15 +10,6 @@ using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.GroupsManager
 {
-    /// <summary>
-    /// Class attributes are used for beta tools management.
-    /// </summary>
-    [Name(nameof(Properties.Resources.GroupsManager_Name), typeof(Properties.Resources))]
-    [Description(nameof(Properties.Resources.GroupsManager_Description), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.GroupsManager_ImageName), typeof(Properties.Resources))]
-    [PanelName(nameof(Properties.Resources.GroupsManager_PanelName), typeof(Properties.Resources))]
-    [ButtonText(nameof(Properties.Resources.GroupsManager_ButtonText), typeof(Properties.Resources))]
-    [Namespace(nameof(Properties.Resources.GroupsManager_Namespace), typeof(Properties.Resources))]
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
@@ -49,7 +40,7 @@ namespace HOK.MissionControl.GroupsManager
                     Owner = Process.GetCurrentProcess().MainWindowHandle
                 };
 
-                view.ShowDialog();
+                view.Show();
             }
             catch (Exception e)
             {
