@@ -2,6 +2,10 @@
 
 #### This tool dynamically generates Ribbon Tab items based on user selection.
 
+###### Release 2018.0.0.8
+
+* Small bug fix where the same panel was getting added twice and it was failing.
+
 ###### Release 2018.0.0.7
 
 * Bug fix where ResourceDictionary was causing exceptions because of duplicate keys. It appears that it resurfaced again. This time I have removed the Window.Resources all together and used in-line resources for the grid. There is no way that they are duplicated keys across these resources.
