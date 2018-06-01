@@ -2,6 +2,10 @@
 
 #### Library of commonly used methods and classes. Contains mostly utility methods shared across more than one plug-in. 
 
+###### Release 2018.0.0.9
+
+* Adds Groups Manager DLL distribution for the post builds.
+
 ###### Release 2018.0.0.8
 
 * Windows updates changed the SSL encryption for HTTP requests. I had to add a specific SSL version to each request to make sure it's compatible with GitHub. 

@@ -7,6 +7,12 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.1.3
+
+* Added Groups Manager to Mission Control. 
+* Added Groups Manager quick access to Communicator tab.
+* Other changes to Mission Control to accomodate this new plugin. 
+
 ###### Release 2018.0.1.2
 
 * Added username conversion to Groups publishing. It will now convert emails into usernames. 
