@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
@@ -22,7 +13,7 @@ namespace HOK.RoomsToMass.ToMass
     /// <summary>
     /// Interaction logic for FloorWindow.xaml
     /// </summary>
-    public partial class FloorWindow : Window
+    public partial class FloorWindow
     {
         private UIApplication m_app = null;
         private Document m_doc = null;
@@ -394,6 +385,10 @@ namespace HOK.RoomsToMass.ToMass
                                 using (Transaction trans = new Transaction(m_doc))
                                 {
                                     trans.Start("Create Mass");
+                                    var options = trans.GetFailureHandlingOptions();
+                                    options.SetFailuresPreprocessor(new DuplicateWarningSwallower());
+                                    trans.SetFailureHandlingOptions(options);
+
                                     try
                                     {
                                         MassProperties createdMass = null;
@@ -486,6 +481,10 @@ namespace HOK.RoomsToMass.ToMass
                                 using (Transaction trans = new Transaction(m_doc))
                                 {
                                     trans.Start("Create 2D Mass");
+                                    var options = trans.GetFailureHandlingOptions();
+                                    options.SetFailuresPreprocessor(new DuplicateWarningSwallower());
+                                    trans.SetFailureHandlingOptions(options);
+
                                     try
                                     {
                                         MassProperties createdMass = null;
@@ -700,6 +699,10 @@ namespace HOK.RoomsToMass.ToMass
                                     using (Transaction trans = new Transaction(m_doc))
                                     {
                                         trans.Start("Update Parameter");
+                                        var options = trans.GetFailureHandlingOptions();
+                                        options.SetFailuresPreprocessor(new DuplicateWarningSwallower());
+                                        trans.SetFailureHandlingOptions(options);
+
                                         try
                                         {
                                             bool updated = false;
