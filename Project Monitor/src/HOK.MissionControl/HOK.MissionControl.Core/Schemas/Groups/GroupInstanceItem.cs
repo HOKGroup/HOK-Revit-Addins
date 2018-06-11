@@ -53,7 +53,10 @@ namespace HOK.MissionControl.Core.Schemas.Groups
         /// <returns></returns>
         private static string VerifyUsername(string name)
         {
-            return name.Substring(0, name.IndexOf("@", StringComparison.Ordinal)).ToLower();
+            var isEmail = name.IndexOf("@", StringComparison.Ordinal) != -1;
+            return isEmail 
+                ? name.Substring(0, name.IndexOf("@", StringComparison.Ordinal)).ToLower() 
+                : name;
         }
     }
 }

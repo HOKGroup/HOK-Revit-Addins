@@ -62,5 +62,9 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("viewStats")]
         public List<string> ViewStats { get; set; } = new List<string>();
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        [JsonProperty("groupStats")]
+        public List<string> GroupStats { get; set; } = new List<string>();
     }
 }
