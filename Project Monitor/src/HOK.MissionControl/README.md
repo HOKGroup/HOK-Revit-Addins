@@ -7,6 +7,10 @@
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
 
+###### Release 2018.0.1.4
+
+* Fix to Workset item counts getting over-reported. Lots of sketch planes being created on these worksets for no reason.
+
 ###### Release 2018.0.1.3
 
 * Added Groups Manager to Mission Control. 
