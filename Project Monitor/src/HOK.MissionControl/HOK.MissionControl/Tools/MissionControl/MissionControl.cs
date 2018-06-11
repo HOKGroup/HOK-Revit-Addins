@@ -305,7 +305,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.GroupsData.Remove(centralPath);
                 MissionControlSetup.GroupsData.Add(centralPath, gData); // store groups record
 
-                Messenger.Default.Send(new HealthReportSummaryAdded { Data = gData, Type = SummaryType.Groups }); //TODO: Track this back up to where summaries are created!
+                Messenger.Default.Send(new HealthReportSummaryAdded { Data = gData, Type = SummaryType.Groups });
 
                 new Thread(() => new GroupMonitor().PublishData(doc, gData.Id))
                 {
