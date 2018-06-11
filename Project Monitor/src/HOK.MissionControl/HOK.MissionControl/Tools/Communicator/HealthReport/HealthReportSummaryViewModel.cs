@@ -25,6 +25,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         private void OnLaunchTool(Button tb)
         {
             if (tb == null) return;
+
             var text = (string)tb.Content;
             Model.LaunchCommand(text);
         }

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.MissionControl.FamilyPu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.MissionControl.LinksManager", "HOK.MissionControl.LinksManager\HOK.MissionControl.LinksManager.csproj", "{E991EB9A-F941-4D5F-800B-70256741AB0E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.MissionControl.GroupsManager", "HOK.MissionControl.GroupsManager\HOK.MissionControl.GroupsManager.csproj", "{FF7AE329-D079-40EC-AA8B-25862DD65E01}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		2015|Any CPU = 2015|Any CPU
@@ -69,8 +71,23 @@ Global
 		{E991EB9A-F941-4D5F-800B-70256741AB0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E991EB9A-F941-4D5F-800B-70256741AB0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E991EB9A-F941-4D5F-800B-70256741AB0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.2015|Any CPU.ActiveCfg = 2015|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.2015|Any CPU.Build.0 = 2015|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.2016|Any CPU.ActiveCfg = 2016|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.2016|Any CPU.Build.0 = 2016|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.2017|Any CPU.ActiveCfg = 2017|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.2017|Any CPU.Build.0 = 2017|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.2018|Any CPU.ActiveCfg = 2018|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.2018|Any CPU.Build.0 = 2018|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF7AE329-D079-40EC-AA8B-25862DD65E01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {26847AD3-E434-44CA-AC5F-FDA35D67CC8F}
 	EndGlobalSection
 EndGlobal

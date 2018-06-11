@@ -196,6 +196,10 @@ namespace HOK.RoomsToMass.ToMass
                                 using (Transaction trans = new Transaction(m_doc))
                                 {
                                     trans.Start("Create 3D Mass");
+                                    var options = trans.GetFailureHandlingOptions();
+                                    options.SetFailuresPreprocessor(new DuplicateWarningSwallower());
+                                    trans.SetFailureHandlingOptions(options);
+
                                     try
                                     {
                                         MassProperties createdMass = null;
@@ -288,6 +292,10 @@ namespace HOK.RoomsToMass.ToMass
                                 using (Transaction trans = new Transaction(m_doc))
                                 {
                                     trans.Start("Create 2D Mass");
+                                    var options = trans.GetFailureHandlingOptions();
+                                    options.SetFailuresPreprocessor(new DuplicateWarningSwallower());
+                                    trans.SetFailureHandlingOptions(options);
+
                                     try
                                     {
                                         MassProperties createdMass = null;
@@ -621,6 +629,10 @@ namespace HOK.RoomsToMass.ToMass
                                     using (Transaction trans = new Transaction(m_doc))
                                     {
                                         trans.Start("Update Parameter");
+                                        var options = trans.GetFailureHandlingOptions();
+                                        options.SetFailuresPreprocessor(new DuplicateWarningSwallower());
+                                        trans.SetFailureHandlingOptions(options);
+
                                         try
                                         {
                                             bool updated = false;

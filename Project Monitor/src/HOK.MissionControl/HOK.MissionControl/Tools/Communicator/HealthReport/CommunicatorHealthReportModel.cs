@@ -85,8 +85,8 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
             {
                 Count = groupStats.Groups.Count.ToString(),
                 Title = "Groups:",
-                ToolName = string.Empty,
-                ShowButton = false,
+                ToolName = "Groups Manager",
+                ShowButton = true,
                 Score = passingChecks + "/" + maxScore,
                 FillColor = GetColor(passingChecks, maxScore)
             };
