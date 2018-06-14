@@ -21,7 +21,16 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var gTypes = new FilteredElementCollector(doc)
                     .OfClass(typeof(GroupType))
                     .Cast<GroupType>()
-                    .ToDictionary(x => x.Id, x => new GroupItem (x));
+                    .ToDictionary(x => x.Id, x => new GroupItem
+                    {
+                        Name = x.Name,
+
+                        // (Konrad) If there is a Detail Group attached to Model Group
+                        // it will have the same name as Model Group but different Category.
+                        Type = x.Category.Name == "Attached Detail Groups" 
+                            ? "Attached Detail Group"
+                            : x.FamilyName
+                    });
 
                 foreach (var gi in new FilteredElementCollector(doc).OfClass(typeof(Group)).Cast<Group>())
                 {
