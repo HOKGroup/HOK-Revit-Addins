@@ -19,7 +19,7 @@ namespace HOK.MissionControl.GroupsManager
         }
 
         /// <summary>
-        /// 
+        /// Retrieves all Group Types from the project.
         /// </summary>
         /// <returns></returns>
         public ObservableCollection<GroupTypeWrapper> CollectGroups()
@@ -27,13 +27,7 @@ namespace HOK.MissionControl.GroupsManager
             var gTypes = new FilteredElementCollector(Doc)
                 .OfClass(typeof(GroupType))
                 .Cast<GroupType>()
-                .ToDictionary(x => x.Id, x => new GroupTypeWrapper
-                {
-                    Name = x.Name,
-                    Type = x.FamilyName,
-                    Id = x.Id,
-                    IsArray = !x.CanBeCopied
-                });
+                .ToDictionary(x => x.Id, x => new GroupTypeWrapper(x));
 
             foreach (var gi in new FilteredElementCollector(Doc).OfClass(typeof(Group)).Cast<Group>())
             {

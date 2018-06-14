@@ -17,6 +17,19 @@ namespace HOK.MissionControl.GroupsManager.Utilities
         {
         }
 
+        public GroupTypeWrapper(ElementType gt)
+        {
+            Name = gt.Name;
+            Id = gt.Id;
+            IsArray = !gt.CanBeCopied;
+
+            // (Konrad) If there is a Detail Group attached to Model Group
+            // it will have the same name as Model Group but different Category.
+            Type = gt.Category.Name == "Attached Detail Groups"
+                ? "Attached Detail Group"
+                : gt.FamilyName;
+        }
+
         private bool _isSelected;
         public bool IsSelected
         {
