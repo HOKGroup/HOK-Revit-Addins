@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Styles Manager</Name>
+    <Assembly>HOK.MissionControl.StylesManager\HOK.MissionControl.StylesManager.dll</Assembly>
+    <AddInId>cf72f827-8ccb-48b8-bbb1-e4802283cfa5</AddInId>
+    <FullClassName>HOK.MissionControl.StylesManager.StylesManagerCommand</FullClassName>
+    <VendorId>Konrad K Sobon</VendorId>
+    <VendorDescription>HOK</VendorDescription>
+  </AddIn>
+</RevitAddIns>

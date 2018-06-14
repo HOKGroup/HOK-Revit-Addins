@@ -1,0 +1,122 @@
+﻿<UserControl x:Class="HOK.MissionControl.StylesManager.DimensionsTab.DimensionsView"
+             x:Name="Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type wpfUtilities:DataGridExtension}">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="VerticalGridLinesBrush" Value="LightGray"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="SelectionMode" Value="Extended"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="BorderBrush" Value="LightGray"/>
+        </Style>
+        <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="ContentDataGridCentering"
+               TargetType="{x:Type DataGridCell}">
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.Resources>
+            <Style x:Key="dgCellStyle" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                <Setter Property="Padding" Value="10"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type DataGridCell}">
+                            <Grid Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding HasInstances}" Value="False">
+                        <Setter Property="IsEnabled" Value="False"/>
+                        <Setter Property="Foreground" Value="#d9534f"/>
+                        <Setter Property="FontWeight"  Value="Bold"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Dimension Styles" Margin="10,10,10,0">
+            <Grid Background="Transparent">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="40"/>
+                </Grid.RowDefinitions>
+                <wpfUtilities:DataGridExtension x:Name="DataGridImages"
+                                                ItemsSource="{Binding Dimensions, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                                CellStyle="{StaticResource ContentDataGridCentering}"
+                                                CanUserAddRows="False" 
+                                                IsReadOnly="False" 
+                                                SelectionUnit="FullRow"
+                                                GridLinesVisibility="None"
+                                                Margin="10,10,10,0"
+                                                SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <wpfUtilities:DataGridExtension.Columns>
+                        <DataGridTemplateColumn Header="Select" Width="45">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                              Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.Check}"
+                                              CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"
+                                              HorizontalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Name" 
+                                            Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                            Width="200" 
+                                            IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style>
+                                    <Setter Property="TextBlock.TextWrapping" Value="WrapWithOverflow"/>
+                                    <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </wpfUtilities:DataGridExtension.Columns>
+                </wpfUtilities:DataGridExtension>
+                <Button Content="All" 
+                        Command="{Binding SelectAll, Mode=OneWay}"
+                        Margin="10,0,0,10" 
+                        Grid.Row="1" 
+                        Height="20" 
+                        VerticalAlignment="Bottom" 
+                        HorizontalAlignment="Left" 
+                        Width="75"/>
+                <Button Content="None" 
+                        Command="{Binding SelectNone, Mode=OneWay}"
+                        Margin="90,0,0,10" 
+                        Grid.Row="1" 
+                        Height="20" 
+                        VerticalAlignment="Bottom" 
+                        HorizontalAlignment="Left" 
+                        Width="75"/>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>
