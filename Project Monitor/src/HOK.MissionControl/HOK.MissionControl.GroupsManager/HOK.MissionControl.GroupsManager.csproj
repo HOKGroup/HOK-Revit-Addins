@@ -130,6 +130,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="AppCommand.cs" />
     <Compile Include="Converters.cs" />
     <Compile Include="GroupManagerRequestHandler.cs" />
@@ -146,7 +149,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\SharedAssemblyInfo.cs" />
     <Compile Include="Utilities\GroupTypeWrapper.cs" />
   </ItemGroup>
   <ItemGroup>

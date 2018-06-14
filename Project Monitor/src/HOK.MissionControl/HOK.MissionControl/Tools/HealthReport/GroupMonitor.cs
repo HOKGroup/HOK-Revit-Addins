@@ -21,11 +21,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var gTypes = new FilteredElementCollector(doc)
                     .OfClass(typeof(GroupType))
                     .Cast<GroupType>()
-                    .ToDictionary(x => x.Id, x => new GroupItem
-                    {
-                        Name = x.Name,
-                        Type = x.FamilyName
-                    });
+                    .ToDictionary(x => x.Id, x => new GroupItem (x));
 
                 foreach (var gi in new FilteredElementCollector(doc).OfClass(typeof(Group)).Cast<Group>())
                 {
