@@ -10,12 +10,6 @@ using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.StylesManager
 {
-    [Name(nameof(Properties.Resources.StylesManager_Name), typeof(Properties.Resources))]
-    [Description(nameof(Properties.Resources.StylesManager_Description), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.StylesManager_ImageName), typeof(Properties.Resources))]
-    [PanelName(nameof(Properties.Resources.StylesManager_PanelName), typeof(Properties.Resources))]
-    [ButtonText(nameof(Properties.Resources.StylesManager_ButtonText), typeof(Properties.Resources))]
-    [Namespace(nameof(Properties.Resources.StylesManager_Namespace), typeof(Properties.Resources))]
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
@@ -45,7 +39,7 @@ namespace HOK.MissionControl.StylesManager
                     Owner = Process.GetCurrentProcess().MainWindowHandle
                 };
 
-                v.ShowDialog();
+                v.Show();
             }
             catch (Exception e)
             {

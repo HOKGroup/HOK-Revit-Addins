@@ -4,7 +4,7 @@
     <Name>Styles Manager</Name>
     <Assembly>HOK.MissionControl.StylesManager\HOK.MissionControl.StylesManager.dll</Assembly>
     <AddInId>cf72f827-8ccb-48b8-bbb1-e4802283cfa5</AddInId>
-    <FullClassName>HOK.MissionControl.StylesManager.StylesManagerCommand</FullClassName>
+    <FullClassName>HOK.MissionControl.StylesManager.AppCommand</FullClassName>
     <VendorId>Konrad K Sobon</VendorId>
     <VendorDescription>HOK</VendorDescription>
   </AddIn>

@@ -61,6 +61,15 @@ namespace HOK.MissionControl.StylesManager.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to StylesManager_Command.
+        /// </summary>
+        internal static string StylesManager_AdditionalButtonNames {
+            get {
+                return ResourceManager.GetString("StylesManager_AdditionalButtonNames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Styles
         ///Manager.
         /// </summary>

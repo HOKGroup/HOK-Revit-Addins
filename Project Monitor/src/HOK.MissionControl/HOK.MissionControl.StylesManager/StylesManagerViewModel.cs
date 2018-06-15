@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.MissionControl.StylesManager.DimensionsTab;
+using HOK.MissionControl.StylesManager.Tabs;
 
 namespace HOK.MissionControl.StylesManager
 {
@@ -22,7 +23,16 @@ namespace HOK.MissionControl.StylesManager
 
             TabItems = new ObservableCollection<TabItem>
             {
-                new TabItem{Content = new DimensionsView {DataContext = new DimensionsViewModel(new DimensionsModel(doc))}, Header = "Dimensions"}
+                new TabItem
+                {
+                    Content = new DimensionsView {DataContext = new DimensionsViewModel(new DimensionsModel(doc))},
+                    Header = "Dimensions"
+                },
+                new TabItem
+                {
+                    Content = new DimensionOverridesView {DataContext = new DimensionOverridesViewModel(new DimensionOverridesModel(doc))},
+                    Header = "Dimension Overrides"
+                }
             };
         }
 

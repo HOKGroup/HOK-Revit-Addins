@@ -1,21 +1,25 @@
 ﻿using System.ComponentModel;
 using Autodesk.Revit.DB;
 
-namespace HOK.MissionControl.StylesManager.DimensionsTab
+namespace HOK.MissionControl.StylesManager.Tabs
 {
     public sealed class DimensionTypeWrapper : INotifyPropertyChanged
     {
         public string Name { get; set; }
         public ElementId Id { get; set; }
-        public object Self { get; set; }
+        public string Type { get; set; }
+        public int Count { get; set; } = 0;
+        public bool IsUsingPu { get; set; }
+        public string Size { get; set; }
 
         public DimensionTypeWrapper()
         {
         }
 
-        public DimensionTypeWrapper(DimensionType type)
+        public DimensionTypeWrapper(DimensionType dt)
         {
-            
+            Name = dt.Name;
+            Id = dt.Id;
         }
 
         private bool _isSelected;
