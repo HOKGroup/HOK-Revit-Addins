@@ -15,7 +15,7 @@ namespace HOK.MissionControl.LinksManager
     {
         public string Title { get; set; }
         public ObservableCollection<TabItem> TabItems { get; set; }
-        public RelayCommand<Window> WindowLoaded { get; }
+        public RelayCommand<Window> WindowLoaded { get; set; }
 
         public LinksManagerViewModel(Document doc)
         {

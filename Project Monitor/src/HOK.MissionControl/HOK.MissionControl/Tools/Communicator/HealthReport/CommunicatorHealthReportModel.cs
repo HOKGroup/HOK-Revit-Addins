@@ -299,8 +299,8 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
             {
                 Count = unusedTypes.ToString(),
                 Title = "Styles:",
-                ToolName = string.Empty,
-                ShowButton = false,
+                ToolName = "Styles Manager",
+                ShowButton = true,
                 Score = passingChecks + "/" + maxScore,
                 FillColor = GetColor(passingChecks, maxScore)
             };
