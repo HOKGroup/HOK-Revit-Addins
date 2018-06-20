@@ -24,6 +24,10 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
                     commandName = 
                         "CustomCtrl_%CustomCtrl_%  HOK - Beta%Mission Control%GroupManager_Command";
                     break;
+                case "Styles Manager":
+                    commandName =
+                        "CustomCtrl_%CustomCtrl_%  HOK - Beta%Mission Control%StylesManager_Command";
+                    break;
             }
 
             if (string.IsNullOrEmpty(commandName)) return;

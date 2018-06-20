@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using Autodesk.Revit.DB;
 
-namespace HOK.MissionControl.StylesManager.Tabs
+namespace HOK.MissionControl.StylesManager.Utilities
 {
     public sealed class DimensionWrapper : INotifyPropertyChanged
     {
@@ -12,8 +12,8 @@ namespace HOK.MissionControl.StylesManager.Tabs
         public double? Value { get; set; }
         public string ValueString { get; set; }
         public string ValueOverride { get; set; }
-        public bool IsLocked { get; set; }
-        public bool IsValueOverrideHuge { get; set; }
+        public bool? IsValueOverrideHuge { get; set; }
+        public bool IsFiltered { get; set; }
 
         public DimensionWrapper()
         {
@@ -23,18 +23,14 @@ namespace HOK.MissionControl.StylesManager.Tabs
         {
             Hash = d.GetHashCode();
             Value = d.Value;
-            ValueString = d.ValueString;
             ValueOverride = d.ValueOverride;
-            IsLocked = d.IsLocked;
         }
 
-        public DimensionWrapper(DimensionSegment d)
+        public DimensionWrapper(DimensionSegment ds)
         {
-            Hash = d.GetHashCode();
-            Value = d.Value;
-            ValueString = d.ValueString;
-            ValueOverride = d.ValueOverride;
-            IsLocked = d.IsLocked;
+            Hash = ds.GetHashCode();
+            Value = ds.Value;
+            ValueOverride = ds.ValueOverride;
         }
 
         private bool _isSelected;
@@ -42,6 +38,13 @@ namespace HOK.MissionControl.StylesManager.Tabs
         {
             get { return _isSelected; }
             set { _isSelected = value; RaisePropertyChanged("IsSelected"); }
+        }
+
+        private bool _isVisible = true;
+        public bool IsVisible
+        {
+            get { return _isVisible; }
+            set { _isVisible = value; RaisePropertyChanged("IsVisible"); }
         }
 
         public override bool Equals(object obj)

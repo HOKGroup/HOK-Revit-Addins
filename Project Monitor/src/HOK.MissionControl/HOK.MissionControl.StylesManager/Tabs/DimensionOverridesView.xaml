@@ -5,11 +5,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
-             xmlns:stylesManager="clr-namespace:HOK.MissionControl.StylesManager"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:utilities="clr-namespace:HOK.MissionControl.StylesManager.Utilities"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding ControlClosed}" CommandParameter="{Binding ElementName=Control}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <UserControl.Resources>
-        <stylesManager:BooleanConverter x:Key="BooleanConverter"/>
+        <utilities:ViewTypeToBooleanConverter x:Key="TypeToBooleanConverter"/>
         <Style x:Key="ContentDataGridCentering" TargetType="{x:Type DataGridCell}">
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Template">
@@ -21,9 +27,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-        <Style x:Key="CenterGridHeaderStyle" TargetType="DataGridColumnHeader">
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
     </UserControl.Resources>
     <Grid>
@@ -65,6 +68,18 @@
                                       CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}"/>
                         </ContextMenu>
                     </wpfUtilities:DataGridExtension.ContextMenu>
+                    <wpfUtilities:DataGridExtension.RowStyle>
+                        <Style TargetType="{x:Type DataGridRow}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsVisible, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </wpfUtilities:DataGridExtension.RowStyle>
                     <wpfUtilities:DataGridExtension.Columns>
                         <DataGridTemplateColumn Header="Select" Width="45">
                             <DataGridTemplateColumn.CellTemplate>
@@ -92,24 +107,27 @@
                                             Binding="{Binding ValueOverride, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                             Width="*" 
                                             IsReadOnly="True">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style>
-                                    <Setter Property="TextBlock.TextWrapping" Value="WrapWithOverflow"/>
-                                    <Setter Property="TextBlock.TextAlignment" Value="Left"/>
-                                    <Setter Property="TextBlock.Padding" Value="5,0,0,0"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                        <DataGridTextColumn Header="Locked?" 
-                                            Binding="{Binding IsLocked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanConverter}}" 
-                                            HeaderStyle="{StaticResource CenterGridHeaderStyle}"
-                                            Width="80" 
-                                            IsReadOnly="True">
                             <DataGridTextColumn.CellStyle>
                                 <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsArray}" Value="True">
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsValueOverrideHuge}" Value="True"/>
+                                                <Condition Binding="{Binding OwnerViewType, Converter={StaticResource TypeToBooleanConverter}}" Value="True"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Foreground" Value="#EAAC44"/>
+                                            <Setter Property="FontWeight"  Value="Bold"/>
+                                        </MultiDataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsValueOverrideHuge}" Value="True"/>
+                                                <Condition Binding="{Binding OwnerViewType, Converter={StaticResource TypeToBooleanConverter}}" Value="False"/>
+                                            </MultiDataTrigger.Conditions>
                                             <Setter Property="Foreground" Value="#d9534f"/>
+                                            <Setter Property="FontWeight"  Value="Bold"/>
+                                        </MultiDataTrigger>
+                                        <DataTrigger Binding="{Binding IsValueOverrideHuge}" Value="{x:Null}">
+                                            <Setter Property="Foreground" Value="DarkGray"/>
                                             <Setter Property="FontWeight"  Value="Bold"/>
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -117,8 +135,9 @@
                             </DataGridTextColumn.CellStyle>
                             <DataGridTextColumn.ElementStyle>
                                 <Style>
-                                    <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
-                                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                                    <Setter Property="TextBlock.TextWrapping" Value="WrapWithOverflow"/>
+                                    <Setter Property="TextBlock.TextAlignment" Value="Left"/>
+                                    <Setter Property="TextBlock.Padding" Value="5,0,0,0"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
@@ -144,26 +163,34 @@
                         Width="75"/>
                 <Button Content="None" 
                         Command="{Binding SelectNone, Mode=OneWay}"
-                        Margin="90,0,0,10" 
+                        Margin="95,0,0,10" 
                         Grid.Row="1" 
                         Height="20" 
                         VerticalAlignment="Bottom" 
                         HorizontalAlignment="Left" 
                         Width="75"/>
+                <CheckBox Name="ShowFilteredCheckBox" 
+                          Content="Show Filtered" 
+                          Command="{Binding ShowFiltered, Mode=OneWay}"
+                          CommandParameter="{Binding ElementName=ShowFilteredCheckBox, Path=IsChecked}"
+                          HorizontalAlignment="Left" 
+                          Margin="180,13,0,0" 
+                          Grid.Row="1" 
+                          VerticalAlignment="Top"/>
             </Grid>
         </GroupBox>
-        <Button Content="Delete" 
-                Command="{Binding Delete, Mode=OneWay}"
-                Margin="0,0,10,10" 
+        <Button Content="Clear Overrides" 
+                Command="{Binding ClearOverride, Mode=OneWay}"
+                Margin="0,0,12,10" 
                 Grid.Row="1" 
                 Height="20" 
                 VerticalAlignment="Bottom" 
                 HorizontalAlignment="Right" 
-                Width="75"/>
+                Width="95"/>
         <Button Content="Close" 
                 Command="{Binding Close, Mode=OneWay}"
                 CommandParameter="{Binding ElementName=Control}"
-                Margin="0,0,90,10" 
+                Margin="0,0,117,10" 
                 Grid.Row="1" 
                 Height="20" 
                 VerticalAlignment="Bottom" 
@@ -173,7 +200,7 @@
                 Name="CheckAllButton" 
                 Command="{Binding SubmitComment, Mode=OneWay}" 
                 ToolTip="Submit Feedback!"
-                Margin="10,8,0,8" 
+                Margin="12,8,0,8" 
                 Cursor="Hand" 
                 Background="Transparent" 
                 Visibility="Visible" 

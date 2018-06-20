@@ -13,6 +13,9 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
         </i:EventTrigger>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding ControlClosing}" CommandParameter="{Binding ElementName=Win}"/>
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
@@ -61,8 +64,8 @@
             <StatusBarItem Margin="8,0,0,0">
                 <TextBlock Text="Ready" Name="statusLabel" Visibility="Visible" Foreground="#FF767474"/>
             </StatusBarItem>
-            <StatusBarItem Grid.Column="1" Margin="0,0,8,0">
-                <ProgressBar Value="0" Width="150" Height="16" Name="progressBar" Visibility="Hidden" SmallChange="1" IsIndeterminate="False" />
+            <StatusBarItem Grid.Column="1" Margin="0,0,10,0">
+                <ProgressBar Value="0" Width="155" Height="16" Name="progressBar" Visibility="Hidden" SmallChange="1" IsIndeterminate="False" />
             </StatusBarItem>
         </StatusBar>
     </Grid>

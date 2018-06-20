@@ -61,6 +61,15 @@ namespace HOK.MissionControl.StylesManager.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 56603be6-aeb2-45d0-9ebc-2830fad6368b.
+        /// </summary>
+        internal static string HealthReportTrackerGuid {
+            get {
+                return ResourceManager.GetString("HealthReportTrackerGuid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to StylesManager_Command.
         /// </summary>
         internal static string StylesManager_AdditionalButtonNames {

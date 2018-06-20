@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Windows.Data;
 
-namespace HOK.MissionControl.StylesManager
+namespace HOK.MissionControl.StylesManager.Utilities
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class InstanceCountToStatusConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
@@ -30,14 +33,33 @@ namespace HOK.MissionControl.StylesManager
         }
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class BooleanConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            if (null == value) return null;
+            if (null == value) return "N/A";
 
             var specific = (bool)value;
             return specific ? "Yes" : "No";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class ViewTypeToBooleanConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return (string)value == "DraftingView";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
