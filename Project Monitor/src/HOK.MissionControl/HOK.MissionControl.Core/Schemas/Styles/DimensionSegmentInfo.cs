@@ -34,9 +34,6 @@ namespace HOK.MissionControl.Core.Schemas.Styles
         [JsonProperty("valueOverride")]
         public string ValueOverride { get; set; }
 
-        [JsonProperty("isLocked")]
-        public bool IsLocked { get; set; }
-
         [JsonProperty("ownerViewId")]
         public int OwnerViewId { get; set; } //not set in constructor
 
@@ -53,7 +50,6 @@ namespace HOK.MissionControl.Core.Schemas.Styles
             IsOverriden = !string.IsNullOrEmpty(dim.ValueOverride);
             Value = dim.Value;
             ValueOverride = dim.ValueOverride;
-            IsLocked = dim.IsLocked;
         }
 
         public DimensionSegmentInfo(Dimension dim)
@@ -61,7 +57,6 @@ namespace HOK.MissionControl.Core.Schemas.Styles
             IsOverriden = !string.IsNullOrEmpty(dim.ValueOverride);
             Value = dim.Value;
             ValueOverride = dim.ValueOverride;
-            IsLocked = dim.IsLocked;
         }
 
         [OnError]

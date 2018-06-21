@@ -75,31 +75,26 @@ namespace HOK.MissionControl.Tools.HealthReport
                         Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.DimensionValueCheck.Values;
                 }
 
+                var units = _doc.GetUnits();
                 var dimSegmentStats = new List<DimensionSegmentInfo>();
                 foreach (var d in dimInstances)
                 {
-                    DimensionType dType;
                     var key = d.GetTypeId().IntegerValue;
                     if (dimTypes.ContainsKey(key))
                     {
                         // increment instance count
                         dimTypes[key] = new Tuple<DimensionType, int>(dimTypes[key].Item1, dimTypes[key].Item2 + 1);
-                        dType = dimTypes[key].Item1;
-                    }
-                    else
-                    {
-                        continue; //without dimension type we can't get units so just break out
                     }
 
-                    var ut = GetUnitType(dType);
-                    if (d.Segments.Size == 0 && 
-                        !string.IsNullOrEmpty(d.ValueOverride) && 
-                        !dimensionValueCheck.Any(d.ValueOverride.Contains))
+                    if (d.NumberOfSegments == 0)
                     {
+                        if (string.IsNullOrEmpty(d.ValueOverride)) continue;
+                        if (dimensionValueCheck.Any(d.ValueOverride.Contains)) continue;
+
                         // dim w/ zero segments
                         dimSegmentStats.Add(new DimensionSegmentInfo(d)
                         {
-                            ValueString = InternalUnitsToProjectUnits(d.Value, ut),
+                            ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),
                             OwnerViewType = d.ViewSpecific 
                                 ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
                                 : string.Empty,
@@ -116,7 +111,7 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                             dimSegmentStats.Add(new DimensionSegmentInfo(s)
                             {
-                                ValueString = InternalUnitsToProjectUnits(s.Value, ut),
+                                ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)s.Value, false, false),
                                 OwnerViewType = d.ViewSpecific 
                                     ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
                                     : string.Empty,
@@ -124,7 +119,6 @@ namespace HOK.MissionControl.Tools.HealthReport
                             });
                         }
                     }
-                    
                 }
 
                 var dimStats = dimTypes.Select(x => new DimensionTypeInfo(x.Value.Item1) { Instances = x.Value.Item2 })
@@ -156,53 +150,6 @@ namespace HOK.MissionControl.Tools.HealthReport
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
             }
-        }
-
-        /// <summary>
-        /// Get UnitType from DimensionType.
-        /// </summary>
-        /// <param name="dType">Dimension Type.</param>
-        /// <returns>Unit Type.</returns>
-        private static UnitType GetUnitType(DimensionType dType)
-        {
-            UnitType ut;
-            switch (dType.StyleType)
-            {
-                case DimensionStyleType.Linear:
-                case DimensionStyleType.ArcLength:
-                case DimensionStyleType.Diameter:
-                case DimensionStyleType.LinearFixed:
-                case DimensionStyleType.SpotElevation:
-                case DimensionStyleType.Radial:
-                    ut = UnitType.UT_Length;
-                    break;
-                case DimensionStyleType.Angular:
-                    ut = UnitType.UT_Angle;
-                    break;
-                case DimensionStyleType.SpotCoordinate:
-                    ut = UnitType.UT_Undefined;
-                    break;
-                case DimensionStyleType.SpotSlope:
-                    ut = UnitType.UT_Slope;
-                    break;
-                default:
-                    ut = UnitType.UT_Undefined;
-                    break;
-            }
-            return ut;
-        }
-
-        /// <summary>
-        /// Formats values from internal units to project units.
-        /// </summary>
-        /// <param name="value">Numerical value to format./</param>
-        /// <param name="type">Unit Type to convert to.</param>
-        /// <returns>String representation of the value.</returns>
-        public static string InternalUnitsToProjectUnits(double? value, UnitType type)
-        {
-            return value == null
-                ? string.Empty
-                : UnitFormatUtils.Format(_doc.GetUnits(), type, (double)value, false, false);
         }
     }
 }
