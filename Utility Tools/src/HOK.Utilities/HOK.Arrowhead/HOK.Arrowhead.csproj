@@ -9,7 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.Arrowhead</RootNamespace>
     <AssemblyName>HOK.Arrowhead</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2015'">v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2016'">v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2017'">v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2018'">v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -67,7 +71,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2019|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2019\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2018</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;RELEASE2019</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
@@ -90,6 +94,10 @@
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2019'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2019\HOK.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
@@ -101,6 +109,9 @@
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2018'">
       <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2018\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2019'">
+      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2019\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
@@ -132,6 +143,14 @@
     </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2018'">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2019'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2019'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -176,6 +195,7 @@ if $(Configuration) == 2015 goto Build2015
 if $(Configuration) == 2016 goto Build2016
 if $(Configuration) == 2017 goto Build2017
 if $(Configuration) == 2018 goto Build2018
+if $(Configuration) == 2019 goto Build2019
 
 :Build2015
 echo Copying results to Build2015
@@ -199,6 +219,12 @@ goto exit
 echo Copying results to Build2018
 if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2019
+echo Copying results to Build2019
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>

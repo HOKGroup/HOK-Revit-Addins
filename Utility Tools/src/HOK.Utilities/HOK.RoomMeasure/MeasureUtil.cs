@@ -62,10 +62,10 @@ namespace HOK.RoomMeasure
                 ElementId categoryId = new ElementId((int)BuiltInCategory.OST_Mass);
                 if (DirectShape.IsValidCategoryId(categoryId, room.Document))
                 {
-#if RELEASE2017 || RELEASE2018
-                    roomShape = DirectShape.CreateElement(room.Document, categoryId);
-#else
+#if RELEASE2015 || RELEASE2016
                     roomShape = DirectShape.CreateElement(room.Document, categoryId, "Measure", room.UniqueId);
+#else
+                    roomShape = DirectShape.CreateElement(room.Document, categoryId);
 #endif
                 }
                 roomShape.SetShape(geoList);
