@@ -23,12 +23,12 @@ using HOK.MissionControl.Tools.MissionControl;
 
 namespace HOK.MissionControl
 {
-    [Name(nameof(Properties.Resources.MissionControl_Name), typeof(Properties.Resources))]
-    [Description(nameof(Properties.Resources.MissionControl_Desc), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.MissionControl_ImageName), typeof(Properties.Resources))]
-    [Namespace(nameof(Properties.Resources.MissionControl_Namespace), typeof(Properties.Resources))]
-    [PanelName(nameof(Properties.Resources.MissionControl_PanelName), typeof(Properties.Resources))]
-    [AdditionalButtonNames(nameof(Properties.Resources.MissionControl_AdditionalButtons), typeof(Properties.Resources))]
+    //[Name(nameof(Properties.Resources.MissionControl_Name), typeof(Properties.Resources))]
+    //[Description(nameof(Properties.Resources.MissionControl_Desc), typeof(Properties.Resources))]
+    //[Image(nameof(Properties.Resources.MissionControl_ImageName), typeof(Properties.Resources))]
+    //[Namespace(nameof(Properties.Resources.MissionControl_Namespace), typeof(Properties.Resources))]
+    //[PanelName(nameof(Properties.Resources.MissionControl_PanelName), typeof(Properties.Resources))]
+    //[AdditionalButtonNames(nameof(Properties.Resources.MissionControl_AdditionalButtons), typeof(Properties.Resources))]
     public class AppCommand : IExternalApplication
     {
         public static AppCommand Instance { get; private set; }
