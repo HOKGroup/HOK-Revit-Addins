@@ -328,12 +328,11 @@ namespace HOK.LPDCalculator
                             double length = 0;
                             foreach (var boundarySegment in boundarySegments)
                             {
-#if RELEASE2016 || RELEASE2017 || RELEASE2018
-                                var curve = boundarySegment.GetCurve();
-#else
+#if RELEASE2015
                                 var curve = boundarySegment.Curve;
+#else
+                                var curve = boundarySegment.GetCurve();
 #endif
-
                                 profile.Append(curve);
                                 length += curve.Length;
                             }

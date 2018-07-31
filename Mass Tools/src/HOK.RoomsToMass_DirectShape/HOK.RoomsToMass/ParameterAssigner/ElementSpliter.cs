@@ -38,7 +38,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
             var secondaryElements = new List<Element>();
             try
             {
-#if RELEASE2014 || RELEASE2015  || RELEASE2016 || RELEASE2017 || RELEASE2018
                 if (ep.LinkedElement)
                 {
                     using (var trans = new Transaction(primaryDoc))
@@ -79,9 +78,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         }
                     }
                 }
-#elif RELEASE2013
-                
-#endif
+
                 if (null == ep.CopiedElement) { ep.SplitSucceed = false; return ep; }
 
                 using (var trans = new Transaction(primaryDoc))
@@ -199,7 +196,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var floortype = floor.FloorType;
 #if RELEASE2013
                 ElementId levelId = floor.Level.Id;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                 var levelId = floor.LevelId;
 #endif
                 var level = primaryDoc.GetElement(levelId) as Level;
@@ -232,7 +229,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var floortype = floor.FloorType;
 #if RELEASE2013
                 ElementId levelId = floor.Level.Id;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                 var levelId = floor.LevelId;
 #endif
                 var level = primaryDoc.GetElement(levelId) as Level;
@@ -350,7 +347,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     var wallTypeId = wall.WallType.Id;
 #if RELEASE2013
                     ElementId levelId = wall.Level.Id;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                     var levelId = wall.LevelId;
 #endif
 
@@ -393,7 +390,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     var wallTypeId = wall.WallType.Id;
 #if RELEASE2013
                     ElementId levelId = wall.Level.Id;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                     var levelId = wall.LevelId;
 #endif
 
@@ -444,7 +441,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     Wall newWall = null;
 #if RELEASE2013
                     ElementId wallLevelId = wall.Level.Id;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                     var wallLevelId = wall.LevelId;
 #endif
 
@@ -474,7 +471,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var offsetVector = orientation.Normalize().Negate().Multiply(0.5 * wall.Width);
 #if RELEASE2013
                 Transform transform = Transform.get_Translation(offsetVector);
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                 var transform = Transform.CreateTranslation(offsetVector);
 #endif
 
@@ -490,7 +487,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                 var curve = edge.AsCurve();
 #if RELEASE2013
                                 curve = curve.get_Transformed(transform);
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                                 curve = curve.CreateTransformed(transform);
 #endif
                                 profile.Add(curve);
@@ -547,7 +544,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     var location = familyInstance.Location as LocationPoint;
 #if RELEASE2013
                     ElementId elementId = familyInstance.Level.Id;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                     var elementId = familyInstance.LevelId;
 #endif
                     var instanceLevel = primaryDoc.GetElement(elementId) as Level;
@@ -601,9 +598,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     var parameterName = originParam.Definition.Name;
                     if (parameterName.Contains("Extensions")) { continue; }
 
-#if RELEASE2013||RELEASE2014
+#if RELEASE2013 || RELEASE2014
                     Parameter fiParam = newInstance.get_Parameter(parameterName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                     var fiParam = newInstance.LookupParameter(parameterName);
 #endif
 
@@ -685,7 +682,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         var firstCurve = originalCurve.Clone();
 #if RELEASE2013
                         firstCurve.MakeBound(firstCurve.get_EndParameter(0), parameter);
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         firstCurve.MakeBound(firstCurve.GetEndParameter(0), parameter);
 #endif
                         locationCurves.Add(firstCurve);
@@ -693,7 +690,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         var secondCurve = originalCurve.Clone();
 #if RELEASE2013
                         secondCurve.MakeBound(parameter, secondCurve.get_EndParameter(1));
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         secondCurve.MakeBound(parameter, secondCurve.GetEndParameter(1));
 #endif
                         locationCurves.Add(secondCurve);
@@ -725,7 +722,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var footPrintRoof = ep.CopiedElement as FootPrintRoof;
 #if RELEASE2013
                 ElementId elementId = footPrintRoof.Level.Id;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                 var elementId = footPrintRoof.LevelId;
 #endif
                 var roofLevel = primaryDoc.GetElement(elementId) as Level;
@@ -769,7 +766,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var footPrintRoof = ep.CopiedElement as FootPrintRoof;
 #if RELEASE2013
                 ElementId elementId = footPrintRoof.Level.Id;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                 var elementId = footPrintRoof.LevelId;
 #endif
 
@@ -1004,7 +1001,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         var firstCurve = originalCurve.Clone();
 #if RELEASE2013
                         firstCurve.MakeBound(firstCurve.get_EndParameter(0), parameter);
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         firstCurve.MakeBound(firstCurve.GetEndParameter(0), parameter);
 #endif
                         locationCurves.Add(firstCurve);
@@ -1012,7 +1009,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         var secondCurve = originalCurve.Clone();
 #if RELEASE2013
                         secondCurve.MakeBound(parameter, secondCurve.get_EndParameter(1));
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         secondCurve.MakeBound(parameter, secondCurve.GetEndParameter(1));
 #endif
                         locationCurves.Add(secondCurve);
@@ -1037,7 +1034,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var originInstance = ep.CopiedElement as FamilyInstance;
 #if RELEASE2013
                 ElementId elementId = originInstance.Level.Id;
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                 var elementId = originInstance.LevelId;
 #endif
 
@@ -1060,7 +1057,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
 #if RELEASE2013
                         curve = primaryDoc.Application.Create.NewLineBound(startPoint, endPoint);
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         curve = Autodesk.Revit.DB.Line.CreateBound(startPoint, endPoint);
 #endif
 
@@ -1123,7 +1120,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         var firstCurve = originalCurve.Clone();
 #if RELEASE2013
                         firstCurve.MakeBound(firstCurve.get_EndParameter(0), parameter);
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         firstCurve.MakeBound(firstCurve.GetEndParameter(0), parameter);
 #endif
                         locationCurves.Add(firstCurve);
@@ -1131,7 +1128,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         var secondCurve = originalCurve.Clone();
 #if RELEASE2013
                         secondCurve.MakeBound(parameter, secondCurve.get_EndParameter(1));         
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         secondCurve.MakeBound(parameter, secondCurve.GetEndParameter(1));
 #endif
                         locationCurves.Add(secondCurve);
@@ -1168,7 +1165,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         try { newPipe = primaryDoc.Create.NewPipe(curve.get_EndPoint(0), intersectingPoint, originPipe.PipeType); }
 #elif RELEASE2014
                         try { newPipe = primaryDoc.Create.NewPipe(curve.GetEndPoint(0), intersectingPoint, originPipe.PipeType); }
-#elif RELEASE2015|| RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         try { newPipe = Pipe.Create(primaryDoc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.ReferenceLevel.Id, curve.GetEndPoint(0), intersectingPoint); }
 #endif
                         catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -1179,7 +1176,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         try { newPipe = primaryDoc.Create.NewPipe(intersectingPoint, curve.get_EndPoint(1), originPipe.PipeType); }
 #elif RELEASE2014
                         try { newPipe = primaryDoc.Create.NewPipe(intersectingPoint, curve.GetEndPoint(1), originPipe.PipeType); }
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         try { newPipe = Pipe.Create(primaryDoc, originPipe.MEPSystem.GetTypeId(), originPipe.GetTypeId(), originPipe.ReferenceLevel.Id, intersectingPoint, curve.GetEndPoint(1)); }
 #endif
                         
@@ -1247,7 +1244,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         try { newDuct = primaryDoc.Create.NewDuct(curve.get_EndPoint(0), intersectingPoint, originDuct.DuctType); }
 #elif RELEASE2014||RELEASE2015 || RELEASE2016 
                         try { newDuct = primaryDoc.Create.NewDuct(curve.GetEndPoint(0), intersectingPoint, originDuct.DuctType); }
-#elif RELEASE2017 || RELEASE2018
+#else
                         try { newDuct = Duct.Create(primaryDoc, originDuct.MEPSystem.GetTypeId(), originDuct.DuctType.Id, originDuct.LevelId, curve.GetEndPoint(0), intersectingPoint); }
 #endif
 
@@ -1259,7 +1256,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         try { newDuct = primaryDoc.Create.NewDuct(intersectingPoint, curve.get_EndPoint(1), originDuct.DuctType); }
 #elif RELEASE2014||RELEASE2015 || RELEASE2016
                         try { newDuct = primaryDoc.Create.NewDuct(intersectingPoint, curve.GetEndPoint(1), originDuct.DuctType); }
-#elif RELEASE2017 || RELEASE2018
+#else
                         try { newDuct = Duct.Create(primaryDoc, originDuct.MEPSystem.GetTypeId(), originDuct.DuctType.Id, originDuct.LevelId, intersectingPoint, curve.GetEndPoint(1)); }
 #endif
 
@@ -1297,7 +1294,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         Conduit newConduit = null;
 #if RELEASE2013
                         try { newConduit = Conduit.Create(primaryDoc, originConduit.GetTypeId(), curve.get_EndPoint(0), intersectingPoint, originConduit.ReferenceLevel.Id); }
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         try { newConduit = Conduit.Create(primaryDoc, originConduit.GetTypeId(), curve.GetEndPoint(0), intersectingPoint, originConduit.ReferenceLevel.Id); }
 #endif
 
@@ -1307,7 +1304,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         newConduit = null;
 #if RELEASE2013
                         try { newConduit = Conduit.Create(primaryDoc, originConduit.GetTypeId(), intersectingPoint, curve.get_EndPoint(1), originConduit.ReferenceLevel.Id); }
-#elif RELEASE2014||RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         try { newConduit = Conduit.Create(primaryDoc, originConduit.GetTypeId(), intersectingPoint, curve.GetEndPoint(1), originConduit.ReferenceLevel.Id); }
 #endif
 
@@ -1386,9 +1383,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                         foreach (var primaryElement in ep.PrimaryElements)
                         {
-#if RELEASE2013||RELEASE2014
+#if RELEASE2013 || RELEASE2014
                             Parameter parameter = primaryElement.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                             var parameter = primaryElement.LookupParameter(paramName);
 #endif
                             if (null != parameter)
@@ -1418,7 +1415,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         {
 #if RELEASE2013||RELEASE2014
                             Parameter parameter = secondaryElement.get_Parameter(paramName);
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                             var parameter = secondaryElement.LookupParameter(paramName);
 #endif
                             if (null != parameter)
@@ -1497,7 +1494,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
         }
     }
 
-#if RELEASE2014 || RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
     public class HideAndAcceptDuplicateTypeNamesHandler : IDuplicateTypeNamesHandler
     {
         #region IDuplicateTypeNamesHandler Members
@@ -1515,6 +1511,4 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         #endregion
     }
-#endif
-    
 }

@@ -354,7 +354,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 uidoc.ShowElements(elementIds);
                 uidoc.Selection.Elements = newSelection;
 
-#elif RELEASE2015 || RELEASE2016 || RELEASE2017
+#else
                 Selection selection = uidoc.Selection;
 
                 foreach (DataGridViewRow row in dataGridViewElement.SelectedRows)

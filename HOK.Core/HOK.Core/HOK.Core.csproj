@@ -250,6 +250,8 @@ xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\T
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.StylesManager"
 xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
 xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2016
@@ -264,6 +266,8 @@ xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\T
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.StylesManager"
 xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
 xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2017
@@ -278,6 +282,8 @@ xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\T
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.StylesManager"
 xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2018
@@ -292,6 +298,8 @@ xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\T
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.StylesManager"
 xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2019
@@ -306,6 +314,8 @@ xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\T
 xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.StylesManager"
 xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
 xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
+xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>

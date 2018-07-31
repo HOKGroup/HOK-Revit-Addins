@@ -122,6 +122,7 @@ namespace HOK.ModelReporting
             try
             {
                 if (e.Document.IsFamilyDocument) return;
+
                 _openSettings = new EventSettings(e.Document);
                 _openSettings.SizeStart = _openSettings.GetFileSize();
                 _openSettings.StartTime = DateTime.Now;

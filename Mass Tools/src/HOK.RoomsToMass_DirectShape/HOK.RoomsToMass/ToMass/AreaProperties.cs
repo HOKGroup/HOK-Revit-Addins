@@ -143,7 +143,7 @@ namespace HOK.RoomsToMass.ToMass
                     {
 #if RELEASE2015
                         curveList.Add(segment.Curve);
-#elif RELEASE2016 || RELEASE2017 || RELEASE2018
+#else
                         curveList.Add(segment.GetCurve());
 #endif
                     }

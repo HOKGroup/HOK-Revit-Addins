@@ -30,10 +30,10 @@ namespace HOK.XYZLocator
         {
             name = location.Name;
             transformValue = location.GetTransform();
-#if RELEASE2018
-            position = location.GetProjectPosition(XYZ.Zero);
-#else
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
             position = location.get_ProjectPosition(XYZ.Zero);
+#else
+            position = location.GetProjectPosition(XYZ.Zero);
 #endif
         }
 

@@ -11,6 +11,7 @@ Global
 		2016|Any CPU = 2016|Any CPU
 		2017|Any CPU = 2017|Any CPU
 		2018|Any CPU = 2018|Any CPU
+		2019|Any CPU = 2019|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
@@ -23,6 +24,8 @@ Global
 		{4CE27E50-138B-4365-ABB4-F948B7FD7E0A}.2017|Any CPU.Build.0 = 2017|Any CPU
 		{4CE27E50-138B-4365-ABB4-F948B7FD7E0A}.2018|Any CPU.ActiveCfg = 2018|Any CPU
 		{4CE27E50-138B-4365-ABB4-F948B7FD7E0A}.2018|Any CPU.Build.0 = 2018|Any CPU
+		{4CE27E50-138B-4365-ABB4-F948B7FD7E0A}.2019|Any CPU.ActiveCfg = 2019|Any CPU
+		{4CE27E50-138B-4365-ABB4-F948B7FD7E0A}.2019|Any CPU.Build.0 = 2019|Any CPU
 		{4CE27E50-138B-4365-ABB4-F948B7FD7E0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4CE27E50-138B-4365-ABB4-F948B7FD7E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CE27E50-138B-4365-ABB4-F948B7FD7E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -30,5 +33,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0E89E047-DD3F-43A8-ABA5-1C7F5284DA6D}
 	EndGlobalSection
 EndGlobal
