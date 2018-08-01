@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>DTM Tool</Name>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.MissionControl.dll</Assembly>
+    <AddInId>9C4D37B2-155D-4AC8-ACCF-383D86673F1C</AddInId>
+    <FullClassName>HOK.MissionControl.AppCommand</FullClassName>
+    <VendorId>Konrad K Sobon</VendorId>
+    <VendorDescription>HOK BuildingSMART Team.</VendorDescription>
+  </AddIn>
+</RevitAddIns>

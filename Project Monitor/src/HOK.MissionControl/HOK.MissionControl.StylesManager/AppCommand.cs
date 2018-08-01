@@ -6,21 +6,23 @@ using HOK.Core.Utilities;
 
 namespace HOK.MissionControl.StylesManager
 {
-    [Name(nameof(Properties.Resources.StylesManager_Name), typeof(Properties.Resources))]
-    [Description(nameof(Properties.Resources.StylesManager_Description), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.StylesManager_ImageName), typeof(Properties.Resources))]
-    [PanelName(nameof(Properties.Resources.StylesManager_PanelName), typeof(Properties.Resources))]
-    [ButtonText(nameof(Properties.Resources.StylesManager_ButtonText), typeof(Properties.Resources))]
-    [Namespace(nameof(Properties.Resources.StylesManager_Namespace), typeof(Properties.Resources))]
-    [AdditionalButtonNames(nameof(Properties.Resources.StylesManager_AdditionalButtonNames), typeof(Properties.Resources))]
     public class AppCommand : IExternalApplication
     {
-        private const string tabName = "  HOK - Beta";
+        private const string tabName = "   HOK   ";
         public static StylesManagerRequestHandler StylesManagerHandler { get; set; }
         public static ExternalEvent StylesManagerEvent { get; set; }
 
         public Result OnStartup(UIControlledApplication application)
         {
+            try
+            {
+                application.CreateRibbonTab(tabName);
+            }
+            catch
+            {
+                Log.AppendLog(LogMessageType.INFO, "Ribbon tab was not created because it already exists: " + tabName);
+            }
+
             var assembly = Assembly.GetAssembly(GetType());
             var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
                         ?? application.CreateRibbonPanel(tabName, "Mission Control");

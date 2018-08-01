@@ -6,20 +6,22 @@ using HOK.Core.Utilities;
 
 namespace HOK.MissionControl.GroupsManager
 {
-    [Name(nameof(Properties.Resources.GroupsManager_Name), typeof(Properties.Resources))]
-    [Description(nameof(Properties.Resources.GroupsManager_Description), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.GroupsManager_ImageName), typeof(Properties.Resources))]
-    [PanelName(nameof(Properties.Resources.GroupsManager_PanelName), typeof(Properties.Resources))]
-    [Namespace(nameof(Properties.Resources.GroupsManager_Namespace), typeof(Properties.Resources))]
-    [AdditionalButtonNames(nameof(Properties.Resources.GroupsManager_AdditionalButtonNames), typeof(Properties.Resources))]
     public class AppCommand : IExternalApplication
     {
-        private const string tabName = "  HOK - Beta";
+        private const string tabName = "   HOK   ";
         public static GroupManagerRequestHandler GroupManagerHandler { get; set; }
         public static ExternalEvent GroupManagerEvent { get; set; }
 
         public Result OnStartup(UIControlledApplication application)
         {
+            try
+            {
+                application.CreateRibbonTab(tabName);
+            }
+            catch
+            {
+                Log.AppendLog(LogMessageType.INFO, "Ribbon tab was not created because it already exists: " + tabName);
+            }
             var assembly = Assembly.GetAssembly(GetType());
             var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
                         ?? application.CreateRibbonPanel(tabName, "Mission Control");

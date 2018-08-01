@@ -1,4 +1,5 @@
 ﻿#region References
+
 using System;
 using System.Windows.Interop;
 using System.Diagnostics;
@@ -11,19 +12,11 @@ using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.FamilyPublish.Utilities;
 using Visibility = System.Windows.Visibility;
+
 #endregion
 
 namespace HOK.MissionControl.FamilyPublish
 {
-    /// <summary>
-    /// Class attributes are used for beta tools management.
-    /// </summary>
-    [Name(nameof(Properties.Resources.FamilyPublish_Name), typeof(Properties.Resources))]
-    [Description(nameof(Properties.Resources.FamilyPublish_Description), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.FamilyPublish_ImageName), typeof(Properties.Resources))]
-    [PanelName(nameof(Properties.Resources.FamilyPublish_PanelName), typeof(Properties.Resources))]
-    [ButtonText(nameof(Properties.Resources.FamilyPublish_ButtonText), typeof(Properties.Resources))]
-    [Namespace(nameof(Properties.Resources.FamilyPublish_Namespace), typeof(Properties.Resources))]
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]

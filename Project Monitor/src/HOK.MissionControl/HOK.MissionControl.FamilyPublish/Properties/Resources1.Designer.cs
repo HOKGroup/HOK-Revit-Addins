@@ -19,7 +19,7 @@ namespace HOK.MissionControl.FamilyPublish.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -57,61 +57,6 @@ namespace HOK.MissionControl.FamilyPublish.Properties {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Publish Family
-        ///Data.
-        /// </summary>
-        internal static string FamilyPublish_ButtonText {
-            get {
-                return ResourceManager.GetString("FamilyPublish_ButtonText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to This plug-in publishes information about Families currently loaded in the project to Mission Control..
-        /// </summary>
-        internal static string FamilyPublish_Description {
-            get {
-                return ResourceManager.GetString("FamilyPublish_Description", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to publishFamily_32x32.png.
-        /// </summary>
-        internal static string FamilyPublish_ImageName {
-            get {
-                return ResourceManager.GetString("FamilyPublish_ImageName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Publish Family.
-        /// </summary>
-        internal static string FamilyPublish_Name {
-            get {
-                return ResourceManager.GetString("FamilyPublish_Name", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to HOK.MissionControl.FamilyPublish.
-        /// </summary>
-        internal static string FamilyPublish_Namespace {
-            get {
-                return ResourceManager.GetString("FamilyPublish_Namespace", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Mission Control.
-        /// </summary>
-        internal static string FamilyPublish_PanelName {
-            get {
-                return ResourceManager.GetString("FamilyPublish_PanelName", resourceCulture);
             }
         }
         
