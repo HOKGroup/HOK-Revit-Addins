@@ -187,6 +187,7 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
                                 : string.Empty;
                             if (sheetsData == null || string.IsNullOrEmpty(sheetId) || string.IsNullOrEmpty(taskId)) return;
 
+
                             var sheet = sheetsData.Sheets.FirstOrDefault(x =>
                                 string.Equals(sheetId, x.Id, StringComparison.Ordinal));
                             var task = sheet?.Tasks.FirstOrDefault(x =>

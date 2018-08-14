@@ -55,6 +55,7 @@ namespace HOK.MissionControl.Tools.SheetTracker
                     }
                     else
                     {
+                        // TODO: Something about this is not right. When a new sheet is added from the web interface, then approved in Revit and synched
                         var task = ms.Tasks.LastOrDefault();
                         if (task != null && task.IsNewSheet)
                         {

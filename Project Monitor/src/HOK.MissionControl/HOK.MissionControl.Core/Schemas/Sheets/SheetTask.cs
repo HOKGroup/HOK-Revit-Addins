@@ -59,9 +59,9 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         [JsonProperty("collectionId")]
         public string CollectionId { get; set; }
 
-        [DataMember(Name = "fileName")]
-        [JsonProperty("fileName")]
-        public string FileName { get; set; }
+        [DataMember(Name = "centralPath")]
+        [JsonProperty("centralPath")]
+        public string CentralPath { get; set; }
 
         private string _name;
         [DataMember(Name = "name")]
@@ -152,6 +152,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
             IsDeleted = other.IsDeleted;
             Message = other.Message;
             Comments = other.Message;
+            CentralPath = other.CentralPath;
         }
 
         public override bool Equals(object obj)
