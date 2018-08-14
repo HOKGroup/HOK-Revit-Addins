@@ -80,6 +80,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
+    </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
     </Reference>
@@ -110,9 +113,6 @@
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2019'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPIUI.dll</HintPath>
     </Reference>
-    <Reference Include="GalaSoft.MvvmLight, Version=5.0.2.32240, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
-      <HintPath>..\packages\Portable.MvvmLightLibs.5.0.2.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
-    </Reference>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
       <Private>True</Private>
@@ -142,7 +142,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Portable.MvvmLightLibs.5.0.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -216,32 +216,27 @@ if $(Configuration) == 2019 goto Build2019
 
 :Build2015
 echo Copying results to Build2015
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2016
 echo Copying results to Build2016
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2017
 echo Copying results to Build2017
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2018
 echo Copying results to Build2018
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2019
 echo Copying results to Build2019
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.FamilyPublish"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.FamilyPublish"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>

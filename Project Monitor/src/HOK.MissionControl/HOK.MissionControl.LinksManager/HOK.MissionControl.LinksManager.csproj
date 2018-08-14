@@ -217,6 +217,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources1.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -246,42 +247,27 @@ if $(Configuration) == 2019 goto Build2019
 
 :Build2015
 echo Copying results to Build2015
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.LinksManager.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2016
 echo Copying results to Build2016
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.LinksManager.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2017
 echo Copying results to Build2017
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.LinksManager.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2018
 echo Copying results to Build2018
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.LinksManager.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2019
 echo Copying results to Build2019
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.LinksManager"
-copy /Y "$(TargetDir)HOK.MissionControl.LinksManager.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>

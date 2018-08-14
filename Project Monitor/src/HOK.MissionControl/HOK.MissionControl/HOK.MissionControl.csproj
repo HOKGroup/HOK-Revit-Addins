@@ -352,6 +352,11 @@
     <Resource Include="Resources\statusInfo_48x48.png" />
     <Resource Include="Resources\statusSuccess_48x48.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="HOK.MissionControl.addin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo Signing...
@@ -369,47 +374,47 @@ if $(Configuration) == Debug goto Build2017
 
 :Build2015
 echo Copying results to Build2015
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)WebSocket4Net.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)WebSocket4Net.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)HOK.MissionControl.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2016
 echo Copying results to Build2016
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)WebSocket4Net.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)WebSocket4Net.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)HOK.MissionControl.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2017
 echo Copying results to Build2017
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)WebSocket4Net.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)WebSocket4Net.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)HOK.MissionControl.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2018
 echo Copying results to Build2018
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)WebSocket4Net.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)WebSocket4Net.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)HOK.MissionControl.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
 goto exit
 
 :Build2019
 echo Copying results to Build2019
-copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl"
-copy /Y "$(TargetDir)WebSocket4Net.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl"
+copy /Y "$(TargetDir)SocketIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)EngineIoClientDotNet.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)WebSocket4Net.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetDir)HOK.MissionControl.addin" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>

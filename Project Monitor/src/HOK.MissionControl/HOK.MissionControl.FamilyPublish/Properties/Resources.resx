@@ -117,25 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FamilyPublish_ButtonText" xml:space="preserve">
-    <value>Publish Family
-Data</value>
-  </data>
-  <data name="FamilyPublish_Description" xml:space="preserve">
-    <value>This plug-in publishes information about Families currently loaded in the project to Mission Control.</value>
-  </data>
-  <data name="FamilyPublish_ImageName" xml:space="preserve">
-    <value>publishFamily_32x32.png</value>
-  </data>
-  <data name="FamilyPublish_Name" xml:space="preserve">
-    <value>Publish Family</value>
-  </data>
-  <data name="FamilyPublish_Namespace" xml:space="preserve">
-    <value>HOK.MissionControl.FamilyPublish</value>
-  </data>
-  <data name="FamilyPublish_PanelName" xml:space="preserve">
-    <value>Mission Control</value>
-  </data>
   <data name="HealthReportTrackerGuid" xml:space="preserve">
     <value>56603be6-aeb2-45d0-9ebc-2830fad6368b</value>
   </data>

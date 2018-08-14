@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.Serialization;
 using Autodesk.Revit.DB;
 using MongoDB.Bson;
@@ -25,9 +24,9 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         [JsonProperty("collectionId")]
         public string CollectionId { get; set; }
 
-        [DataMember(Name = "fileName")]
-        [JsonProperty("fileName")]
-        public string FileName { get; set; }
+        [DataMember(Name = "centralPath")]
+        [JsonProperty("centralPath")]
+        public string CentralPath { get; set; }
 
         [DataMember(Name = "isNewSheet")]
         [JsonProperty("isNewSheet")]
@@ -112,7 +111,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
             UniqueId = sheet.UniqueId;
             RevisionNumber = sheet.get_Parameter(BuiltInParameter.SHEET_CURRENT_REVISION).AsString();
             IsPlaceholder = sheet.IsPlaceholder;
-            FileName = !string.IsNullOrEmpty(path) ? Path.GetFileNameWithoutExtension(path) : string.Empty;
+            CentralPath = path.ToLower();
             IsNewSheet = false;
             IsDeleted = false;
             IsSelected = false;
