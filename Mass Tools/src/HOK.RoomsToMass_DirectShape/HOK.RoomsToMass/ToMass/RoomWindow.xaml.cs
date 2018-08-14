@@ -775,22 +775,6 @@ namespace HOK.RoomsToMass.ToMass
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-        }
-
-        
-
-       
-
-        
-
-        
-
-       
-
-        
-
-        
-
-        
+        } 
     }
 }
