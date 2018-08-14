@@ -10,15 +10,6 @@ using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.LinksManager
 {
-    /// <summary>
-    /// Class attributes are used for beta tools management.
-    /// </summary>
-    [Name(nameof(Properties.Resources.LinksManager_Name), typeof(Properties.Resources))]
-    [Description(nameof(Properties.Resources.LinksManager_Description), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.LInksManager_ImageName), typeof(Properties.Resources))]
-    [PanelName(nameof(Properties.Resources.LinksManager_PanelName), typeof(Properties.Resources))]
-    [ButtonText(nameof(Properties.Resources.LinksManager_ButtonText), typeof(Properties.Resources))]
-    [Namespace(nameof(Properties.Resources.LinksManager_Namespace), typeof(Properties.Resources))]
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]

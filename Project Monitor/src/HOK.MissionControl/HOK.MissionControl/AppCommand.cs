@@ -1,6 +1,8 @@
 ﻿#region References
+
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -19,18 +21,15 @@ using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.MissionControl;
+
 #endregion
 
 namespace HOK.MissionControl
 {
-    [Name(nameof(Properties.Resources.MissionControl_Name), typeof(Properties.Resources))]
-    [Description(nameof(Properties.Resources.MissionControl_Desc), typeof(Properties.Resources))]
-    [Image(nameof(Properties.Resources.MissionControl_ImageName), typeof(Properties.Resources))]
-    [Namespace(nameof(Properties.Resources.MissionControl_Namespace), typeof(Properties.Resources))]
-    [PanelName(nameof(Properties.Resources.MissionControl_PanelName), typeof(Properties.Resources))]
-    [AdditionalButtonNames(nameof(Properties.Resources.MissionControl_AdditionalButtons), typeof(Properties.Resources))]
     public class AppCommand : IExternalApplication
     {
+        #region Properties
+
         public static AppCommand Instance { get; private set; }
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
@@ -44,10 +43,13 @@ namespace HOK.MissionControl
         public static Dictionary<string, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<string, FamilyItem>();
         public PushButton CommunicatorButton { get; set; }
         public PushButton WebsiteButton { get; set; }
+        public PushButton FamilyPublishButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
         public DtmUpdater DtmUpdaterInstance { get; set; }
-        private const string tabName = "  HOK - Beta";
+        private const string tabName = "   HOK   ";
         private static Queue<Action<UIApplication>> Tasks;
+
+        #endregion
 
         public Result OnStartup(UIControlledApplication application)
         {
@@ -68,34 +70,14 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
                 application.ControlledApplication.DocumentCreated += OnDocumentCreated;
 
-                // (Konrad) Create Communicator/WebsiteLink buttons and register dockable panel.
+                // (Konrad) Create buttons and register dockable panel.
                 CommunicatorUtilities.RegisterCommunicator(application);
-
-                try
-                {
-                    application.CreateRibbonTab(tabName);
-                }
-                catch
-                {
-                    Log.AppendLog(LogMessageType.ERROR, "Ribbon tab was not created: " + tabName);
-                }
-
-                var assembly = Assembly.GetAssembly(GetType());
-                var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
-                            ?? application.CreateRibbonPanel(tabName, "Mission Control");
-                CommunicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command", "Show/Hide" + Environment.NewLine + "Communicator",
-                    assembly.Location, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
-
-                WebsiteButton = (PushButton)panel.AddItem(new PushButtonData("WebsiteLink_Command", "Launch" + Environment.NewLine + "MissionControl",
-                    assembly.Location, "HOK.MissionControl.Tools.WebsiteLink.WebsiteLinkCommand"));
-                WebsiteButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "missionControl_32x32.png");
-                WebsiteButton.ToolTip = "Launch Mission Control website.";
+                CreateButtons(application);
 
                 // (Konrad) Since Communicator Task Assistant offers to open Families for editing,
                 // it requires an External Event because new document cannot be opened from Idling Event
                 CommunicatorHandler = new CommunicatorRequestHandler();
                 CommunicatorEvent = ExternalEvent.Create(CommunicatorHandler);
-
             }
             catch (Exception ex)
             {
@@ -255,6 +237,61 @@ namespace HOK.MissionControl
         }
 
         #region Utilities
+
+        /// <summary>
+        /// Utility method for creating all MissionControl buttons that don't have their own AppCommand.
+        /// </summary>
+        /// <param name="application">UI Controlled Application.</param>
+        private void CreateButtons(UIControlledApplication application)
+        {
+            try
+            {
+                application.CreateRibbonTab(tabName);
+            }
+            catch
+            {
+                Log.AppendLog(LogMessageType.INFO, "Ribbon tab was not created because it already exists: " + tabName);
+            }
+
+            var assembly = Assembly.GetAssembly(GetType());
+            var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
+                        ?? application.CreateRibbonPanel(tabName, "Mission Control");
+            CommunicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command",
+                "Show/Hide" + Environment.NewLine + "Communicator",
+                assembly.Location, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
+
+            WebsiteButton = (PushButton)panel.AddItem(new PushButtonData("WebsiteLink_Command",
+                "Launch" + Environment.NewLine + "MissionControl",
+                assembly.Location, "HOK.MissionControl.Tools.WebsiteLink.WebsiteLinkCommand"));
+            WebsiteButton.LargeImage =
+                ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "missionControl_32x32.png");
+            WebsiteButton.ToolTip = "Launch Mission Control website.";
+
+            var currentAssembly = Assembly.GetAssembly(GetType()).Location;
+            var currentDirectory = Path.GetDirectoryName(currentAssembly);
+
+            // (Konrad) Publish Family Data
+            var fpAssembly = Assembly.LoadFrom(currentDirectory + "/HOK.MissionControl.FamilyPublish.dll");
+            FamilyPublishButton = (PushButton)panel.AddItem(new PushButtonData("FamilyPublish_Command",
+                "Publish Family" + Environment.NewLine + " Data",
+                currentDirectory + "/HOK.MissionControl.FamilyPublish.dll",
+                "HOK.MissionControl.FamilyPublish.FamilyPublishCommand"));
+            FamilyPublishButton.LargeImage = ButtonUtil.LoadBitmapImage(fpAssembly, "HOK.MissionControl.FamilyPublish",
+                "publishFamily_32x32.png");
+            FamilyPublishButton.ToolTip =
+                "This plug-in publishes information about Families currently loaded in the project to Mission Control.";
+
+            // (Konrad) Links Manager
+            var lmAssembly = Assembly.LoadFrom(currentDirectory + "/HOK.MissionControl.LinksManager.dll");
+            var linksButton = (PushButton)panel.AddItem(new PushButtonData("LinksManager_Command",
+                "Links" + Environment.NewLine + " Manager ",
+                currentDirectory + "/HOK.MissionControl.LinksManager.dll",
+                "HOK.MissionControl.LinksManager.LinksManagerCommand"));
+            linksButton.LargeImage = ButtonUtil.LoadBitmapImage(lmAssembly, "HOK.MissionControl.LinksManager",
+                "linksManager_32x32.png");
+            linksButton.ToolTip =
+                "Utility tool that allows users to quickly identify Imported Images, DWGs, and Styles.";
+        }
 
         /// <summary>
         /// 

@@ -543,6 +543,9 @@ namespace HOK.MissionControl.Tools.MissionControl
             // kill website button
             AppCommand.Instance.WebsiteButton.Enabled = false;
 
+            // kill family publish button
+            AppCommand.Instance.FamilyPublishButton.Enabled = false;
+
             // kill communicator panel and button
             AppCommand.CommunicatorHandler.Request.Make(RequestId.Disable);
             AppCommand.CommunicatorEvent.Raise();
@@ -555,6 +558,7 @@ namespace HOK.MissionControl.Tools.MissionControl
         {
             AppCommand.Instance.WebsiteButton.Enabled = true;
             AppCommand.Instance.CommunicatorButton.Enabled = true;
+            AppCommand.Instance.FamilyPublishButton.Enabled = true;
         }
 
         /// <summary>

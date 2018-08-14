@@ -117,23 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="LinksManager_ButtonText" xml:space="preserve">
-    <value>Links
-Manager</value>
-  </data>
-  <data name="LinksManager_Description" xml:space="preserve">
-    <value>Utility tool that allows users to quickly identify Imported Images, DWGs, and Styles. </value>
-  </data>
-  <data name="LInksManager_ImageName" xml:space="preserve">
-    <value>linksManager_32x32.png</value>
-  </data>
-  <data name="LinksManager_Name" xml:space="preserve">
-    <value>Links Manager</value>
-  </data>
-  <data name="LinksManager_Namespace" xml:space="preserve">
-    <value>HOK.MissionControl.LinksManager</value>
-  </data>
-  <data name="LinksManager_PanelName" xml:space="preserve">
-    <value>Mission Control</value>
-  </data>
 </root>
