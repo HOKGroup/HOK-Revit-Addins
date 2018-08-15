@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -15,8 +14,12 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
         public string Id { get; set; }
-        public string name { get; set; }
-        public string value { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        [JsonProperty("value")]
+        public string Value { get; set; }
     }
 
     public class AddinLog
@@ -25,33 +28,35 @@ namespace HOK.MissionControl.Core.Schemas
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty("_id")]
         public string Id { get; set; }
-        public string pluginName { get; set; }
-        public string user { get; set; }
-        public string revitVersion { get; set; }
-        public string office { get; set; }
-        public DateTime createdOn { get; set; } = DateTime.UtcNow;
-        public List<InfoItem> detailInfo { get; set; } = new List<InfoItem>();
+
+        [JsonProperty("pluginName")]
+        public string PluginName { get; set; }
+
+        [JsonProperty("user")]
+        public string User { get; set; }
+
+        [JsonProperty("revitVersion")]
+        public string RevitVersion { get; set; }
+
+        [JsonProperty("office")]
+        public string Office { get; set; }
+
+        [JsonProperty("createdOn")]
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+
+        [JsonProperty("detailInfo")]
+        public List<InfoItem> DetailInfo { get; set; } = new List<InfoItem>();
 
         public AddinLog()
         {
         }
 
-        // TODO: We should NOT be passing a document into the constructor here.
-        // TODO: Apps in a "zero doc" state will fail to initialize.
-        [Obsolete]
-        public AddinLog(string name, Document doc)
-        {
-            pluginName = name;
-            user = Environment.UserName.ToLower();
-            revitVersion = doc.Application.VersionNumber;
-        }
-
         public AddinLog(string name, string version)
         {
-            pluginName = name;
-            user = Environment.UserName.ToLower();
-            revitVersion = version;
-            office = GetOffice();
+            PluginName = name;
+            User = Environment.UserName.ToLower();
+            RevitVersion = version;
+            Office = GetOffice();
         }
 
         /// <summary>
@@ -80,14 +85,5 @@ namespace HOK.MissionControl.Core.Schemas
                 return string.Empty;
             }
         }
-    }
-
-    public class AddinData
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
-        public string Id { get; set; }
-        public List<AddinLog> usageLogs { get; set; } = new List<AddinLog>();
     }
 }
