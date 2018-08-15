@@ -1,5 +1,7 @@
 ﻿Imports Autodesk.Revit.DB
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 ' Need better handling for Metric areas as m2
 
@@ -20,6 +22,8 @@ Public Class form_ElemPlaceUnplacedRooms
     ''' <remarks></remarks>
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ElementTools-PlaceUnplacedRooms", settings.Document.Application.VersionNumber))
 
         'Initialize Settings Class
         m_Settings = settings

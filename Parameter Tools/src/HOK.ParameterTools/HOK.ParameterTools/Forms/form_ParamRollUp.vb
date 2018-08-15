@@ -1,6 +1,8 @@
 ﻿Imports Autodesk.Revit.DB
 Imports Autodesk.Revit.UI
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ParamRollUp
 
@@ -13,6 +15,9 @@ Public Class form_ParamRollUp
     ''' <remarks></remarks>
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ParameterTools-RollUp", settings.Document.Application.VersionNumber))
+
         ' Main Settings Class
         m_Settings = settings
         ' Category Selections

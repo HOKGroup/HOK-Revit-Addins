@@ -1,6 +1,8 @@
 ﻿Imports Autodesk.Revit.DB
 Imports Microsoft.Office.Interop
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ParamWriteToExcel
 
@@ -17,6 +19,9 @@ Public Class form_ParamWriteToExcel
     ''' <remarks></remarks>
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ParameterTools-WriteToExcel", settings.Document.Application.VersionNumber))
+
         m_Settings = settings
         m_Excel = New clsUtilityExcel
         Dim categoryList As New List(Of String)

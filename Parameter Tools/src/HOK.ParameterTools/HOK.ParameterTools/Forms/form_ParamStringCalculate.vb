@@ -1,6 +1,8 @@
 ﻿Imports Autodesk.Revit
 
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ParamStringCalculate
 
@@ -9,6 +11,9 @@ Public Class form_ParamStringCalculate
 
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ParameterTools-StringCalculation", settings.Document.Application.VersionNumber))
+
         m_Settings = settings
 
         comboBoxElementType.Text = m_Settings.StringCalcElementType

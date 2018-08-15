@@ -2,6 +2,8 @@
 
 Imports System.Windows.Forms
 Imports Autodesk.Revit.DB
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ElemRoomsFromAreas
 
@@ -13,6 +15,8 @@ Public Class form_ElemRoomsFromAreas
 
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ElementTools-RoomsFromAreas", settings.Document.Application.VersionNumber))
 
         'Initialize the controls from settings
         m_Settings = settings

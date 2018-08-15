@@ -1,6 +1,8 @@
 ﻿Imports Autodesk.Revit.DB
 Imports Autodesk.Revit.UI
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ParamCalculate
 
@@ -36,6 +38,9 @@ Public Class form_ParamCalculate
 
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ParameterTools-MathCalculation", settings.Document.Application.VersionNumber))
+
         m_Settings = settings
 
         comboBoxElementType.Text = m_Settings.MathCalcElementType

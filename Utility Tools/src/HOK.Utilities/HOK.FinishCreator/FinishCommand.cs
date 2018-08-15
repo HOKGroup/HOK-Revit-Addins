@@ -31,8 +31,7 @@ namespace HOK.FinishCreator
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
-                var unused1 = AddinUtilities.PublishAddinLog(
-                    new AddinLog("Utilities-FinishCreator", commandData.Application.Application.VersionNumber), LogPosted);
+                AddinUtilities.PublishAddinLog(new AddinLog("Utilities-FinishCreator", commandData.Application.Application.VersionNumber));
 
                 var uidoc = m_app.ActiveUIDocument;
                 var title = "Finish Creator v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
@@ -168,16 +167,6 @@ namespace HOK.FinishCreator
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return Result.Failed;
             }
-        }
-
-        /// <summary>
-        /// Callback method for when Addin-info is published.
-        /// </summary>
-        /// <param name="data"></param>
-        private static void LogPosted(AddinData data)
-        {
-            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
-                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
     }
 

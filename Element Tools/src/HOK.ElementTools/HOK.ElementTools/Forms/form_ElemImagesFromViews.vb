@@ -2,6 +2,8 @@
 
 Imports System.Windows.Forms
 Imports System.IO
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ElemImagesFromViews
 
@@ -12,6 +14,8 @@ Public Class form_ElemImagesFromViews
 
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ElementTools-ImagesFromViews", settings.Document.Application.VersionNumber))
 
         'Initialize the settings text boxes
         m_Settings = settings

@@ -2,6 +2,8 @@
 
 Imports System.Windows.Forms
 Imports Autodesk.Revit.DB
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ElemTagViewsArea
     Private m_Settings As clsSettings
@@ -10,6 +12,8 @@ Public Class form_ElemTagViewsArea
 
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ElementTools-TagViewsArea", settings.Document.Application.VersionNumber))
 
         'Initialize the settings text boxes
         m_Settings = settings

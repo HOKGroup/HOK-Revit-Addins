@@ -39,11 +39,11 @@ namespace HOK.AddInManager
                         // If Window was closed using the OK button we can collect more details about the app to publish.
                         var log = new AddinLog("AddinManager", commandData.Application.Application.VersionNumber)
                         {
-                            detailInfo = vm.AddinsObj.AddinCollection
-                                .Select(x => new InfoItem { name = x.ToolName, value = x.ToolLoadType.ToString() })
+                            DetailInfo = vm.AddinsObj.AddinCollection
+                                .Select(x => new InfoItem { Name = x.ToolName, Value = x.ToolLoadType.ToString() })
                                 .ToList()
                         };
-                        var unused1 = AddinUtilities.PublishAddinLog(log, LogPosted);
+                        AddinUtilities.PublishAddinLog(log);
                     }
                     catch (Exception e)
                     {
@@ -57,8 +57,7 @@ namespace HOK.AddInManager
                 else
                 {
                     // If user cancelled out of this window, we don't need to log all the details, other than that it was opened.
-                    var unused1 = AddinUtilities.PublishAddinLog(
-                        new AddinLog("AddinManager", commandData.Application.Application.VersionNumber), LogPosted);
+                    AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", commandData.Application.Application.VersionNumber));
 
                     OverrideTempSettings();
                 }
@@ -70,16 +69,6 @@ namespace HOK.AddInManager
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
-        }
-
-        /// <summary>
-        /// Callback method for when Addin-info is published.
-        /// </summary>
-        /// <param name="data"></param>
-        private static void LogPosted(AddinData data)
-        {
-            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
-                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
 
         /// <summary>
