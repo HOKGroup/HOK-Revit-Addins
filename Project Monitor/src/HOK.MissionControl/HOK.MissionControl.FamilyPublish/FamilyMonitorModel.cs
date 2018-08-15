@@ -126,7 +126,7 @@ namespace HOK.MissionControl.FamilyPublish
                             .OfClass(typeof(ReferencePlane))
                             .GetElementCount();
 
-                        var filter = new LogicalAndFilter(new List<ElementFilter>
+                        var filter = new LogicalOrFilter(new List<ElementFilter>
                         {
                             new ElementClassFilter(typeof(LinearArray)),
                             new ElementClassFilter(typeof(RadialArray))
