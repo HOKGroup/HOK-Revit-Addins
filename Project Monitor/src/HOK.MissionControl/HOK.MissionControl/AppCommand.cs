@@ -14,6 +14,7 @@ using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.Warnings;
 using HOK.MissionControl.Tools.CADoor;
 using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.DTMTool;
@@ -33,6 +34,7 @@ namespace HOK.MissionControl
         public static AppCommand Instance { get; private set; }
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
+        public static Dictionary<string, WarningItem> Warnings { get; set; } = new Dictionary<string, WarningItem>();
         public static CommunicatorView CommunicatorWindow { get; set; }
         public static MissionControlSocket Socket { get; set; }
         public static bool IsSynching { get; set; }
@@ -69,6 +71,7 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
                 application.ControlledApplication.DocumentCreated += OnDocumentCreated;
+                application.ControlledApplication.FailuresProcessing += OnFailureProcessing;
 
                 // (Konrad) Create buttons and register dockable panel.
                 CommunicatorUtilities.RegisterCommunicator(application);
@@ -86,6 +89,20 @@ namespace HOK.MissionControl
             return Result.Succeeded;
         }
 
+        private static void OnFailureProcessing(object sender, FailuresProcessingEventArgs e)
+        {
+            var fa = e.GetFailuresAccessor();
+            var doc = fa.GetDocument();
+
+            foreach (var fma in fa.GetFailureMessages(FailureSeverity.Warning))
+            {
+                var w = new WarningItem(fma, doc);
+                if(Warnings.ContainsKey(w.UniqueId)) continue;
+
+                Warnings.Add(w.UniqueId, w);
+            }
+        }
+
         public Result OnShutdown(UIControlledApplication application)
         {
             application.Idling -= OnIdling;
@@ -96,6 +113,7 @@ namespace HOK.MissionControl
             application.ControlledApplication.DocumentSynchronizingWithCentral -= OnDocumentSynchronizing;
             application.ControlledApplication.DocumentSynchronizedWithCentral -= OnDocumentSynchronized;
             application.ControlledApplication.DocumentCreated -= OnDocumentCreated;
+            application.ControlledApplication.FailuresProcessing -= OnFailureProcessing;
 
             return Result.Succeeded;
         }
@@ -228,6 +246,7 @@ namespace HOK.MissionControl
                 {
                     Tools.MissionControl.MissionControl.ProcessModels(ActionType.Synch, doc, centralPath);
                     Tools.MissionControl.MissionControl.ProcessSheets(ActionType.Synch, doc, centralPath);
+                    Tools.MissionControl.MissionControl.ProcessWarnings(doc, centralPath);
                 }
             }
             catch (Exception ex)

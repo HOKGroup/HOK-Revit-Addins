@@ -191,12 +191,14 @@
     <Compile Include="Schemas\TriggerRecords\TriggerRecordData.cs" />
     <Compile Include="Schemas\Views\ViewsData.cs" />
     <Compile Include="Schemas\Views\ViewsDataItem.cs" />
+    <Compile Include="Schemas\Warnings\WarningItem.cs" />
     <Compile Include="Schemas\Worksets\WorksetItem.cs" />
     <Compile Include="Schemas\Worksets\WorksetData.cs" />
     <Compile Include="Schemas\Worksets\WorksetEvent.cs" />
     <Compile Include="Schemas\Worksets\WorksetItemData.cs" />
     <Compile Include="Utils\AddinUtilities.cs" />
     <Compile Include="Utils\ElementUtilities.cs" />
+    <Compile Include="Utils\FileInfoUtil.cs" />
     <Compile Include="Utils\MissionControlSetup.cs" />
     <Compile Include="Utils\MonitorUtilities.cs" />
     <Compile Include="Utils\RestSharpJsonNetSerializer.cs" />

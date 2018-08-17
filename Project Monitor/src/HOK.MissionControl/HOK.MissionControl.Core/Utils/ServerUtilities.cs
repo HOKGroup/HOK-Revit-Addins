@@ -12,8 +12,8 @@ namespace HOK.MissionControl.Core.Utils
     public static class ServerUtilities
     {
         public static bool UseLocalServer = true;
-        public const string RestApiBaseUrl = "http://hok-184vs/";
-        //public const string RestApiBaseUrl = "http://localhost:8080/";
+        //public const string RestApiBaseUrl = "http://hok-184vs/";
+        public const string RestApiBaseUrl = "http://localhost:8080/";
         public const string ApiVersion = "api/v2";
 
         #region GET
@@ -296,6 +296,18 @@ namespace HOK.MissionControl.Core.Utils
         }
 
         #endregion
+    }
+
+    public class ResponseCreated
+    {
+        [JsonProperty("n")]
+        public int N { get; set; }
+
+        [JsonProperty("nModified")]
+        public int NModified { get; set; }
+
+        [JsonProperty("ok")]
+        public int Ok { get; set; }
     }
 
     /// <summary>

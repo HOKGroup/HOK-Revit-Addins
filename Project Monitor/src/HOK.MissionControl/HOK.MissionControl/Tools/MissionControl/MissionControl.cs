@@ -1,8 +1,11 @@
 ﻿#region References
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.UI.Events;
 using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
@@ -14,6 +17,7 @@ using HOK.MissionControl.Core.Schemas.Models;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Schemas.Styles;
 using HOK.MissionControl.Core.Schemas.Views;
+using HOK.MissionControl.Core.Schemas.Warnings;
 using HOK.MissionControl.Core.Schemas.Worksets;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator;
@@ -63,6 +67,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                 // (Konrad) Register Updaters that are in the config file.
                 CommunicatorUtilities.LaunchCommunicator();
                 ApplyConfiguration(doc);
+                CollectWarnings(doc);
                 EnableMissionControl();
 
                 Log.AppendLog(LogMessageType.INFO, "Mission Control check in succeeded.");
@@ -281,6 +286,31 @@ namespace HOK.MissionControl.Tools.MissionControl
                     Priority = ThreadPriority.BelowNormal,
                     IsBackground = true
                 }.Start();
+            }
+        }
+
+        private static void CollectWarnings(Document doc)
+        {
+            AppCommand.Warnings = doc.GetWarnings()
+                .Select(x => new WarningItem(x, doc))
+                .ToDictionary(x => x.UniqueId, x => x);
+        }
+
+        public static void ProcessWarnings(Document doc, string centralPath)
+        {
+            var current = doc.GetWarnings().Select(x => new WarningItem(x, doc));
+            var newW = AppCommand.Warnings.Values
+                .Where(x => !string.IsNullOrEmpty(x.CreatedBy) && current.Any(y => y.UniqueId == x.UniqueId)).ToList();
+            var existingW = current.Except(newW).Select(x => x.UniqueId);
+
+            var payload = new WarningData(Environment.UserName, centralPath, newW, existingW);
+            if (!ServerUtilities.Post(payload, "warnings", out ResponseCreated unused))
+            {
+                Log.AppendLog(LogMessageType.ERROR, "Failed to publish Views Data.");
+            }
+            else
+            {
+                CollectWarnings(doc);
             }
         }
 
