@@ -33,4 +33,4 @@ Formit360.png,FormIt 360 Converter,FormItConverter.addinZZZ,31,Convert FormIt fi
 dbLink.png,Revit DB Link,Autodesk.RevitDBLink.addinZZZ,32,"Export Revit project data to a database, make changes and re-import",http://autode.sk/2dPFkcm,FALSE
 Lumion.png,Lumion Exporter,RevitToLumionBridge.addin,33,Export to Lumion,https://www.youtube.com/watch?v=3Lsn-QssVkY,FALSE
 NBS.png,NBS Plugin,NBS2018.addin,34,Coordinate element data with the NBS Specification & access the National BIM Library,https://www.nationalbimlibrary.com/nbs-plug-in-for-autodesk-revit,FALSE
-TrimbleConnect.png,Trimble Connect Uploader,RVT2BSQPlugin2018.addin,35,"Export to Trimble Connect to visualize the model in a browser, markup, and create To Dos",https://community.trimble.com/docs/DOC-10018-trimble-connect-for-revit,FALSE
+TrimbleConnect.png,Trimble Connect Uploader,RVT2BSQPlugin2018.addin,35,"Export to Trimble Connect to visualize the model in a browser, markup, and create To Dos",https://community.trimble.com/docs/DOC-10018-trimble-connect-for-revit,TRUE
