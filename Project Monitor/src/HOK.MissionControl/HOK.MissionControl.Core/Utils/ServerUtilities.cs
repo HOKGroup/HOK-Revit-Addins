@@ -298,6 +298,18 @@ namespace HOK.MissionControl.Core.Utils
         #endregion
     }
 
+    public class ResponseCreated
+    {
+        [JsonProperty("n")]
+        public int N { get; set; }
+
+        [JsonProperty("nModified")]
+        public int NModified { get; set; }
+
+        [JsonProperty("ok")]
+        public int Ok { get; set; }
+    }
+
     /// <summary>
     /// Different states of the Revit model.
     /// </summary>

@@ -88,7 +88,7 @@
     </Reference>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
@@ -246,7 +246,6 @@
     <Compile Include="Tools\SheetTracker\SheetTracker.cs" />
     <Compile Include="Tools\WebsiteLink\WebsiteLinkCommand.cs" />
     <Compile Include="Utils\FailureProcessor.cs" />
-    <Compile Include="Utils\FileInfoUtil.cs" />
     <Compile Include="Utils\StatusReporter\Converters.cs" />
     <Compile Include="Utils\StatusReporter\StatusReporterView.xaml.cs">
       <DependentUpon>StatusReporterView.xaml</DependentUpon>
@@ -313,6 +312,7 @@
     <EmbeddedResource Include="Resources\missionControl_32x32.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
