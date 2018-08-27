@@ -71,8 +71,11 @@ namespace HOK.MissionControl
                 application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
                 application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
                 application.ControlledApplication.DocumentCreated += OnDocumentCreated;
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+                // (Konrad) We are not going to process warnings here.
+#else
                 application.ControlledApplication.FailuresProcessing += OnFailureProcessing;
-
+#endif
                 // (Konrad) Create buttons and register dockable panel.
                 CommunicatorUtilities.RegisterCommunicator(application);
                 CreateButtons(application);
@@ -88,7 +91,9 @@ namespace HOK.MissionControl
             }
             return Result.Succeeded;
         }
-
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+        // (Konrad) We are not going to process warnings here.
+#else
         private static void OnFailureProcessing(object sender, FailuresProcessingEventArgs e)
         {
             var fa = e.GetFailuresAccessor();
@@ -102,6 +107,7 @@ namespace HOK.MissionControl
                 Warnings.Add(w.UniqueId, w);
             }
         }
+#endif
 
         public Result OnShutdown(UIControlledApplication application)
         {
@@ -113,8 +119,11 @@ namespace HOK.MissionControl
             application.ControlledApplication.DocumentSynchronizingWithCentral -= OnDocumentSynchronizing;
             application.ControlledApplication.DocumentSynchronizedWithCentral -= OnDocumentSynchronized;
             application.ControlledApplication.DocumentCreated -= OnDocumentCreated;
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+            // (Konrad) We are not going to process warnings here.
+#else
             application.ControlledApplication.FailuresProcessing -= OnFailureProcessing;
-
+#endif
             return Result.Succeeded;
         }
 
@@ -246,7 +255,11 @@ namespace HOK.MissionControl
                 {
                     Tools.MissionControl.MissionControl.ProcessModels(ActionType.Synch, doc, centralPath);
                     Tools.MissionControl.MissionControl.ProcessSheets(ActionType.Synch, doc, centralPath);
-                    Tools.MissionControl.MissionControl.ProcessWarnings(doc, centralPath);
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+                    // (Konrad) We are not going to process warnings here.
+#else
+                    Tools.MissionControl.MissionControl.ProcessWarnings(ActionType.Synch, doc, centralPath);
+#endif
                 }
             }
             catch (Exception ex)
@@ -255,7 +268,7 @@ namespace HOK.MissionControl
             }
         }
 
-        #region Utilities
+#region Utilities
 
         /// <summary>
         /// Utility method for creating all MissionControl buttons that don't have their own AppCommand.
@@ -350,6 +363,6 @@ namespace HOK.MissionControl
             if (CommunicatorWindow != null) CommunicatorWindow.DataContext = null;
         }
 
-        #endregion
+#endregion
     }
 }

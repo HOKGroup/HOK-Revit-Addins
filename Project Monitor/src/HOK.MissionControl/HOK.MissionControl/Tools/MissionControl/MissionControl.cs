@@ -1,11 +1,10 @@
 ﻿#region References
+
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI.Events;
 using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
@@ -25,6 +24,7 @@ using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Utils;
+
 #endregion
 
 namespace HOK.MissionControl.Tools.MissionControl
@@ -67,7 +67,11 @@ namespace HOK.MissionControl.Tools.MissionControl
                 // (Konrad) Register Updaters that are in the config file.
                 CommunicatorUtilities.LaunchCommunicator();
                 ApplyConfiguration(doc);
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+                // (Konrad) We are not going to process warnings here.
+#else
                 CollectWarnings(doc);
+#endif
                 EnableMissionControl();
 
                 Log.AppendLog(LogMessageType.INFO, "Mission Control check in succeeded.");
@@ -136,6 +140,11 @@ namespace HOK.MissionControl.Tools.MissionControl
                         // (Konrad) These are read-only methods so they don't need to run in Revit context.
                         ProcessModels(ActionType.CheckIn, doc, centralPath);
                         ProcessWorksets(ActionType.CheckIn, doc, centralPath);
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+                        // (Konrad) We are not going to process warnings here.
+#else
+                        ProcessWarnings(ActionType.CheckIn, doc, centralPath);
+#endif
                         ProcessFamilies(centralPath);
                         ProcessStyle(doc, centralPath);
                         ProcessLinks(doc, centralPath);
@@ -288,32 +297,44 @@ namespace HOK.MissionControl.Tools.MissionControl
                 }.Start();
             }
         }
-
-        private static void CollectWarnings(Document doc)
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+        // (Konrad) We are not going to process warnings here.
+#else
+        /// <summary>
+        /// Adds Warnings to a collection in database. If warnings exist it updates their status.
+        /// </summary>
+        public static void ProcessWarnings(ActionType action, Document doc, string centralPath)
         {
-            AppCommand.Warnings = doc.GetWarnings()
-                .Select(x => new WarningItem(x, doc))
-                .ToDictionary(x => x.UniqueId, x => x);
-        }
+            var current = doc.GetWarnings().Select(x => new WarningItem(x, doc)).ToList();
 
-        public static void ProcessWarnings(Document doc, string centralPath)
-        {
-            var current = doc.GetWarnings().Select(x => new WarningItem(x, doc));
-            var newW = AppCommand.Warnings.Values
-                .Where(x => !string.IsNullOrEmpty(x.CreatedBy) && current.Any(y => y.UniqueId == x.UniqueId)).ToList();
-            var existingW = current.Except(newW).Select(x => x.UniqueId);
-
-            var payload = new WarningData(Environment.UserName, centralPath, newW, existingW);
-            if (!ServerUtilities.Post(payload, "warnings", out ResponseCreated unused))
+            switch (action)
             {
-                Log.AppendLog(LogMessageType.ERROR, "Failed to publish Views Data.");
-            }
-            else
-            {
-                CollectWarnings(doc);
+                case ActionType.CheckIn:
+                    if (!ServerUtilities.Post(current, "warnings/add", out ResponseCreated unused1))
+                    {
+                        Log.AppendLog(LogMessageType.ERROR, "Failed to publish Views Data.");
+                    }
+                    break;
+                case ActionType.Synch:
+                    var newW = AppCommand.Warnings.Values
+                        .Where(x => !string.IsNullOrEmpty(x.CreatedBy) && current.Any(y => y.UniqueId == x.UniqueId)).ToList();
+                    var existingW = current.Except(newW).Select(x => x.UniqueId);
+
+                    var payload = new WarningData(Environment.UserName, centralPath, newW, existingW);
+                    if (!ServerUtilities.Post(payload, "warnings/update", out ResponseCreated unused))
+                    {
+                        Log.AppendLog(LogMessageType.ERROR, "Failed to publish Views Data.");
+                    }
+                    else
+                    {
+                        CollectWarnings(doc);
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(action), action, null);
             }
         }
-
+#endif
         /// <summary>
         /// Adds Groups data to collection if such exists, otherwise creates a new one.
         /// </summary>
@@ -595,6 +616,7 @@ namespace HOK.MissionControl.Tools.MissionControl
         /// Unregisters all updaters that might have been registered when we checked into Mission Control.
         /// Also cleans up any static variables that might cause issues on re-open.
         /// </summary>
+        /// <param name="doc">Revit Document.</param>
         public static void UnregisterUpdaters(Document doc)
         {
             var centralPath = FileInfoUtil.GetCentralFilePath(doc);
@@ -625,8 +647,21 @@ namespace HOK.MissionControl.Tools.MissionControl
             MissionControlSetup.ClearAll();
             AppCommand.ClearAll();
         }
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+        // (Konrad) We are not going to process warnings here.
+#else
+        /// <summary>
+        /// Collects all currently existing warnings in the file and sets them on AppCommand.
+        /// </summary>
+        /// <param name="doc">Revit Document.</param>
+        private static void CollectWarnings(Document doc)
+        {
+            AppCommand.Warnings = doc.GetWarnings()
+                .Select(x => new WarningItem(x, doc))
+                .ToDictionary(x => x.UniqueId, x => x);
+        }
+#endif
     }
-
     /// <summary>
     /// Specified the type of interaction that we want to execute. 
     /// </summary>
