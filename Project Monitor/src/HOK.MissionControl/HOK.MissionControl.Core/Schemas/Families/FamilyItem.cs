@@ -46,6 +46,10 @@ namespace HOK.MissionControl.Core.Schemas.Families
         [JsonProperty("arrayCount")]
         public int ArrayCount { get; set; }
 
+        [DataMember(Name = "imageCount")]
+        [JsonProperty("imageCount")]
+        public int ImageCount { get; set; }
+
         [DataMember(Name = "voidCount")]
         [JsonProperty("voidCount")]
         public int VoidCount { get; set; }

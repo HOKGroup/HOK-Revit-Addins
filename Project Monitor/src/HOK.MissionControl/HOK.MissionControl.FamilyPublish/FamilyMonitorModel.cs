@@ -96,6 +96,7 @@ namespace HOK.MissionControl.FamilyPublish
                     var nestedFamilies = 0;
                     var parameters = 0;
                     var sizeStr = "0Kb";
+                    var images = 0;
                     try
                     {
                         var famDoc = Doc.EditFamily(family);
@@ -126,7 +127,7 @@ namespace HOK.MissionControl.FamilyPublish
                             .OfClass(typeof(ReferencePlane))
                             .GetElementCount();
 
-                        var filter = new LogicalAndFilter(new List<ElementFilter>
+                        var filter = new LogicalOrFilter(new List<ElementFilter>
                         {
                             new ElementClassFilter(typeof(LinearArray)),
                             new ElementClassFilter(typeof(RadialArray))
@@ -134,6 +135,11 @@ namespace HOK.MissionControl.FamilyPublish
 
                         arrays = new FilteredElementCollector(famDoc)
                             .WherePasses(filter)
+                            .GetElementCount();
+
+                        images = new FilteredElementCollector(famDoc)
+                            .OfClass(typeof(ImageType))
+                            .WhereElementIsElementType()
                             .GetElementCount();
 
                         voids = new FilteredElementCollector(famDoc)
@@ -181,6 +187,7 @@ namespace HOK.MissionControl.FamilyPublish
                         VoidCount = voids,
                         NestedFamilyCount = nestedFamilies,
                         ParametersCount = parameters,
+                        ImageCount = images,
                         Tasks = new List<FamilyTask>()
                     };
 

@@ -56,7 +56,7 @@ namespace HOK.MissionControl.Core.Schemas.Groups
             var isEmail = name.IndexOf("@", StringComparison.Ordinal) != -1;
             return isEmail 
                 ? name.Substring(0, name.IndexOf("@", StringComparison.Ordinal)).ToLower() 
-                : name;
+                : name.ToLower();
         }
     }
 }
