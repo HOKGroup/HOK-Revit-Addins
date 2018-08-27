@@ -3,6 +3,8 @@ Imports Autodesk.Revit.DB
 Imports Autodesk.Revit.DB.Architecture
 
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ElemViewsFromRooms
 
@@ -20,6 +22,9 @@ Public Class form_ElemViewsFromRooms
 #Region "Constructor"
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ElementTools-ViewsFromRooms", settings.Document.Application.VersionNumber))
+
         'Initialize the settings text boxes
         m_Settings = settings
 

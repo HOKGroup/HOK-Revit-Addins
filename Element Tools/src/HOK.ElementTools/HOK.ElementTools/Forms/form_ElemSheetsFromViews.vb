@@ -1,6 +1,8 @@
 ﻿Imports Autodesk.Revit
 Imports Autodesk.Revit.DB
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ElemSheetsFromViews
 
@@ -10,6 +12,8 @@ Public Class form_ElemSheetsFromViews
 
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ElementTools-SheetsFromViews", settings.Document.Application.VersionNumber))
 
         'Initialize the settings text boxes
         m_Settings = settings

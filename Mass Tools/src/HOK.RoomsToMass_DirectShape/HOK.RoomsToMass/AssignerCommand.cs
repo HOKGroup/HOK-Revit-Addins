@@ -29,8 +29,8 @@ namespace HOK.RoomsToMass
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
-                var unused1 = AddinUtilities.PublishAddinLog(
-                    new AddinLog("MassTools-MassCommands", commandData.Application.Application.VersionNumber), LogPosted);
+                AddinUtilities.PublishAddinLog(
+                    new AddinLog("MassTools-MassCommands", commandData.Application.Application.VersionNumber));
 
                 m_app.Application.FailuresProcessing += OnFailuresProcessing;
                 var linkedFilesForm = new Form_LinkedFiles(m_app);
@@ -64,16 +64,6 @@ namespace HOK.RoomsToMass
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                 return Result.Failed;
             }
-        }
-
-        /// <summary>
-        /// Callback method for when Addin-info is published.
-        /// </summary>
-        /// <param name="data"></param>
-        private static void LogPosted(AddinData data)
-        {
-            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
-                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
 
         private static void OnFailuresProcessing(object sender, FailuresProcessingEventArgs e)

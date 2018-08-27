@@ -26,8 +26,7 @@ namespace HOK.DoorRoom
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
-            var unused1 = AddinUtilities.PublishAddinLog(
-                new AddinLog("Utilities-DoorRoom", commandData.Application.Application.VersionNumber), LogPosted);
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-DoorRoom", commandData.Application.Application.VersionNumber));
 
             FindSharedParameters(out bool toNumberFound, out bool toNameFound, out bool fromNumberFound, out bool fromNameFound);
 
@@ -80,16 +79,6 @@ namespace HOK.DoorRoom
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
-        }
-
-        /// <summary>
-        /// Callback method for when Addin-info is published.
-        /// </summary>
-        /// <param name="data"></param>
-        private static void LogPosted(AddinData data)
-        {
-            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
-                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
 
         private void FindSharedParameters(out bool toNumberFound, out bool toNameFound, out bool fromNumberFound, out bool fromNameFound)

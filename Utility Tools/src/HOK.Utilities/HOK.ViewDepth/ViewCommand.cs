@@ -23,23 +23,12 @@ namespace HOK.ViewDepth
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
-            var unused1 = AddinUtilities.PublishAddinLog(
-                new AddinLog("Utilities-ViewDepth", commandData.Application.Application.VersionNumber), LogPosted);
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-ViewDepth", commandData.Application.Application.VersionNumber));
 
             var overrideViewDepth = new OverrideViewDepth(m_app);
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
             return Result.Succeeded;
-        }
-
-        /// <summary>
-        /// Callback method for when Addin-info is published.
-        /// </summary>
-        /// <param name="data"></param>
-        private static void LogPosted(AddinData data)
-        {
-            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
-                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
     }
 }

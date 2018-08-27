@@ -2,16 +2,19 @@
 '
 ' Code managed by Don
 ' Code modified by Jinsol Kim, Hong Kong
+' Code modified by Konrad K Sobon, New York
 
 Imports Autodesk.Revit.DB
 Imports Autodesk.Revit.UI
 Imports Autodesk.Revit.Attributes
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 ''' <summary>
 ''' Implements the Revit add-in interface IExternalCommand
 ''' </summary>
 ''' <remarks></remarks>
-<Transaction(TransactionMode.Manual)> _
+<Transaction(TransactionMode.Manual)>
 Public Class cmdSheetManager
 
     Implements IExternalCommand
@@ -26,10 +29,11 @@ Public Class cmdSheetManager
     ''' <remarks></remarks>
     ''' 
 
-    Public Function Execute(ByVal commandData As ExternalCommandData, _
-                            ByRef message As String, _
+    Public Function Execute(ByVal commandData As ExternalCommandData,
+                            ByRef message As String,
                             ByVal elements As ElementSet) As Result Implements IExternalCommand.Execute
         Try
+            AddinUtilities.PublishAddinLog(New AddinLog("Sheet Manager-Excel", commandData.Application.Application.VersionNumber))
 
             ' Construct the settings class used to manage the Revit environment and document
             Dim m_Settings As New clsSettings(commandData)

@@ -5,7 +5,7 @@ using System.Reflection;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2018")]
+[assembly: AssemblyCopyright("Copyright Â© HOK Group 2018")]
 [assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
@@ -18,5 +18,5 @@ using System.Reflection;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("2019.1.0.4")]
-[assembly: AssemblyFileVersion("2019.1.0.4")]
+[assembly: AssemblyVersion("2019.1.0.5")]
+[assembly: AssemblyFileVersion("2019.1.0.5")]

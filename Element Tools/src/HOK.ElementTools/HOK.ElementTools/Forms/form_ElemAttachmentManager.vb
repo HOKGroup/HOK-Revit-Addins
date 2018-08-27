@@ -3,6 +3,8 @@ Imports Autodesk.Revit.UI
 
 Imports System.Windows.Forms
 Imports System.IO
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 
 Public Class form_ElemAttachmentManager
@@ -14,6 +16,9 @@ Public Class form_ElemAttachmentManager
 
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ElementTools-AttachmentManager", settings.Document.Application.VersionNumber))
+
         mSettings = settings
 
         'mElementSet = elementSet;

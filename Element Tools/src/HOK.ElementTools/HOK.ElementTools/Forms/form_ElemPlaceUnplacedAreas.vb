@@ -1,6 +1,8 @@
 ﻿Imports Autodesk.Revit
 Imports Autodesk.Revit.DB
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 Public Class form_ElemPlaceUnplacedAreas
 
@@ -10,6 +12,8 @@ Public Class form_ElemPlaceUnplacedAreas
 
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ElementTools-PlaceUnplacedAreas", settings.Document.Application.VersionNumber))
 
         'Initialize the settings text boxes
         m_Settings = settings
@@ -243,7 +247,7 @@ Public Class form_ElemPlaceUnplacedAreas
 
         Dim origin As New DB.XYZ(0, 0, 0)
         Dim norm As New DB.XYZ(0, 0, 1)
-       
+
         'Autodesk.Revit.Elements.ViewPlan activeView = (Autodesk.Revit.Elements.ViewPlan) document.ActiveView;
 
         Dim space As Double
@@ -345,7 +349,7 @@ Public Class form_ElemPlaceUnplacedAreas
                 curves.Add(line)
 
                 Dim plane As DB.Plane = m_Settings.Document.Application.Create.NewPlane(norm, origin)
-                Dim sketchPlane As DB.SketchPlane = sketchPlane.Create(m_Settings.Document, plane)
+                Dim sketchPlane As DB.SketchPlane = SketchPlane.Create(m_Settings.Document, plane)
 #ElseIf RELEASE2017 Then
                 curves.Clear()
                 line = DB.Line.CreateBound(ptCurrentBox1, ptCurrentBox2)
@@ -360,7 +364,7 @@ Public Class form_ElemPlaceUnplacedAreas
                 Dim plane As DB.Plane = Plane.CreateByNormalAndOrigin(norm, origin)
                 Dim sketchPlane As DB.SketchPlane = sketchPlane.Create(m_Settings.Document, plane)
 #End If
-                
+
                 For Each curve As DB.Curve In curves
                     areaBoundaryLine = m_Settings.Document.Create.NewAreaBoundaryLine(sketchPlane, curve, m_Settings.ActiveViewPlan)
                     modelCurves.Add(areaBoundaryLine)

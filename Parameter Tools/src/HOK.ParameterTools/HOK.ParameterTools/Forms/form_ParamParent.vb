@@ -1,6 +1,8 @@
 ﻿Imports Autodesk.Revit.DB
 Imports Autodesk.Revit.UI
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 
 ''' <summary>
 ''' A class used to create a parent child relationship
@@ -17,6 +19,9 @@ Public Class form_ParamParent
     ''' <remarks></remarks>
     Public Sub New(ByVal settings As clsSettings)
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ParameterTools-ParentChild", settings.Document.Application.VersionNumber))
+
         ' Settings Class
         m_Settings = settings
         ' Add Valid Category Selections

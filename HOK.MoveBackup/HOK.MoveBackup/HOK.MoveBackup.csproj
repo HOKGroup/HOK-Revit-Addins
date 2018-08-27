@@ -9,7 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.MoveBackup</RootNamespace>
     <AssemblyName>HOK.MoveBackup</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2016'">v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2017'">v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2018'">v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -56,15 +59,16 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2019|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2019\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2019</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2017'">
-      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2017\HOK.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2018'">
-      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
       <HintPath>..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
     </Reference>
@@ -74,6 +78,9 @@
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2018'">
       <HintPath>..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
     </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2019'">
+      <HintPath>..\..\HOK.Core\HOK.Core\bin\2019\HOK.Core.dll</HintPath>
+    </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2016'">
       <HintPath>..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2016\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
@@ -82,6 +89,9 @@
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2018'">
       <HintPath>..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2018\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2019'">
+      <HintPath>..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2019\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -102,6 +112,12 @@
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2018'">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2019'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2019'">
+      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPIUI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -140,20 +156,20 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo Signing...
-"C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  "$(TargetPath)"
 
 echo Configuration: $(Configuration)
 
 if $(Configuration) == 2016 goto Build2016
 if $(Configuration) == 2017 goto Build2017
 if $(Configuration) == 2018 goto Build2018
+if $(Configuration) == 2019 goto Build2019
 
 :Build2016
 echo Copying results to Build2016
 copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MoveBackup"
 copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MoveBackup"
 copy /Y "$(TargetDir)HOK.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MoveBackup"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MoveBackup"
 copy /Y "$(TargetDir)HOK.MoveBackup.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp"
 goto exit
 
@@ -162,7 +178,6 @@ echo Copying results to Build2017
 copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MoveBackup"
 copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MoveBackup"
 copy /Y "$(TargetDir)HOK.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MoveBackup"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MoveBackup"
 copy /Y "$(TargetDir)HOK.MoveBackup.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp"
 goto exit
 
@@ -171,8 +186,15 @@ echo Copying results to Build2018
 copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MoveBackup"
 copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MoveBackup"
 copy /Y "$(TargetDir)HOK.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MoveBackup"
-copy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MoveBackup"
 copy /Y "$(TargetDir)HOK.MoveBackup.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp"
+goto exit
+
+:Build2019
+echo Copying results to Build2019
+copy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MoveBackup"
+copy /Y "$(TargetDir)HOK.MissionControl.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MoveBackup"
+copy /Y "$(TargetDir)HOK.Core.dll" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MoveBackup"
+copy /Y "$(TargetDir)HOK.MoveBackup.addin" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp"
 goto exit
 
 :exit</PostBuildEvent>

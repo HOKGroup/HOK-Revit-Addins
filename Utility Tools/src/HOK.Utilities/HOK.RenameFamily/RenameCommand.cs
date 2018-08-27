@@ -26,8 +26,7 @@ namespace HOK.RenameFamily
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
-                var unused1 = AddinUtilities.PublishAddinLog(
-                    new AddinLog("Utilities-RenameFamily", commandData.Application.Application.VersionNumber), LogPosted);
+                AddinUtilities.PublishAddinLog(new AddinLog("Utilities-RenameFamily", commandData.Application.Application.VersionNumber));
 
                 var viewModel = new RenameViewModel(commandData.Application);
                 var window = new RenameWindow
@@ -43,16 +42,6 @@ namespace HOK.RenameFamily
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
             return Result.Succeeded;
-        }
-
-        /// <summary>
-        /// Callback method for when Addin-info is published.
-        /// </summary>
-        /// <param name="data"></param>
-        private static void LogPosted(AddinData data)
-        {
-            Log.AppendLog(LogMessageType.INFO, "Addin info was published: "
-                + (string.IsNullOrEmpty(data.Id) ? "Unsuccessfully." : "Successfully."));
         }
     }
 }

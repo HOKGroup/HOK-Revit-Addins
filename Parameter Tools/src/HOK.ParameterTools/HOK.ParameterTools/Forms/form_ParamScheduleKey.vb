@@ -4,6 +4,8 @@ Imports Autodesk.Revit.UI
 
 Imports System.IO
 Imports System.Windows.Forms
+Imports HOK.MissionControl.Core.Schemas
+Imports HOK.MissionControl.Core.Utils
 Imports Microsoft.Office.Interop.Excel
 
 Public Class form_ParamScheduleKey
@@ -19,6 +21,8 @@ Public Class form_ParamScheduleKey
         Dim positionDelimeter As Integer
 
         InitializeComponent()
+
+        AddinUtilities.PublishAddinLog(New AddinLog("ParameterTools-ScheduleKeyManager", settings.Document.Application.VersionNumber))
 
         mSettings = settings
         mUtilityExcel = New clsUtilityExcel
