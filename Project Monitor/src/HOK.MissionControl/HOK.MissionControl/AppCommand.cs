@@ -34,7 +34,11 @@ namespace HOK.MissionControl
         public static AppCommand Instance { get; private set; }
         public static Dictionary<string, DateTime> SynchTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
+#if RELEASE2015 || RELEASE2016 || RELEASE2017
+        // (Konrad) We are not going to process warnings here.
+#else
         public static Dictionary<string, WarningItem> Warnings { get; set; } = new Dictionary<string, WarningItem>();
+#endif
         public static CommunicatorView CommunicatorWindow { get; set; }
         public static MissionControlSocket Socket { get; set; }
         public static bool IsSynching { get; set; }
