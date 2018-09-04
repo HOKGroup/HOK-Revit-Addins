@@ -158,6 +158,7 @@
     <Compile Include="Schemas\Families\FamilyData.cs" />
     <Compile Include="Schemas\Families\FamilyItem.cs" />
     <Compile Include="Schemas\Families\FamilyTask.cs" />
+    <Compile Include="Schemas\FilePaths\FilePathItem.cs" />
     <Compile Include="Schemas\Groups\GroupDataItem.cs" />
     <Compile Include="Schemas\Groups\GroupInstanceItem.cs" />
     <Compile Include="Schemas\Groups\GroupItem.cs" />
@@ -202,6 +203,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo Configuration: $(Configuration)

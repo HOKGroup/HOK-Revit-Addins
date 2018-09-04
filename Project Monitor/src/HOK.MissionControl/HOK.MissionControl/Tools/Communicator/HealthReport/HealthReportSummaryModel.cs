@@ -18,15 +18,15 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
             {
                 case "Links Manager":
                     commandName =
-                        "CustomCtrl_%CustomCtrl_%  HOK - Beta%Mission Control%Links Manager_Command";
+                        "CustomCtrl_%CustomCtrl_%   HOK   %Mission Control%LinksManager_Command";
                     break;
                 case "Groups Manager":
-                    commandName = 
-                        "CustomCtrl_%CustomCtrl_%  HOK - Beta%Mission Control%GroupManager_Command";
+                    commandName =
+                        "CustomCtrl_%CustomCtrl_%   HOK   %Mission Control%GroupManager_Command";
                     break;
                 case "Styles Manager":
                     commandName =
-                        "CustomCtrl_%CustomCtrl_%  HOK - Beta%Mission Control%StylesManager_Command";
+                        "CustomCtrl_%CustomCtrl_%   HOK   %Mission Control%StylesManager_Command";
                     break;
             }
 

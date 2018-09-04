@@ -10,6 +10,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.FilePaths;
 using HOK.MissionControl.Core.Schemas.Groups;
 using HOK.MissionControl.Core.Schemas.Links;
 using HOK.MissionControl.Core.Schemas.Models;
@@ -40,6 +41,15 @@ namespace HOK.MissionControl.Tools.MissionControl
             try
             {
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
+
+                // (Konrad) We can publish a file path to the DB. 
+                // That will make it easier to create Configurations.
+                if (!ServerUtilities.Post(new FilePathItem(centralPath), "filepaths/add", out FilePathItem unused))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish File Path: " + centralPath);
+                }
+
+                // (Konrad) Get Configuration/Project.
                 if (!ServerUtilities.GetByCentralPath(centralPath, "configurations/centralpath", out Configuration configFound))
                 {
                     DisableMissionControl();

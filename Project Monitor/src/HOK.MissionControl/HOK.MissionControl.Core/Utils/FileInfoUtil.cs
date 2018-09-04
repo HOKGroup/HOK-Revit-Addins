@@ -33,7 +33,7 @@ namespace HOK.MissionControl.Utils
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return centralPath;
+            return centralPath.ToLower();
         }
 
         public static Project GetProjectInfo(string centralPath)
