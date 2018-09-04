@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -27,10 +26,7 @@ namespace HOK.MoveBackup
                 if (!AppCommand.extensions.Contains(extension)) return;
 
                 var backupDirectory = Path.Combine(saveDirectory, BackupFolderName);
-                if (!Directory.Exists(backupDirectory))
-                {
-                    Directory.CreateDirectory(backupDirectory);
-                }
+                if (!Directory.Exists(backupDirectory)) Directory.CreateDirectory(backupDirectory);
 
                 // (Konrad) First we need to count how many backup files with matching name were already saved
                 var regex = new Regex("(\\d{4})\\" + extension + "$", RegexOptions.IgnoreCase);
@@ -41,10 +37,7 @@ namespace HOK.MoveBackup
                 if (existingBackups.Any())
                 {
                     var match = regex.Match(existingBackups.Last());
-                    if (match.Success)
-                    {
-                        suffix = int.Parse(match.Groups[1].Captures[0].Value) + 1;
-                    }
+                    if (match.Success) suffix = int.Parse(match.Groups[1].Captures[0].Value) + 1;
                 }
 
                 // (Konrad) Now we have to override the name of the new backup file created to account for existing
@@ -63,14 +56,13 @@ namespace HOK.MoveBackup
                         {
                             try
                             {
-                                if (File.Exists(backupFileName))
-                                    File.Delete(backupFileName);
+                                if (File.Exists(backupFileName)) File.Delete(backupFileName);
                                 File.Move(fileName, backupFileName);
                                 flag = true;
                             }
-                            catch (Exception ex)
+                            catch(Exception ex)
                             {
-                                Trace.WriteLine(ex);
+                                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                                 Thread.Sleep((int)(5000.0 * Math.Pow(3.0, i)));
                             }
                             if (flag) break;
@@ -94,7 +86,7 @@ namespace HOK.MoveBackup
                         }
                         catch (Exception ex)
                         {
-                            Trace.WriteLine(ex);
+                            Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                             Thread.Sleep((int)(5000.0 * Math.Pow(3.0, k)));
                         }
                         if (flag) break;
