@@ -14,6 +14,11 @@
 * Added File Path publishing. This adds new schema for a FilePathItem that stores central file path to a current model in a MongoDB. That makes creating Configurations via the web interface a lot easier since users don't have to open the files. 
 * Fixes a small bug for the dockable panel where the quick access buttons were not working. Since we moved all tools from Beta to HOK tab, their paths for command tools had to change as well. 
 
+###### Release 2019.1.0.1
+
+* Update to 2019.
+* Upgrade from BETA to full HOK plugin that is distributed to all Revit users. 
+
 ###### Release 2018.0.1.5
 
 * Added Styles Manager to Mission Control.
