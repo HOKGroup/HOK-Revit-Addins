@@ -6,6 +6,13 @@
 * HOK.MissionControl.Core.dll - core server interaction library. Contains all methods for sending and getting data from MongoDB
 * HOK.MissionControl.FamilyPublish.dll - External Command for publishing Family information to Health Monitor part of Mission Control.
 * HOK.MissionControl.LinksManager.dll - External Command for managing links, imports and styles. 
+* HOK.MissionControl.StylesManager.dll - External Command for managing styles.
+* HOK.MissionControl.GroupsManager.dll - External Command for managing groups.
+
+###### Release 2019.1.0.6
+
+* Added File Path publishing. This adds new schema for a FilePathItem that stores central file path to a current model in a MongoDB. That makes creating Configurations via the web interface a lot easier since users don't have to open the files. 
+* Fixes a small bug for the dockable panel where the quick access buttons were not working. Since we moved all tools from Beta to HOK tab, their paths for command tools had to change as well. 
 
 ###### Release 2018.0.1.5
 
