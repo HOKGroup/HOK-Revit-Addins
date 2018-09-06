@@ -36,6 +36,7 @@ namespace HOK.MissionControl.GroupsManager
         public RelayCommand SelectNone { get; set; }
         public RelayCommand<bool> Check { get; set; }
         public RelayCommand<GroupTypeWrapper> FindGroup { get; set; }
+        public RelayCommand<GroupTypeWrapper> IsolateGroup { get; set; }
 
         private ObservableCollection<GroupTypeWrapper> _groups;
         public ObservableCollection<GroupTypeWrapper> Groups
@@ -63,6 +64,7 @@ namespace HOK.MissionControl.GroupsManager
             SelectNone = new RelayCommand(OnSelectNone);
             Check = new RelayCommand<bool>(OnCheck);
             FindGroup = new RelayCommand<GroupTypeWrapper>(OnFindGroup);
+            IsolateGroup = new RelayCommand<GroupTypeWrapper>(OnIsolateGroup);
 
             Messenger.Default.Register<GroupsDeleted>(this, OnGroupsDeleted);
             Messenger.Default.Register<DocumentChanged>(this, OnDocumentChanged);
@@ -136,6 +138,15 @@ namespace HOK.MissionControl.GroupsManager
 
             AppCommand.GroupManagerHandler.Arg1 = selected;
             AppCommand.GroupManagerHandler.Request.Make(GroupRequestType.Ungroup);
+            AppCommand.GroupManagerEvent.Raise();
+        }
+
+        private static void OnIsolateGroup(GroupTypeWrapper gt)
+        {
+            if (gt == null) return;
+
+            AppCommand.GroupManagerHandler.Arg1 = gt;
+            AppCommand.GroupManagerHandler.Request.Make(GroupRequestType.IsolateView);
             AppCommand.GroupManagerEvent.Raise();
         }
 

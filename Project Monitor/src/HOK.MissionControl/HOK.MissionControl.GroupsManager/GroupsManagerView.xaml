@@ -73,8 +73,11 @@
                                                 SelectedItemsList="{Binding SelectedRows, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <wpfUtilities:DataGridExtension.ContextMenu>
                         <ContextMenu>
-                            <MenuItem Header="Find in View"
+                            <MenuItem Header="Open in View"
                                       Command="{Binding FindGroup}"
+                                      CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}"/>
+                            <MenuItem Header="Isolate in View"
+                                      Command="{Binding IsolateGroup}"
                                       CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}"/>
                         </ContextMenu>
                     </wpfUtilities:DataGridExtension.ContextMenu>

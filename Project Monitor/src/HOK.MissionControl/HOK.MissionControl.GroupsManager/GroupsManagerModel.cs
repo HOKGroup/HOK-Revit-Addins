@@ -53,7 +53,7 @@ namespace HOK.MissionControl.GroupsManager
 
             // (Konrad) Handle new instances of groups being added
             var added = msg.Added.Intersect(new FilteredElementCollector(Doc).OfClass(typeof(Group)).ToElementIds()).ToList();
-            if (added.Any()) return;
+            if (!added.Any()) return;
 
             foreach (var id in added)
             {
