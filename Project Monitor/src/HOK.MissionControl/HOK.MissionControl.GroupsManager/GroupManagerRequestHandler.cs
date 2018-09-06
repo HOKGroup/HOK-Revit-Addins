@@ -19,7 +19,6 @@ namespace HOK.MissionControl.GroupsManager
     {
         public GroupManagerRequest Request { get; set; } = new GroupManagerRequest();
         public object Arg1 { get; set; }
-        public object Arg2 { get; set; }
 
         public string GetName()
         {
@@ -45,9 +44,6 @@ namespace HOK.MissionControl.GroupsManager
                     case GroupRequestType.FindView:
                         FindView(app);
                         break;
-                    case GroupRequestType.Add:
-                        AddGroups(app);
-                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -57,11 +53,6 @@ namespace HOK.MissionControl.GroupsManager
                 Console.WriteLine(e);
                 throw;
             }
-        }
-
-        private void AddGroups(UIApplication app)
-        {
-
         }
 
         /// <summary>
@@ -229,7 +220,6 @@ namespace HOK.MissionControl.GroupsManager
         None,
         Delete,
         Ungroup,
-        FindView,
-        Add
+        FindView
     }
 }
