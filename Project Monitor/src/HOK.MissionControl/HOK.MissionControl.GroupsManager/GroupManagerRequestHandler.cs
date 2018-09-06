@@ -44,6 +44,9 @@ namespace HOK.MissionControl.GroupsManager
                     case GroupRequestType.FindView:
                         FindView(app);
                         break;
+                    case GroupRequestType.IsolateView:
+                        IsolateView(app);
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -56,9 +59,10 @@ namespace HOK.MissionControl.GroupsManager
         }
 
         /// <summary>
-        /// 
+        /// Method for finding first View in which given instance of the Group is visible,
+        /// activating that view, and zooming into the element.
         /// </summary>
-        /// <param name="app"></param>
+        /// <param name="app">UI Application.</param>
         private void FindView(UIApplication app)
         {
             var doc = app.ActiveUIDocument.Document;
@@ -107,10 +111,52 @@ namespace HOK.MissionControl.GroupsManager
         }
 
         /// <summary>
-        /// 
+        /// Method for isolating all of the group instances in currently active view,
+        /// and zooming view extents to all of them.
         /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
+        /// <param name="app">UI Application.</param>
+        private void IsolateView(UIApplication app)
+        {
+            var doc = app.ActiveUIDocument.Document;
+            var activeView = doc.ActiveView;
+            var gt = (GroupTypeWrapper) Arg1;
+            if (!gt.Instances.Any()) return;
+
+            var exclude = new List<ElementId>();
+            foreach (var id in gt.Instances)
+            {
+                if (!(doc.GetElement(id) is Group group)) continue;
+
+                exclude.Add(id);
+                exclude.AddRange(group.GetMemberIds());
+            }
+            
+            var toHide = new FilteredElementCollector(doc, activeView.Id)
+                .WhereElementIsNotElementType()
+                .WherePasses(new ExclusionFilter(exclude))
+                .ToElementIds();
+
+            using (var trans = new Transaction(doc, "Isolate in View"))
+            {
+                trans.Start();
+                try
+                {
+                    activeView.HideElementsTemporary(toHide);
+                }
+                catch (Exception e)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                }
+                trans.Commit();
+            }
+
+            app.ActiveUIDocument.ShowElements(exclude);
+        }
+
+        /// <summary>
+        /// Method for deleting selected group types and all of their instances.
+        /// </summary>
+        /// <param name="app">UI Application.</param>
         public void Delete(UIApplication app)
         {
             var doc = app.ActiveUIDocument.Document;
@@ -144,10 +190,10 @@ namespace HOK.MissionControl.GroupsManager
         }
 
         /// <summary>
-        /// 
+        /// Method for ungrouping selected group type and all of their instances.
+        /// Once all instances are ingrouped a Group Type will be deleted.
         /// </summary>
-        /// <param name="app"></param>
-        /// <returns></returns>
+        /// <param name="app">UI Application.</param>
         public void Ungroup(UIApplication app)
         {
             var doc = app.ActiveUIDocument.Document;
@@ -220,6 +266,7 @@ namespace HOK.MissionControl.GroupsManager
         None,
         Delete,
         Ungroup,
-        FindView
+        FindView,
+        IsolateView
     }
 }
