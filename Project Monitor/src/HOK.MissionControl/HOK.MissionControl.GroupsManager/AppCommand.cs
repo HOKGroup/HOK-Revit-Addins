@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
+using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
+using HOK.MissionControl.GroupsManager.Utilities;
 
 namespace HOK.MissionControl.GroupsManager
 {
@@ -32,14 +36,22 @@ namespace HOK.MissionControl.GroupsManager
                 ToolTip = Properties.Resources.GroupsManager_Description
             });
 
+            application.ControlledApplication.DocumentChanged += OnDocumentChanged;
+
             GroupManagerHandler = new GroupManagerRequestHandler();
             GroupManagerEvent = ExternalEvent.Create(GroupManagerHandler);
 
             return Result.Succeeded;
         }
 
+        private void OnDocumentChanged(object sender, DocumentChangedEventArgs e)
+        {
+            Messenger.Default.Send(new DocumentChanged(e.GetDeletedElementIds(), e.GetAddedElementIds(), e.GetDocument()));
+        }
+
         public Result OnShutdown(UIControlledApplication application)
         {
+            application.ControlledApplication.DocumentChanged -= OnDocumentChanged;
             return Result.Succeeded;
         }
     }

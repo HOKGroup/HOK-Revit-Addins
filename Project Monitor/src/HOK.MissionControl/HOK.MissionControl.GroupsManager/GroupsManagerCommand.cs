@@ -1,14 +1,18 @@
 ﻿#region References
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Interop;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
+using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using HOK.MissionControl.GroupsManager.Utilities;
 
 #endregion
 
@@ -42,7 +46,7 @@ namespace HOK.MissionControl.GroupsManager
                 {
                     Owner = Process.GetCurrentProcess().MainWindowHandle
                 };
-
+                
                 view.Show();
             }
             catch (Exception e)

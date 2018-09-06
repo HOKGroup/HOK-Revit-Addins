@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Autodesk.Revit.DB;
 
@@ -10,7 +10,7 @@ namespace HOK.MissionControl.GroupsManager.Utilities
         public string Type { get; set; }
         public ElementId Id { get; set; }
         public int MemberCount { get; set; }
-        public List<ElementId> Instances { get; set; } = new List<ElementId>();
+        public ObservableCollection<ElementId> Instances { get; set; } = new ObservableCollection<ElementId>();
         public bool IsArray { get; set; }
 
         public GroupTypeWrapper()

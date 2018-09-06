@@ -65,9 +65,19 @@ namespace HOK.MissionControl.GroupsManager
             FindGroup = new RelayCommand<GroupTypeWrapper>(OnFindGroup);
 
             Messenger.Default.Register<GroupsDeleted>(this, OnGroupsDeleted);
+            Messenger.Default.Register<DocumentChanged>(this, OnDocumentChanged);
         }
 
         #region Message Handlers
+
+        private void OnDocumentChanged(DocumentChanged msg)
+        {
+            Model.Doc = msg.Document;
+            lock (_lock)
+            {
+                Model.ProcessDocumentChanged(msg, Groups);
+            }
+        }
 
         private void OnGroupsDeleted(GroupsDeleted msg)
         {
