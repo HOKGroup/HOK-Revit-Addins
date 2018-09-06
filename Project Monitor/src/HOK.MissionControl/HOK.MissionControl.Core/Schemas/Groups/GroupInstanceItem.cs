@@ -33,7 +33,7 @@ namespace HOK.MissionControl.Core.Schemas.Groups
         public GroupInstanceItem(Element group)
         {
             var doc = group.Document;
-            var created = VerifyUsername(WorksharingUtils.GetWorksharingTooltipInfo(doc, group.Id).Creator);
+            var created = VerifyUsername(WorksharingUtils.GetWorksharingTooltipInfo(doc, group.Id).LastChangedBy);
             var levelId = group.LevelId == null 
                 ? ElementId.InvalidElementId 
                 : group.LevelId;
