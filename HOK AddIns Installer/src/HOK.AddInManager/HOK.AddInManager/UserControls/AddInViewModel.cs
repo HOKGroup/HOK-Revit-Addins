@@ -1,4 +1,5 @@
 ﻿#region References
+
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -12,12 +13,15 @@ using GalaSoft.MvvmLight.Command;
 using HOK.Core.WpfUtilities;
 using HOK.Core.WpfUtilities.FeedbackUI;
 using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
+
 #endregion
 
 namespace HOK.AddInManager.UserControls
 {
     public class AddInViewModel : ViewModelBase
     {
+        #region Properties
+
         private bool _userChanged = true;
         public string Title { get; set; }
         public RelayCommand Help { get; set; }
@@ -27,6 +31,22 @@ namespace HOK.AddInManager.UserControls
         public RelayCommand<Window> WindowLoaded { get; set; }
         public RelayCommand<Window> Cancel { get; set; }
         public RelayCommand<Window> Ok { get; set; }
+
+        private Addins _addins;
+        public Addins AddinsObj
+        {
+            get { return _addins; }
+            set { _addins = value; RaisePropertyChanged(() => AddinsObj); }
+        }
+
+        private ObservableCollection<AddinInfo> _selectedAddins = new ObservableCollection<AddinInfo>();
+        public ObservableCollection<AddinInfo> SelectedAddins
+        {
+            get { return _selectedAddins; }
+            set { _selectedAddins = value; RaisePropertyChanged(() => SelectedAddins); }
+        }
+
+        #endregion
 
         public AddInViewModel(Addins addinsObj)
         {
@@ -137,20 +157,6 @@ namespace HOK.AddInManager.UserControls
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-        }
-
-        private Addins _addins;
-        public Addins AddinsObj
-        {
-            get { return _addins; }
-            set { _addins = value; RaisePropertyChanged(() => AddinsObj); }
-        }
-
-        private ObservableCollection<AddinInfo> _selectedAddins = new ObservableCollection<AddinInfo>();
-        public ObservableCollection<AddinInfo> SelectedAddins
-        {
-            get { return _selectedAddins; }
-            set { _selectedAddins = value; RaisePropertyChanged(() => SelectedAddins); }
         }
     }
 
