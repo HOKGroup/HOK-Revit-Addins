@@ -25,12 +25,5 @@ namespace HOK.MissionControl.Core.Schemas
             From = from ?? DateTime.UtcNow.AddMonths(-1);
             To = to ?? DateTime.UtcNow;
         }
-
-        public DataRangeRequest(string centralPath)
-        {
-            CentralPath = centralPath;
-            From = null;
-            To = null;
-        }
     }
 }
