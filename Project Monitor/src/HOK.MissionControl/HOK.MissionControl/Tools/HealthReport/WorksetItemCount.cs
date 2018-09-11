@@ -13,8 +13,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// Publishes Workset Item Count data when Document is closed.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
-        /// <param name="worksetsId">Worksets Document Id.</param>
-        public void PublishData(Document doc, string worksetsId)
+        /// <param name="filePath">Revit Document central file path.</param>
+        public void PublishData(Document doc, string filePath)
         {
             try
             {
@@ -42,8 +42,13 @@ namespace HOK.MissionControl.Tools.HealthReport
                     });
                 }
 
-                if (!ServerUtilities.Post(new WorksetItemData { Worksets = worksetInfo },
-                    "worksets/" + worksetsId + "/itemcount", out WorksetItemData unused))
+                var wItemData = new WorksetItemData
+                {
+                    CentralPath = filePath.ToLower(),
+                    User = Environment.UserName.ToLower(),
+                    Worksets = worksetInfo
+                };
+                if (!ServerUtilities.Post(wItemData, "worksets/itemcount", out WorksetItemData unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Worksets Data.");
                 }

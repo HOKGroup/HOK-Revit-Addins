@@ -12,9 +12,9 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// Publishes Workset Open Data to database for onOpened/onSynched events.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
-        /// <param name="worksetsId">Worksets Document Id.</param>
+        /// <param name="filePath">Revit Document central file path.</param>
         /// <param name="state">State of the Revit model.</param>
-        public void PublishData(Document doc, string worksetsId, WorksetMonitorState state)
+        public void PublishData(Document doc, string filePath, WorksetMonitorState state)
         {
             try
             {
@@ -32,13 +32,14 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var worksetInfo = new WorksetEvent
                 {
+                    CentralPath = filePath.ToLower(),
                     User = Environment.UserName.ToLower(),
                     Opened = opened,
                     Closed = closed
                 };
 
-                if (!ServerUtilities.Post(worksetInfo, "worksets/" + worksetsId + "/" + state,
-                    out WorksetEvent unused))
+                var route = state == WorksetMonitorState.onopened ? "onopened" : "onsynched";
+                if (!ServerUtilities.Post(worksetInfo, "worksets/" + route, out WorksetEvent unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Worksets Data: " + state + ".");
                 }

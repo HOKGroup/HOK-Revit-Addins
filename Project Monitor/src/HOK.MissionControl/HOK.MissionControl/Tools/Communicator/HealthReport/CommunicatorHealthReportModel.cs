@@ -32,7 +32,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
                     var vData = (ViewsData)obj.Data;
                     return ProcessViews(vData);
                 case SummaryType.Worksets:
-                    var wData = (WorksetData)obj.Data;
+                    var wData = (WorksetStats)obj.Data;
                     return ProcessWorksets(wData);
                 case SummaryType.Families:
                     var fData = (FamilyData)obj.Data;
@@ -44,7 +44,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
                     var lData = (LinkData)obj.Data;
                     return ProcessLinks(lData);
                 case SummaryType.Models:
-                    var mData = (ModelData)obj.Data;
+                    var mData = (ModelStats)obj.Data;
                     return ProcessModels(mData);
                 case SummaryType.Groups:
                     var gData = (GroupsData)obj.Data;
@@ -149,7 +149,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         /// </summary>
         /// <param name="data">Worksets Data</param>
         /// <returns></returns>
-        private static HealthReportSummaryViewModel ProcessWorksets(WorksetData data)
+        private static HealthReportSummaryViewModel ProcessWorksets(WorksetStats data)
         {
             var worksetStats = data.ItemCount.LastOrDefault();
             if (worksetStats == null) return null;
@@ -351,7 +351,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         /// </summary>
         /// <param name="data">Models Data</param>
         /// <returns></returns>
-        private static HealthReportSummaryViewModel ProcessModels(ModelData data)
+        private static HealthReportSummaryViewModel ProcessModels(ModelStats data)
         {
             var modelStats = data.ModelSizes.LastOrDefault();
             if (modelStats == null) return null;

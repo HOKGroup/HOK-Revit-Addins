@@ -1,6 +1,7 @@
 ﻿#region References
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -377,63 +378,6 @@ namespace HOK.MissionControl.Tools.MissionControl
         }
 
         /// <summary>
-        /// Adds Worksets data to collection if such exists, otherwise creates a new one.
-        /// </summary>
-        public static void ProcessWorksets(ActionType action, Document doc, string centralPath)
-        {
-            var project = MissionControlSetup.Projects[centralPath];
-            var data = new DataRangeRequest(centralPath.ToLower());
-            switch (action)
-            {
-                case ActionType.CheckIn:
-                    if (!ServerUtilities.Post(data, "worksets/worksetstats", out WorksetData wData))
-                    {
-                        if (ServerUtilities.Post(new WorksetData { CentralPath = centralPath.ToLower() }, "worksets", out wData))
-                        {
-                            ServerUtilities.Put(new { id = wData.Id }, "projects/" + project.Id + "/addworkset");
-                            if (MissionControlSetup.WorksetsData.ContainsKey(centralPath))
-                                MissionControlSetup.WorksetsData.Remove(centralPath);
-                            MissionControlSetup.WorksetsData.Add(centralPath, wData); // store workset record
-                        }
-                    }
-                    if (wData != null)
-                    {
-                        if (MissionControlSetup.WorksetsData.ContainsKey(centralPath))
-                            MissionControlSetup.WorksetsData.Remove(centralPath);
-                        MissionControlSetup.WorksetsData.Add(centralPath, wData); // store workset record
-
-                        Messenger.Default.Send(new HealthReportSummaryAdded { Data = wData, Type = SummaryType.Worksets });
-
-                        new Thread(() => new WorksetItemCount().PublishData(doc, wData.Id))
-                        {
-                            Priority = ThreadPriority.BelowNormal,
-                            IsBackground = true
-                        }.Start();
-
-                        new Thread(() => new WorksetOpenSynch().PublishData(doc, wData.Id, WorksetMonitorState.onopened))
-                        {
-                            Priority = ThreadPriority.BelowNormal,
-                            IsBackground = true
-                        }.Start();
-                    }
-                    break;
-                case ActionType.Synch:
-                    if (MissionControlSetup.WorksetsData.ContainsKey(centralPath))
-                    {
-                        var worksetsId = MissionControlSetup.WorksetsData[centralPath].Id;
-                        new Thread(() => new WorksetOpenSynch().PublishData(doc, worksetsId, WorksetMonitorState.onsynched))
-                        {
-                            Priority = ThreadPriority.BelowNormal,
-                            IsBackground = true
-                        }.Start();
-                    }
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(action), action, null);
-            }
-        }
-
-        /// <summary>
         /// Checks if Families collection exists and creates one if it doesn't. Since families
         /// stats are published on demand by another tool there is no need to publish them here.
         /// </summary>
@@ -533,35 +477,75 @@ namespace HOK.MissionControl.Tools.MissionControl
         }
 
         /// <summary>
+        /// Adds Worksets data to collection if such exists, otherwise creates a new one.
+        /// </summary>
+        public static void ProcessWorksets(ActionType action, Document doc, string centralPath)
+        {
+            var data = new DataRangeRequest(centralPath.ToLower()){ From = null, To = null };
+            switch (action)
+            {
+                case ActionType.CheckIn:
+                    if (!ServerUtilities.Post(data, "worksets/getworksetsdata", out List<WorksetStats> wData))
+                    {
+                        Log.AppendLog(LogMessageType.ERROR, "Failed to get Workset Stats.");
+                        return;
+                    }
+                    if (wData != null && wData.Any())
+                    {
+                        if (MissionControlSetup.WorksetsData.ContainsKey(centralPath))
+                            MissionControlSetup.WorksetsData.Remove(centralPath);
+                        MissionControlSetup.WorksetsData.Add(centralPath, wData.First()); // store workset record
+
+                        Messenger.Default.Send(new HealthReportSummaryAdded { Data = wData.First(), Type = SummaryType.Worksets });
+
+                        new Thread(() => new WorksetItemCount().PublishData(doc, centralPath))
+                        {
+                            Priority = ThreadPriority.BelowNormal,
+                            IsBackground = true
+                        }.Start();
+
+                        new Thread(() => new WorksetOpenSynch().PublishData(doc, centralPath, WorksetMonitorState.onopened))
+                        {
+                            Priority = ThreadPriority.BelowNormal,
+                            IsBackground = true
+                        }.Start();
+                    }
+                    break;
+                case ActionType.Synch:
+                    new Thread(() => new WorksetOpenSynch().PublishData(doc, centralPath, WorksetMonitorState.onsynched))
+                    {
+                        Priority = ThreadPriority.BelowNormal,
+                        IsBackground = true
+                    }.Start();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(action), action, null);
+            }
+        }
+
+        /// <summary>
         /// Adds Models data to collection if such exists, otherwise creates a new one.
         /// </summary>
         public static void ProcessModels(ActionType action, Document doc, string centralPath)
         {
-            var project = MissionControlSetup.Projects[centralPath];
-            var data = new DataRangeRequest(centralPath.ToLower());
+            var data = new DataRangeRequest(centralPath.ToLower()){ From = null, To = null };
             switch (action)
             {
                 case ActionType.CheckIn:
-                    if (!ServerUtilities.Post(data, "models/modelstats", out ModelData mData) || mData == null)
+                    if (!ServerUtilities.Post(data, "model/getmodelsdata", out List<ModelStats> mData) || mData == null)
                     {
-                        if (ServerUtilities.Post(new ModelData { CentralPath = centralPath.ToLower() }, "models", out mData))
-                        {
-                            ServerUtilities.Put(new { id = mData.Id }, "projects/" + project.Id + "/addmodel");
-
-                            if (MissionControlSetup.ModelsData.ContainsKey(centralPath))
-                                MissionControlSetup.ModelsData.Remove(centralPath);
-                            MissionControlSetup.ModelsData.Add(centralPath, mData); // store model record
-                        }
+                        Log.AppendLog(LogMessageType.ERROR, "Failed to get Model Stats.");
+                        return;
                     }
-                    if (mData != null)
+                    if (mData.Any())
                     {
                         if (MissionControlSetup.ModelsData.ContainsKey(centralPath))
                             MissionControlSetup.ModelsData.Remove(centralPath);
-                        MissionControlSetup.ModelsData.Add(centralPath, mData); // store model record
+                        MissionControlSetup.ModelsData.Add(centralPath, mData.First()); // store model record
 
-                        Messenger.Default.Send(new HealthReportSummaryAdded { Data = mData, Type = SummaryType.Models });
+                        Messenger.Default.Send(new HealthReportSummaryAdded { Data = mData.First(), Type = SummaryType.Models });
 
-                        new Thread(() => new ModelMonitor().PublishModelSize(doc, centralPath, mData.Id, doc.Application.VersionNumber))
+                        new Thread(() => new ModelMonitor().PublishModelSize(doc, centralPath, doc.Application.VersionNumber))
                         {
                             Priority = ThreadPriority.BelowNormal,
                             IsBackground = true
@@ -569,7 +553,7 @@ namespace HOK.MissionControl.Tools.MissionControl
 
                         if (AppCommand.OpenTime.ContainsKey("from"))
                         {
-                            new Thread(() => new ModelMonitor().PublishOpenTime(mData.Id))
+                            new Thread(() => new ModelMonitor().PublishOpenTime(centralPath))
                             {
                                 Priority = ThreadPriority.BelowNormal,
                                 IsBackground = true
@@ -578,17 +562,13 @@ namespace HOK.MissionControl.Tools.MissionControl
                     }
                     break;
                 case ActionType.Synch:
-                    if (MissionControlSetup.ModelsData.ContainsKey(centralPath))
+                    if (AppCommand.SynchTime.ContainsKey("from"))
                     {
-                        var modelsId = MissionControlSetup.ModelsData[centralPath].Id;
-                        if (AppCommand.SynchTime.ContainsKey("from"))
+                        new Thread(() => new ModelMonitor().PublishSynchTime(centralPath))
                         {
-                            new Thread(() => new ModelMonitor().PublishSynchTime(modelsId))
-                            {
-                                Priority = ThreadPriority.BelowNormal,
-                                IsBackground = true
-                            }.Start();
-                        }
+                            Priority = ThreadPriority.BelowNormal,
+                            IsBackground = true
+                        }.Start();
                     }
                     break;
                 default:

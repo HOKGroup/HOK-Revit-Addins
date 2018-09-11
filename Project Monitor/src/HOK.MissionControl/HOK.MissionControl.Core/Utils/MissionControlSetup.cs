@@ -63,14 +63,14 @@ namespace HOK.MissionControl.Core.Utils
         /// <summary>
         /// Key is Central Path of Document.
         /// </summary>
-        public static Dictionary<string, WorksetData> WorksetsData { get; set; } 
-            = new Dictionary<string, WorksetData>(StringComparer.OrdinalIgnoreCase);
+        public static Dictionary<string, WorksetStats> WorksetsData { get; set; } 
+            = new Dictionary<string, WorksetStats>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Key is Central Path of Document.
         /// </summary>
-        public static Dictionary<string, ModelData> ModelsData { get; set; } 
-            = new Dictionary<string, ModelData>(StringComparer.OrdinalIgnoreCase);
+        public static Dictionary<string, ModelStats> ModelsData { get; set; }
+            = new Dictionary<string, ModelStats>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Key is Central Path of Document.

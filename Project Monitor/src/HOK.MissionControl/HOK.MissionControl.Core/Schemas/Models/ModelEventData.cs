@@ -15,6 +15,9 @@ namespace HOK.MissionControl.Core.Schemas.Models
         [JsonProperty("_id")]
         public string Id { get; set; }
 
+        [JsonProperty("centralPath")]
+        public string CentralPath { get; set; }
+
         [JsonProperty("value")]
         public long Value { get; set; }
 
