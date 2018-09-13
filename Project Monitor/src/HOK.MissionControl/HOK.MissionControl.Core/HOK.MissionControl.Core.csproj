@@ -185,6 +185,7 @@
     <Compile Include="Schemas\TriggerRecords\TriggerRecordItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Schemas\TriggerRecords\TriggerRecordData.cs" />
+    <Compile Include="Schemas\Users\UserItem.cs" />
     <Compile Include="Schemas\Views\ViewsData.cs" />
     <Compile Include="Schemas\Views\ViewsDataItem.cs" />
     <Compile Include="Schemas\Warnings\WarningItem.cs" />

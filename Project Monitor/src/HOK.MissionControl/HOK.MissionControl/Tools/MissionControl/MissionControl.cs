@@ -17,6 +17,7 @@ using HOK.MissionControl.Core.Schemas.Links;
 using HOK.MissionControl.Core.Schemas.Models;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Core.Schemas.Styles;
+using HOK.MissionControl.Core.Schemas.Users;
 using HOK.MissionControl.Core.Schemas.Views;
 using HOK.MissionControl.Core.Schemas.Warnings;
 using HOK.MissionControl.Core.Schemas.Worksets;
@@ -187,6 +188,18 @@ namespace HOK.MissionControl.Tools.MissionControl
                     var socket = new MissionControlSocket(doc);
                     socket.Start();
                     AppCommand.Socket = socket;
+                }
+
+                // Publish user/machine info to be used by Zombie
+                var userInfo = new UserItem
+                {
+                    User = Environment.UserName.ToLower(),
+                    Machine = Environment.MachineName
+                };
+
+                if (!ServerUtilities.Post(userInfo, "users/add", out ResponseCreated unused1))
+                {
+                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish User/Machine Data.");
                 }
             }
             catch (Exception ex)
