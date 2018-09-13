@@ -167,8 +167,8 @@
     <Compile Include="Schemas\Links\DwgFileInfo.cs" />
     <Compile Include="Schemas\Links\LinkData.cs" />
     <Compile Include="Schemas\Links\LinkDataItem.cs" />
-    <Compile Include="Schemas\Models\ModelData.cs" />
     <Compile Include="Schemas\Models\ModelEventData.cs" />
+    <Compile Include="Schemas\Models\ModelStats.cs" />
     <Compile Include="Schemas\Project\Project.cs" />
     <Compile Include="Schemas\Project\ProjectAddress.cs" />
     <Compile Include="Schemas\RevitServer.cs" />
@@ -189,9 +189,9 @@
     <Compile Include="Schemas\Views\ViewsDataItem.cs" />
     <Compile Include="Schemas\Warnings\WarningItem.cs" />
     <Compile Include="Schemas\Worksets\WorksetItem.cs" />
-    <Compile Include="Schemas\Worksets\WorksetData.cs" />
     <Compile Include="Schemas\Worksets\WorksetEvent.cs" />
     <Compile Include="Schemas\Worksets\WorksetItemData.cs" />
+    <Compile Include="Schemas\Worksets\WorksetStats.cs" />
     <Compile Include="Utils\AddinUtilities.cs" />
     <Compile Include="Utils\ElementUtilities.cs" />
     <Compile Include="Utils\FileInfoUtil.cs" />

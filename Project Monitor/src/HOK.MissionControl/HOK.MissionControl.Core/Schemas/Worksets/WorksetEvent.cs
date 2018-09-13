@@ -15,6 +15,9 @@ namespace HOK.MissionControl.Core.Schemas.Worksets
         [JsonProperty("_id")]
         public string Id { get; set; }
 
+        [JsonProperty("centralPath")]
+        public string CentralPath { get; set; }
+
         [JsonProperty("user")]
         public string User { get; set; } = "";
 

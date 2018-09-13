@@ -14,8 +14,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes data about Model Synch duration.
         /// </summary>
-        /// <param name="modelsId"></param>
-        public void PublishSynchTime(string modelsId)
+        /// <param name="filePath">Revit Document central file path.</param>
+        public void PublishSynchTime(string filePath)
         {
             try
             {
@@ -26,11 +26,12 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var eventItem = new ModelEventData
                 {
+                    CentralPath = filePath.ToLower(),
                     Value = ms,
                     User = Environment.UserName.ToLower()
                 };
 
-                if (!ServerUtilities.Post(eventItem, "models/" + modelsId + "/modelsynchtime", out ModelData unused))
+                if (!ServerUtilities.Post(eventItem, "model/synchtimes", out ModelEventData unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Model Synch Times Data.");
                 }
@@ -44,8 +45,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// <summary>
         /// Publishes data about Model Opening duration.
         /// </summary>
-        /// <param name="modelsId">Id of the HealthRecord in MongoDB.</param>
-        public void PublishOpenTime(string modelsId)
+        /// <param name="filePath">Revit Document central file path.</param>
+        public void PublishOpenTime(string filePath)
         {
             try
             {
@@ -56,11 +57,12 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var eventItem = new ModelEventData
                 {
+                    CentralPath = filePath.ToLower(),
                     Value = ms,
                     User = Environment.UserName.ToLower()
                 };
 
-                if (!ServerUtilities.Post(eventItem, "models/" + modelsId + "/modelopentime", out ModelData unused))
+                if (!ServerUtilities.Post(eventItem, "model/opentimes", out ModelEventData unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Model Open Times Data.");
                 }
@@ -76,9 +78,8 @@ namespace HOK.MissionControl.Tools.HealthReport
         /// </summary>
         /// <param name="doc">Revit Document.</param>
         /// <param name="filePath">Revit Document central file path.</param>
-        /// <param name="recordId">Id of the HealthRecord in MongoDB.</param>
         /// <param name="version">Revit file version.</param>
-        public void PublishModelSize(Document doc, string filePath, string recordId, string version)
+        public void PublishModelSize(Document doc, string filePath, string version)
         {
             try
             {
@@ -135,12 +136,12 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var eventItem = new ModelEventData
                 {
+                    CentralPath = filePath.ToLower(),
                     Value = fileSize,
                     User = Environment.UserName.ToLower()
                 };
 
-                if (!ServerUtilities.Post(eventItem, "models/" + recordId + "/modelsize", 
-                    out ModelData unused))
+                if (!ServerUtilities.Post(eventItem, "model/modelsizes", out ModelEventData unused))
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Model Size Data.");
                 }

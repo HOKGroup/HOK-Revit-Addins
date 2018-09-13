@@ -222,14 +222,6 @@ namespace HOK.MissionControl
                 if (string.IsNullOrEmpty(centralPath)) return;
 
                 SynchTime["from"] = DateTime.UtcNow;
-
-                // (Konrad) We need to make sure that we were able to check into Mission Control 
-                // If all of these values are present that means we can publish data.
-                if (MissionControlSetup.Projects.ContainsKey(centralPath) &&
-                    MissionControlSetup.Configurations.ContainsKey(centralPath))
-                {
-                    Tools.MissionControl.MissionControl.ProcessWorksets(ActionType.Synch, doc, centralPath);
-                }
             }
             catch (Exception ex)
             {
@@ -257,13 +249,26 @@ namespace HOK.MissionControl
                 if (MissionControlSetup.Projects.ContainsKey(centralPath) &&
                     MissionControlSetup.Configurations.ContainsKey(centralPath))
                 {
-                    Tools.MissionControl.MissionControl.ProcessModels(ActionType.Synch, doc, centralPath);
-                    Tools.MissionControl.MissionControl.ProcessSheets(ActionType.Synch, doc, centralPath);
+                    var config = MissionControlSetup.Configurations[centralPath];
+                    foreach (var updater in config.Updaters)
+                    {
+                        if (!updater.IsUpdaterOn) continue;
+
+                        if (string.Equals(updater.UpdaterId, Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase))
+                        {
+                            Tools.MissionControl.MissionControl.ProcessModels(ActionType.Synch, doc, centralPath);
+                            Tools.MissionControl.MissionControl.ProcessWorksets(ActionType.Synch, doc, centralPath);
 #if RELEASE2015 || RELEASE2016 || RELEASE2017
-                    // (Konrad) We are not going to process warnings here.
+                            // (Konrad) We are not going to process warnings here.
 #else
-                    Tools.MissionControl.MissionControl.ProcessWarnings(ActionType.Synch, doc, centralPath);
+                            Tools.MissionControl.MissionControl.ProcessWarnings(ActionType.Synch, doc, centralPath);
 #endif
+                        }
+                        else if (string.Equals(updater.UpdaterId, Properties.Resources.SheetsTrackerGuid, StringComparison.OrdinalIgnoreCase))
+                        {
+                            Tools.MissionControl.MissionControl.ProcessSheets(ActionType.Synch, doc, centralPath);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
