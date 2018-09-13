@@ -9,6 +9,15 @@
 * HOK.MissionControl.StylesManager.dll - External Command for managing styles.
 * HOK.MissionControl.GroupsManager.dll - External Command for managing groups.
 
+###### Release 2019.1.0.8
+
+* Added new schema and method for publishing User name and Machine name. This will be used by the Zombie Logs to tie machine names to users using them. 
+* Changed the schema and functionality around Models and Worksets stats. They are no longer stored in a single document tied to a single central path, and instead are stored as individual docs that each has a central path property. 
+
+###### Release 2019.1.0.7
+
+* Updates and fixes to Groups Manager functionality. There was a small bug in there that was fixed and few new tools that were requested by Dragos from LON that were added. 
+
 ###### Release 2019.1.0.6
 
 * Added File Path publishing. This adds new schema for a FilePathItem that stores central file path to a current model in a MongoDB. That makes creating Configurations via the web interface a lot easier since users don't have to open the files. 
