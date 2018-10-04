@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Costura.Fody.3.1.4\build\Costura.Fody.props" Condition="Exists('..\packages\Costura.Fody.3.1.4\build\Costura.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -16,6 +17,8 @@
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -80,14 +83,23 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Costura, Version=3.1.4.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Costura.Fody.3.1.4\lib\net46\Costura.dll</HintPath>
+    </Reference>
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
     </Reference>
+    <Reference Include="HOK.Core, Version=2019.1.0.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
@@ -112,11 +124,6 @@
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2019'">
       <HintPath>..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPIUI.dll</HintPath>
-    </Reference>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2017'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2017\HOK.Core.dll</HintPath>
@@ -202,6 +209,12 @@
   <ItemGroup>
     <Resource Include="Resources\hoklogo.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo Signing...
@@ -237,9 +250,18 @@ goto exit
 
 :Build2019
 echo Copying results to Build2019
-copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\Fody.3.2.6\build\Fody.targets" Condition="Exists('..\packages\Fody.3.2.6\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.3.2.6\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.3.2.6\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Costura.Fody.3.1.4\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.3.1.4\build\Costura.Fody.props'))" />
+    <Error Condition="!Exists('..\packages\Costura.Fody.3.1.4\build\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.3.1.4\build\Costura.Fody.targets'))" />
+  </Target>
+  <Import Project="..\packages\Costura.Fody.3.1.4\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.3.1.4\build\Costura.Fody.targets')" />
 </Project>
