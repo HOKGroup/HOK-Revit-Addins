@@ -30,7 +30,7 @@ namespace HOK.MissionControl.FamilyPublish.Utilities
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return centralPath;
+            return centralPath.ToLower();
         }
     }
 }
