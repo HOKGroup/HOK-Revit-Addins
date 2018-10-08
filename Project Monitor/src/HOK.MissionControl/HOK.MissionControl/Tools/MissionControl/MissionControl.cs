@@ -46,9 +46,12 @@ namespace HOK.MissionControl.Tools.MissionControl
 
                 // (Konrad) We can publish a file path to the DB. 
                 // That will make it easier to create Configurations.
-                if (!ServerUtilities.Post(new FilePathItem(centralPath), "filepaths/add", out FilePathItem unused))
+                if (!doc.IsDetached && !doc.IsFamilyDocument && doc.IsWorkshared)
                 {
-                    Log.AppendLog(LogMessageType.ERROR, "Failed to publish File Path: " + centralPath);
+                    if (!ServerUtilities.Post(new FilePathItem(centralPath), "filepaths/add", out FilePathItem unused))
+                    {
+                        Log.AppendLog(LogMessageType.ERROR, "Failed to publish File Path: " + centralPath);
+                    }
                 }
 
                 // (Konrad) Get Configuration/Project.
