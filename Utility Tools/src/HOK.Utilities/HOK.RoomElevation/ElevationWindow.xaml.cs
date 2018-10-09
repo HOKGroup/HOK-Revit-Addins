@@ -249,7 +249,7 @@ namespace HOK.RoomElevation
                 var sections = from section in viewSections where section.IsTemplate select section;
                 if (sections.Count() > 0)
                 {
-                    List<ViewSection> sectionList = sections.OrderBy(view => view.ViewName).ToList();
+                    List<ViewSection> sectionList = sections.OrderBy(view => view.Name).ToList();
                     foreach (ViewSection viewSection in sectionList)
                     {
                         vtp = new ViewTemplateProperties(viewSection);
@@ -842,7 +842,7 @@ namespace HOK.RoomElevation
         {
             templateObj = section;
             templateId = section.Id;
-            templateName = section.ViewName;
+            templateName = section.Name;
         }
     }
 

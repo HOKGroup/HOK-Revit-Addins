@@ -320,7 +320,7 @@ namespace HOK.CeilingHeight
                         var results = ceilingIds.ToList();
                         if (results.Count > 0)
                         {
-                            ceilingPlan = view.ViewName;
+                            ceilingPlan = view.Name;
                             break;
                         }
                     }

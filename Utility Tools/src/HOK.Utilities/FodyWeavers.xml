@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Weavers>
+  <Costura IncludeDebugSymbols='false'>
+    <ExcludeAssemblies>
+      RevitAPIFoundation
+      RevitDBAPI
+      PersistenceDBAPI
+      UtilityAPI
+      APIDBAPI
+      GraphicsAPI
+      ElementGroupDBAPI
+      EssentialsDBAPI
+      GeomUtilAPI
+      FamilyDBAPI
+      DetailDBAPI
+      CurtainGridFamilyDBAPI
+      ArrayElemsDBAPI
+      EnergyAnalysisDBAPI
+      BuildingSystemsDBAPI
+      HostObjDBAPI
+      RoomAreaPlanDBAPI
+      SiteDBAPI
+      SculptingDBAPI
+      StructuralDBAPI
+      InterfaceAPI
+      InterfaceUtilAPI
+      RebarDBAPI
+      StructuralAnalysisDBAPI
+      MassingDBAPI
+      AssemblyDBAPI
+      DPartDBAPI
+      NumberingDBAPI
+      PointCloudAccessAPI
+      StairRampDBAPI
+      AnalysisAppsDBAPI
+      MaterialDBAPI
+      DBManagedServices
+      AdWindows
+      RevitAddInUtility
+      APIInterop
+      UIFramework
+      AddInManager
+      RevitUIAPI
+      BuildingSystemsUIAPI
+      DesktopMFCAPI
+      APIUIAPI
+      RevitMFCAPI
+      EssentialsUIAPI
+      EnergyAnalysisUtilitiesAPI
+      DetailUIAPI
+      AdWindows.resources
+      Xceed.Wpf.AvalonDock
+      UIFrameworkServices
+    </ExcludeAssemblies>
+  </Costura>
+</Weavers>
