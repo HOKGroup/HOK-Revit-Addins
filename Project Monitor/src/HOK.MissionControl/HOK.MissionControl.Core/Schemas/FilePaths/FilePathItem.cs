@@ -18,6 +18,9 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
         [JsonProperty("projectId")]
         public string ProjectId { get; set; }
 
+        [JsonProperty("isDisabled")]
+        public bool IsDisabled { get; set; }
+
         [JsonConstructor]
         public FilePathItem()
         {
