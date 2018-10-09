@@ -397,7 +397,7 @@ namespace HOK.CameraDuplicator
                         View3D createdView = View3D.CreatePerspective(recipientDoc, vFamilyType.Id);
                         if (CanHaveViewName(rModel, cameraInfo.ViewName))
                         {
-                            createdView.ViewName = cameraInfo.ViewName;
+                            createdView.Name = cameraInfo.ViewName;
                         }
                         createdView.SetOrientation(cameraInfo.Orientation);
                         createdView.CropBoxActive = cameraInfo.IsCropBoxOn;
@@ -638,7 +638,7 @@ namespace HOK.CameraDuplicator
                             {
                                 if (CanHaveViewName(rModel, planInfo.ViewName))
                                 {
-                                    createdView.ViewName = planInfo.ViewName;
+                                    createdView.Name = planInfo.ViewName;
                                 }
                                 createdView.CropBoxActive = planInfo.IsCropBoxOn;
                                 createdView.CropBox = planInfo.CropBox;

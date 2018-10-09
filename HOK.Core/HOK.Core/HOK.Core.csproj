@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Costura.Fody.3.1.4\build\Costura.Fody.props" Condition="Exists('..\packages\Costura.Fody.3.1.4\build\Costura.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -15,6 +16,8 @@
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2018'">v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -79,6 +82,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Costura, Version=3.1.4.0, Culture=neutral, PublicKeyToken=9919ef960d84173d, processorArchitecture=MSIL">
+      <HintPath>..\packages\Costura.Fody.3.1.4\lib\net46\Costura.dll</HintPath>
+    </Reference>
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
     </Reference>
@@ -101,8 +107,8 @@
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\CommonServiceLocator.1.3\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -111,33 +117,43 @@
     </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2019'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2019'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2018'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2018'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2017'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2017'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -230,95 +246,29 @@
     <Resource Include="Resources\deleteAttachmentHover_16x16.png" />
     <Resource Include="Resources\deleteAttachment_16x16.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo Configuration: $(Configuration)
-
-if $(Configuration) == 2015 goto Build2015
-if $(Configuration) == 2016 goto Build2016
-if $(Configuration) == 2017 goto Build2017
-if $(Configuration) == 2018 goto Build2018
-if $(Configuration) == 2019 goto Build2019
-
-:Build2015
-echo Copying results to Build2015
-xcopy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.FamilyPublish"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.CitrixTools"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.LinksManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.GroupsManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2015\Temp\HOK.MissionControl.StylesManager"
-xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2015\HOK-Addin.bundle\Contents"
-goto exit
-
-:Build2016
-echo Copying results to Build2016
-xcopy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)RestSharp.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.FamilyPublish"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.CitrixTools"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.LinksManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.GroupsManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2016\Temp\HOK.MissionControl.StylesManager"
-xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-goto exit
-
-:Build2017
-echo Copying results to Build2017
-xcopy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)RestSharp.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.FamilyPublish"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.CitrixTools"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.LinksManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.GroupsManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2017\Temp\HOK.MissionControl.StylesManager"
-xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-goto exit
-
-:Build2018
-echo Copying results to Build2018
-xcopy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)RestSharp.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.FamilyPublish"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.CitrixTools"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.LinksManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.GroupsManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2018\Temp\HOK.MissionControl.StylesManager"
-xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2018\HOK-Addin.bundle\Contents"
-goto exit
-
-:Build2019
-echo Copying results to Build2019
-xcopy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)RestSharp.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.FamilyPublish"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.CitrixTools"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.LinksManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.GroupsManager"
-xcopy /Y "$(TargetPath)" "C:\Users\konrad.sobon\Desktop\BetaFiles Testing\2019\Temp\HOK.MissionControl.StylesManager"
-xcopy /Y "$(TargetDir)System.Windows.Interactivity.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Microsoft.Practices.ServiceLocation.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)GalaSoft.MvvmLight.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
-xcopy /Y "$(TargetDir)Newtonsoft.Json.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
-goto exit
-
-:exit</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
+  <Import Project="..\packages\Fody.3.2.6\build\Fody.targets" Condition="Exists('..\packages\Fody.3.2.6\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.3.2.6\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.3.2.6\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\Costura.Fody.3.1.4\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.3.1.4\build\Costura.Fody.props'))" />
+    <Error Condition="!Exists('..\packages\Costura.Fody.3.1.4\build\Costura.Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.3.1.4\build\Costura.Fody.targets'))" />
+  </Target>
+  <Target Name="CopyFiles" AfterTargets="AfterBuild;NonWinFodyTarget">
+    <Message Text="Signing file..." Importance="high" />
+    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />
+    <Message Text="Copy files..." Importance="high" />
+    <Message Text="$(TargetPath) &gt; $(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" Importance="high" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
+  </Target>
+  <Import Project="..\packages\Costura.Fody.3.1.4\build\Costura.Fody.targets" Condition="Exists('..\packages\Costura.Fody.3.1.4\build\Costura.Fody.targets')" />
 </Project>

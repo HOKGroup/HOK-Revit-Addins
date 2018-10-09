@@ -92,7 +92,7 @@ namespace HOK.CameraDuplicator
         public CameraViewInfo(View3D view3d)
         {
             viewId = view3d.Id.IntegerValue;
-            viewName = view3d.ViewName;
+            viewName = view3d.Name;
 
             viewTemplateId = view3d.ViewTemplateId;
             
@@ -215,7 +215,7 @@ namespace HOK.CameraDuplicator
         public PlanViewInfo(ViewPlan planView)
         {
             viewId = planView.Id.IntegerValue;
-            viewName = planView.ViewName;
+            viewName = planView.Name;
             planViewType = planView.ViewType;
 
             if (null != planView.GenLevel)

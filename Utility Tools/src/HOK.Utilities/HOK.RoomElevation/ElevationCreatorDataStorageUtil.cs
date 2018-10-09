@@ -444,7 +444,7 @@ namespace HOK.RoomElevation
         public ElevationViewProperties(ViewSection viewSection)
         {
             m_view = viewSection;
-            viewName = m_view.ViewName;
+            viewName = m_view.Name;
             viewId = m_view.Id.IntegerValue;
         }
 
