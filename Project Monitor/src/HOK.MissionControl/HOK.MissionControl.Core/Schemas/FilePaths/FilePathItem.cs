@@ -21,14 +21,18 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
         [JsonProperty("isDisabled")]
         public bool IsDisabled { get; set; }
 
+        [JsonProperty("revitVersion")]
+        public string RevitVersion { get; set; }
+
         [JsonConstructor]
         public FilePathItem()
         {
         }
 
-        public FilePathItem(string centralPath)
+        public FilePathItem(string centralPath, string version)
         {
             CentralPath = centralPath.ToLower();
+            RevitVersion = version;
         }
     }
 }

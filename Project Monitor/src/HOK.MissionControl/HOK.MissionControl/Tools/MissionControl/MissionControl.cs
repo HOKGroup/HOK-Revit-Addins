@@ -48,7 +48,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                 // That will make it easier to create Configurations.
                 if (!doc.IsDetached && !doc.IsFamilyDocument && doc.IsWorkshared)
                 {
-                    if (!ServerUtilities.Post(new FilePathItem(centralPath), "filepaths/add", out FilePathItem unused))
+                    if (!ServerUtilities.Post(new FilePathItem(centralPath, doc.Application.VersionNumber), "filepaths/add", out FilePathItem unused))
                     {
                         Log.AppendLog(LogMessageType.ERROR, "Failed to publish File Path: " + centralPath);
                     }
