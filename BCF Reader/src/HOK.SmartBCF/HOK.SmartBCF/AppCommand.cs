@@ -1,23 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#region References
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using System.Windows.Interop;
 using Autodesk.Revit.UI;
-using HOK.SmartBCF.Utils;
+using HOK.Core.Utilities;
 using HOK.SmartBCF.Walker;
+
+#endregion
 
 namespace HOK.SmartBCF
 {
     public class AppCommand : IExternalApplication
     {
-        internal static AppCommand thisApp = null;
+        internal static AppCommand thisApp;
         private WalkerWindow walkerWindow;
-        private string tabName = "  HOK - Beta";
+        private const string tabName = "  HOK - Beta";
 
         public Result OnShutdown(UIControlledApplication application)
         {
@@ -25,7 +27,6 @@ namespace HOK.SmartBCF
             {
                 walkerWindow.Close();
             }
-
             
             return Result.Succeeded;
         }
@@ -35,75 +36,91 @@ namespace HOK.SmartBCF
             thisApp = this;
             walkerWindow = null;
 
-            try { application.CreateRibbonTab(tabName); }
-            catch { }
+            try
+            {
+                application.CreateRibbonTab(tabName);
+            }
+            catch (Exception e)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+            }
 
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
-            RibbonPanel rp = application.CreateRibbonPanel(tabName, "BCF");
-            string currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
-
-            BitmapSource walkerImage = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(Properties.Resources.walker.GetHbitmap(), IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-
-            PushButton walkerButton = rp.AddItem(new PushButtonData("smartBCF", "smartBCF", currentAssembly, "HOK.SmartBCF.BCFCommand")) as PushButton;
+            var rp = application.CreateRibbonPanel(tabName, "BCF");
+            var currentAssembly = Assembly.GetAssembly(GetType()).Location;
+            var walkerImage = Imaging.CreateBitmapSourceFromHBitmap(Properties.Resources.walker.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            var walkerButton = rp.AddItem(new PushButtonData("smartBCF", "smartBCF", currentAssembly, "HOK.SmartBCF.BCFCommand")) as PushButton;
             walkerButton.LargeImage = walkerImage;
 
             return Result.Succeeded;
         }
 
-        Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             try
             {
                 var name = new AssemblyName(args.Name);
-                string[] assemblyNames = new string[] { "System.Net.Http.Primitives", "Newtonsoft.Json" };
+                var assemblyNames = new[] { "System.Net.Http.Primitives", "Newtonsoft.Json" };
                 if (assemblyNames.Contains(name.Name))
                 {
-                    string currentAssembly = System.Reflection.Assembly.GetAssembly(this.GetType()).Location;
-                    string assemblyToLoad = Path.Combine(Path.GetDirectoryName(currentAssembly), name.Name+".dll");
-                    Assembly assemblyLoaded = Assembly.LoadFrom(assemblyToLoad);
-                    if (null != assemblyLoaded) { return assemblyLoaded; }
+                    var currentAssembly = Assembly.GetAssembly(GetType()).Location;
+                    var assemblyToLoad = Path.Combine(Path.GetDirectoryName(currentAssembly), name.Name+".dll");
+                    var assemblyLoaded = Assembly.LoadFrom(assemblyToLoad);
+
+                    return assemblyLoaded;
                 }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                MessageBox.Show("Failed to load assembly.\n" + ex.Message);
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                MessageBox.Show("Failed to load assembly.\n" + e.Message);
             }
             return null;
         }
 
+        /// <summary>
+        /// Shows the Walker Window
+        /// </summary>
+        /// <param name="uiapp"></param>
         public void ShowWalker(UIApplication uiapp)
         {
-            if (walkerWindow == null)
-            {
-                WalkerHandler handler = new WalkerHandler(uiapp);
-                ExternalEvent exEvent = ExternalEvent.Create(handler);
+            if (walkerWindow != null) return;
 
-                walkerWindow = new WalkerWindow(exEvent, handler);
-                walkerWindow.Closed += WindowClosed;
-                walkerWindow.Show();
-            }
+            var handler = new WalkerHandler(uiapp);
+            var exEvent = ExternalEvent.Create(handler);
+
+            walkerWindow = new WalkerWindow(exEvent, handler);
+            walkerWindow.Closed += WindowClosed;
+            walkerWindow.Show();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void WakeWalkerUp()
         {
-            if (walkerWindow != null)
-            {
-                walkerWindow.WakeUp();
-            }
+            walkerWindow?.WakeUp();
         }
 
-        public void WindowClosed(object sender, System.EventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void WindowClosed(object sender, EventArgs e)
         {
+            // TODO: Remove event handler?
             walkerWindow = null;
         }
-
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
     public static class AbortFlag
     {
-        private static bool abortFlag = false;
+        private static bool abortFlag;
 
         public static bool GetAbortFlag()
         {

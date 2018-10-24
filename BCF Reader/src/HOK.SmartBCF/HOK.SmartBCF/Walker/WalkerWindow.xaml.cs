@@ -75,8 +75,8 @@ namespace HOK.SmartBCF.Walker
         [DllImport("user32.dll")]
         static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        private delegate void UpdateLableDelegate(System.Windows.DependencyProperty dp, Object value);
-        private delegate void UpdateProgressDelegate(System.Windows.DependencyProperty dp, Object value);
+        private delegate void UpdateLableDelegate(DependencyProperty dp, Object value);
+        private delegate void UpdateProgressDelegate(DependencyProperty dp, Object value);
 
         public WalkerWindow(ExternalEvent exEvent, WalkerHandler handler)
         {
@@ -86,17 +86,15 @@ namespace HOK.SmartBCF.Walker
             InitializeComponent();
 
             expanderBCF.Header = "Show BCF Info";
-            //expanderRowDefinition.Height = new GridLength(40);
-            this.MinHeight = 535;
-            this.Height = 535;
-            this.Title = "smartBCF v." +System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            MinHeight = 535;
+            Height = 535;
+            Title = "smartBCF v." + Assembly.GetExecutingAssembly().GetName().Version;
             labelStep.Content = "";
 
             filterOnImage = ImageUtil.LoadBitmapImage("filter.png", 24);
             filterOffImage = ImageUtil.LoadBitmapImage("filter_empty.png", 24);
 
             buttonFilterImage.Source = filterOffImage;
-
             bcfFileDictionary = m_handler.BCFFileDictionary;
             bcfDictionary = m_handler.BCFDictionary;
             categoryInfoList = m_handler.CategoryInfoList;
@@ -105,16 +103,11 @@ namespace HOK.SmartBCF.Walker
             bcfColorSchemeId = m_handler.BCFColorSchemeId;
             googleFolders = m_handler.GoogleFolders;
 
-            if (bcfDictionary.Count > 0)
-            {
-                currentIndex = 0;
-                DisplayLinkedBCF();
-                DisplayColorscheme(schemeInfo);
-            }
-            else
-            {
-                //MessageBox.Show("Elements cannot be found in the active Revit document.\n", "Elements Not Found", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
+            if (!bcfDictionary.Any()) return;
+
+            currentIndex = 0;
+            DisplayLinkedBCF();
+            DisplayColorscheme(schemeInfo);
         }
 
         private BitmapImage LoadBitmapImage(string imageName)
@@ -382,8 +375,8 @@ namespace HOK.SmartBCF.Walker
         {
             expanderBCF.Header = "Show BCF Info";
             //expanderRowDefinition.Height = new GridLength(40);
-            this.MinHeight = 535;
-            this.Height = 535;
+            MinHeight = 535;
+            Height = 535;
         }
 
         private void expanderBCF_Expanded(object sender, RoutedEventArgs e)
@@ -391,8 +384,8 @@ namespace HOK.SmartBCF.Walker
             expanderBCF.Header = "Hide BCF Info";
             GridLength expandedHeight = new GridLength(1, GridUnitType.Star);
             expanderRowDefinition.Height = expandedHeight;
-            this.MinHeight = 900;
-            this.Height = 900;
+            MinHeight = 900;
+            Height = 900;
         }
         
         private void InitializeUIComponents()
@@ -691,7 +684,7 @@ namespace HOK.SmartBCF.Walker
 
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
         #endregion
 

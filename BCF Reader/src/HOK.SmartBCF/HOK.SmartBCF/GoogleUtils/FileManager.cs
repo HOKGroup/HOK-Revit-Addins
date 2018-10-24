@@ -1,15 +1,15 @@
-﻿using System;
+﻿#region References
+
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -18,62 +18,95 @@ using Google.Apis.Drive.v2;
 using Google.Apis.Drive.v2.Data;
 using Google.Apis.Services;
 using Google.Apis.Upload;
-using Google.GData.Spreadsheets;
+using HOK.Core.Utilities;
 using HOK.SmartBCF.Utils;
 using HOK.SmartBCF.Walker;
+using File = Google.Apis.Drive.v2.Data.File;
 
-
+#endregion
 
 namespace HOK.SmartBCF.GoogleUtils
 {
     public static class FileManager
     {
-        private static string keyFile = "HOK smartBCF.p12";
-        private static string serviceAccountEmail = "756603983986-lrc8dm2b0nl381cepd60q2o7fo8df3bg@developer.gserviceaccount.com";
-        private static string smartBCFVersion = "SmartBCF v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+        private const string keyFile = "HOK smartBCF.p12";
+        private const string serviceAccountEmail = "756603983986-lrc8dm2b0nl381cepd60q2o7fo8df3bg@developer.gserviceaccount.com";
+        private static readonly string smartBCFVersion = "SmartBCF v." + Assembly.GetExecutingAssembly().GetName().Version;
 
-        private static string[] markupCols = new string[] { "IssueGuid", "IssueTopic", "CommentGuid", "Comment", "Status", "VerbalStatus", "Author", "Date" };
-        private static string[] viewpointCols = new string[] { "IssueGuid", "ComponentIfcGuid", "AuthoringToolId", "Action", "Responsible" };
-        private static string[] colorschemeCols = new string[] { "ColorSchemeId", "SchemeName", "ParameterName", "ParameterValue", "ColorR", "ColorG", "ColorB" };
-        private static string[] categoryCols = new string[] { "CategoryName" };
+        private static string[] markupCols =
+        {
+            "IssueGuid",
+            "IssueTopic",
+            "CommentGuid",
+            "Comment",
+            "Status",
+            "VerbalStatus",
+            "Author",
+            "Date"
+        };
+        private static string[] viewpointCols =
+        {
+            "IssueGuid",
+            "ComponentIfcGuid",
+            "AuthoringToolId",
+            "Action",
+            "Responsible"
+        };
+        private static string[] colorschemeCols =
+        {
+            "ColorSchemeId",
+            "SchemeName",
+            "ParameterName",
+            "ParameterValue",
+            "ColorR",
+            "ColorG",
+            "ColorB"
+        };
+        private static string[] categoryCols =
+        {
+            "CategoryName"
+        };
 
-        public static DriveService service = null;
+        public static DriveService service;
 
+        /// <summary>
+        /// Retrieves google user credentials embedded in the Resources.
+        /// </summary>
+        /// <returns>Drive Service or null if failed to validate credentials.</returns>
         private static DriveService GetUserCredential()
         {
             DriveService driveService = null;
             try
             {
-                string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
-                string keyFilePath = System.IO.Path.Combine(currentDirectory, "Resources\\" + keyFile);
-
-                X509Certificate2 certificate = new X509Certificate2(keyFilePath, "notasecret", X509KeyStorageFlags.Exportable);
-
-                ServiceAccountCredential credential = new ServiceAccountCredential(
+                var currentAssembly = Assembly.GetExecutingAssembly().Location;
+                var currentDirectory = Path.GetDirectoryName(currentAssembly);
+                var keyFilePath = Path.Combine(currentDirectory, "Resources\\" + keyFile);
+                var certificate = new X509Certificate2(keyFilePath, "notasecret", X509KeyStorageFlags.Exportable);
+                var credential = new ServiceAccountCredential(
                     new ServiceAccountCredential.Initializer(serviceAccountEmail)
                     {
                         Scopes = new[] { DriveService.Scope.Drive }
                     }.FromCertificate(certificate));
 
-                // Create the service.
+                // (Jinsol) Create the service.
                 driveService = new DriveService(new BaseClientService.Initializer()
                 {
                     HttpClientInitializer = credential,
                     ApplicationName = "smartBCF",
                 });
-
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to get user credential.\n" + ex.Message, "Get User Credential", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                MessageBox.Show("Failed to get user credential.\n" + ex.Message, "Get User Credential",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return driveService;
         }
 
         public static bool RootFolderExist(string rootFolderId, out File rootFolder)
         {
-            bool exist = false;
+            var exist = false;
             rootFolder = null;
             try
             {
@@ -87,17 +120,25 @@ namespace HOK.SmartBCF.GoogleUtils
                     rootFolder = service.Files.Get(rootFolderId).Execute();
                     if (null != rootFolder)
                     {
-                        PermissionId permissionId = service.Permissions.GetIdForEmail(serviceAccountEmail).Execute();
+                        var permissionId = service.Permissions.GetIdForEmail(serviceAccountEmail).Execute();
                         Permission permission = null;
-                        try { permission = service.Permissions.Get(rootFolderId, permissionId.Id).Execute();  }
-                        catch { }
+                        try
+                        {
+                            permission = service.Permissions.Get(rootFolderId, permissionId.Id).Execute();
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
 
                         if (null == permission)
                         {
-                            Permission newPermission = new Permission();
-                            newPermission.Value = serviceAccountEmail;
-                            newPermission.Type = "user";
-                            newPermission.Role = "writer";
+                            var newPermission = new Permission
+                            {
+                                Value = serviceAccountEmail,
+                                Type = "user",
+                                Role = "writer"
+                            };
                             permission = service.Permissions.Insert(newPermission, rootFolderId).Execute();
                         }
 
@@ -112,64 +153,65 @@ namespace HOK.SmartBCF.GoogleUtils
             return exist;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rootFolderId"></param>
+        /// <returns></returns>
         public static FolderHolders FindGoogleFolders(string rootFolderId)
         {
-            FolderHolders holder = new FolderHolders(rootFolderId);
+            var holder = new FolderHolders(rootFolderId);
             try
             {
-                if (null == service)
+                if (service == null) service = GetUserCredential();
+                File rootFolder;
+                if (service != null)
                 {
-                    service = GetUserCredential();
-                }
-
-                if (null != service )
-                {
-                    File rootFolder = null;
                     if(RootFolderExist(rootFolderId, out rootFolder))
                     {
                         holder.RootFolder = rootFolder;
                         holder.RootTitle = rootFolder.Title;
 
-                        string colorSchemeTitle = "ColorSchemes.csv";
-                        File colorSheet = FindSubItemByFolderId(colorSchemeTitle, rootFolderId);
-                        if (null == colorSheet)
+                        const string colorSchemeTitle = "ColorSchemes.csv";
+                        var colorSheet = FindSubItemByFolderId(colorSchemeTitle, rootFolderId);
+                        if (colorSheet == null)
                         {
-                            ColorSchemeInfo colorSchemeInfo = BCFParser.CreateDefaultSchemeInfo();
-                            System.IO.MemoryStream colorStream = BCFParser.CreateColorSchemeStream(colorSchemeInfo);
-                            if (null != colorStream)
+                            var colorSchemeInfo = BCFParser.CreateDefaultSchemeInfo();
+                            var colorStream = BCFParser.CreateColorSchemeStream(colorSchemeInfo);
+                            if (colorStream != null)
                             {
-                                colorSheet = FileManager.UploadSpreadsheet(colorStream, colorSchemeTitle, rootFolderId, rootFolderId);// UploadId as folder id
+                                colorSheet = UploadSpreadsheet(colorStream, colorSchemeTitle, rootFolderId, rootFolderId);// UploadId as folder id
                             }
                         }
                         holder.ColorSheet = colorSheet;
 
-                        string categorySheetTitle = "ElementCategories.csv";
-                        File categorySheet = FindSubItemByFolderId(categorySheetTitle, rootFolderId);
+                        var categorySheetTitle = "ElementCategories.csv";
+                        var categorySheet = FindSubItemByFolderId(categorySheetTitle, rootFolderId);
                         if (null == categorySheet)
                         {
-                            List<string> categoryNames = new List<string>();
-                            System.IO.MemoryStream categoryStream = BCFParser.CreateCategoryStream(categoryNames);
+                            var categoryNames = new List<string>();
+                            var categoryStream = BCFParser.CreateCategoryStream(categoryNames);
                             if (null != categoryStream)
                             {
-                                categorySheet = FileManager.UploadSpreadsheet(categoryStream, categorySheetTitle, rootFolderId, rootFolderId);// UploadId as folder id
+                                categorySheet = UploadSpreadsheet(categoryStream, categorySheetTitle, rootFolderId, rootFolderId);// UploadId as folder id
                             }
                         }
                         holder.CategorySheet = categorySheet;
 
-                        File activeFolder = FindSubItemByFolderId("Active", rootFolderId);
+                        var activeFolder = FindSubItemByFolderId("Active", rootFolderId);
                         if (null == activeFolder)
                         {
                             activeFolder = CreateSubFolder(rootFolderId, "Active", "Interactive BCF Data will be stored in this folder.");
                         }
                         if (null != activeFolder)
                         {
-                            File bcfFolder = FindSubItemByFolderId("BCF_Files", activeFolder.Id);
+                            var bcfFolder = FindSubItemByFolderId("BCF_Files", activeFolder.Id);
                             if (null == bcfFolder)
                             {
                                 bcfFolder = CreateSubFolder(activeFolder.Id, "BCF_Files", "Parsed BCF Data will be stored as Google Spreadsheet.");
                             }
 
-                            File imgFolder = FindSubItemByFolderId("BCF_Images", activeFolder.Id);
+                            var imgFolder = FindSubItemByFolderId("BCF_Images", activeFolder.Id);
                             if (null == imgFolder)
                             {
                                 imgFolder = CreateSubFolder(activeFolder.Id, "BCF_Images", "Screen captured images of each issue will be stored in this folder.");
@@ -180,20 +222,20 @@ namespace HOK.SmartBCF.GoogleUtils
                             holder.ActiveImgFolder = imgFolder;
                         }
 
-                        File archiveFolder = FindSubItemByFolderId("Archive", rootFolderId);
+                        var archiveFolder = FindSubItemByFolderId("Archive", rootFolderId);
                         if (null == archiveFolder)
                         {
                             archiveFolder = CreateSubFolder(rootFolderId, "Archive", "Archived .bcfzip files will be stored in this folder.");
                         }
                         if (null != archiveFolder)
                         {
-                            File bcfFolder = FindSubItemByFolderId("BCF_Files", archiveFolder.Id);
+                            var bcfFolder = FindSubItemByFolderId("BCF_Files", archiveFolder.Id);
                             if (null == bcfFolder)
                             {
                                 bcfFolder = CreateSubFolder(archiveFolder.Id, "BCF_Files",  "Parsed BCF Data will be stored as Google Spreadsheet.");
                             }
 
-                            File imgFolder = FindSubItemByFolderId("BCF_Images", archiveFolder.Id);
+                            var imgFolder = FindSubItemByFolderId("BCF_Images", archiveFolder.Id);
                             if (null == imgFolder)
                             {
                                 imgFolder = CreateSubFolder(archiveFolder.Id, "BCF_Images", "Screen captured images of each issue will be stored in this folder.");
@@ -220,13 +262,13 @@ namespace HOK.SmartBCF.GoogleUtils
             File subFolder = null;
             try
             {
-                File body = new File();
+                var body = new File();
                 body.Title = folderTitle;
                 body.Description = smartBCFVersion+" - "+ description;
                 body.MimeType = "application/vnd.google-apps.folder";
                 body.Parents = new List<ParentReference>() { new ParentReference() { Id = parentId } };
                 
-                FilesResource.InsertRequest request = service.Files.Insert(body);
+                var request = service.Files.Insert(body);
                 subFolder = request.Execute();
             }
             catch (Exception ex)
@@ -241,13 +283,13 @@ namespace HOK.SmartBCF.GoogleUtils
             File subItem = null;
             try
             {
-                FilesResource.ListRequest request = service.Files.List();
+                var request = service.Files.List();
                 request.Q = "title = \'" + itemTitle + "\' and \'" + parentId + "\' in parents";
-                FileList files = request.Execute();
+                var files = request.Execute();
 
                 if (files.Items.Count > 0)
                 {
-                    foreach (File file in files.Items)
+                    foreach (var file in files.Items)
                     {
                         if (null == file.ExplicitlyTrashed)
                         {
@@ -268,7 +310,7 @@ namespace HOK.SmartBCF.GoogleUtils
             File file = null;
             try
             {
-                File fileFound = service.Files.Get(fileId).Execute();
+                var fileFound = service.Files.Get(fileId).Execute();
                 if (null == fileFound.ExplicitlyTrashed && fileFound.Parents.Count > 0)
                 {
                     file = fileFound;
@@ -283,12 +325,12 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static List<File> FindFilesByProperty(string parentId, string propertyKey, string propertyValue)
         {
-            List<File> filesFound = new List<File>();
+            var filesFound = new List<File>();
             try
             {
-                FilesResource.ListRequest request = service.Files.List();
+                var request = service.Files.List();
                 request.Q = "properties has { key= \'" + propertyKey + "\' and value=\'" + propertyValue + "\' and visibility=\'PUBLIC\' } and \'"+ parentId +"\' in parents";
-                FileList files = request.Execute();
+                var files = request.Execute();
 
                 filesFound = files.Items.ToList();
             }
@@ -301,10 +343,10 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static bool DeleteFile(string fileId)
         {
-            bool deleted = false;
+            var deleted = false;
             try
             {
-                FilesResource.DeleteRequest request = service.Files.Delete(fileId);
+                var request = service.Files.Delete(fileId);
                 request.Execute();
                 deleted = true;
             }
@@ -329,22 +371,22 @@ namespace HOK.SmartBCF.GoogleUtils
                 {
                     if (System.IO.File.Exists(bcfPath))
                     {
-                        string title = System.IO.Path.GetFileName(bcfPath);
-                        File body = new File();
+                        var title = System.IO.Path.GetFileName(bcfPath);
+                        var body = new File();
                         body.Title = title;
                         body.Description = smartBCFVersion+" - Archived BCF";
                         body.Parents = new List<ParentReference>() { new ParentReference() { Id = parentId } };
                         body.Properties = new List<Property>();
-                        Property property = new Property() { Key = "UploadId", Value = uploadId, Visibility = "PUBLIC" };
+                        var property = new Property() { Key = "UploadId", Value = uploadId, Visibility = "PUBLIC" };
                         body.Properties.Add(property);
                         //body.Thumbnail = GetThumbnail("bcficon64.png");
 
-                        byte[] byteArray = System.IO.File.ReadAllBytes(bcfPath);
-                        System.IO.MemoryStream stream = new System.IO.MemoryStream(byteArray);
+                        var byteArray = System.IO.File.ReadAllBytes(bcfPath);
+                        var stream = new System.IO.MemoryStream(byteArray);
                      
-                        FilesResource.InsertMediaUpload request = service.Files.Insert(body, stream, "");
+                        var request = service.Files.Insert(body, stream, "");
                         request.Upload();
-                        IUploadProgress progress = request.GetProgress();
+                        var progress = request.GetProgress();
                         
                         while (progress.Status != UploadStatus.Completed && progress.Status!=UploadStatus.Failed)
                         {
@@ -364,22 +406,30 @@ namespace HOK.SmartBCF.GoogleUtils
             return uploadedBCF;
         }
 
-        public static File UploadSpreadsheet(System.IO.MemoryStream stream, string fileName, string parentId, string uploadId)
+        /// <summary>
+        /// Uploads Spreadsheet file to Google Drive.
+        /// </summary>
+        /// <param name="stream">Memory Stream of the resource to be uploaded.</param>
+        /// <param name="fileName">File Name/Title for the Spreadsheet.</param>
+        /// <param name="parentId"></param>
+        /// <param name="uploadId"></param>
+        /// <returns>Google Drive File response if uploaded, otherwise null.</returns>
+        public static File UploadSpreadsheet(MemoryStream stream, string fileName, string parentId, string uploadId)
         {
             File uploadedFile = null;
             try
             {
-                string mimeType = "text/csv";
-                File body = new File();
-                body.Title = fileName;
-                body.Description = smartBCFVersion;
-                body.MimeType = mimeType;
-                body.Parents = new List<ParentReference>() { new ParentReference() { Id = parentId } };
-                body.Properties = new List<Property>();
-                Property property = new Property() { Key = "UploadId", Value = uploadId, Visibility = "PUBLIC" };
-                body.Properties.Add(property);
+                const string mimeType = "text/csv";
+                var body = new File
+                {
+                    Title = fileName,
+                    Description = smartBCFVersion,
+                    MimeType = mimeType,
+                    Parents = new List<ParentReference> { new ParentReference { Id = parentId } },
+                    Properties = new List<Property> { new Property { Key = "UploadId", Value = uploadId, Visibility = "PUBLIC" } }
+                };
 
-                FilesResource.InsertMediaUpload request = service.Files.Insert(body, stream, mimeType);
+                var request = service.Files.Insert(body, stream, mimeType);
                 request.Convert = true;
                 request.Upload();
 
@@ -387,7 +437,9 @@ namespace HOK.SmartBCF.GoogleUtils
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to upload a spreadsheet.\n." + fileName + "\n" + ex.Message, "Upload Spreadsheet", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                MessageBox.Show("Failed to upload a spreadsheet.\n." + fileName + "\n" + ex.Message,
+                    "Upload Spreadsheet", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return uploadedFile;
         }
@@ -397,10 +449,10 @@ namespace HOK.SmartBCF.GoogleUtils
             File updatedFile = null;
             try
             {
-                File file = service.Files.Get(fileId).Execute();
+                var file = service.Files.Get(fileId).Execute();
                 if (null != file)
                 {
-                    FilesResource.UpdateMediaUpload request = service.Files.Update(file, fileId, stream, file.MimeType);
+                    var request = service.Files.Update(file, fileId, stream, file.MimeType);
                     request.Convert = true;
                     request.Upload();
 
@@ -428,14 +480,14 @@ namespace HOK.SmartBCF.GoogleUtils
                 {
                     if (System.IO.File.Exists(bcfPath))
                     {
-                        string title = System.IO.Path.GetFileNameWithoutExtension(bcfPath);
-                        File body = new File();
+                        var title = System.IO.Path.GetFileNameWithoutExtension(bcfPath);
+                        var body = new File();
                         body.Title = title;
                         body.Description = smartBCFVersion + " - Issue Info";
                         body.Parents = new List<ParentReference>() { new ParentReference() { Id = parentId } };
                         body.MimeType = "application/vnd.google-apps.spreadsheet";
 
-                        FilesResource.InsertRequest request = service.Files.Insert(body);
+                        var request = service.Files.Insert(body);
                         spreadsheet = request.Execute();
                        
                     }
@@ -460,13 +512,13 @@ namespace HOK.SmartBCF.GoogleUtils
 
                 if (null != service)
                 {
-                    File body = new File();
+                    var body = new File();
                     body.Title = "Color Schemes";
                     body.Description = smartBCFVersion + " - Color Schemes";
                     body.Parents = new List<ParentReference>() { new ParentReference() { Id = parentId } };
                     body.MimeType = "application/vnd.google-apps.spreadsheet";
 
-                    FilesResource.InsertRequest request = service.Files.Insert(body);
+                    var request = service.Files.Insert(body);
                     spreadsheet = request.Execute();
 
                 }
@@ -480,12 +532,12 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static List<File> UploadBCFImages(BCFZIP bcfzip, string parentId, string uploadId, ProgressBar progressBar)
         {
-            List<File> uploadedFiles = new List<File>();
+            var uploadedFiles = new List<File>();
             try
             {
                 if (bcfzip.BCFComponents.Length > 0)
                 {
-                    HOK.SmartBCF.Walker.ImportBCFWindow.UpdateProgressDelegate updateProgressDelegate = new HOK.SmartBCF.Walker.ImportBCFWindow.UpdateProgressDelegate(progressBar.SetValue);
+                    var updateProgressDelegate = new ImportBCFWindow.UpdateProgressDelegate(progressBar.SetValue);
                     double progressValue = 0;
                     progressBar.Maximum = bcfzip.BCFComponents.Length;
                     progressBar.Value = progressValue;
@@ -497,28 +549,28 @@ namespace HOK.SmartBCF.GoogleUtils
 
                     if (null != service)
                     {
-                        foreach (BCFComponent bcf in bcfzip.BCFComponents)
+                        foreach (var bcf in bcfzip.BCFComponents)
                         {
-                            string imagePath = bcf.Snapshot.FilePath;
+                            var imagePath = bcf.Snapshot.FilePath;
                             if (System.IO.File.Exists(imagePath))
                             {
                                 if (AbortFlag.GetAbortFlag()) { return null; }
 
-                                File body = new File();
+                                var body = new File();
                                 body.Title = bcf.GUID;
                                 body.Description = smartBCFVersion + " - Topic: " + bcf.Markup.Topic.Title;
                                 body.Parents = new List<ParentReference>() { new ParentReference() { Id = parentId } };
                                 body.MimeType = "image/png";
                                 body.Properties = new List<Property>();
-                                Property property = new Property() { Key = "UploadId", Value = uploadId, Visibility = "PUBLIC" };
+                                var property = new Property() { Key = "UploadId", Value = uploadId, Visibility = "PUBLIC" };
                                 body.Properties.Add(property);
 
-                                byte[] byteArray = System.IO.File.ReadAllBytes(imagePath);
-                                System.IO.MemoryStream stream = new System.IO.MemoryStream(byteArray);
+                                var byteArray = System.IO.File.ReadAllBytes(imagePath);
+                                var stream = new System.IO.MemoryStream(byteArray);
 
-                                FilesResource.InsertMediaUpload request = service.Files.Insert(body, stream, "image/png");
+                                var request = service.Files.Insert(body, stream, "image/png");
                                 request.Upload();
-                                IUploadProgress progress = request.GetProgress();
+                                var progress = request.GetProgress();
                                 while (progress.Status != UploadStatus.Completed && progress.Status != UploadStatus.Failed)
                                 {
                                     System.Threading.Thread.Sleep(500);
@@ -526,12 +578,12 @@ namespace HOK.SmartBCF.GoogleUtils
 
                                 if (progress.Status == UploadStatus.Completed)
                                 {
-                                    File uploadedImage = request.ResponseBody;
+                                    var uploadedImage = request.ResponseBody;
                                     if (null != uploadedImage)
                                     {
                                         uploadedFiles.Add(uploadedImage);
                                         progressValue++;
-                                        Dispatcher.CurrentDispatcher.Invoke(updateProgressDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, progressValue });
+                                        Dispatcher.CurrentDispatcher.Invoke(updateProgressDelegate, DispatcherPriority.Background, new object[] { RangeBase.ValueProperty, progressValue });
                                     }
                                 }
                             }
@@ -548,19 +600,19 @@ namespace HOK.SmartBCF.GoogleUtils
 
         private static File.ThumbnailData GetThumbnail(string imageName)
         {
-            File.ThumbnailData thumbnail = new File.ThumbnailData();
+            var thumbnail = new File.ThumbnailData();
             try
             {
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                string prefix = typeof(AppCommand).Namespace + ".Resources.";
-                System.IO.Stream stream = assembly.GetManifestResourceStream(prefix + imageName);
+                var assembly = Assembly.GetExecutingAssembly();
+                var prefix = typeof(AppCommand).Namespace + ".Resources.";
+                var stream = assembly.GetManifestResourceStream(prefix + imageName);
 
-                System.Drawing.Image image = System.Drawing.Image.FromStream(stream);
-                using (System.IO.MemoryStream memoryStream = new System.IO.MemoryStream())
+                var image = System.Drawing.Image.FromStream(stream);
+                using (var memoryStream = new System.IO.MemoryStream())
                 {
                     image.Save(memoryStream, ImageFormat.Png);
-                    byte[] imageBytes = memoryStream.ToArray();
-                    string base64String = Convert.ToBase64String(imageBytes);
+                    var imageBytes = memoryStream.ToArray();
+                    var base64String = Convert.ToBase64String(imageBytes);
 
                     thumbnail.Image = base64String;
                     thumbnail.MimeType = "image/png";
@@ -578,10 +630,10 @@ namespace HOK.SmartBCF.GoogleUtils
             File updatedFile = null;
             try
             {
-                bool pFound = false;
+                var pFound = false;
                 if (null != file.Properties)
                 {
-                    for (int i = 0; i < file.Properties.Count; i++)
+                    for (var i = 0; i < file.Properties.Count; i++)
                     {
                         if (file.Properties[i].Key == key)
                         {
@@ -592,14 +644,14 @@ namespace HOK.SmartBCF.GoogleUtils
                     }
                     if (!pFound)
                     {
-                        Property property = new Property() { Key = key, Value = value, Visibility="PUBLIC" };
+                        var property = new Property() { Key = key, Value = value, Visibility="PUBLIC" };
                         file.Properties.Add(property);
                     }
                 }
                 else
                 {
-                    List<Property> properties = new List<Property>();
-                    Property property = new Property() { Key = key, Value = value, Visibility="PUBLIC" };
+                    var properties = new List<Property>();
+                    var property = new Property() { Key = key, Value = value, Visibility="PUBLIC" };
                     properties.Add(property);
 
                     file.Properties = properties;
@@ -619,7 +671,7 @@ namespace HOK.SmartBCF.GoogleUtils
             File updatedFile = null;
             try
             {
-                File file = service.Files.Get(fileId).Execute();
+                var file = service.Files.Get(fileId).Execute();
                 updatedFile = file;
                 if (null != file)
                 {
@@ -628,10 +680,10 @@ namespace HOK.SmartBCF.GoogleUtils
                         file.Properties = new List<Property>();
                     }
 
-                    foreach (string key in dictionary.Keys)
+                    foreach (var key in dictionary.Keys)
                     {
-                        bool pFound = false;
-                        for (int i = 0; i < file.Properties.Count; i++)
+                        var pFound = false;
+                        for (var i = 0; i < file.Properties.Count; i++)
                         {
                             if (file.Properties[i].Key == key)
                             {
@@ -642,23 +694,23 @@ namespace HOK.SmartBCF.GoogleUtils
                         }
                         if (!pFound)
                         {
-                            Property property = new Property() { Key = key, Value = dictionary[key], Visibility = "PUBLIC" };
+                            var property = new Property() { Key = key, Value = dictionary[key], Visibility = "PUBLIC" };
                             file.Properties.Add(property);
                         }
                     }
                     updatedFile = service.Files.Update(file, file.Id).Execute();
                 }
             }
-            catch (Exception ex) { string message = ex.Message; }
+            catch (Exception ex) { var message = ex.Message; }
             return updatedFile;
         }
 
         public static string GetPropertyValue(IList<Property> properties, string propertyName)
         {
-            string propertyValue = "";
+            var propertyValue = "";
             try
             {
-                foreach (Property p in properties)
+                foreach (var p in properties)
                 {
                     if (p.Key == propertyName)
                     {
@@ -675,7 +727,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static BitmapImage DownloadImage(string issueId, string parentId)
         {
-            BitmapImage bitmap = new BitmapImage();
+            var bitmap = new BitmapImage();
             try
             {
                 if (null == service)
@@ -688,9 +740,9 @@ namespace HOK.SmartBCF.GoogleUtils
                     File imgFile = null;
                     try
                     {
-                        FilesResource.ListRequest request = service.Files.List();
+                        var request = service.Files.List();
                         request.Q = "title contains \'" + issueId + "\' and \'" + parentId + "\' in parents";
-                        FileList files = request.Execute();
+                        var files = request.Execute();
 
                         if (files.Items.Count > 0)
                         {
@@ -699,7 +751,7 @@ namespace HOK.SmartBCF.GoogleUtils
                     }
                     catch (Exception ex)
                     {
-                        string message = ex.Message;
+                        var message = ex.Message;
                     }
                     
                     if (null != imgFile)
@@ -709,7 +761,7 @@ namespace HOK.SmartBCF.GoogleUtils
                             try
                             {
                                 bitmap.BeginInit();
-                                System.IO.Stream stream = service.HttpClient.GetStreamAsync(imgFile.DownloadUrl).Result;
+                                var stream = service.HttpClient.GetStreamAsync(imgFile.DownloadUrl).Result;
                                 bitmap.StreamSource = stream;
                                 bitmap.EndInit();
                             }
@@ -730,12 +782,12 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static List<OnlineBCFInfo> GetOnlineBCFs(FolderHolders folders)
         {
-            List<OnlineBCFInfo> onlineBCFs = new List<OnlineBCFInfo>();
+            var onlineBCFs = new List<OnlineBCFInfo>();
             try
             {
-                FilesResource.ListRequest request = service.Files.List();
+                var request = service.Files.List();
                 request.Q = "mimeType=\'application/vnd.google-apps.spreadsheet\' and \'" + folders.ActiveBCFFolder.Id + "\' in parents";
-                FileList files = request.Execute();
+                var files = request.Execute();
 
                 if (files.Items.Count > 0)
                 {
@@ -744,17 +796,17 @@ namespace HOK.SmartBCF.GoogleUtils
 
                     if (markupFiles.Count() > 0)
                     {
-                        foreach (File file in markupFiles)
+                        foreach (var file in markupFiles)
                         {
-                            string bcfName = file.Title.Replace("_Markup.csv", "");
+                            var bcfName = file.Title.Replace("_Markup.csv", "");
                             var vpFiles = from vpFile in viewpointFiles where vpFile.Title.Contains(bcfName) select vpFile;
                             if (vpFiles.Count() > 0)
                             {
                                 File viewpointSheet = null;
-                                string markupUploadId = GetPropertyValue(file.Properties, "UploadId");
-                                foreach(File vp in vpFiles)
+                                var markupUploadId = GetPropertyValue(file.Properties, "UploadId");
+                                foreach(var vp in vpFiles)
                                 {
-                                    string vpUploadId = GetPropertyValue(vp.Properties, "UploadId");
+                                    var vpUploadId = GetPropertyValue(vp.Properties, "UploadId");
                                     if (vpUploadId == markupUploadId)
                                     {
                                         viewpointSheet = vp; break;
@@ -763,9 +815,9 @@ namespace HOK.SmartBCF.GoogleUtils
 
                                 if (null != viewpointSheet)
                                 {
-                                    OnlineBCFInfo info = new OnlineBCFInfo(folders.RootId, file, viewpointSheet);
+                                    var info = new OnlineBCFInfo(folders.RootId, file, viewpointSheet);
                                     info.ImageFiles = FindFilesByProperty(folders.ActiveImgFolder.Id, "UploadId", markupUploadId);
-                                    List<File> archiveFiles = FindFilesByProperty(folders.ArchiveBCFFolder.Id, "UploadId", markupUploadId);
+                                    var archiveFiles = FindFilesByProperty(folders.ArchiveBCFFolder.Id, "UploadId", markupUploadId);
                                     if (archiveFiles.Count > 0)
                                     {
                                         info.ArchiveFile = archiveFiles.First();
@@ -795,15 +847,15 @@ namespace HOK.SmartBCF.GoogleUtils
                 }
                 if (null != service)
                 {
-                    string uploadId = Guid.NewGuid().ToString();
-                    Property property = new Property() { Key = "UploadId", Value = uploadId, Visibility = "PUBLIC" };
+                    var uploadId = Guid.NewGuid().ToString();
+                    var property = new Property() { Key = "UploadId", Value = uploadId, Visibility = "PUBLIC" };
 
                     if (null != folders.ActiveBCFFolder)
                     {
                         
 
                         //copy markup sheet
-                        File markupBody = new File();
+                        var markupBody = new File();
                         markupBody.Title = onlineBCF.MarkupFile.Title;
                         markupBody.Description = smartBCFVersion + " - Parsed BCF";
                         markupBody.Parents = new List<ParentReference>() { new ParentReference() { Id = folders.ActiveBCFFolder.Id } };
@@ -811,10 +863,10 @@ namespace HOK.SmartBCF.GoogleUtils
                         markupBody.Properties = new List<Property>();
                         markupBody.Properties.Add(property);
 
-                        File copiedMarkup = service.Files.Copy(markupBody, onlineBCF.MarkupSheetId).Execute();
+                        var copiedMarkup = service.Files.Copy(markupBody, onlineBCF.MarkupSheetId).Execute();
                         
 
-                        File viewpointBody = new File();
+                        var viewpointBody = new File();
                         viewpointBody.Title = onlineBCF.ViewpointFile.Title;
                         viewpointBody.Description = smartBCFVersion + " - Parsed BCF";
                         viewpointBody.Parents = new List<ParentReference>() { new ParentReference() { Id = folders.ActiveBCFFolder.Id } };
@@ -822,7 +874,7 @@ namespace HOK.SmartBCF.GoogleUtils
                         viewpointBody.Properties = new List<Property>();
                         viewpointBody.Properties.Add(property);
 
-                        File copiedViewpoint = service.Files.Copy(viewpointBody, onlineBCF.ViewpointSheetId).Execute();
+                        var copiedViewpoint = service.Files.Copy(viewpointBody, onlineBCF.ViewpointSheetId).Execute();
 
                         if (null!=copiedMarkup && null!=copiedViewpoint)
                         {
@@ -833,14 +885,14 @@ namespace HOK.SmartBCF.GoogleUtils
                     if (null != folders.ArchiveBCFFolder)
                     {
                         //upload bcfzip
-                        File body = new File();
+                        var body = new File();
                         body.Title = onlineBCF.ArchiveFile.Title;
                         body.Description = smartBCFVersion + " - Archived BCF";
                         body.Parents = new List<ParentReference>() { new ParentReference() { Id = folders.ArchiveBCFFolder.Id } };
                         body.Properties = new List<Property>();
                         body.Properties.Add(property);
 
-                        File copiedZip = service.Files.Copy(body, onlineBCF.ArchiveFile.Id).Execute();
+                        var copiedZip = service.Files.Copy(body, onlineBCF.ArchiveFile.Id).Execute();
                         if (null != copiedZip && null != copiedBCFInfo)
                         {
                             copiedBCFInfo.ArchiveFile = copiedZip;
@@ -849,10 +901,10 @@ namespace HOK.SmartBCF.GoogleUtils
 
                     if (null != folders.ActiveImgFolder)
                     {
-                        List<File> copiedFiles=new List<File>();
-                        foreach (File imgFile in onlineBCF.ImageFiles)
+                        var copiedFiles=new List<File>();
+                        foreach (var imgFile in onlineBCF.ImageFiles)
                         {
-                            File body = new File();
+                            var body = new File();
                             body.Title = imgFile.Title;
                             body.Description = imgFile.Description;
                             body.Parents = new List<ParentReference>() { new ParentReference() { Id = folders.ActiveImgFolder.Id } };
@@ -860,7 +912,7 @@ namespace HOK.SmartBCF.GoogleUtils
                             body.Properties = new List<Property>();
                             body.Properties.Add(property);
 
-                            File copiedImage = service.Files.Copy(body, imgFile.Id).Execute();
+                            var copiedImage = service.Files.Copy(body, imgFile.Id).Execute();
                             if (null != copiedImage)
                             {
                                 copiedFiles.Add(copiedImage);
@@ -892,7 +944,7 @@ namespace HOK.SmartBCF.GoogleUtils
                 }
                 if (null != service)
                 {
-                    File body = new File();
+                    var body = new File();
                     body.Title = sourceFile.Title;
                     body.Description = sourceFile.Description;
                     body.Parents = new List<ParentReference>() { new ParentReference() { Id = parentId } };
@@ -910,51 +962,51 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static bool CheckExistingFiles(string fileName, FolderHolders folderHolder)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                string markupCSV = fileName + "_Markup.csv";
-                string viewpointCSV = fileName + "_Viewpoint.csv";
+                var markupCSV = fileName + "_Markup.csv";
+                var viewpointCSV = fileName + "_Viewpoint.csv";
 
-                File markupUploaded = FileManager.FindSubItemByFolderId(markupCSV, folderHolder.ActiveBCFFolder.Id);
-                File viewpointUploaded = FileManager.FindSubItemByFolderId(viewpointCSV, folderHolder.ActiveBCFFolder.Id);
+                var markupUploaded = FindSubItemByFolderId(markupCSV, folderHolder.ActiveBCFFolder.Id);
+                var viewpointUploaded = FindSubItemByFolderId(viewpointCSV, folderHolder.ActiveBCFFolder.Id);
                 if (null != markupUploaded || null != viewpointUploaded)
                 {
-                    MessageBoxResult mbr = MessageBox.Show(fileName + " already exists in the shared Google Drive folder.\nWould you like to replace the file in the shared folders?", "File Already Exists", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+                    var mbr = MessageBox.Show(fileName + " already exists in the shared Google Drive folder.\nWould you like to replace the file in the shared folders?", "File Already Exists", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
                     switch (mbr)
                     {
                         case MessageBoxResult.Yes:
                             //delete the existing files first
 
-                            string searchKey = "UploadId";
-                            string searchValue = GetPropertyValue(markupUploaded.Properties, searchKey);
+                            var searchKey = "UploadId";
+                            var searchValue = GetPropertyValue(markupUploaded.Properties, searchKey);
 
-                            string markupFileId = markupUploaded.Id;
-                            List<File> archiveFound = FileManager.FindFilesByProperty(folderHolder.ArchiveBCFFolder.Id, searchKey, searchValue);
+                            var markupFileId = markupUploaded.Id;
+                            var archiveFound = FindFilesByProperty(folderHolder.ArchiveBCFFolder.Id, searchKey, searchValue);
                             if (archiveFound.Count > 0)
                             {
-                                foreach (File file in archiveFound)
+                                foreach (var file in archiveFound)
                                 {
-                                    bool deleted = FileManager.DeleteFile(file.Id);
+                                    var deleted = DeleteFile(file.Id);
                                 }
                             }
-                            List<File> imagesFound = FileManager.FindFilesByProperty(folderHolder.ActiveImgFolder.Id, searchKey, searchValue);
+                            var imagesFound = FindFilesByProperty(folderHolder.ActiveImgFolder.Id, searchKey, searchValue);
                             if (imagesFound.Count > 0)
                             {
-                                foreach (File file in imagesFound)
+                                foreach (var file in imagesFound)
                                 {
-                                    bool deleted = FileManager.DeleteFile(file.Id);
+                                    var deleted = DeleteFile(file.Id);
                                 }
                             }
 
                             if (null != markupUploaded)
                             {
-                                bool bcfDeleted = FileManager.DeleteFile(markupUploaded.Id);
+                                var bcfDeleted = DeleteFile(markupUploaded.Id);
                             }
 
                             if (null != viewpointUploaded)
                             {
-                                bool bcfDeleted = FileManager.DeleteFile(viewpointUploaded.Id);
+                                var bcfDeleted = DeleteFile(viewpointUploaded.Id);
                             }
                             
                             result = true;
@@ -981,15 +1033,15 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static string GetSharedLinkAddress(string folderId)
         {
-            string sharedLink = "https://drive.google.com/folderview?id=" + folderId + "&usp=sharing";
+            var sharedLink = "https://drive.google.com/folderview?id=" + folderId + "&usp=sharing";
             return sharedLink;
         }
 
         public static string GetFolderId(string sharedLink)
         {
-            string folderId = "";
-            string[] seperator = new string[] { "folderview?id=", "&usp=sharing" };
-            string[] matchedStr = sharedLink.Split(seperator, StringSplitOptions.RemoveEmptyEntries);
+            var folderId = "";
+            string[] seperator = { "folderview?id=", "&usp=sharing" };
+            var matchedStr = sharedLink.Split(seperator, StringSplitOptions.RemoveEmptyEntries);
             if (matchedStr.Length > 1)
             {
                 folderId = matchedStr[1];
@@ -999,7 +1051,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static Dictionary<string, IssueEntry> ReadIssues(LinkedBcfFileInfo bcfFileInfo)
         {
-            Dictionary<string/*issueId*/, IssueEntry> issueDictionary = new Dictionary<string, IssueEntry>();
+            var issueDictionary = new Dictionary<string, IssueEntry>();
             try
             {
                 if (null == service)
@@ -1008,40 +1060,40 @@ namespace HOK.SmartBCF.GoogleUtils
                 }
                 if (null != service)
                 {
-                    File markupFile = service.Files.Get(bcfFileInfo.MarkupFileId).Execute();
+                    var markupFile = service.Files.Get(bcfFileInfo.MarkupFileId).Execute();
                     if (null != markupFile)
                     {
                         if (markupFile.ExportLinks.ContainsKey("text/csv"))
                         {
-                            string downloadUrl = markupFile.ExportLinks["text/csv"];
+                            var downloadUrl = markupFile.ExportLinks["text/csv"];
                             var x = service.HttpClient.GetByteArrayAsync(downloadUrl);
-                            byte[] arrayByte = x.Result;
+                            var arrayByte = x.Result;
 
-                            string csvString = System.Text.Encoding.UTF8.GetString(arrayByte);
-                            string[] rows = csvString.Split(new string[] { "\n" }, StringSplitOptions.None);
+                            var csvString = System.Text.Encoding.UTF8.GetString(arrayByte);
+                            var rows = csvString.Split(new string[] { "\n" }, StringSplitOptions.None);
                             if (rows.Length > 1)
                             {
-                                for (int i = 1; i < rows.Length; i++)
+                                for (var i = 1; i < rows.Length; i++)
                                 {
-                                    string[] cells = rows[i].Split(new char[] { ',' });
+                                    var cells = rows[i].Split(new char[] { ',' });
                                     if (cells.Length == 8)
                                     {
-                                        IssueEntry issueEntry = new IssueEntry();
+                                        var issueEntry = new IssueEntry();
                                         issueEntry.BCFName = bcfFileInfo.BCFName;
 
-                                        string issueId = cells[0];
-                                        string issueTopic = cells[1];
-                                        string commentId = cells[2];
-                                        string commentStr = cells[3];
-                                        string status = cells[4];
-                                        string verbalStatus = cells[5];
-                                        string author = cells[6];
-                                        string date = cells[7];
+                                        var issueId = cells[0];
+                                        var issueTopic = cells[1];
+                                        var commentId = cells[2];
+                                        var commentStr = cells[3];
+                                        var status = cells[4];
+                                        var verbalStatus = cells[5];
+                                        var author = cells[6];
+                                        var date = cells[7];
 
                                         issueEntry.IssueId = issueId;
                                         issueEntry.IssueTopic = issueTopic;
 
-                                        Comment comment = new Comment();
+                                        var comment = new Comment();
                                         comment.Topic.Guid = issueId;
                                         comment.Guid = commentId;
                                         comment.Comment1 = commentStr;
@@ -1050,10 +1102,10 @@ namespace HOK.SmartBCF.GoogleUtils
                                         comment.Author = author;
                                         comment.Date = DateTime.Parse(date);
 
-                                        Dictionary<string, CellAddress> cellEntries = new Dictionary<string, CellAddress>();
-                                        for (int j = 0; j < markupCols.Length; j++)
+                                        var cellEntries = new Dictionary<string, CellAddress>();
+                                        for (var j = 0; j < markupCols.Length; j++)
                                         {
-                                            CellAddress cell = new CellAddress((uint)(i+1), (uint)(j+1));
+                                            var cell = new CellAddress((uint)(i+1), (uint)(j+1));
                                             cellEntries.Add(markupCols[j], cell);
                                         }
                                         comment.CellEntries = cellEntries;
@@ -1076,39 +1128,39 @@ namespace HOK.SmartBCF.GoogleUtils
 
                     if (issueDictionary.Count > 0)
                     {
-                        File viewpointFile = service.Files.Get(bcfFileInfo.ViewpointFileId).Execute();
+                        var viewpointFile = service.Files.Get(bcfFileInfo.ViewpointFileId).Execute();
                         if (null != viewpointFile)
                         {
                             if (viewpointFile.ExportLinks.ContainsKey("text/csv"))
                             {
-                                string downloadUrl = viewpointFile.ExportLinks["text/csv"];
+                                var downloadUrl = viewpointFile.ExportLinks["text/csv"];
                                 var x = service.HttpClient.GetByteArrayAsync(downloadUrl);
-                                byte[] arrayByte = x.Result;
+                                var arrayByte = x.Result;
 
-                                string csvString = System.Text.Encoding.UTF8.GetString(arrayByte);
-                                string[] rows = csvString.Split(new string[] { "\n" }, StringSplitOptions.None);
+                                var csvString = System.Text.Encoding.UTF8.GetString(arrayByte);
+                                var rows = csvString.Split(new string[] { "\n" }, StringSplitOptions.None);
 
                                 if (rows.Length > 1)
                                 {
-                                    for (int i = 1; i < rows.Length; i++)
+                                    for (var i = 1; i < rows.Length; i++)
                                     {
-                                        string[] cells = rows[i].Split(new char[] { ',' });
+                                        var cells = rows[i].Split(new char[] { ',' });
                                         if (cells.Length == 5)
                                         {
-                                            string issueId = cells[0];
-                                            int elementId = int.Parse(cells[2]);
-                                            string action = cells[3];
-                                            string responsibleParty = cells[4];
+                                            var issueId = cells[0];
+                                            var elementId = int.Parse(cells[2]);
+                                            var action = cells[3];
+                                            var responsibleParty = cells[4];
 
-                                            ElementProperties ep = new ElementProperties(elementId);
+                                            var ep = new ElementProperties(elementId);
                                             ep.IssueId = issueId;
                                             ep.Action = action;
                                             ep.ResponsibleParty = responsibleParty;
 
-                                            Dictionary<string, CellAddress> cellEntries = new Dictionary<string, CellAddress>();
-                                            for (int j = 0; j < viewpointCols.Length; j++)
+                                            var cellEntries = new Dictionary<string, CellAddress>();
+                                            for (var j = 0; j < viewpointCols.Length; j++)
                                             {
-                                                CellAddress cell = new CellAddress((uint)(i+1), (uint)(j+1));
+                                                var cell = new CellAddress((uint)(i+1), (uint)(j+1));
                                                 cellEntries.Add(viewpointCols[j], cell);
                                             }
                                             ep.CellEntries = cellEntries;
@@ -1137,7 +1189,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static ColorSchemeInfo ReadColorSchemes(string colorSheetId, string categorySheetId, bool isImported)
         {
-            ColorSchemeInfo schemeInfo = new ColorSchemeInfo();
+            var schemeInfo = new ColorSchemeInfo();
             try
             {
                 if (null == service)
@@ -1147,22 +1199,22 @@ namespace HOK.SmartBCF.GoogleUtils
 
                 if (null != service)
                 {
-                    File categoryFile = service.Files.Get(categorySheetId).Execute();
-                    List<string> categoryNames = new List<string>();
+                    var categoryFile = service.Files.Get(categorySheetId).Execute();
+                    var categoryNames = new List<string>();
                     if (null != categoryFile)
                     {
                         if (categoryFile.ExportLinks.ContainsKey("text/csv"))
                         {
-                            string downloadUrl = categoryFile.ExportLinks["text/csv"];
+                            var downloadUrl = categoryFile.ExportLinks["text/csv"];
                             var x = service.HttpClient.GetByteArrayAsync(downloadUrl);
-                            byte[] arrayByte = x.Result;
+                            var arrayByte = x.Result;
 
-                            string csvString = System.Text.Encoding.UTF8.GetString(arrayByte);
-                            string[] rows = csvString.Split(new string[] { "\n" }, StringSplitOptions.None);
+                            var csvString = System.Text.Encoding.UTF8.GetString(arrayByte);
+                            var rows = csvString.Split(new string[] { "\n" }, StringSplitOptions.None);
 
                             if (rows.Length > 1)
                             {
-                                for (int i = 1; i < rows.Length; i++)
+                                for (var i = 1; i < rows.Length; i++)
                                 {
                                     if (!categoryNames.Contains(rows[i]))
                                     {
@@ -1173,49 +1225,49 @@ namespace HOK.SmartBCF.GoogleUtils
                         }
                     }
 
-                    File colorSchemeFile = service.Files.Get(colorSheetId).Execute();
+                    var colorSchemeFile = service.Files.Get(colorSheetId).Execute();
                     if (null != colorSchemeFile)
                     {
                         if (colorSchemeFile.ExportLinks.ContainsKey("text/csv"))
                         {
-                            string downloadUrl = colorSchemeFile.ExportLinks["text/csv"];
+                            var downloadUrl = colorSchemeFile.ExportLinks["text/csv"];
                             var x = service.HttpClient.GetByteArrayAsync(downloadUrl);
-                            byte[] arrayByte = x.Result;
+                            var arrayByte = x.Result;
 
-                            string csvString = System.Text.Encoding.UTF8.GetString(arrayByte);
-                            string[] rows = csvString.Split(new string[] { "\n" }, StringSplitOptions.None);
+                            var csvString = System.Text.Encoding.UTF8.GetString(arrayByte);
+                            var rows = csvString.Split(new string[] { "\n" }, StringSplitOptions.None);
 
                             if (rows.Length > 1)
                             {
-                                for (int i = 1; i < rows.Length; i++)
+                                for (var i = 1; i < rows.Length; i++)
                                 {
-                                    string[] cells = rows[i].Split(new char[] { ',' });
+                                    var cells = rows[i].Split(new char[] { ',' });
                                     if (cells.Length == 7)
                                     {
-                                        string schemeId = cells[0];
-                                        string schemeName = cells[1];
-                                        string paramName = cells[2];
-                                        string paramValue = cells[3];
-                                        byte[] colorBytes = new byte[3];
+                                        var schemeId = cells[0];
+                                        var schemeName = cells[1];
+                                        var paramName = cells[2];
+                                        var paramValue = cells[3];
+                                        var colorBytes = new byte[3];
                                         colorBytes[0] = byte.Parse(cells[4]);
                                         colorBytes[1] = byte.Parse(cells[5]);
                                         colorBytes[2] = byte.Parse(cells[6]);
 
-                                        Dictionary<string, CellAddress> cellEntries = new Dictionary<string, CellAddress>();
-                                        for (int j = 0; j < colorschemeCols.Length; j++)
+                                        var cellEntries = new Dictionary<string, CellAddress>();
+                                        for (var j = 0; j < colorschemeCols.Length; j++)
                                         {
-                                            CellAddress cell = new CellAddress((uint)(i+1), (uint)(j+1));
+                                            var cell = new CellAddress((uint)(i+1), (uint)(j+1));
                                             cellEntries.Add(colorschemeCols[j], cell);
                                         }
                                        
-                                        int colorschemeIndex = schemeInfo.ColorSchemes.FindIndex(o => o.SchemeId == schemeId);
+                                        var colorschemeIndex = schemeInfo.ColorSchemes.FindIndex(o => o.SchemeId == schemeId);
                                         if (colorschemeIndex > -1)
                                         {
-                                            ColorDefinition cd = new ColorDefinition();
+                                            var cd = new ColorDefinition();
                                             cd.ParameterValue = paramValue;
                                             cd.Color = colorBytes;
 
-                                            System.Windows.Media.Color windowColor = System.Windows.Media.Color.FromRgb(cd.Color[0], cd.Color[1], cd.Color[2]);
+                                            var windowColor = Color.FromRgb(cd.Color[0], cd.Color[1], cd.Color[2]);
                                             cd.BackgroundColor = new SolidColorBrush(windowColor);
                                             cd.CellEntries = cellEntries;
 
@@ -1223,18 +1275,18 @@ namespace HOK.SmartBCF.GoogleUtils
                                         }
                                         else
                                         {
-                                            ColorScheme scheme = new ColorScheme();
+                                            var scheme = new ColorScheme();
                                             scheme.SchemeId = schemeId;
                                             scheme.SchemeName = schemeName;
                                             scheme.Categories = categoryNames;
                                             scheme.ParameterName = paramName;
                                             scheme.DefinitionBy = DefinitionType.ByValue;
 
-                                            ColorDefinition cd = new ColorDefinition();
+                                            var cd = new ColorDefinition();
                                             cd.ParameterValue = paramValue;
                                             cd.Color = colorBytes;
 
-                                            System.Windows.Media.Color windowColor = System.Windows.Media.Color.FromRgb(cd.Color[0], cd.Color[1], cd.Color[2]);
+                                            var windowColor = Color.FromRgb(cd.Color[0], cd.Color[1], cd.Color[2]);
                                             cd.BackgroundColor = new SolidColorBrush(windowColor);
                                             cd.CellEntries = cellEntries;
 
@@ -1258,63 +1310,42 @@ namespace HOK.SmartBCF.GoogleUtils
 
     public class FolderHolders
     {
-        private string rootId = "";
-        private string rootTitle = "";
-        private File rootFolder = null;
-        private File colorSheet = null;
-        private File categorySheet = null;
-        private File activeFolder = null;
-        private File activeBCFFolder = null;
-        private File activeImgFolder = null;
-        private File archiveFolder = null;
-        private File archiveBCFFolder = null;
-        private File archiveImgFolder = null;
+        public string RootId { get; set; }
+        public string RootTitle { get; set; } = "";
+        public File RootFolder { get; set; }
 
-        public string RootId { get { return rootId; } set { rootId = value; } }
-        public string RootTitle { get { return rootTitle; } set { rootTitle = value; } }
-        public File RootFolder { get { return rootFolder; } set { rootFolder = value; } }
+        public File ColorSheet { get; set; }
+        public File CategorySheet { get; set; }
 
-        public File ColorSheet { get { return colorSheet; } set { colorSheet = value; } }
-        public File CategorySheet { get { return categorySheet; } set { categorySheet = value; } }
+        public File ActiveFolder { get; set; }
+        public File ActiveBCFFolder { get; set; }
+        public File ActiveImgFolder { get; set; }
 
-        public File ActiveFolder { get { return activeFolder; } set { activeFolder = value; } }
-        public File ActiveBCFFolder { get { return activeBCFFolder; } set { activeBCFFolder = value; } }
-        public File ActiveImgFolder { get { return activeImgFolder; } set { activeImgFolder = value; } }
-       
 
-        public File ArchiveFolder { get { return archiveFolder; } set { archiveFolder = value; } }
-        public File ArchiveBCFFolder { get { return archiveBCFFolder; } set { archiveBCFFolder = value; } }
-        public File ArchiveImgFolder { get { return archiveImgFolder; } set { archiveImgFolder = value; } }
+        public File ArchiveFolder { get; set; }
+        public File ArchiveBCFFolder { get; set; }
+        public File ArchiveImgFolder { get; set; }
 
         public FolderHolders(string folderId)
         {
-            rootId = folderId;
+            RootId = folderId;
         }
     }
 
     public class FileHolders
     {
-        private string bcfPath = "";
-        private string sharedLink = "";
-        private FolderHolders folderHolders = null;
-        private BCFZIP bcfzip = null;
-        private File archivedBCF = null;
-        private File activeBCF = null;
-        private List<File> bcfImages = null;
-
-        public string BCFPath { get { return bcfPath; } set { bcfPath = value; } }
-        public string SharedLink { get { return sharedLink; } set { sharedLink = value; } }
-        public FolderHolders FolderInfo { get { return folderHolders; } set { folderHolders = value; } }
-        public BCFZIP BcfZip { get { return bcfzip; } set { bcfzip = value; } }
-        public File ArchivedBCF { get { return archivedBCF; } set { archivedBCF = value; } }
-        public File ActiveBCF { get { return activeBCF; } set { activeBCF = value; } }
-        public List<File> BCFImages { get { return bcfImages; } set { bcfImages = value; } }
+        public string BCFPath { get; set; }
+        public string SharedLink { get; set; }
+        public FolderHolders FolderInfo { get; set; } = null;
+        public BCFZIP BcfZip { get; set; } = null;
+        public File ArchivedBCF { get; set; } = null;
+        public File ActiveBCF { get; set; } = null;
+        public List<File> BCFImages { get; set; } = null;
 
         public FileHolders(string path, string link)
         {
-            bcfPath = path;
-            sharedLink = link;
+            BCFPath = path;
+            SharedLink = link;
         }
-      
     }
 }

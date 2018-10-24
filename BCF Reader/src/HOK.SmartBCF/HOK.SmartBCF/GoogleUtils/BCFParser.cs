@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -22,13 +20,14 @@ namespace HOK.SmartBCF.GoogleUtils
         Edit=1,
         Delete=2
     }
+
     public static class BCFParser
     {
-        public static SpreadsheetsService sheetsService = null;
+        public static SpreadsheetsService sheetsService;
         public static string colorSheetId = "";
-        public static WorksheetEntry colorSheet = null;
+        public static WorksheetEntry colorSheet;
         public static string currentSheetId = ""; //fileId of Google Spreadsheet
-        public static WorksheetEntry currentSheet = null; //worksheet of ViewPoint
+        public static WorksheetEntry currentSheet; //worksheet of ViewPoint
 
         //private static string userName = "bsmart@hokbuildingsmart.com";
         //private static string passWord = "HOKb$mart";
@@ -36,10 +35,10 @@ namespace HOK.SmartBCF.GoogleUtils
         private static string keyFile = "HOK smartBCF.p12";
         private static string serviceAccountEmail = "756603983986-lrc8dm2b0nl381cepd60q2o7fo8df3bg@developer.gserviceaccount.com";
 
-        private static string[] markupCols = new string[] { "IssueGuid", "IssueTopic", "CommentGuid", "Comment", "Status", "VerbalStatus", "Author", "Date" };
-        private static string[] viewpointCols = new string[] { "IssueGuid", "ComponentIfcGuid", "AuthoringToolId", "Action", "Responsible" };
-        private static string[] colorschemeCols = new string[] { "ColorSchemeId", "SchemeName", "ParameterName", "ParameterValue", "ColorR", "ColorG", "ColorB"};
-        private static string[] categoryCols = new string[] { "CategoryName" };
+        private static string[] markupCols = new[] { "IssueGuid", "IssueTopic", "CommentGuid", "Comment", "Status", "VerbalStatus", "Author", "Date" };
+        private static string[] viewpointCols = new[] { "IssueGuid", "ComponentIfcGuid", "AuthoringToolId", "Action", "Responsible" };
+        private static string[] colorschemeCols = new[] { "ColorSchemeId", "SchemeName", "ParameterName", "ParameterValue", "ColorR", "ColorG", "ColorB"};
+        private static string[] categoryCols = new[] { "CategoryName" };
 
         private static Random random = new Random();
 
@@ -48,13 +47,13 @@ namespace HOK.SmartBCF.GoogleUtils
             SpreadsheetsService service = null;
             try
             {
-                string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                string currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
-                string keyFilePath = System.IO.Path.Combine(currentDirectory, "Resources\\" + keyFile);
+                var currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                var currentDirectory = System.IO.Path.GetDirectoryName(currentAssembly);
+                var keyFilePath = System.IO.Path.Combine(currentDirectory, "Resources\\" + keyFile);
 
                 var certificate = new X509Certificate2(keyFilePath, "notasecret", X509KeyStorageFlags.Exportable);
 
-                ServiceAccountCredential credential = new ServiceAccountCredential(new
+                var credential = new ServiceAccountCredential(new
                 ServiceAccountCredential.Initializer(serviceAccountEmail)
                 {
                     Scopes = new[] { "https://spreadsheets.google.com/feeds/" }
@@ -80,9 +79,9 @@ namespace HOK.SmartBCF.GoogleUtils
             System.IO.MemoryStream csvStream = null;
             try
             {
-                StringBuilder csvBuilder = new StringBuilder();
+                var csvBuilder = new StringBuilder();
                 //write columns
-                for (int i = 0; i < colorschemeCols.Length; i++)
+                for (var i = 0; i < colorschemeCols.Length; i++)
                 {
                     if (i != 0)
                     {
@@ -93,20 +92,20 @@ namespace HOK.SmartBCF.GoogleUtils
                 }
                 csvBuilder.Append("\n");
 
-                char[] specialChar = new char[] { '"', ',' };
-                foreach (ColorScheme scheme in colorSchemeInfo.ColorSchemes)
+                var specialChar = new[] { '"', ',' };
+                foreach (var scheme in colorSchemeInfo.ColorSchemes)
                 {
-                    string schemeId = scheme.SchemeId;
-                    string schemeName = scheme.SchemeName;
-                    string paramName = scheme.ParameterName;
+                    var schemeId = scheme.SchemeId;
+                    var schemeName = scheme.SchemeName;
+                    var paramName = scheme.ParameterName;
 
-                    foreach (ColorDefinition definition in scheme.ColorDefinitions)
+                    foreach (var definition in scheme.ColorDefinitions)
                     {
-                        string[] strArray = new string[] { schemeId, schemeName, paramName, definition.ParameterValue, 
+                        var strArray = new[] { schemeId, schemeName, paramName, definition.ParameterValue, 
                             definition.Color[0].ToString(), definition.Color[1].ToString(), definition.Color[2].ToString() };
 
-                        StringBuilder rowBuilder = new StringBuilder();
-                        for (int i = 0; i < strArray.Length; i++)
+                        var rowBuilder = new StringBuilder();
+                        for (var i = 0; i < strArray.Length; i++)
                         {
                             if (i != 0) { rowBuilder.Append(','); }
                             if (strArray[i].IndexOfAny(specialChar) != -1)
@@ -124,7 +123,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
                 if (csvBuilder.ToString().Length > 0)
                 {
-                    byte[] csvByteArray = System.Text.Encoding.UTF8.GetBytes(csvBuilder.ToString());
+                    var csvByteArray = Encoding.UTF8.GetBytes(csvBuilder.ToString());
                     csvStream = new System.IO.MemoryStream(csvByteArray);
                 }
             }
@@ -140,19 +139,19 @@ namespace HOK.SmartBCF.GoogleUtils
             System.IO.MemoryStream csvStream = null;
             try
             {
-                StringBuilder csvBuilder = new StringBuilder();
+                var csvBuilder = new StringBuilder();
                 //write columns
                 csvBuilder.AppendLine(categoryCols[0]);
 
-                char[] specialChar = new char[] { '"', ',' };
-                foreach (string categoryName in categoryNames)
+                var specialChar = new[] { '"', ',' };
+                foreach (var categoryName in categoryNames)
                 {
                     csvBuilder.AppendLine(categoryName);
                 }
 
                 if (csvBuilder.ToString().Length > 0)
                 {
-                    byte[] csvByteArray = System.Text.Encoding.UTF8.GetBytes(csvBuilder.ToString());
+                    var csvByteArray = Encoding.UTF8.GetBytes(csvBuilder.ToString());
                     csvStream = new System.IO.MemoryStream(csvByteArray);
                 }
             }
@@ -168,9 +167,9 @@ namespace HOK.SmartBCF.GoogleUtils
             System.IO.MemoryStream csvStream = null;
             try
             {
-                StringBuilder csvBuilder = new StringBuilder();
+                var csvBuilder = new StringBuilder();
                 //write columns
-                for (int i = 0; i < markupCols.Length; i++)
+                for (var i = 0; i < markupCols.Length; i++)
                 {
                     if (i != 0)
                     {
@@ -181,20 +180,20 @@ namespace HOK.SmartBCF.GoogleUtils
                 }
                 csvBuilder.Append("\n");
 
-                char[] specialChar = new char[] { '"', ','};
-                foreach (BCFComponent bcf in bcfZip.BCFComponents)
+                var specialChar = new[] { '"', ','};
+                foreach (var bcf in bcfZip.BCFComponents)
                 {
-                    Topic bcfTopic = bcf.Markup.Topic;
+                    var bcfTopic = bcf.Markup.Topic;
                     if (null != bcf.Markup.Comment)
                     {
-                        foreach (Comment comment in bcf.Markup.Comment)
+                        foreach (var comment in bcf.Markup.Comment)
                         {
-                            string[] strArray = new string[] { bcfTopic.Guid, bcfTopic.Title, 
+                            var strArray = new[] { bcfTopic.Guid, bcfTopic.Title, 
                                 comment.Guid, comment.Comment1, comment.Status, comment.VerbalStatus, comment.Author, comment.Date.ToString() };
 
-                            StringBuilder rowBuilder = new StringBuilder();
+                            var rowBuilder = new StringBuilder();
 
-                            for (int i = 0; i < strArray.Length; i++)
+                            for (var i = 0; i < strArray.Length; i++)
                             {
                                 if (i != 0) { rowBuilder.Append(','); }
                                 if (strArray[i].IndexOfAny(specialChar) != -1)
@@ -213,7 +212,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
                 if (csvBuilder.ToString().Length > 0)
                 {
-                    byte[] csvByteArray = System.Text.Encoding.UTF8.GetBytes(csvBuilder.ToString());
+                    var csvByteArray = Encoding.UTF8.GetBytes(csvBuilder.ToString());
                     csvStream = new System.IO.MemoryStream(csvByteArray);
                 }
             }
@@ -229,9 +228,9 @@ namespace HOK.SmartBCF.GoogleUtils
             System.IO.MemoryStream csvStream = null;
             try
             {
-                StringBuilder csvBuilder = new StringBuilder();
+                var csvBuilder = new StringBuilder();
                 //write columns
-                for (int i = 0; i < viewpointCols.Length; i++)
+                for (var i = 0; i < viewpointCols.Length; i++)
                 {
                     if (i != 0)
                     {
@@ -241,15 +240,15 @@ namespace HOK.SmartBCF.GoogleUtils
                 }
                 csvBuilder.Append("\n");
 
-                char[] specialChar = new char[] { '"', ',' };
-                foreach (BCFComponent bcf in bcfZip.BCFComponents)
+                var specialChar = new[] { '"', ',' };
+                foreach (var bcf in bcfZip.BCFComponents)
                 {
-                    foreach (Component component in bcf.VisualizationInfo.Components)
+                    foreach (var component in bcf.VisualizationInfo.Components)
                     {
-                        string[] strArray = new string[] { bcf.GUID, component.IfcGuid, component.AuthoringToolId, "MOVE", "ARCHITECTURE" };
+                        var strArray = new[] { bcf.GUID, component.IfcGuid, component.AuthoringToolId, "MOVE", "ARCHITECTURE" };
 
-                        StringBuilder rowBuilder = new StringBuilder();
-                        for (int i = 0; i < strArray.Length; i++)
+                        var rowBuilder = new StringBuilder();
+                        for (var i = 0; i < strArray.Length; i++)
                         {
                             if (i != 0) { rowBuilder.Append(','); }
                             if (strArray[i].IndexOfAny(specialChar) != -1)
@@ -267,7 +266,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
                 if (csvBuilder.ToString().Length > 0)
                 {
-                    byte[] csvByteArray = System.Text.Encoding.UTF8.GetBytes(csvBuilder.ToString());
+                    var csvByteArray = Encoding.UTF8.GetBytes(csvBuilder.ToString());
                     csvStream = new System.IO.MemoryStream(csvByteArray);
                 }
 
@@ -281,42 +280,42 @@ namespace HOK.SmartBCF.GoogleUtils
 
         private static bool CreateMarkupSheet(BCFZIP bcfZip, string fileId, out WorksheetFeed wsFeed)
         {
-            bool created = false;
+            var created = false;
             wsFeed = null;
             try
             {
-                WorksheetQuery worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
+                var worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
                 wsFeed = sheetsService.Query(worksheetquery);
                 if (wsFeed.Entries.Count > 0)
                 {
-                    WorksheetEntry worksheet = (WorksheetEntry)wsFeed.Entries[0];
+                    var worksheet = (WorksheetEntry)wsFeed.Entries[0];
                     worksheet.Title.Text = "MarkUp";
                     worksheet.Update();
 
-                    CellQuery cellQuery = new CellQuery(worksheet.CellFeedLink);
-                    CellFeed cellFeed = sheetsService.Query(cellQuery);
+                    var cellQuery = new CellQuery(worksheet.CellFeedLink);
+                    var cellFeed = sheetsService.Query(cellQuery);
                     
-                    for (int i = 0; i < markupCols.Length; i++)
+                    for (var i = 0; i < markupCols.Length; i++)
                     {
-                        string colText = markupCols[i];
-                        CellEntry cell = new CellEntry(1, Convert.ToUInt16(i+1), colText);
+                        var colText = markupCols[i];
+                        var cell = new CellEntry(1, Convert.ToUInt16(i+1), colText);
                         cellFeed.Insert(cell);
                     }
 
                     //write issue data
-                    AtomLink listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                    ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                    ListFeed listFeed = sheetsService.Query(listQuery);
+                    var listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                    var listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                    var listFeed = sheetsService.Query(listQuery);
 
                     // "Issue Guid", "Issue Topic"
-                    foreach (BCFComponent bcf in bcfZip.BCFComponents)
+                    foreach (var bcf in bcfZip.BCFComponents)
                     {
-                        Topic bcfTopic = bcf.Markup.Topic;
+                        var bcfTopic = bcf.Markup.Topic;
                         if (null != bcf.Markup.Comment)
                         {
-                            foreach (Comment comment in bcf.Markup.Comment)
+                            foreach (var comment in bcf.Markup.Comment)
                             {
-                                ListEntry row = new ListEntry();
+                                var row = new ListEntry();
                                 row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[0].ToLower(), Value = bcfTopic.Guid });
                                 row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[1].ToLower(), Value = bcfTopic.Title });
                                 row.Elements.Add(new ListEntry.Custom() { LocalName = markupCols[2].ToLower(), Value = comment.Guid });
@@ -328,7 +327,7 @@ namespace HOK.SmartBCF.GoogleUtils
                                 
                                 try
                                 {
-                                    ListEntry insertedRow = sheetsService.Insert(listFeed, row);
+                                    var insertedRow = sheetsService.Insert(listFeed, row);
                                 }
                                 catch { System.Threading.Thread.Sleep(500); }
                             }
@@ -347,36 +346,36 @@ namespace HOK.SmartBCF.GoogleUtils
 
         private static bool CreateViewSheet(BCFZIP bcfZip, WorksheetFeed wsFeed)
         {
-            bool created = false;
+            var created = false;
             try
             {
-                WorksheetEntry wsEntry = new WorksheetEntry(10000, 10, "ViewPoint");
-                WorksheetEntry worksheet = sheetsService.Insert(wsFeed, wsEntry);
+                var wsEntry = new WorksheetEntry(10000, 10, "ViewPoint");
+                var worksheet = sheetsService.Insert(wsFeed, wsEntry);
 
                 if (null != worksheet)
                 {
-                    CellQuery cellQuery = new CellQuery(worksheet.CellFeedLink);
-                    CellFeed cellFeed = sheetsService.Query(cellQuery);
+                    var cellQuery = new CellQuery(worksheet.CellFeedLink);
+                    var cellFeed = sheetsService.Query(cellQuery);
 
                     //write headers
-                    for (int i = 0; i < viewpointCols.Length; i++)
+                    for (var i = 0; i < viewpointCols.Length; i++)
                     {
-                        string colText = viewpointCols[i];
-                        CellEntry cell = new CellEntry(1, Convert.ToUInt16(i + 1), colText);
+                        var colText = viewpointCols[i];
+                        var cell = new CellEntry(1, Convert.ToUInt16(i + 1), colText);
                         cellFeed.Insert(cell);
                     }
 
                     //write issue data
-                    AtomLink listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                    ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                    ListFeed listFeed = sheetsService.Query(listQuery);
+                    var listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                    var listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                    var listFeed = sheetsService.Query(listQuery);
 
                     // "Issue Guid", "Component IfcGuid", "Authoring Tool Id"
-                    foreach (BCFComponent bcf in bcfZip.BCFComponents)
+                    foreach (var bcf in bcfZip.BCFComponents)
                     {
-                        foreach (Component component in bcf.VisualizationInfo.Components)
+                        foreach (var component in bcf.VisualizationInfo.Components)
                         {
-                            ListEntry row = new ListEntry();
+                            var row = new ListEntry();
                             row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[0].ToLower(), Value = bcf.GUID });
                             row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[1].ToLower(), Value = component.IfcGuid });
                             row.Elements.Add(new ListEntry.Custom() { LocalName = viewpointCols[2].ToLower(), Value = component.AuthoringToolId });
@@ -385,7 +384,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
                             try
                             {
-                                ListEntry insertedRow = sheetsService.Insert(listFeed, row);
+                                var insertedRow = sheetsService.Insert(listFeed, row);
                             }
                             catch { System.Threading.Thread.Sleep(500); }
                         }
@@ -407,31 +406,31 @@ namespace HOK.SmartBCF.GoogleUtils
             {
                 try
                 {
-                    WorksheetQuery worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + colorSheetId + "/private/full");
-                    WorksheetFeed wsFeed = sheetsService.Query(worksheetquery);
+                    var worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + colorSheetId + "/private/full");
+                    var wsFeed = sheetsService.Query(worksheetquery);
 
                     if (wsFeed.Entries.Count > 0)
                     {
-                        WorksheetEntry worksheet = (WorksheetEntry)wsFeed.Entries[0];
+                        var worksheet = (WorksheetEntry)wsFeed.Entries[0];
                         worksheet.Title.Text = "ColorScheme";
                         wsEntry = (WorksheetEntry)worksheet.Update();
                     }
                 }
                 catch (Exception ex)
                 {
-                    string message = ex.Message;
+                    var message = ex.Message;
                 }
 
                 if (null != wsEntry)
                 {
                     //create headers
-                    CellQuery cellQuery = new CellQuery(wsEntry.CellFeedLink);
-                    CellFeed cellFeed = sheetsService.Query(cellQuery);
+                    var cellQuery = new CellQuery(wsEntry.CellFeedLink);
+                    var cellFeed = sheetsService.Query(cellQuery);
 
-                    for (int i = 0; i < colorschemeCols.Length; i++)
+                    for (var i = 0; i < colorschemeCols.Length; i++)
                     {
-                        string colText = colorschemeCols[i];
-                        CellEntry cell = new CellEntry(1, Convert.ToUInt16(i + 1), colText);
+                        var colText = colorschemeCols[i];
+                        var cell = new CellEntry(1, Convert.ToUInt16(i + 1), colText);
                         cellFeed.Insert(cell);
                     }
                 }
@@ -445,7 +444,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static bool WriteColorSheet(ColorSchemeInfo colorSchemeInfo, string sheetId)
         {
-            bool result = false;
+            var result = false;
             try
             {
                 if (colorSheetId != sheetId)
@@ -458,26 +457,26 @@ namespace HOK.SmartBCF.GoogleUtils
                 //Update color schemes
                 if (null != colorSheet)
                 {
-                    AtomLink listFeedLink = colorSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                    ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                    ListFeed listFeed = sheetsService.Query(listQuery);
+                    var listFeedLink = colorSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                    var listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                    var listFeed = sheetsService.Query(listQuery);
 
-                    for (int i = listFeed.Entries.Count - 1; i > -1; i--)
+                    for (var i = listFeed.Entries.Count - 1; i > -1; i--)
                     {
-                        ListEntry row = (ListEntry)listFeed.Entries[i];
+                        var row = (ListEntry)listFeed.Entries[i];
                         row.Delete();
                     }
 
                     // "ColorSchemeId", "SchemeName", "ParameterName", "ParameterValue", "ColorValue"
-                    foreach (ColorScheme scheme in colorSchemeInfo.ColorSchemes)
+                    foreach (var scheme in colorSchemeInfo.ColorSchemes)
                     {
-                        string schemeId = scheme.SchemeId;
-                        string schemeName = scheme.SchemeName;
-                        string paramName = scheme.ParameterName;
+                        var schemeId = scheme.SchemeId;
+                        var schemeName = scheme.SchemeName;
+                        var paramName = scheme.ParameterName;
 
-                        foreach (ColorDefinition definition in scheme.ColorDefinitions)
+                        foreach (var definition in scheme.ColorDefinitions)
                         {
-                            ListEntry row = new ListEntry();
+                            var row = new ListEntry();
                             row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[0].ToLower(), Value = schemeId });
                             row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[1].ToLower(), Value = schemeName });
                             row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[2].ToLower(), Value = paramName });
@@ -500,7 +499,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static bool UpdateColorSheet(ColorScheme colorScheme, ColorDefinition oldDefinition, ColorDefinition newDefinition, ModifyItem modifyItem, string sheetId)
         {
-            bool result = false;
+            var result = false;
             try
             {
                 if (null == sheetsService)
@@ -517,13 +516,13 @@ namespace HOK.SmartBCF.GoogleUtils
                     }
                     if (null != colorSheet)
                     {
-                        AtomLink listFeedLink = colorSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                        ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                        ListFeed listFeed = sheetsService.Query(listQuery);
+                        var listFeedLink = colorSheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                        var listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                        var listFeed = sheetsService.Query(listQuery);
 
                         if (modifyItem == ModifyItem.Add)
                         {
-                            ListEntry row = new ListEntry();
+                            var row = new ListEntry();
                             row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[0].ToLower(), Value = colorScheme.SchemeId });
                             row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[1].ToLower(), Value = colorScheme.SchemeName });
                             row.Elements.Add(new ListEntry.Custom() { LocalName = colorschemeCols[2].ToLower(), Value = colorScheme.ParameterName });
@@ -536,9 +535,9 @@ namespace HOK.SmartBCF.GoogleUtils
                         else
                         {
                             ListEntry rowFound = null;
-                            for (int i = listFeed.Entries.Count - 1; i > -1; i--)
+                            for (var i = listFeed.Entries.Count - 1; i > -1; i--)
                             {
-                                ListEntry row = (ListEntry)listFeed.Entries[i];
+                                var row = (ListEntry)listFeed.Entries[i];
                                 if (row.Elements[0].Value == colorScheme.SchemeId && row.Elements[3].Value == oldDefinition.ParameterValue)
                                 {
                                     rowFound = row;
@@ -573,19 +572,19 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static bool UpdateCommonCategorySheet(List<string> categoryNames, string colorSheetId)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                SpreadsheetQuery sheetQuery = new SpreadsheetQuery();
+                var sheetQuery = new SpreadsheetQuery();
                 sheetQuery.Title = "Color Schemes";
 
-                SpreadsheetFeed feed = sheetsService.Query(sheetQuery);
+                var feed = sheetsService.Query(sheetQuery);
                 WorksheetEntry categorySheet = null;
                 foreach (SpreadsheetEntry sheet in feed.Entries)
                 {
                     if (sheet.Id.AbsoluteUri.Contains(colorSheetId))
                     {
-                        WorksheetFeed wsFeed = sheet.Worksheets;
+                        var wsFeed = sheet.Worksheets;
                         if (wsFeed.Entries.Count > 0)
                         {
                             foreach (WorksheetEntry entry in wsFeed.Entries)
@@ -600,18 +599,18 @@ namespace HOK.SmartBCF.GoogleUtils
                         if (null == categorySheet)
                         {
                             //crate element categories work sheet
-                            WorksheetEntry wsEntry = new WorksheetEntry(10000, 10, "ElementCategories");
+                            var wsEntry = new WorksheetEntry(10000, 10, "ElementCategories");
                             categorySheet = sheetsService.Insert(wsFeed, wsEntry);
                             if (null != categorySheet)
                             {
-                                CellQuery cellQuery = new CellQuery(categorySheet.CellFeedLink);
-                                CellFeed cellFeed = sheetsService.Query(cellQuery);
+                                var cellQuery = new CellQuery(categorySheet.CellFeedLink);
+                                var cellFeed = sheetsService.Query(cellQuery);
 
                                 //write headers
-                                for (int i = 0; i < categoryCols.Length; i++)
+                                for (var i = 0; i < categoryCols.Length; i++)
                                 {
-                                    string colText = categoryCols[i];
-                                    CellEntry cell = new CellEntry(1, Convert.ToUInt16(i + 1), colText);
+                                    var colText = categoryCols[i];
+                                    var cell = new CellEntry(1, Convert.ToUInt16(i + 1), colText);
                                     cellFeed.Insert(cell);
                                 }
                             }
@@ -620,14 +619,14 @@ namespace HOK.SmartBCF.GoogleUtils
                         //Update color schemes
                         if (null != categorySheet)
                         {
-                            AtomLink listFeedLink = categorySheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                            ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                            ListFeed listFeed = sheetsService.Query(listQuery);
+                            var listFeedLink = categorySheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                            var listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                            var listFeed = sheetsService.Query(listQuery);
 
-                            List<string> existingCategories = new List<string>();
+                            var existingCategories = new List<string>();
                             foreach (ListEntry row in listFeed.Entries)
                             {
-                                string catName = row.Elements[0].Value;
+                                var catName = row.Elements[0].Value;
 
                                 if (!existingCategories.Contains(catName))
                                 {
@@ -635,11 +634,11 @@ namespace HOK.SmartBCF.GoogleUtils
                                 }
                             }
 
-                            foreach (string categoryName in categoryNames)
+                            foreach (var categoryName in categoryNames)
                             {
                                 if (existingCategories.Contains(categoryName)) { continue; }
 
-                                ListEntry row = new ListEntry();
+                                var row = new ListEntry();
                                 row.Elements.Add(new ListEntry.Custom() { LocalName = categoryCols[0].ToLower(), Value = categoryName });
                                 sheetsService.Insert(listFeed, row);
                             }
@@ -660,16 +659,16 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static ColorSchemeInfo CreateDefaultSchemeInfo()
         {
-            ColorSchemeInfo schemeInfo = new ColorSchemeInfo();
+            var schemeInfo = new ColorSchemeInfo();
             try
             {
-                ColorScheme aScheme = new ColorScheme(); //Action
+                var aScheme = new ColorScheme(); //Action
                 aScheme.SchemeName = "BCF Action";
                 aScheme.SchemeId = Guid.NewGuid().ToString();
                 aScheme.ParameterName = "BCF_Action";
                 aScheme.DefinitionBy = DefinitionType.ByValue;
 
-                ColorDefinition cd = new ColorDefinition();
+                var cd = new ColorDefinition();
                 cd.ParameterValue = "DELETE";
                 cd.Color = GetRandomColor();
                 aScheme.ColorDefinitions.Add(cd);
@@ -691,7 +690,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
                 schemeInfo.ColorSchemes.Add(aScheme);
 
-                ColorScheme rScheme = new ColorScheme(); //Responsibility
+                var rScheme = new ColorScheme(); //Responsibility
                 rScheme.SchemeName = "BCF Responsibility";
                 rScheme.SchemeId = Guid.NewGuid().ToString();
                 rScheme.ParameterName = "BCF_Responsibility";
@@ -723,7 +722,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
         private static byte[] GetRandomColor()
         {
-            byte[] colorBytes = new byte[3];
+            var colorBytes = new byte[3];
             colorBytes[0] = (byte)random.Next(256);
             colorBytes[1] = (byte)random.Next(256);
             colorBytes[2] = (byte)random.Next(256);
@@ -732,7 +731,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static Dictionary<string, IssueEntry> ReadIssues(string fileId, string fileName)
         {
-            Dictionary<string/*issueId*/, IssueEntry> issueDictionary = new Dictionary<string, IssueEntry>();
+            var issueDictionary = new Dictionary<string, IssueEntry>();
             try
             {
                 if (null == sheetsService)
@@ -741,35 +740,35 @@ namespace HOK.SmartBCF.GoogleUtils
                 }
                 if (null != sheetsService)
                 {
-                    WorksheetQuery worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
-                    WorksheetFeed wsFeed = sheetsService.Query(worksheetquery);
+                    var worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
+                    var wsFeed = sheetsService.Query(worksheetquery);
                     if (wsFeed.Entries.Count > 1)
                     {
-                        WorksheetEntry worksheet = (WorksheetEntry)wsFeed.Entries[0]; //markup sheet
-                        AtomLink listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
-                        ListQuery listQuery = new ListQuery(listFeedLink.HRef.ToString());
-                        ListFeed listFeed = sheetsService.Query(listQuery);
+                        var worksheet = (WorksheetEntry)wsFeed.Entries[0]; //markup sheet
+                        var listFeedLink = worksheet.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
+                        var listQuery = new ListQuery(listFeedLink.HRef.ToString());
+                        var listFeed = sheetsService.Query(listQuery);
 
                         foreach (ListEntry row in listFeed.Entries)
                         {
-                            IssueEntry issueEntry = new IssueEntry();
+                            var issueEntry = new IssueEntry();
                             issueEntry.BCFName = fileName;
                             
                             try
                             {
-                                string issueId = row.Elements[0].Value;
-                                string issueTopic = row.Elements[1].Value;
-                                string commentId = row.Elements[2].Value;
-                                string commentStr = row.Elements[3].Value;
-                                string status = row.Elements[4].Value;
-                                string verbalStatus = row.Elements[5].Value;
-                                string author = row.Elements[6].Value;
-                                string date = row.Elements[7].Value;
+                                var issueId = row.Elements[0].Value;
+                                var issueTopic = row.Elements[1].Value;
+                                var commentId = row.Elements[2].Value;
+                                var commentStr = row.Elements[3].Value;
+                                var status = row.Elements[4].Value;
+                                var verbalStatus = row.Elements[5].Value;
+                                var author = row.Elements[6].Value;
+                                var date = row.Elements[7].Value;
 
                                 issueEntry.IssueId = issueId;
                                 issueEntry.IssueTopic = issueTopic;
 
-                                Comment comment = new Comment();
+                                var comment = new Comment();
                                 comment.Topic.Guid = issueId;
                                 comment.Guid = commentId;
                                 comment.Comment1 = commentStr;
@@ -790,7 +789,7 @@ namespace HOK.SmartBCF.GoogleUtils
                             }
                             catch (Exception ex)
                             {
-                                string message = ex.Message;
+                                var message = ex.Message;
                                 continue;
                             }
                         }
@@ -807,12 +806,12 @@ namespace HOK.SmartBCF.GoogleUtils
                             {
                                 try
                                 {
-                                    string issueId = row.Elements[0].Value;
-                                    int elementId = int.Parse(row.Elements[2].Value);
-                                    string action = row.Elements[3].Value;
-                                    string responsibleParty = row.Elements[4].Value;
+                                    var issueId = row.Elements[0].Value;
+                                    var elementId = int.Parse(row.Elements[2].Value);
+                                    var action = row.Elements[3].Value;
+                                    var responsibleParty = row.Elements[4].Value;
 
-                                    ElementProperties ep = new ElementProperties(elementId);
+                                    var ep = new ElementProperties(elementId);
                                     ep.IssueId = issueId;
                                     ep.Action = action;
                                     ep.ResponsibleParty = responsibleParty;
@@ -826,7 +825,7 @@ namespace HOK.SmartBCF.GoogleUtils
                                 }
                                 catch (Exception ex)
                                 {
-                                    string message = ex.Message;
+                                    var message = ex.Message;
                                     continue;
                                 }
                             }
@@ -843,7 +842,7 @@ namespace HOK.SmartBCF.GoogleUtils
 
         public static ColorSchemeInfo ReadColorSchemes(string fileId, bool isImported)
         {
-            ColorSchemeInfo schemeInfo = new ColorSchemeInfo();
+            var schemeInfo = new ColorSchemeInfo();
             try
             {
                 if (null == sheetsService)
@@ -854,11 +853,11 @@ namespace HOK.SmartBCF.GoogleUtils
                 {
                     if (!isImported) { colorSheetId = fileId; }
                    
-                    WorksheetQuery worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
-                    WorksheetFeed wsFeed = sheetsService.Query(worksheetquery);
+                    var worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
+                    var wsFeed = sheetsService.Query(worksheetquery);
                     if (wsFeed.Entries.Count > 0)
                     {
-                        List<string> categoryNames = new List<string>();
+                        var categoryNames = new List<string>();
                         WorksheetEntry categorySheet = null;
                         AtomLink listFeedLink = null;
                         ListQuery listQuery = null;
@@ -876,7 +875,7 @@ namespace HOK.SmartBCF.GoogleUtils
                                 {
                                     if (element.LocalName == "categoryname")
                                     {
-                                        string catName = element.Value;
+                                        var catName = element.Value;
                                         if (categoryNames.Contains(catName))
                                         {
                                             categoryNames.Add(catName);
@@ -886,18 +885,18 @@ namespace HOK.SmartBCF.GoogleUtils
                             }
                         }
 
-                        WorksheetEntry workSheetEntry = (WorksheetEntry)wsFeed.Entries[0]; //ColorScheme sheet
+                        var workSheetEntry = (WorksheetEntry)wsFeed.Entries[0]; //ColorScheme sheet
                         if (!isImported) { colorSheet = workSheetEntry; }
                         listFeedLink = workSheetEntry.Links.FindService(GDataSpreadsheetsNameTable.ListRel, null);
                         listQuery = new ListQuery(listFeedLink.HRef.ToString());
                         listFeed = sheetsService.Query(listQuery);
                         foreach (ListEntry row in listFeed.Entries)
                         {
-                            string schemeId = "";
-                            string schemeName = "";
-                            string paramName = "";
-                            string paramValue = "";
-                            byte[] colorBytes = new byte[3];
+                            var schemeId = "";
+                            var schemeName = "";
+                            var paramName = "";
+                            var paramValue = "";
+                            var colorBytes = new byte[3];
                             //"ColorSchemeId", "SchemeName", "ParameterName", "ParameterValue", "ColorR", "ColorG", "ColorB"
                             foreach (ListEntry.Custom element in row.Elements)
                             {
@@ -930,15 +929,15 @@ namespace HOK.SmartBCF.GoogleUtils
                             var schemes = from scheme in schemeInfo.ColorSchemes where scheme.SchemeId == schemeId select scheme;
                             if (schemes.Count() > 0)
                             {
-                                for (int i = 0; i < schemeInfo.ColorSchemes.Count; i++)
+                                for (var i = 0; i < schemeInfo.ColorSchemes.Count; i++)
                                 {
                                     if (schemeInfo.ColorSchemes[i].SchemeId == schemeId)
                                     {
-                                        ColorDefinition cd = new ColorDefinition();
+                                        var cd = new ColorDefinition();
                                         cd.ParameterValue = paramValue;
                                         cd.Color = colorBytes;
 
-                                        System.Windows.Media.Color windowColor = System.Windows.Media.Color.FromRgb(cd.Color[0], cd.Color[1], cd.Color[2]);
+                                        var windowColor = System.Windows.Media.Color.FromRgb(cd.Color[0], cd.Color[1], cd.Color[2]);
                                         cd.BackgroundColor = new SolidColorBrush(windowColor);
 
                                         schemeInfo.ColorSchemes[i].ColorDefinitions.Add(cd);
@@ -948,18 +947,20 @@ namespace HOK.SmartBCF.GoogleUtils
                             }
                             else
                             {
-                                ColorScheme scheme = new ColorScheme();
-                                scheme.SchemeId = schemeId;
-                                scheme.SchemeName = schemeName;
-                                scheme.Categories = categoryNames;
-                                scheme.ParameterName = paramName;
-                                scheme.DefinitionBy = DefinitionType.ByValue;
+                                var scheme = new ColorScheme
+                                {
+                                    SchemeId = schemeId,
+                                    SchemeName = schemeName,
+                                    Categories = categoryNames,
+                                    ParameterName = paramName,
+                                    DefinitionBy = DefinitionType.ByValue
+                                };
 
-                                ColorDefinition cd = new ColorDefinition();
+                                var cd = new ColorDefinition();
                                 cd.ParameterValue = paramValue;
                                 cd.Color = colorBytes;
 
-                                System.Windows.Media.Color windowColor = System.Windows.Media.Color.FromRgb(cd.Color[0], cd.Color[1], cd.Color[2]);
+                                var windowColor = System.Windows.Media.Color.FromRgb(cd.Color[0], cd.Color[1], cd.Color[2]);
                                 cd.BackgroundColor = new SolidColorBrush(windowColor);
 
                                 scheme.ColorDefinitions.Add(cd);
@@ -982,8 +983,8 @@ namespace HOK.SmartBCF.GoogleUtils
             WorksheetEntry worksheetEntry = null;
             try
             {
-                WorksheetQuery worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
-                WorksheetFeed wsFeed = sheetsService.Query(worksheetquery);
+                var worksheetquery = new WorksheetQuery("https://spreadsheets.google.com/feeds/worksheets/" + fileId + "/private/full");
+                var wsFeed = sheetsService.Query(worksheetquery);
 
                 if (wsFeed.Entries.Count > 0)
                 {
@@ -992,14 +993,14 @@ namespace HOK.SmartBCF.GoogleUtils
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return worksheetEntry;
         }
 
         public static bool UpdateElementProperties(ElementProperties ep, BCFParameters bcfParam, string fileId)
         {
-            bool updated = false;
+            var updated = false;
             try
             {
                 if (null == sheetsService)
@@ -1017,7 +1018,7 @@ namespace HOK.SmartBCF.GoogleUtils
                     if (null != currentSheet)
                     {
                         CellAddress cellAddress = null;
-                        string cellValue = "";
+                        var cellValue = "";
                         if(bcfParam == BCFParameters.BCF_Action && ep.CellEntries.ContainsKey(viewpointCols[3]))
                         {
                             cellAddress = ep.CellEntries[viewpointCols[3]];
@@ -1030,16 +1031,16 @@ namespace HOK.SmartBCF.GoogleUtils
                         }
                         if (null != cellAddress)
                         {
-                            AtomLink cellFeedLink = currentSheet.Links.FindService(GDataSpreadsheetsNameTable.CellRel, null);
-                            CellQuery cellQuery = new CellQuery(cellFeedLink.HRef.ToString());
+                            var cellFeedLink = currentSheet.Links.FindService(GDataSpreadsheetsNameTable.CellRel, null);
+                            var cellQuery = new CellQuery(cellFeedLink.HRef.ToString());
                             cellQuery.MinimumRow = cellQuery.MaximumRow = cellAddress.Row;
                             cellQuery.MinimumColumn = cellQuery.MaximumColumn = cellAddress.Col;
-                            CellFeed cellFeed = sheetsService.Query(cellQuery);
+                            var cellFeed = sheetsService.Query(cellQuery);
                             if (cellFeed.Entries.Count > 0)
                             {
-                                CellEntry cellEntry = cellFeed.Entries[0] as CellEntry;
+                                var cellEntry = cellFeed.Entries[0] as CellEntry;
                                 cellEntry.Cell.InputValue = cellValue;
-                                AtomEntry updatedCell = cellEntry.Update();
+                                var updatedCell = cellEntry.Update();
 
                             }
 
@@ -1090,89 +1091,63 @@ namespace HOK.SmartBCF.GoogleUtils
 
     public class ElementProperties
     {
-        private int elementId = -1;
-        private Element elementObj = null;
-        private ElementId elementIdObj = Autodesk.Revit.DB.ElementId.InvalidElementId;
-        private string elementName = "";
-        private string categoryName = "";
-        private int categoryId = -1;
-        private string issueId = "";
-        private string action = "";
-        private string responsibleParty = "";
-        private Dictionary<string, CellAddress> cellEntries = new Dictionary<string, CellAddress>();
-
-        public int ElementId { get { return elementId; } set { elementId = value; } }
-        public Element ElementObj { get { return elementObj; } set { elementObj = value; } }
-        public ElementId ElementIdObj { get { return elementIdObj; } set { elementIdObj = value; } }
-        public string ElementName { get { return elementName; } set { elementName = value; } }
-        public string CategoryName { get { return categoryName; } set { categoryName = value; } }
-        public int CategoryId { get { return categoryId; } set { categoryId = value; } }
-        public string IssueId { get { return issueId; } set { issueId = value; } }
-        public string Action { get { return action; } set { action = value; } }
-        public string ResponsibleParty { get { return responsibleParty; } set { responsibleParty = value; } }
-        public Dictionary<string, CellAddress> CellEntries { get { return cellEntries; } set { cellEntries = value; } }
+        public int ElementId { get; set; } = -1;
+        public Element ElementObj { get; set; }
+        public ElementId ElementIdObj { get; set; } = Autodesk.Revit.DB.ElementId.InvalidElementId;
+        public string ElementName { get; set; } = "";
+        public string CategoryName { get; set; } = "";
+        public int CategoryId { get; set; } = -1;
+        public string IssueId { get; set; } = "";
+        public string Action { get; set; } = "";
+        public string ResponsibleParty { get; set; } = "";
+        public Dictionary<string, CellAddress> CellEntries { get; set; } = new Dictionary<string, CellAddress>();
 
         public ElementProperties(Element element)
         {
-            elementId = element.Id.IntegerValue;
-            elementObj = element;
-            elementIdObj = element.Id;
-            elementName = element.Name;
+            ElementId = element.Id.IntegerValue;
+            ElementObj = element;
+            ElementIdObj = element.Id;
+            ElementName = element.Name;
             if (null != element.Category)
             {
-                categoryName = element.Category.Name;
-                categoryId = element.Category.Id.IntegerValue;
+                CategoryName = element.Category.Name;
+                CategoryId = element.Category.Id.IntegerValue;
             }
         }
 
         public ElementProperties(int id)
         {
-            elementId = id;
+            ElementId = id;
         }
     }
 
     public class IssueEntry
     {
-        private string bcfName = "";
-        private string issueId = "";
-        private string issueTopic = "";
-        private BitmapImage snapshot = null;
-        private int numElements = 0;
-        private bool isSelected = false;
-        private Dictionary<int, ElementProperties> elementDictionary = new Dictionary<int, ElementProperties>();
-        private Dictionary<string, Comment> commentDictionary = new Dictionary<string, Comment>();
-
-        public string BCFName { get { return bcfName; } set { bcfName = value; } }
-        public string IssueId { get { return issueId; } set { issueId = value; } }
-        public string IssueTopic { get { return issueTopic; } set { issueTopic = value; } }
-        public BitmapImage Snapshot { get { return snapshot; } set { snapshot = value; } }
-        public int NumElements { get { return numElements; } set { numElements = value; } }
-        public bool IsSelected { get { return isSelected; } set { isSelected = value; } }
-        public Dictionary<int, ElementProperties> ElementDictionary { get { return elementDictionary; } set { elementDictionary = value; } }
-        public Dictionary<string, Comment> CommentDictionary { get { return commentDictionary; } set { commentDictionary = value; } }
-
-        public IssueEntry()
-        {
-           
-        }
+        public string BCFName { get; set; } = "";
+        public string IssueId { get; set; } = "";
+        public string IssueTopic { get; set; } = "";
+        public BitmapImage Snapshot { get; set; } = null;
+        public int NumElements { get; set; } = 0;
+        public bool IsSelected { get; set; } = false;
+        public Dictionary<int, ElementProperties> ElementDictionary { get; set; } = new Dictionary<int, ElementProperties>();
+        public Dictionary<string, Comment> CommentDictionary { get; set; } = new Dictionary<string, Comment>();
     }
 
     public class CellAddress
     {
-        private uint row = 0;
-        private uint col = 0;
-        private string idString = "";
+        public uint Row { get; set; }
+        public uint Col { get; set; }
+        public string IdString { get; set; }
 
-        public uint Row { get { return row; } set { row = value; } }
-        public uint Col { get { return col; } set { col = value; } }
-        public string IdString { get { return idString; } set { idString = value; } }
+        public CellAddress()
+        {
+        }
 
         public CellAddress(uint rowNum, uint colNum)
         {
-            row = rowNum;
-            col = colNum;
-            idString = string.Format("R{0}C{1}", row, col);
+            Row = rowNum;
+            Col = colNum;
+            IdString = $"R{Row}C{Col}";
         }
     }
-
 }

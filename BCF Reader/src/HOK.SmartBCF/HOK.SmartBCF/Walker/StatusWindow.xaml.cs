@@ -2,17 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Google.Apis.Drive.v2.Data;
 using HOK.SmartBCF.GoogleUtils;
 using WinForm = System.Windows.Forms;
@@ -22,7 +14,7 @@ namespace HOK.SmartBCF.Walker
     /// <summary>
     /// Interaction logic for StatusWindow.xaml
     /// </summary>
-    public partial class StatusWindow : Window
+    public partial class StatusWindow
     {
         private ColorSchemeInfo schemeInfo = new ColorSchemeInfo();
         private string colorSheetId = "";

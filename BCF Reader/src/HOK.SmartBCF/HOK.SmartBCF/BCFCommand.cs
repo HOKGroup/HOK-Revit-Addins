@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.Attributes;
+using HOK.Core.Utilities;
 
 namespace HOK.SmartBCF
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-
-    public class BCFCommand:IExternalCommand
+    [Transaction(TransactionMode.Manual)]
+    public class BCFCommand : IExternalCommand
     {
-        private Document m_doc = null;
+        private Document m_doc;
 
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             try
             {
@@ -24,6 +22,7 @@ namespace HOK.SmartBCF
                 {
                     AppCommand.thisApp.ShowWalker(commandData.Application);
                 }
+
                 return Result.Succeeded;
             }
             catch (Exception ex)
@@ -33,35 +32,40 @@ namespace HOK.SmartBCF
             }
         }
 
+        /// <summary>
+        /// Verifies that active view is 3D View type.
+        /// </summary>
+        /// <returns>True if active view is 3D type or view exists in the model, otherwise false.</returns>
         private bool IsValidView()
         {
-            bool result = false;
             try
             {
-                View3D view3d = m_doc.ActiveView as View3D;
-                if (null != view3d)
-                {
-                    return true;
-                }
+                var view3d = m_doc.ActiveView as View3D;
+                if (view3d != null) return true;
 
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<View3D> view3ds = collector.OfClass(typeof(View3D)).WhereElementIsNotElementType().ToElements().Cast<View3D>().ToList();
-                var viewfound = from view in view3ds where view.IsTemplate==false && view.IsPerspective == false && view.ViewName == "{3D}" select view;
-                if (viewfound.Count() > 0)
-                {
-                    return true;
-                }
-                else
-                {
-                    MessageBox.Show("Please open a 3d view to navigate elements associated with BCF before running smartBCF.", "Background 3D View", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return false;
-                }
+                // (Konrad) Even though the current active view is not a 3D View, if 3D View exists in the model
+                // we can still set it to active when External Event Handler is initialized.
+                var v = new FilteredElementCollector(m_doc)
+                    .OfClass(typeof(View3D))
+                    .WhereElementIsNotElementType()
+                    .Cast<View3D>()
+                    .FirstOrDefault(x => !x.IsTemplate && !x.IsPerspective && x.Name.Contains("{3D}"));
+                
+                if (v != null) return true;
+
+                Log.AppendLog(LogMessageType.ERROR, "Invalid view. Could not find any 3D Views in the model.");
+                MessageBox.Show(
+                    "Please open a 3d view to navigate elements associated with BCF before running smartBCF.",
+                    "Background 3D View", MessageBoxButton.OK, MessageBoxImage.Information);
+                return false;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                MessageBox.Show("Faild to find valid 3d view to navigate.\n"+ex.Message, "Find Background 3D View", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                MessageBox.Show("Faild to find valid 3d view to navigate.\n" + e.Message, "Find Background 3D View",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            return result;
+            return false;
         }
     }
 }

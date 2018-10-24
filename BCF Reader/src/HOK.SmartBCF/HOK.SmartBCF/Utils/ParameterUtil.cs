@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
 using HOK.SmartBCF.GoogleUtils;
 
 namespace HOK.SmartBCF.Utils
@@ -25,39 +24,47 @@ namespace HOK.SmartBCF.Utils
         BCF_Topic
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public static class ParameterUtil
     {
         private static string sharedParameterTxt = "";
+        private static readonly Definition ProjectIdDefinition = null;
+        private static readonly Definition ActionDefinition = null;
+        private static readonly Definition AuthorDefinition = null;
+        private static readonly Definition CommentDefinition = null;
+        private static readonly Definition DateDefinition = null;
+        private static readonly Definition NameDefinition = null;
+        private static readonly Definition ResponsibilityDefinition = null;
+        private static readonly Definition TopicDefinition = null;
 
-        private static Definition ProjectIdDefinition = null;
-        private static Definition ActionDefinition = null;
-        private static Definition AuthorDefinition = null;
-        private static Definition CommentDefinition = null;
-        private static Definition DateDefinition = null;
-        private static Definition NameDefinition = null;
-        private static Definition ResponsibilityDefinition = null;
-        private static Definition TopicDefinition = null;
-
-        public static DefinitionFile SetDefinitionFile(UIApplication uiapp, string definitionPath)
+        /// <summary>
+        /// Sets the Shared Parameter Definition file from a file path.
+        /// </summary>
+        /// <param name="uiapp">UI Application.</param>
+        /// <param name="filePath">File Path to Shared Parameters File.</param>
+        /// <returns>Definition File or null if failed.</returns>
+        public static DefinitionFile SetDefinitionFile(UIApplication uiapp, string filePath)
         {
             DefinitionFile definitionFile = null;
             try
             {
-                Document doc = uiapp.ActiveUIDocument.Document;
-                if (File.Exists(definitionPath))
+                var doc = uiapp.ActiveUIDocument.Document;
+                if (File.Exists(filePath))
                 {
-                    using (Transaction trans = new Transaction(doc))
+                    using (var trans = new Transaction(doc))
                     {
                         trans.Start("Open Parameter Definition");
                         try
                         {
-                            uiapp.Application.SharedParametersFilename = definitionPath;
+                            uiapp.Application.SharedParametersFilename = filePath;
                             definitionFile = uiapp.Application.OpenSharedParameterFile();
                             trans.Commit();
                         }
                         catch (Exception ex)
                         {
-                            string message = ex.Message;
+                            Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                             trans.RollBack();
                         }
                     }
@@ -65,33 +72,35 @@ namespace HOK.SmartBCF.Utils
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to set a definition file.\n"+ex.Message, "Set Definition File", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                MessageBox.Show("Failed to set a definition file.\n" + ex.Message, "Set Definition File",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return definitionFile;
         }
 
         public static bool CreateBCFParameters(UIApplication uiapp, List<BuiltInCategory> bltCategories)
         {
-            bool created = false;
+            var created = false;
             try
             {
-                Document doc = uiapp.ActiveUIDocument.Document;
+                var doc = uiapp.ActiveUIDocument.Document;
 
                 if (string.IsNullOrEmpty(sharedParameterTxt))
                 {
-                    string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                    var currentAssembly = Assembly.GetExecutingAssembly().Location;
                     sharedParameterTxt = Path.GetDirectoryName(currentAssembly) + "/Resources/Addins Shared Parameters.txt";
                 }
 
-                string originalDefinitionFile = uiapp.Application.SharedParametersFilename;
-                DefinitionFile definitionFile = SetDefinitionFile(uiapp, sharedParameterTxt);
+                var originalDefinitionFile = uiapp.Application.SharedParametersFilename;
+                var definitionFile = SetDefinitionFile(uiapp, sharedParameterTxt);
 
                 
              
                 //insertedParam = InsertBinding(uiapp, definitionFile, BCFParameters.BCF_ColorSchemeId, pInfoCategory);
                 if (bltCategories.Count > 0)
                 {
-                    bool insertedParam = InsertBinding(uiapp, definitionFile, BCFParameters.BCF_Action, bltCategories);
+                    var insertedParam = InsertBinding(uiapp, definitionFile, BCFParameters.BCF_Action, bltCategories);
                     insertedParam = InsertBinding(uiapp, definitionFile, BCFParameters.BCF_Author, bltCategories);
                     insertedParam = InsertBinding(uiapp, definitionFile, BCFParameters.BCF_Comment, bltCategories);
                     insertedParam = InsertBinding(uiapp, definitionFile, BCFParameters.BCF_Date, bltCategories);
@@ -109,40 +118,50 @@ namespace HOK.SmartBCF.Utils
             return created;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uiapp"></param>
+        /// <returns></returns>
         public static string GetBCFProjectId(UIApplication uiapp)
         {
-            string bcfProjectId = "";
+            var bcfProjectId = "";
             try
             {
-                Document doc = uiapp.ActiveUIDocument.Document;
-                ProjectInfo pInfo = doc.ProjectInformation;
+                var doc = uiapp.ActiveUIDocument.Document;
+                var pInfo = doc.ProjectInformation;
                 if (null != pInfo)
                 {
 #if RELEASE2015 || RELEASE2016
-                    Parameter param = pInfo.LookupParameter(BCFParameters.BCF_ProjectId.ToString());
+                    var param = pInfo.LookupParameter(BCFParameters.BCF_ProjectId.ToString());
 #elif RELEASE2013||RELEASE2014
                     Parameter param = pInfo.get_Parameter(BCFParameters.BCF_ProjectId.ToString());
 #endif
-                    if (null != param)
+                    if (param != null)
                     {
                         bcfProjectId = param.AsString();
                     }
                     else
                     {
+                        // TODO: This is a little sketchy! 
+                        // TODO: Why not just stream a file to location on user drive? That way I don't have to distribute it with the DLLs.
+                        // (Konrad) Shared Parameters File should be included with the DLL distribution.
                         if (string.IsNullOrEmpty(sharedParameterTxt))
                         {
-                            string currentAssembly = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                            var currentAssembly = Assembly.GetExecutingAssembly().Location;
                             sharedParameterTxt = Path.GetDirectoryName(currentAssembly) + "/Resources/Addins Shared Parameters.txt";
                         }
 
-                        string originalDefinitionFile = uiapp.Application.SharedParametersFilename;
-                        DefinitionFile definitionFile = SetDefinitionFile(uiapp, sharedParameterTxt);
-                        if (null != definitionFile)
+                        var originalDefinitionFile = uiapp.Application.SharedParametersFilename;
+                        var definitionFile = SetDefinitionFile(uiapp, sharedParameterTxt);
+                        if (definitionFile != null)
                         {
                             //create BCF_ProjectId parameter
-                            List<BuiltInCategory> pInfoCategory = new List<BuiltInCategory>();
-                            pInfoCategory.Add(BuiltInCategory.OST_ProjectInformation);
-                            bool insertedParam = InsertBinding(uiapp, definitionFile, BCFParameters.BCF_ProjectId, pInfoCategory);
+                            var pInfoCategory = new List<BuiltInCategory>
+                            {
+                                BuiltInCategory.OST_ProjectInformation
+                            };
+                            var unused = InsertBinding(uiapp, definitionFile, BCFParameters.BCF_ProjectId, pInfoCategory);
 
                             SetDefinitionFile(uiapp, originalDefinitionFile);
                         }
@@ -152,27 +171,27 @@ namespace HOK.SmartBCF.Utils
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return bcfProjectId;
         }
 
         public static bool SetBCFProjectId(Document doc, string bcfProjectId)
         {
-            bool inserted = false;
+            var inserted = false;
             try
             {
-                ProjectInfo pInfo = doc.ProjectInformation;
+                var pInfo = doc.ProjectInformation;
                 if (null != pInfo)
                 {
 #if RELEASE2015 || RELEASE2016
-                    Parameter param = pInfo.LookupParameter(BCFParameters.BCF_ProjectId.ToString());
+                    var param = pInfo.LookupParameter(BCFParameters.BCF_ProjectId.ToString());
 #elif RELEASE2013||RELEASE2014
                     Parameter param = pInfo.get_Parameter(BCFParameters.BCF_ProjectId.ToString());
 #endif
                     if (null != param)
                     {
-                        using (Transaction trans = new Transaction(doc))
+                        using (var trans = new Transaction(doc))
                         {
                             try 
                             {
@@ -188,21 +207,21 @@ namespace HOK.SmartBCF.Utils
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return inserted;
         }
 
         public static string GetBCFColorSchemeId(Document doc)
         {
-            string colorSchemeId = "";
+            var colorSchemeId = "";
             try
             {
-                ProjectInfo pInfo = doc.ProjectInformation;
+                var pInfo = doc.ProjectInformation;
                 if (null != pInfo)
                 {
 #if RELEASE2015 || RELEASE2016
-                    Parameter param = pInfo.LookupParameter(BCFParameters.BCF_ColorSchemeId.ToString());
+                    var param = pInfo.LookupParameter(BCFParameters.BCF_ColorSchemeId.ToString());
 #elif RELEASE2013||RELEASE2014
                     Parameter param = pInfo.get_Parameter(BCFParameters.BCF_ColorSchemeId.ToString());
 #endif
@@ -214,27 +233,27 @@ namespace HOK.SmartBCF.Utils
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return colorSchemeId;
         }
 
         public static bool SetColorSchemeId(Document doc, string colorSchemeId)
         {
-            bool inserted = false;
+            var inserted = false;
             try
             {
-                ProjectInfo pInfo = doc.ProjectInformation;
+                var pInfo = doc.ProjectInformation;
                 if (null != pInfo)
                 {
 #if RELEASE2015 || RELEASE2016
-                    Parameter param = pInfo.LookupParameter(BCFParameters.BCF_ColorSchemeId.ToString());
+                    var param = pInfo.LookupParameter(BCFParameters.BCF_ColorSchemeId.ToString());
 #elif RELEASE2013||RELEASE2014
                     Parameter param = pInfo.get_Parameter(BCFParameters.BCF_ColorSchemeId.ToString());
 #endif
                     if (null != param)
                     {
-                        using (Transaction trans = new Transaction(doc))
+                        using (var trans = new Transaction(doc))
                         {
                             try
                             {
@@ -250,98 +269,104 @@ namespace HOK.SmartBCF.Utils
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return inserted;
         }
 
-        private static bool InsertBinding(UIApplication uiapp, DefinitionFile definitionFile, BCFParameters bcfParam, List<BuiltInCategory> bltCategories)
+        /// <summary>
+        /// Generates new Parameter Bindings in the model for BCF Parameters.
+        /// </summary>
+        /// <param name="uiapp">UI Application.</param>
+        /// <param name="definitionFile">Shared Parameter Definition File.</param>
+        /// <param name="bcfParam">BCF Parameter to be added.</param>
+        /// <param name="bltCategories">Categories to bind the Parameter to.</param>
+        /// <returns>True if successfull, otherwise false.</returns>
+        private static bool InsertBinding(UIApplication uiapp, DefinitionFile definitionFile, BCFParameters bcfParam, IEnumerable<BuiltInCategory> bltCategories)
         {
-            bool inserted = false;
+            var inserted = false;
             try
             {
-                Document doc = uiapp.ActiveUIDocument.Document;
-                using (Transaction trans = new Transaction(doc))
+                var doc = uiapp.ActiveUIDocument.Document;
+                using (var trans = new Transaction(doc))
                 {
                     trans.Start("Insert Binding");
                     try
                     {
-                        DefinitionBindingMapIterator iter = doc.ParameterBindings.ForwardIterator();
-                        CategorySet catSet = uiapp.Application.Create.NewCategorySet();
-                        foreach (BuiltInCategory bltCat in bltCategories)
+                        var catSet = uiapp.Application.Create.NewCategorySet();
+                        foreach (var bltCat in bltCategories)
                         {
-                            Category category = doc.Settings.Categories.get_Item(bltCat);
-                            if (null != category)
-                            {
-                                catSet.Insert(category);
-                            }
+                            var category = doc.Settings.Categories.get_Item(bltCat);
+                            if (category != null) catSet.Insert(category);
                         }
 
-                        //see if the project parameter already exists
-                        Definition definitionFound = FindExistingDefinition(doc, bcfParam);
-                        if (null != definitionFound)
+                        // (Jinsol) See if the project parameter already exists.
+                        var definitionFound = FindExistingDefinition(doc, bcfParam);
+                        if (definitionFound != null)
                         {
-                            ElementBinding elemBinding = (ElementBinding)doc.ParameterBindings.get_Item(definitionFound);
-                            if (null != elemBinding)
+                            var elemBinding = (ElementBinding)doc.ParameterBindings.get_Item(definitionFound);
+                            if (elemBinding != null)
                             {
-                                bool reinsert = false;
+                                var reinsert = false;
                                 foreach (Category cat in catSet)
                                 {
-                                    if (!elemBinding.Categories.Contains(cat))
-                                    {
-                                        reinsert = true;
-                                    }
+                                    if (!elemBinding.Categories.Contains(cat)) reinsert = true;
                                 }
 
-                                if (reinsert)
-                                {
-                                    InstanceBinding binding = uiapp.Application.Create.NewInstanceBinding(catSet);
-                                    inserted = doc.ParameterBindings.ReInsert(definitionFound, binding);
-                                    trans.Commit();
-                                }
+                                if (!reinsert) return false;
+
+                                var binding = uiapp.Application.Create.NewInstanceBinding(catSet);
+                                inserted = doc.ParameterBindings.ReInsert(definitionFound, binding);
+                                trans.Commit();
                                 return inserted;
                             }
                         }
-                        
 
                         Definition bcfDefinition = null;
-                        foreach (DefinitionGroup group in definitionFile.Groups)
+                        foreach (var group in definitionFile.Groups)
                         {
-                            if (group.Name == "HOK BCF")
+                            if (group.Name != "HOK BCF") continue;
+
+                            foreach (var definition in group.Definitions)
                             {
-                                foreach (Definition definition in group.Definitions)
-                                {
-                                    if (definition.Name == bcfParam.ToString())
-                                    {
-                                        bcfDefinition = definition;
-                                        break;
-                                    }
-                                }
+                                if (definition.Name != bcfParam.ToString()) continue;
+
+                                bcfDefinition = definition;
                                 break;
                             }
+                            break;
                         }
 
                         if (null != bcfDefinition)
                         {
-                            InstanceBinding binding = uiapp.Application.Create.NewInstanceBinding(catSet);
+                            var binding = uiapp.Application.Create.NewInstanceBinding(catSet);
                             inserted = doc.ParameterBindings.Insert(bcfDefinition, binding);
                         }
+
                         trans.Commit();
                     }
                     catch (Exception ex)
                     {
-                        string message = ex.Message;
+                        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
                         trans.RollBack();
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show(bcfParam.ToString() + " Failed to insert binding." + ex.Message, "Insert Binding", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                MessageBox.Show(bcfParam + " Failed to insert binding." + ex.Message, "Insert Binding",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return inserted;
         }
 
+        /// <summary>
+        /// Checks if Definition already exists in the model.
+        /// </summary>
+        /// <param name="doc">Revit Document.</param>
+        /// <param name="bcfParam">BCF Parameter</param>
+        /// <returns>Parameter Definition for given BCF Paramter or null.</returns>
         private static Definition FindExistingDefinition(Document doc, BCFParameters bcfParam)
         {
             Definition definitionFound = null;
@@ -373,15 +398,20 @@ namespace HOK.SmartBCF.Utils
                     case BCFParameters.BCF_Topic:
                         definitionFound = TopicDefinition;
                         break;
+                    case BCFParameters.BCF_ColorSchemeId:
+                        break;
+                    case BCFParameters.BCF_IssueNumber:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(bcfParam), bcfParam, null);
                 }
 
-                if (null == definitionFound)
+                if (definitionFound == null)
                 {
-                    DefinitionBindingMapIterator iter = doc.ParameterBindings.ForwardIterator();
+                    var iter = doc.ParameterBindings.ForwardIterator();
                     while (iter.MoveNext())
                     {
-                        Definition definition = iter.Key;
-                        ElementBinding elemBinding = (ElementBinding)iter.Current;
+                        var definition = iter.Key;
                         if (definition.Name == bcfParam.ToString())
                         {
                             definitionFound = definition;
@@ -391,28 +421,30 @@ namespace HOK.SmartBCF.Utils
             }
             catch (Exception ex)
             {
-                MessageBox.Show(bcfParam.ToString() + ": Failed to find existing definition.\n"+ex.Message, "Find Exisiting Definition", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                MessageBox.Show(bcfParam + ": Failed to find existing definition.\n" + ex.Message,
+                    "Find Exisiting Definition", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return definitionFound;
         }
 
         public static bool UpdateBCFParameter(Document doc, ElementProperties ep, BCFParameters bcfParam, string value)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                Element element = doc.GetElement(new ElementId(ep.ElementId));
+                var element = doc.GetElement(new ElementId(ep.ElementId));
                 if (null != element)
                 {
 #if RELEASE2015 || RELEASE2016
-                    Parameter param = element.LookupParameter(bcfParam.ToString());
+                    var param = element.LookupParameter(bcfParam.ToString());
                     
 #elif RELEASE2013||RELEASE2014
                     Parameter param = element.get_Parameter(bcfParam.ToString());
 #endif
                     if (null != param)
                     {
-                        using (Transaction trans = new Transaction(doc))
+                        using (var trans = new Transaction(doc))
                         {
                             trans.Start("Update Parameter");
                             try
@@ -422,7 +454,7 @@ namespace HOK.SmartBCF.Utils
                             }
                             catch (Exception ex)
                             {
-                                string message = ex.Message;
+                                var message = ex.Message;
                                 trans.RollBack();
                             }
                         }
@@ -438,7 +470,7 @@ namespace HOK.SmartBCF.Utils
 
         public static bool UpdateBCFParameters(Document doc, ElementProperties ep, IssueEntry issue, Comment comment)
         {
-            bool result = false;
+            var result = false;
             try
             {
                 foreach (BCFParameters param in Enum.GetValues(typeof(BCFParameters)))
