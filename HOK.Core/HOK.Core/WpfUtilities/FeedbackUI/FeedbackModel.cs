@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using RestSharp;
@@ -11,7 +12,14 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
 {
     public class FeedbackModel
     {
+        private Settings Settings { get; set; }
         private const string baseUrl = "https://api.github.com";
+
+        public FeedbackModel()
+        {
+            var settingsString = Resources.StreamEmbeddedResource(Assembly.GetExecutingAssembly(), "HOK.Core.Resources.Settings.json");
+            Settings = Json.Deserialize<Settings>(settingsString);
+        }
 
         /// <summary>
         /// Async call to GitHub that removes an image.
@@ -27,14 +35,13 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            var token = Properties.Settings.Default.GitHubToken;
             var client = new RestClient(baseUrl);
-            var request = new RestRequest("/repos/HOKGroup/MissionControl_Issues/contents/" + att.UploadImageContent.path, Method.DELETE)
+            var request = new RestRequest(Settings.FeedbackPath + "contents/" + att.UploadImageContent.path, Method.DELETE)
             {
                 OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
             };
             request.AddHeader("Content-type", "application/json");
-            request.AddHeader("Authorization", "Token " + token);
+            request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
             request.RequestFormat = DataFormat.Json;
 
             request.AddBody(new DeleteObject
@@ -100,14 +107,13 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            var token = Properties.Settings.Default.GitHubToken;
             var client = new RestClient(baseUrl);
-            var request = new RestRequest("/repos/HOKGroup/MissionControl_Issues/contents/" + body.path, Method.PUT)
+            var request = new RestRequest(Settings.FeedbackPath + "contents/" + body.path, Method.PUT)
             {
                 OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
             };
             request.AddHeader("Content-type", "application/json");
-            request.AddHeader("Authorization", "Token " + token);
+            request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
             request.RequestFormat = DataFormat.Json;
             request.AddBody(body);
 
@@ -163,14 +169,13 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            var token = Properties.Settings.Default.GitHubToken;
             var client = new RestClient(baseUrl);
-            var request = new RestRequest("/repos/HOKGroup/MissionControl_Issues/issues", Method.POST)
+            var request = new RestRequest(Settings.FeedbackPath + "issues", Method.POST)
             {
                 OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
             };
             request.AddHeader("Content-type", "application/json");
-            request.AddHeader("Authorization", "Token " + token);
+            request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
             request.RequestFormat = DataFormat.Json;
             request.AddBody(body);
 

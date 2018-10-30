@@ -144,6 +144,8 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
             }
             else
             {
+                // (Konrad) For some reason RestSharp.dll has to be strong named (specific version).
+                // This forces us to include it with the distribution DLLs instead of embedding in Resources (Fody.Costura).
                 response = await Model.Submit<Issue>(Name, Email, Feedback, ToolName);
             }
 
