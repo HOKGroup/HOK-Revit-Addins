@@ -1,6 +1,18 @@
 HOK-Revit-Addins 2018.0.0.X
 ================
 
+### Settings
+
+Most of the tools in this repository have a reference to HOK.Core. This is because most of these tools use some utilities from that DLL. One of these utilities is a HOK Feedback tool that can be easily embedded into any other tool via a button. This tool allows users to post an issue directly to GitHub via a proxy user and a special access token. In order to make that tool work for anyone, anywhere, without distributing other people's tokens and repo info, there is a `Settings.json` file embedded into the Resources in HOK.Core.dll. Here's the contents schema: 
+```
+{
+  "FeedbackToken": "<access token>",
+  "FeedbackPath": "/repos/<user>/<repo name>/"
+}
+```
+* FeedbackToken - this is a token that you can obtain from GitHub to allow remote access to a repository. Since the purpose of this tool is to create GitHub issues on our behalf, we need an access token from authorized user, to login as that user and create a new issue. Replace this with a valid access token. 
+* FeedbackPath - this is a url address to GitHub repository that you want to post issues to. In our case the address is `/repos/HOKGroup/MissionControl_Issues/`. Please not the `/repos/` and `/` at the end of the address. Make sure to replace the content of `<>` with a valid name, and make sure that access token is valid to gran user access to the repo. 
+
 This repository will include all documentation files and source codes for HOK Revit Addins
 
 1. <b>On Opening Monitor:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/tree/master/Utility%20Tools/src/HOK.FileOnpeningMonitor)
