@@ -25,4 +25,4 @@ This repository will include all documentation files and source codes for HOK Re
 8. <b>Move Backup:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.MoveBackup/README.md)
 
 Rules: 
-<li> Always run Visual Studio in Administrator mode. Otherwise it's possible that <code>xcopy</code> post build events will fail.
+<li> Always run Visual Studio in Administrator mode. Otherwise it's possible that post build events will fail.
