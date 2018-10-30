@@ -7,6 +7,9 @@
 *.sln.docstates
 **/.vs/
 
+# Settings file that is specific to each user/organization
+HOK.Core\HOK.Core\Resources\Settings.json
+
 # Build results
 
 [Dd]ebug/
@@ -156,3 +159,4 @@ $RECYCLE.BIN/
 # Mac desktop service store files
 .DS_Store
 /_releases/
+/HOK.Core/HOK.Core/Resources/Settings.json
