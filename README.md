@@ -13,7 +13,7 @@ Most of the tools in this repository have a reference to HOK.Core. This is becau
 * FeedbackToken - this is a token that you can obtain from GitHub to allow remote access to a repository. Since the purpose of this tool is to create GitHub issues on our behalf, we need an access token from authorized user, to login as that user and create a new issue. Replace this with a valid access token. 
 * FeedbackPath - this is a url address to GitHub repository that you want to post issues to. In our case the address is `/repos/HOKGroup/MissionControl_Issues/`. Please not the `/repos/` and `/` at the end of the address. Make sure to replace the content of `<>` with a valid name, and make sure that access token is valid to gran user access to the repo. 
 
-This repository will include all documentation files and source codes for HOK Revit Addins
+### Links to release notes
 
 1. <b>On Opening Monitor:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/tree/master/Utility%20Tools/src/HOK.FileOnpeningMonitor)
 2. <b>Mission Control:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/Project%20Monitor/src/HOK.MissionControl/README.md)
@@ -24,5 +24,5 @@ This repository will include all documentation files and source codes for HOK Re
 7. <b>Mass Tools:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/Mass%20Tools/README.MD)
 8. <b>Move Backup:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.MoveBackup/README.md)
 
-Rules: 
+### Tips
 <li> Always run Visual Studio in Administrator mode. Otherwise it's possible that post build events will fail.
