@@ -1,4 +1,4 @@
-HOK-Revit-Addins 2018.0.0.X
+HOK-Revit-Addins 2019.0.0.X
 ================
 
 ### Settings
