@@ -23,7 +23,7 @@
                Grid.Column="0"/>
         <Button Name="DeleteAttachmentButton" 
                 Command="{Binding Delete, Mode=OneWay}" 
-                ToolTip="Submit Feedback!"
+                ToolTip="Remove attachment."
                 Cursor="Hand" 
                 Grid.Column="1"
                 Background="Transparent" 
@@ -44,6 +44,5 @@
                 </ControlTemplate>
             </Button.Template>
         </Button>
-
     </Grid>
 </UserControl>
