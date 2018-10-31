@@ -17,7 +17,7 @@ namespace HOK.MissionControl.FamilyPublish
 {
     public class FamilyMonitorModel
     {
-        public static Guid UpdaterGuid { get; set; } = new Guid(Resources.HealthReportTrackerGuid);
+        public static Guid UpdaterGuid { get; set; } = new Guid(Properties.Resources.HealthReportTrackerGuid);
         public static Document Doc { get; set; }
         public Configuration Config { get; set; }
         public Project Project { get; set; }
@@ -59,7 +59,7 @@ namespace HOK.MissionControl.FamilyPublish
                 if (config != null)
                 {
                     familyNameCheck = config.Updaters.First(x => string.Equals(x.UpdaterId,
-                        Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.FamilyNameCheck.Values;
+                        Properties.Resources.HealthReportTrackerGuid, StringComparison.OrdinalIgnoreCase)).UserOverrides.FamilyNameCheck.Values;
                 }
 
                 //var count = 0;
