@@ -13,7 +13,7 @@ Most of the tools in this repository have a reference to HOK.Core. This is becau
 * FeedbackToken - this is a token that you can obtain from GitHub to allow remote access to a repository. Since the purpose of this tool is to create GitHub issues on our behalf, we need an access token from authorized user, to login as that user and create a new issue. Replace this with a valid access token. 
 * FeedbackPath - this is a url address to GitHub repository that you want to post issues to. In our case the address is `/repos/HOKGroup/MissionControl_Issues/`. Please not the `/repos/` and `/` at the end of the address. Make sure to replace the content of `<>` with a valid name, and make sure that access token is valid to grant user access to the repo. 
 
-Actual values can be found here: [HOK Teams](https://hok365.sharepoint.com/sites/DesignTechSoftwareDevelopment/Shared%20Documents/Revit%20Addins/Settings.json)
+Actual values can be found here: [HOK Teams](https://hok365.sharepoint.com/:u:/s/DesignTechSoftwareDevelopment/EfJpKQL6fp1Cn6S5NSDIGOIBue1moWdwEOVex_wo6Z5nzw?e=2BSURC)
 
 ### Links to release notes
 
