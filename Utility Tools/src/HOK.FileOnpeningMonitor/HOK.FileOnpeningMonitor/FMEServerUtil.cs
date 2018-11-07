@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows;
+using HOK.Core.Utilities;
 using Safe.FMEServer.API;
 
 namespace HOK.FileOnpeningMonitor
@@ -59,18 +60,17 @@ namespace HOK.FileOnpeningMonitor
             IFMEServerSession fmeServerSession;
             try
             {
-                userId = "revit";
-                password = "revit";
-                //host = "hok-119vs";
-                host = "fme.hok.com";
-                port = 7071;
-                clientId = "app_revitnotification";
+                var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
+                var settings = Json.Deserialize<Settings>(settingsString);
 
+                userId = settings.FileOnOpeningFmeUserId;
+                password = settings.FileOnOpeningFmePassword;
+                host = settings.FileOnOpeningFmeHost;
+                port = settings.FileOnOpeningFmePort;
+                clientId = settings.FileOnOpeningFmeClientId;
                 fmeServerSession = FMEServer.CreateServerSession();
 
                 var connectInfo = fmeServerSession.CreateServerConnectionInfo(host, port, userId, password);
-                //IDictionary<string, string> directives = new Dictionary<string, string>();
-                //directives.Add("CLIENT_ID", clientId);
                 fmeServerSession.Init(connectInfo, null);
 
                 repositoryMgr = fmeServerSession.GetRepositoryManager();
