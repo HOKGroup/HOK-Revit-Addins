@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Autodesk.Revit.DB;
 
 namespace HOK.CameraDuplicator
@@ -19,24 +10,23 @@ namespace HOK.CameraDuplicator
     /// <summary>
     /// Interaction logic for ViewConfigurationWindow.xaml
     /// </summary>
-    public partial class ViewConfigurationWindow : Window
+    public partial class ViewConfigurationWindow
     {
-        private ModelInfo sModelInfo = null;
-        private ModelInfo rModelInfo = null;
-        private ViewConfiguration viewConfig = new ViewConfiguration();
+        private ModelInfo sModelInfo;
+        private ModelInfo rModelInfo;
 
         private Dictionary<int, ItemInfo> sourceItems = new Dictionary<int, ItemInfo>();
         private Dictionary<int, ItemInfo> recipientItems = new Dictionary<int, ItemInfo>();
 
         private MapType currentType = MapType.None;
 
-        public ViewConfiguration ViewConfig { get { return viewConfig; } set { viewConfig = value; } }
+        public ViewConfiguration ViewConfig { get; set; } = new ViewConfiguration();
 
         public ViewConfigurationWindow(ModelInfo source, ModelInfo recipient, ViewConfiguration vc)
         {
             sModelInfo = source;
             rModelInfo = recipient;
-            viewConfig = vc;
+            ViewConfig = vc;
 
             InitializeComponent();
             labelSource.Content = sModelInfo.ModelName;
@@ -45,12 +35,12 @@ namespace HOK.CameraDuplicator
             checkBoxWorkset.IsChecked = vc.ApplyWorksetVisibility;
             GetItems();
             //remove non-existing mapping items
-            for (int i = viewConfig.MapItems.Count - 1; i > -1; i--)
+            for (var i = ViewConfig.MapItems.Count - 1; i > -1; i--)
             {
-                MapItemInfo mapItemInfo = viewConfig.MapItems[i];
+                var mapItemInfo = ViewConfig.MapItems[i];
                 if (!sourceItems.ContainsKey(mapItemInfo.SourceItemId) || !recipientItems.ContainsKey(mapItemInfo.RecipientItemId))
                 {
-                    viewConfig.MapItems.RemoveAt(i);
+                    ViewConfig.MapItems.RemoveAt(i);
                 }
             }
 
@@ -68,15 +58,15 @@ namespace HOK.CameraDuplicator
                 GetWorksets();
                 GetAreaSchemes();
 
-                var currentMaps = from map in viewConfig.MapItems where map.SourceModelId == sModelInfo.ModelId && map.RecipientModelId == rModelInfo.ModelId select map;
-                foreach (MapItemInfo mapInfo in currentMaps)
+                var currentMaps = from map in ViewConfig.MapItems where map.SourceModelId == sModelInfo.ModelId && map.RecipientModelId == rModelInfo.ModelId select map;
+                foreach (var mapInfo in currentMaps)
                 {
-                    int sItemId = mapInfo.SourceItemId;
-                    int rItemId = mapInfo.RecipientItemId;
+                    var sItemId = mapInfo.SourceItemId;
+                    var rItemId = mapInfo.RecipientItemId;
 
                     if (sourceItems.ContainsKey(sItemId) && recipientItems.ContainsKey(rItemId))
                     {
-                        ItemInfo sItem = sourceItems[sItemId];
+                        var sItem = sourceItems[sItemId];
                         if (!sItem.Mapped)
                         {
                             sItem.Mapped = true;
@@ -84,7 +74,7 @@ namespace HOK.CameraDuplicator
                             sourceItems.Add(sItemId, sItem);
                         }
 
-                        ItemInfo rItem = recipientItems[rItemId];
+                        var rItem = recipientItems[rItemId];
                         if (!rItem.Mapped)
                         {
                             rItem.Mapped = true;
@@ -104,22 +94,22 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                FilteredElementCollector sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
-                List<Element> sLevels = sCollector.OfCategory(BuiltInCategory.OST_Levels).ToElements().ToList();
-                foreach (Element elem in sLevels)
+                var sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
+                var sLevels = sCollector.OfCategory(BuiltInCategory.OST_Levels).ToElements().ToList();
+                foreach (var elem in sLevels)
                 {
-                    ItemInfo iInfo = new ItemInfo(elem, MapType.Level);
+                    var iInfo = new ItemInfo(elem, MapType.Level);
                     if (!sourceItems.ContainsKey(iInfo.ItemId))
                     {
                         sourceItems.Add(iInfo.ItemId, iInfo);
                     }
                 }
 
-                FilteredElementCollector rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
-                List<Element> rLevels = rCollector.OfCategory(BuiltInCategory.OST_Levels).ToElements().ToList();
-                foreach (Element elem in rLevels)
+                var rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
+                var rLevels = rCollector.OfCategory(BuiltInCategory.OST_Levels).ToElements().ToList();
+                foreach (var elem in rLevels)
                 {
-                    ItemInfo iInfo = new ItemInfo(elem, MapType.Level);
+                    var iInfo = new ItemInfo(elem, MapType.Level);
                     if (!recipientItems.ContainsKey(iInfo.ItemId))
                     {
                         recipientItems.Add(iInfo.ItemId, iInfo);
@@ -136,22 +126,22 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                FilteredElementCollector sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
-                List<Element> sPhases = sCollector.OfCategory(BuiltInCategory.OST_Phases).ToElements().ToList();
-                foreach (Element elem in sPhases)
+                var sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
+                var sPhases = sCollector.OfCategory(BuiltInCategory.OST_Phases).ToElements().ToList();
+                foreach (var elem in sPhases)
                 {
-                    ItemInfo iInfo = new ItemInfo(elem, MapType.Phase);
+                    var iInfo = new ItemInfo(elem, MapType.Phase);
                     if (!sourceItems.ContainsKey(iInfo.ItemId))
                     {
                         sourceItems.Add(iInfo.ItemId, iInfo);
                     }
                 }
 
-                FilteredElementCollector rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
-                List<Element> rPhases = rCollector.OfCategory(BuiltInCategory.OST_Phases).ToElements().ToList();
-                foreach (Element elem in rPhases)
+                var rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
+                var rPhases = rCollector.OfCategory(BuiltInCategory.OST_Phases).ToElements().ToList();
+                foreach (var elem in rPhases)
                 {
-                    ItemInfo iInfo = new ItemInfo(elem, MapType.Phase);
+                    var iInfo = new ItemInfo(elem, MapType.Phase);
                     if (!recipientItems.ContainsKey(iInfo.ItemId))
                     {
                         recipientItems.Add(iInfo.ItemId, iInfo);
@@ -168,29 +158,29 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                List<Type> types = new List<Type>();
+                var types = new List<Type>();
                 types.Add(typeof(View3D));
                 types.Add(typeof(ViewPlan));
-                ElementMulticlassFilter multiClassFilter = new ElementMulticlassFilter(types);
+                var multiClassFilter = new ElementMulticlassFilter(types);
 
-                FilteredElementCollector sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
-                List<View> sViews = sCollector.WherePasses(multiClassFilter).ToElements().Cast<View>().ToList();
+                var sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
+                var sViews = sCollector.WherePasses(multiClassFilter).ToElements().Cast<View>().ToList();
                 var sTemplates = from view in sViews where view.IsTemplate select view;
-                foreach (View view in sTemplates)
+                foreach (var view in sTemplates)
                 {
-                    ItemInfo iInfo = new ItemInfo(view, MapType.ViewTemplate);
+                    var iInfo = new ItemInfo(view, MapType.ViewTemplate);
                     if (!sourceItems.ContainsKey(iInfo.ItemId))
                     {
                         sourceItems.Add(iInfo.ItemId, iInfo);
                     }
                 }
 
-                FilteredElementCollector rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
-                List<View> rViews = sCollector.WherePasses(multiClassFilter).ToElements().Cast<View>().ToList();
+                var rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
+                var rViews = sCollector.WherePasses(multiClassFilter).ToElements().Cast<View>().ToList();
                 var rTemplates = from view in rViews where view.IsTemplate select view;
                 foreach (Element elem in rTemplates)
                 {
-                    ItemInfo iInfo = new ItemInfo(elem, MapType.ViewTemplate);
+                    var iInfo = new ItemInfo(elem, MapType.ViewTemplate);
                     if (!recipientItems.ContainsKey(iInfo.ItemId))
                     {
                         recipientItems.Add(iInfo.ItemId, iInfo);
@@ -209,12 +199,12 @@ namespace HOK.CameraDuplicator
             {
                 if (sModelInfo.ModelDoc.IsWorkshared)
                 {
-                    FilteredWorksetCollector collector = new FilteredWorksetCollector(sModelInfo.ModelDoc);
-                    WorksetKindFilter wsFilter = new WorksetKindFilter(WorksetKind.UserWorkset);
-                    List<Workset> worksets = collector.WherePasses(wsFilter).ToWorksets().ToList();
-                    foreach (Workset ws in worksets)
+                    var collector = new FilteredWorksetCollector(sModelInfo.ModelDoc);
+                    var wsFilter = new WorksetKindFilter(WorksetKind.UserWorkset);
+                    var worksets = collector.WherePasses(wsFilter).ToWorksets().ToList();
+                    foreach (var ws in worksets)
                     {
-                        ItemInfo iInfo = new ItemInfo(ws, MapType.Workset);
+                        var iInfo = new ItemInfo(ws, MapType.Workset);
                         if(!sourceItems.ContainsKey(iInfo.ItemId))
                         {
                             sourceItems.Add(iInfo.ItemId, iInfo);
@@ -224,12 +214,12 @@ namespace HOK.CameraDuplicator
 
                 if (rModelInfo.ModelDoc.IsWorkshared)
                 {
-                    FilteredWorksetCollector collector = new FilteredWorksetCollector(rModelInfo.ModelDoc);
-                    WorksetKindFilter wsFilter = new WorksetKindFilter(WorksetKind.UserWorkset);
-                    List<Workset> worksets = collector.WherePasses(wsFilter).ToWorksets().ToList();
-                    foreach (Workset ws in worksets)
+                    var collector = new FilteredWorksetCollector(rModelInfo.ModelDoc);
+                    var wsFilter = new WorksetKindFilter(WorksetKind.UserWorkset);
+                    var worksets = collector.WherePasses(wsFilter).ToWorksets().ToList();
+                    foreach (var ws in worksets)
                     {
-                        ItemInfo iInfo = new ItemInfo(ws, MapType.Workset);
+                        var iInfo = new ItemInfo(ws, MapType.Workset);
                         if (!recipientItems.ContainsKey(iInfo.ItemId))
                         {
                             recipientItems.Add(iInfo.ItemId, iInfo);
@@ -248,22 +238,22 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                FilteredElementCollector sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
-                List<Element> sScopeBoxes= sCollector.OfCategory(BuiltInCategory.OST_VolumeOfInterest).ToElements().ToList();
-                foreach (Element elem in sScopeBoxes)
+                var sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
+                var sScopeBoxes= sCollector.OfCategory(BuiltInCategory.OST_VolumeOfInterest).ToElements().ToList();
+                foreach (var elem in sScopeBoxes)
                 {
-                    ItemInfo iInfo = new ItemInfo(elem, MapType.ScopeBox);
+                    var iInfo = new ItemInfo(elem, MapType.ScopeBox);
                     if (!sourceItems.ContainsKey(iInfo.ItemId))
                     {
                         sourceItems.Add(iInfo.ItemId, iInfo);
                     }
                 }
 
-                FilteredElementCollector rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
-                List<Element> rScopeBoxes = rCollector.OfCategory(BuiltInCategory.OST_VolumeOfInterest).ToElements().ToList();
-                foreach (Element elem in rScopeBoxes)
+                var rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
+                var rScopeBoxes = rCollector.OfCategory(BuiltInCategory.OST_VolumeOfInterest).ToElements().ToList();
+                foreach (var elem in rScopeBoxes)
                 {
-                    ItemInfo iInfo = new ItemInfo(elem, MapType.ScopeBox);
+                    var iInfo = new ItemInfo(elem, MapType.ScopeBox);
                     if (!recipientItems.ContainsKey(iInfo.ItemId))
                     {
                         recipientItems.Add(iInfo.ItemId, iInfo);
@@ -280,22 +270,22 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                FilteredElementCollector sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
-                List<Element> sSchemes = sCollector.OfCategory(BuiltInCategory.OST_AreaSchemes).ToElements().ToList();
-                foreach (Element elem in sSchemes)
+                var sCollector = new FilteredElementCollector(sModelInfo.ModelDoc);
+                var sSchemes = sCollector.OfCategory(BuiltInCategory.OST_AreaSchemes).ToElements().ToList();
+                foreach (var elem in sSchemes)
                 {
-                    ItemInfo iInfo = new ItemInfo(elem, MapType.AreaScheme);
+                    var iInfo = new ItemInfo(elem, MapType.AreaScheme);
                     if (!sourceItems.ContainsKey(iInfo.ItemId))
                     {
                         sourceItems.Add(iInfo.ItemId, iInfo);
                     }
                 }
 
-                FilteredElementCollector rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
-                List<Element> rSchemes = rCollector.OfCategory(BuiltInCategory.OST_AreaSchemes).ToElements().ToList();
-                foreach (Element elem in rSchemes)
+                var rCollector = new FilteredElementCollector(rModelInfo.ModelDoc);
+                var rSchemes = rCollector.OfCategory(BuiltInCategory.OST_AreaSchemes).ToElements().ToList();
+                foreach (var elem in rSchemes)
                 {
-                    ItemInfo iInfo = new ItemInfo(elem, MapType.AreaScheme);
+                    var iInfo = new ItemInfo(elem, MapType.AreaScheme);
                     if (!recipientItems.ContainsKey(iInfo.ItemId))
                     {
                         recipientItems.Add(iInfo.ItemId, iInfo);
@@ -313,16 +303,16 @@ namespace HOK.CameraDuplicator
             try
             {
                 var sItems = from item in sourceItems.Values where !item.Mapped && item.MapTypeEnum == currentType select item;
-                List<ItemInfo> sItemList = sItems.OrderBy(o => o.ItemName).ToList();
+                var sItemList = sItems.OrderBy(o => o.ItemName).ToList();
                 dataGridSource.ItemsSource = null;
                 dataGridSource.ItemsSource = sItemList;
 
                 var rItems = from item in recipientItems.Values where !item.Mapped  && item.MapTypeEnum == currentType select item;
-                List<ItemInfo> rItemList = rItems.OrderBy(o => o.ItemName).ToList();
+                var rItemList = rItems.OrderBy(o => o.ItemName).ToList();
                 dataGridRecipient.ItemsSource = null;
                 dataGridRecipient.ItemsSource = rItemList;
                 
-                var currentMap = from map in viewConfig.MapItems where map.SourceModelId == sModelInfo.ModelId && map.RecipientModelId == rModelInfo.ModelId && map.MapItemType == currentType select map;
+                var currentMap = from map in ViewConfig.MapItems where map.SourceModelId == sModelInfo.ModelId && map.RecipientModelId == rModelInfo.ModelId && map.MapItemType == currentType select map;
                 dataGridMap.ItemsSource = null;
                 dataGridMap.ItemsSource = currentMap.ToList();
             }
@@ -338,12 +328,12 @@ namespace HOK.CameraDuplicator
             {
                 if (null != dataGridSource.SelectedItem && null != dataGridRecipient.SelectedItem)
                 {
-                    ItemInfo sItemInfo = (ItemInfo)dataGridSource.SelectedItem;
-                    ItemInfo rItemInfo = (ItemInfo)dataGridRecipient.SelectedItem;
+                    var sItemInfo = (ItemInfo)dataGridSource.SelectedItem;
+                    var rItemInfo = (ItemInfo)dataGridRecipient.SelectedItem;
 
                     if (rItemInfo.Enabled)
                     {
-                        MapItemInfo mapItemInfo = new MapItemInfo();
+                        var mapItemInfo = new MapItemInfo();
                         mapItemInfo.MapItemType = currentType;
                         mapItemInfo.SourceModelId = sModelInfo.ModelId;
                         mapItemInfo.SourceItemId = sItemInfo.ItemId;
@@ -351,7 +341,7 @@ namespace HOK.CameraDuplicator
                         mapItemInfo.RecipientModelId = rModelInfo.ModelId;
                         mapItemInfo.RecipientItemId = rItemInfo.ItemId;
                         mapItemInfo.RecipientItemName = rItemInfo.ItemName;
-                        viewConfig.MapItems.Add(mapItemInfo);
+                        ViewConfig.MapItems.Add(mapItemInfo);
 
                         if (sourceItems.ContainsKey(sItemInfo.ItemId) && recipientItems.ContainsKey(rItemInfo.ItemId))
                         {
@@ -388,19 +378,19 @@ namespace HOK.CameraDuplicator
             {
                 if (null != dataGridMap.SelectedItem)
                 {
-                    MapItemInfo mapItemInfo = (MapItemInfo)dataGridMap.SelectedItem;
-                    bool removed = viewConfig.MapItems.Remove(mapItemInfo);
+                    var mapItemInfo = (MapItemInfo)dataGridMap.SelectedItem;
+                    var removed = ViewConfig.MapItems.Remove(mapItemInfo);
 
-                    int sItemId = mapItemInfo.SourceItemId;
-                    int rItemId = mapItemInfo.RecipientItemId;
+                    var sItemId = mapItemInfo.SourceItemId;
+                    var rItemId = mapItemInfo.RecipientItemId;
                     if (sourceItems.ContainsKey(sItemId) && recipientItems.ContainsKey(rItemId))
                     {
-                        ItemInfo sItemInfo = sourceItems[sItemId];
+                        var sItemInfo = sourceItems[sItemId];
                         sItemInfo.Mapped = false;
                         sourceItems.Remove(sItemId);
                         sourceItems.Add(sItemId, sItemInfo);
 
-                        ItemInfo rItemInfo = recipientItems[rItemId];
+                        var rItemInfo = recipientItems[rItemId];
                         rItemInfo.Mapped = false;
                         recipientItems.Remove(rItemId);
                         recipientItems.Add(rItemId, rItemInfo);
@@ -476,16 +466,16 @@ namespace HOK.CameraDuplicator
 
         private void buttonApply_Click(object sender, RoutedEventArgs e)
         {
-            bool savedStorage = ViewConfigDataStorageUtil.StoreViewConfiguration(rModelInfo.ModelDoc, viewConfig);
+            var savedStorage = ViewConfigDataStorageUtil.StoreViewConfiguration(rModelInfo.ModelDoc, ViewConfig);
             if (savedStorage)
             {
-                this.DialogResult = true;
+                DialogResult = true;
             }
         }
 
         private void buttonCancel_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void dataGridSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -494,17 +484,17 @@ namespace HOK.CameraDuplicator
             {
                 if (null != dataGridSource.SelectedItem && currentType == MapType.ViewTemplate)
                 {
-                    ItemInfo sourceItem = (ItemInfo)dataGridSource.SelectedItem;
-                    View selectedTemplate = sourceItem.Item as View;
+                    var sourceItem = (ItemInfo)dataGridSource.SelectedItem;
+                    var selectedTemplate = sourceItem.Item as View;
                     if (null != selectedTemplate)
                     {
-                        ViewType selectedViewType = selectedTemplate.ViewType;
+                        var selectedViewType = selectedTemplate.ViewType;
 
-                        List<ItemInfo> rItemList = new List<ItemInfo>();
+                        var rItemList = new List<ItemInfo>();
                         var rItems = from item in recipientItems.Values where !item.Mapped && item.MapTypeEnum == currentType select item;
-                        foreach (ItemInfo itemInfo in rItems)
+                        foreach (var itemInfo in rItems)
                         {
-                            View viewItem = itemInfo.Item as View;
+                            var viewItem = itemInfo.Item as View;
                             if (null != viewItem)
                             {
                                 if (viewItem.ViewType == selectedViewType)
@@ -535,7 +525,7 @@ namespace HOK.CameraDuplicator
         {
             if ((bool)checkBoxWorkset.IsChecked)
             {
-                viewConfig.ApplyWorksetVisibility = true;
+                ViewConfig.ApplyWorksetVisibility = true;
             }
         }
 
@@ -543,52 +533,41 @@ namespace HOK.CameraDuplicator
         {
             if (!(bool)checkBoxWorkset.IsChecked)
             {
-                viewConfig.ApplyWorksetVisibility = false;
+                ViewConfig.ApplyWorksetVisibility = false;
             }
         }
-
     }
 
     public class ItemInfo
     {
-        private Element item = null;
-        private Workset worksetItem = null;
-        private string itemName = "";
-        private int itemId = -1;
-        private ElementId itemElementId = ElementId.InvalidElementId;
-        private WorksetId worksetItemId = WorksetId.InvalidWorksetId;
-        private MapType mapTypeEnum = MapType.None;
-        private bool mapped = false;
-        private bool enabled = true;
-
-        public Element Item { get { return item; } set { item = value; } }
-        public Workset WorksetItem { get { return worksetItem; } set { worksetItem = value; } }
-        public string ItemName { get { return itemName; } set { itemName = value; } }
-        public int ItemId { get { return itemId; } set { itemId = value; } }
-        public ElementId ItemElementId { get { return itemElementId; } set { itemElementId = value; } }
-        public WorksetId WorksetItemId { get { return worksetItemId; } set { worksetItemId = value; } }
-        public MapType MapTypeEnum { get { return mapTypeEnum; } set { mapTypeEnum = value; } }
-        public bool Mapped { get { return mapped; } set { mapped = value; } }
-        public bool Enabled { get { return enabled; } set { enabled = value; } }
+        public Element Item { get; set; }
+        public Workset WorksetItem { get; set; }
+        public string ItemName { get; set; } = "";
+        public int ItemId { get; set; } = -1;
+        public ElementId ItemElementId { get; set; } = ElementId.InvalidElementId;
+        public WorksetId WorksetItemId { get; set; } = WorksetId.InvalidWorksetId;
+        public MapType MapTypeEnum { get; set; } = MapType.None;
+        public bool Mapped { get; set; }
+        public bool Enabled { get; set; } = true;
 
         public ItemInfo() { }
 
         public ItemInfo(Element elem, MapType mType)
         {
-            item = elem;
-            itemName = elem.Name;
-            itemElementId = elem.Id;
-            itemId = itemElementId.IntegerValue;
-            mapTypeEnum = mType;
+            Item = elem;
+            ItemName = elem.Name;
+            ItemElementId = elem.Id;
+            ItemId = ItemElementId.IntegerValue;
+            MapTypeEnum = mType;
         }
 
         public ItemInfo(Workset ws, MapType mType)
         {
-            worksetItem = ws;
-            itemName = worksetItem.Name;
-            worksetItemId = worksetItem.Id;
-            itemId = worksetItemId.IntegerValue;
-            mapTypeEnum = mType;
+            WorksetItem = ws;
+            ItemName = WorksetItem.Name;
+            WorksetItemId = WorksetItem.Id;
+            ItemId = WorksetItemId.IntegerValue;
+            MapTypeEnum = mType;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region References
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -8,6 +10,8 @@ using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+
+#endregion
 
 namespace HOK.CameraDuplicator
 {
@@ -29,7 +33,11 @@ namespace HOK.CameraDuplicator
 
             if (m_app.Application.Documents.Size > 1)
             {
-                var cameraWindow = new CameraWindow(m_app);
+                var vm = new CameraViewModel();
+                var cameraWindow = new CameraWindow(m_app)
+                {
+                    DataContext = vm
+                };
                 if (true == cameraWindow.ShowDialog())
                 {
                     cameraWindow.Close();
@@ -50,59 +58,39 @@ namespace HOK.CameraDuplicator
 
     public class CameraViewInfo
     {
-        private int viewId = -1;
-        private string viewName = "";
-        
-        private int linkedViewId = -1;
-        private bool linked = false;
+        public int ViewId { get; set; }
+        public string ViewName { get; set; }
 
-        private ElementId viewTemplateId = ElementId.InvalidElementId;
-        private ElementId phaseId = ElementId.InvalidElementId;
-        private Dictionary<WorksetId, WorksetVisibility> worksetVisibilities = new Dictionary<WorksetId, WorksetVisibility>();
-        
-        private ViewOrientation3D orientation = null;
-        private bool isCropBoxOn = false;
-        private BoundingBoxXYZ cropBox = null;
-        private bool isSectionBoxOn = false;
-        private BoundingBoxXYZ sectionBox = null;
-        private DisplayStyle display = DisplayStyle.Undefined;
-       
-        private Dictionary<string, Parameter> viewParameters = new Dictionary<string, Parameter>();
-        private bool isSelected = false;
-        
-        public int ViewId { get { return viewId; } set { viewId = value; } }
-        public string ViewName { get { return viewName; } set { viewName = value; } }
+        public int LinkedViewId { get; set; } = -1;
+        public bool Linked { get; set; }
 
-        public int LinkedViewId { get { return linkedViewId; } set { linkedViewId = value; } }
-        public bool Linked { get { return linked; } set { linked = value; } }
+        public ElementId ViewTemplateId { get; set; }
+        public ElementId PhaseId { get; set; } = ElementId.InvalidElementId;
+        public Dictionary<WorksetId, WorksetVisibility> WorksetVisibilities { get; set; } = new Dictionary<WorksetId, WorksetVisibility>();
 
-        public ElementId ViewTemplateId { get { return viewTemplateId; } set { viewTemplateId = value; } }
-        public ElementId PhaseId { get { return phaseId; } set { phaseId = value; } }
-        public Dictionary<WorksetId, WorksetVisibility> WorksetVisibilities { get { return worksetVisibilities; } set { worksetVisibilities = value; } }
-
-        public ViewOrientation3D Orientation { get { return orientation; } set { orientation = value; } }
-        public bool IsCropBoxOn { get { return isCropBoxOn; } set { isCropBoxOn = value; } }
-        public BoundingBoxXYZ CropBox { get { return cropBox; } set { cropBox = value; } }
-        public bool IsSectionBoxOn { get { return isSectionBoxOn; } set { isSectionBoxOn = value; } }
-        public BoundingBoxXYZ SectionBox { get { return sectionBox; } set { sectionBox = value; } }
-        public DisplayStyle Display { get { return display; } set { display = value; } }
-        public Dictionary<string, Parameter> ViewParameters { get { return viewParameters; } set { viewParameters = value; } }
-        public bool IsSelected { get { return isSelected; } set { isSelected = value; } }
+        public ViewOrientation3D Orientation { get; set; }
+        public bool IsCropBoxOn { get; set; }
+        public BoundingBoxXYZ CropBox { get; set; }
+        public bool IsSectionBoxOn { get; set; }
+        public BoundingBoxXYZ SectionBox { get; set; }
+        public DisplayStyle Display { get; set; }
+        public Dictionary<string, Parameter> ViewParameters { get; set; } = new Dictionary<string, Parameter>();
+        public bool IsSelected { get; set; }
 
         public CameraViewInfo(View3D view3d)
         {
-            viewId = view3d.Id.IntegerValue;
-            viewName = view3d.Name;
+            ViewId = view3d.Id.IntegerValue;
+            ViewName = view3d.Name;
 
-            viewTemplateId = view3d.ViewTemplateId;
+            ViewTemplateId = view3d.ViewTemplateId;
             
-            orientation = view3d.GetOrientation();
-            isCropBoxOn = view3d.CropBoxActive;
-            cropBox = view3d.CropBox;
-            isSectionBoxOn = view3d.IsSectionBoxActive;
-            sectionBox = view3d.GetSectionBox();
+            Orientation = view3d.GetOrientation();
+            IsCropBoxOn = view3d.CropBoxActive;
+            CropBox = view3d.CropBox;
+            IsSectionBoxOn = view3d.IsSectionBoxActive;
+            SectionBox = view3d.GetSectionBox();
 
-            display = view3d.DisplayStyle;
+            Display = view3d.DisplayStyle;
             GetParameters(view3d.Parameters);
         }
 
@@ -130,18 +118,18 @@ namespace HOK.CameraDuplicator
                 {
                     var paramName = param.Definition.Name;
                     if (paramName.Contains(".Extensions")) { continue; }
-                    if (param.Id.IntegerValue == (int)BuiltInParameter.VIEW_PHASE) { phaseId = param.AsElementId(); }
+                    if (param.Id.IntegerValue == (int)BuiltInParameter.VIEW_PHASE) { PhaseId = param.AsElementId(); }
                     if (param.StorageType == StorageType.None || param.StorageType  == StorageType.ElementId) { continue; }
 
-                    if (!viewParameters.ContainsKey(paramName) && param.HasValue)
+                    if (!ViewParameters.ContainsKey(paramName) && param.HasValue)
                     {
-                        viewParameters.Add(paramName, param);
+                        ViewParameters.Add(paramName, param);
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var message = ex.Message;
+                // ignored
             }
         }
 
@@ -151,89 +139,66 @@ namespace HOK.CameraDuplicator
             {
                 foreach (var wsId in worksetIds)
                 {
-                    if (!worksetVisibilities.ContainsKey(wsId))
+                    if (!WorksetVisibilities.ContainsKey(wsId))
                     {
-                        worksetVisibilities.Add(wsId, view3d.GetWorksetVisibility(wsId));
+                        WorksetVisibilities.Add(wsId, view3d.GetWorksetVisibility(wsId));
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var message = ex.Message;
+                // ignored
             }
         }
     }
 
     public class PlanViewInfo
     {
-        private int viewId = -1;
-        private string viewName = "";
-        private ViewType planViewType = ViewType.Undefined;
+        public int ViewId { get; set; }
+        public string ViewName { get; set; }
+        public ViewType PlanViewType { get; set; }
 
-        private int linkedViewId = -1;
-        private bool linked = false;
+        public int LinkedViewId { get; set; } = -1;
+        public bool Linked { get; set; }
 
-        private ElementId levelId = ElementId.InvalidElementId;
-        private string levelName = "";
+        public ElementId LevelId { get; set; } = ElementId.InvalidElementId;
+        public string LevelName { get; set; } = "";
 
-        private ElementId viewTemplateId = ElementId.InvalidElementId;
-        private ElementId scopeBoxId = ElementId.InvalidElementId;
-        private ElementId phaseId = ElementId.InvalidElementId;
-        private ElementId areaShcemeId = ElementId.InvalidElementId;
-        private Dictionary<WorksetId, WorksetVisibility> worksetVisibilities = new Dictionary<WorksetId, WorksetVisibility>();
+        public ElementId ViewTemplateId { get; set; }
+        public ElementId ScopeBoxId { get; set; } = ElementId.InvalidElementId;
+        public ElementId PhaseId { get; set; } = ElementId.InvalidElementId;
+        public ElementId AreaSchemeId { get; set; } = ElementId.InvalidElementId;
+        public Dictionary<WorksetId, WorksetVisibility> WorksetVisibilities { get; set; } = new Dictionary<WorksetId, WorksetVisibility>();
 
-        private bool isCropBoxOn = false;
-        private BoundingBoxXYZ cropBox = null;
-        private DisplayStyle display = DisplayStyle.Undefined;
+        public bool IsCropBoxOn { get; set; }
+        public BoundingBoxXYZ CropBox { get; set; }
+        public DisplayStyle Display { get; set; }
 
-        private Dictionary<string, Parameter> viewParameters = new Dictionary<string, Parameter>();
-        private bool isSelected = false;
-
-        public int ViewId { get { return viewId; } set { viewId = value; } }
-        public string ViewName { get { return viewName; } set { viewName = value; } }
-        public ViewType PlanViewType { get { return planViewType; } set { planViewType = value; } }
-
-        public int LinkedViewId { get { return linkedViewId; } set { linkedViewId = value; } }
-        public bool Linked { get { return linked; } set { linked = value; } }
-
-        public ElementId LevelId { get { return levelId; } set { levelId = value; } }
-        public string LevelName { get { return levelName; } set { levelName = value; } }
-
-        public ElementId ViewTemplateId { get { return viewTemplateId; } set { viewTemplateId = value; } }
-        public ElementId ScopeBoxId { get { return scopeBoxId; } set { scopeBoxId = value; } }
-        public ElementId PhaseId { get { return phaseId; } set { phaseId = value; } }
-        public ElementId AreaSchemeId { get { return areaShcemeId; } set { areaShcemeId = value; } }
-        public Dictionary<WorksetId, WorksetVisibility> WorksetVisibilities { get { return worksetVisibilities; } set { worksetVisibilities = value; } }
-
-        public bool IsCropBoxOn { get { return isCropBoxOn; } set { isCropBoxOn = value; } }
-        public BoundingBoxXYZ CropBox { get { return cropBox; } set { cropBox = value; } }
-        public DisplayStyle Display { get { return display; } set { display = value; } }
-
-        public Dictionary<string, Parameter> ViewParameters { get { return viewParameters; } set { viewParameters = value; } }
-        public bool IsSelected { get { return isSelected; } set { isSelected = value; } }
+        public Dictionary<string, Parameter> ViewParameters { get; set; } = new Dictionary<string, Parameter>();
+        public bool IsSelected { get; set; }
 
         public PlanViewInfo(ViewPlan planView)
         {
-            viewId = planView.Id.IntegerValue;
-            viewName = planView.Name;
-            planViewType = planView.ViewType;
+            ViewId = planView.Id.IntegerValue;
+            ViewName = planView.Name;
+            PlanViewType = planView.ViewType;
 
             if (null != planView.GenLevel)
             {
-                levelId = planView.GenLevel.Id;
-                levelName = planView.GenLevel.Name;
+                LevelId = planView.GenLevel.Id;
+                LevelName = planView.GenLevel.Name;
             }
             
-            viewTemplateId = planView.ViewTemplateId;
+            ViewTemplateId = planView.ViewTemplateId;
             if (null != planView.AreaScheme)
             {
-                areaShcemeId = planView.AreaScheme.Id;
+                AreaSchemeId = planView.AreaScheme.Id;
             }
 
-            isCropBoxOn = planView.CropBoxActive;
-            cropBox = planView.CropBox;
+            IsCropBoxOn = planView.CropBoxActive;
+            CropBox = planView.CropBox;
 
-            display = planView.DisplayStyle;
+            Display = planView.DisplayStyle;
             GetParameters(planView.Parameters);
         }
 
@@ -253,7 +218,7 @@ namespace HOK.CameraDuplicator
             IsCropBoxOn = info.IsCropBoxOn;
             CropBox = info.CropBox;
             Display = info.Display;
-            viewParameters = info.ViewParameters;
+            ViewParameters = info.ViewParameters;
             IsSelected = info.IsSelected;
         }
 
@@ -265,18 +230,18 @@ namespace HOK.CameraDuplicator
                 {
                     var paramName = param.Definition.Name;
                     if (paramName.Contains(".Extensions")) { continue; }
-                    if (param.Id.IntegerValue == (int)BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP) { scopeBoxId = param.AsElementId(); continue; }
-                    if (param.Id.IntegerValue == (int)BuiltInParameter.VIEW_PHASE) { phaseId = param.AsElementId(); continue; }
+                    if (param.Id.IntegerValue == (int)BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP) { ScopeBoxId = param.AsElementId(); continue; }
+                    if (param.Id.IntegerValue == (int)BuiltInParameter.VIEW_PHASE) { PhaseId = param.AsElementId(); continue; }
                     if (param.StorageType == StorageType.None || param.StorageType == StorageType.ElementId) { continue; }
-                    if (!viewParameters.ContainsKey(paramName) && param.HasValue)
+                    if (!ViewParameters.ContainsKey(paramName) && param.HasValue)
                     {
-                        viewParameters.Add(paramName, param);
+                        ViewParameters.Add(paramName, param);
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var message = ex.Message;
+                // ignored
             }
         }
 
@@ -286,41 +251,36 @@ namespace HOK.CameraDuplicator
             {
                 foreach (var wsId in worksetIds)
                 {
-                    if (!worksetVisibilities.ContainsKey(wsId))
+                    if (!WorksetVisibilities.ContainsKey(wsId))
                     {
-                        worksetVisibilities.Add(wsId, viewPlan.GetWorksetVisibility(wsId));
+                        WorksetVisibilities.Add(wsId, viewPlan.GetWorksetVisibility(wsId));
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var message = ex.Message;
+                // ignored
             }
         }
     }
 
     public class ModelInfo
     {
-        private string modelId = "";
-        private string modelName = "";
-        private Document modelDoc = null;
         private List<WorksetId> worksetIds = new List<WorksetId>();
-        private Dictionary<int/*viewId*/, CameraViewInfo> cameraViews = new Dictionary<int, CameraViewInfo>();
-        private Dictionary<int/*viewId*/, PlanViewInfo> planViews = new Dictionary<int, PlanViewInfo>();
 
-        public string ModelId { get { return modelId; } set { modelId = value; } }
-        public string ModelName { get { return modelName; } set { modelName = value; } }
-        public Document ModelDoc { get { return modelDoc; } set { modelDoc = value; } }
-        public Dictionary<int, CameraViewInfo> CameraViews { get { return cameraViews; } set { cameraViews = value; } }
-        public Dictionary<int, PlanViewInfo> PlanViews { get { return planViews; } set { planViews = value; } }
+        public string ModelId { get; set; }
+        public string ModelName { get; set; }
+        public Document ModelDoc { get; set; }
+        public Dictionary<int, CameraViewInfo> CameraViews { get; set; } = new Dictionary<int, CameraViewInfo>();
+        public Dictionary<int, PlanViewInfo> PlanViews { get; set; } = new Dictionary<int, PlanViewInfo>();
 
         public ModelInfo(Document doc, string id)
         {
-            modelDoc = doc;
-            modelName = doc.Title;
-            modelId = id;
+            ModelDoc = doc;
+            ModelName = doc.Title;
+            ModelId = id;
 
-            if (modelDoc.IsWorkshared)
+            if (ModelDoc.IsWorkshared)
             {
                 GetWorksets();
             }
@@ -332,7 +292,7 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                var wsCollector = new FilteredWorksetCollector(modelDoc);
+                var wsCollector = new FilteredWorksetCollector(ModelDoc);
                 var wsFilter = new WorksetKindFilter(WorksetKind.UserWorkset);
                 worksetIds = wsCollector.WherePasses(wsFilter).ToWorksetIds().ToList();
             }
@@ -346,7 +306,7 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                var collector = new FilteredElementCollector(modelDoc);
+                var collector = new FilteredElementCollector(ModelDoc);
                 var threeDViews = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                 foreach (var view in threeDViews)
                 {
@@ -359,9 +319,9 @@ namespace HOK.CameraDuplicator
                         {
                             viewInfo.GetWorksetVisibilities(view, worksetIds);
                         }
-                        if (!cameraViews.ContainsKey(viewInfo.ViewId))
+                        if (!CameraViews.ContainsKey(viewInfo.ViewId))
                         {
-                            cameraViews.Add(viewInfo.ViewId, viewInfo);
+                            CameraViews.Add(viewInfo.ViewId, viewInfo);
                         }
                     }
                 }
@@ -376,7 +336,7 @@ namespace HOK.CameraDuplicator
         {
             try
             {
-                var collector = new FilteredElementCollector(modelDoc);
+                var collector = new FilteredElementCollector(ModelDoc);
                 var viewPlans = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
                 foreach (var pView in viewPlans)
                 {
@@ -387,14 +347,14 @@ namespace HOK.CameraDuplicator
                         if (parentParam.HasValue) { continue; }
                     }
 
-                    if (!planViews.ContainsKey(pView.Id.IntegerValue))
+                    if (!PlanViews.ContainsKey(pView.Id.IntegerValue))
                     {
                         var pvi = new PlanViewInfo(pView);
                         if (worksetIds.Count > 0)
                         {
                             pvi.GetWorksetVisibilities(pView, worksetIds);
                         }
-                        planViews.Add(pvi.ViewId, pvi);
+                        PlanViews.Add(pvi.ViewId, pvi);
                     }
                 }
             }
@@ -407,11 +367,8 @@ namespace HOK.CameraDuplicator
 
     public class ViewConfiguration
     {
-        private bool applyWorksetVisibility = false;
-        private List<MapItemInfo> mapItems = new List<MapItemInfo>();
-
-        public bool ApplyWorksetVisibility { get { return applyWorksetVisibility; } set { applyWorksetVisibility = value; } }
-        public List<MapItemInfo> MapItems { get { return mapItems; } set { mapItems = value; } }
+        public bool ApplyWorksetVisibility { get; set; }
+        public List<MapItemInfo> MapItems { get; set; } = new List<MapItemInfo>();
 
         public ViewConfiguration()
         {
@@ -419,32 +376,20 @@ namespace HOK.CameraDuplicator
 
         public ViewConfiguration(bool apply, List<MapItemInfo> maps)
         {
-            applyWorksetVisibility = apply;
-            mapItems = maps;
+            ApplyWorksetVisibility = apply;
+            MapItems = maps;
         }
     }
 
     public class MapItemInfo
     {
-        private string sourceModelId = "";
-        private string recipientModelId = "";
-        private MapType mapItemType = MapType.None;
-        private int sourceItemId = -1;
-        private int recipientItemId = -1;
-        private string sourceItemName = "";
-        private string recipientItemName = "";
-
-        public string SourceModelId { get { return sourceModelId; } set { sourceModelId = value; } }
-        public string RecipientModelId { get { return recipientModelId; } set { recipientModelId = value; } }
-        public MapType MapItemType { get { return mapItemType; } set { mapItemType = value; } }
-        public int SourceItemId { get { return sourceItemId; } set { sourceItemId = value; } }
-        public int RecipientItemId { get { return recipientItemId; } set { recipientItemId = value; } }
-        public string SourceItemName { get { return sourceItemName; } set { sourceItemName = value; } }
-        public string RecipientItemName { get { return recipientItemName; } set { recipientItemName = value; } }
-
-        public MapItemInfo()
-        {
-        }
+        public string SourceModelId { get; set; } = "";
+        public string RecipientModelId { get; set; } = "";
+        public MapType MapItemType { get; set; } = MapType.None;
+        public int SourceItemId { get; set; } = -1;
+        public int RecipientItemId { get; set; } = -1;
+        public string SourceItemName { get; set; } = "";
+        public string RecipientItemName { get; set; } = "";
     }
 
     public enum MapType
@@ -454,13 +399,9 @@ namespace HOK.CameraDuplicator
 
     public class ViewTypeInfo
     {
-        private string viewTypeName = "";
-        private ViewType viewTypeEnum = ViewType.Undefined;
-        private ViewFamily viewFamilyEnum = ViewFamily.ThreeDimensional;
-
-        public string ViewTypeName { get { return viewTypeName; } set { viewTypeName = value; } }
-        public ViewType ViewTypeEnum { get { return viewTypeEnum; } set { viewTypeEnum = value; } }
-        public ViewFamily ViewFamilyEnum { get { return viewFamilyEnum; } set { viewFamilyEnum = value; } }
+        public string ViewTypeName { get; set; } = "";
+        public ViewType ViewTypeEnum { get; set; } = ViewType.Undefined;
+        public ViewFamily ViewFamilyEnum { get; set; } = ViewFamily.ThreeDimensional;
 
         public ViewTypeInfo()
         {
@@ -468,9 +409,9 @@ namespace HOK.CameraDuplicator
 
         public ViewTypeInfo(string name, ViewType vType, ViewFamily vFamily)
         {
-            viewTypeName = name;
-            viewTypeEnum = vType;
-            viewFamilyEnum = vFamily;
+            ViewTypeName = name;
+            ViewTypeEnum = vType;
+            ViewFamilyEnum = vFamily;
         }
     }
 }

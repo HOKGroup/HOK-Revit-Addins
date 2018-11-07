@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 
@@ -20,7 +11,7 @@ namespace HOK.CameraDuplicator
     /// <summary>
     /// Interaction logic for CameraWindow.xaml
     /// </summary>
-    public partial class CameraWindow : Window
+    public partial class CameraWindow
     {
         private UIApplication m_app = null;
         private ViewType selectedViewType = ViewType.ThreeD;
@@ -41,7 +32,7 @@ namespace HOK.CameraDuplicator
             modelDictionary = GetModelInfo();
             InitializeComponent();
 
-            this.Title = "View Mover v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            Title = "View Mover v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
             SetViewTypeList();
 
             List<ModelInfo> models = modelDictionary.Values.OrderBy(o => o.ModelName).ToList();
@@ -91,20 +82,40 @@ namespace HOK.CameraDuplicator
             }
         }
 
+        /// <summary>
+        /// Retrieves information about currently open models.
+        /// </summary>
+        /// <returns></returns>
         private Dictionary<string, ModelInfo> GetModelInfo()
         {
-            Dictionary<string, ModelInfo> infoDictionary = new Dictionary<string, ModelInfo>();
+            var infoDictionary = new Dictionary<string, ModelInfo>();
             foreach (Document doc in m_app.Application.Documents)
             {
                 if (doc.IsFamilyDocument) { continue; }
                 if (doc.IsLinked) { continue; }
-                string modelId = ModelDataStorageUtil.GetModelId(doc);
-                if (!infoDictionary.ContainsKey(modelId))
+                var modelId = ModelDataStorageUtil.GetModelId(doc);
+                if (infoDictionary.ContainsKey(modelId))
                 {
-                    ModelInfo info = new ModelInfo(doc, modelId);
-                    infoDictionary.Add(modelId, info);
+                    // (Konrad) Two models have the same Id. That's possible if one model was created, by "save as" of the other model.
+                    // Let's make sure that these models are actually not the same model.
+                    var current = FileUtils.GetCentralFilePath(doc);
+                    var storedDoc = infoDictionary[modelId];
+                    var storedPath = FileUtils.GetCentralFilePath(storedDoc.ModelDoc);
+                    if (current.Equals(storedPath, StringComparison.OrdinalIgnoreCase)) continue;
+
+                    // (Konrad) The two models have the same modelId, but not the same file paths.
+                    // We should reset the stored modelId for the current model.
+                    var newid = Guid.NewGuid().ToString();
+                    var reset = ModelDataStorageUtil.StoreModelId(doc, modelId);
+                    if (!reset) continue;
+
+                    modelId = newid;
                 }
+
+                var info = new ModelInfo(doc, modelId);
+                infoDictionary.Add(modelId, info);
             }
+
             return infoDictionary;
         }
 

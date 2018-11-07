@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using RestSharp;
@@ -17,7 +16,7 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
 
         public FeedbackModel()
         {
-            var settingsString = Resources.StreamEmbeddedResource(Assembly.GetExecutingAssembly(), "HOK.Core.Resources.Settings.json");
+            var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
             Settings = Json.Deserialize<Settings>(settingsString);
         }
 

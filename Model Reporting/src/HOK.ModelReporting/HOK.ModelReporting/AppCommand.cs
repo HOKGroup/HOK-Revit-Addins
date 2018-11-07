@@ -231,8 +231,12 @@ namespace HOK.ModelReporting
         {
             try
             {
-                var entities = new KNetBIMDataServiceReference.KNetBIMDataCollectionEntities(
-                    new Uri("http://bimservices.hok.com/BIM/HOK.BIM.Services/KNetBIMDataService.svc/"));
+                // (Konrad) All HOK specific settings are stored in a Settings.json file and referenced
+                // inside of the HOK.Core. We can retrieve them by deserializing the resource.
+                var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
+                var path = Json.Deserialize<Core.Utilities.Settings>(settingsString)?.ModelReportingServiceEndpoint;
+
+                var entities = new KNetBIMDataServiceReference.KNetBIMDataCollectionEntities(new Uri(path));
                 var dataPointEntity = new KNetBIMDataServiceReference.RevitEvent();
                 {
                     dataPointEntity.ID = Guid.NewGuid();

@@ -234,7 +234,7 @@ namespace HOK.ModelReporting
             long fileSize = 0;
             try
             {
-                if (DocCentralPath.StartsWith("C:")) { return fileSize; }
+                if (DocCentralPath.StartsWith("C:", StringComparison.OrdinalIgnoreCase)) { return fileSize; }
 
                 if (!string.IsNullOrEmpty(DocLocalPath))
                 {

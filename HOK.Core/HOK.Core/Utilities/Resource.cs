@@ -8,11 +8,13 @@ namespace HOK.Core.Utilities
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="assembly"></param>
         /// <param name="fileName"></param>
+        /// <param name="assembly"></param>
         /// <returns></returns>
-        public static string StreamEmbeddedResource(Assembly assembly, string fileName)
+        public static string StreamEmbeddedResource(string fileName, Assembly assembly = null)
         {
+            if(assembly == null) assembly = Assembly.GetExecutingAssembly();
+
             using (var stream = assembly.GetManifestResourceStream(fileName))
             {
                 if (stream == null) return string.Empty;
