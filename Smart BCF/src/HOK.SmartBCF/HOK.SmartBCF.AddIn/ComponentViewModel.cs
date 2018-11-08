@@ -1,20 +1,20 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.IFC;
-using Autodesk.Revit.UI;
-using HOK.SmartBCF.AddIn.Util;
-using HOK.SmartBCF.Schemas;
-using HOK.SmartBCF.UserControls;
-using HOK.SmartBCF.Utils;
+﻿#region References
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using HOK.SmartBCF.AddIn.Util;
+using HOK.SmartBCF.Schemas;
+using HOK.SmartBCF.UserControls;
+using HOK.SmartBCF.Utils;
 using Component = HOK.SmartBCF.Schemas.Component;
+
+#endregion
 
 namespace HOK.SmartBCF.AddIn
 {
@@ -156,29 +156,6 @@ namespace HOK.SmartBCF.AddIn
                                         rvtComponent = new RevitComponent(comp, compElement, rlp);
                                     } 
                                 }
-                                /*
-                                BuiltInParameter bip = BuiltInParameter.IFC_GUID;
-                                ParameterValueProvider provider = new ParameterValueProvider(new ElementId(bip));
-                                FilterStringRuleEvaluator evaluator = new FilterStringEquals();
-
-                                FilterRule rule = new FilterStringRule(provider, evaluator, comp.IfcGuid, true);
-                                ElementParameterFilter filter = new ElementParameterFilter(rule);
-
-                                foreach (RevitLinkProperties rlp in linkDictionary.Values)
-                                {
-                                    if (null != rlp.LinkedDocument)
-                                    {
-                                        FilteredElementCollector collector = new FilteredElementCollector(rlp.LinkedDocument);
-                                        ICollection<Element> elements = collector.WherePasses(filter).WhereElementIsNotElementType().ToElements();
-
-                                        if (elements.Count > 0)
-                                        {
-                                            Element element = elements.First();
-                                            rvtComponent = new RevitComponent(comp, element, rlp);
-                                            break;
-                                        }
-                                    }
-                                }*/
                             }
                            
                             if (null != rvtComponent)

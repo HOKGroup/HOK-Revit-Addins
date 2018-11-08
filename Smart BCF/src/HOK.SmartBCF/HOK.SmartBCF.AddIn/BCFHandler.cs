@@ -1,145 +1,96 @@
-﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
-using HOK.SmartBCF.AddIn.Util;
-using HOK.SmartBCF.Schemas;
-using HOK.SmartBCF.Utils;
+﻿#region References
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using HOK.SmartBCF.AddIn.Util;
+using HOK.SmartBCF.Schemas;
+using HOK.SmartBCF.Utils;
+
+#endregion
 
 namespace HOK.SmartBCF.AddIn
 {
-    public enum BCFParameters
-    {
-        BCF_Action,
-        BCF_Author,
-        BCF_Comment,
-        BCF_Date,
-        BCF_Name,
-        BCF_Responsibility,
-        BCF_Topic,
-        BCF_TopicStatus,
-        BCF_TopicType,
-        BCF_AssignedTo
-    }
-
     public class BCFHandler : IExternalEventHandler
     {
-        private UIApplication m_app = null;
-        private Document m_doc = null;
-        private View3D bcfOrthoView = null;
-        private View3D bcfPersView = null;
-        private UIView bcfUIView = null;
-        private Request m_request = new Request();
-        private ComponentViewModel viewModel = null;
-        private AddViewModel addViewModel = null;
-
-        private string addinDefinitionFile = "";
-        private string databaseFile = "";
-       
-        public Document ActiveDoc { get { return m_doc; } set { m_doc = value; } }
-        public View3D BCFOrthoView { get { return bcfOrthoView; } set { bcfOrthoView = value; } }
-        public View3D BCFPersView { get { return bcfPersView; } set { bcfPersView = value; } }
-        public UIView BCFUIView { get { return bcfUIView; } set { bcfUIView = value; } }
-        public Request Request { get { return m_request; } }
-        public ComponentViewModel ViewModel { get { return viewModel; } set { viewModel = value; } }
-        public AddViewModel ViewPointViewModel { get { return addViewModel; } set { addViewModel = value; } }
-
-        public string DatabaseFile { get { return databaseFile; } set { databaseFile = value; } }
+        private UIApplication m_app;
+        private readonly string addinDefinitionFile;
+        public Document ActiveDoc { get; set; }
+        public View3D BCFOrthoView { get; set; }
+        public View3D BCFPersView { get; set; }
+        public UIView BCFUIView { get; set; }
+        public Request Request { get; } = new Request();
+        public ComponentViewModel ViewModel { get; set; } = null;
+        public AddViewModel ViewPointViewModel { get; set; } = null;
+        public string DatabaseFile { get; set; } = "";
 
         public BCFHandler(UIApplication uiapp)
         {
             m_app = uiapp;
-            m_doc = uiapp.ActiveUIDocument.Document;
-
-            addinDefinitionFile = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "/Resources/Addins Shared Parameters.txt";
-            //collect information of linked instances
+            ActiveDoc = uiapp.ActiveUIDocument.Document;
+            addinDefinitionFile = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) +
+                                  "/Resources/Addins Shared Parameters.txt";
         }
 
         public void Execute(UIApplication app)
         {
-            m_doc = app.ActiveUIDocument.Document;
+            ActiveDoc = app.ActiveUIDocument.Document;
             try
             {
                 switch (Request.Take())
                 {
                     case RequestId.ApplyViews:
-                        //when component selection changed
-                        if (null != bcfOrthoView)
+                        // (Jinsol) When component selection changed
+                        if (null != BCFOrthoView)
                         {
-                            CleanViewSettings(bcfOrthoView, true, true, true);
+                            CleanViewSettings(BCFOrthoView, true, true, true);
                             
                             SetDefaultView();
-                            if (viewModel.IsHighlightChecked)
-                            {
-                                HighlightElements();
-                            }
-                            if (ViewModel.IsIsolateChecked)
-                            {
-                                IsolateElement(bcfOrthoView);
-                            }
-                            else if (viewModel.IsSectionBoxChecked)
-                            {
-                                PlaceSectionBox(bcfOrthoView);
-                            }
+                            if (ViewModel.IsHighlightChecked) HighlightElements();
+                            if (ViewModel.IsIsolateChecked) IsolateElement(BCFOrthoView);
+                            else if (ViewModel.IsSectionBoxChecked) PlaceSectionBox(BCFOrthoView);
                         }
                         break;
                     case RequestId.HighlightElement:
-                         if (null != bcfOrthoView)
-                        {
-                            CleanViewSettings(bcfOrthoView, true, false, false);
-                            if (viewModel.IsHighlightChecked)
-                            {
-                                HighlightElements();
-                            }
-                        }
+                         if (null != BCFOrthoView)
+                         {
+                             CleanViewSettings(BCFOrthoView, true, false, false);
+                             if (ViewModel.IsHighlightChecked) HighlightElements();
+                         }
                         break;
                     case RequestId.IsolateElement:
-                        if (null != bcfOrthoView)
+                        if (null != BCFOrthoView)
                         {
-                            CleanViewSettings(bcfOrthoView, false, true, true);
-
+                            CleanViewSettings(BCFOrthoView, false, true, true);
                             SetDefaultView();
-                            if (ViewModel.IsIsolateChecked)
-                            {
-                                IsolateElement(bcfOrthoView);
-                            }
-                            else
-                            {
-                                SetViewPointView();
-                            }
+
+                            if (ViewModel.IsIsolateChecked) IsolateElement(BCFOrthoView);
+                            else SetViewPointView();
                         }
                         break;
                     case RequestId.PlaceSectionBox:
-                         if (null != bcfOrthoView)
+                         if (null != BCFOrthoView)
                          {
-                             CleanViewSettings(bcfOrthoView, false, true, true);
-
+                             CleanViewSettings(BCFOrthoView, false, true, true);
                              SetDefaultView();
-                             if (ViewModel.IsSectionBoxChecked)
-                             {
-                                 PlaceSectionBox(bcfOrthoView);
-                             }
-                             else
-                             {
-                                 SetViewPointView();
-                             }
+
+                             if (ViewModel.IsSectionBoxChecked) PlaceSectionBox(BCFOrthoView);
+                             else SetViewPointView();
                          }
                         break;
                     case RequestId.WriteParameters:
                         WriteParameters();
                         break;
                     case RequestId.SetViewPointView:
-                        //when markup topic changed
-                        bool viewSet = SetViewPointView();
-                        
+                        // (Jinsol) When markup topic changed
+                        SetViewPointView();
                         break;
                     case RequestId.StoreToolSettings:
                         StoreToolSettings();
@@ -148,7 +99,6 @@ namespace HOK.SmartBCF.AddIn
                         ExportImage();
                         break;
                 }
-                
             }
             catch (Exception ex)
             {
@@ -156,184 +106,154 @@ namespace HOK.SmartBCF.AddIn
             }
         }
 
-        private bool HighlightElements()
+        /// <summary>
+        /// 
+        /// </summary>
+        private void HighlightElements()
         {
-            bool highlighted = false;
-            if (null != viewModel.SelectedComponent)
+            if (null == ViewModel.SelectedComponent) return;
+
+            try
             {
+                var uidoc = new UIDocument(ActiveDoc);
+                var selectedIds = new List<ElementId>();
+                selectedIds.Add(ViewModel.SelectedComponent.ElementId);
+                uidoc.Selection.SetElementIds(selectedIds);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bcfView"></param>
+        private void IsolateElement(View3D bcfView)
+        {
+            var selectedComponent = ViewModel.SelectedComponent;
+            if (null == selectedComponent) return;
+
+            using (var trans = new Transaction(ActiveDoc))
+            {
+                trans.Start("Isolate View");
                 try
                 {
-                    UIDocument uidoc = new UIDocument(m_doc);
+                    bcfView.IsolateElementTemporary(ViewModel.SelectedComponent.ElementId);
 
-#if RELEASE2014
-                        SelElementSet selElements = SelElementSet.Create();
-                        selElements.Add(viewModel.SelectedComponent.RvtElement);
-                       
-                        uidoc.Selection.Elements = selElements;
-                        //uidoc.ShowElements(selElements);
+                    var element = ViewModel.SelectedComponent.RvtElement;
+                    if (element != null)
+                    {
+                        var boundingBox = element.get_BoundingBox(null);
+                        if (boundingBox != null)
+                        {
+                            BCFUIView.ZoomAndCenterRectangle(boundingBox.Min, boundingBox.Max);
+                            BCFUIView.Zoom(0.8);
+                        }
+                    }
+                    trans.Commit();
+                }
+                catch (Exception)
+                {
+                    trans.RollBack();
+                }
+            }
+        }
 
-#elif RELEASE2015 || RELEASE2016 ||RELEASE2017
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bcfView"></param>
+        private void PlaceSectionBox(View3D bcfView)
+        {
+            var selectedComponent = ViewModel.SelectedComponent;
+            if (null == selectedComponent) return;
 
-                    List<ElementId> selectedIds = new List<ElementId>();
-                    selectedIds.Add(viewModel.SelectedComponent.ElementId);
+            using (var trans = new Transaction(ActiveDoc))
+            {
+                trans.Start("Set Section Box");
+                try
+                {
+                    var element = selectedComponent.RvtElement;
+                    if (null != element)
+                    {
+                        var transform = selectedComponent.TransformValue;
+                        var boundingBox = element.get_BoundingBox(null);
+                        var minXYZ = transform.OfPoint(boundingBox.Min);
+                        var maxXYZ = transform.OfPoint(boundingBox.Max);
+                            
 
-                    uidoc.Selection.SetElementIds(selectedIds);
-                    //uidoc.ShowElements(selectedIds);
-#endif
+                        var offsetBox = new BoundingBoxXYZ();
+                        offsetBox.Min = new XYZ(minXYZ.X - 3, minXYZ.Y - 3, minXYZ.Z - 3);
+                        offsetBox.Max = new XYZ(maxXYZ.X + 3, maxXYZ.Y + 3, maxXYZ.Z + 3);
+
+                        bcfView.SetSectionBox(offsetBox);
+                        bcfView.GetSectionBox().Enabled = true;
+
+                        BCFUIView.ZoomAndCenterRectangle(offsetBox.Min, offsetBox.Max);
+                        BCFUIView.Zoom(0.8);
+                    }
+                    trans.Commit();
                 }
                 catch (Exception ex)
                 {
-                    string message = ex.Message;
+                    MessageBox.Show("Failed to set sectionbox.\n" + ex.Message, "Set Section Box", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    trans.RollBack();
                 }
             }
-            
-            return highlighted;
         }
 
-        private bool IsolateElement(View3D bcfView)
+        /// <summary>
+        /// 
+        /// </summary>
+        private void WriteParameters()
         {
-            bool isolated = false;
-
-            RevitComponent selectedComponent = viewModel.SelectedComponent;
-            if (null != selectedComponent)
-            {
-                using (Transaction trans = new Transaction(m_doc))
-                {
-                    trans.Start("Isolate View");
-                    try
-                    {
-                        bcfView.IsolateElementTemporary(viewModel.SelectedComponent.ElementId);
-
-                        Element element = viewModel.SelectedComponent.RvtElement;
-                        if (null != element)
-                        {
-                            BoundingBoxXYZ boundingBox = element.get_BoundingBox(null);
-                            if (null != boundingBox)
-                            {
-                                bcfUIView.ZoomAndCenterRectangle(boundingBox.Min, boundingBox.Max);
-#if RELEASE2014||RELEASE2015||RELEASE2016||RELEASE2017
-                                bcfUIView.Zoom(0.8);
-#endif
-                            }
-                        }
-                        trans.Commit();
-                        isolated = true;
-                    }
-                    catch (Exception ex)
-                    {
-                        trans.RollBack();
-                        string message = ex.Message;
-                    }
-                }
-            }
-            return isolated;
-        }
-
-        private bool PlaceSectionBox(View3D bcfView)
-        {
-            bool placed = false;
-            RevitComponent selectedComponent = viewModel.SelectedComponent;
-            if (null != selectedComponent)
-            {
-                using (Transaction trans = new Transaction(m_doc))
-                {
-                    trans.Start("Set Section Box");
-                    try
-                    {
-                        Element element = selectedComponent.RvtElement;
-                        if (null != element)
-                        {
-                            Transform transform = selectedComponent.TransformValue;
-                            BoundingBoxXYZ boundingBox = element.get_BoundingBox(null);
-                            XYZ minXYZ = transform.OfPoint(boundingBox.Min);
-                            XYZ maxXYZ = transform.OfPoint(boundingBox.Max);
-                            
-
-                            BoundingBoxXYZ offsetBox = new BoundingBoxXYZ();
-                            offsetBox.Min = new XYZ(minXYZ.X - 3, minXYZ.Y - 3, minXYZ.Z - 3);
-                            offsetBox.Max = new XYZ(maxXYZ.X + 3, maxXYZ.Y + 3, maxXYZ.Z + 3);
-
-                            bcfView.SetSectionBox(offsetBox);
-                            bcfView.GetSectionBox().Enabled = true;
-
-                            bcfUIView.ZoomAndCenterRectangle(offsetBox.Min, offsetBox.Max);
-
-#if RELEASE2014||RELEASE2015||RELEASE2016||RELEASE2017
-                            bcfUIView.Zoom(0.8);
-#endif
-                        }
-                        trans.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Failed to set sectionbox.\n" + ex.Message, "Set Section Box", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        trans.RollBack();
-                    }
-                }
-            }
-            return placed;
-        }
-
-        private bool WriteParameters()
-        {
-            bool updated = false;
             try
             {
-                RevitComponent selectedComponent = viewModel.SelectedComponent;
-                if (null != selectedComponent)
-                {
-                    if (!selectedComponent.IsLinked)
-                    {
-                        Element element = selectedComponent.RvtElement;
-                        if (null != element)
-                        {
-                            using (Transaction trans = new Transaction(m_doc))
-                            {
-                                trans.Start("Write Parameters");
-                                try
-                                {
-                                    bool updatedName = WriteParameter(element, BCFParameters.BCF_Name, viewModel.SelectedBCF.ZipFileName);
-                                    bool updatedTopic = WriteParameter(element, BCFParameters.BCF_Topic, viewModel.SelectedMarkup.Topic.Title);
-                                    bool updatedTopicType = WriteParameter(element, BCFParameters.BCF_TopicType, viewModel.SelectedMarkup.Topic.TopicType.ToString());
-                                    bool updatedTopicStatus = WriteParameter(element, BCFParameters.BCF_TopicStatus, viewModel.SelectedMarkup.Topic.TopicStatus.ToString());
-                                    bool updatedAssignedTo = WriteParameter(element, BCFParameters.BCF_AssignedTo, viewModel.SelectedMarkup.Topic.AssignedTo);
-                                    bool updatedComment = WriteParameter(element, BCFParameters.BCF_Comment, viewModel.SelectedComment.Comment1);
-                                    bool updatedAuthor = WriteParameter(element, BCFParameters.BCF_Author, viewModel.SelectedComment.ModifiedAuthor);
-                                    bool updatedDate = WriteParameter(element, BCFParameters.BCF_Date, viewModel.SelectedComment.ModifiedDate.ToString());
-                                    bool updatedAction = WriteParameter(element, BCFParameters.BCF_Action, selectedComponent.Action.ParameterValue);
-                                    bool updatedResponsibility = WriteParameter(element, BCFParameters.BCF_Responsibility, selectedComponent.Responsibility.ParameterValue);
+                var selectedComponent = ViewModel.SelectedComponent;
+                if (null == selectedComponent) return;
+                if (selectedComponent.IsLinked) return;
 
-                                    trans.Commit();
-                                    updated = true;
-                                }
-                                catch (Exception ex)
-                                {
-                                    trans.RollBack();
-                                    string message = ex.Message;
-                                }
-                            }
-                        }
+                var element = selectedComponent.RvtElement;
+                if (null == element) return;
+
+                using (var trans = new Transaction(ActiveDoc))
+                {
+                    trans.Start("Write Parameters");
+                    try
+                    {
+                        WriteParameter(element, BCFParameters.BCF_Name, ViewModel.SelectedBCF.ZipFileName);
+                        WriteParameter(element, BCFParameters.BCF_Topic, ViewModel.SelectedMarkup.Topic.Title);
+                        WriteParameter(element, BCFParameters.BCF_TopicType, ViewModel.SelectedMarkup.Topic.TopicType.ToString());
+                        WriteParameter(element, BCFParameters.BCF_TopicStatus, ViewModel.SelectedMarkup.Topic.TopicStatus.ToString());
+                        WriteParameter(element, BCFParameters.BCF_AssignedTo, ViewModel.SelectedMarkup.Topic.AssignedTo);
+                        WriteParameter(element, BCFParameters.BCF_Comment, ViewModel.SelectedComment.Comment1);
+                        WriteParameter(element, BCFParameters.BCF_Author, ViewModel.SelectedComment.ModifiedAuthor);
+                        WriteParameter(element, BCFParameters.BCF_Date, ViewModel.SelectedComment.ModifiedDate.ToString(CultureInfo.InvariantCulture));
+                        WriteParameter(element, BCFParameters.BCF_Action, selectedComponent.Action.ParameterValue);
+                        WriteParameter(element, BCFParameters.BCF_Responsibility, selectedComponent.Responsibility.ParameterValue);
+
+                        trans.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        trans.RollBack();
                     }
                 }
-               
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
-            return updated;
         }
 
         private bool WriteParameter(Element element, BCFParameters bcfParam, string value)
         {
-            bool updated = false;
+            var updated = false;
             try
             {
-#if RELEASE2014
-                 Parameter param = element.get_Parameter(bcfParam.ToString());
-#else
-                Parameter param = element.LookupParameter(bcfParam.ToString());
-#endif
+                var param = element.LookupParameter(bcfParam.ToString());
                 if (null != param)
                 {
                     if (!param.IsReadOnly)
@@ -343,31 +263,32 @@ namespace HOK.SmartBCF.AddIn
                 }
                 else
                 {
-                    bool insertedParam = InsertBinding(bcfParam, element.Category);
+                    var insertedParam = InsertBinding(bcfParam, element.Category);
                     if (insertedParam)
                     {
                         updated = WriteParameter(element, bcfParam, value);
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
+
             return updated;
         }
 
         private bool InsertBinding(BCFParameters bcfParam, Category category)
         {
-            bool inserted = false;
+            var inserted = false;
             try
             {
-                DefinitionBindingMapIterator iter = m_doc.ParameterBindings.ForwardIterator();
+                var iter = ActiveDoc.ParameterBindings.ForwardIterator();
                 Definition definitionFound = null;
                 while (iter.MoveNext())
                 {
-                    Definition definition = iter.Key;
-                    ElementBinding elemBinding = (ElementBinding)iter.Current;
+                    var definition = iter.Key;
+                    var elemBinding = (ElementBinding)iter.Current;
                     if (definition.Name == bcfParam.ToString())
                     {
                         definitionFound = definition;
@@ -378,27 +299,27 @@ namespace HOK.SmartBCF.AddIn
                 {
                     if (null != definitionFound)
                     {
-                        ElementBinding elementBinding = (ElementBinding)m_doc.ParameterBindings.get_Item(definitionFound);
+                        var elementBinding = (ElementBinding)ActiveDoc.ParameterBindings.get_Item(definitionFound);
                         if (null != elementBinding)
                         {
-                            CategorySet catset = elementBinding.Categories;
+                            var catset = elementBinding.Categories;
                             catset.Insert(category);
 
-                            InstanceBinding binding = m_app.Application.Create.NewInstanceBinding(catset);
-                            inserted = m_doc.ParameterBindings.ReInsert(definitionFound, binding);
+                            var binding = m_app.Application.Create.NewInstanceBinding(catset);
+                            inserted = ActiveDoc.ParameterBindings.ReInsert(definitionFound, binding);
                         }
                     }
                     else
                     {
                        
-                        string originalDefinitionFile = m_app.Application.SharedParametersFilename;
+                        var originalDefinitionFile = m_app.Application.SharedParametersFilename;
                         m_app.Application.SharedParametersFilename = addinDefinitionFile;
-                        DefinitionFile definitionFile = m_app.Application.OpenSharedParameterFile();
-                        foreach (DefinitionGroup group in definitionFile.Groups)
+                        var definitionFile = m_app.Application.OpenSharedParameterFile();
+                        foreach (var group in definitionFile.Groups)
                         {
                             if (group.Name == "HOK BCF")
                             {
-                                foreach (Definition definition in group.Definitions)
+                                foreach (var definition in group.Definitions)
                                 {
                                     if (definition.Name == bcfParam.ToString())
                                     {
@@ -412,11 +333,11 @@ namespace HOK.SmartBCF.AddIn
 
                         if (null != definitionFound)
                         {
-                            CategorySet catset = m_app.Application.Create.NewCategorySet();
+                            var catset = m_app.Application.Create.NewCategorySet();
                             catset.Insert(category);
 
-                            InstanceBinding binding = m_app.Application.Create.NewInstanceBinding(catset);
-                            inserted = m_doc.ParameterBindings.Insert(definitionFound, binding);
+                            var binding = m_app.Application.Create.NewInstanceBinding(catset);
+                            inserted = ActiveDoc.ParameterBindings.Insert(definitionFound, binding);
                         }
 
                         m_app.Application.SharedParametersFilename = originalDefinitionFile;
@@ -426,63 +347,63 @@ namespace HOK.SmartBCF.AddIn
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return inserted;
         }
 
         private bool SetViewPointView()
         {
-            bool updated = false;
+            var updated = false;
             try
             {
                 //refresh background view
-                if (null == bcfPersView)
+                if (null == BCFPersView)
                 {
-                    bcfPersView = CreateDefaultPersView();
+                    BCFPersView = CreateDefaultPersView();
                 }
-                if (null == bcfOrthoView)
+                if (null == BCFOrthoView)
                 {
-                    bcfOrthoView = CreateDefaultOrthoView();
+                    BCFOrthoView = CreateDefaultOrthoView();
                 }
 
                 SetDefaultView();
-                VisualizationInfo visInfo = viewModel.SelectedMarkup.SelectedViewpoint.VisInfo;
-                if (viewModel.RvtComponents.Count > 0)
+                var visInfo = ViewModel.SelectedMarkup.SelectedViewpoint.VisInfo;
+                if (ViewModel.RvtComponents.Count > 0)
                 {
                     //create orthoview to iterate elements
-                    CleanViewSettings(bcfOrthoView, true, true, true);
+                    CleanViewSettings(BCFOrthoView, true, true, true);
 
-                    bcfUIView = FindDefaultUIView(bcfOrthoView);
+                    BCFUIView = FindDefaultUIView(BCFOrthoView);
 
                     if (visInfo.IsPersepective)
                     {
-                        updated = SetOrthogonalView(bcfOrthoView, visInfo.PerspectiveCamera);
+                        updated = SetOrthogonalView(BCFOrthoView, visInfo.PerspectiveCamera);
                     }
                     else
                     {
-                        updated = SetOrthogonalView(bcfOrthoView, visInfo.OrthogonalCamera);
+                        updated = SetOrthogonalView(BCFOrthoView, visInfo.OrthogonalCamera);
                     }
                 }
                 else
                 {
-                    if (visInfo.IsPersepective && null != bcfPersView)
+                    if (visInfo.IsPersepective && null != BCFPersView)
                     {
                         //PerspectiveCamera
-                        CleanViewSettings(bcfPersView, true, true, true);
+                        CleanViewSettings(BCFPersView, true, true, true);
 
-                        updated = SetPerspectiveView(bcfPersView, visInfo.PerspectiveCamera);
-                        m_app.ActiveUIDocument.ActiveView = bcfPersView;
-                        bcfUIView = FindDefaultUIView(bcfPersView);    
+                        updated = SetPerspectiveView(BCFPersView, visInfo.PerspectiveCamera);
+                        m_app.ActiveUIDocument.ActiveView = BCFPersView;
+                        BCFUIView = FindDefaultUIView(BCFPersView);    
                     }
-                    else if (!visInfo.IsPersepective && null != bcfOrthoView)
+                    else if (!visInfo.IsPersepective && null != BCFOrthoView)
                     {
                         //OrthogonalCamera
-                        CleanViewSettings(bcfOrthoView, true, true, true);
+                        CleanViewSettings(BCFOrthoView, true, true, true);
 
-                        bcfUIView = FindDefaultUIView(bcfOrthoView);
+                        BCFUIView = FindDefaultUIView(BCFOrthoView);
 
-                        updated = SetOrthogonalView(bcfOrthoView, visInfo.OrthogonalCamera);
+                        updated = SetOrthogonalView(BCFOrthoView, visInfo.OrthogonalCamera);
                     }
                 }
 
@@ -490,40 +411,40 @@ namespace HOK.SmartBCF.AddIn
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return updated;
         }
 
         public bool SetDefaultView()
         {
-            bool result = false;
+            var result = false;
             try
             {
-                if (null != bcfOrthoView)
+                if (null != BCFOrthoView)
                 {
-                    m_app.ActiveUIDocument.ActiveView = bcfOrthoView;
+                    m_app.ActiveUIDocument.ActiveView = BCFOrthoView;
                 }
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return result;
         }
 
         private bool SetOrthogonalView(View3D bcfView, OrthogonalCamera camera)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                double zoom = camera.ViewToWorldScale.ToFeet();
-                XYZ direction = RevitUtils.GetRevitXYZ(camera.CameraDirection);
-                XYZ upVector = RevitUtils.GetRevitXYZ(camera.CameraUpVector);
-                XYZ viewPoint = RevitUtils.GetRevitXYZ(camera.CameraViewPoint);
-                ViewOrientation3D orientation = RevitUtils.ConvertBasePoint(m_doc, viewPoint, direction, upVector, true);
+                var zoom = camera.ViewToWorldScale.ToFeet();
+                var direction = RevitUtils.GetRevitXYZ(camera.CameraDirection);
+                var upVector = RevitUtils.GetRevitXYZ(camera.CameraUpVector);
+                var viewPoint = RevitUtils.GetRevitXYZ(camera.CameraViewPoint);
+                var orientation = RevitUtils.ConvertBasePoint(ActiveDoc, viewPoint, direction, upVector, true);
 
-                using (var trans = new Transaction(m_doc))
+                using (var trans = new Transaction(ActiveDoc))
                 {
                     trans.Start("Set Orientation");
                     try
@@ -534,35 +455,40 @@ namespace HOK.SmartBCF.AddIn
                     catch (Exception ex)
                     {
                         trans.RollBack();
-                        string message = ex.Message;
+                        var message = ex.Message;
                     }
                 }
 
-                XYZ m_xyzTl = bcfView.Origin.Add(bcfView.UpDirection.Multiply(zoom)).Subtract(bcfView.RightDirection.Multiply(zoom));
-                XYZ m_xyzBr = bcfView.Origin.Subtract(bcfView.UpDirection.Multiply(zoom)).Add(bcfView.RightDirection.Multiply(zoom));
-                bcfUIView.ZoomAndCenterRectangle(m_xyzTl, m_xyzBr);
+                var m_xyzTl = bcfView.Origin.Add(bcfView.UpDirection.Multiply(zoom)).Subtract(bcfView.RightDirection.Multiply(zoom));
+                var m_xyzBr = bcfView.Origin.Subtract(bcfView.UpDirection.Multiply(zoom)).Add(bcfView.RightDirection.Multiply(zoom));
+                BCFUIView.ZoomAndCenterRectangle(m_xyzTl, m_xyzBr);
 
                 result = true;
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                var message = ex.Message;
             }
             return result;
         }
 
-        //orthogonalview by PerspectiveCamera
+        /// <summary>
+        /// Orthogonal View by Perspective Camera.
+        /// </summary>
+        /// <param name="bcfView"></param>
+        /// <param name="camera"></param>
+        /// <returns></returns>
         private bool SetOrthogonalView(View3D bcfView, PerspectiveCamera camera)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                XYZ direction = RevitUtils.GetRevitXYZ(camera.CameraDirection);
-                XYZ upVector = RevitUtils.GetRevitXYZ(camera.CameraUpVector);
-                XYZ viewPoint = RevitUtils.GetRevitXYZ(camera.CameraViewPoint);
-                ViewOrientation3D orientation = RevitUtils.ConvertBasePoint(m_doc, viewPoint, direction, upVector, true);
+                var direction = RevitUtils.GetRevitXYZ(camera.CameraDirection);
+                var upVector = RevitUtils.GetRevitXYZ(camera.CameraUpVector);
+                var viewPoint = RevitUtils.GetRevitXYZ(camera.CameraViewPoint);
+                var orientation = RevitUtils.ConvertBasePoint(ActiveDoc, viewPoint, direction, upVector, true);
 
-                using (var trans = new Transaction(m_doc))
+                using (var trans = new Transaction(ActiveDoc))
                 {
                     trans.Start("Set Orientation");
                     try
@@ -570,53 +496,45 @@ namespace HOK.SmartBCF.AddIn
                         bcfView.SetOrientation(orientation);
                         trans.Commit();
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         trans.RollBack();
-                        string message = ex.Message;
                     }
                 }
 
-                bool boundingBoxSet = SetViewPointBoundingBox(bcfView);
-
+                SetViewPointBoundingBox(bcfView);
                 result = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
+
             return result;
         }
 
         private bool SetPerspectiveView(View3D bcfView,  PerspectiveCamera camera)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                double zoom = camera.FieldOfView;
-                XYZ direction = RevitUtils.GetRevitXYZ(camera.CameraDirection);
-                XYZ upVector = RevitUtils.GetRevitXYZ(camera.CameraUpVector);
-                XYZ viewPoint = RevitUtils.GetRevitXYZ(camera.CameraViewPoint);
-                ViewOrientation3D orientation = RevitUtils.ConvertBasePoint(m_doc, viewPoint, direction, upVector, true);
+                var zoom = camera.FieldOfView;
+                var direction = RevitUtils.GetRevitXYZ(camera.CameraDirection);
+                var upVector = RevitUtils.GetRevitXYZ(camera.CameraUpVector);
+                var viewPoint = RevitUtils.GetRevitXYZ(camera.CameraViewPoint);
+                var orientation = RevitUtils.ConvertBasePoint(ActiveDoc, viewPoint, direction, upVector, true);
 
 
-                using (var trans = new Transaction(m_doc))
+                using (var trans = new Transaction(ActiveDoc))
                 {
                     trans.Start("Set Orientation");
                     try
                     {
-#if RELEASE2015|| RELEASE2016 || RELEASE2017
-                        if (bcfView.CanResetCameraTarget())
-                        {
-                            bcfView.ResetCameraTarget();
-                        }
-#endif
-
+                        if (bcfView.CanResetCameraTarget()) bcfView.ResetCameraTarget();
                         bcfView.SetOrientation(orientation);
-
                         if (bcfView.get_Parameter(BuiltInParameter.VIEWER_BOUND_ACTIVE_FAR).HasValue)
                         {
-                            Parameter m_farClip = bcfView.get_Parameter(BuiltInParameter.VIEWER_BOUND_ACTIVE_FAR);
+                            var m_farClip = bcfView.get_Parameter(BuiltInParameter.VIEWER_BOUND_ACTIVE_FAR);
                             m_farClip.Set(0); 
                         }
 
@@ -625,30 +543,31 @@ namespace HOK.SmartBCF.AddIn
 
                         trans.Commit();
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         trans.RollBack();
-                        string message = ex.Message;
                     }
                 }
                 result = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
+
             return result;
         }
 
-        private bool SetViewPointBoundingBox(View3D bcfView)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bcfView"></param>
+        private void SetViewPointBoundingBox(View3D bcfView)
         {
-            bool boundingBoxSet = false;
+            if (ViewModel.RvtComponents.Count == 0) return;
 
-            if (viewModel.RvtComponents.Count == 0) { return boundingBoxSet; }
-
-            BoundingBoxXYZ offsetBoundingBox = new BoundingBoxXYZ();
-
-            using (Transaction trans = new Transaction(m_doc))
+            var offsetBoundingBox = new BoundingBoxXYZ();
+            using (var trans = new Transaction(ActiveDoc))
             {
                 trans.Start("Set BoundingBox");
                 try
@@ -659,20 +578,20 @@ namespace HOK.SmartBCF.AddIn
                     double maxX = 0;
                     double maxY = 0;
                     double maxZ = 0;
-                    bool firstLoop = true;
+                    var firstLoop = true;
 
-                    foreach (RevitComponent rvtComp in viewModel.RvtComponents)
+                    foreach (var rvtComp in ViewModel.RvtComponents)
                     {
-                        Element element = rvtComp.RvtElement;
+                        var element = rvtComp.RvtElement;
                         if (null != element)
                         {
-                            BoundingBoxXYZ bb = element.get_BoundingBox(null);
+                            var bb = element.get_BoundingBox(null);
                             if (null != bb)
                             {
-                                Transform transform = rvtComp.TransformValue;
+                                var transform = rvtComp.TransformValue;
 
-                                XYZ minXYZ = transform.OfPoint(bb.Min);
-                                XYZ maxXYZ = transform.OfPoint(bb.Max);
+                                var minXYZ = transform.OfPoint(bb.Min);
+                                var maxXYZ = transform.OfPoint(bb.Max);
 
                                 if (firstLoop)
                                 {
@@ -702,42 +621,37 @@ namespace HOK.SmartBCF.AddIn
                     bcfView.SetSectionBox(offsetBoundingBox);
                     bcfView.GetSectionBox().Enabled = true;
 
-                    bcfUIView.ZoomAndCenterRectangle(offsetBoundingBox.Min, offsetBoundingBox.Max);
-
-#if RELEASE2014||RELEASE2015||RELEASE2016||RELEASE2017
-                    bcfUIView.Zoom(0.8);
-#endif
+                    BCFUIView.ZoomAndCenterRectangle(offsetBoundingBox.Min, offsetBoundingBox.Max);
+                    BCFUIView.Zoom(0.8);
 
                     trans.Commit();
-                    boundingBoxSet = true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     trans.RollBack();
-                    string message = ex.Message;
                 }
             }
-            return boundingBoxSet;
         }
 
-        private bool CleanViewSettings(View3D bcfView, bool removeHighlight, bool removeIsolate, bool removeSectionBox)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bcfView"></param>
+        /// <param name="removeHighlight"></param>
+        /// <param name="removeIsolate"></param>
+        /// <param name="removeSectionBox"></param>
+        private void CleanViewSettings(View3D bcfView, bool removeHighlight, bool removeIsolate, bool removeSectionBox)
         {
-            bool cleaned = false;
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(ActiveDoc))
             {
                 trans.Start("Clean Views");
                 try
                 {
-                    UIDocument uidoc = new UIDocument(m_doc);
+                    var uidoc = new UIDocument(ActiveDoc);
                     if (removeHighlight)
                     {
                         //remove selection
-#if RELEASE2014
-                        SelElementSet selElements = SelElementSet.Create();
-                        uidoc.Selection.Elements = selElements;
-#elif RELEASE2015 || RELEASE2016||RELEASE2017
                         uidoc.Selection.SetElementIds(new List<ElementId>());
-#endif
                     }
 
                     if (removeIsolate)
@@ -756,15 +670,12 @@ namespace HOK.SmartBCF.AddIn
                     }
 
                     trans.Commit();
-                    cleaned = true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     trans.RollBack();
-                    string message = ex.Message;
                 }
             }
-            return cleaned;
         }
 
         private View3D CreateDefaultOrthoView()
@@ -772,41 +683,41 @@ namespace HOK.SmartBCF.AddIn
             View3D view3D = null;
             try
             {
-                string viewName = "SmartBCF - Orthogonal - " + Environment.UserName;
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
+                var viewName = "SmartBCF - Orthogonal - " + Environment.UserName;
+                var collector = new FilteredElementCollector(ActiveDoc);
+                var view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                 var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.ViewName == viewName select view;
-                if (viewfound.Count() > 0)
+                if (viewfound.Any())
                 {
                     view3D = viewfound.First();
                 }
                 else
                 {
-                    ElementId viewFamilyTypeId = GetViewFamilyTypeId();
+                    var viewFamilyTypeId = GetViewFamilyTypeId();
                     if (viewFamilyTypeId != ElementId.InvalidElementId)
                     {
-                        using (Transaction trans = new Transaction(m_doc))
+                        using (var trans = new Transaction(ActiveDoc))
                         {
                             trans.Start("Create View");
                             try
                             {
-                                view3D = View3D.CreateIsometric(m_doc, viewFamilyTypeId);
+                                view3D = View3D.CreateIsometric(ActiveDoc, viewFamilyTypeId);
                                 view3D.Name = viewName;
                                 trans.Commit();
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 trans.RollBack();
-                                string message = ex.Message;
                             }
                         }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+               // ignored
             }
+
             return view3D;
         }
 
@@ -815,42 +726,42 @@ namespace HOK.SmartBCF.AddIn
             View3D view3D = null;
             try
             {
-                string viewName = "SmartBCF - Perspective - " + Environment.UserName;
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
+                var viewName = "SmartBCF - Perspective - " + Environment.UserName;
+                var collector = new FilteredElementCollector(ActiveDoc);
+                var view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                 //by the limitation of perspective view, create isometric instead
                 var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == true && view.ViewName == viewName select view;
-                if (viewfound.Count() > 0)
+                if (viewfound.Any())
                 {
                     view3D = viewfound.First();
                 }
                 else
                 {
-                    ElementId viewFamilyTypeId = GetViewFamilyTypeId();
+                    var viewFamilyTypeId = GetViewFamilyTypeId();
                     if (viewFamilyTypeId != ElementId.InvalidElementId)
                     {
-                        using (Transaction trans = new Transaction(m_doc))
+                        using (var trans = new Transaction(ActiveDoc))
                         {
                             trans.Start("Create View");
                             try
                             {
-                                view3D = View3D.CreatePerspective(m_doc, viewFamilyTypeId);
+                                view3D = View3D.CreatePerspective(ActiveDoc, viewFamilyTypeId);
                                 view3D.Name = viewName;
                                 trans.Commit();
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 trans.RollBack();
-                                string message = ex.Message;
                             }
                         }
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string messge = ex.Message;
+                // ignored
             }
+
             return view3D;
         }
 
@@ -859,76 +770,70 @@ namespace HOK.SmartBCF.AddIn
             UIView uiview = null;
             try
             {
-                UIDocument uidoc = new UIDocument(m_doc);
-                IList<UIView> uiviews = uidoc.GetOpenUIViews();
+                var uidoc = new UIDocument(ActiveDoc);
+                var uiviews = uidoc.GetOpenUIViews();
                 var viewFound = from view in uiviews where view.ViewId == bcfView.Id select view;
-                if (viewFound.Count() > 0)
+                if (viewFound.Any())
                 {
                     uiview = viewFound.First();
                 }   
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
+
             return uiview;
         }
 
         private ElementId GetViewFamilyTypeId()
         {
-            ElementId viewTypeId = ElementId.InvalidElementId;
+            var viewTypeId = ElementId.InvalidElementId;
             try
             {
-                FilteredElementCollector collector = new FilteredElementCollector(m_doc);
-                List<ViewFamilyType> viewFamilyTypes = collector.OfClass(typeof(ViewFamilyType)).ToElements().Cast<ViewFamilyType>().ToList();
+                var collector = new FilteredElementCollector(ActiveDoc);
+                var viewFamilyTypes = collector.OfClass(typeof(ViewFamilyType)).ToElements().Cast<ViewFamilyType>().ToList();
                 var vTypes = from vType in viewFamilyTypes where vType.ViewFamily == ViewFamily.ThreeDimensional select vType;
-                if (vTypes.Count() > 0)
+                if (vTypes.Any())
                 {
-                    ViewFamilyType vfType = vTypes.First();
+                    var vfType = vTypes.First();
                     viewTypeId = vfType.Id;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
+
             return viewTypeId;
         }
 
-        private bool StoreToolSettings()
+        private void StoreToolSettings()
         {
-            bool stored = false;
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(ActiveDoc))
             {
                 trans.Start("Store Settings");
                 try
                 {
-                    stored = DataStorageUtil.UpdateLinkedDatabase(m_doc, databaseFile);
+                    DataStorageUtil.UpdateLinkedDatabase(ActiveDoc, DatabaseFile);
                     trans.Commit();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     trans.RollBack();
-                    string message = ex.Message;
                 }
             }
-            return stored;
         }
 
-        private bool ExportImage()
+        private void ExportImage()
         {
-            bool exported = false;
-            using (Transaction trans = new Transaction(m_doc))
+            using (var trans = new Transaction(ActiveDoc))
             {
                 trans.Start("Export Image");
                 try
                 {
-                    
-                    string imgFileName = Path.Combine(Path.GetTempPath(), "SmartBCF", Path.GetTempFileName() + ".png");
-                    if (File.Exists(imgFileName))
-                    {
-                        File.Delete(imgFileName);
-                    }
+                    var imgFileName = Path.Combine(Path.GetTempPath(), "SmartBCF", Path.GetTempFileName() + ".png");
+                    if (File.Exists(imgFileName)) File.Delete(imgFileName);
 
                     var options = new ImageExportOptions
                     {
@@ -941,86 +846,81 @@ namespace HOK.SmartBCF.AddIn
                         PixelSize = 1000
                     };
 
-                    m_doc.ExportImage(options);
+                    ActiveDoc.ExportImage(options);
                     trans.Commit();
 
-                    bool defined = SetViewPoint(imgFileName);
+                    SetViewPoint(imgFileName);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     trans.RollBack();
-                    string message = ex.Message;
                 }
             }
-            return exported;
         }
 
-        private bool SetViewPoint(string imageFile)
+        private void SetViewPoint(string imageFile)
         {
-            bool result = false;
             try
             {
-                int count = 5;
+                var count = 5;
                 while (!File.Exists(imageFile))
                 {
                     count--;
                     if (count < 0) { break; }
-                    System.Threading.Thread.Sleep(100);
+                    Thread.Sleep(100);
                 }
-                
-                if (File.Exists(imageFile))
+
+                if (!File.Exists(imageFile)) return;
+
+                var vp = new ViewPoint();
+                vp.Guid = Guid.NewGuid().ToString();
+                vp.TopicGuid = ViewPointViewModel.SelectedMarkup.Topic.Guid;
+                vp.Snapshot = Path.GetFileName(imageFile);
+                vp.SnapshotImage = ImageUtil.GetImageArray(imageFile);
+
+                var visInfo = new VisualizationInfo();
+                visInfo.ViewPointGuid = vp.Guid;
+                //update components
+                visInfo.Components = GetElements(vp.Guid);
+
+                //update camera
+                var currentView = ActiveDoc.ActiveView as View3D;
+                if (null != currentView)
                 {
-                    ViewPoint vp = new ViewPoint();
-                    vp.Guid = Guid.NewGuid().ToString();
-                    vp.TopicGuid = addViewModel.SelectedMarkup.Topic.Guid;
-                    vp.Snapshot = Path.GetFileName(imageFile);
-                    vp.SnapshotImage = ImageUtil.GetImageArray(imageFile);
-
-                    VisualizationInfo visInfo = new VisualizationInfo();
-                    visInfo.ViewPointGuid = vp.Guid;
-                    //update components
-                    visInfo.Components = GetElements(vp.Guid);
-
-                    //update camera
-                    View3D currentView = m_doc.ActiveView as View3D;
-                    if (null != currentView)
+                    if (currentView.IsPerspective)
                     {
-                        if (currentView.IsPerspective)
-                        {
-                            visInfo.PerspectiveCamera = GetPerspectiveCamera(currentView, vp.Guid);
-                        }
-                        else
-                        {
-                            visInfo.OrthogonalCamera = GetOrthogonalCamera(currentView, vp.Guid);
-                        }
+                        visInfo.PerspectiveCamera = GetPerspectiveCamera(currentView, vp.Guid);
                     }
-
-                    vp.VisInfo = visInfo;
-                    addViewModel.UserViewPoint = vp;
+                    else
+                    {
+                        visInfo.OrthogonalCamera = GetOrthogonalCamera(currentView, vp.Guid);
+                    }
                 }
+
+                vp.VisInfo = visInfo;
+                ViewPointViewModel.UserViewPoint = vp;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
-            return result;
         }
 
         private ObservableCollection<Component> GetElements(string viewpoint_Guid)
         {
-            ObservableCollection<Component> components = new ObservableCollection<Component>();
+            var components = new ObservableCollection<Component>();
             try
             {
-                switch (addViewModel.SelectedOption)
+                switch (ViewPointViewModel.SelectedOption)
                 {
-                    case Utils.ComponentOption.SelectedElements:
-                        ICollection<ElementId> selectedIds = m_app.ActiveUIDocument.Selection.GetElementIds();
-                        foreach (ElementId eId in selectedIds)
+                    case ComponentOption.SelectedElements:
+                        var selectedIds = m_app.ActiveUIDocument.Selection.GetElementIds();
+                        foreach (var eId in selectedIds)
                         {
-                            Element element = m_doc.GetElement(eId);
+                            var element = ActiveDoc.GetElement(eId);
                             if (null != element)
                             {
-                                Component comp = new Component();
+                                var comp = new Component();
                                 comp.Guid = Guid.NewGuid().ToString();
                                 comp.IfcGuid = element.IfcGUID();
                                 comp.Selected = false;
@@ -1035,12 +935,12 @@ namespace HOK.SmartBCF.AddIn
                         }
                         break;
                     case Utils.ComponentOption.OnlyVisible:
-                        View currentView = m_doc.ActiveView;
-                        FilteredElementCollector collector = new FilteredElementCollector(m_doc, currentView.Id);
+                        var currentView = ActiveDoc.ActiveView;
+                        var collector = new FilteredElementCollector(ActiveDoc, currentView.Id);
                         ICollection<Element> elements = collector.ToElements();
-                        foreach (Element element in elements)
+                        foreach (var element in elements)
                         {
-                            Component comp = new Component();
+                            var comp = new Component();
                             comp.Guid = Guid.NewGuid().ToString();
                             comp.IfcGuid = element.IfcGUID();
                             comp.Selected = false;
@@ -1056,31 +956,31 @@ namespace HOK.SmartBCF.AddIn
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
             return components;
         }
 
         private PerspectiveCamera GetPerspectiveCamera(View3D view, string viewpoint_Guid)
         {
-            PerspectiveCamera camera = new PerspectiveCamera();
+            var camera = new PerspectiveCamera();
             try
             {
-                XYZ viewCenter = view.Origin;
+                var viewCenter = view.Origin;
                 double zoomValue = 45;
 
-                ViewOrientation3D orientation = RevitUtils.ConvertBasePoint(m_doc, viewCenter, view.ViewDirection, view.UpDirection, false);
+                var orientation = RevitUtils.ConvertBasePoint(ActiveDoc, viewCenter, view.ViewDirection, view.UpDirection, false);
 
-                XYZ c = orientation.EyePosition;
-                XYZ vi = orientation.ForwardDirection;
-                XYZ up = orientation.UpDirection;
+                var c = orientation.EyePosition;
+                var vi = orientation.ForwardDirection;
+                var up = orientation.UpDirection;
 
                 camera.Guid = Guid.NewGuid().ToString();
                 camera.ViewPointGuid = viewpoint_Guid;
 
-                HOK.SmartBCF.Schemas.Point viewPoint = new Schemas.Point()
+                var viewPoint = new Schemas.Point
                 {
                     Guid = Guid.NewGuid().ToString(),
                     X = c.X.ToMeters(),
@@ -1089,7 +989,7 @@ namespace HOK.SmartBCF.AddIn
                 };
                 camera.CameraViewPoint = viewPoint;
 
-                Direction upVector = new Direction()
+                var upVector = new Direction
                 {
                     Guid = Guid.NewGuid().ToString(),
                     X=up.X.ToMeters(),
@@ -1098,7 +998,7 @@ namespace HOK.SmartBCF.AddIn
                 };
                 camera.CameraUpVector = upVector;
 
-                Direction direction = new Direction()
+                var direction = new Direction
                 {
                     Guid = Guid.NewGuid().ToString(),
                     X= -(vi.X.ToMeters()),
@@ -1109,43 +1009,50 @@ namespace HOK.SmartBCF.AddIn
 
                 camera.FieldOfView = zoomValue;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
+
             return camera;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="view"></param>
+        /// <param name="viewpoint_Guid"></param>
+        /// <returns></returns>
         private OrthogonalCamera GetOrthogonalCamera(View3D view, string viewpoint_Guid)
         {
-            OrthogonalCamera camera = new OrthogonalCamera();
+            var camera = new OrthogonalCamera();
             try
             {
 
-                UIView uiView = FindDefaultUIView(view); if (null == uiView) { return camera; }
-                XYZ topLeft = uiView.GetZoomCorners()[0];
-                XYZ bottomRight = uiView.GetZoomCorners()[1];
+                var uiView = FindDefaultUIView(view); if (null == uiView) { return camera; }
+                var topLeft = uiView.GetZoomCorners()[0];
+                var bottomRight = uiView.GetZoomCorners()[1];
 
-                double x = (topLeft.X + bottomRight.X) / 2;
-                double y = (topLeft.Y + bottomRight.Y) / 2;
-                double z = (topLeft.Z + bottomRight.Z) / 2;
+                var x = (topLeft.X + bottomRight.X) / 2;
+                var y = (topLeft.Y + bottomRight.Y) / 2;
+                var z = (topLeft.Z + bottomRight.Z) / 2;
 
-                XYZ viewCenter = new XYZ(x, y, z);
+                var viewCenter = new XYZ(x, y, z);
 
-                XYZ diagVector = topLeft.Subtract(bottomRight);
-                double dist = topLeft.DistanceTo(bottomRight) / 2;
+                var diagVector = topLeft.Subtract(bottomRight);
+                var dist = topLeft.DistanceTo(bottomRight) / 2;
 
-                double zoomValue = dist * Math.Sin(diagVector.AngleTo(view.RightDirection)).ToMeters();
+                var zoomValue = dist * Math.Sin(diagVector.AngleTo(view.RightDirection)).ToMeters();
 
-                ViewOrientation3D orientation = RevitUtils.ConvertBasePoint(m_doc, viewCenter, view.ViewDirection, view.UpDirection, false);
+                var orientation = RevitUtils.ConvertBasePoint(ActiveDoc, viewCenter, view.ViewDirection, view.UpDirection, false);
 
-                XYZ c = orientation.EyePosition;
-                XYZ vi = orientation.ForwardDirection;
-                XYZ up = orientation.UpDirection;
+                var c = orientation.EyePosition;
+                var vi = orientation.ForwardDirection;
+                var up = orientation.UpDirection;
 
                 camera.Guid = Guid.NewGuid().ToString();
                 camera.ViewPointGuid = viewpoint_Guid;
-                HOK.SmartBCF.Schemas.Point viewPoint = new Schemas.Point()
+                var viewPoint = new Schemas.Point
                 {
                     Guid = Guid.NewGuid().ToString(),
                     X = c.X.ToMeters(),
@@ -1154,7 +1061,7 @@ namespace HOK.SmartBCF.AddIn
                 };
                 camera.CameraViewPoint = viewPoint;
 
-                Direction upVector = new Direction()
+                var upVector = new Direction
                 {
                     Guid = Guid.NewGuid().ToString(),
                     X = up.X.ToMeters(),
@@ -1163,7 +1070,7 @@ namespace HOK.SmartBCF.AddIn
                 };
                 camera.CameraUpVector = upVector;
 
-                Direction direction = new Direction()
+                var direction = new Direction
                 {
                     Guid = Guid.NewGuid().ToString(),
                     X = -(vi.X.ToMeters()),
@@ -1174,13 +1081,13 @@ namespace HOK.SmartBCF.AddIn
 
                 camera.ViewToWorldScale = zoomValue;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
+
             return camera;
         }
-
        
         public string GetName()
         {
@@ -1188,9 +1095,17 @@ namespace HOK.SmartBCF.AddIn
         }
     }
 
-    public enum RequestId : int
+    public enum RequestId
     {
-        None = 0, SetViewPointView = 1, ApplyViews = 2, HighlightElement = 3, IsolateElement = 4, PlaceSectionBox = 5, WriteParameters = 6, StoreToolSettings = 7, ExportImage = 8
+        None = 0,
+        SetViewPointView = 1,
+        ApplyViews = 2,
+        HighlightElement = 3,
+        IsolateElement = 4,
+        PlaceSectionBox = 5,
+        WriteParameters = 6,
+        StoreToolSettings = 7,
+        ExportImage = 8
     }
 
     public class Request
@@ -1208,4 +1123,17 @@ namespace HOK.SmartBCF.AddIn
         }
     }
 
+    public enum BCFParameters
+    {
+        BCF_Action,
+        BCF_Author,
+        BCF_Comment,
+        BCF_Date,
+        BCF_Name,
+        BCF_Responsibility,
+        BCF_Topic,
+        BCF_TopicStatus,
+        BCF_TopicType,
+        BCF_AssignedTo
+    }
 }

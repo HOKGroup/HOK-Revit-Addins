@@ -1,25 +1,19 @@
 ﻿using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.IFC;
-using HOK.SmartBCF.Schemas;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HOK.SmartBCF.AddIn.Util
 {
-    public class RevitComponent : HOK.SmartBCF.Schemas.Component, INotifyPropertyChanged
+    public class RevitComponent : Schemas.Component, INotifyPropertyChanged
     {
-        private Element rvtElement = null;
+        private Element rvtElement;
         private ElementId elementId = ElementId.InvalidElementId;
         private CategoryProperties category = new CategoryProperties();
-        private Bitmap previewImage = null;
-        private bool isSpatialElement = false;
+        private Bitmap previewImage;
+        private bool isSpatialElement;
         private Transform transformValue = Transform.Identity;
-        private bool isLinked = false;
+        private bool isLinked;
         private string ifcProjectGuid = "";
 
         public Element RvtElement { get { return rvtElement; } set { rvtElement = value; NotifyPropertyChanged("RvtElement"); } }
@@ -35,41 +29,41 @@ namespace HOK.SmartBCF.AddIn.Util
         {
         }
 
-        public RevitComponent(HOK.SmartBCF.Schemas.Component component, Element element, RevitLinkProperties link)
+        public RevitComponent(Schemas.Component component, Element element, RevitLinkProperties link)
         {
             try
             {
-                this.Action = component.Action;
-                this.AuthoringToolId = component.AuthoringToolId;
-                this.Color = component.Color;
-                this.ElementName = component.ElementName;
-                this.Guid = component.Guid;
-                this.IfcGuid = component.IfcGuid;
-                this.OriginatingSystem = component.OriginatingSystem;
-                this.Responsibility = component.Responsibility;
-                this.Selected = component.Selected;
-                this.ViewPointGuid = component.ViewPointGuid;
-                this.Visible = component.Visible;
+                Action = component.Action;
+                AuthoringToolId = component.AuthoringToolId;
+                Color = component.Color;
+                ElementName = component.ElementName;
+                Guid = component.Guid;
+                IfcGuid = component.IfcGuid;
+                OriginatingSystem = component.OriginatingSystem;
+                Responsibility = component.Responsibility;
+                Selected = component.Selected;
+                ViewPointGuid = component.ViewPointGuid;
+                Visible = component.Visible;
 
-                this.RvtElement = element;
-                this.ElementId = element.Id;
-                this.IfcProjectGuid = link.IfcProjectGuid;
-                this.TransformValue = link.TransformValue;
-                this.IsLinked = link.IsLinked;
-                this.ElementName = element.Name;
-                this.Category = new CategoryProperties(element.Category);
+                RvtElement = element;
+                ElementId = element.Id;
+                IfcProjectGuid = link.IfcProjectGuid;
+                TransformValue = link.TransformValue;
+                IsLinked = link.IsLinked;
+                ElementName = element.Name;
+                Category = new CategoryProperties(element.Category);
 
-                ElementId typeId = element.GetTypeId();
-                ElementType elementType = link.LinkedDocument.GetElement(typeId) as ElementType;
+                var typeId = element.GetTypeId();
+                var elementType = link.LinkedDocument.GetElement(typeId) as ElementType;
                 if (null != elementType)
                 {
-                    this.PreviewImage = elementType.GetPreviewImage(new Size(48, 48));
+                    PreviewImage = elementType.GetPreviewImage(new Size(48, 48));
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
         }
 
