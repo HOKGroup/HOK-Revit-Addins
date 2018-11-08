@@ -7,7 +7,13 @@ Most of the tools in this repository have a reference to HOK.Core. This is becau
 ```
 {
   "FeedbackToken": "<access token>",
-  "FeedbackPath": "/repos/<user>/<repo name>/"
+  "FeedbackPath": "/repos/<user>/<repo name>/",
+  "ModelReportingServiceEndpoint": "<reporting server endpoint>",
+  "FileOnOpeningFmeUserId": "<fme user id>",
+  "FileOnOpeningFmePassword": "<fme password>",
+  "FileOnOpeningFmeHost": "<fme endpoint>",
+  "FileOnOpeningFmePort": <port number>,
+  "FileOnOpeningFmeClientId": "<fme client id>"
 }
 ```
 * FeedbackToken - this is a token that you can obtain from GitHub to allow remote access to a repository. Since the purpose of this tool is to create GitHub issues on our behalf, we need an access token from authorized user, to login as that user and create a new issue. Replace this with a valid access token. 
