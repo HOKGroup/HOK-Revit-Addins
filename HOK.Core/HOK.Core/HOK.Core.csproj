@@ -243,7 +243,7 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <Target Name="CopyFiles" AfterTargets="AfterBuild;NonWinFodyTarget">
+  <Target Name="CopyFiles" AfterTargets="AfterBuild">
     <Message Text="Signing file..." Importance="high" />
     <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />
     <Message Text="Copy files..." Importance="high" />

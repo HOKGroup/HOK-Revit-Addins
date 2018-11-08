@@ -1,13 +1,8 @@
-﻿using Autodesk.Revit.UI;
-using HOK.SmartBCF.AddIn.Properties;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using Autodesk.Revit.UI;
+using HOK.SmartBCF.AddIn.Properties;
 
 namespace HOK.SmartBCF.AddIn
 {

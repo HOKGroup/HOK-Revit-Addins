@@ -18,14 +18,13 @@ namespace HOK.SmartBCF.AddIn
     public class AddViewModel : INotifyPropertyChanged
     {
         private BCFViewModel bcfView;
-        private bool isAddInMode = true;
 
         private BCFHandler m_handler;
         private ExternalEvent m_event;
 
-        private BCFZIP selectedBCF = null;
-        private Markup selectedMarkup = null;
-        private ViewPoint userViewPoint = null;
+        private BCFZIP selectedBCF;
+        private Markup selectedMarkup;
+        private ViewPoint userViewPoint;
         private ComponentOption selectedOption = ComponentOption.SelectedElements;
 
         private RelayCommand browseCommand;
@@ -37,8 +36,8 @@ namespace HOK.SmartBCF.AddIn
         public Markup SelectedMarkup { get { return selectedMarkup; } set { selectedMarkup = value; NotifyPropertyChanged("SelectedMarkup"); } }
         public ViewPoint UserViewPoint { get { return userViewPoint; } set { userViewPoint = value; NotifyPropertyChanged("UserViewPoint"); } }
         public ComponentOption SelectedOption { get { return selectedOption; } set { selectedOption = value; NotifyPropertyChanged("SelectedOption"); } }
-        public bool IsAddInMode { get { return isAddInMode; } set { isAddInMode = value; } }
-        
+        public bool IsAddInMode { get; set; } = true;
+
         public ICommand BrowseCommand { get { return browseCommand; } }
         public ICommand AddCommand { get { return addCommand; } }
         public ICommand SnapshotCommand { get { return snapshotCommand; } }
@@ -49,9 +48,9 @@ namespace HOK.SmartBCF.AddIn
             m_handler = handler;
             m_event = exEvent;
 
-            browseCommand = new RelayCommand(param => this.BrowseExecuted(param));
-            addCommand = new RelayCommand(param => this.AddExecuted(param));
-            snapshotCommand = new RelayCommand(param => this.SnapshotExecuted(param));
+            browseCommand = new RelayCommand(param => BrowseExecuted(param));
+            addCommand = new RelayCommand(param => AddExecuted(param));
+            snapshotCommand = new RelayCommand(param => SnapshotExecuted(param));
             SetSelectedMarkup();
         }
 
@@ -59,12 +58,12 @@ namespace HOK.SmartBCF.AddIn
         {
             try
             {
-                this.SelectedBCF = bcfView.BCFFiles[bcfView.SelectedIndex];
-                this.SelectedMarkup = selectedBCF.Markups[selectedBCF.SelectedMarkup];
+                SelectedBCF = bcfView.BCFFiles[bcfView.SelectedIndex];
+                SelectedMarkup = selectedBCF.Markups[selectedBCF.SelectedMarkup];
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
         }
 
@@ -79,12 +78,12 @@ namespace HOK.SmartBCF.AddIn
                 if ((bool)openDialog.ShowDialog())
                 {
                     string fileName = openDialog.FileName;
-                    this.UserViewPoint = DefineViewPoint(fileName);
+                    UserViewPoint = DefineViewPoint(fileName);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
         }
 
@@ -103,9 +102,9 @@ namespace HOK.SmartBCF.AddIn
 
                 viewPoint.VisInfo = visInfo;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
             return viewPoint;
         }
@@ -119,9 +118,9 @@ namespace HOK.SmartBCF.AddIn
                 m_event.Raise();
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
         }
 
@@ -134,9 +133,9 @@ namespace HOK.SmartBCF.AddIn
                     AddViewPoint(userViewPoint);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
         }
 
@@ -146,14 +145,14 @@ namespace HOK.SmartBCF.AddIn
             {
                 bcfView.BCFFiles[bcfView.SelectedIndex].Markups[selectedBCF.SelectedMarkup].Viewpoints.Add(vp);
                 SetSelectedMarkup();
-                this.SelectedMarkup.SelectedViewpoint = vp;
+                SelectedMarkup.SelectedViewpoint = vp;
 
                 string fileId = bcfView.BCFFiles[bcfView.SelectedIndex].FileId;
                 bool added = BCFDBWriter.BCFDBWriter.InsertViewPoint(fileId, vp);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
         }
 

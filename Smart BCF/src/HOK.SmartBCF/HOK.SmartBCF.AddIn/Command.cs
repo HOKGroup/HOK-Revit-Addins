@@ -1,22 +1,26 @@
-﻿using Autodesk.Revit.DB;
+﻿using System;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Autodesk.Revit.Attributes;
+using HOK.MissionControl.Core.Schemas;
+using HOK.MissionControl.Core.Utils;
 
 namespace HOK.SmartBCF.AddIn
 {
-    [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
+    [Transaction(TransactionMode.Manual)]
+    [Regeneration(RegenerationOption.Manual)]
+    [Journaling(JournalingMode.NoCommandData)]
     public class Command : IExternalCommand
     {
-        private Document m_doc = null;
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             try
             {
-                m_doc = commandData.Application.ActiveUIDocument.Document;
+                // (Konrad) We are gathering information about the addin use. This allows us to
+                // better maintain the most used plug-ins or discontiue the unused ones.
+                AddinUtilities.PublishAddinLog(
+                    new AddinLog("Smart BCF", commandData.Application.Application.VersionNumber));
+
                 AppCommand.thisApp.ShowWindow(commandData.Application);
                 return Result.Succeeded;
             }

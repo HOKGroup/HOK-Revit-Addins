@@ -3,90 +3,100 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SQLite;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
+using HOK.SmartBCF.Utils;
 using HOK.SmartBCF.Schemas;
 using Version = HOK.SmartBCF.Schemas.Version;
 using Point = HOK.SmartBCF.Schemas.Point;
-using HOK.SmartBCF.Utils;
 
 namespace HOK.SmartBCF.BCFDBReader
 {
     public static class BCFDBReader
     {
-        public static SQLiteConnection connection = null;
+        public static SQLiteConnection connection;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbFile"></param>
+        /// <returns></returns>
         public static string GetConnectionString(string dbFile)
         {
-            string connectionString = "";
+            var connectionString = "";
             try
             {
-                SQLiteConnectionStringBuilder connectionBuilder = new SQLiteConnectionStringBuilder();
-                connectionBuilder.DataSource = dbFile;
-                connectionBuilder.Version = 3;
-                connectionBuilder.ForeignKeys = true;
+                var connectionBuilder = new SQLiteConnectionStringBuilder
+                {
+                    DataSource = dbFile,
+                    Version = 3,
+                    ForeignKeys = true
+                };
                 connectionString = connectionBuilder.ConnectionString;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                string message = ex.Message;
+                // ignored
             }
             return connectionString;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dbFile"></param>
+        /// <returns></returns>
         public static Dictionary<string, BCFZIP> ReadDatabase(string dbFile)
         {
-            Dictionary<string, BCFZIP> bcfDictionary = new Dictionary<string, BCFZIP>();
+            var bcfDictionary = new Dictionary<string, BCFZIP>();
             try
             {
-                string connectionString = GetConnectionString(dbFile);
+                var connectionString = GetConnectionString(dbFile);
                 using (connection = new SQLiteConnection(connectionString, true))
                 {
                     connection.Open();
                     //read tables
                     //file Info
-                    Dictionary<string, BCFZIP> bcfFileInfo = GetBCFFileInfoTable();
-                    Dictionary<string, ProjectExtension> projectExts = GetProjectExtensionTable();
-                    Dictionary<string, Project> projects = GetProjectTable();
-                    Dictionary<string, Version> versions = GetVersionTable();
+                    var bcfFileInfo = GetBCFFileInfoTable();
+                    var projectExts = GetProjectExtensionTable();
+                    var projects = GetProjectTable();
+                    var versions = GetVersionTable();
 
                     //markup
-                    Dictionary<string, Topic> topics = GetTopicTables();
-                    Dictionary<string, List<string>> labels = GetLabelTable();
-                    Dictionary<string, HeaderFile> headerFiles = GetHeaderFileTable();
-                    Dictionary<string, BimSnippet> bimSnippets = GetBimSnippetTable();
-                    Dictionary<string, TopicDocumentReferences> docReferences = GetDocumentReferencesTable();
-                    Dictionary<string, TopicRelatedTopics> relTopics = GetRelTopicTables();
-                    Dictionary<string, Comment> comments = GetCommentTable();
-                    Dictionary<string, ViewPoint> viewpoints = GetViewpointsTable();
+                    var topics = GetTopicTables();
+                    var labels = GetLabelTable();
+                    var headerFiles = GetHeaderFileTable();
+                    var bimSnippets = GetBimSnippetTable();
+                    var docReferences = GetDocumentReferencesTable();
+                    var relTopics = GetRelTopicTables();
+                    var comments = GetCommentTable();
+                    var viewpoints = GetViewpointsTable();
 
                     //visualizationInfo
-                    Dictionary<string, RevitExtension> extensions = GetRevitExtensionTable();
-                    Dictionary<string, Component> components = GetComponentTable();
-                    Dictionary<string, Point> points = GetPointTable();
-                    Dictionary<string, Direction> directions = GetDirectionTable();
-                    Dictionary<string, VisualizationInfoBitmaps> bitmaps = GetBitmapsTable();
-                    Dictionary<string, ClippingPlane> clippingPlanes = GetClippingPlaneTable();
-                    Dictionary<string, Line> lines = GetLineTable();
-                    Dictionary<string, OrthogonalCamera> orthoCameras = GetOrthoCameraTable();
-                    Dictionary<string, PerspectiveCamera> persCameras = GetPerspectiveTable();
+                    var extensions = GetRevitExtensionTable();
+                    var components = GetComponentTable();
+                    var points = GetPointTable();
+                    var directions = GetDirectionTable();
+                    var bitmaps = GetBitmapsTable();
+                    var clippingPlanes = GetClippingPlaneTable();
+                    var lines = GetLineTable();
+                    var orthoCameras = GetOrthoCameraTable();
+                    var persCameras = GetPerspectiveTable();
 
                     //combine tables to class structure
-                    foreach (string fileId in bcfFileInfo.Keys)
+                    foreach (var fileId in bcfFileInfo.Keys)
                     {
                         //get file Info
-                        BCFZIP bcfZip = bcfFileInfo[fileId];
-                        RevitExtensionInfo extInfo = new RevitExtensionInfo();
+                        var bcfZip = bcfFileInfo[fileId];
+                        var extInfo = new RevitExtensionInfo();
                         extInfo.Extensions = new ObservableCollection<RevitExtension>(extensions.Values.ToList());
                         bcfZip.ExtensionColor = extInfo;
 
                         var projectExtFound = from projectExt in projectExts.Values where projectExt.FileId == bcfZip.FileId select projectExt;
-                        if (projectExtFound.Count() > 0)
+                        if (projectExtFound.Any())
                         {
-                            ProjectExtension projectExt = projectExtFound.First();
+                            var projectExt = projectExtFound.First();
                             var projectFound = from project in projects.Values where project.ExtensionGuid == projectExt.Guid select project;
-                            if (projectFound.Count() > 0)
+                            if (projectFound.Any())
                             {
                                 projectExt.Project = projectFound.First();
                             }
@@ -94,57 +104,59 @@ namespace HOK.SmartBCF.BCFDBReader
                         }
 
                         var versionFound = from version in versions.Values where version.FileId == bcfZip.FileId select version;
-                        if (versionFound.Count() > 0)
+                        if (versionFound.Any())
                         {
                             bcfZip.VersionFile = versionFound.First();
                         }
 
-                        List<string> topicIds = new List<string>();
+                        var topicIds = new List<string>();
                         var topicFound = from topic in topics.Values where topic.FileId == bcfZip.FileId select topic.Guid;
-                        if (topicFound.Count() > 0)
+                        if (topicFound.Any())
                         {
                             topicIds = topicFound.ToList();
                         }
 
                         ProgressManager.InitializeProgress("Reading "+bcfZip.ZipFileName+"...", topicIds.Count);
                         ProgressManager.databaseFilePath = dbFile;
-                        foreach (string topicId in topicIds)
+                        foreach (var topicId in topicIds)
                         {
                             //Get Markup
                             ProgressManager.StepForward();
 
                             #region Combine Markup
-                            Markup markup = new Markup();
-                            markup.Topic = topics[topicId];
+                            var markup = new Markup
+                            {
+                                Topic = topics[topicId]
+                            };
                             markup.Topic.Labels = (labels.ContainsKey(topicId)) ? labels[topicId] : new List<string>();
 
                             var snippetFound = from snippet in bimSnippets.Values where snippet.TopicGuid == topicId select snippet;
-                            if (snippetFound.Count() > 0)
+                            if (snippetFound.Any())
                             {
                                 markup.Topic.BimSnippet = snippetFound.First();
                             }
 
                             var docRefFound = from docRef in docReferences.Values where docRef.TopicGuid == topicId select docRef;
-                            if (docRefFound.Count() > 0)
+                            if (docRefFound.Any())
                             {
                                 markup.Topic.DocumentReferences = docRefFound.ToList();
                             }
 
                             var relTopicFound = from relTopic in relTopics.Values where relTopic.TopicGuid == topicId select relTopic;
-                            if (relTopicFound.Count() > 0)
+                            if (relTopicFound.Any())
                             {
                                 markup.Topic.RelatedTopics = relTopicFound.ToList();
                             }
 
                             var headerFound = from header in headerFiles.Values where header.TopicGuid == topicId select header;
-                            if (headerFound.Count() > 0)
+                            if (headerFound.Any())
                             {
                                 markup.Header = headerFound.ToList();
                             }
 
-                            ObservableCollection<Comment> commentList = new ObservableCollection<Comment>();
+                            var commentList = new ObservableCollection<Comment>();
                             var commentFound = from comment in comments.Values where comment.TopicGuid == topicId select comment;
-                            if (commentFound.Count() > 0)
+                            if (commentFound.Any())
                             {
                                 commentList = new ObservableCollection<Comment>(commentFound.ToList());
                                 markup.Comment = commentList;
@@ -162,29 +174,29 @@ namespace HOK.SmartBCF.BCFDBReader
 
                             //Get Visualization Info
                             #region Combine Visualization Info
-                            for (int i = 0; i < markup.Viewpoints.Count; i++)
+                            for (var i = 0; i < markup.Viewpoints.Count; i++)
                             {
-                                string viewPointGuid = markup.Viewpoints[i].Guid;
+                                var viewPointGuid = markup.Viewpoints[i].Guid;
 
-                                VisualizationInfo visInfo = new VisualizationInfo();
+                                var visInfo = new VisualizationInfo();
                                 visInfo.ViewPointGuid = viewPointGuid;
 
 
                                 var componentFound = from comp in components.Values where comp.ViewPointGuid == viewPointGuid select comp;
-                                if (componentFound.Count() > 0)
+                                if (componentFound.Any())
                                 {
-                                    ObservableCollection<Component> componentCollection = new ObservableCollection<Component>();
-                                    foreach (Component comp in componentFound)
+                                    var componentCollection = new ObservableCollection<Component>();
+                                    foreach (var comp in componentFound)
                                     {
-                                        Component compItem = comp;
+                                        var compItem = comp;
                                         var foundAction = from ext in bcfZip.ExtensionColor.Extensions where ext.Guid == compItem.Action.Guid select ext;
-                                        if (foundAction.Count() > 0)
+                                        if (foundAction.Any())
                                         {
                                             compItem.Action = foundAction.First();
                                         }
 
                                         var foundResponsibility = from ext in bcfZip.ExtensionColor.Extensions where ext.Guid == compItem.Responsibility.Guid select ext;
-                                        if (foundResponsibility.Count() > 0)
+                                        if (foundResponsibility.Any())
                                         {
                                             compItem.Responsibility = foundResponsibility.First();
                                         }
@@ -195,9 +207,9 @@ namespace HOK.SmartBCF.BCFDBReader
                                 }
 
                                 var orthoCameraFound = from ortho in orthoCameras.Values where ortho.ViewPointGuid == viewPointGuid select ortho;
-                                if (orthoCameraFound.Count() > 0)
+                                if (orthoCameraFound.Any())
                                 {
-                                    OrthogonalCamera orthoCamera = orthoCameraFound.First();
+                                    var orthoCamera = orthoCameraFound.First();
                                     orthoCamera.CameraViewPoint = (points.ContainsKey(orthoCamera.CameraViewPoint.Guid)) ? points[orthoCamera.CameraViewPoint.Guid] : new Point();
                                     orthoCamera.CameraDirection = (directions.ContainsKey(orthoCamera.CameraDirection.Guid)) ? directions[orthoCamera.CameraDirection.Guid] : new Direction();
                                     orthoCamera.CameraUpVector = (directions.ContainsKey(orthoCamera.CameraUpVector.Guid)) ? directions[orthoCamera.CameraUpVector.Guid] : new Direction();
@@ -206,9 +218,9 @@ namespace HOK.SmartBCF.BCFDBReader
                                 }
 
                                 var persCameraFound = from pers in persCameras.Values where pers.ViewPointGuid == viewPointGuid select pers;
-                                if (persCameraFound.Count() > 0)
+                                if (persCameraFound.Any())
                                 {
-                                    PerspectiveCamera persCamera = persCameraFound.First();
+                                    var persCamera = persCameraFound.First();
                                     persCamera.CameraViewPoint = (points.ContainsKey(persCamera.CameraViewPoint.Guid)) ? points[persCamera.CameraViewPoint.Guid] : new Point();
                                     persCamera.CameraDirection = (directions.ContainsKey(persCamera.CameraDirection.Guid)) ? directions[persCamera.CameraDirection.Guid] : new Direction();
                                     persCamera.CameraUpVector = (directions.ContainsKey(persCamera.CameraUpVector.Guid)) ? directions[persCamera.CameraUpVector.Guid] : new Direction();
@@ -217,12 +229,12 @@ namespace HOK.SmartBCF.BCFDBReader
                                 }
 
                                 var lineFound = from line in lines.Values where line.ViewPointGuid == viewPointGuid select line;
-                                if (lineFound.Count() > 0)
+                                if (lineFound.Any())
                                 {
-                                    List<Line> lineList = new List<Line>();
-                                    foreach (Line line in lineFound)
+                                    var lineList = new List<Line>();
+                                    foreach (var line in lineFound)
                                     {
-                                        Line lineItem = line;
+                                        var lineItem = line;
                                         lineItem.StartPoint = (points.ContainsKey(lineItem.StartPoint.Guid)) ? points[lineItem.StartPoint.Guid] : new Point();
                                         lineItem.EndPoint = (points.ContainsKey(lineItem.EndPoint.Guid)) ? points[lineItem.EndPoint.Guid] : new Point();
                                         lineList.Add(lineItem);
@@ -231,12 +243,12 @@ namespace HOK.SmartBCF.BCFDBReader
                                 }
 
                                 var clippingPlaneFound = from plane in clippingPlanes.Values where plane.ViewPointGuid == viewPointGuid select plane;
-                                if (clippingPlaneFound.Count() > 0)
+                                if (clippingPlaneFound.Any())
                                 {
-                                    List<ClippingPlane> planeList = new List<ClippingPlane>();
-                                    foreach (ClippingPlane plane in clippingPlaneFound)
+                                    var planeList = new List<ClippingPlane>();
+                                    foreach (var plane in clippingPlaneFound)
                                     {
-                                        ClippingPlane planeItem = plane;
+                                        var planeItem = plane;
                                         planeItem.Location = (points.ContainsKey(planeItem.Location.Guid)) ? points[planeItem.Location.Guid] : new Point();
                                         planeItem.Direction = (directions.ContainsKey(planeItem.Direction.Guid)) ? directions[planeItem.Direction.Guid] : new Direction();
                                         planeList.Add(planeItem);
@@ -245,12 +257,12 @@ namespace HOK.SmartBCF.BCFDBReader
                                 }
 
                                 var bitmapFound = from bitmap in bitmaps.Values where bitmap.ViewPointGuid == viewPointGuid select bitmap;
-                                if (bitmapFound.Count() > 0)
+                                if (bitmapFound.Any())
                                 {
-                                    List<VisualizationInfoBitmaps> bitmapList = new List<VisualizationInfoBitmaps>();
-                                    foreach (VisualizationInfoBitmaps bitmap in bitmapFound)
+                                    var bitmapList = new List<VisualizationInfoBitmaps>();
+                                    foreach (var bitmap in bitmapFound)
                                     {
-                                        VisualizationInfoBitmaps bitmapItem = bitmap;
+                                        var bitmapItem = bitmap;
                                         bitmapItem.Location = (points.ContainsKey(bitmapItem.Location.Guid)) ? points[bitmapItem.Location.Guid] : new Point();
                                         bitmapItem.Normal = (directions.ContainsKey(bitmapItem.Normal.Guid)) ? directions[bitmapItem.Normal.Guid] : new Direction();
                                         bitmapItem.Up = (directions.ContainsKey(bitmapItem.Up.Guid)) ? directions[bitmap.Up.Guid] : new Direction();
@@ -283,17 +295,17 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string/*guid*/, BCFZIP> GetBCFFileInfoTable()
         {
-            Dictionary<string, BCFZIP> bcfFiles = new Dictionary<string, BCFZIP>();
+            var bcfFiles = new Dictionary<string, BCFZIP>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM BCFFileInfo";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            BCFZIP bcfZip = new BCFZIP();
+                            var bcfZip = new BCFZIP();
                             bcfZip.FileId = reader.GetString(reader.GetOrdinal("Guid"));
                             bcfZip.ZipFileName = reader.GetString(reader.GetOrdinal("FileName"));
                             bcfZip.ZipFilePath = reader.GetString(reader.GetOrdinal("FilePath"));
@@ -318,23 +330,23 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, BimSnippet> GetBimSnippetTable()
         {
-            Dictionary<string, BimSnippet> bimSnippets = new Dictionary<string, BimSnippet>();
+            var bimSnippets = new Dictionary<string, BimSnippet>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM BimSnippet";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            BimSnippet bimSnippet = new BimSnippet();
+                            var bimSnippet = new BimSnippet();
                             bimSnippet.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             bimSnippet.SnippetType = reader.GetString(reader.GetOrdinal("SnippetType"));
                             bimSnippet.isExternal = reader.GetBoolean(reader.GetOrdinal("isExternal"));
                             bimSnippet.Reference = reader.GetString(reader.GetOrdinal("Reference"));
                             bimSnippet.ReferenceSchema = reader.GetString(reader.GetOrdinal("ReferenceSchema"));
-                            if (reader["FileContent"] != System.DBNull.Value)
+                            if (reader["FileContent"] != DBNull.Value)
                             {
                                 bimSnippet.FileContent = (byte[])reader["FileContent"];
                             }
@@ -357,20 +369,20 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, VisualizationInfoBitmaps> GetBitmapsTable()
         {
-            Dictionary<string, VisualizationInfoBitmaps> bitmaps = new Dictionary<string, VisualizationInfoBitmaps>();
+            var bitmaps = new Dictionary<string, VisualizationInfoBitmaps>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Bitmaps";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            VisualizationInfoBitmaps bitmap = new VisualizationInfoBitmaps();
+                            var bitmap = new VisualizationInfoBitmaps();
                             bitmap.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             bitmap.Bitmap = (BitmapFormat)Enum.Parse(typeof(BitmapFormat), reader.GetString(reader.GetOrdinal("Bitmap")));
-                            if (reader["Bitmap_Image"] != System.DBNull.Value)
+                            if (reader["Bitmap_Image"] != DBNull.Value)
                             {
                                 bitmap.BitmapImage = (byte[])reader["Bitmap_Image"];
                             }
@@ -399,17 +411,17 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, ClippingPlane> GetClippingPlaneTable()
         {
-            Dictionary<string, ClippingPlane> clippingPlanes = new Dictionary<string, ClippingPlane>();
+            var clippingPlanes = new Dictionary<string, ClippingPlane>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM ClippingPlane";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            ClippingPlane cp = new ClippingPlane();
+                            var cp = new ClippingPlane();
                             cp.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             cp.Location.Guid = reader.GetString(reader.GetOrdinal("Location"));
                             cp.Direction.Guid = reader.GetString(reader.GetOrdinal("Direction"));
@@ -432,21 +444,21 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, Comment> GetCommentTable()
         {
-            Dictionary<string, Comment> comments = new Dictionary<string, Comment>();
+            var comments = new Dictionary<string, Comment>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Comment";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            Comment comment = new Comment();
+                            var comment = new Comment();
                             comment.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             comment.VerbalStatus = reader.GetString(reader.GetOrdinal("VerbalStatus"));
                             comment.Status = reader.GetString(reader.GetOrdinal("Status"));
-                            if (reader["Date"] != System.DBNull.Value)
+                            if (reader["Date"] != DBNull.Value)
                             {
                                 comment.Date = reader.GetDateTime(reader.GetOrdinal("Date"));
                             }
@@ -454,7 +466,7 @@ namespace HOK.SmartBCF.BCFDBReader
                             comment.Author = reader.GetString(reader.GetOrdinal("Author"));
                             comment.Comment1 = reader.GetString(reader.GetOrdinal("Comment"));
 
-                            if (reader["ModifiedDate"] != System.DBNull.Value)
+                            if (reader["ModifiedDate"] != DBNull.Value)
                             {
                                 comment.ModifiedDateSpecified = true;
                                 comment.ModifiedDate = reader.GetDateTime(reader.GetOrdinal("ModifiedDate"));
@@ -480,22 +492,22 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, Component> GetComponentTable()
         {
-            Dictionary<string, Component> components = new Dictionary<string, Component>();
+            var components = new Dictionary<string, Component>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Components";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            Component comp = new Component();
+                            var comp = new Component();
                             comp.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             comp.IfcGuid = reader.GetString(reader.GetOrdinal("IfcGuid"));
                             comp.Selected = reader.GetBoolean(reader.GetOrdinal("Selected"));
                             comp.Visible = reader.GetBoolean(reader.GetOrdinal("Visible"));
-                            if (reader["Color"] != System.DBNull.Value)
+                            if (reader["Color"] != DBNull.Value)
                             {
                                 comp.Color = (byte[])reader["Color"];
                             }
@@ -524,17 +536,17 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, Direction> GetDirectionTable()
         {
-            Dictionary<string, Direction> directions = new Dictionary<string, Direction>();
+            var directions = new Dictionary<string, Direction>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Direction";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            Direction direction = new Direction();
+                            var direction = new Direction();
                             direction.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             direction.X = reader.GetDouble(reader.GetOrdinal("X"));
                             direction.Y = reader.GetDouble(reader.GetOrdinal("Y"));
@@ -556,21 +568,21 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, TopicDocumentReferences> GetDocumentReferencesTable()
         {
-            Dictionary<string, TopicDocumentReferences> docReferences = new Dictionary<string, TopicDocumentReferences>();
+            var docReferences = new Dictionary<string, TopicDocumentReferences>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM DocumentReferences";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            TopicDocumentReferences docRef = new TopicDocumentReferences();
+                            var docRef = new TopicDocumentReferences();
                             docRef.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             docRef.isExternal = reader.GetBoolean(reader.GetOrdinal("isExternal"));
                             docRef.ReferencedDocument = reader.GetString(reader.GetOrdinal("ReferenceDocument"));
-                            if (reader["FileContent"] != System.DBNull.Value)
+                            if (reader["FileContent"] != DBNull.Value)
                             {
                                 docRef.FileContent = (byte[])reader["FileContent"];
                             }
@@ -594,24 +606,24 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, HeaderFile> GetHeaderFileTable()
         {
-            Dictionary<string, HeaderFile> headerFiles = new Dictionary<string, HeaderFile>();
+            var headerFiles = new Dictionary<string, HeaderFile>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM HeaderFile";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            HeaderFile headerFile = new HeaderFile();
+                            var headerFile = new HeaderFile();
                             headerFile.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             headerFile.IfcProject = reader.GetString(reader.GetOrdinal("IfcProject"));
                             headerFile.IfcSpatialStructureElement = reader.GetString(reader.GetOrdinal("IfcSpatialStructureElement"));
                             headerFile.isExternal = reader.GetBoolean(reader.GetOrdinal("isExternal"));
                             headerFile.Filename = reader.GetString(reader.GetOrdinal("FileName"));
 
-                            if (reader["Date"] != System.DBNull.Value)
+                            if (reader["Date"] != DBNull.Value)
                             {
                                 headerFile.DateSpecified = true;
                                 headerFile.Date = reader.GetDateTime(reader.GetOrdinal("Date"));
@@ -637,18 +649,18 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string/*topicId*/, List<string> /*labels*/> GetLabelTable()
         {
-            Dictionary<string, List<string>> labels = new Dictionary<string, List<string>>();
+            var labels = new Dictionary<string, List<string>>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Labels";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            string label = reader.GetString(reader.GetOrdinal("Label"));
-                            string topicGuid = reader.GetString(reader.GetOrdinal("Topic_Guid"));
+                            var label = reader.GetString(reader.GetOrdinal("Label"));
+                            var topicGuid = reader.GetString(reader.GetOrdinal("Topic_Guid"));
 
                             if (labels.ContainsKey(topicGuid))
                             {
@@ -656,7 +668,7 @@ namespace HOK.SmartBCF.BCFDBReader
                             }
                             else
                             {
-                                List<string> labelList = new List<string>();
+                                var labelList = new List<string>();
                                 labelList.Add(label);
                                 labels.Add(topicGuid, labelList);
                             }
@@ -673,17 +685,17 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, Line> GetLineTable()
         {
-            Dictionary<string, Line> lines = new Dictionary<string, Line>();
+            var lines = new Dictionary<string, Line>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Lines";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            Line line = new Line();
+                            var line = new Line();
                             line.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             line.StartPoint.Guid = reader.GetString(reader.GetOrdinal("StartPoint"));
                             line.EndPoint.Guid = reader.GetString(reader.GetOrdinal("EndPoint"));
@@ -706,17 +718,17 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, OrthogonalCamera> GetOrthoCameraTable()
         {
-            Dictionary<string, OrthogonalCamera> orthoCameras = new Dictionary<string, OrthogonalCamera>();
+            var orthoCameras = new Dictionary<string, OrthogonalCamera>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM OrthogonalCamera";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            OrthogonalCamera orthoCamera = new OrthogonalCamera();
+                            var orthoCamera = new OrthogonalCamera();
                             orthoCamera.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             orthoCamera.CameraViewPoint.Guid = reader.GetString(reader.GetOrdinal("CameraViewPoint"));
                             orthoCamera.CameraDirection.Guid = reader.GetString(reader.GetOrdinal("CameraDirection"));
@@ -741,17 +753,17 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, PerspectiveCamera> GetPerspectiveTable()
         {
-            Dictionary<string, PerspectiveCamera> persCameras = new Dictionary<string, PerspectiveCamera>();
+            var persCameras = new Dictionary<string, PerspectiveCamera>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM PerspectiveCamera";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            PerspectiveCamera persCamera = new PerspectiveCamera();
+                            var persCamera = new PerspectiveCamera();
                             persCamera.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             persCamera.CameraViewPoint.Guid = reader.GetString(reader.GetOrdinal("CameraViewPoint"));
                             persCamera.CameraDirection.Guid = reader.GetString(reader.GetOrdinal("CameraDirection"));
@@ -776,17 +788,17 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, Point> GetPointTable()
         {
-            Dictionary<string, Point> points = new Dictionary<string, Point>();
+            var points = new Dictionary<string, Point>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Point";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            Point point = new Point();
+                            var point = new Point();
                             point.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             point.X = reader.GetDouble(reader.GetOrdinal("X"));
                             point.Y = reader.GetDouble(reader.GetOrdinal("Y"));
@@ -809,21 +821,23 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, Project> GetProjectTable()
         {
-            Dictionary<string, Project> projects = new Dictionary<string, Project>();
+            var projects = new Dictionary<string, Project>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Project";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            Project project = new Project();
-                            project.Guid = reader.GetString(reader.GetOrdinal("Guid"));
-                            project.ProjectId = reader.GetString(reader.GetOrdinal("ProjectId"));
-                            project.Name = reader.GetString(reader.GetOrdinal("ProjectName"));
-                            project.ExtensionGuid = reader.GetString(reader.GetOrdinal("ProjectExtension_Guid"));
+                            var project = new Project
+                            {
+                                Guid = reader.GetString(reader.GetOrdinal("Guid")),
+                                ProjectId = reader.GetString(reader.GetOrdinal("ProjectId")),
+                                Name = reader.GetString(reader.GetOrdinal("ProjectName")),
+                                ExtensionGuid = reader.GetString(reader.GetOrdinal("ProjectExtension_Guid"))
+                            };
 
                             if (!projects.ContainsKey(project.Guid))
                             {
@@ -842,17 +856,17 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, ProjectExtension> GetProjectExtensionTable()
         {
-            Dictionary<string, ProjectExtension> projectExts = new Dictionary<string, ProjectExtension>();
+            var projectExts = new Dictionary<string, ProjectExtension>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM ProjectExtension";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            ProjectExtension projectExt = new ProjectExtension();
+                            var projectExt = new ProjectExtension();
                             projectExt.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             projectExt.ExtensionSchema = reader.GetString(reader.GetOrdinal("ExtensionSchema"));
                             projectExt.FileId = reader.GetString(reader.GetOrdinal("File_Guid"));
@@ -873,17 +887,17 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, TopicRelatedTopics> GetRelTopicTables()
         {
-            Dictionary<string, TopicRelatedTopics> relTopics = new Dictionary<string, TopicRelatedTopics>();
+            var relTopics = new Dictionary<string, TopicRelatedTopics>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM RelatedTopics";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            TopicRelatedTopics relTopic = new TopicRelatedTopics();
+                            var relTopic = new TopicRelatedTopics();
                             relTopic.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             relTopic.TopicGuid = reader.GetString(reader.GetOrdinal("Topic_Guid"));
 
@@ -904,21 +918,23 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, RevitExtension> GetRevitExtensionTable()
         {
-            Dictionary<string, RevitExtension> extensions = new Dictionary<string, RevitExtension>();
+            var extensions = new Dictionary<string, RevitExtension>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM RevitExtensions";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            RevitExtension extension = new RevitExtension();
-                            extension.Guid = reader.GetString(reader.GetOrdinal("Guid"));
-                            extension.ParameterName = reader.GetString(reader.GetOrdinal("ParameterName"));
-                            extension.ParameterValue = reader.GetString(reader.GetOrdinal("ParameterValue"));
-                            if (reader["Color"] != System.DBNull.Value)
+                            var extension = new RevitExtension
+                            {
+                                Guid = reader.GetString(reader.GetOrdinal("Guid")),
+                                ParameterName = reader.GetString(reader.GetOrdinal("ParameterName")),
+                                ParameterValue = reader.GetString(reader.GetOrdinal("ParameterValue"))
+                            };
+                            if (reader["Color"] != DBNull.Value)
                             {
                                 extension.Color = (byte[])reader["Color"];
                             }
@@ -940,21 +956,21 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, Topic> GetTopicTables()
         {
-            Dictionary<string, Topic> topics = new Dictionary<string, Topic>();
+            var topics = new Dictionary<string, Topic>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Topic";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            Topic topic = new Topic();
+                            var topic = new Topic();
                             topic.Guid = reader.GetString(reader.GetOrdinal("Guid"));
-                            string topicType = reader.GetString(reader.GetOrdinal("TopicType"));
+                            var topicType = reader.GetString(reader.GetOrdinal("TopicType"));
                             topic.TopicType = (string.IsNullOrEmpty(topicType)) ? TopicType.Unknown : (TopicType)Enum.Parse(typeof(TopicType), topicType);
-                            string topicStatus = reader.GetString(reader.GetOrdinal("TopicStatus"));
+                            var topicStatus = reader.GetString(reader.GetOrdinal("TopicStatus"));
                             topic.TopicStatus = (string.IsNullOrEmpty(topicStatus)) ? TopicStatus.Open : (TopicStatus)Enum.Parse(typeof(TopicStatus), topicStatus);
                             topic.Title = reader.GetString(reader.GetOrdinal("Title"));
                             topic.ReferenceLink = reader.GetString(reader.GetOrdinal("ReferenceLink"));
@@ -962,13 +978,13 @@ namespace HOK.SmartBCF.BCFDBReader
                             topic.Priority = reader.GetString(reader.GetOrdinal("Priority"));
                             topic.Index = reader.GetInt32(reader.GetOrdinal("TopicIndex"));
 
-                            if (reader["CreationDate"] != System.DBNull.Value)
+                            if (reader["CreationDate"] != DBNull.Value)
                             {
                                 topic.CreationDate = reader.GetDateTime(reader.GetOrdinal("CreationDate"));
                             }
                             topic.CreationAuthor = reader.GetString(reader.GetOrdinal("CreationAuthor"));
 
-                            if (reader["ModifiedDate"] != System.DBNull.Value)
+                            if (reader["ModifiedDate"] != DBNull.Value)
                             {
                                 topic.ModifiedDateSpecified = true;
                                 topic.ModifiedDate = reader.GetDateTime(reader.GetOrdinal("ModifiedDate"));
@@ -995,21 +1011,23 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, Version> GetVersionTable()
         {
-            Dictionary<string, Version> versions = new Dictionary<string, Version>();
+            var versions = new Dictionary<string, Version>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Version";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            Version version = new Version();
-                            version.Guid = reader.GetString(reader.GetOrdinal("Guid"));
-                            version.VersionId = reader.GetString(reader.GetOrdinal("VersionId"));
-                            version.DetailedVersion = reader.GetString(reader.GetOrdinal("DetailedVersion"));
-                            version.FileId = reader.GetString(reader.GetOrdinal("File_Guid"));
+                            var version = new Version
+                            {
+                                Guid = reader.GetString(reader.GetOrdinal("Guid")),
+                                VersionId = reader.GetString(reader.GetOrdinal("VersionId")),
+                                DetailedVersion = reader.GetString(reader.GetOrdinal("DetailedVersion")),
+                                FileId = reader.GetString(reader.GetOrdinal("File_Guid"))
+                            };
 
                             if (!versions.ContainsKey(version.Guid))
                             {
@@ -1028,21 +1046,21 @@ namespace HOK.SmartBCF.BCFDBReader
 
         private static Dictionary<string, ViewPoint> GetViewpointsTable()
         {
-            Dictionary<string, ViewPoint> viewpoints = new Dictionary<string, ViewPoint>();
+            var viewpoints = new Dictionary<string, ViewPoint>();
             try
             {
-                using (SQLiteCommand cmd = new SQLiteCommand(connection))
+                using (var cmd = new SQLiteCommand(connection))
                 {
                     cmd.CommandText = "SELECT * FROM Viewpoints";
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
-                            ViewPoint vp = new ViewPoint();
+                            var vp = new ViewPoint();
                             vp.Guid = reader.GetString(reader.GetOrdinal("Guid"));
                             vp.Viewpoint = reader.GetString(reader.GetOrdinal("Viewpoint"));
                             vp.Snapshot = reader.GetString(reader.GetOrdinal("Snapshot"));
-                            if (reader["Snapshot_Image"] != System.DBNull.Value)
+                            if (reader["Snapshot_Image"] != DBNull.Value)
                             {
                                 vp.SnapshotImage = (byte[])reader["Snapshot_Image"];
                             }
