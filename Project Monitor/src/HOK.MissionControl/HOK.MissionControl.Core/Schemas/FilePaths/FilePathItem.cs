@@ -126,6 +126,30 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
             }
         }
 
+        /// <summary>
+        /// Validates a file path, making sure that its either a revit server file, bim 360 or hok network location.
+        /// </summary>
+        /// <param name="centralPath">Central Path to validate.</param>
+        /// <returns>True if file path is valid, otherwise false.</returns>
+        public static bool IsValidFilePath(string centralPath)
+        {
+            var result = false;
+            if (centralPath.StartsWith("rsn://", StringComparison.OrdinalIgnoreCase))
+            {
+                result = true;
+            }
+            else if (centralPath.StartsWith("\\\\group\\hok\\", StringComparison.OrdinalIgnoreCase))
+            {
+                result = true;
+            }
+            else if (centralPath.StartsWith("bim 360://", StringComparison.OrdinalIgnoreCase))
+            {
+                result = true;
+            }
+
+            return result;
+        }
+
         #endregion
     }
 }

@@ -46,7 +46,12 @@ namespace HOK.MissionControl.Tools.MissionControl
 
                 // (Konrad) We can publish a file path to the DB.
                 // That will make it easier to create Configurations.
-                if (!doc.IsDetached && !doc.IsFamilyDocument && doc.IsWorkshared)
+                // Valid file is:
+                // - not detached
+                // - not a family
+                // - is workshared
+                // - is saved on the network, revit server or bim 360 server
+                if (!doc.IsDetached && !doc.IsFamilyDocument && doc.IsWorkshared && FilePathItem.IsValidFilePath(centralPath))
                 {
                     if (!ServerUtilities.Post(new FilePathItem(centralPath, doc.Application.VersionNumber), "filepaths/add", out FilePathItem unused))
                     {
