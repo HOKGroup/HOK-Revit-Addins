@@ -26,3 +26,4 @@ ETABSexport.png,Export to ETABS,NM.Revit.addin,24,Export a structural Revit mode
 ScopeBoxSync.png,Scope Box Synchronizer,ScopeBoxSynchronizer.addin,4,Keep scope boxes in linked models synchronized with those in the host model,https://apps.autodesk.com/RVT/en/Detail/Index?id=6897465823377340538&appLang=en&os=Win64
 StructCope.png,Structural Cope Tool,SSFT.StrucCope.addin,20,Automatically cope selected beams/columns with any number of intersecting members,https://apps.autodesk.com/RVT/en/Detail/Index?id=662680847725051942&appLang=en&os=Win32_64
 StructColSplit.png,Column Splitter,Ssft.Column-Splitter.addin,22,"Split columns by point (now available ootb), by levels or by reference planes",https://apps.autodesk.com/RVT/en/Detail/Index?id=5528791458580677035&appLang=en&os=Win32_64
+greg testing
