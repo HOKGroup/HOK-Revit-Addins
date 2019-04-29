@@ -9,7 +9,7 @@ Code signing is an optional process that developers can choose to enable when bu
 
 However, if you are one of the Open Source users of these tools, and want to use a specific PFX file located on your drive, and don't want to share your password with everyone use this code instead: 
 
-<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe&quot; sign /f &quot;$(SolutionDir)..\_cert\archilabCertificate.pfx&quot; /p &quot;$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\HOK', 'certificatePassword', null, RegistryView.Registry64, RegistryView.Registry32))&quot; /t http://timestamp.comodoca.com/authenticode &quot;$(TargetPath)&quot;" />
+`<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe&quot; sign /f &quot;$(SolutionDir)..\_cert\archilabCertificate.pfx&quot; /p &quot;$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\HOK', 'certificatePassword', null, RegistryView.Registry64, RegistryView.Registry32))&quot; /t http://timestamp.comodoca.com/authenticode &quot;$(TargetPath)&quot;" />`
 
 For the above: 
 - please make sure to replace the path to version of signtool.exe that you have available. These vary based on .NET version installed on your machine. 
