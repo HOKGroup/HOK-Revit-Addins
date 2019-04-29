@@ -9,13 +9,14 @@ Code signing is an optional process that developers can choose to enable when bu
 
 However, if you are one of the Open Source users of these tools, and want to use a specific PFX file located on your drive, and don't want to share your password with everyone use this code instead: 
 
-`<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe&quot; sign /f &quot;$(ProjectDir)bin\archilabCertificate.pfx&quot; /p &quot;$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\HOK', 'certificatePassword', null, RegistryView.Registry64, RegistryView.Registry32))&quot; /t http://timestamp.comodoca.com/authenticode &quot;$(TargetPath)&quot;" />`
+<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe&quot; sign /f &quot;$(SolutionDir)..\_cert\archilabCertificate.pfx&quot; /p &quot;$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\HOK', 'certificatePassword', null, RegistryView.Registry64, RegistryView.Registry32))&quot; /t http://timestamp.comodoca.com/authenticode &quot;$(TargetPath)&quot;" />
 
 For the above: 
 - please make sure to replace the path to version of signtool.exe that you have available. These vary based on .NET version installed on your machine. 
 - please make sure to replace the PFX file name to match one on your machine. 
 - if you don't want to expose your password please create a new Registry key called "certificatePassword" under "HKEY_LOCAL_MACHINE\SOFTWARE\HOK" and store your password there. The above bit of code will make sure to read in at runtime. 
 - potentially, depending on who's the provider of your certificate you might want to replace the path to authentication server. 
+- last, but not least, please make sure to PLACE a copy of your certifacte in the roof folder of this repo under `_cert` folder. It will be ignored by the `.gitignore` so no worries about it getting published. 
 
 ### Settings
 
