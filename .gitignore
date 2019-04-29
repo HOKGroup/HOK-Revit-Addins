@@ -96,6 +96,9 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
+# Code Signing Certificate location
+_cert/
+
 # Publish Web Output
 *.Publish.xml
 
