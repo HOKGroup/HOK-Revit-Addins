@@ -1,6 +1,22 @@
 HOK-Revit-Addins 2019.0.0.X
 ================
 
+### Code Signing
+
+Code signing is an optional process that developers can choose to enable when building this repo. Autodesk strongly recommends that all Revit Plugins be signed with a code signing certificate, authenticating the plugin and adding its creator to the list of certified developers on users computer. This prevents a pop-up window from appearing every time user starts Revit, and tries to load a plugin from an unknown developer. Since HOK uses domain based certificates, if you are a developer for HOK, you would have (or can request to have it added by the IT) a certificate called "Code Signing DTM" installed on your machine. If that's the case simply comment out this line of code in the *.csproj file: 
+
+`<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />`
+
+However, if you are one of the Open Source users of these tools, and want to use a specific PFX file located on your drive, and don't want to share your password with everyone use this code instead: 
+
+`<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe&quot; sign /f &quot;$(ProjectDir)bin\archilabCertificate.pfx&quot; /p &quot;$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\HOK', 'certificatePassword', null, RegistryView.Registry64, RegistryView.Registry32))&quot; /t http://timestamp.comodoca.com/authenticode &quot;$(TargetPath)&quot;" />`
+
+For the above: 
+- please make sure to replace the path to version of signtool.exe that you have available. These vary based on .NET version installed on your machine. 
+- please make sure to replace the PFX file name to match one on your machine. 
+- if you don't want to expose your password please create a new Registry key called "certificatePassword" under "HKEY_LOCAL_MACHINE\SOFTWARE\HOK" and store your password there. The above bit of code will make sure to read in at runtime. 
+- potentially, depending on who's the provider of your certificate you might want to replace the path to authentication server. 
+
 ### Settings
 
 Most of the tools in this repository have a reference to HOK.Core. This is because most of these tools use some utilities from that DLL. One of these utilities is a HOK Feedback tool that can be easily embedded into any other tool via a button. This tool allows users to post an issue directly to GitHub via a proxy user and a special access token. In order to make that tool work for anyone, anywhere, without distributing other people's tokens and repo info, there is a `Settings.json` file embedded into the Resources in HOK.Core.dll. Here's the contents schema: 
