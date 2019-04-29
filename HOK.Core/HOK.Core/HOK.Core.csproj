@@ -243,9 +243,23 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
+  
   <Target Name="CopyFiles" AfterTargets="AfterBuild">
+    <!--
+    <ItemGroup>
+      <SignFiles Include="**\bin\*.exe" />
+    </ItemGroup>
+    <PropertyGroup>
+      <SignToolTimestampServers Condition="'$(Configuration)'=='Release'">http://timestamp.comodoca.com/authenticode;http://timestamp.verisign.com/scripts/timstamp.dll;http://timestamp.globalsign.com/scripts/timstamp.dll</SignToolTimestampServers>
+    </PropertyGroup>
+    <SignTool SignFiles="@(SignFiles)" 
+              PfxFile="cert.pfx" 
+              PfxPassword="$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\MyCompanyDev@cert.pfx)" 
+              TimestampServer="$(SignToolTimestampServers)" />
+    -->
     <Message Text="Signing file..." Importance="high" />
-    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />
+    <!--<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />-->
+    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe&quot; sign /f &quot;$(ProjectDir)bin\archilabCertificate.pfx&quot; /p &quot;CodeSigning456123&quot; /t http://timestamp.comodoca.com/authenticode &quot;$(TargetPath)&quot;" />
     <Message Text="Copy files..." Importance="high" />
     <Message Text="$(TargetPath) copied" Importance="high" />
     <Message Text="$(TargetDir)RestSharp.dll copied" Importance="high" />

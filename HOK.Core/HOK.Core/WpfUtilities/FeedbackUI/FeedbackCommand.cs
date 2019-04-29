@@ -5,8 +5,8 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
-using HOK.MissionControl.Core.Schemas;
-using HOK.MissionControl.Core.Utils;
+//using HOK.MissionControl.Core.Schemas;
+//using HOK.MissionControl.Core.Utils;
 
 namespace HOK.Core.WpfUtilities.FeedbackUI
 {
@@ -21,10 +21,10 @@ namespace HOK.Core.WpfUtilities.FeedbackUI
 
             try
             {
-                // (Konrad) We are gathering information about the addin use. This allows us to
-                // better maintain the most used plug-ins or discontiue the unused ones.
-                AddinUtilities.PublishAddinLog(
-                    new AddinLog("Feedback Tool", commandData.Application.Application.VersionNumber));
+                //// (Konrad) We are gathering information about the addin use. This allows us to
+                //// better maintain the most used plug-ins or discontiue the unused ones.
+                //AddinUtilities.PublishAddinLog(
+                //    new AddinLog("Feedback Tool", commandData.Application.Application.VersionNumber));
 
                 var title = "HOK Feedback Tool v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 var model = new FeedbackModel();

@@ -41,5 +41,5 @@ namespace HOK.Core.WpfUtilities
         {
             throw new NotImplementedException();
         }
-    }
+    }       
 }
