@@ -232,7 +232,8 @@
   </PropertyGroup>
   <Target Name="CopyFiles" AfterTargets="AfterBuild">
     <Message Text="Signing file..." Importance="high" />
-    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />
+    <!--<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />-->
+    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe&quot; sign /f &quot;$(SolutionDir)..\..\..\_cert\archilabCertificate.pfx&quot; /p &quot;$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\HOK', 'certificatePassword', null, RegistryView.Registry64, RegistryView.Registry32))&quot; /t http://timestamp.comodoca.com/authenticode &quot;$(TargetPath)&quot;" />
     <Message Text="Copy files..." Importance="high" />
     <Message Text="$(TargetPath) copied" Importance="high" />
     <Message Text="$(TargetDir)$(TargetName).addin copied" Importance="high" />
