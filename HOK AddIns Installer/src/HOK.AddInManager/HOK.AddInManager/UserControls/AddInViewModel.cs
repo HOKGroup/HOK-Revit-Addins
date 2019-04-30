@@ -11,7 +11,7 @@ using HOK.Core.Utilities;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.Core.WpfUtilities;
-using HOK.Core.WpfUtilities.FeedbackUI;
+using HOK.Feedback;
 using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
 
 #endregion

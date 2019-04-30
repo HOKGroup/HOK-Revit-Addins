@@ -105,6 +105,26 @@
       <Private>True</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\HOK.Feedback\HOK.Feedback\bin\2016\HOK.Feedback.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\HOK.Feedback\HOK.Feedback\bin\2017\HOK.Feedback.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\HOK.Feedback\HOK.Feedback\bin\2018\HOK.Feedback.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2019'">
+      <HintPath>..\..\..\..\HOK.Feedback\HOK.Feedback\bin\2019\HOK.Feedback.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>
       <Private>True</Private>
@@ -251,7 +271,8 @@
   </PropertyGroup>
   <Target Name="CopyFiles" AfterTargets="AfterBuild;NonWinFodyTarget">
     <Message Text="Signing file..." Importance="high" />
-    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />
+    <!--<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />-->
+    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe&quot; sign /f &quot;$(SolutionDir)..\..\..\_cert\archilabCertificate.pfx&quot; /p &quot;$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\HOK', 'certificatePassword', null, RegistryView.Registry64, RegistryView.Registry32))&quot; /t http://timestamp.comodoca.com/authenticode &quot;$(TargetPath)&quot;" />
     <Message Text="Copy files..." Importance="high" />
     <Message Text="$(TargetPath) copied" Importance="high" />
     <Message Text="$(TargetDir)$(TargetName).addin copied" Importance="high" />
