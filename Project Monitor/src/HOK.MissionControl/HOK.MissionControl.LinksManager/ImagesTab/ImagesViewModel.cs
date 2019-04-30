@@ -9,7 +9,7 @@ using System.Windows.Interop;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.Core.ElementWrapers;
-using HOK.Core.WpfUtilities.FeedbackUI;
+using HOK.Feedback;
 
 namespace HOK.MissionControl.LinksManager.ImagesTab
 {

@@ -81,22 +81,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2016'">
-      <HintPath>..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2016\HOK.MissionControl.Core.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2017'">
-      <HintPath>..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2017\HOK.MissionControl.Core.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2018'">
-      <HintPath>..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2018\HOK.MissionControl.Core.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2019'">
-      <HintPath>..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2019\HOK.MissionControl.Core.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
     </Reference>
@@ -108,10 +92,6 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="RestSharp, Version=106.1.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.106.1.0\lib\net452\RestSharp.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2019'">
       <HintPath>..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPI.dll</HintPath>
       <Private>False</Private>
@@ -193,17 +173,6 @@
     <Compile Include="WpfUtilities\DataGridUtilities.cs" />
     <Compile Include="WpfUtilities\DataGridExtension.cs" />
     <Compile Include="WpfUtilities\EventToCommand.cs" />
-    <Compile Include="WpfUtilities\FeedbackUI\AttachmentView.xaml.cs">
-      <DependentUpon>AttachmentView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="WpfUtilities\FeedbackUI\AttachmentViewModel.cs" />
-    <Compile Include="WpfUtilities\FeedbackUI\FeedbackCommand.cs" />
-    <Compile Include="WpfUtilities\FeedbackUI\FeedbackModel.cs" />
-    <Compile Include="WpfUtilities\FeedbackUI\FeedbackView.xaml.cs">
-      <DependentUpon>FeedbackView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="WpfUtilities\FeedbackUI\FeedbackViewModel.cs" />
-    <Compile Include="WpfUtilities\FeedbackUI\GitHubWrappers.cs" />
     <Compile Include="WpfUtilities\IEventArgsConverter.cs" />
     <Compile Include="WpfUtilities\ProgressManager.cs" />
     <Compile Include="WpfUtilities\RelayCommand.cs" />
@@ -214,16 +183,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\Settings.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="WpfUtilities\FeedbackUI\AttachmentView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="WpfUtilities\FeedbackUI\FeedbackView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\hoklogo.ico" />
@@ -243,20 +202,17 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  
   <Target Name="CopyFiles" AfterTargets="AfterBuild">
     <Message Text="Signing file..." Importance="high" />
     <!--<Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />-->
     <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.15063.0\x86\signtool.exe&quot; sign /f &quot;$(SolutionDir)..\_cert\archilabCertificate.pfx&quot; /p &quot;$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\HOK', 'certificatePassword', null, RegistryView.Registry64, RegistryView.Registry32))&quot; /t http://timestamp.comodoca.com/authenticode &quot;$(TargetPath)&quot;" />
     <Message Text="Copy files..." Importance="high" />
     <Message Text="$(TargetPath) copied" Importance="high" />
-    <Message Text="$(TargetDir)RestSharp.dll copied" Importance="high" />
     <Message Text="$(TargetDir)Microsoft.Practices.ServiceLocation.dll copied" Importance="high" />
     <Message Text="$(TargetDir)System.Windows.Interactivity.dll copied" Importance="high" />
     <Message Text="$(TargetDir)GalaSoft.MvvmLight.dll copied" Importance="high" />
     <Message Text="$(TargetDir)Newtonsoft.Json.dll copied" Importance="high" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
-    <Copy SourceFiles="$(TargetDir)RestSharp.dll" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
     <Copy SourceFiles="$(TargetDir)Microsoft.Practices.ServiceLocation.dll" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
     <Copy SourceFiles="$(TargetDir)System.Windows.Interactivity.dll" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
     <Copy SourceFiles="$(TargetDir)GalaSoft.MvvmLight.dll" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />

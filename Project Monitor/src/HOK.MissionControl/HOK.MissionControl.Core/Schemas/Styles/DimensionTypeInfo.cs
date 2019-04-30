@@ -71,8 +71,8 @@ namespace HOK.MissionControl.Core.Schemas.Styles
         public DimensionTypeInfo(DimensionType dt)
         {
             Name = dt.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString();
-#if RELEASE2016 || RELEASE2015
-// (Konrad) Revit 2016 API doesn't have that info exposed.
+#if RELEASE2016 || RELEASE2015 || RELEASE2017
+// (Konrad) Revit 2016 API doesn't have that info exposed. Also 2017.0 doesn't have it but 2017.1 does.
             UsesProjectUnits = false;
 #else
             UsesProjectUnits = dt.GetUnitsFormatOptions().UseDefault;

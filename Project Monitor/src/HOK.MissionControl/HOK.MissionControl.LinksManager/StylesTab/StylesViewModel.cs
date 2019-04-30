@@ -1,4 +1,5 @@
 ﻿#region References
+
 using System.Windows;
 using System.Windows.Controls;
 using System.Collections;
@@ -10,7 +11,8 @@ using System.Windows.Interop;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using HOK.Core.ElementWrapers;
-using HOK.Core.WpfUtilities.FeedbackUI;
+using HOK.Feedback;
+
 #endregion
 
 namespace HOK.MissionControl.LinksManager.StylesTab

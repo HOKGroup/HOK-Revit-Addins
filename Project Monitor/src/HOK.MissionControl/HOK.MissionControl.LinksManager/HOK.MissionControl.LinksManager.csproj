@@ -85,6 +85,26 @@
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2016'">
+      <HintPath>..\..\..\..\HOK.Feedback\HOK.Feedback\bin\2016\HOK.Feedback.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2017'">
+      <HintPath>..\..\..\..\HOK.Feedback\HOK.Feedback\bin\2017\HOK.Feedback.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2018'">
+      <HintPath>..\..\..\..\HOK.Feedback\HOK.Feedback\bin\2018\HOK.Feedback.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2019'">
+      <HintPath>..\..\..\..\HOK.Feedback\HOK.Feedback\bin\2019\HOK.Feedback.dll</HintPath>
+      <Private>False</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
       <Private>False</Private>

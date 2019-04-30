@@ -11,7 +11,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using HOK.Core.WpfUtilities;
-using HOK.Core.WpfUtilities.FeedbackUI;
+using HOK.Feedback;
 using HOK.MissionControl.StylesManager.Tabs;
 using HOK.MissionControl.StylesManager.Utilities;
 using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
@@ -188,7 +188,7 @@ namespace HOK.MissionControl.StylesManager.DimensionsTab
 
         private void OnControlClosed(UserControl control)
         {
-            // (Konrad) Unregisters any Messanger handlers.
+            // (Konrad) Unregistered any Messenger handlers.
             Cleanup();
         }
 

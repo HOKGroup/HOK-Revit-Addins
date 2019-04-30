@@ -11,7 +11,7 @@ using System.Windows.Interop;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
-using HOK.Core.WpfUtilities.FeedbackUI;
+using HOK.Feedback;
 using HOK.MissionControl.GroupsManager.Utilities;
 
 #endregion
