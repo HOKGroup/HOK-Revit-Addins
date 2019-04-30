@@ -162,4 +162,11 @@ $RECYCLE.BIN/
 # Mac desktop service store files
 .DS_Store
 /_releases/
+
+# Ignore Settings.json file since that is company specific
 /HOK.Core/HOK.Core/Resources/Settings.json
+
+# Ignore packages folders
+HOK.Core/packages/
+Ribbon Tab/src/HOK.RibbonTab/packages/
+HOK.Feedback/packages/
