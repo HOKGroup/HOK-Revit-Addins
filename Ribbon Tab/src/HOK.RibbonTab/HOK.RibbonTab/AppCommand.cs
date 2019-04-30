@@ -102,11 +102,11 @@ namespace HOK.RibbonTab
                 var created = m_app.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Help");
                 var feedbackPanel = created ?? m_app.CreateRibbonPanel(tabName, "Help");
 
-                if (File.Exists(currentDirectory + "/HOK.Core.dll"))
+                if (File.Exists(currentDirectory + "/HOK.Feedback.dll"))
                 {
-                    var coreAssembly = Assembly.LoadFrom(currentDirectory + "/HOK.Core.dll");
-                    var pb = (PushButton)feedbackPanel.AddItem(new PushButtonData("SendFeedback_command", "Send" + Environment.NewLine + " Feedback", currentDirectory + "/HOK.Core.dll", "HOK.Core.WpfUtilities.FeedbackUI.FeedbackCommand"));
-                    pb.LargeImage = ButtonUtil.LoadBitmapImage(coreAssembly, "HOK.Core", "comments_32x32.png");
+                    var coreAssembly = Assembly.LoadFrom(currentDirectory + "/HOK.Feedback.dll");
+                    var pb = (PushButton)feedbackPanel.AddItem(new PushButtonData("SendFeedback_command", "Send" + Environment.NewLine + " Feedback", currentDirectory + "/HOK.Feedback.dll", "HOK.Feedback.FeedbackCommand"));
+                    pb.LargeImage = ButtonUtil.LoadBitmapImage(coreAssembly, "HOK.Feedback", "comments_32x32.png");
                     pb.ToolTip = "Submit feedback to HOK developers.";
                     AddToolTips(pb);
                     fileExist = true;
