@@ -96,6 +96,9 @@ DocProject/Help/html
 # Click-Once directory
 publish/
 
+# Code Signing Certificate location
+_cert/
+
 # Publish Web Output
 *.Publish.xml
 
@@ -159,4 +162,16 @@ $RECYCLE.BIN/
 # Mac desktop service store files
 .DS_Store
 /_releases/
+
+# Ignore Settings.json file since that is company specific
 /HOK.Core/HOK.Core/Resources/Settings.json
+
+# Ignore packages folders
+HOK.Core/packages/
+HOK.RibbonTab/packages/
+HOK.Feedback/packages/
+HOK.MoveBackup/packages/
+HOK.MissionControl/packages/
+HOK.Feedback/packages/
+HOK.BetaToolsManager/packages/
+HOK.AddInManager/packages/
