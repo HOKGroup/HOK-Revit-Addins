@@ -168,5 +168,10 @@ $RECYCLE.BIN/
 
 # Ignore packages folders
 HOK.Core/packages/
-Ribbon Tab/src/HOK.RibbonTab/packages/
+HOK.RibbonTab/packages/
 HOK.Feedback/packages/
+HOK.MoveBackup/packages/
+HOK.MissionControl/packages/
+HOK.Feedback/packages/
+HOK.BetaToolsManager/packages/
+HOK.AddInManager/packages/
