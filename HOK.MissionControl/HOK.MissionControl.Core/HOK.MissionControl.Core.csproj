@@ -189,6 +189,7 @@
     <Compile Include="Schemas\Project\ProjectAddress.cs" />
     <Compile Include="Schemas\RevitServer.cs" />
     <Compile Include="Schemas\Configurations\RvtFile.cs" />
+    <Compile Include="Schemas\Settings\Settings.cs" />
     <Compile Include="Schemas\Sheets\SheetsData.cs" />
     <Compile Include="Schemas\Sheets\RevisionItem.cs" />
     <Compile Include="Schemas\Sheets\SheetItem.cs" />
@@ -227,7 +228,7 @@
     </PostBuildEvent>
   </PropertyGroup>
   <Target Name="CopyFiles" AfterTargets="AfterBuild">
-    <Exec Command="&quot;%WINDIR%\SysNative\WindowsPowerShell\v1.0\powershell.exe&quot; &quot;$(SolutionDir)..\_postBuild\codeSigning.bat&quot; &quot;$(TargetPath)&quot;"/>
+    <Exec Command="&quot;%WINDIR%\SysNative\WindowsPowerShell\v1.0\powershell.exe&quot; &quot;$(SolutionDir)..\_postBuild\codeSigning.bat&quot; &quot;$(TargetPath)&quot;" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
   </Target>
 </Project>

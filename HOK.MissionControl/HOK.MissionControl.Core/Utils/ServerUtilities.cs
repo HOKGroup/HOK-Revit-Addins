@@ -25,6 +25,44 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="path"></param>
         /// <param name="result"></param>
         /// <returns></returns>
+        public static bool GetOne<T>(string path, out T result) where T : new()
+        {
+            result = default(T);
+            try
+            {
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(ApiVersion + "/" + path, Method.GET);
+                var response = client.Execute(request);
+                if (response.StatusCode != HttpStatusCode.OK) return false;
+
+                if (!string.IsNullOrWhiteSpace(response.Content))
+                {
+                    var data = JsonConvert.DeserializeObject<T>(response.Content);
+                    if (data != null)
+                    {
+                        result = data;
+                        return true;
+                    }
+
+                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document matching the query.");
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Generic GET request that returns true if asset matching the query was successfully retrieved.
+        /// </summary>
+        /// <typeparam name="T">Type of the Asset that will be returned.</typeparam>
+        /// <param name="path">HTTP request url.</param>
+        /// <param name="result">Resulting Asset.</param>
+        /// <returns>True if success, otherwise false.</returns>
         public static bool Get<T>(string path, out T result) where T : new()
         {
             result = default(T);
@@ -35,7 +73,7 @@ namespace HOK.MissionControl.Core.Utils
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.OK) return false;
 
-                if (!string.IsNullOrEmpty(response.Content))
+                if (!string.IsNullOrWhiteSpace(response.Content))
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
                     if (data != null)
@@ -44,7 +82,7 @@ namespace HOK.MissionControl.Core.Utils
                         return true;
                     }
 
-                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
+                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document matching the query.");
                 }
 
                 return false;
