@@ -54,7 +54,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
 
                 if (MissionControlSetup.Projects.ContainsKey(centralPath))
                 {
-                    Process.Start("http://missioncontrol.hok.com/#/projects/healthreport/" + MissionControlSetup.Projects[centralPath].Id);
+                    Process.Start(AppSettings.Instance.HttpAddress + "/#/projects/healthreport/" + MissionControlSetup.Projects[centralPath].Id);
                 }
             });
         }
