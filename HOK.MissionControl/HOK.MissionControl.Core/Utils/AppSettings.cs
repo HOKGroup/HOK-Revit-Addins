@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace HOK.MissionControl
+namespace HOK.MissionControl.Core.Utils
 {
     public sealed class AppSettings : INotifyPropertyChanged
     {

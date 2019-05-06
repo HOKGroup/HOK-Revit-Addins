@@ -16,8 +16,5 @@ namespace HOK.MissionControl.Core.Schemas.Settings
 
         [JsonProperty("name")]
         public string Name { get; } = "Settings";
-
-        [JsonProperty("httpAddress")]
-        public string HttpAddress { get; set; } = "http://missioncontrol.hok.com";
     }
 }

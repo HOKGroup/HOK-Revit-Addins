@@ -27,7 +27,6 @@ using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Utils;
-using Settings = HOK.MissionControl.Core.Schemas.Settings.Settings;
 
 #endregion
 
@@ -45,14 +44,11 @@ namespace HOK.MissionControl.Tools.MissionControl
             {
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
 
-                if (!ServerUtilities.GetOne("settings", out Settings mcSettings))
+                if (!ServerUtilities.GetOne("settings", out Core.Schemas.Settings.Settings mcSettings))
                 {
                     DisableMissionControl();
                     return;
                 }
-
-                // (Konrad) Set Website Address using the mcSettings
-                AppSettings.Instance.HttpAddress = mcSettings.HttpAddress;
 
                 // (Konrad) We can publish a file path to the DB.
                 // That will make it easier to create Configurations.

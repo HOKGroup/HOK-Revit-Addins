@@ -1,4 +1,6 @@
-﻿namespace HOK.Core.Utilities
+﻿// ReSharper disable UnusedMember.Global
+
+namespace HOK.Core.Utilities
 {
     public class Settings
     {
@@ -10,5 +12,7 @@
         public string FileOnOpeningFmeHost { get; set; }
         public int FileOnOpeningFmePort { get; set; }
         public string FileOnOpeningFmeClientId { get; set; }
+        public string HttpAddress { get; set; }
+        public string HttpAddressDebug { get; set; }
     }
 }

@@ -211,6 +211,7 @@
     <Compile Include="Schemas\Worksets\WorksetItemData.cs" />
     <Compile Include="Schemas\Worksets\WorksetStats.cs" />
     <Compile Include="Utils\AddinUtilities.cs" />
+    <Compile Include="Utils\AppSettings.cs" />
     <Compile Include="Utils\ElementUtilities.cs" />
     <Compile Include="Utils\FileInfoUtil.cs" />
     <Compile Include="Utils\MissionControlSetup.cs" />

@@ -13,6 +13,7 @@ using Quobject.SocketIoClientDotNet.Client;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Sheets;
+using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Utils;
 
@@ -24,10 +25,9 @@ namespace HOK.MissionControl.Tools.Communicator.Socket
     {
         private volatile bool _alive;
         private readonly Thread _t;
-
         private Quobject.SocketIoClientDotNet.Client.Socket _socket;
-        //public const string BaseUrlLocal = "http://hok-184vs/";
-        public const string BaseUrlLocal = "http://localhost:8080";
+
+        public string BaseUrlLocal = ServerUtilities.RestApiBaseUrl;
 
         public MissionControlSocket(Document doc)
         {

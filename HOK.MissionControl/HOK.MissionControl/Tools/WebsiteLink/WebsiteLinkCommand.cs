@@ -9,6 +9,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
+// ReSharper disable UnusedMember.Global
 
 #endregion
 
@@ -41,7 +42,7 @@ namespace HOK.MissionControl.Tools.WebsiteLink
                         if (MissionControlSetup.Projects.ContainsKey(centralPath))
                         {
                             var id = MissionControlSetup.Projects[centralPath].Id;
-                            Process.Start(AppSettings.Instance.HttpAddress + "/#/projects/edit/" + id);
+                            Process.Start(ServerUtilities.RestApiBaseUrl + "/#/projects/edit/" + id);
                         }
                         else launchHome = true;
                     }
@@ -49,7 +50,7 @@ namespace HOK.MissionControl.Tools.WebsiteLink
                 }
                 else launchHome = true;
 
-                if(launchHome) Process.Start(AppSettings.Instance.HttpAddress + "/#/home");
+                if(launchHome) Process.Start(ServerUtilities.RestApiBaseUrl + "/#/home");
             }
             catch (Exception e)
             {
