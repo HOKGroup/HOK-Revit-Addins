@@ -79,7 +79,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
                         FileLocation = regMatch.Value.Trim();
                     }
                 }
-                else if (centralPath.StartsWith("\\\\group\\hok\\", StringComparison.OrdinalIgnoreCase))
+                else if (AppSettings.Instance.LocalPathRgx.Any(x => Regex.IsMatch(centralPath, x, RegexOptions.IgnoreCase)))
                 {
                     const string regexPattern = @"^\\\\group\\hok\\(.+?(?=\\))|^\\\\(.{2,3})-\d{2}svr(\.group\.hok\.com)?\\";
                     var regServer = new Regex(regexPattern, RegexOptions.IgnoreCase);
@@ -114,7 +114,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
                 {
                     regexPattern = @"\/([0-9]{2}[\.|\-][0-9]{4,5}[\.|\-][0-9]{2})(.*?)\/";
                 }
-                else if (centralPath.StartsWith("\\\\group\\hok\\", StringComparison.OrdinalIgnoreCase))
+                else if (AppSettings.Instance.LocalPathRgx.Any(x => Regex.IsMatch(centralPath, x, RegexOptions.IgnoreCase)))
                 {
                     regexPattern = @"\\([0-9]{2}[\.|\-][0-9]{4,5}[\.|\-][0-9]{2})(.*?)\\";
                 }
