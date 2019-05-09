@@ -1,10 +1,16 @@
-﻿using System;
+﻿#region References
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas.Settings;
+using HOK.MissionControl.Core.Utils;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+
+#endregion
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -67,16 +73,27 @@ namespace HOK.MissionControl.Core.Schemas
         {
             try
             {
-                var machineName = Environment.MachineName;
-                var splits = machineName.Split('-');
-                if (!splits.Any()) return string.Empty;
-
-                var s = splits.FirstOrDefault();
-                if (s != null)
+                var settings = AppSettings.Instance.UserLocation;
+                string sourceString;
+                switch (settings.Source)
                 {
-                    var office = s.ToUpper();
-                    return office;
+                    case UserLocationSources.MachineName:
+                        sourceString = Environment.MachineName;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
+
+                if (string.IsNullOrWhiteSpace(sourceString)) return string.Empty;
+
+                // (Konrad) If we got a Source string ie. Machine Name we can proceed
+                // to extract the user location/office from it using regex pattern.
+                var match = Regex.Match(sourceString, settings.Pattern, RegexOptions.IgnoreCase);
+                if (match.Success && match.Groups.Count >= settings.Group)
+                {
+                    return match.Groups[settings.Group].Value;
+                }
+
                 return string.Empty;
             }
             catch (Exception e)

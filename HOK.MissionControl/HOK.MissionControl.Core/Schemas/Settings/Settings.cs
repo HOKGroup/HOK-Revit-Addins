@@ -2,6 +2,9 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+// ReSharper disable UnusedMember.Global
 
 namespace HOK.MissionControl.Core.Schemas.Settings
 {
@@ -26,6 +29,27 @@ namespace HOK.MissionControl.Core.Schemas.Settings
 
         [JsonProperty("localPathRgx")]
         public List<string> LocalPathRgx { get; set; } = new List<string>();
+
+        [JsonProperty("userLocation")]
+        public UserLocation UserLocation { get; set; } = new UserLocation();
+    }
+
+    public class UserLocation
+    {
+        [JsonProperty("source")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public UserLocationSources Source { get; set; }
+
+        [JsonProperty("pattern")]
+        public string Pattern { get; set; }
+
+        [JsonProperty("group")]
+        public int Group { get; set; }
+    }
+
+    public enum UserLocationSources
+    {
+        MachineName
     }
 
     public class Office

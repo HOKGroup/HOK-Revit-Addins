@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using HOK.MissionControl.Core.Schemas.Settings;
 
 namespace HOK.MissionControl.Core.Utils
 {
@@ -8,6 +9,7 @@ namespace HOK.MissionControl.Core.Utils
         public static AppSettings Instance { get; } = new AppSettings();
 
         public List<string> LocalPathRgx { get; set; } = new List<string>();
+        public UserLocation UserLocation { get; set; }
 
         static AppSettings()
         {
