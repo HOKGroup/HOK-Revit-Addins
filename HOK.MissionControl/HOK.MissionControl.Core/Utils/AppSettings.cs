@@ -10,6 +10,7 @@ namespace HOK.MissionControl.Core.Utils
 
         public List<string> LocalPathRgx { get; set; } = new List<string>();
         public UserLocation UserLocation { get; set; }
+        public ProjectInfo ProjectInfo { get; set; }
 
         static AppSettings()
         {

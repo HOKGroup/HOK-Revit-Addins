@@ -52,6 +52,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
             CentralPath = centralPath.ToLower();
             RevitVersion = version;
 
+            // TODO: Break this up into specific methods for each property
             GetProjectNumberName(centralPath);
             GetProjectLocation(centralPath);
         }
@@ -64,6 +65,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
         /// <param name="centralPath">Central Path to parse.</param>
         private void GetProjectLocation(string centralPath)
         {
+            //TODO: Use the settings passed from global settings here.
             if (string.IsNullOrEmpty(centralPath)) return;
 
             //TODO: Replace all of the below Regex patters with patterns retrieved from settings.

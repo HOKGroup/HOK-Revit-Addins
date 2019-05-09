@@ -32,6 +32,25 @@ namespace HOK.MissionControl.Core.Schemas.Settings
 
         [JsonProperty("userLocation")]
         public UserLocation UserLocation { get; set; } = new UserLocation();
+
+        [JsonProperty("projectInfo")]
+        public ProjectInfo ProjectInfo { get; set; } = new ProjectInfo();
+    }
+
+    public class ProjectInfo
+    {
+        [JsonProperty("source")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ProjectInfoSources Source { get; set; }
+
+        [JsonProperty("projectName")]
+        public Dictionary<string, object> ProjectName { get; set; }
+
+        [JsonProperty("projectNumber")]
+        public Dictionary<string, object> ProjectNumber { get; set; }
+
+        [JsonProperty("projectLocation")]
+        public Dictionary<string, object> ProjectLocation { get; set; }
     }
 
     public class UserLocation
@@ -45,6 +64,11 @@ namespace HOK.MissionControl.Core.Schemas.Settings
 
         [JsonProperty("group")]
         public int Group { get; set; }
+    }
+
+    public enum ProjectInfoSources
+    {
+        FilePath
     }
 
     public enum UserLocationSources

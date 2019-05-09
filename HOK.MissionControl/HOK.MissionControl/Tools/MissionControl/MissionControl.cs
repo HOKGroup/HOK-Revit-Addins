@@ -54,6 +54,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                 // publicly available for all tools.
                 AppSettings.Instance.LocalPathRgx = mcSettings.LocalPathRgx;
                 AppSettings.Instance.UserLocation = mcSettings.UserLocation;
+                AppSettings.Instance.ProjectInfo = mcSettings.ProjectInfo;
 
                 // (Konrad) We can publish a file path to the DB.
                 // That will make it easier to create Configurations.
