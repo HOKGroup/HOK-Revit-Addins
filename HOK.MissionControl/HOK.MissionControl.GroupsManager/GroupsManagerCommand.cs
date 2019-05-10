@@ -13,6 +13,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.GroupsManager.Utilities;
+// ReSharper disable UnusedMember.Global
 
 #endregion
 
@@ -32,7 +33,7 @@ namespace HOK.MissionControl.GroupsManager
             try
             {
                 // (Konrad) We are gathering information about the addin use. This allows us to
-                // better maintain the most used plug-ins or discontiue the unused ones.
+                // better maintain the most used plug-ins or discontinue the unused ones.
                 AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-GroupsManager", commandData.Application.Application.VersionNumber));
 
                 var model = new GroupsManagerModel(doc);
