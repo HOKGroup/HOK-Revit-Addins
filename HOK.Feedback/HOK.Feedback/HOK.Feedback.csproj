@@ -197,11 +197,11 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\comments_32x32.png" />
-    <EmbeddedResource Include="Resources\Settings.json" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\commentsAttachment_16x16.png" />
@@ -224,7 +224,7 @@
     </PostBuildEvent>
   </PropertyGroup>
   <Target Name="CopyFiles" AfterTargets="AfterBuild">
-    <Exec Command="&quot;%WINDIR%\SysNative\WindowsPowerShell\v1.0\powershell.exe&quot; &quot;$(SolutionDir)..\_postBuild\codeSigning.bat&quot; &quot;$(TargetPath)&quot;"/>
+    <Exec Command="&quot;%WINDIR%\SysNative\WindowsPowerShell\v1.0\powershell.exe&quot; &quot;$(SolutionDir)..\_postBuild\codeSigning.bat&quot; &quot;$(TargetPath)&quot;" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
     <Copy SourceFiles="$(TargetDir)RestSharp.dll" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
     <Copy SourceFiles="$(TargetDir)Microsoft.Practices.ServiceLocation.dll" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />

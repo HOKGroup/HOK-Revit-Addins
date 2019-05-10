@@ -44,12 +44,18 @@ namespace HOK.MissionControl.Tools.MissionControl
             {
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
 
+                if (!ServerUtilities.GetOne("settings", out Core.Schemas.Settings.Settings mcSettings))
+                {
+                    DisableMissionControl();
+                    return;
+                }
+
                 // (Konrad) We can publish a file path to the DB.
                 // That will make it easier to create Configurations.
                 // Valid file is:
                 // - not detached
                 // - not a family
-                // - is workshared
+                // - is work-shared
                 // - is saved on the network, revit server or bim 360 server
                 if (!doc.IsDetached && !doc.IsFamilyDocument && doc.IsWorkshared && FilePathItem.IsValidFilePath(centralPath))
                 {
@@ -103,7 +109,7 @@ namespace HOK.MissionControl.Tools.MissionControl
         }
 
         /// <summary>
-        /// Registers availble configuration based on Central Model path match.
+        /// Registers available configuration based on Central Model path match.
         /// </summary>
         private static void ApplyConfiguration(Document doc)
         {
@@ -142,10 +148,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                     else if (string.Equals(updater.UpdaterId, Properties.Resources.LinkUnloadTrackerGuid, 
                         StringComparison.OrdinalIgnoreCase))
                     {
-                        AppCommand.EnqueueTask(app =>
-                        {
-                            LinkUnloadMonitor.LinkUnloadMonitor.CreateLinkUnloadOverride(app);
-                        });
+                        AppCommand.EnqueueTask(LinkUnloadMonitor.LinkUnloadMonitor.CreateLinkUnloadOverride);
                     }
                     else if (string.Equals(updater.UpdaterId, Properties.Resources.SheetsTrackerGuid, 
                         StringComparison.OrdinalIgnoreCase))
@@ -624,7 +627,7 @@ namespace HOK.MissionControl.Tools.MissionControl
         }
 
         /// <summary>
-        /// Unregisters all updaters that might have been registered when we checked into Mission Control.
+        /// Un-registers all updaters that might have been registered when we checked into Mission Control.
         /// Also cleans up any static variables that might cause issues on re-open.
         /// </summary>
         /// <param name="doc">Revit Document.</param>
