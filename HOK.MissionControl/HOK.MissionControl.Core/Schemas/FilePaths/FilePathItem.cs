@@ -129,7 +129,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
             if (string.IsNullOrWhiteSpace(pattern) || group == -1) return result;
 
             var matches = Regex.Matches(CentralPath, pattern, RegexOptions.IgnoreCase);
-            if (matches.Count < match) return result;
+            if (matches.Count <= match) return result;
 
             var m = matches[match];
             result = m.Groups.Count > group ? m.Groups[group].Value : string.Empty;

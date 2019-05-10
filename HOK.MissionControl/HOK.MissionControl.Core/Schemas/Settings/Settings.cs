@@ -62,6 +62,9 @@ namespace HOK.MissionControl.Core.Schemas.Settings
         [JsonProperty("pattern")]
         public string Pattern { get; set; }
 
+        [JsonProperty("match")]
+        public int Match { get; set; }
+
         [JsonProperty("group")]
         public int Group { get; set; }
     }
