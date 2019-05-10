@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace HOK.MissionControl.Core.Utils
 {
@@ -6,7 +7,7 @@ namespace HOK.MissionControl.Core.Utils
     {
         public static AppSettings Instance { get; } = new AppSettings();
 
-        public string HttpAddress { get; set; }
+        public List<string> LocalPathRgx { get; set; } = new List<string>();
 
         static AppSettings()
         {

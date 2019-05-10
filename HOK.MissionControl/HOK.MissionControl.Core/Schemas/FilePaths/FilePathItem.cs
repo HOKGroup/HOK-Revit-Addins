@@ -1,9 +1,15 @@
-﻿using System;
+﻿#region References
+
+using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Utils;
+
+#endregion
 
 namespace HOK.MissionControl.Core.Schemas.FilePaths
 {
@@ -60,6 +66,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
         {
             if (string.IsNullOrEmpty(centralPath)) return;
 
+            //TODO: Replace all of the below Regex patters with patterns retrieved from settings.
             try
             {
                 if (centralPath.StartsWith("rsn://", StringComparison.OrdinalIgnoreCase))
@@ -72,7 +79,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
                         FileLocation = regMatch.Value.Trim();
                     }
                 }
-                else if (centralPath.StartsWith("\\\\group\\hok\\", StringComparison.OrdinalIgnoreCase))
+                else if (AppSettings.Instance.LocalPathRgx.Any(x => Regex.IsMatch(centralPath, x, RegexOptions.IgnoreCase)))
                 {
                     const string regexPattern = @"^\\\\group\\hok\\(.+?(?=\\))|^\\\\(.{2,3})-\d{2}svr(\.group\.hok\.com)?\\";
                     var regServer = new Regex(regexPattern, RegexOptions.IgnoreCase);
@@ -99,6 +106,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
         {
             if (string.IsNullOrEmpty(centralPath)) return;
 
+            //TODO: Replace all of the below Regex patters with patterns retrieved from settings.
             var regexPattern = string.Empty;
             try
             {
@@ -106,7 +114,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
                 {
                     regexPattern = @"\/([0-9]{2}[\.|\-][0-9]{4,5}[\.|\-][0-9]{2})(.*?)\/";
                 }
-                else if (centralPath.StartsWith("\\\\group\\hok\\", StringComparison.OrdinalIgnoreCase))
+                else if (AppSettings.Instance.LocalPathRgx.Any(x => Regex.IsMatch(centralPath, x, RegexOptions.IgnoreCase)))
                 {
                     regexPattern = @"\\([0-9]{2}[\.|\-][0-9]{4,5}[\.|\-][0-9]{2})(.*?)\\";
                 }
@@ -138,8 +146,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
             {
                 result = true;
             }
-            //TODO: This needs an update to stop ignoring files that don't start with that path.
-            else if (centralPath.StartsWith("\\\\group\\hok\\", StringComparison.OrdinalIgnoreCase))
+            else if (AppSettings.Instance.LocalPathRgx.Any(x => Regex.IsMatch(centralPath, x, RegexOptions.IgnoreCase)))
             {
                 result = true;
             }
