@@ -7,7 +7,9 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas.Settings;
 using HOK.MissionControl.Core.Utils;
+using Newtonsoft.Json.Linq;
 
 #endregion
 
@@ -52,86 +54,87 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
             CentralPath = centralPath.ToLower();
             RevitVersion = version;
 
-            GetProjectNumberName(centralPath);
-            GetProjectLocation(centralPath);
+            GetProjectInfo(AppSettings.Instance.ProjectInfo.Source);
         }
 
         #region Utilities
 
         /// <summary>
-        /// Retrieves project location from the file path. 
+        /// Retrieves Project Info using method specified in Settings.
         /// </summary>
-        /// <param name="centralPath">Central Path to parse.</param>
-        private void GetProjectLocation(string centralPath)
+        /// <param name="source">Source of the info ex. FilePath.</param>
+        private void GetProjectInfo(ProjectInfoSources source)
         {
-            if (string.IsNullOrEmpty(centralPath)) return;
+            switch (source)
+            {
+                case ProjectInfoSources.FilePath:
+                    if (string.IsNullOrEmpty(CentralPath)) break;
 
-            //TODO: Replace all of the below Regex patters with patterns retrieved from settings.
-            try
-            {
-                if (centralPath.StartsWith("rsn://", StringComparison.OrdinalIgnoreCase))
-                {
-                    const string regexPattern = @"(?<=\/\/)\w{2,3}";
-                    var regServer = new Regex(regexPattern, RegexOptions.IgnoreCase);
-                    var regMatch = regServer.Match(centralPath);
-                    if (regMatch.Success)
+                    var settingsName = AppSettings.Instance.ProjectInfo.ProjectName;
+                    var settingsNumber = AppSettings.Instance.ProjectInfo.ProjectNumber;
+                    var settingsLocation = AppSettings.Instance.ProjectInfo.ProjectLocation;
+                    try
                     {
-                        FileLocation = regMatch.Value.Trim();
+                        string key;
+                        if (CentralPath.StartsWith("rsn://", StringComparison.OrdinalIgnoreCase))
+                            key = "revitServer";
+                        else if (AppSettings.Instance.LocalPathRgx.Any(x =>
+                            Regex.IsMatch(CentralPath, x, RegexOptions.IgnoreCase)))
+                            key = "local";
+                        else if (CentralPath.StartsWith("bim 360://", StringComparison.OrdinalIgnoreCase))
+                            key = "bimThreeSixty";
+                        else return;
+
+                        var nameObject = settingsName.ContainsKey(key) 
+                            ? JObject.FromObject(settingsName[key]) 
+                            : null;
+                        var numberObject = settingsNumber.ContainsKey(key) 
+                            ? JObject.FromObject(settingsNumber[key]) 
+                            : null;
+                        var locationObject = settingsLocation.ContainsKey(key) 
+                            ? JObject.FromObject(settingsLocation[key]) 
+                            : null;
+
+                        ProjectName = GetValueFromObject(nameObject);
+                        ProjectNumber = GetValueFromObject(numberObject);
+                        FileLocation = GetValueFromObject(locationObject);
                     }
-                }
-                else if (AppSettings.Instance.LocalPathRgx.Any(x => Regex.IsMatch(centralPath, x, RegexOptions.IgnoreCase)))
-                {
-                    const string regexPattern = @"^\\\\group\\hok\\(.+?(?=\\))|^\\\\(.{2,3})-\d{2}svr(\.group\.hok\.com)?\\";
-                    var regServer = new Regex(regexPattern, RegexOptions.IgnoreCase);
-                    var regMatch = regServer.Match(centralPath);
-                    if (regMatch.Success)
+                    catch (Exception e)
                     {
-                        FileLocation = string.IsNullOrEmpty(regMatch.Groups[1].Value)
-                            ? regMatch.Groups[2].Value.Trim()
-                            : regMatch.Groups[1].Value.Trim();
+                        Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
                     }
-                }
-            }
-            catch (Exception e)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(source), source, null);
             }
         }
 
         /// <summary>
-        /// Retrieves Project Number and Project Name from the file path.
+        /// Utility method for parsing FilePath based ProjectInfo regex.
         /// </summary>
-        /// <param name="centralPath">Central Path to parse.</param>
-        private void GetProjectNumberName(string centralPath)
+        /// <param name="obj">JSON object that contains regex pattern, match, group info.</param>
+        /// <returns>Value extracted using Regex or empty string.</returns>
+        private string GetValueFromObject(JObject obj)
         {
-            if (string.IsNullOrEmpty(centralPath)) return;
+            var result = string.Empty;
+            var pattern = obj?.Property("pattern") != null
+                ? obj["pattern"].ToObject<string>()
+                : string.Empty;
+            var match = obj?.Property("match") != null
+                ? obj["match"].ToObject<int>()
+                : -1;
+            var group = obj?.Property("group") != null
+                ? obj["group"].ToObject<int>()
+                : -1;
+            if (string.IsNullOrWhiteSpace(pattern) || group == -1) return result;
 
-            //TODO: Replace all of the below Regex patters with patterns retrieved from settings.
-            var regexPattern = string.Empty;
-            try
-            {
-                if (centralPath.StartsWith("rsn://", StringComparison.OrdinalIgnoreCase))
-                {
-                    regexPattern = @"\/([0-9]{2}[\.|\-][0-9]{4,5}[\.|\-][0-9]{2})(.*?)\/";
-                }
-                else if (AppSettings.Instance.LocalPathRgx.Any(x => Regex.IsMatch(centralPath, x, RegexOptions.IgnoreCase)))
-                {
-                    regexPattern = @"\\([0-9]{2}[\.|\-][0-9]{4,5}[\.|\-][0-9]{2})(.*?)\\";
-                }
+            var matches = Regex.Matches(CentralPath, pattern, RegexOptions.IgnoreCase);
+            if (matches.Count <= match) return result;
 
-                if (string.IsNullOrEmpty(regexPattern)) return;
+            var m = matches[match];
+            result = m.Groups.Count > group ? m.Groups[group].Value : string.Empty;
 
-                var regex = new Regex(regexPattern, RegexOptions.IgnoreCase);
-                var match = regex.Match(centralPath);
-                if (!match.Success) return;
-
-                ProjectNumber = match.Groups[1].Value.Trim();
-                ProjectName = match.Groups[2].Value.Trim();
-            }
-            catch (Exception e)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
-            }
+            return result;
         }
 
         /// <summary>

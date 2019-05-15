@@ -78,7 +78,8 @@ namespace HOK.MissionControl.Core.Schemas
                 switch (settings.Source)
                 {
                     case UserLocationSources.MachineName:
-                        sourceString = Environment.MachineName;
+                        //sourceString = Environment.MachineName;
+                        sourceString = "DSK-NY-201";
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -88,13 +89,13 @@ namespace HOK.MissionControl.Core.Schemas
 
                 // (Konrad) If we got a Source string ie. Machine Name we can proceed
                 // to extract the user location/office from it using regex pattern.
-                var match = Regex.Match(sourceString, settings.Pattern, RegexOptions.IgnoreCase);
-                if (match.Success && match.Groups.Count >= settings.Group)
-                {
-                    return match.Groups[settings.Group].Value;
-                }
+                var matches = Regex.Matches(sourceString, settings.Pattern, RegexOptions.IgnoreCase);
+                if (matches.Count <= settings.Match) return string.Empty;
 
-                return string.Empty;
+                var m = matches[settings.Match];
+                return m.Groups.Count > settings.Group 
+                    ? m.Groups[settings.Group].Value 
+                    : string.Empty;
             }
             catch (Exception e)
             {
