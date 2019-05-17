@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using HOK.MissionControl.Core.Schemas.Settings;
+// ReSharper disable UnusedMember.Local
 
 namespace HOK.MissionControl.Core.Utils
 {
@@ -10,6 +11,7 @@ namespace HOK.MissionControl.Core.Utils
 
         public List<string> LocalPathRgx { get; set; } = new List<string>();
         public UserLocation UserLocation { get; set; }
+        public TempLocation TempLocation { get; set; }
         public ProjectInfo ProjectInfo { get; set; }
 
         static AppSettings()
@@ -18,6 +20,18 @@ namespace HOK.MissionControl.Core.Utils
 
         private AppSettings()
         {
+        }
+
+        /// <summary>
+        /// Utility for passing Settings properties into the Static class.
+        /// </summary>
+        /// <param name="settings"></param>
+        public void SetSettings(Settings settings)
+        {
+            LocalPathRgx = settings.LocalPathRgx;
+            UserLocation = settings.UserLocation;
+            ProjectInfo = settings.ProjectInfo;
+            TempLocation = settings.TempLocation;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
