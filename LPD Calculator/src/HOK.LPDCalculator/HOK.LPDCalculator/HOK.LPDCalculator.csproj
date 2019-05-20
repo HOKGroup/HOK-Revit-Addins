@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -110,23 +110,23 @@
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2016\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2016\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2017'">
-      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2017\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2017\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2018'">
-      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2018\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2018\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2019'">
-      <HintPath>..\..\..\..\Project Monitor\src\HOK.MissionControl\HOK.MissionControl.Core\bin\2019\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2019\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
