@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Windows.Interop;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using HOK.Core.WpfUtilities.FeedbackUI;
+using HOK.Feedback;
 
 namespace HOK.CameraDuplicator
 {
