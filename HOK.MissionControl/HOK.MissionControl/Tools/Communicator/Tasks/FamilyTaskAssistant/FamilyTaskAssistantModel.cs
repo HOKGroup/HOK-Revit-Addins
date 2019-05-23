@@ -1,10 +1,14 @@
-﻿using System;
+﻿#region References
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Properties;
+
+#endregion
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
 {
@@ -36,7 +40,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
                 {
                     CheckName = $"Name: {family.Name}",
                     IsCheckPassing = familyNameCheck.Any(family.Name.Contains),
-                    ToolTipText = "Check will fail if Family name does not contain \"_HOK_I\" or \"_HOK_M\"."
+                    ToolTipText = "Check will fail if Family name does not contain " + string.Join(", ", familyNameCheck) + "."
                 },
                 new CheckWrapper
                 {
@@ -54,19 +58,19 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
                 {
                     CheckName = $"Voids: {family.VoidCount}",
                     IsCheckPassing = family.VoidCount < 5,
-                    ToolTipText = "Check will fail if Family contains more than 5 void cuts."
+                    ToolTipText = "Check will fail if Family contains more than 5 Void Cuts."
                 },
                 new CheckWrapper
                 {
                     CheckName = $"Arrays: {family.ArrayCount}",
                     IsCheckPassing = family.ArrayCount < 5,
-                    ToolTipText = "Check will fail if Family contains more than 5 arrays."
+                    ToolTipText = "Check will fail if Family contains more than 5 Arrays."
                 },
                 new CheckWrapper
                 {
                     CheckName = $"Nested Families: {family.NestedFamilyCount}",
                     IsCheckPassing = family.NestedFamilyCount < 5,
-                    ToolTipText = "Check will fail if Family contains more than 5 nested families."
+                    ToolTipText = "Check will fail if Family contains more than 5 Nested Families."
                 }
             };
 
