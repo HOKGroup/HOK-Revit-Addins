@@ -52,9 +52,7 @@ namespace HOK.MissionControl.Tools.MissionControl
 
                 // (Konrad) Store retrieved settings on the AppSettings class so that they are
                 // publicly available for all tools.
-                AppSettings.Instance.LocalPathRgx = mcSettings.LocalPathRgx;
-                AppSettings.Instance.UserLocation = mcSettings.UserLocation;
-                AppSettings.Instance.ProjectInfo = mcSettings.ProjectInfo;
+                AppSettings.Instance.SetSettings(mcSettings);
 
                 // (Konrad) We can publish a file path to the DB.
                 // That will make it easier to create Configurations.

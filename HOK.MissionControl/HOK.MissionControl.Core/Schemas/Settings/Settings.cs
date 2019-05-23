@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿#region References
+
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 // ReSharper disable UnusedMember.Global
+
+#endregion
 
 namespace HOK.MissionControl.Core.Schemas.Settings
 {
@@ -35,6 +39,9 @@ namespace HOK.MissionControl.Core.Schemas.Settings
 
         [JsonProperty("projectInfo")]
         public ProjectInfo ProjectInfo { get; set; } = new ProjectInfo();
+
+        [JsonProperty("tempLocation")]
+        public TempLocation TempLocation { get; set; } = new TempLocation();
     }
 
     public class ProjectInfo
@@ -69,12 +76,30 @@ namespace HOK.MissionControl.Core.Schemas.Settings
         public int Group { get; set; }
     }
 
+    public class TempLocation
+    {
+        [JsonProperty("source")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public TempLocationSources Source { get; set; }
+
+        [JsonProperty("pattern")]
+        public string Pattern { get; set; }
+
+        [JsonProperty("tempPath")]
+        public string TempPath { get; set; }
+    }
+
     public enum ProjectInfoSources
     {
         FilePath
     }
 
     public enum UserLocationSources
+    {
+        MachineName
+    }
+
+    public enum TempLocationSources
     {
         MachineName
     }
