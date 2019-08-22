@@ -18,12 +18,14 @@ namespace HOK.MissionControl.Core.Utils
     {
         public static string RestApiBaseUrl { get; set; }
         public const string ApiVersion = "api/v2";
+        private static Settings Settings { get; set; }
 
         static ServerUtilities()
         {
             var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
             RestApiBaseUrl = Json.Deserialize<Settings>(settingsString)?.HttpAddress; //production
             //RestApiBaseUrl = Json.Deserialize<Settings>(settingsString)?.HttpAddressDebug; //debug
+            Settings = Json.Deserialize<Settings>(settingsString);
         }
 
         #region GET
@@ -316,6 +318,13 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddHeader("User-Name", Environment.UserName);
                 request.AddHeader("User-Machine-Name", Environment.UserName + "PC");
                 request.AddHeader("Operation-GUID", Guid.NewGuid().ToString());
+                string[] clarityServers = Settings.ClarityServers;
+                if (clarityServers.Any(clientPath.Contains)) {
+                    string clarityId = Settings.ClarityUserId;
+                    request.AddHeader("ClarityUserId", clarityId);
+                    string securityToken = Settings.ClarityToken;
+                    request.AddHeader("SecurityToken", securityToken);
+                }
 
                 var response = client.Execute<T>(request);
                 if (response.Data != null)
