@@ -22,7 +22,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
         public string ProjectId { get; set; }
 
         [JsonProperty("isDisabled")]
-        public bool IsDisabled { get; set; }
+        public bool IsDisabled { get; set; } = false;
 
         [JsonProperty("revitVersion")]
         public string RevitVersion { get; set; } = string.Empty;
