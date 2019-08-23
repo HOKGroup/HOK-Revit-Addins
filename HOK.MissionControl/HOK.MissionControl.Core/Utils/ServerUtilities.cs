@@ -1,4 +1,4 @@
-﻿#region References
+#region References
 
 using System;
 using System.Collections.Generic;
@@ -316,7 +316,6 @@ namespace HOK.MissionControl.Core.Utils
                 var client = new RestClient(clientPath);
                 var request = new RestRequest(requestPath, Method.GET);
                 request.AddHeader("User-Name", Environment.UserName);
-                request.AddHeader("User-Machine-Name", Environment.UserName + "PC");
                 request.AddHeader("Operation-GUID", Guid.NewGuid().ToString());
                 string[] clarityServers = Settings.ClarityServers;
                 if (clarityServers.Any(clientPath.Contains)) {
@@ -324,6 +323,10 @@ namespace HOK.MissionControl.Core.Utils
                     request.AddHeader("ClarityUserId", clarityId);
                     string securityToken = Settings.ClarityToken;
                     request.AddHeader("SecurityToken", securityToken);
+                    string clarityMachine = Settings.ClarityMachine;
+                    request.AddHeader("User-Machine-Name", clarityMachine); 
+                } else {
+                    request.AddHeader("User-Machine-Name", Environment.UserName + "PC");
                 }
 
                 var response = client.Execute<T>(request);

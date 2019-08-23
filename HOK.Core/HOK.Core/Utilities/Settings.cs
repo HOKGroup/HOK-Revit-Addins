@@ -8,6 +8,7 @@ namespace HOK.Core.Utilities
         public string FeedbackPath { get; set; }
         public string ClarityUserId { get; set; }
         public string ClarityToken { get; set; }
+        public string ClarityMachine { get; set; }
         public string[] ClarityServers { get; set; }
         public string ModelReportingServiceEndpoint { get; set; }
         public string FileOnOpeningFmeUserId { get; set; }
