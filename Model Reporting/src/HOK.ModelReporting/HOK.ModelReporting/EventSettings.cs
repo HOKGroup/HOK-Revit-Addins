@@ -115,10 +115,22 @@ namespace HOK.ModelReporting
 
                 if(string.IsNullOrEmpty(ProjectNumber))
                 {
-                    ProjectName=GetProjectName(DocCentralPath);
-                    ProjectNumber = "00.00000.00";
+                    ProjectName = GetProjectName(DocCentralPath);
+                    const string projectNumberRegPattern = @"\d{2}\.\d{5}\.\d{2}";
+                    var regex = new Regex(projectNumberRegPattern);
+                    var match = regex.Match(Doc.ProjectInformation.Number);
+                    if (match.Success)
+                    {
+                        ProjectNumber = match.Value; 
+                    }
+                    else
+                    {
+                        ProjectNumber = "00.00000.00";
+                    }
 
-                    if (DocCentralPath.StartsWith(@"\\GROUP\HOK") || DocCentralPath.StartsWith("RSN:") || DocCentralPath.StartsWith("A360:"))
+                    if (DocCentralPath.StartsWith(@"\\GROUP\HOK", StringComparison.OrdinalIgnoreCase) ||
+                        DocCentralPath.StartsWith("RSN://", StringComparison.OrdinalIgnoreCase) ||
+                        DocCentralPath.StartsWith("BIM 360://", StringComparison.OrdinalIgnoreCase))
                     {
                         IsRecordable = true;
                     }
