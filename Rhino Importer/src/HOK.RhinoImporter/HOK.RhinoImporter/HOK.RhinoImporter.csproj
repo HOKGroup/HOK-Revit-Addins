@@ -72,7 +72,7 @@
     <PostBuildEvent>xcopy /s /y "$(SolutionDir)packages\Rhino3dmIO.dll-AnyCPU-Windows.5.1.30000.25\NativeBinaries\x86\*.*" "$(TargetDir)x86\"
 xcopy /s /y "$(SolutionDir)packages\Rhino3dmIO.dll-AnyCPU-Windows.5.1.30000.25\NativeBinaries\x64\*.*" "$(TargetDir)x64\"
 
-"C:\Program Files (x86)\Windows Kits\8.1\bin\x64\signtool.exe" sign /fd SHA256 /f "B:\Development\Certification\HOKAddIn.pfx" /p "hok"  "$(TargetDir)$(TargetFileName)"
+"%WINDIR%\SysNative\WindowsPowerShell\v1.0\powershell.exe" "$(SolutionDir)..\_postBuild\codeSigning.bat" "$(TargetPath)"
 xcopy /s /y "$(SolutionDir)packages\Rhino3dmIO.dll-AnyCPU-Windows.5.1.30000.25\NativeBinaries\x86\*.*" "$(TargetDir)x86\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

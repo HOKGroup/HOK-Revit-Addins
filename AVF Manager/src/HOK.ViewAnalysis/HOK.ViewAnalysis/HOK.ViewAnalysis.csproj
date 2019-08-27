@@ -208,7 +208,7 @@
   </PropertyGroup>
   <Target Name="CopyFiles" AfterTargets="AfterBuild;NonWinFodyTarget">
     <Message Text="Signing file..." Importance="high" />
-    <Exec Command="&quot;C:\Program Files (x86)\Windows Kits\10\bin\10.0.17134.0\x64\signtool.exe&quot; sign /c &quot;Code Signing - DTM&quot; /v &quot;$(TargetPath)&quot;" />
+    <Exec Command="&quot;$(SolutionDir)..\..\..\_postBuild\codeSigning.bat&quot; &quot;$(TargetPath)&quot;" />
     <Message Text="Copy files..." Importance="high" />
     <Message Text="$(TargetPath) &gt; $(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" Importance="high" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
