@@ -26,6 +26,8 @@ steps:
     script: 'Get-ChildItem -Path $S -Directory | Where-Object { $_.Name -notMatch ''^(HOK)|_|\.'' } |  ForEach-Object { Remove-Item -Recurse -LiteralPath $_.Name }'
   env:
     s: $(Build.SourcesDirectory)
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: NuGetToolInstaller@0
 
@@ -41,11 +43,24 @@ steps:
   inputs:
     secureFile: 'Settings.json'
 
+
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(Agent.TempDirectory)'
     Contents: 'Settings.json'
     TargetFolder: '$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources'
+
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: 'CISign.pfx'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Agent.TempDirectory)'
+    Contents: 'CISign.pfx'
+    TargetFolder: '$(Build.SourcesDirectory)/_cert'
+
 
 - task: ExtractFiles@1
 
