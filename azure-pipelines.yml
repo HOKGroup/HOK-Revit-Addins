@@ -1,0 +1,115 @@
+# .NET Desktop
+# Build and run tests for .NET Desktop or Windows classic desktop solutions.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/windows/dot-net
+
+trigger:
+- release/*
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/HOK*.sln'
+  coreSolution: '**/HOK.Core.sln'
+  MCsolution: '**/HOK.MissionControl.sln'
+  feedbackSolution: '**/HOK.Feedback.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: '2019'
+  BUILD_ENV: 'AzureDevOps'
+  HOKDepsDirectory: '$(Build.SourcesDirectory)'
+
+steps:
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'Get-ChildItem -Path $S -Directory | Where-Object { $_.Name -notMatch ''^(HOK)|_|\.'' } |  ForEach-Object { Remove-Item -Recurse -LiteralPath $_.Name }'
+  env:
+    s: $(Build.SourcesDirectory)
+
+- task: NuGetToolInstaller@0
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: 'HOK Addins Deps01.zip'
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: 'HOK Addins Deps02.zip'
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: 'Settings.json'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Agent.TempDirectory)'
+    Contents: 'Settings.json'
+    TargetFolder: '$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources'
+
+- task: ExtractFiles@1
+
+  inputs:
+    archiveFilePatterns: '$(Agent.TempDirectory)/*.zip'
+    cleanDestinationFolder: false
+    destinationFolder: '$(Build.SourcesDirectory)'
+
+- task: CmdLine@2
+  inputs:
+    script: 'dir %HOKDepsDirectory%'
+  env: 
+    HOKDepsDirectory: $(HOKDepsDirectory)
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(coreSolution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: MSBuild@1
+  inputs:
+    solution: '$(MCsolution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArguments: '/target:HOK_MissionControl'
+
+- task: MSBuild@1
+  inputs:
+    solution: '$(MCsolution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArguments: '/target:HOK_MissionControl_Core'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(feedbackSolution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(MCsolution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+# - task: VSTest@2
+#   inputs:
+#     platform: '$(buildPlatform)'
+#     configuration: '$(buildConfiguration)'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '**\bin\$(buildConfiguration)\**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\$(buildConfiguration)'
+    OverWrite: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
