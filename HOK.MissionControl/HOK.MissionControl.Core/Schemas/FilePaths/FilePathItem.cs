@@ -138,6 +138,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
             {
                 result = true;
             }
+            //TODO: This needs an update to stop ignoring files that don't start with that path.
             else if (centralPath.StartsWith("\\\\group\\hok\\", StringComparison.OrdinalIgnoreCase))
             {
                 result = true;

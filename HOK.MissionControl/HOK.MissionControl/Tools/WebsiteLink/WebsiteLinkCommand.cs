@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region References
+
+using System;
 using System.Diagnostics;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -7,6 +9,9 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
+// ReSharper disable UnusedMember.Global
+
+#endregion
 
 namespace HOK.MissionControl.Tools.WebsiteLink
 {
@@ -24,20 +29,20 @@ namespace HOK.MissionControl.Tools.WebsiteLink
             try
             {
                 // (Konrad) We are gathering information about the addin use. This allows us to
-                // better maintain the most used plug-ins or discontiue the unused ones.
+                // better maintain the most used plug-ins or discontinue the unused ones.
                 AddinUtilities.PublishAddinLog(
                     new AddinLog("MissionControl-WebsiteLink", commandData.Application.Application.VersionNumber));
 
                 var launchHome = false;
-                if (!string.IsNullOrEmpty(doc.PathName))
+                if (!string.IsNullOrWhiteSpace(doc.PathName))
                 {
                     var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                    if (!string.IsNullOrEmpty(centralPath))
+                    if (!string.IsNullOrWhiteSpace(centralPath))
                     {
                         if (MissionControlSetup.Projects.ContainsKey(centralPath))
                         {
                             var id = MissionControlSetup.Projects[centralPath].Id;
-                            Process.Start("http://missioncontrol.hok.com/#/projects/edit/" + id);
+                            Process.Start(ServerUtilities.RestApiBaseUrl + "/#/projects/edit/" + id);
                         }
                         else launchHome = true;
                     }
@@ -45,7 +50,7 @@ namespace HOK.MissionControl.Tools.WebsiteLink
                 }
                 else launchHome = true;
 
-                if(launchHome) Process.Start("http://missioncontrol.hok.com/#/home");
+                if(launchHome) Process.Start(ServerUtilities.RestApiBaseUrl + "/#/home");
             }
             catch (Exception e)
             {
