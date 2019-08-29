@@ -27,12 +27,13 @@ variables:
   buildConfiguration: '2019'
   BUILD_ENV: 'AzureDevOps'
   HOKDepsDirectory: '$(Build.SourcesDirectory)'
+  regexToDelete: '^([.|_]\w+)|HOK.AddInManager|Utility Tools|HOK.BetaToolsManager|HOK.Core|HOK.Feedback|LPD Calculator|HOK.MissionControl|Model Reporting|HOK.MoveBackup|Navigator|Mass Tools|Sheet Manager|Smart BCF|AVF Manager'
 
 steps:
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
-    script: 'Get-ChildItem -Path $S -Directory | Where-Object { $_.Name -notMatch ''^(HOK)|_|\.'' } |  ForEach-Object { Remove-Item -Recurse -LiteralPath $_.Name }'
+    script: 'Get-ChildItem -Path $S -Directory | Where-Object { $_.Name -notMatch "$(regexToDelete)" } |  ForEach-Object { Remove-Item -Recurse -LiteralPath $_.Name }'
   env:
     s: $(Build.SourcesDirectory)
     PFX_PASS: $(CERT_SIGNING_PASS)
