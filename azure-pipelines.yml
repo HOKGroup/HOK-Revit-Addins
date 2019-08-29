@@ -6,6 +6,15 @@
 trigger:
 - release/*
 
+strategy:
+  matrix:
+    2019:
+      buildConfiguration: '2019'
+    2018:
+      buildConfiguration: '2018'
+    2017:
+      buildConfiguration: '2017'
+
 pool:
   vmImage: 'windows-latest'
 
