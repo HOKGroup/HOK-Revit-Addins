@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region References
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -6,15 +8,23 @@ using System.Threading.Tasks;
 using RestSharp;
 using Newtonsoft.Json;
 using HOK.Core.Utilities;
+// ReSharper disable InconsistentNaming
+
+#endregion
 
 namespace HOK.MissionControl.Core.Utils
 {
     public static class ServerUtilities
     {
-        public static bool UseLocalServer = true;
-        public const string RestApiBaseUrl = "http://hok-184vs/";
-        //public const string RestApiBaseUrl = "http://localhost:8080/";
+        public static string RestApiBaseUrl { get; set; }
         public const string ApiVersion = "api/v2";
+
+        static ServerUtilities()
+        {
+            var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
+            RestApiBaseUrl = Json.Deserialize<Settings>(settingsString)?.HttpAddress; //production
+            //RestApiBaseUrl = Json.Deserialize<Settings>(settingsString)?.HttpAddressDebug; //debug
+        }
 
         #region GET
 
@@ -25,6 +35,44 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="path"></param>
         /// <param name="result"></param>
         /// <returns></returns>
+        public static bool GetOne<T>(string path, out T result) where T : new()
+        {
+            result = default(T);
+            try
+            {
+                var client = new RestClient(RestApiBaseUrl);
+                var request = new RestRequest(ApiVersion + "/" + path, Method.GET);
+                var response = client.Execute(request);
+                if (response.StatusCode != HttpStatusCode.OK) return false;
+
+                if (!string.IsNullOrWhiteSpace(response.Content))
+                {
+                    var data = JsonConvert.DeserializeObject<T>(response.Content);
+                    if (data != null)
+                    {
+                        result = data;
+                        return true;
+                    }
+
+                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document matching the query.");
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Generic GET request that returns true if asset matching the query was successfully retrieved.
+        /// </summary>
+        /// <typeparam name="T">Type of the Asset that will be returned.</typeparam>
+        /// <param name="path">HTTP request url.</param>
+        /// <param name="result">Resulting Asset.</param>
+        /// <returns>True if success, otherwise false.</returns>
         public static bool Get<T>(string path, out T result) where T : new()
         {
             result = default(T);
@@ -35,7 +83,7 @@ namespace HOK.MissionControl.Core.Utils
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.OK) return false;
 
-                if (!string.IsNullOrEmpty(response.Content))
+                if (!string.IsNullOrWhiteSpace(response.Content))
                 {
                     var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
                     if (data != null)
@@ -44,7 +92,7 @@ namespace HOK.MissionControl.Core.Utils
                         return true;
                     }
 
-                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
+                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document matching the query.");
                 }
 
                 return false;
@@ -88,8 +136,10 @@ namespace HOK.MissionControl.Core.Utils
                 client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
                 client.AddHandler("*+json", new NewtonsoftJsonSerializer());
 
-                var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET);
-                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+                var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET)
+                {
+                    OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
+                };
                 request.AddHeader("Content-type", "application/json");
                 request.RequestFormat = DataFormat.Json;
                 request.JsonSerializer = new NewtonsoftJsonSerializer();
@@ -116,27 +166,6 @@ namespace HOK.MissionControl.Core.Utils
             }
         }
 
-        /// <summary>
-        /// Retrieves all objects in a collection by route.
-        /// </summary>
-        /// <typeparam name="T">Type to be returned.</typeparam>
-        /// <param name="route">Route to make the request to.</param>
-        /// <returns>A List of Type objects if any were found.</returns>
-        public static async Task<List<T>> FindAll<T>(string route) where T : new()
-        {
-            var client = new RestClient(RestApiBaseUrl);
-            var request = new RestRequest(ApiVersion + "/" + route, Method.GET);
-            var response = await client.ExecuteTaskAsync<List<T>>(request);
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, response.StatusDescription);
-                return new List<T>();
-            }
-
-            Log.AppendLog(LogMessageType.INFO, response.StatusDescription + "-" + route);
-            return response.Data;
-        }
-
         #endregion
 
         #region POST
@@ -158,8 +187,10 @@ namespace HOK.MissionControl.Core.Utils
                 client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
                 client.AddHandler("*+json", new NewtonsoftJsonSerializer());
 
-                var request = new RestRequest(ApiVersion + "/" + route, Method.PUT);
-                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+                var request = new RestRequest(ApiVersion + "/" + route, Method.PUT)
+                {
+                    OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
+                };
                 request.AddHeader("Content-type", "application/json");
                 request.RequestFormat = DataFormat.Json;
                 request.JsonSerializer = new NewtonsoftJsonSerializer();
@@ -198,8 +229,10 @@ namespace HOK.MissionControl.Core.Utils
             client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
             client.AddHandler("*+json", new NewtonsoftJsonSerializer());
 
-            var request = new RestRequest(ApiVersion + "/" + route, Method.POST);
-            request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+            var request = new RestRequest(ApiVersion + "/" + route, Method.POST)
+            {
+                OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
+            };
             request.AddHeader("Content-type", "application/json");
             request.RequestFormat = DataFormat.Json;
             request.JsonSerializer = new NewtonsoftJsonSerializer();
@@ -238,8 +271,10 @@ namespace HOK.MissionControl.Core.Utils
                 client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
                 client.AddHandler("*+json", new NewtonsoftJsonSerializer());
 
-                var request = new RestRequest(ApiVersion + "/"+ route, Method.POST);
-                request.OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; };
+                var request = new RestRequest(ApiVersion + "/" + route, Method.POST)
+                {
+                    OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
+                };
                 request.AddHeader("Content-type", "application/json");
                 request.RequestFormat = DataFormat.Json;
                 request.JsonSerializer = new NewtonsoftJsonSerializer();
@@ -266,7 +301,7 @@ namespace HOK.MissionControl.Core.Utils
         #region Revit Server REST API
 
         /// <summary>
-        /// Retrieves information about the model, inclusing its file size.
+        /// Retrieves information about the model, including its file size.
         /// </summary>
         /// <param name="clientPath">Base URL to the Revit Server.</param>
         /// <param name="requestPath">Request string.</param>
