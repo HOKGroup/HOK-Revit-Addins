@@ -36,8 +36,7 @@ steps:
     errorActionPreference: 'continue'
   env:
     BUILD_SOURCESDIRECTORY: $(Build.SourcesDirectory)
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
+
 - task: NuGetToolInstaller@0
 
 - task: DownloadSecureFile@1
@@ -92,17 +91,22 @@ steps:
   inputs:
     command: 'restore'
     restoreSolution: '$(Build.SourcesDirectory)/Smart BCF/src/HOK.SmartBCF/HOK.SmartBCF/packages.config'
+    restoreDirectory: '$(Build.SourcesDirectory)/Smart BCF/src/HOK.SmartBCF/packages'
 
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
     restoreSolution: '$(Build.SourcesDirectory)/Utility Tools/src/HOK.FileOnpeningMonitor/HOK.FileOnpeningMonitor/packages.config'
+    restoreDirectory: '$(Build.SourcesDirectory)/Utility Tools/src/HOK.FileOnpeningMonitor/packages'
 
 - task: VSBuild@1
   inputs:
     solution: '$(coreSolution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: MSBuild@1
   inputs:
@@ -110,6 +114,9 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildArguments: '/target:HOK_MissionControl'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: MSBuild@1
   inputs:
@@ -117,24 +124,36 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildArguments: '/target:HOK_MissionControl_Core'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
   inputs:
     solution: '$(feedbackSolution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
   inputs:
     solution: '$(MCsolution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 
 
