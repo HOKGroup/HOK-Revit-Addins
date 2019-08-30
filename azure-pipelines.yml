@@ -92,11 +92,13 @@ steps:
   inputs:
     command: 'restore'
     restoreSolution: '$(Build.SourcesDirectory)/Smart BCF/src/HOK.SmartBCF/HOK.SmartBCF/packages.config'
+    restoreDirectory: '$(Build.SourcesDirectory)/Smart BCF/src/HOK.SmartBCF/packages'
 
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
     restoreSolution: '$(Build.SourcesDirectory)/Utility Tools/src/HOK.FileOnpeningMonitor/HOK.FileOnpeningMonitor/packages.config'
+    restoreDirectory: '$(Build.SourcesDirectory)/Utility Tools/src/HOK.FileOnpeningMonitor/packages'
 
 - task: VSBuild@1
   inputs:
