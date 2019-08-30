@@ -69,28 +69,6 @@ steps:
     Contents: 'CISign.pfx'
     TargetFolder: '$(Build.SourcesDirectory)/_cert'
 
-- task: CmdLine@2
-  inputs:
-    script: 'dir %HOKDepsDirectory%'
-  env: 
-    HOKDepsDirectory: $(HOKDepsDirectory)
-
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
-
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '$(Build.SourcesDirectory)/Smart BCF/src/HOK.SmartBCF/HOK.SmartBCF/packages.config'
-    restoreDirectory: '$(Build.SourcesDirectory)/Smart BCF/src/HOK.SmartBCF/packages'
-
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '$(Build.SourcesDirectory)/Utility Tools/src/HOK.FileOnpeningMonitor/HOK.FileOnpeningMonitor/packages.config'
-    restoreDirectory: '$(Build.SourcesDirectory)/Utility Tools/src/HOK.FileOnpeningMonitor/packages'
-
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
@@ -101,7 +79,23 @@ steps:
     archiveFilePatterns: '$(Agent.TempDirectory)/*.zip'
     cleanDestinationFolder: false
     destinationFolder: '$(Build.SourcesDirectory)'
-    
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '$(Build.SourcesDirectory)/Smart_BCF/src/HOK.SmartBCF/HOK.SmartBCF/packages.config'
+    restoreDirectory: '$(Build.SourcesDirectory)/Smart_BCF/src/HOK.SmartBCF/packages'
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '$(Build.SourcesDirectory)/Utility_Tools/src/HOK.FileOnpeningMonitor/HOK.FileOnpeningMonitor/packages.config'
+    restoreDirectory: '$(Build.SourcesDirectory)/Utility_Tools/src/HOK.FileOnpeningMonitor/packages'
+
 - task: VSBuild@1
   inputs:
     solution: '$(coreSolution)'
