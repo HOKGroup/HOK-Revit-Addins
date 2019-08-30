@@ -301,7 +301,7 @@
   </Target>
   <Target Name="CopyFiles" AfterTargets="AfterBuild;NonWinFodyTarget">
     <Message Text="Signing file..." Importance="high" />
-    <Exec Command="&quot;$(SolutionDir)..\..\..\_postBuild\codeSigning.bat&quot; &quot;$(TargetPath)&quot;" />
+    <Exec Command="&quot;$(SolutionDir)..\..\..\_postBuild\codeSigning.bat&quot; $(TargetPath)" />
     <Message Text="Copy files..." Importance="high" />
     <Message Text="$(TargetPath) copied" Importance="high" />
     <Message Text="$(TargetDir)RestSharp.dll copied" Importance="high" />
