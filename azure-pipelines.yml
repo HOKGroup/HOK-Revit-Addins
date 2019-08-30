@@ -27,8 +27,6 @@ variables:
   buildConfiguration: '2019'
   BUILD_ENV: 'AzureDevOps'
   HOKDepsDirectory: '$(Build.SourcesDirectory)'
-  PFX_PASS: $(CERT_SIGNING_PASS)
-  PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 steps:
 
@@ -106,6 +104,9 @@ steps:
     solution: '$(coreSolution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: MSBuild@1
   inputs:
@@ -113,6 +114,9 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildArguments: '/target:HOK_MissionControl'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: MSBuild@1
   inputs:
@@ -120,24 +124,36 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildArguments: '/target:HOK_MissionControl_Core'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
   inputs:
     solution: '$(feedbackSolution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
   inputs:
     solution: '$(MCsolution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
   inputs:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 
 
