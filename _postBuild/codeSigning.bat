@@ -1,7 +1,7 @@
 REM @echo off
 echo.
 echo Signing Dlls...
-setlocal ENABLEEXTENSIONS
+setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
 set DLL_PATH=%1
 REM set PFX_PATH="C:\Users\ksobon\source\repos\HOK-Revit-Addins\_cert\archilabCertificate.pfx"
