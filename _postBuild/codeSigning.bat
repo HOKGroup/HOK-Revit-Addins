@@ -10,6 +10,8 @@ set VALUE_NAME="certificatePassword"
 
 REM for /f "tokens=3" %%a in ('reg query %KEY_NAME% /V %VALUE_NAME% ^|findstr /ri "REG_SZ"') do set PFX_PASS=%%a
 echo %DLL_PATH%
+echo %PFX_PASS%
+echo %PFX_PATH%
 
 "C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\signtool.exe" sign /f "%PFX_PATH%" /p %PFX_PASS% /t http://timestamp.comodoca.com/authenticode "%DLL_PATH%"
 REM "C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x64\signtool.exe"  sign /c "Code Signing - DTM" /v  %DLL_PATH%
