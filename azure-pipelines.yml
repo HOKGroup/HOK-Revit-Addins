@@ -69,14 +69,6 @@ steps:
     Contents: 'CISign.pfx'
     TargetFolder: '$(Build.SourcesDirectory)/_cert'
 
-
-- task: ExtractFiles@1
-
-  inputs:
-    archiveFilePatterns: '$(Agent.TempDirectory)/*.zip'
-    cleanDestinationFolder: false
-    destinationFolder: '$(Build.SourcesDirectory)'
-
 - task: CmdLine@2
   inputs:
     script: 'dir %HOKDepsDirectory%'
@@ -103,6 +95,12 @@ steps:
   inputs:
     targetType: 'inline'
     script: 'Get-ChildItem -Directory | Where-Object { $_.Name.Contains(" ") } | Rename-Item -NewName { $_.Name.Replace(" ", "_") }'
+
+- task: ExtractFiles@1
+  inputs:
+    archiveFilePatterns: '$(Agent.TempDirectory)/*.zip'
+    cleanDestinationFolder: false
+    destinationFolder: '$(Build.SourcesDirectory)'
     
 - task: VSBuild@1
   inputs:
