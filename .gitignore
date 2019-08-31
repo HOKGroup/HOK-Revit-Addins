@@ -14,13 +14,11 @@ HOK.Core\HOK.Core\Resources\Settings.json
 
 [Dd]ebug/
 [Rr]elease/
-x64/
 build/
 [Bb]in/
 [Oo]bj/
 
-# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
-!packages/*/build/
+
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -167,11 +165,21 @@ $RECYCLE.BIN/
 /HOK.Core/HOK.Core/Resources/Settings.json
 
 # Ignore packages folders
-HOK.Core/packages/
-HOK.RibbonTab/packages/
-HOK.Feedback/packages/
-HOK.MoveBackup/packages/
-HOK.MissionControl/packages/
-HOK.Feedback/packages/
-HOK.BetaToolsManager/packages/
-HOK.AddInManager/packages/
+# HOK.Core/packages/
+# HOK.RibbonTab/packages/
+# HOK.Feedback/packages/
+# HOK.MoveBackup/packages/
+# HOK.MissionControl/packages/
+# HOK.Feedback/packages/
+# HOK.BetaToolsManager/packages/
+# HOK.AddInManager/packages/
+# HOK.SmartBCF/packages/
+# /Utility Tools/src/HOK.FileOnpeningMonitor/packages/**
+# The packages folder can be ignored because of Package Restore
+**/[Pp]ackages/*
+
+ NuGet Packages
+*.nupkg
+
+# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
+!packages/*/build/
