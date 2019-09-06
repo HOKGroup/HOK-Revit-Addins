@@ -24,7 +24,6 @@ variables:
   MCsolution: '**/HOK.MissionControl.sln'
   feedbackSolution: '**/HOK.Feedback.sln'
   buildPlatform: 'Any CPU'
-  buildConfiguration: '2019'
   BUILD_ENV: 'AzureDevOps'
   HOKDepsDirectory: '$(Build.SourcesDirectory)'
 
@@ -89,18 +88,6 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '$(Build.SourcesDirectory)/Smart_BCF/src/HOK.SmartBCF/HOK.SmartBCF/packages.config'
-    restoreDirectory: '$(Build.SourcesDirectory)/Smart_BCF/src/HOK.SmartBCF/packages'
-
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '$(Build.SourcesDirectory)/Utility_Tools/src/HOK.FileOnpeningMonitor/HOK.FileOnpeningMonitor/packages.config'
-    restoreDirectory: '$(Build.SourcesDirectory)/Utility_Tools/src/HOK.FileOnpeningMonitor/packages'
-
 - task: VSBuild@1
   inputs:
     solution: '$(coreSolution)'
@@ -156,8 +143,6 @@ steps:
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-
 
 - task: CopyFiles@2
   inputs:
