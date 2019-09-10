@@ -16,8 +16,13 @@ namespace HOK.MissionControl.Tools.CADoor
         private List<Parameter> pullParameters = new List<Parameter>();
         private List<Parameter> pushParameters = new List<Parameter>();
         private List<Parameter> stateCAParameters = new List<Parameter>();
-        private string pullParamName = "Approach @ Pull Side";
-        private string pushParamName = "Approach @ Push Side";
+        private string v1pullParamName = "Approach @ Pull Side";
+        private string v1pushParamName = "Approach @ Push Side";
+        private string v1clearanceTypeName = "Approach";
+        private string v2ParamName = "COMPONENT VERSION";
+        private string v2pullParamName = "CLEARANCE TYPE_ PULL SIDE";
+        private string v2pushParamName = "CLEARANCE TYPE_ PUSH SIDE";
+        private string v2clearanceTypeName = "SWING,";
         private string stateCAParamName = "StateCA";
         private Guid _updaterGuid = new Guid("C2C658D7-EC43-4721-8D2C-2B8C10C340E2");
         public Guid UpdaterGuid { get { return _updaterGuid; } set { _updaterGuid = value; } }
@@ -144,6 +149,10 @@ namespace HOK.MissionControl.Tools.CADoor
                     if (doors.Any())
                     {
                         var doorInstance = doors.First();
+                        bool isV2Door = null != doorInstance.Symbol.LookupParameter(v2ParamName);
+                        string pullParamName = isV2Door ? v2pullParamName : v1pullParamName;
+                        string pushParamName = isV2Door ? v2pushParamName : v1pushParamName;
+                        doorInstance.LookupParameter(v2ParamName);
                         var pullParam = doorInstance.LookupParameter(pullParamName);
                         if (null != pullParam)
                         {
@@ -187,6 +196,10 @@ namespace HOK.MissionControl.Tools.CADoor
                 {
                     var doorId = data.GetModifiedElementIds().First();
                     var doorInstance = doc.GetElement(doorId) as FamilyInstance;
+                    bool isV2Door = null != doorInstance.Symbol.LookupParameter(v2ParamName);
+                    string pullParamName = isV2Door ? v2pullParamName : v1pullParamName;
+                    string pushParamName = isV2Door ? v2pushParamName : v1pushParamName;
+                    string typeNameContains = isV2Door ? v2clearanceTypeName : v1clearanceTypeName;
                     if (null != doorInstance)
                     {
                         var pushParameter = doorInstance.LookupParameter(pushParamName);
@@ -196,7 +209,7 @@ namespace HOK.MissionControl.Tools.CADoor
                             if (data.IsChangeTriggered(doorId, Element.GetChangeTypeParameter(pushParameter)))
                             {
                                 var pushValue = pushParameter.AsValueString();
-                                if (!pushValue.Contains("Approach"))
+                                if (!pushValue.Contains(typeNameContains))
                                 {
                                     DoorFailure.IsDoorFailed = true;
                                     DoorFailure.FailingDoorId = doorId;
@@ -213,7 +226,7 @@ namespace HOK.MissionControl.Tools.CADoor
                             if (data.IsChangeTriggered(doorId, Element.GetChangeTypeParameter(pullParameter)))
                             {
                                 var pullValue = pullParameter.AsValueString();
-                                if (!pullValue.Contains("Approach"))
+                                if (!pullValue.Contains(typeNameContains))
                                 {
                                     DoorFailure.IsDoorFailed = true;
                                     DoorFailure.FailingDoorId = doorId;
