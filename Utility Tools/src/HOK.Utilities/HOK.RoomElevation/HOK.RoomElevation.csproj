@@ -108,6 +108,11 @@
       <Private>True</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2019'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2019\HOK.Core.dll</HintPath>
+      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2020'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2020\HOK.Core.dll</HintPath>
       <Private>True</Private>

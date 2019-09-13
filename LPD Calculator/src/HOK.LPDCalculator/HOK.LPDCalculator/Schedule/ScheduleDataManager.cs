@@ -59,8 +59,11 @@ namespace HOK.LPDCalculator.Schedule
                 foreach (var element in collector)
                 {
                     var vs = (ViewSchedule) element;
+#if RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
                     if (vs.ViewName != viewName) continue;
-
+#else
+                    if (vs.Name != viewName) continue;
+#endif
                     viewSchedule = vs;
                     break;
                 }
