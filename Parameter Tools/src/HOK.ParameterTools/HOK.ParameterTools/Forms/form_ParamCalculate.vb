@@ -70,7 +70,7 @@ Public Class form_ParamCalculate
     Private Function GetParameterValue(ByVal element As Element, ByVal nameParameter As String, ByRef returnValue As Double) As Boolean
 #If RELEASE2013 Or RELEASE2014 Then
         Dim parameter As Parameter = element.Parameter(nameParameter)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
         Dim parameter As Parameter = element.LookupParameter(nameParameter)
 #End If
         If parameter Is Nothing Then
@@ -92,7 +92,7 @@ Public Class form_ParamCalculate
     Private Function GetParameterValue(ByVal element As Element, ByVal nameParameter As String, ByRef returnValue As String) As Boolean
 #If RELEASE2013 Or RELEASE2014 Then
         Dim parameter As Parameter = element.Parameter(nameParameter)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
         Dim parameter As Parameter = element.LookupParameter(nameParameter)
 #End If
 
@@ -116,7 +116,7 @@ Public Class form_ParamCalculate
     Private Function SetParameterValue(ByVal element As Element, ByVal nameParameter As String, ByVal value As Double) As Boolean
 #If RELEASE2013 Or RELEASE2014 Then
         Dim parameter As Parameter = element.Parameter(nameParameter)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
         Dim parameter As Parameter = element.LookupParameter(nameParameter)
 #End If
         If parameter Is Nothing Then
@@ -138,7 +138,7 @@ Public Class form_ParamCalculate
         End If
 #If RELEASE2013 Or RELEASE2014 Then
         Dim parameter As Parameter = element.Parameter(control.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
         Dim parameter As Parameter = element.LookupParameter(control.Text)
 #End If
         If parameter Is Nothing Then

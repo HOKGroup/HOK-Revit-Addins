@@ -14,7 +14,7 @@ namespace HOK.BetaToolsManager
 {
     public class AddinInstallerModel
     {
-#if Release15 || Release16 || Release17 || Release18 || Release19
+#if Release15 || Release16 || Release17 || Release18 || Release19 || Release20
         public string BetaDirectory { get; set; } = @"\\group\sysvol\group.hok.com\HOK\Tools\Revit\";
 #else
         public string BetaDirectory { get; set; } = @"C:\Users\" + Environment.UserName + @"\Desktop\BetaFiles Testing\";

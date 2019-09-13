@@ -14,6 +14,7 @@
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2017'">v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2018'">v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2020'">v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -79,6 +80,15 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2020|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2020\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2020</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
@@ -105,6 +115,11 @@
       <Private>True</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2020'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2020\HOK.Core.dll</HintPath>
+      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2015'">
       <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
@@ -123,6 +138,10 @@
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2019'">
       <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2019\HOK.MissionControl.Core.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2020'">
+      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2020\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
@@ -169,6 +188,16 @@
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2019'">
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPI.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2019\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2020'">
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2020\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2020'">
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2020\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
