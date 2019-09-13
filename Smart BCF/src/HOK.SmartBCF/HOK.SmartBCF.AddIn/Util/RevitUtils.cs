@@ -15,7 +15,7 @@ namespace HOK.SmartBCF.AddIn.Util
             //if BPL is set to 0,0,0 not always it corresponds to Revit's origin
 
             var origin = new XYZ(0, 0, 0);
-#if RELEASE2019
+#if RELEASE2019 || RELEASE2020
             var position = doc.ActiveProjectLocation.GetProjectPosition(origin);
 #else
             var position = doc.ActiveProjectLocation.get_ProjectPosition(origin);
