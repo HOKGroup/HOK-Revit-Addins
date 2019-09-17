@@ -12,9 +12,11 @@ $list = Import-Csv .\_build\resources.csv | ForEach {
     $s = "{0}" -f $_.sourcePath,$buildConfiguration
     $p = Join-Path -Path $s -ChildPath $_.fileName 
     $d = "{0}{1}" -f $addinFolder,$_.destination
+    Write-Host "Copying {0} to {1}" -f $p,$d
     Copy-Item $p -Destination $d
 }
 
 $p = ".\HOK.AddInManager\_resources\{0}\HOK{0}Addins.csv" -f $buildConfiguration
 $d = "{0}\Resources" -f $libaryFolder
+Write-Host "Copying {0} to {1}" -f $p,$d
 Copy-Item $p -Destination $d
