@@ -18,7 +18,7 @@ $list = Import-Csv .\_build\resources.csv | ForEach {
 }
 
 $p = ".\HOK.AddInManager\_resources\{0}\HOK{0}Addins.csv" -f $buildConfiguration
-$d = "{0}\Resources" -f $libaryFolder
+$d = "{0}\Resources" -f $libraryFolder
 $msg = "Copying {0} to {1}" -f $p,$d
 Write-Debug $msg
 Copy-Item $p -Destination $d
