@@ -210,7 +210,8 @@
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPIIFC.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2020\RevitAPIIFC.dll</HintPath>
       <Private>False</Private>
-    </Reference>    <Reference Include="RevitAPIIFC" Condition=" '$(Configuration)' == '2019'">
+    </Reference>
+    <Reference Include="RevitAPIIFC" Condition=" '$(Configuration)' == '2019'">
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPIIFC.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2019\RevitAPIIFC.dll</HintPath>
       <Private>False</Private>

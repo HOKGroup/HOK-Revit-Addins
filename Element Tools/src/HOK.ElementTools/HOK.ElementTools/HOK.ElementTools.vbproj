@@ -18,7 +18,6 @@
     <TargetFrameworkVersion Condition=" '$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition=" '$(Configuration)' == '2020'">v4.7.2</TargetFrameworkVersion>
     <OptionExplicit>On</OptionExplicit>
-    <OptionExplicit>On</OptionExplicit>
     <OptionCompare>Binary</OptionCompare>
     <OptionStrict>Off</OptionStrict>
     <OptionInfer>On</OptionInfer>
