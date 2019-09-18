@@ -8,6 +8,8 @@ trigger:
 
 strategy:
   matrix:
+    2020:
+      buildConfiguration: '2020'
     2019:
       buildConfiguration: '2019'
     2018:
@@ -52,6 +54,10 @@ steps:
 - task: DownloadSecureFile@1
   inputs:
     secureFile: 'HOK Addins Deps02.zip'
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: 'HOK Addins Deps03.zip'
 
 - task: DownloadSecureFile@1
   inputs:

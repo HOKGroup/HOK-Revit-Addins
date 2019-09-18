@@ -12,9 +12,18 @@ $list = Import-Csv .\_build\resources.csv | ForEach {
     $s = "{0}" -f $_.sourcePath,$buildConfiguration
     $p = Join-Path -Path $s -ChildPath $_.fileName 
     $d = "{0}{1}" -f $addinFolder,$_.destination
+    $msg = "Copying {0} to {1}" -f $p,$d
+    Write-Debug $msg
     Copy-Item $p -Destination $d
 }
 
 $p = ".\HOK.AddInManager\_resources\{0}\HOK{0}Addins.csv" -f $buildConfiguration
-$d = "{0}\Resources" -f $libaryFolder
+$d = "{0}\Resources" -f $libraryFolder
+$msg = "Copying {0} to {1}" -f $p,$d
+Write-Debug $msg
 Copy-Item $p -Destination $d
+
+$p = ".\Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\{0}\x86\ " -f $buildConfiguration
+Copy-Item -Path $p -Destination $libraryFolder -Filter '*.dll' -Container -Recurse
+$p = ".\Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\{0}\x64\ " -f $buildConfiguration
+Copy-Item -Path $p -Destination $libraryFolder -Filter '*.dll' -Container -Recurse

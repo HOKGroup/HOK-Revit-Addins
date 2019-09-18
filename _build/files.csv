@@ -1,6 +1,4 @@
 ﻿sourcePath,fileName,destination
-Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,x64,HOK-Addin.bundle\Contents\
-Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,x86,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,EngineIoClientDotNet.dll,HOK-Addin.bundle\Contents\
 Smart_BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,EntityFramework.dll,HOK-Addin.bundle\Contents\
 Smart_BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,EntityFramework.SqlServer.dll,HOK-Addin.bundle\Contents\
@@ -31,7 +29,7 @@ HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,HOK.MissionControl.Styl
 Model_Reporting\src\HOK.ModelReporting\HOK.ModelReporting\bin\,HOK.ModelReporting.dll,HOK-Addin.bundle\Contents\
 HOK.MoveBackup\HOK.MoveBackup\bin\,HOK.MoveBackup.dll,HOK-Addin.bundle\Contents\
 Navigator\src\HOK.Navigator\HOK.Navigator\bin\,HOK.Navigator.dll,HOK-Addin.bundle\Contents\
-Parameter Tools\src\HOK.ParameterTools\HOK.ParameterTools\bin\,HOK.ParameterTools.dll,HOK-Addin.bundle\Contents\
+Parameter_Tools\src\HOK.ParameterTools\HOK.ParameterTools\bin\,HOK.ParameterTools.dll,HOK-Addin.bundle\Contents\
 Utility_Tools\src\HOK.Utilities\HOK.RenameFamily\bin\,HOK.RenameFamily.dll,HOK-Addin.bundle\Contents\
 HOK.RibbonTab\HOK.RibbonTab\bin\,HOK.RibbonTab.dll,HOK-Addin.bundle\Contents\
 Utility_Tools\src\HOK.Utilities\HOK.RoomElevation\bin\,HOK.RoomElevation.dll,HOK-Addin.bundle\Contents\

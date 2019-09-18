@@ -129,7 +129,11 @@ namespace HOK.ViewAnalysis
             {
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
                 List<View3D> views = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
+#if RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
                 var linq = from view in views where view.IsTemplate == false && view.ViewName == "{3D}" select view;
+#else
+                var linq = from view in views where view.IsTemplate == false && view.Name == "{3D}" select view;
+#endif
                 if (linq.Count() > 0)
                 {
                     view3d = linq.First();

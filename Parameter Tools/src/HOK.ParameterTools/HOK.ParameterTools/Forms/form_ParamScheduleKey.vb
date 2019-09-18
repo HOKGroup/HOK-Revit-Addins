@@ -274,7 +274,7 @@ Public Class form_ParamScheduleKey
                     End If
 #If RELEASE2013 Or RELEASE2014 Then
                     parameterChange = element.Parameter("Key Name")
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                     parameterChange = element.LookupParameter("Key Name")
 #End If
 
@@ -295,7 +295,7 @@ Public Class form_ParamScheduleKey
                     For Each parameterName As String In parameterNames
 #If RELEASE2013 Or RELEASE2014 Then
                         parameterChange = element.Parameter(parameterName)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                         parameterChange = element.LookupParameter(parameterName)
 #End If
 

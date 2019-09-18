@@ -686,7 +686,11 @@ namespace HOK.SmartBCF.AddIn
                 var viewName = "SmartBCF - Orthogonal - " + Environment.UserName;
                 var collector = new FilteredElementCollector(ActiveDoc);
                 var view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
+#if RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
                 var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.ViewName == viewName select view;
+#else
+                var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.Name == viewName select view;
+#endif
                 if (viewfound.Any())
                 {
                     view3D = viewfound.First();
@@ -730,7 +734,11 @@ namespace HOK.SmartBCF.AddIn
                 var collector = new FilteredElementCollector(ActiveDoc);
                 var view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                 //by the limitation of perspective view, create isometric instead
-                var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == true && view.ViewName == viewName select view;
+#if RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+                var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.ViewName == viewName select view;
+#else
+                var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.Name == viewName select view;
+#endif
                 if (viewfound.Any())
                 {
                     view3D = viewfound.First();
