@@ -1,6 +1,4 @@
 ﻿sourcePath,fileName,destination
-Smart_BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,x64,HOK-Addin.bundle\Contents\
-Smart_BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,x86,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,EngineIoClientDotNet.dll,HOK-Addin.bundle\Contents\
 Smart_BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,EntityFramework.dll,HOK-Addin.bundle\Contents\
 Smart_BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,EntityFramework.SqlServer.dll,HOK-Addin.bundle\Contents\
