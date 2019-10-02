@@ -43,9 +43,6 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup>
-    <TargetFrameworks>net452;net471;net472</TargetFrameworks>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -410,7 +407,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
+    <ItemGroup>
     <PackageReference Include="Microsoft.Office.Interop.Excel">
       <Version>12.0.4518.1014</Version>
     </PackageReference>
