@@ -30,7 +30,13 @@ Most of the tools in this repository have a reference to HOK.Core. This is becau
   "FileOnOpeningFmePassword": "<fme password>",
   "FileOnOpeningFmeHost": "<fme endpoint>",
   "FileOnOpeningFmePort": <port number>,
-  "FileOnOpeningFmeClientId": "<fme client id>"
+  "FileOnOpeningFmeClientId": "<fme client id>",
+  "HttpAddress": "<address to MC production server>",
+  "HttpAddressDebug": "<address to MC testing server>"
+  "ClarityUserId": "<Clarity user id>",
+  "ClarityToken": "<Clarity access token>",
+  "ClarityMachine": "<Machine used to generate access token>",
+  "ClarityServers": ["<clarity_server1>", "<clarity_server2>"]
 }
 ```
 * FeedbackToken - this is a token that you can obtain from GitHub to allow remote access to a repository. Since the purpose of this tool is to create GitHub issues on our behalf, we need an access token from authorized user, to login as that user and create a new issue. Replace this with a valid access token. 

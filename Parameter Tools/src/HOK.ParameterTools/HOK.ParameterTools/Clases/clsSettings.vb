@@ -132,7 +132,7 @@ Public Class clsSettings
             Dim uiDoc As UIDocument = commandData.Application.ActiveUIDocument
 #If RELEASE2013 Or RELEASE2014 Then
             mElementsPreSelected = uiDoc.Selection.Elements
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Then
+#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
             For Each elementId As ElementId In uiDoc.Selection.GetElementIds
                 Dim element As Element = m_Doc.GetElement(elementId)
                 mElementsPreSelected.Insert(element)

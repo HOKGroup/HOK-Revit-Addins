@@ -50,11 +50,11 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
             {
                 var doc = app.ActiveUIDocument.Document;
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
-                if (string.IsNullOrEmpty(centralPath)) return;
+                if (string.IsNullOrWhiteSpace(centralPath)) return;
 
                 if (MissionControlSetup.Projects.ContainsKey(centralPath))
                 {
-                    Process.Start("http://missioncontrol.hok.com/#/projects/healthreport/" + MissionControlSetup.Projects[centralPath].Id);
+                    Process.Start(ServerUtilities.RestApiBaseUrl + "/#/projects/healthreport/" + MissionControlSetup.Projects[centralPath].Id);
                 }
             });
         }

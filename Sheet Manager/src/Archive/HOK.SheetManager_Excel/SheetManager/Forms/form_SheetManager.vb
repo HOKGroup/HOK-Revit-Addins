@@ -306,7 +306,7 @@ Public Class form_SheetManager
                         For Each dc As DataColumn In m_DataTable.Columns
 #If RELEASE2013 Or RELEASE2014 Then
                             Dim m_pSht As Parameter = m_SheetItem.Parameter(dc.ColumnName)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                             Dim m_pSht As Parameter = m_SheetItem.LookupParameter(dc.ColumnName)
 #End If
                             If m_pSht IsNot Nothing Then
@@ -374,7 +374,7 @@ Public Class form_SheetManager
                             If isPlaceholderSheet = False And m_TblkItem IsNot Nothing Then
 #If RELEASE2013 Or RELEASE2014 Then
                             Dim m_pTblk As Parameter = m_TblkItem.Parameter(dc.ColumnName)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                                 Dim m_pTblk As Parameter = m_TblkItem.LookupParameter(dc.ColumnName)
 #End If
 
@@ -1039,10 +1039,18 @@ Public Class form_SheetManager
                     'See if sheet exists, otherwise ignore it.  If found renumber and update dictionary
                     If m_Settings.Views.ContainsKey(oldName) And Not m_Settings.Views.ContainsKey(newName) Then
                         m_View = m_Settings.Views(oldName)
+#If RELEASE2020 Or RELEASE2019 Then
+                        m_View.Name = newName
+#Else
                         m_View.ViewName = newName
+#End If
                         m_Settings.Views.Add(newName, m_Settings.Views(oldName))
                         m_Settings.Views.Remove(oldName)
+#If RELEASE2020 Or RELEASE2019 Then
+                        m_View.Name = newName
+#Else
                         m_View.ViewName = newName
+#End If
                         countView = countView + 1
                     End If
                 Next
@@ -1422,7 +1430,7 @@ UpdateExistingElement:
                             ' Does the param exist in here?
 #If RELEASE2013 Or RELEASE2014 Then
                 Dim m_P As Parameter = m_SheetView.Parameter(x)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                             Dim m_P As Parameter = m_SheetView.LookupParameter(x)
 #End If
 
@@ -1501,7 +1509,7 @@ UpdateExistingElement:
                                         ' Itentify the element by Sheet Number
 #If RELEASE2013 Or RELEASE2014 Then
                             Dim m_SheetNumberP As Parameter = y.Parameter("Sheet Number")
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                                         Dim m_SheetNumberP As Parameter = y.LookupParameter("Sheet Number")
 #End If
 
@@ -1531,7 +1539,7 @@ UpdateExistingElement:
                                 ' Does the param exist in here?
 #If RELEASE2013 Or RELEASE2014 Then
                     Dim m_P As Parameter = m_SheetTitleblock.Parameter(x)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                                 Dim m_P As Parameter = m_SheetTitleblock.LookupParameter(x)
 #End If
 

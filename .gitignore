@@ -11,16 +11,11 @@
 HOK.Core\HOK.Core\Resources\Settings.json
 
 # Build results
-
 [Dd]ebug/
 [Rr]elease/
-x64/
 build/
 [Bb]in/
 [Oo]bj/
-
-# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
-!packages/*/build/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -102,10 +97,6 @@ _cert/
 # Publish Web Output
 *.Publish.xml
 
-# NuGet Packages Directory
-## TODO: If you have NuGet Package Restore enabled, uncomment the next line
-#packages/
-
 # Windows Azure Build Output
 csx
 *.build.csdef
@@ -145,6 +136,9 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 
+#Build Artifacts
+_artifacts/
+
 # =========================
 # Windows detritus
 # =========================
@@ -167,11 +161,10 @@ $RECYCLE.BIN/
 /HOK.Core/HOK.Core/Resources/Settings.json
 
 # Ignore packages folders
-HOK.Core/packages/
-HOK.RibbonTab/packages/
-HOK.Feedback/packages/
-HOK.MoveBackup/packages/
-HOK.MissionControl/packages/
-HOK.Feedback/packages/
-HOK.BetaToolsManager/packages/
-HOK.AddInManager/packages/
+**/[Pp]ackages/*
+
+ NuGet Packages
+*.nupkg
+
+# Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
+!packages/*/build/
