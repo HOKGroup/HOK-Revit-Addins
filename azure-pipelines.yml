@@ -30,7 +30,6 @@ variables:
   HOKDepsDirectory: '$(Build.SourcesDirectory)'
 
 steps:
-
 - task: PowerShell@2
   inputs:
     filePath: '$(Build.SourcesDirectory)/_build/copy_resources.ps1'
@@ -63,13 +62,11 @@ steps:
   inputs:
     secureFile: 'Settings.json'
 
-
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(Agent.TempDirectory)'
     Contents: 'Settings.json'
     TargetFolder: '$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources'
-
 
 - task: DownloadSecureFile@1
   inputs:
@@ -156,13 +153,6 @@ steps:
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-# - task: CopyFiles@2
-#   inputs:
-#     SourceFolder: '$(Build.SourcesDirectory)'
-#     Contents: '**\bin\$(buildConfiguration)\**'
-#     TargetFolder: '$(Build.ArtifactStagingDirectory)\$(buildConfiguration)'
-#     OverWrite: true
 
 - task: PowerShell@2
   inputs:

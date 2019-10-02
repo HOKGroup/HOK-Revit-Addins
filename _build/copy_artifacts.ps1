@@ -9,6 +9,3 @@ $list = Import-Csv .\_build\files.csv | ForEach {
     $d = "{0}\{1}" -f $addinFolder,$_.destination
     Copy-Item $p -Destination $d
 }
-
-
-
