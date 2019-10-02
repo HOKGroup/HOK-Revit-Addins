@@ -77,6 +77,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>RELEASE2015</DefineConstants>
+    <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2016|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -89,6 +90,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>RELEASE2016</DefineConstants>
+    <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2017|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -101,6 +103,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>RELEASE2017</DefineConstants>
+    <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -125,6 +128,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworks>net471</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2020|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -137,6 +141,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworks>net472</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HOK.Core" Condition=" '$(Configuration)' == '2015'">
