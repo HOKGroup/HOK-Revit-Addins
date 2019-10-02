@@ -20,11 +20,11 @@ $projectsToKeep = @(
 )
 
 foreach ($project in $projectsToKeep) {
-    $regexTokeep += "|" + $project
+    $regexToKeep += "|" + $project
 }
 
 Get-ChildItem -Path "$Env:BUILD_SOURCESDIRECTORY" -Directory 
-| Where-Object { $_.Name -notMatch "$regexToDelete" } 
+| Where-Object { $_.Name -notMatch "$regexToKeep" } 
 | ForEach-Object { Remove-Item -Recurse -LiteralPath $_.FullName }
 
 Get-ChildItem -Path "$Env:BUILD_SOURCESDIRECTORY\AVF Manager\src" -Directory 
