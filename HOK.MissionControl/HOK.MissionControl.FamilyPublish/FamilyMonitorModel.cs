@@ -1,16 +1,19 @@
 ﻿#region References
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Schemas.Families;
+using HOK.MissionControl.Core.Schemas.Settings;
 using HOK.MissionControl.Core.Utils;
-using HOK.MissionControl.FamilyPublish.Properties;
+
 #endregion
 
 namespace HOK.MissionControl.FamilyPublish
@@ -110,8 +113,8 @@ namespace HOK.MissionControl.FamilyPublish
                         {
                             if (string.IsNullOrWhiteSpace(famDoc.Title)) continue; // could cause an exception
 
-                            var myDocPath = IsCitrixMachine(Environment.MachineName) 
-                                ? "B:\\Temp" 
+                            var myDocPath = IsCitrixMachine() 
+                                ? AppSettings.Instance.TempLocation.TempPath
                                 : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                             
                             var path = myDocPath + "\\temp_" + famDoc.Title;
@@ -211,7 +214,7 @@ namespace HOK.MissionControl.FamilyPublish
 
                 // (Konrad) I know it's not efficient to iterate this list yet again, but
                 // I want to minimize the amount of time between publishing families and
-                // retrieving them from database to avoid someone addind tasks to DB while
+                // retrieving them from database to avoid someone adding tasks to DB while
                 // we are exporting and hence losing them after the export.
                 foreach (var family in famOutput)
                 {
@@ -255,13 +258,17 @@ namespace HOK.MissionControl.FamilyPublish
         /// <summary>
         /// Checks if user machine is Citrix server or desktop/laptop.
         /// </summary>
-        /// <param name="machineName">Environment.MachineName</param>
         /// <returns>True if machine is a Citrix server or false if it's not.</returns>
-        private static bool IsCitrixMachine(string machineName)
+        private static bool IsCitrixMachine()
         {
-            // (Konrad) All Citrix servers sit on a Physical Hardware the name will contain/end with SVR. 
-            // Virtual server would end with VS. 
-            return machineName.Substring(machineName.Length - 3).ToLower() == "svr";
+            var settings = AppSettings.Instance.TempLocation;
+            switch (settings.Source)
+            {
+                case TempLocationSources.MachineName:
+                    return Regex.IsMatch(Environment.MachineName, settings.Pattern, RegexOptions.IgnoreCase);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <summary>
