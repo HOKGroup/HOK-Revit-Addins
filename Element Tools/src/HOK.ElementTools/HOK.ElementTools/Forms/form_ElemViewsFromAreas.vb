@@ -1,4 +1,4 @@
-Imports Autodesk.Revit
+﻿Imports Autodesk.Revit
 Imports Autodesk.Revit.DB
 Imports Autodesk.Revit.DB.Architecture
 
@@ -1199,12 +1199,20 @@ Public Class form_ElemViewsFromAreas
                         param(1) = True
 
                         If checkBoxBoxShow.Checked Then
+#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                             view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
                             'view3d.SetVisibility(categorySectionBox, True)
+#Else
+                            view3d.SetCategoryHidden(categorySectionBox.Id, False)
+#End If
                         Else
                             param(1) = False
+#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                             view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
                             'view3d.SetVisibility(categorySectionBox, False)
+#Else
+                            view3d.SetCategoryHidden(categorySectionBox.Id, True)
+#End If
                         End If
 
                         view3d.Name = viewNameComposite
@@ -1255,12 +1263,20 @@ Public Class form_ElemViewsFromAreas
                             param(1) = True
 
                             If checkBoxBoxShow.Checked Then
+#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                                 view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
                                 'view3d.SetVisibility(categorySectionBox, True)
+#Else
+                            view3d.SetCategoryHidden(categorySectionBox.Id, False)
+#End If
                             Else
                                 param(1) = False
+#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
                                 view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
                                 'view3d.SetVisibility(categorySectionBox, False)
+#Else
+                            view3d.SetCategoryHidden(categorySectionBox.Id, True)
+#End If
                             End If
                         End If
 
