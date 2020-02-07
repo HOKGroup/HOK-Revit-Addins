@@ -1,4 +1,4 @@
-﻿Imports Autodesk.Revit
+Imports Autodesk.Revit
 Imports Autodesk.Revit.DB
 Imports Autodesk.Revit.DB.Architecture
 
@@ -319,7 +319,7 @@ Public Class form_ElemViewsFromAreas
                 'Only include properly placed and bounded Areas
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter("Area")
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                 parameter = RmElement.LookupParameter("Area")
 #End If
 
@@ -334,7 +334,7 @@ Public Class form_ElemViewsFromAreas
                 'In case of blank view name skip the Area
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter(textBoxParameterViewName.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                 parameter = RmElement.LookupParameter(textBoxParameterViewName.Text)
 #End If
 
@@ -432,7 +432,7 @@ Public Class form_ElemViewsFromAreas
                 'Get the Area name value (we are assuming it is a string
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter(textBoxParameterAreaName.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                 parameter = RmElement.LookupParameter(textBoxParameterAreaName.Text)
 #End If
 
@@ -445,7 +445,7 @@ Public Class form_ElemViewsFromAreas
                 'Get list values
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter(textBoxParameterList1.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                 parameter = RmElement.LookupParameter(textBoxParameterList1.Text)
 #End If
 
@@ -472,7 +472,7 @@ Public Class form_ElemViewsFromAreas
                 End If
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = RmElement.Parameter(textBoxParameterList2.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                 parameter = RmElement.LookupParameter(textBoxParameterList2.Text)
 #End If
 
@@ -546,7 +546,7 @@ Public Class form_ElemViewsFromAreas
 
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = element.Parameter(parameterNameGroupBy)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                 parameter = element.LookupParameter(parameterNameGroupBy)
 #End If
 
@@ -565,7 +565,7 @@ Public Class form_ElemViewsFromAreas
                 'allowing blank is trouble; user should have a value like "<none>".
 #If RELEASE2013 Or RELEASE2014 Then
                 parameter = element.Parameter("Area")
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                 parameter = element.LookupParameter("Area")
 #End If
 
@@ -1083,7 +1083,7 @@ Public Class form_ElemViewsFromAreas
 #ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
                                 Dim curve As Curve = boundarySegment.Curve
                                 Dim endPoint As XYZ = curve.GetEndPoint(0)
-#ElseIf RELEASE2017 Then
+#Else
                                 Dim curve As Curve = boundarySegment.GetCurve()
                                 Dim endPoint As XYZ = curve.GetEndPoint(0)
 #End If
@@ -1150,7 +1150,7 @@ Public Class form_ElemViewsFromAreas
                     view2d.Scale = scale
 #If RELEASE2013 Or RELEASE2014 Then
                     parameter = view2d.Parameter("Title on Sheet")
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                     parameter = view2d.LookupParameter("Title on Sheet")
 #End If
 
@@ -1189,7 +1189,7 @@ Public Class form_ElemViewsFromAreas
 #If RELEASE2013 Then
                         view3d.SectionBox.Enabled = True
                         view3d.SectionBox = boundingBoxBox
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                         view3d.IsSectionBoxActive = True
                         view3d.SetSectionBox(boundingBoxBox)
 #End If
@@ -1244,7 +1244,7 @@ Public Class form_ElemViewsFromAreas
 #If RELEASE2013 Then
                             view3d.SectionBox.Enabled = True
                             view3d.SectionBox = boundingBoxBox
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                             view3d.IsSectionBoxActive = True
                             view3d.SetSectionBox(boundingBoxBox)
 #End If
