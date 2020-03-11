@@ -78,8 +78,7 @@ namespace HOK.MissionControl.Core.Schemas
                 switch (settings.Source)
                 {
                     case UserLocationSources.MachineName:
-                        //sourceString = Environment.MachineName;
-                        sourceString = "DSK-NY-201";
+                        sourceString = Environment.MachineName;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
