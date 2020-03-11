@@ -713,7 +713,7 @@ Public Class form_SheetManager
                         placed = True
                         placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
                     End If
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                             pointInsert = XYZ.Zero
 
                             If Viewport.CanAddViewToSheet(m_Settings.Document, m_ViewSheet.Id, m_View.Id) Then
@@ -1158,7 +1158,7 @@ Public Class form_SheetManager
 
 #If RELEASE2013 Or RELEASE2014 Then
             m_ParamTblk = m_ViewSheet.Parameter(dataColumn.ColumnName)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
             m_ParamTblk = m_ViewSheet.LookupParameter(dataColumn.ColumnName)
 #End If
 
@@ -1173,7 +1173,7 @@ Public Class form_SheetManager
 
 #If RELEASE2013 Or RELEASE2014 Then
             m_ParamTblk = m_ViewSheet.Parameter("Sheet Number")
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
             m_ParamTblk = m_ViewSheet.LookupParameter("Sheet Number")
 #End If
 
@@ -1191,7 +1191,7 @@ Public Class form_SheetManager
 
 #If RELEASE2013 Or RELEASE2014 Then
                     m_ParamTblk = m_ViewSheet.Parameter(parameterName)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                     m_ParamTblk = m_ViewSheet.LookupParameter(parameterName)
 #End If
 
@@ -1209,7 +1209,7 @@ Public Class form_SheetManager
 
 #If RELEASE2013 Or RELEASE2014 Then
                     m_ParamTblk = m_ViewSheet.Parameter(parameterName)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                     m_ParamTblk = m_ViewSheet.LookupParameter(parameterName)
 #End If
 

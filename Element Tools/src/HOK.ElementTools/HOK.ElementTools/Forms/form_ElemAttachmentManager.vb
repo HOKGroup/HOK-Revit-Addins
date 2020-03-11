@@ -52,7 +52,7 @@ Public Class form_ElemAttachmentManager
             '' ''elementId.Value = CInt(Convert.ToInt64(listItem.Substring(0, listItem.IndexOf(" "))))
             docUI.Selection.Elements.Add(mSettings.Document.GetElement(elementId))
         Next
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
         Dim elementIds As New List(Of ElementId)
 
         For Each listItem As String In listBoxDwg.SelectedItems

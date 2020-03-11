@@ -13,6 +13,7 @@ namespace HOK.Core.Utilities
         public string ModelReportingServiceEndpoint { get; set; }
         public string FileOnOpeningFmeUserId { get; set; }
         public string FileOnOpeningFmePassword { get; set; }
+        public string FileOnOpeningFmeApiToken { get; set; }
         public string FileOnOpeningFmeHost { get; set; }
         public int FileOnOpeningFmePort { get; set; }
         public string FileOnOpeningFmeClientId { get; set; }

@@ -350,7 +350,7 @@ Public Class form_ElemTagViews
 
 #If RELEASE2013 Then
                     roomTag = m_Settings.Document.Create.NewRoomTag(roomToTag, uvPointInsertion, viewToUse)
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
+#Else
                     Dim linkId As LinkElementId = New LinkElementId(roomToTag.Id)
                     roomTag = m_Settings.Document.Create.NewRoomTag(linkId, uvPointInsertion, viewToUse.Id)
 #End If

@@ -1,4 +1,5 @@
 ﻿#region References
+
 using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
@@ -8,7 +9,7 @@ using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Tools.Communicator.Messaging;
-using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
+
 #endregion
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
@@ -24,6 +25,20 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
         public RelayCommand<Window> WindowLoaded { get; set; }
         public RelayCommand<Window> WindowClosed { get; set; }
         private readonly object _lock = new object();
+
+        private ObservableCollection<CheckWrapper> _checks = new ObservableCollection<CheckWrapper>();
+        public ObservableCollection<CheckWrapper> Checks
+        {
+            get { return _checks; }
+            set { _checks = value; RaisePropertyChanged(() => Checks); }
+        }
+
+        private FamilyTaskWrapper _wrapper;
+        public FamilyTaskWrapper Wrapper
+        {
+            get { return _wrapper; }
+            set { _wrapper = value; RaisePropertyChanged(() => Wrapper); }
+        }
 
         public FamilyTaskAssistantViewModel(FamilyTaskWrapper wrapper)
         {
@@ -74,20 +89,6 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
         {
             Model.Submit(Wrapper);
             win.Close();
-        }
-
-        private ObservableCollection<CheckWrapper> _checks = new ObservableCollection<CheckWrapper>();
-        public ObservableCollection<CheckWrapper> Checks
-        {
-            get { return _checks; }
-            set { _checks = value; RaisePropertyChanged(() => Checks); }
-        }
-
-        private FamilyTaskWrapper _wrapper;
-        public FamilyTaskWrapper Wrapper
-        {
-            get { return _wrapper; }
-            set { _wrapper = value; RaisePropertyChanged(() => Wrapper); }
         }
 
         #region Message Handlers

@@ -1,10 +1,16 @@
-﻿using System;
+﻿#region References
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Text.RegularExpressions;
 using HOK.Core.Utilities;
+using HOK.MissionControl.Core.Schemas.Settings;
+using HOK.MissionControl.Core.Utils;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+
+#endregion
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -67,17 +73,28 @@ namespace HOK.MissionControl.Core.Schemas
         {
             try
             {
-                var machineName = Environment.MachineName;
-                var splits = machineName.Split('-');
-                if (!splits.Any()) return string.Empty;
-
-                var s = splits.FirstOrDefault();
-                if (s != null)
+                var settings = AppSettings.Instance.UserLocation;
+                string sourceString;
+                switch (settings.Source)
                 {
-                    var office = s.ToUpper();
-                    return office;
+                    case UserLocationSources.MachineName:
+                        sourceString = Environment.MachineName;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
-                return string.Empty;
+
+                if (string.IsNullOrWhiteSpace(sourceString)) return string.Empty;
+
+                // (Konrad) If we got a Source string ie. Machine Name we can proceed
+                // to extract the user location/office from it using regex pattern.
+                var matches = Regex.Matches(sourceString, settings.Pattern, RegexOptions.IgnoreCase);
+                if (matches.Count <= settings.Match) return string.Empty;
+
+                var m = matches[settings.Match];
+                return m.Groups.Count > settings.Group 
+                    ? m.Groups[settings.Group].Value 
+                    : string.Empty;
             }
             catch (Exception e)
             {
