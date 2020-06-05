@@ -61,13 +61,18 @@ steps:
 
 - task: DownloadSecureFile@1
   inputs:
-    secureFile: 'Settings.json'
+    secureFile: '$(SettingsFileName)'
 
 - task: CopyFiles@2
   inputs:
     SourceFolder: '$(Agent.TempDirectory)'
-    Contents: 'Settings.json'
+    Contents: '$(SettingsFileName)'
     TargetFolder: '$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources'
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'Rename-Item –Path "$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources/$(SettingsFileName)" -NewName "Settings.json"'
 
 - task: DownloadSecureFile@1
   inputs:
