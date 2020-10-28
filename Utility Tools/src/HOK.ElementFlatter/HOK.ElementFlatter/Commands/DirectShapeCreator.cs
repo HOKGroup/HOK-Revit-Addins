@@ -109,11 +109,9 @@ namespace HOK.ElementFlatter.Commands
                         if (null != directShape)
                         {
                             directShape.SetName(element.Name);
-#if RELEASE2016 || RELEASE2017 || RELEASE2018 || RELEASE2019 || RELEASE2020
                             var dsOptions = directShape.GetOptions();
                             dsOptions.ReferencingOption = DirectShapeReferencingOption.Referenceable;
                             directShape.SetOptions(dsOptions);
-#endif
                             shapeInfo = new DirectShapeInfo(directShape.Id, element.Id);
                         }
                     }

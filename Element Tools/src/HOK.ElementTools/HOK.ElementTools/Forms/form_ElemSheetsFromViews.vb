@@ -90,12 +90,13 @@ Public Class form_ElemSheetsFromViews
         '' ''filterViewSheets = mSettings.Application.Create.Filter.NewCategoryFilter(BuiltInCategory.OST_Sheets)
         '' ''mSettings.Application.ActiveDocument.get_Elements(filterViewSheets, elementsViewSheetsRaw)
         For Each viewSheet As DB.ViewSheet In elementsViewSheetsRaw
-            For Each parameterItem As DB.Parameter In viewSheet.Parameters
-                If parameterItem.Definition.Name = "Sheet Number" Then
-                    viewSheets.Add(parameterItem.AsString(), viewSheet.Id.IntegerValue.ToString)
-                    Exit For
-                End If
-            Next
+            viewSheets.Add(viewSheet.Name, viewSheet.Id.IntegerValue.ToString())
+            'For Each parameterItem As DB.Parameter In viewSheet.Parameters
+            '    If parameterItem.Definition.Name = "Sheet Number" Then
+            '        viewSheets.Add(parameterItem.Id.ToString(), viewSheet.Id.IntegerValue.ToString())
+            '        Exit For
+            '    End If
+            'Next
         Next
 
         'Prepare the list box
@@ -261,14 +262,16 @@ Public Class form_ElemSheetsFromViews
 
             'Make the new sheet if needed and skip existing sheets if option to update not selected.
             sheetToCreate = ViewSheet.Create(m_Settings.Document, titleBlock.Id)
-            For Each parameterItem As DB.Parameter In sheetToCreate.Parameters
-                If parameterItem.Definition.Name = "Sheet Number" Then
-                    parameterItem.[Set](viewToUse.Name.ToString)
-                End If
-                If parameterItem.Definition.Name = "Sheet Name" Then
-                    parameterItem.[Set](sheetName)
-                End If
-            Next
+            sheetToCreate.SheetNumber = viewToUse.Name.ToString()
+            sheetToCreate.Name = sheetName
+            'For Each parameterItem As DB.Parameter In sheetToCreate.Parameters
+            '    If parameterItem.Definition.Name = "Sheet Number" Then
+            '        parameterItem.[Set](viewToUse.Name.ToString)
+            '    End If
+            '    If parameterItem.Definition.Name = "Sheet Name" Then
+            '        parameterItem.[Set](sheetName)
+            '    End If
+            'Next
 
             'Insert the view
             Dim viewPort As DB.Viewport

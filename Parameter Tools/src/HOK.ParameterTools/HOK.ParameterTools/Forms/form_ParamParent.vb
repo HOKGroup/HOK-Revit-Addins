@@ -121,11 +121,7 @@ Public Class form_ParamParent
             Try
 
                 ' Get the parameter if it exists 
-#If RELEASE2013 Or RELEASE2014 Then
-                Dim m_ParentKeyParam As Parameter = elementParent.Parameter(textBoxParamParentKey.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                 Dim m_ParentKeyParam As Parameter = elementParent.LookupParameter(textBoxParamParentKey.Text)
-#End If
 
                 If m_ParentKeyParam IsNot Nothing Then
                     Dim m_para As New clsPara(m_ParentKeyParam)
@@ -145,11 +141,7 @@ Public Class form_ParamParent
                         If xyzChild.Y > boundingBoxParent.Min.Y And xyzChild.Y < boundingBoxParent.Max.Y Then
 
                             ' Set the parameter if it exists
-#If RELEASE2013 Or RELEASE2014 Then
-                            Dim m_ChildKeyParam As Parameter = elementChild.Parameter(textBoxParamChildKey.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                             Dim m_ChildKeyParam As Parameter = elementChild.LookupParameter(textBoxParamChildKey.Text)
-#End If
 
                             If m_ChildKeyParam IsNot Nothing Then
                                 Dim m_para As New clsPara(m_ChildKeyParam)

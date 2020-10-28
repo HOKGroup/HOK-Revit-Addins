@@ -120,21 +120,12 @@ Public Class form_ParamStringCalculate
                 Next
                 Exit Select
             Case "LevelNo"
-#If RELEASE2013 Then
-                If element.Level Is Nothing Then
-                    valueToAssign = ""
-                Else
-                    valueToAssign = m_Settings.Document.GetElement(element.Level.Id).Name
-                    valueToAssign = valueToAssign.Substring(valueToAssign.LastIndexOf(" ") + 1)
-                End If
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                 If element.LevelId Is Nothing Then
                 valueToAssign = ""
                 Else
                     valueToAssign = m_Settings.Document.GetElement(element.LevelId).Name
                     valueToAssign = valueToAssign.Substring(valueToAssign.LastIndexOf(" ") + 1)
                 End If
-#End If
 
                 Exit Select
             Case "ElementId"

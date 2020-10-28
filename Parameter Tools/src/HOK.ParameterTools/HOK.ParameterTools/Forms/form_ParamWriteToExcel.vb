@@ -199,11 +199,7 @@ Public Class form_ParamWriteToExcel
                 column = 3
                 If Me.CheckBoxInstance.Checked = True Then
                     For Each stringPropertyName As String In m_InstProps
-#If RELEASE2013 Or RELEASE2014 Then
-                        Dim p As Parameter = Elem.Parameter(stringPropertyName)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                         Dim p As Parameter = Elem.LookupParameter(stringPropertyName)
-#End If
 
                         If p IsNot Nothing Then
                             Dim m_para As New clsPara(p)
@@ -222,11 +218,7 @@ Public Class form_ParamWriteToExcel
                             ' This is not a type element, get it from this instance
                             Try
                                 Dim m_TypeElem As Element = m_Settings.Document.GetElement(Elem.GetTypeId)
-#If RELEASE2013 Or RELEASE2014 Then
-                                Dim p As Parameter = m_TypeElem.Parameter(stringPropertyName)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                                 Dim p As Parameter = m_TypeElem.LookupParameter(stringPropertyName)
-#End If
                                 If p IsNot Nothing Then
                                     Dim m_para As New clsPara(p)
                                     m_ExcelWorksheet.Cells(row, column) = m_para.Value
@@ -237,11 +229,7 @@ Public Class form_ParamWriteToExcel
 
                         Else
                             ' This is a type element
-#If RELEASE2013 Or RELEASE2014 Then
-                            Dim p As Parameter = Elem.Parameter(stringPropertyName)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                             Dim p As Parameter = Elem.LookupParameter(stringPropertyName)
-#End If
                             If p IsNot Nothing Then
                                 Dim m_para As New clsPara(p)
                                 m_ExcelWorksheet.Cells(row, column) = m_para.Value
