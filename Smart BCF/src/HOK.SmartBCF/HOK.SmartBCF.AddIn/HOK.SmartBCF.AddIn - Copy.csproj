@@ -42,15 +42,6 @@
     <OutputPath>bin\2014\</OutputPath>
     <DefineConstants>RELEASE2014</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2015|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\2015\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2015</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2016|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2016\</OutputPath>

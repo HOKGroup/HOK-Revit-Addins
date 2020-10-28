@@ -1,22 +1,22 @@
 $regexToKeep = "^([.|_]\w+)"
 $projectsToKeep = @(
+    "AVF Manager",
+    "Element Tools",
     "HOK.AddInManager",
-    "Utility Tools",
     "HOK.BetaToolsManager",
     "HOK.Core",
     "HOK.Feedback",
-    "LPD Calculator",
     "HOK.MissionControl",
-    "Model Reporting",
     "HOK.MoveBackup",
-    "Navigator",
+    "HOK.RibbonTab"
+    "LPD Calculator",
     "Mass Tools",
+    "Model Reporting",
+    "Navigator",
+    "Parameter Tools",
     "Sheet Manager",
     "Smart BCF",
-    "AVF Manager",
-    "Parameter Tools",
-    "Element Tools",
-    "HOK.RibbonTab"
+    "Utility Tools",
 )
 
 foreach ($project in $projectsToKeep) {
