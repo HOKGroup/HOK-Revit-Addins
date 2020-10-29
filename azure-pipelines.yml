@@ -34,7 +34,7 @@ variables:
   coreSolution: '**/HOK.Core.sln'
   MCsolution: '**/HOK.MissionControl.sln'
   feedbackSolution: '**/HOK.Feedback.sln'
-  buildPlatform: 'Any CPU'
+  buildPlatform: 'x64'
   BUILD_ENV: 'AzureDevOps'
   HOKDepsDirectory: '$(Build.SourcesDirectory)'
 
