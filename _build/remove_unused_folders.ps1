@@ -8,7 +8,7 @@ $projectsToKeep = @(
     "HOK.Feedback",
     "HOK.MissionControl",
     "HOK.MoveBackup",
-    "HOK.RibbonTab"
+    "HOK.RibbonTab",
     "LPD Calculator",
     "Mass Tools",
     "Model Reporting",
@@ -16,7 +16,7 @@ $projectsToKeep = @(
     "Parameter Tools",
     "Sheet Manager",
     "Smart BCF",
-    "Utility Tools",
+    "Utility Tools"
 )
 
 foreach ($project in $projectsToKeep) {
