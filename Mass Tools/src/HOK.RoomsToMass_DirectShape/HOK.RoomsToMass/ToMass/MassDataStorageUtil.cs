@@ -41,8 +41,13 @@ namespace HOK.RoomsToMass.ToMass
                     {
                         hostCategory = entity.Get<string>(m_schema.GetField(s_SourceCategory));
                         hostUniqueId = entity.Get<string>(m_schema.GetField(s_LinkedSourceId));
+#if RELEASE2021
+                        centroid = entity.Get<XYZ>(m_schema.GetField(s_SourceCentroid), UnitTypeId.Feet);
+                        userHeight = entity.Get<double>(m_schema.GetField(s_MassHeight), UnitTypeId.Feet);
+#else
                         centroid = entity.Get<XYZ>(m_schema.GetField(s_SourceCentroid), DisplayUnitType.DUT_DECIMAL_FEET);
                         userHeight = entity.Get<double>(m_schema.GetField(s_MassHeight), DisplayUnitType.DUT_DECIMAL_FEET);
+#endif
                         if (!string.IsNullOrEmpty(hostCategory) && !string.IsNullOrEmpty(hostUniqueId) && null != centroid && userHeight >= 0)
                         {
                             found = true;
@@ -77,8 +82,13 @@ namespace HOK.RoomsToMass.ToMass
                     entity = new Entity(m_schema);
                     entity.Set<string>(m_schema.GetField(s_SourceCategory), hostCategory);
                     entity.Set<string>(m_schema.GetField(s_LinkedSourceId), hostUniqueId);
+#if RELEASE2021
+                    entity.Set<XYZ>(m_schema.GetField(s_SourceCentroid), centroid, UnitTypeId.Feet);
+                    entity.Set<double>(m_schema.GetField(s_MassHeight), userHeight, UnitTypeId.Feet);
+#else
                     entity.Set<XYZ>(m_schema.GetField(s_SourceCentroid), centroid, DisplayUnitType.DUT_DECIMAL_FEET);
                     entity.Set<double>(m_schema.GetField(s_MassHeight), userHeight, DisplayUnitType.DUT_DECIMAL_FEET);
+#endif
                     massElement.SetEntity(entity);
                 }
             }
@@ -99,9 +109,17 @@ namespace HOK.RoomsToMass.ToMass
                 sBuilder.AddSimpleField(s_SourceCategory, typeof(string));
                 sBuilder.AddSimpleField(s_LinkedSourceId, typeof(string));
                 FieldBuilder fBuilder = sBuilder.AddSimpleField(s_SourceCentroid, typeof(XYZ));
+#if RELEASE2021
+                fBuilder.SetSpec(SpecTypeId.Length);
+#else
                 fBuilder.SetUnitType(UnitType.UT_Length);
+#endif
                 fBuilder = sBuilder.AddSimpleField(s_MassHeight, typeof(double));
+#if RELEASE2021
+                fBuilder.SetSpec(SpecTypeId.Length);
+#else
                 fBuilder.SetUnitType(UnitType.UT_Length);
+#endif
                 schema = sBuilder.Finish();
             }
             catch (Exception ex)
@@ -154,7 +172,11 @@ namespace HOK.RoomsToMass.ToMass
                                 massConfig.HostCategory = hostCategory;
                                 massConfig.MassCategory = entity.Get<string>(m_schema.GetField(s_MassCategory));
                                 massConfig.UpdateType = (ParameterUpdateType)Enum.Parse(typeof(ParameterUpdateType), entity.Get<string>(m_schema.GetField(s_ParameterUpdateType)));
+#if RELEASE2021
+                                massConfig.UserHeight = entity.Get<double>(m_schema.GetField(s_UserHeight), UnitTypeId.Feet);
+#else
                                 massConfig.UserHeight = entity.Get<double>(m_schema.GetField(s_UserHeight), DisplayUnitType.DUT_DECIMAL_FEET);
+#endif
                                 massConfig.SetDefaultHeight = entity.Get<bool>(m_schema.GetField(s_SetDefaultHeight));
 
                                 List<ParameterMapInfo> massParameters = new List<ParameterMapInfo>();
@@ -238,7 +260,11 @@ namespace HOK.RoomsToMass.ToMass
                             entity.Set<string>(s_MassCategory, mc.MassCategory);
                             entity.Set<string>(s_ParameterUpdateType, mc.UpdateType.ToString());
                             entity.Set<bool>(s_SetDefaultHeight, mc.SetDefaultHeight);
+#if RELEASE2021
+                            entity.Set<double>(s_UserHeight, mc.UserHeight, UnitTypeId.Feet);
+#else
                             entity.Set<double>(s_UserHeight, mc.UserHeight, DisplayUnitType.DUT_DECIMAL_FEET);
+#endif
 
                             List<Entity> subEntities = new List<Entity>();
                             foreach (ParameterMapInfo paramMapInfo in mc.MassParameters)
@@ -363,7 +389,11 @@ namespace HOK.RoomsToMass.ToMass
                 sBuilder.AddSimpleField(s_ParameterUpdateType, typeof(string));
                 sBuilder.AddSimpleField(s_SetDefaultHeight, typeof(bool));
                 FieldBuilder fBuilder = sBuilder.AddSimpleField(s_UserHeight, typeof(double));
+#if RELEASE2021
+                fBuilder.SetSpec(SpecTypeId.Length);
+#else
                 fBuilder.SetUnitType(UnitType.UT_Length);
+#endif
 
                 fBuilder = sBuilder.AddArrayField(s_ParameterMaps, typeof(Entity));
                 fBuilder.SetSubSchemaGUID(subSchemaId);

@@ -40,7 +40,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private SplitINIDataManager splitDataManager;
         private bool followHost = true;
         private double ratio = 0.7;
-        private bool logCreated = false;
 
         public Dictionary<string, int> WorksetDictionary { get { return worksetDictionary; } set { worksetDictionary = value; } }
         public List<MassProperties> IntegratedMassList { get { return integratedMassList; } set { integratedMassList = value; } }

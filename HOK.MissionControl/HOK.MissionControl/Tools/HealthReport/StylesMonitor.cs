@@ -94,7 +94,11 @@ namespace HOK.MissionControl.Tools.HealthReport
                         // dim w/ zero segments
                         dimSegmentStats.Add(new DimensionSegmentInfo(d)
                         {
+#if RELEASE2021
+                            ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)d.Value, false),
+#else
                             ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),
+#endif
                             OwnerViewType = d.ViewSpecific 
                                 ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
                                 : string.Empty,
@@ -111,7 +115,11 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                             dimSegmentStats.Add(new DimensionSegmentInfo(s)
                             {
-                                ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)s.Value, false, false),
+#if RELEASE2021
+                                ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)d.Value, false),
+#else
+                                ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),
+#endif
                                 OwnerViewType = d.ViewSpecific 
                                     ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
                                     : string.Empty,
@@ -124,13 +132,13 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var dimStats = dimTypes.Select(x => new DimensionTypeInfo(x.Value.Item1) { Instances = x.Value.Item2 })
                     .ToList();
 
-                #endregion
+#endregion
 
-                #region Line Style stats
+#region Line Style stats
 
                 //TODO: Finish this out.
 
-                #endregion
+#endregion
 
                 var stylesStats = new StylesDataItem
                 {
