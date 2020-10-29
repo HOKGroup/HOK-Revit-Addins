@@ -18,6 +18,7 @@
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2018'">v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2020'">v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2020'">v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
