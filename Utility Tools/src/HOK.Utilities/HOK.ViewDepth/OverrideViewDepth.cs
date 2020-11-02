@@ -79,9 +79,9 @@ namespace HOK.ViewDepth
                 //it should work also with floor plans and even tilted Detail Views
                 //but it wasn't my goal when I started
                 //won't work for a 3D View
-                int clip = activeView.get_Parameter(BuiltInParameter.VIEWER_BOUND_FAR_CLIPPING).AsInteger();
+                Parameter clip = activeView.get_Parameter(BuiltInParameter.VIEWER_BOUND_FAR_CLIPPING);
                 //If the far clipping is not active the default depth is 10 feet and won't work correctly
-                if (clip == 0)
+                if (clip != null && clip.AsInteger() == 0)
                 {
                     TaskDialog.Show("View Depth Override", "In order to use this macro far clipping must be activated.");
                 }
