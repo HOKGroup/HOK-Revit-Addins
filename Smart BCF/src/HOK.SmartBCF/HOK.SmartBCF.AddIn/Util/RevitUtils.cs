@@ -15,7 +15,7 @@ namespace HOK.SmartBCF.AddIn.Util
             //if BPL is set to 0,0,0 not always it corresponds to Revit's origin
 
             var origin = new XYZ(0, 0, 0);
-#if RELEASE2019 || RELEASE2020
+#if RELEASE2019 || RELEASE2020 || RELEASE2021
             var position = doc.ActiveProjectLocation.GetProjectPosition(origin);
 #else
             var position = doc.ActiveProjectLocation.get_ProjectPosition(origin);
@@ -69,12 +69,20 @@ namespace HOK.SmartBCF.AddIn.Util
 
         public static double ToMeters(this double feet)
         {
+#if RELEASE2021
+            return UnitUtils.ConvertFromInternalUnits(feet, UnitTypeId.Meters);
+#else
             return UnitUtils.ConvertFromInternalUnits(feet, DisplayUnitType.DUT_METERS);
+#endif
         }
 
         public static double ToFeet(this double meters)
         {
-            return UnitUtils.ConvertToInternalUnits(meters, DisplayUnitType.DUT_METERS);
+#if RELEASE2021
+            return UnitUtils.ConvertToInternalUnits(meters, UnitTypeId.Feet);
+#else
+            return UnitUtils.ConvertToInternalUnits(meters, DisplayUnitType.DUT_DECIMAL_FEET);
+#endif
         }
     }
 }

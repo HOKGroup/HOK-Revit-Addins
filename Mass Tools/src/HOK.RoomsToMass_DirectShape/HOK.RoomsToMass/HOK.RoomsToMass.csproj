@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{4CE27E50-138B-4365-ABB4-F948B7FD7E0A}</ProjectGuid>
@@ -10,16 +10,16 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.RoomsToMass</RootNamespace>
     <AssemblyName>HOK.RoomsToMass</AssemblyName>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2015'">v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2016'">v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2017'">v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2018'">v4.5.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition="'$(Configuration)' == '2020'">v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion Condition="'$(Configuration)' == '2021'">v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -29,7 +29,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -38,64 +38,61 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2015|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <OutputPath>bin\2015\</OutputPath>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DefineConstants>RELEASE2015</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2016|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2016|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2016\</OutputPath>
     <DefineConstants>TRACE;DEBUG;RELEASE2016</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2017|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2017|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2017\</OutputPath>
     <DefineConstants>RELEASE2017</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2018\</OutputPath>
     <DefineConstants>TRACE;DEBUG;RELEASE2018</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2019|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2019|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2019\</OutputPath>
     <DefineConstants>TRACE;DEBUG;RELEASE2019</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2020|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2020|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2020\</OutputPath>
     <DefineConstants>TRACE;DEBUG;RELEASE2020</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2021|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2021\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2021</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2015\HOK.Core.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
       <Private>False</Private>
@@ -121,8 +118,9 @@
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2015\HOK.MissionControl.Core.dll</HintPath>
+    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2021'">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\2021\HOK.Core.dll</HintPath>
+      <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2016'">
@@ -145,18 +143,14 @@
       <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2020\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="HOK.MissionControl.Core" Condition="'$(Configuration)' == '2021'">
+      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\2021\HOK.MissionControl.Core.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>..\packages\Microsoft.Office.Interop.Outlook.15.0.4797.1003\lib\net20\Microsoft.Office.Interop.Outlook.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
@@ -206,6 +200,21 @@
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2020\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="RevitAPIUI" Condition=" '$(Configuration)' == '2021'">
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2021\RevitAPIUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPI" Condition=" '$(Configuration)' == '2021'">
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2021\RevitAPI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="RevitAPIIFC" Condition=" '$(Configuration)' == '2021'">
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPIIFC.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2021\RevitAPIIFC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="RevitAPIIFC" Condition=" '$(Configuration)' == '2020'">
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPIIFC.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2020\RevitAPIIFC.dll</HintPath>
@@ -228,10 +237,6 @@
     </Reference>
     <Reference Include="RevitAPIIFC" Condition=" '$(Configuration)' == '2016'">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIIFC.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIIFC" Condition=" '$(Configuration)' == '2015'">
-      <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2015\RevitAPIIFC.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />

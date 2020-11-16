@@ -138,11 +138,7 @@ Public Class form_ParamRollUp
 
             m_KeyValue = ""
             Try
-#If RELEASE2013 Or RELEASE2014 Then
-                Dim m_ParameterParent As Parameter = m_ParentElem.Parameter(textBoxParamParentKey.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                 Dim m_ParameterParent As Parameter = m_ParentElem.LookupParameter(textBoxParamParentKey.Text)
-#End If
 
                 If m_ParameterParent IsNot Nothing Then
                     Dim m_ParaP As New clsPara(m_ParameterParent)
@@ -154,19 +150,11 @@ Public Class form_ParamRollUp
 
                 ' Iterate the Child elements
                 For Each m_ChildElem As Element In m_ChildElementList
-#If RELEASE2013 Or RELEASE2014 Then
-                    Dim m_ParameterKeyChild As Parameter = m_ChildElem.Parameter(textBoxParamChildKey.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                     Dim m_ParameterKeyChild As Parameter = m_ChildElem.LookupParameter(textBoxParamChildKey.Text)
-#End If
                     If m_ParameterKeyChild IsNot Nothing Then
                         Dim m_para As New clsPara(m_ParameterKeyChild)
                         If m_para.Value = m_KeyValue Then
-#If RELEASE2013 Or RELEASE2014 Then
-                            Dim m_ParaFinal As Parameter = m_ChildElem.Parameter(textBoxParamSource.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                             Dim m_ParaFinal As Parameter = m_ChildElem.LookupParameter(textBoxParamSource.Text)
-#End If
 
                             Dim m_ParaAdder As New clsPara(m_ParaFinal)
                             areaRollUp = areaRollUp + m_ParaAdder.Value
@@ -174,11 +162,7 @@ Public Class form_ParamRollUp
                     End If
 
                 Next
-#If RELEASE2013 Or RELEASE2014 Then
-                Dim m_Param As Parameter = m_ParentElem.Parameter(textBoxParamRollUp.Text)
-#ElseIf RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Then
                 Dim m_Param As Parameter = m_ParentElem.LookupParameter(textBoxParamRollUp.Text)
-#End If
 
                 If m_Param IsNot Nothing Then
                     Dim m_para As New clsPara(m_Param)

@@ -325,7 +325,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     catch { wallSolid = null; }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // ignored
             }

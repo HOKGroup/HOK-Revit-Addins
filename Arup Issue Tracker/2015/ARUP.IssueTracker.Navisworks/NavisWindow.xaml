@@ -1,9 +1,0 @@
-﻿<UserControl x:Class="ARUP.IssueTracker.Navisworks.NavisWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:ctr="clr-namespace:ARUP.IssueTracker.UserControls;assembly=ARUP.IssueTracker"
-        Width="800" Height="500">
-    <Grid>
-        <ctr:MainPanel Name="mainPan" />
-    </Grid>
-</UserControl>
