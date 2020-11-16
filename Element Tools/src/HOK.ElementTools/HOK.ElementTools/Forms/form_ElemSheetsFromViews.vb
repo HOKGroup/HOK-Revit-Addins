@@ -91,12 +91,6 @@ Public Class form_ElemSheetsFromViews
         '' ''mSettings.Application.ActiveDocument.get_Elements(filterViewSheets, elementsViewSheetsRaw)
         For Each viewSheet As DB.ViewSheet In elementsViewSheetsRaw
             viewSheets.Add(viewSheet.Name, viewSheet.Id.IntegerValue.ToString())
-            'For Each parameterItem As DB.Parameter In viewSheet.Parameters
-            '    If parameterItem.Definition.Name = "Sheet Number" Then
-            '        viewSheets.Add(parameterItem.Id.ToString(), viewSheet.Id.IntegerValue.ToString())
-            '        Exit For
-            '    End If
-            'Next
         Next
 
         'Prepare the list box
@@ -264,14 +258,6 @@ Public Class form_ElemSheetsFromViews
             sheetToCreate = ViewSheet.Create(m_Settings.Document, titleBlock.Id)
             sheetToCreate.SheetNumber = viewToUse.Name.ToString()
             sheetToCreate.Name = sheetName
-            'For Each parameterItem As DB.Parameter In sheetToCreate.Parameters
-            '    If parameterItem.Definition.Name = "Sheet Number" Then
-            '        parameterItem.[Set](viewToUse.Name.ToString)
-            '    End If
-            '    If parameterItem.Definition.Name = "Sheet Name" Then
-            '        parameterItem.[Set](sheetName)
-            '    End If
-            'Next
 
             'Insert the view
             Dim viewPort As DB.Viewport
