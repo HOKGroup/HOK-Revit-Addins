@@ -43,6 +43,8 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
     <TargetFrameworks>net452;net471;net472;net48</TargetFrameworks>
+    <Configurations>Debug;Release;2016;2017;2018;2019;2020;2021</Configurations>
+    <Platforms>x86;x64</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
