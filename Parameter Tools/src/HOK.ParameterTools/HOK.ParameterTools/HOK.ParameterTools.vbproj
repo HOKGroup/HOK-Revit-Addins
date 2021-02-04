@@ -17,12 +17,6 @@
     <TargetFrameworkVersion Condition=" '$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition=" '$(Configuration)' == '2020'">v4.7.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition=" '$(Configuration)' == '2021'">v4.8</TargetFrameworkVersion>
-    <TargetFrameworks Condition=" '$(Configuration)' == '2016'">net452</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(Configuration)' == '2017'">net452</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(Configuration)' == '2018'">net452</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(Configuration)' == '2019'">net471</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(Configuration)' == '2020'">net472</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(Configuration)' == '2021'">net48</TargetFrameworks>
     <OptionExplicit>On</OptionExplicit>
     <OptionCompare>Binary</OptionCompare>
     <OptionStrict>Off</OptionStrict>
@@ -61,6 +55,7 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DebugType>pdbonly</DebugType>
@@ -72,6 +67,7 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
+    <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2016|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -84,6 +80,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>RELEASE2016</DefineConstants>
+    <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2017|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -96,6 +93,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>RELEASE2017</DefineConstants>
+    <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -108,6 +106,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworks>net452</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2019|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -120,6 +119,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworks>net471</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2020|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -132,6 +132,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworks>net472</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2021|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -144,6 +145,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworks>net48</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HOK.Core" Condition=" '$(Configuration)' == '2016'">
