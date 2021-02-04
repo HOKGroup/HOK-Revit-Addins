@@ -108,7 +108,10 @@ steps:
 
 - task: NuGetCommand@2
   inputs:
+    command: 'restore'
     restoreSolution: '$(solution)'
+    feedsToUse: 'select'
+    noCache: true
 
 - task: VSBuild@1
   inputs:
