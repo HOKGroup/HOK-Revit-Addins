@@ -17,6 +17,12 @@
     <TargetFrameworkVersion Condition=" '$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition=" '$(Configuration)' == '2020'">v4.7.2</TargetFrameworkVersion>
     <TargetFrameworkVersion Condition=" '$(Configuration)' == '2021'">v4.8</TargetFrameworkVersion>
+    <TargetFrameworks Condition=" '$(Configuration)' == '2016'">net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(Configuration)' == '2017'">net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(Configuration)' == '2018'">net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(Configuration)' == '2019'">net471</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(Configuration)' == '2020'">net472</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(Configuration)' == '2021'">net48</TargetFrameworks>
     <OptionExplicit>On</OptionExplicit>
     <OptionCompare>Binary</OptionCompare>
     <OptionStrict>Off</OptionStrict>
