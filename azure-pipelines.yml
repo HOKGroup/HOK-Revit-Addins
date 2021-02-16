@@ -27,7 +27,7 @@ strategy:
       buildConfiguration: '2017'
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'vs2017-win2016'
 
 variables:
   solution: '**/HOK*.sln'
