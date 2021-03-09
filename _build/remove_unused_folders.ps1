@@ -13,7 +13,7 @@ $projectsToKeep = @(
     "Mass Tools",
     "Model Reporting",
     "Navigator",
-    "Parameter Tools",
+    #"Parameter Tools",
     "Sheet Manager",
     "Smart BCF",
     "Utility Tools"
