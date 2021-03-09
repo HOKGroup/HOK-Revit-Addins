@@ -27,7 +27,7 @@ strategy:
       buildConfiguration: '2017'
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'vs2017-win2016'
 
 variables:
   solution: '**/HOK*.sln'
@@ -108,7 +108,10 @@ steps:
 
 - task: NuGetCommand@2
   inputs:
+    command: 'restore'
     restoreSolution: '$(solution)'
+    feedsToUse: 'select'
+    noCache: true
 
 - task: VSBuild@1
   inputs:
