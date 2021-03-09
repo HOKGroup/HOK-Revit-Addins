@@ -287,7 +287,18 @@ namespace HOK.ModelReporting
                     {
                         GetIpAddress();
                     }
-                    if (IpAddress.StartsWith("172.30.56"))
+                    if (IpAddress.StartsWith("172.30.56."))
+                    {
+                        UserLocation = "VPN";
+                    }
+                }
+                if (UserLocation == "HK")
+                {
+                    if (IpAddress == "")
+                    {
+                        GetIpAddress();
+                    }
+                    if (IpAddress.StartsWith("172.30.57."))
                     {
                         UserLocation = "VPN";
                     }
