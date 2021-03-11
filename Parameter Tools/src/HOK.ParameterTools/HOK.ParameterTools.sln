@@ -1,4 +1,6 @@
-﻿# Visual Studio 15
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HOK.ParameterTools", "HOK.ParameterTools\HOK.ParameterTools.vbproj", "{B1FB0FCE-6DE8-4D1A-9F33-95108EAD2DE5}"
@@ -32,3 +34,10 @@ Global
 		{B1FB0FCE-6DE8-4D1A-9F33-95108EAD2DE5}.Release|x64.ActiveCfg = Release|x64
 		{B1FB0FCE-6DE8-4D1A-9F33-95108EAD2DE5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1D8D1CA1-CC98-40FE-9CEE-36CEA2CD0EF4}
+	EndGlobalSection
+EndGlobal
