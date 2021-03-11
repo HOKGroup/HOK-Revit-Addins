@@ -281,15 +281,26 @@ namespace HOK.ModelReporting
                 var systemInfo = new ActiveDs.ADSystemInfo();
                 var siteName = systemInfo.SiteName;
                 UserLocation = !string.IsNullOrEmpty(siteName) ? siteName : "UNKNOWN";
-                if (UserLocation == "VPN")
+                if (UserLocation == "LON")
                 {
                     if (IpAddress == "")
                     {
                         GetIpAddress();
                     }
-                    if (IpAddress.StartsWith("172.30.56"))
+                    if (IpAddress.StartsWith("172.30.56."))
                     {
-                        UserLocation = "LON";
+                        UserLocation = "VPN";
+                    }
+                }
+                if (UserLocation == "HK")
+                {
+                    if (IpAddress == "")
+                    {
+                        GetIpAddress();
+                    }
+                    if (IpAddress.StartsWith("172.30.57."))
+                    {
+                        UserLocation = "VPN";
                     }
                 }
             }
