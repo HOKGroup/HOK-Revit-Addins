@@ -4,6 +4,9 @@ using Autodesk.Revit.DB;
 using System.Text.RegularExpressions;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Linq;
 
 namespace HOK.ModelReporting
 {
@@ -218,6 +221,27 @@ namespace HOK.ModelReporting
             return fileLocation;
         }
 
+        private static string GetReportingIp()
+        {
+            NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(x => x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || x.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                .Where(ni => ni.OperationalStatus == OperationalStatus.Up)
+                .Where(ni => (ni.Description.StartsWith("PANGP") || !ni.Description.Contains("Virtual")) &&  !ni.Description.Contains("VMware"))
+                .ToArray();
+
+            foreach (NetworkInterface ni in nis)
+            {
+                foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                {
+                    if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                    {
+                        return ip.Address.ToString();
+                    }
+                }
+            }
+            return "UNKNOWN";
+        }
+
         private string GetProjectName(string path)
         {
             const string name = "";
@@ -263,15 +287,7 @@ namespace HOK.ModelReporting
 
         private void GetIpAddress()
         {
-            try
-            {
-                var hostEntry = Dns.GetHostEntry(Dns.GetHostName());
-                IpAddress = hostEntry.AddressList[1].ToString();
-            }
-            catch
-            {
-                IpAddress = "UNKNOWN";
-            }
+            IpAddress = GetReportingIp();
         }
 
         private void GetUserLocation()
