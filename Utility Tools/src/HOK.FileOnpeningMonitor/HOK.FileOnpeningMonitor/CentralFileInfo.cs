@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
@@ -31,6 +34,34 @@ namespace HOK.FileOnpeningMonitor
 
             GetProjectInfo();
             GetUserInfo();
+        }
+
+        private static string GetReportingIp()
+        {
+            try
+            {
+                NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces()
+                    .Where(x => x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || x.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                    .Where(ni => ni.OperationalStatus == OperationalStatus.Up)
+                    .Where(ni => (ni.Description.StartsWith("PANGP") || !ni.Description.Contains("Virtual")) &&  !ni.Description.Contains("VMware"))
+                    .ToArray();
+
+                foreach (NetworkInterface ni in nis)
+                {
+                    foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                    {
+                        if (ip.Address.AddressFamily == AddressFamily.InterNetwork)
+                        {
+                            return ip.Address.ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+            }
+            return "UNKNOWN";
         }
 
         private void GetProjectInfo()
@@ -107,16 +138,7 @@ namespace HOK.FileOnpeningMonitor
                 UserLocation = "UNKNOWN";
             }
 
-            try
-            {
-                var hostEntry = Dns.GetHostEntry(Dns.GetHostName());
-                IPAddress = hostEntry.AddressList[1].ToString();
-            }
-            catch (Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-                IPAddress = "UNKNOWN";
-            }
+            IPAddress = GetReportingIp();
         }
     }
 }
