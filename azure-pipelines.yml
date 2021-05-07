@@ -15,6 +15,8 @@ trigger:
 
 strategy:
   matrix:
+    2022:
+      buildConfiguration: '2022'
     2021:
       buildConfiguration: '2021'
     2020:
@@ -23,8 +25,6 @@ strategy:
       buildConfiguration: '2019'
     2018:
       buildConfiguration: '2018'
-    2017:
-      buildConfiguration: '2017'
 
 pool:
   vmImage: 'vs2017-win2016'
