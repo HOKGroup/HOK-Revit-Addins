@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>HOK Desktop Connector Launcher</Name>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.DesktopConnectorLauncher.dll</Assembly>
+    <AddInId>508CA037-F865-4AC8-B872-F34225B6ACC9</AddInId>
+    <FullClassName>HOK.DesktopConnectorLauncher.AppCommand</FullClassName>
+    <VendorId>DSIR</VendorId>
+    <VendorDescription>DSIR</VendorDescription>
+  </AddIn>
+</RevitAddIns>
