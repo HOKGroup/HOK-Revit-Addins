@@ -96,7 +96,7 @@
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.Core">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\$(RevitVersion\HOK.Core.dll</HintPath>
+      <HintPath>..\..\HOK.Core\HOK.Core\bin\$(RevitVersion)\HOK.Core.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
