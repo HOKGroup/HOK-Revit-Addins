@@ -438,7 +438,7 @@ Public Class form_ElemPlaceUnplacedRooms
     Public Function CreateSketchPlaneByCurve(ByVal curve As CurveArray) As SketchPlane
         Try
             ' First create a Geometry.Plane which need in NewSketchPlane() method
-#If RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Or RELEASE2021 Then
+#If RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Or RELEASE2021 Or RELEASE2022 Then
             Dim curveList As List(Of Curve) = New List(Of Curve)
             Dim curveIterator As CurveArrayIterator = curve.ForwardIterator
             While (curveIterator.MoveNext())
