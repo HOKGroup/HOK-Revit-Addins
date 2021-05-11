@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.AddInManager", "HOK.AddInManager\HOK.AddInManager.csproj", "{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}"
 EndProject
@@ -12,6 +12,7 @@ Global
 		2019|x64 = 2019|x64
 		2020|x64 = 2020|x64
 		2021|x64 = 2021|x64
+		2022|x64 = 2022|x64
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64
 	EndGlobalSection
@@ -25,7 +26,8 @@ Global
 		{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}.2020|x64.ActiveCfg = 2020|x64
 		{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}.2020|x64.Build.0 = 2020|x64
 		{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}.2021|x64.ActiveCfg = 2021|x64
-		{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}.2021|x64.Build.0 = 2021|x64
+		{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}.2022|x64.ActiveCfg = 2022|x64
+		{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}.2022|x64.Build.0 = 2022|x64
 		{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}.Debug|x64.ActiveCfg = Debug|x64
 		{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}.Debug|x64.Build.0 = Debug|x64
 		{7CE0B057-4D66-4955-AE4C-993CABF9AA9E}.Release|x64.ActiveCfg = Release|x64
