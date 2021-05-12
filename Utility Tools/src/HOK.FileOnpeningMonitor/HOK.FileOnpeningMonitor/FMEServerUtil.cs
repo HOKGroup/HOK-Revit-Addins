@@ -10,12 +10,8 @@ namespace HOK.FileOnpeningMonitor
 {
     public static class FMEServerUtil
     {
-        private static string userId = "";
-        private static string password = "";
         private static string apiToken = "";
         private static string host = "";
-        private static int port;
-        private static string clientId = "";
 
         public static bool RunFMEWorkspaceHTTP(CentralFileInfo info, string repository, string workspace, out Dictionary<string, string> properties)
         {

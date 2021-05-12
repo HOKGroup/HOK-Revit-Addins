@@ -388,12 +388,8 @@ Public Class form_ElemRoomsFromAreas
                 End If
             Next
             'Tag the new room
-#If RELEASE2013 Then
-            roomTag = m_Settings.Document.Create.NewRoomTag(roomNew, ptCurrentInsert, m_Settings.ActiveView)
-#Else
             Dim linkRoomId As LinkElementId = New LinkElementId(roomNew.Id)
             roomTag = m_Settings.Document.Create.NewRoomTag(linkRoomId, ptCurrentInsert, m_Settings.ActiveView.Id)
-#End If
 
             roomTag.HasLeader = False
 

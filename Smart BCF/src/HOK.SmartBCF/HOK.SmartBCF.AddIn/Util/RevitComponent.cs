@@ -67,12 +67,12 @@ namespace HOK.SmartBCF.AddIn.Util
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler RevitPropertyChanged;
         private void NotifyPropertyChanged(String info)
         {
-            if (PropertyChanged != null)
+            if (RevitPropertyChanged != null)
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
+                RevitPropertyChanged(this, new PropertyChangedEventArgs(info));
             }
         }
     }

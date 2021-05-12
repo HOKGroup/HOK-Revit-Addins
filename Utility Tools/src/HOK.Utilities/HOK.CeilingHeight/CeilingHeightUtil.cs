@@ -386,8 +386,13 @@ namespace HOK.CeilingHeight
                         parameter.Set(rp.CeilingHeight);
                         trans.Commit();
                     }
+#if RELEASE2022
+                    else if (CreateSharedParameter(paramName, SpecTypeId.Length, BuiltInParameterGroup.PG_GEOMETRY))
+                    {
+#else
                     else if (CreateSharedParameter(paramName, ParameterType.Length, BuiltInParameterGroup.PG_GEOMETRY))
                     {
+#endif
                         parameter = room.LookupParameter(paramName);
                         if (null != parameter)
                         {
@@ -441,8 +446,13 @@ namespace HOK.CeilingHeight
                         parameter.Set(ceilingHeights);
                         trans.Commit();
                     }
+#if RELEASE2022
+                    else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.PG_GEOMETRY))
+                    {
+#else
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.PG_GEOMETRY))
                     {
+#endif
                         parameter = room.LookupParameter(paramName);
                         if (null != parameter)
                         {
@@ -488,8 +498,13 @@ namespace HOK.CeilingHeight
                             trans.Commit();
                         }
                     }
+#if RELEASE2022
+                    else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.INVALID))
+                    {
+#else
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.INVALID))
                     {
+#endif
                         parameter = room.LookupParameter(paramName);
                         if (null != parameter)
                         {
@@ -549,8 +564,13 @@ namespace HOK.CeilingHeight
                             trans.RollBack();
                         }
                     }
+#if RELEASE2022
+                    else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.INVALID))
+                    {
+#else
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.INVALID))
                     {
+#endif
                         parameter = room.LookupParameter(paramName);
                         if (null != parameter)
                         {
@@ -574,8 +594,13 @@ namespace HOK.CeilingHeight
             }
         }
 
+#if RELEASE2022
+        private bool CreateSharedParameter(string paramName, ForgeTypeId paramType, BuiltInParameterGroup pramGroup)
+        {
+#else
         private bool CreateSharedParameter(string paramName, ParameterType paramType, BuiltInParameterGroup pramGroup)
         {
+#endif
             var created = false;
             using (var trans = new Transaction(m_doc))
             {
@@ -594,12 +619,8 @@ namespace HOK.CeilingHeight
                         var definition = group.Definitions.get_Item(paramName);
                         if (definition == null)
                         {
-#if RELEASE2015
-                            definition = group.Definitions.Create(paramName, paramType);
-#else
                             var options = new ExternalDefinitionCreationOptions(paramName, paramType);
                             definition = group.Definitions.Create(options);
-#endif
                         }
 
                         var categorySet = m_app.Application.Create.NewCategorySet();

@@ -57,10 +57,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
             InitializeComponent();
 
-#if RELEASE2013
-            bttnSplit.Enabled = false;
-#endif
-            
             toolStripProgressBar.Visible = false;
 
             splitDataManager = new SplitINIDataManager(m_app);
@@ -109,7 +105,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     radioButtonLink.Checked = true;
                     break;
             }
-              
+
         }
 
         private void DisplayMassList(MassSource massSourceType)
@@ -120,7 +116,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 dataGridViewParameter.Columns.Clear();
                 foreach (var paramName in massParameters)
                 {
-                   
+
                     var colIndex = dataGridViewParameter.Columns.Add(paramName, paramName);
                     if (selectedParameters.ContainsKey(paramName))
                     {
@@ -202,7 +198,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                 dataGridViewParameter.Rows[index].Cells[param.Definition.Name].Value = param.AsInteger();
                                 break;
                         }
-                        
+
                     }
                 }
             }
@@ -339,13 +335,13 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         foreach (var mp in massList)
                         {
                             var elementList = new List<Element>();
-                            if (checkBoxFilter.Checked) 
+                            if (checkBoxFilter.Checked)
                             {
-                                elementList = mp.FilteredContainer; 
+                                elementList = mp.FilteredContainer;
                             }
-                            else 
+                            else
                             {
-                                elementList = mp.ElementContainer; 
+                                elementList = mp.ElementContainer;
                             }
 
                             foreach (var element in elementList)
@@ -374,11 +370,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                         if (!selectedParameters.ContainsKey(param.Definition.Name)) { continue; }
 
                                         var paramName = selectedParameters[param.Definition.Name];
-#if RELEASE2013||RELEASE2014
-                                        Parameter elemParam = element.get_Parameter(paramName);
-#else
                                         var elemParam = element.LookupParameter(paramName);
-#endif
 
                                         if (null != elemParam)
                                         {
@@ -386,13 +378,13 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                             {
                                                 existingParameters.Add(param.Definition.Name); //to determine the existence of parameters.
                                             }
-                                            
+
                                             switch (elemParam.StorageType)
                                             {
                                                 case StorageType.Integer:
                                                     try
                                                     {
-                                                        if (emptyOnly){ if (elemParam.AsInteger() != 0) { break; } } 
+                                                        if (emptyOnly) { if (elemParam.AsInteger() != 0) { break; } }
                                                         if (paramName == "Workset")
                                                         {
                                                             var worksetName = param.AsString();
@@ -414,12 +406,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                                     {
                                                     }
                                                     break;
-                                                 
+
                                                 case StorageType.Double:
-                                                    try 
+                                                    try
                                                     {
-                                                        if(emptyOnly){if (elemParam.AsDouble() != 0) { break; }}
-                                                        elemParam.Set(param.AsDouble()); 
+                                                        if (emptyOnly) { if (elemParam.AsDouble() != 0) { break; } }
+                                                        elemParam.Set(param.AsDouble());
                                                     }
                                                     catch { }
                                                     break;
@@ -456,7 +448,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             MessageBox.Show(strBuilder.ToString(), "Worksets Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
 
-                        if (selectedParameters.Count!=existingParameters.Count)
+                        if (selectedParameters.Count != existingParameters.Count)
                         {
                             var strBuilder = new StringBuilder();
                             strBuilder.AppendLine("The following selected parameters cannot be found in any of elements.");
@@ -464,7 +456,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             {
                                 if (!existingParameters.Contains(massParam))
                                 {
-                                    strBuilder.AppendLine("Parameter Name: "+selectedParameters[massParam]);//element Parameter name
+                                    strBuilder.AppendLine("Parameter Name: " + selectedParameters[massParam]);//element Parameter name
                                 }
                             }
                             MessageBox.Show(strBuilder.ToString(), "Parameters Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -491,10 +483,10 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                             var msgForm = new MessageBoxForm("Assigning Parameters", strBuilder.ToString() + failureMessage, LogFileManager.logFullName, true, true);
                             msgForm.ShowDialog();
-                            
+
                             //MessageBox.Show("Parameter values cannot be set on following elements:\n\n"+failureMessage.ToString(), "Failure Message : Assigning Parameters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
-                        else if(existingParameters.Count>0)
+                        else if (existingParameters.Count > 0)
                         {
                             if (unassignedElements.Count > 0)
                             {
@@ -513,7 +505,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                                 var msgForm = new MessageBoxForm("Unassigned Elements", strBuilder.ToString(), LogFileManager.logFullName, true, true);
                                 msgForm.ShowDialog();
-                               
+
                             }
                             else
                             {
@@ -550,11 +542,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         if (categoryNames.Contains(element.Category.Name)) { continue; }
                         foreach (var paramName in parameterNames)
                         {
-#if RELEASE2013||RELEASE2014
-                            Parameter param = element.get_Parameter(paramName);
-#else
                             var param = element.LookupParameter(paramName);
-#endif
 
                             if (null != param)
                             {
@@ -568,7 +556,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         categoryNames.Add(element.Category.Name);
                     }
                 }
-                
+
                 var elementParamFilters = new List<ElementFilter>();
                 foreach (var paramId in paramDictionary.Keys)
                 {
@@ -588,7 +576,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             elementParamFilters.Add(filter);
                             break;
                         case StorageType.String:
+#if RELEASE2022
+                            var stringRule = new FilterStringRule(provider, new FilterStringEquals(), "");
+#else
                             var stringRule = new FilterStringRule(provider, new FilterStringEquals(), "", false);
+#endif
                             filter = new ElementParameterFilter(stringRule);
                             elementParamFilters.Add(filter);
                             break;
@@ -604,7 +596,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                 var elementCollector = new FilteredElementCollector(m_doc, selectedElementIds);
                 filteredElements = elementCollector.WherePasses(orFilter).ToElements().ToList();
-                
+
             }
             catch (Exception ex)
             {
@@ -957,25 +949,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     {
                         var mp = dataGridViewMass.Rows[e.RowIndex].Tag as MassProperties;
                         var uidoc = m_app.ActiveUIDocument;
-#if RELEASE2013||RELEASE2014
-                        SelElementSet newSelection = SelElementSet.Create();
-
-                        List<Element> elementList = new List<Element>();
-                        if (checkBoxFilter.Checked) { elementList = mp.FilteredContainer; }
-                        else { elementList = mp.ElementContainer; }
-
-                        foreach (Element element in elementList)
-                        {
-#if RELEASE2013
-                            if (element.Document.Title != m_doc.Title) { continue; }
-#elif RELEASE2014
-                            if (element.Document.IsLinked) { continue; }
-#endif
-                            newSelection.Add(element);
-                        }
-                        uidoc.ShowElements(newSelection);
-                        uidoc.Selection.Elements = newSelection;
-#else
                         Selection selection = uidoc.Selection;
                         List<Element> elementList = new List<Element>();
                         if (checkBoxFilter.Checked) { elementList = mp.FilteredContainer; }
@@ -989,7 +962,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         }
                         uidoc.ShowElements(elementIds);
                         selection.SetElementIds(elementIds);
-#endif
                     }
                 }
             }
@@ -1034,7 +1006,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             try
             {
                 var filterForm = new Form_ElementFilter(m_doc, integratedMassList, elementCategories, parameterMaps);
-                if(DialogResult.OK==filterForm.ShowDialog())
+                if (DialogResult.OK == filterForm.ShowDialog())
                 {
                     integratedMassList = filterForm.IntegratedMassDictionary;
                     elementCategories = filterForm.ElementCategories;
@@ -1099,7 +1071,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             {
                 MessageBox.Show("Failed to open the help link.\n" + ex.Message, "Form_Assigner:linkHelp_LinkClicked", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            
+
         }
 
     }

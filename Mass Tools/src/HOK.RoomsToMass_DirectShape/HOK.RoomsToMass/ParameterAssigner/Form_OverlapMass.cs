@@ -22,9 +22,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private double determinant = 0;
         private UIApplication m_app;
         private bool splitOption = false;
-        private string[] categoryNames = new string[] { "Columns", "Conduits", "Ducts", "Floors", "Pipes","Roofs", "Structural Columns", "Structural Framing", "Walls" };
+        private string[] categoryNames = new string[] { "Columns", "Conduits", "Ducts", "Floors", "Pipes", "Roofs", "Structural Columns", "Structural Framing", "Walls" };
         private List<string> categoriesToSplit = new List<string>();
-        private Dictionary<int/*hostId*/, Dictionary<int/*elementId*/, int/*index*/>> hostMaps = new Dictionary<int, Dictionary<int,int>>();
+        private Dictionary<int/*hostId*/, Dictionary<int/*elementId*/, int/*index*/>> hostMaps = new Dictionary<int, Dictionary<int, int>>();
         private Dictionary<int/*elemntId*/, ElementProperties> unassignedElements = new Dictionary<int, ElementProperties>();
 
         public Dictionary<int, ElementProperties> IntersectingElements { get { return intersectingElements; } set { intersectingElements = value; } }
@@ -53,7 +53,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 labelDescription.Text = "Define a mass element that will propagate parameters to the intersecting element.";
                 splitContainer1.Panel1Collapsed = true;
             }
-            
+
             DisplayIntersectingMasses();
 
             textBoxRatio.Text = "0.7";
@@ -101,8 +101,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     {
                         colWidth += 120;
                     }
-                    
-                    this.Size = new Size(this.Size.Width+colWidth, this.Size.Height);
+
+                    this.Size = new Size(this.Size.Width + colWidth, this.Size.Height);
                 }
 
                 if (!splitOption)
@@ -186,11 +186,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     comboCell.DataSource = massNames;
                     if (ep.OpverappingMaps.Count > 0) { comboCell.Value = selectedName; }
                     else { comboCell.Value = massNames[0]; maxId = 0; }
-                    
+
                     dataGridViewElement.Rows[index].Cells["MassId"].Value = maxId;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
@@ -200,7 +200,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                determinant=determinantVal;
+                determinant = determinantVal;
                 textBoxRatio.Text = determinant.ToString();
                 foreach (DataGridViewRow row in dataGridViewElement.Rows)
                 {
@@ -226,7 +226,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
@@ -293,9 +293,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var sendingCB = sender as DataGridViewComboBoxEditingControl;
                 DataGridViewTextBoxCell cell = (DataGridViewTextBoxCell)dataGridViewElement.Rows[currentCell.Y].Cells["MassId"];
                 int selectedIndex = ((System.Windows.Forms.ComboBox)sender).SelectedIndex;
-                
+
                 int selectedMassId = 0;
-                if (null != dataGridViewElement.Rows[currentCell.Y].Tag && selectedIndex!=-1)
+                if (null != dataGridViewElement.Rows[currentCell.Y].Tag && selectedIndex != -1)
                 {
                     if (selectedIndex == 0) //mass name: <None>
                     {
@@ -338,23 +338,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 Document m_doc = uidoc.Document;
                 List<ElementId> elementIds = new List<ElementId>();
 
-#if RELEASE2013||RELEASE2014
-                SelElementSet newSelection = SelElementSet.Create();
-
-                foreach (DataGridViewRow row in dataGridViewElement.SelectedRows)
-                {
-                    if (null != row.Tag)
-                    {
-                        ElementProperties ep = row.Tag as ElementProperties;
-                        ElementId elementId = new ElementId(ep.ElementId);
-                        elementIds.Add(elementId);
-                        newSelection.Add(ep.ElementObj);
-                    }
-                }
-                uidoc.ShowElements(elementIds);
-                uidoc.Selection.Elements = newSelection;
-
-#else
                 Selection selection = uidoc.Selection;
 
                 foreach (DataGridViewRow row in dataGridViewElement.SelectedRows)
@@ -368,7 +351,6 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 }
                 uidoc.ShowElements(elementIds);
                 selection.SetElementIds(elementIds);
-#endif
             }
             catch (Exception ex)
             {

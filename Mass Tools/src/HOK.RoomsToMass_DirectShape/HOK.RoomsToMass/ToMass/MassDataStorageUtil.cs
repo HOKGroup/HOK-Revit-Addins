@@ -328,7 +328,11 @@ namespace HOK.RoomsToMass.ToMass
                         paramInfo = new ParameterInfo();
                         paramInfo.ParameterName = "Comments";
                         paramInfo.ParamStorageType = StorageType.String;
+#if RELEASE2022
+                        paramInfo.ParamType = SpecTypeId.String.Text;
+#else
                         paramInfo.ParamType = ParameterType.Text;
+#endif
                         return paramInfo;
                     }
 
@@ -338,7 +342,11 @@ namespace HOK.RoomsToMass.ToMass
                         paramInfo = new ParameterInfo();
                         paramInfo.ParameterName = "Mark";
                         paramInfo.ParamStorageType = StorageType.String;
+#if RELEASE2022
+                        paramInfo.ParamType = SpecTypeId.String.Text;
+#else
                         paramInfo.ParamType = ParameterType.Text;
+#endif
                         return paramInfo;
                     }
 
@@ -356,7 +364,11 @@ namespace HOK.RoomsToMass.ToMass
                                 {
                                     paramInfo = new ParameterInfo();
                                     paramInfo.ParameterName = paramDefinition.Name;
+#if RELEASE2022
+                                    paramInfo.ParamType = paramDefinition.GetDataType();
+#else
                                     paramInfo.ParamType = paramDefinition.ParameterType;
+#endif
                                     return paramInfo;
                                 }
                             }

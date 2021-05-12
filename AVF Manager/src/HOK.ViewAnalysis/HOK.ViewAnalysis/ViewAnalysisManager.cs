@@ -27,7 +27,7 @@ namespace HOK.ViewAnalysis
         private int resultIndex = -1;
         private bool includeLinkedModel = false;
         private bool overwriteData = false;
-       
+
         private ElementId occupiedParamId = ElementId.InvalidElementId;
         private Dictionary<int/*roomId*/, RoomData> roomDictionary = new Dictionary<int, RoomData>();
         private List<ElementFilter> categoryFilters = new List<ElementFilter>();
@@ -51,7 +51,7 @@ namespace HOK.ViewAnalysis
                 analysisSettings = settings;
                 overwriteData = analysisSettings.OverwriteData;
                 dataCollection = analysisDataCollection;
-                epsilon = m_app.Application.ShortCurveTolerance ;
+                epsilon = m_app.Application.ShortCurveTolerance;
 
                 categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_Walls)); //intercepting elements.
                 categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_Windows)); //passing elements
@@ -59,7 +59,7 @@ namespace HOK.ViewAnalysis
                 categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_Doors)); //passing elements
                 categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_StructuralColumns)); //intercepting elements
                 if (includeLinkedModel) { categoryFilters.Add(new ElementCategoryFilter(BuiltInCategory.OST_RvtLinks)); } //find elements in link
-                
+
                 m_view = FindDefault3DView();
                 linkedInstances = GetLinkedInstancesInfo();
 
@@ -86,11 +86,11 @@ namespace HOK.ViewAnalysis
                     MessageBox.Show("Please select exterior walls and set LEED_IsExteriorWall parameter true.\n", "Exterior Walls Not Defined", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
 
-                
+
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to run View Analysis.\n"+ex.Message, "View Analysis Manager", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to run View Analysis.\n" + ex.Message, "View Analysis Manager", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -116,9 +116,9 @@ namespace HOK.ViewAnalysis
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to get the information of linked instances.\n"+ex.Message, "Find Linked Instances", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to get the information of linked instances.\n" + ex.Message, "Find Linked Instances", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-            
+
             return linkedInstances;
         }
 
@@ -129,7 +129,7 @@ namespace HOK.ViewAnalysis
             {
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
                 List<View3D> views = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
-#if RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#if RELEASE2018
                 var linq = from view in views where view.IsTemplate == false && view.ViewName == "{3D}" select view;
 #else
                 var linq = from view in views where view.IsTemplate == false && view.Name == "{3D}" select view;
@@ -225,7 +225,7 @@ namespace HOK.ViewAnalysis
                             roomData.RoomFace = roomData.GetRoomFace();
                             roomData.BoundarySegments = roomData.CollectSegmentData(exteriorElementIds, includeLinkedModel);
                         }
-                       
+
                         if (!dictionary.ContainsKey(roomData.RoomId))
                         {
                             dictionary.Add(roomData.RoomId, roomData);
@@ -249,7 +249,7 @@ namespace HOK.ViewAnalysis
                 try
                 {
                     UpdateLableDelegate updateLabelDelegate = new UpdateLableDelegate(statusLable.SetValue);
-                    
+
                     List<int> keys = roomDictionary.Keys.ToList();
                     int finishedRoom = 0;
                     foreach (int roomId in keys)
@@ -262,7 +262,7 @@ namespace HOK.ViewAnalysis
                             try
                             {
                                 RoomData rData = roomDictionary[roomId];
-                                string roomInfo = rData.RoomObj.Name+" ("+finishedRoom+" of "+keys.Count+")";
+                                string roomInfo = rData.RoomObj.Name + " (" + finishedRoom + " of " + keys.Count + ")";
                                 Dispatcher.CurrentDispatcher.Invoke(updateLabelDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { TextBlock.TextProperty, roomInfo });
                                 progressBar.Visibility = System.Windows.Visibility.Visible;
 
@@ -283,7 +283,7 @@ namespace HOK.ViewAnalysis
                                     roomDictionary.Remove(roomId);
                                     roomDictionary.Add(roomId, updatedData);
                                 }
-                                
+
                                 finishedRoom++;
                                 trans.Commit();
                             }
@@ -305,7 +305,7 @@ namespace HOK.ViewAnalysis
                     tg.RollBack();
                 }
             }
-            return result; 
+            return result;
         }
 
         private RoomData FindVisibilityByPointData(RoomData rd, AnalysisData aData, ProgressBar progressBar)
@@ -314,7 +314,7 @@ namespace HOK.ViewAnalysis
             try
             {
                 updatedData.RoomFace = FMEDataUtil.CreateFacebyFMEData(aData.RoomFace);
-                if(null!=updatedData.RoomFace)
+                if (null != updatedData.RoomFace)
                 {
                     updatedData.PointDataList = FMEDataUtil.ConvertToPointDataList(updatedData.RoomFace, aData.PointValues);
 
@@ -350,7 +350,7 @@ namespace HOK.ViewAnalysis
                     //visualize
                     Transform transform = Transform.CreateTranslation(new XYZ(0, 0, offsetHeight));
                     int index = m_sfm.AddSpatialFieldPrimitive(updatedData.RoomFace, transform);
-                
+
                     FieldDomainPointsByUV domainPoints = new FieldDomainPointsByUV(uvPoints);
                     FieldValues values = new FieldValues(valList);
 
@@ -376,7 +376,7 @@ namespace HOK.ViewAnalysis
 
                 Face face = rd.RoomFace;
                 BoundingBoxUV bb = face.GetBoundingBox();
-                
+
                 IList<UV> uvPoints = new List<UV>();
                 IList<ValueAtPoint> valList = new List<ValueAtPoint>();
 
@@ -399,9 +399,9 @@ namespace HOK.ViewAnalysis
 
                 int visibleCount = 0;
                 double progressValue = 0;
-                foreach(double u in uList) //start from in the middle of grid
+                foreach (double u in uList) //start from in the middle of grid
                 {
-                    foreach(double v in vList)
+                    foreach (double v in vList)
                     {
                         if (AbortFlag.GetAbortFlag()) { return updatedData; }
                         Dispatcher.CurrentDispatcher.Invoke(updateProgressDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, progressValue });
@@ -432,7 +432,7 @@ namespace HOK.ViewAnalysis
                                 else { pointValue = 0; }
 
                             }
-                            
+
                             PointData pData = new PointData(uvPoint, xyzPoint, pointValue);
                             pointDataList.Add(pData);
 
@@ -479,7 +479,7 @@ namespace HOK.ViewAnalysis
                 {
                     uList.Add(bb.Max.U - offset);
                 }
-                
+
                 for (double v = bb.Min.V + offset; v < bb.Max.V; v += interval)
                 {
                     vList.Add(v);
@@ -488,7 +488,7 @@ namespace HOK.ViewAnalysis
                 {
                     vList.Add(bb.Max.V - offset);
                 }
-              
+
             }
             catch (Exception ex)
             {
@@ -513,7 +513,7 @@ namespace HOK.ViewAnalysis
                         exteriorPoints.AddRange(sData.ViewPoints); //check exterior walls first
                     }
                 }
-             
+
                 if (interiorSegments.Count() > 0)
                 {
                     foreach (SegmentData sData in interiorSegments)
@@ -530,7 +530,7 @@ namespace HOK.ViewAnalysis
             }
             return sorted;
         }
-        
+
         private bool CheckVisibilityByMaterial(ReferenceIntersector intersector, XYZ pointOrigin, List<XYZ> viewPoints)
         {
             bool visible = false;
@@ -543,7 +543,7 @@ namespace HOK.ViewAnalysis
 
                     if (null != contexts)
                     {
-                        var filteredContexts = from context in contexts where context.Proximity > epsilon  select context;
+                        var filteredContexts = from context in contexts where context.Proximity > epsilon select context;
                         filteredContexts = filteredContexts.OrderBy(x => x.Proximity).ToList();
 
                         if (filteredContexts.Count() > 0)
@@ -553,7 +553,7 @@ namespace HOK.ViewAnalysis
                             {
                                 Reference reference = context.GetReference();
                                 Element element = null;
-                                
+
                                 if (reference.LinkedElementId != ElementId.InvalidElementId)
                                 {
                                     //element from linked models
@@ -597,13 +597,13 @@ namespace HOK.ViewAnalysis
                                             //family instance of wall 
                                             visible = false; break;
                                         }
-                                       
+
                                     }
                                     else if (categoryId == (int)BuiltInCategory.OST_StructuralColumns)
                                     {
                                         visible = false; break;
                                     }
-                                    else if (categoryId == (int)BuiltInCategory.OST_Windows || categoryId == (int)BuiltInCategory.OST_Doors || categoryId ==(int)BuiltInCategory.OST_CurtainWallPanels)
+                                    else if (categoryId == (int)BuiltInCategory.OST_Windows || categoryId == (int)BuiltInCategory.OST_Doors || categoryId == (int)BuiltInCategory.OST_CurtainWallPanels)
                                     {
                                         if (reference.LinkedElementId == ElementId.InvalidElementId)
                                         {
@@ -624,11 +624,11 @@ namespace HOK.ViewAnalysis
                                                 }
                                             }
                                         }
-                                        else if(categoryId ==(int)BuiltInCategory.OST_Doors)
+                                        else if (categoryId == (int)BuiltInCategory.OST_Doors)
                                         {
                                             visible = false; break;
                                         }
-                                        
+
 
                                         FamilyInstance instance = element as FamilyInstance;
                                         if (null != instance)

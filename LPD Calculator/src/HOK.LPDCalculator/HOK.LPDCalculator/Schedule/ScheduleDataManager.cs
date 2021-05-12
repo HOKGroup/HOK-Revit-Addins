@@ -41,7 +41,7 @@ namespace HOK.LPDCalculator.Schedule
 
         private ViewSchedule FindViewSchedule(CalculationTypes calType)
         {
-            ViewSchedule viewSchedule=null;
+            ViewSchedule viewSchedule = null;
             try
             {
                 var viewName = "";
@@ -58,8 +58,8 @@ namespace HOK.LPDCalculator.Schedule
                 var collector = new FilteredElementCollector(m_doc).OfClass(typeof(ViewSchedule));
                 foreach (var element in collector)
                 {
-                    var vs = (ViewSchedule) element;
-#if RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+                    var vs = (ViewSchedule)element;
+#if RELEASE2018
                     if (vs.ViewName != viewName) continue;
 #else
                     if (vs.Name != viewName) continue;
@@ -162,11 +162,7 @@ namespace HOK.LPDCalculator.Schedule
                                     ColumnHeading = field.ColumnHeading,
                                     IsHidden = field.IsHidden
                                 };
-#if RELEASE2015 || RELEASE2016
-                                fp.HasTotals = field.HasTotals;
-#else
                                 fp.HasTotals = field.DisplayType == ScheduleFieldDisplayType.Totals;
-#endif
                                 fieldDictionary.Add(fieldName, fp);
                             }
 
@@ -176,11 +172,7 @@ namespace HOK.LPDCalculator.Schedule
                             {
                                 continue;
                             }
-#if RELEASE2015 || RELEASE2016
-                            if (field.CanTotal()) { field.HasTotals = true; }
-#else
                             if (field.CanTotal()) { field.DisplayType = ScheduleFieldDisplayType.Totals; }
-#endif
                             field.IsHidden = false;
                         }
                     }
@@ -212,16 +204,12 @@ namespace HOK.LPDCalculator.Schedule
                         if (fieldDictionary.ContainsKey(fieldName))
                         {
                             var originalField = fieldDictionary[fieldName];
-#if RELEASE2015 || RELEASE2016
-                            if (field.CanTotal()) { field.HasTotals = originalField.HasTotals; }
-#else
                             if (field.CanTotal())
                             {
-                                field.DisplayType = originalField.HasTotals 
-                                    ? ScheduleFieldDisplayType.Totals 
+                                field.DisplayType = originalField.HasTotals
+                                    ? ScheduleFieldDisplayType.Totals
                                     : ScheduleFieldDisplayType.Standard;
                             }
-#endif
                             field.IsHidden = originalField.IsHidden;
                         }
                     }
@@ -405,8 +393,8 @@ namespace HOK.LPDCalculator.Schedule
 
     public class FieldProperties
     {
-        public string ColumnHeading{get;set;}
-        public bool IsHidden{get;set;}
+        public string ColumnHeading { get; set; }
+        public bool IsHidden { get; set; }
         public bool HasTotals { get; set; }
     }
 }

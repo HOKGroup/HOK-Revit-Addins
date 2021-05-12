@@ -304,11 +304,7 @@ Public Class form_SheetManager
 
                         ' Iterate the columns in the datarow
                         For Each dc As DataColumn In m_DataTable.Columns
-#If RELEASE2013 Or RELEASE2014 Then
-                            Dim m_pSht As Parameter = m_SheetItem.Parameter(dc.ColumnName)
-#Else
                             Dim m_pSht As Parameter = m_SheetItem.LookupParameter(dc.ColumnName)
-#End If
                             If m_pSht IsNot Nothing Then
 
                                 Dim m_para As New clsPara(m_pSht)
@@ -372,11 +368,7 @@ Public Class form_SheetManager
 
 
                             If isPlaceholderSheet = False And m_TblkItem IsNot Nothing Then
-#If RELEASE2013 Or RELEASE2014 Then
-                            Dim m_pTblk As Parameter = m_TblkItem.Parameter(dc.ColumnName)
-#Else
                                 Dim m_pTblk As Parameter = m_TblkItem.LookupParameter(dc.ColumnName)
-#End If
 
                                 If m_pTblk IsNot Nothing Then
 
@@ -694,26 +686,6 @@ Public Class form_SheetManager
                         If parameterViewSheetInfo.AsString.ToUpper = "NOT IN A SHEET" Then
                             Dim boundingBox As BoundingBoxXYZ = m_View.BoundingBox(m_View)
 
-#If RELEASE2013 Then
-                    pointInsert = New XYZ(offsetU - m_View.Outline.Min.U, offsetV - m_View.Outline.Min.V, 0)
-
-                    If Viewport.CanAddViewToSheet(m_Settings.Document, m_ViewSheet.Id, m_View.Id) Then
-                        Dim createdViewport As Viewport = Viewport.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
-
-                        placed = True
-                        placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
-                    ElseIf TypeOf m_View Is ViewSchedule Then
-                        pointInsert = XYZ.Zero
-                        Dim createdScheduleInstance As ScheduleSheetInstance = ScheduleSheetInstance.Create(m_Settings.Document, m_ViewSheet.Id, m_View.Id, pointInsert)
-                        Dim centerPoint As XYZ = createdScheduleInstance.Point
-                        Dim bbBox As BoundingBoxXYZ = createdScheduleInstance.BoundingBox(m_ViewSheet)
-                        Dim diffToMove As XYZ = New XYZ(offsetU - bbBox.Min.X, offsetV - bbBox.Min.Y, 0)
-                        ElementTransformUtils.MoveElement(m_Settings.Document, createdScheduleInstance.Id, diffToMove)
-
-                        placed = True
-                        placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
-                    End If
-#Else
                             pointInsert = XYZ.Zero
 
                             If Viewport.CanAddViewToSheet(m_Settings.Document, m_ViewSheet.Id, m_View.Id) Then
@@ -736,7 +708,6 @@ Public Class form_SheetManager
                                 placedViews.AppendLine(m_ViewSheet.SheetNumber & " : " & m_View.Name)
 
                             End If
-#End If
                         Else
                             upPlacedViews.AppendLine(parameterViewSheetInfo.AsString() & " : " & m_View.Name)
                         End If
@@ -1156,11 +1127,7 @@ Public Class form_SheetManager
         'Determine parameter list from matching parameters and fields
         For Each dataColumn As DataColumn In m_DataTable.Columns
 
-#If RELEASE2013 Or RELEASE2014 Then
-            m_ParamTblk = m_ViewSheet.Parameter(dataColumn.ColumnName)
-#Else
             m_ParamTblk = m_ViewSheet.LookupParameter(dataColumn.ColumnName)
-#End If
 
             If m_ParamTblk IsNot Nothing Then
                 m_ParameterList.Add(dataColumn.ColumnName)
@@ -1171,11 +1138,7 @@ Public Class form_SheetManager
         For Each sheetNumber As String In m_Settings.Sheets.Keys
             m_ViewSheet = m_Settings.Sheets(sheetNumber)
 
-#If RELEASE2013 Or RELEASE2014 Then
-            m_ParamTblk = m_ViewSheet.Parameter("Sheet Number")
-#Else
             m_ParamTblk = m_ViewSheet.LookupParameter("Sheet Number")
-#End If
 
             dataRowArray = m_DataTable.[Select]("[Sheet Number] = '" + m_ParamTblk.AsString() & "'")
             If dataRowArray.Length > 1 Then
@@ -1189,11 +1152,7 @@ Public Class form_SheetManager
                 dataRow = m_DataTable.NewRow()
                 For Each parameterName As String In m_ParameterList
 
-#If RELEASE2013 Or RELEASE2014 Then
-                    m_ParamTblk = m_ViewSheet.Parameter(parameterName)
-#Else
                     m_ParamTblk = m_ViewSheet.LookupParameter(parameterName)
-#End If
 
                     Dim m_Para As New clsPara(m_ParamTblk)
                     If m_ParamTblk Is Nothing Then
@@ -1207,11 +1166,7 @@ Public Class form_SheetManager
                 dataRow = dataRowArray(0)
                 For Each parameterName As String In m_ParameterList
 
-#If RELEASE2013 Or RELEASE2014 Then
-                    m_ParamTblk = m_ViewSheet.Parameter(parameterName)
-#Else
                     m_ParamTblk = m_ViewSheet.LookupParameter(parameterName)
-#End If
 
                     Dim m_Para As New clsPara(m_ParamTblk)
                     If m_ParamTblk Is Nothing Then
@@ -1428,11 +1383,7 @@ UpdateExistingElement:
                         If m_SheetView IsNot Nothing Then
 
                             ' Does the param exist in here?
-#If RELEASE2013 Or RELEASE2014 Then
-                Dim m_P As Parameter = m_SheetView.Parameter(x)
-#Else
                             Dim m_P As Parameter = m_SheetView.LookupParameter(x)
-#End If
 
                             If m_P IsNot Nothing Then
 
@@ -1507,11 +1458,7 @@ UpdateExistingElement:
                                     For Each y As Element In m_ListTBs
 
                                         ' Itentify the element by Sheet Number
-#If RELEASE2013 Or RELEASE2014 Then
-                            Dim m_SheetNumberP As Parameter = y.Parameter("Sheet Number")
-#Else
                                         Dim m_SheetNumberP As Parameter = y.LookupParameter("Sheet Number")
-#End If
 
                                         If m_SheetNumberP IsNot Nothing Then
 
@@ -1537,11 +1484,7 @@ UpdateExistingElement:
                             If m_SheetTitleblock IsNot Nothing Then
 
                                 ' Does the param exist in here?
-#If RELEASE2013 Or RELEASE2014 Then
-                    Dim m_P As Parameter = m_SheetTitleblock.Parameter(x)
-#Else
                                 Dim m_P As Parameter = m_SheetTitleblock.LookupParameter(x)
-#End If
 
                                 If m_P IsNot Nothing Then
 

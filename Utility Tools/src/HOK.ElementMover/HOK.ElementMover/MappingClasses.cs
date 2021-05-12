@@ -83,7 +83,7 @@ namespace HOK.ElementMover
                 var collector = new FilteredElementCollector(LinkedDocument);
                 var elements = collector.WhereElementIsNotElementType().ToElements().ToList();
                 var elementCategories = from element in elements where null != element.Category select element.Category;
-                var modelCategories = from category in elementCategories where  category.HasMaterialQuantities && category.CategoryType == CategoryType.Model select category;
+                var modelCategories = from category in elementCategories where category.HasMaterialQuantities && category.CategoryType == CategoryType.Model select category;
 
                 var categoryNames = from category in modelCategories select category.Name;
                 var categoryNameList = categoryNames.Distinct().ToList();
@@ -92,7 +92,7 @@ namespace HOK.ElementMover
                 foreach (var catName in categoryNameList)
                 {
                     if (!categoryObjects.Contains(catName)) { continue; }
-                   
+
                     var category = categoryObjects.get_Item(catName);
                     if (null != category)
                     {
@@ -126,7 +126,7 @@ namespace HOK.ElementMover
                         {
                             var catProperties = new CategoryProperties(category);
                             var categoryFound = from mepCurve in mepCurves where mepCurve.Category.Id == category.Id select mepCurve;
-                            var itemCount= categoryFound.Count();
+                            var itemCount = categoryFound.Count();
                             if (itemCount > 0)
                             {
                                 catProperties.ItemCount = itemCount;
@@ -343,7 +343,7 @@ namespace HOK.ElementMover
                 }
             }
             ToolTipText = (linkType == LinkType.ByCopy) ? "Created by Duplication" : "Defined by Users";
-            
+
         }
 
         public static bool CompareLocation(Element sourceElement, Element linkedElement, Transform transform)
@@ -384,7 +384,7 @@ namespace HOK.ElementMover
                         identical = true;
                     }
                 }
-                else if(null == sourceElement.Location && null== linkedElement.Location)
+                else if (null == sourceElement.Location && null == linkedElement.Location)
                 {
                     identical = true;
                 }
@@ -472,15 +472,7 @@ namespace HOK.ElementMover
         {
             Id = elementType.Id;
             Name = elementType.Name;
-#if RELEASE2014
-            Parameter param = elementType.get_Parameter(BuiltInParameter.ALL_MODEL_FAMILY_NAME);
-            if (null != param)
-            {
-                FamilyName = param.AsString();
-            }
-#else
             FamilyName = elementType.FamilyName;
-#endif
             if (null != elementType.Category)
             {
                 CategoryName = elementType.Category.Name;

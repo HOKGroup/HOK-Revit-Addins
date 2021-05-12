@@ -35,6 +35,15 @@ namespace HOK.CeilingHeight
             {
                 var uidoc = m_app.ActiveUIDocument;
                 var room = new FilteredElementCollector(m_doc).OfCategory(BuiltInCategory.OST_Rooms).FirstElement() as Room;
+#if RELEASE2022
+                var parameterRequirements = new Dictionary<string, ForgeTypeId>
+                {
+                    {"Ceiling Height", SpecTypeId.Length},
+                    {"Secondary Ceiling Heights", SpecTypeId.String.Text},
+                    {"Ceiling Plan", SpecTypeId.String.Text},
+                    {"Ceiling Type", SpecTypeId.String.Text}
+                };
+#else
                 var parameterRequirements = new Dictionary<string, ParameterType>
                 {
                     {"Ceiling Height", ParameterType.Length},
@@ -42,7 +51,7 @@ namespace HOK.CeilingHeight
                     {"Ceiling Plan", ParameterType.Text},
                     {"Ceiling Type", ParameterType.Text}
                 };
-
+#endif
                 var notFoundParams = new StringBuilder();
                 foreach (var paramName in parameterRequirements.Keys)
                 {
@@ -127,12 +136,21 @@ namespace HOK.CeilingHeight
             return Result.Succeeded;
         }
 
+#if RELEASE2022
+        private static bool FindParameter(Room room, string paramName, ForgeTypeId paramType)
+        {
+#else
         private static bool FindParameter(Room room, string paramName, ParameterType paramType)
         {
+#endif
             try
             {
                 var param = room.LookupParameter(paramName);
+#if RELEASE2022
+                return param?.Definition.GetDataType() == paramType;
+#else
                 return param?.Definition.ParameterType == paramType;
+#endif
             }
             catch (Exception ex)
             {

@@ -124,7 +124,11 @@ namespace HOK.RoomsToMass.ToMass
                             ParameterInfo commentsParamInfo = new ParameterInfo();
                             commentsParamInfo.ParameterName = "Comments";
                             commentsParamInfo.ParamStorageType = StorageType.String;
+#if RELEASE2022
+                            commentsParamInfo.ParamType = SpecTypeId.String.Text;
+#else
                             commentsParamInfo.ParamType = ParameterType.Text;
+#endif
                             massParameters.Add(commentsParamInfo);
                         }
 
@@ -134,7 +138,11 @@ namespace HOK.RoomsToMass.ToMass
                             ParameterInfo markParamInfo = new ParameterInfo();
                             markParamInfo.ParameterName = "Mark";
                             markParamInfo.ParamStorageType = StorageType.String;
+#if RELEASE2022
+                            markParamInfo.ParamType = SpecTypeId.String.Text;
+#else
                             markParamInfo.ParamType = ParameterType.Text;
+#endif
                             massParameters.Add(markParamInfo);
                         }
 
@@ -152,7 +160,11 @@ namespace HOK.RoomsToMass.ToMass
                                     if (paramDefinition.Name.Contains("Extensions.")) { continue; }
                                     ParameterInfo paramInfo = new ParameterInfo();
                                     paramInfo.ParameterName = paramDefinition.Name;
+#if RELEASE2022
+                                    paramInfo.ParamType = paramDefinition.GetDataType();
+#else
                                     paramInfo.ParamType = paramDefinition.ParameterType;
+#endif
                                     massParameters.Add(paramInfo);
                                 }
                             }
@@ -353,12 +365,20 @@ namespace HOK.RoomsToMass.ToMass
     public class ParameterInfo
     {
         private string parameterName = "";
+#if RELEASE2022
+        private ForgeTypeId paramType = null;
+#else
         private ParameterType paramType = ParameterType.Invalid;
+#endif
         private StorageType paramStorageType = StorageType.None;
         private bool enabled = true;
 
         public string ParameterName { get { return parameterName; } set { parameterName = value; } }
+#if RELEASE2022
+        public ForgeTypeId ParamType { get { return paramType; } set { paramType = value; } }
+#else
         public ParameterType ParamType { get { return paramType; } set { paramType = value; } }
+#endif
         public StorageType ParamStorageType { get { return paramStorageType; } set { paramStorageType = value; } }
         public bool Enabled { get { return enabled; } set { enabled = value; } }
 
@@ -370,7 +390,11 @@ namespace HOK.RoomsToMass.ToMass
         public ParameterInfo(Parameter param)
         {
             parameterName = param.Definition.Name;
+#if RELEASE2022
+            paramType = param.Definition.GetDataType();
+#else
             paramType = param.Definition.ParameterType;
+#endif
             paramStorageType = param.StorageType;
         }
     }

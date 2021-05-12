@@ -57,7 +57,7 @@ namespace HOK.RoomsToMass.ToMass
         public bool ModifiedHost { get { return modifiedHost; } set { modifiedHost = value; } }
         public bool IsSelected { get { return isSelected; } set { isSelected = value; } }
         public string ToolTip { get { return tooltip; } set { tooltip = value; } }
-            
+
 
         public AreaProperties(Area area)
         {
@@ -123,7 +123,7 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
         public void GetAreaProfile()
@@ -141,11 +141,7 @@ namespace HOK.RoomsToMass.ToMass
                     List<Curve> curveList = new List<Curve>();
                     foreach (BoundarySegment segment in boundaryList)
                     {
-#if RELEASE2015
-                        curveList.Add(segment.Curve);
-#else
                         curveList.Add(segment.GetCurve());
-#endif
                     }
                     CurveLoop curveLoop = CurveLoop.Create(curveList);
                     if (!curveLoop.IsOpen())
@@ -207,7 +203,7 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
     }
