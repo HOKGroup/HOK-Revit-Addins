@@ -208,7 +208,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     }
                     CurveLoop curveLoop = CurveLoop.Create(curves);
                     loopProfile.Add(curveLoop);
-                    var primaryFloor = Floor.Create(primaryDoc, loopProfile, floortype, level);
+                    var primaryFloor = Floor.Create(primaryDoc, loopProfile, floortype.Id, level.Id);
 #else
                     var primaryFloor = primaryDoc.Create.NewFloor(profile, floortype, level, structural);
 #endif
