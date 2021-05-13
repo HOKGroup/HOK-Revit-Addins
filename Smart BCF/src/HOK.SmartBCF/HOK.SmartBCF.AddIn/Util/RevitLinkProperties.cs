@@ -1,11 +1,13 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.IFC;
-using Revit.IFC.Export.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if RELEASE2022 
+using Revit.IFC.Export.Utility;
+#endif
 
 namespace HOK.SmartBCF.AddIn.Util
 {
@@ -77,7 +79,7 @@ namespace HOK.SmartBCF.AddIn.Util
                     ifcProjectGuid = ExporterIFCUtils.CreateProjectLevelGUID(linkedDocument, IFCProjectLevelGUIDType.Project);
 #endif
                 }
-                
+
             }
             catch (Exception ex)
             {
