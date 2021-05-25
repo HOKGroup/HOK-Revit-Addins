@@ -30,7 +30,7 @@ pool:
   vmImage: 'vs2017-win2016'
 
 variables:
-  solution: '**/HOK*.sln'
+  solution: '**/HOK*.sln !**/HOK.ParameterTools.sln'
   coreSolution: '**/HOK.Core.sln'
   MCsolution: '**/HOK.MissionControl.sln'
   feedbackSolution: '**/HOK.Feedback.sln'
