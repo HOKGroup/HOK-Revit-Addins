@@ -27,7 +27,7 @@ strategy:
       buildConfiguration: '2018'
 
 pool:
-  vmImage: 'vs2017-win2016'
+  vmImage: 'windows-latest'
 
 variables:
   solution: '**/HOK.*.sln'
@@ -150,7 +150,7 @@ steps:
     solution: '$(paramToolsSolution)'
     platform: 'Any CPU'
     configuration: '$(buildConfiguration)'
-    msbuildArguments: '-t:restore -MSBuildVersion 16.7.0'
+    msbuildArguments: '-t:restore'
 
 - task: VSBuild@1
   inputs:
