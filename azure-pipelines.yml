@@ -148,7 +148,7 @@ steps:
 - task: MSBuild@1
   inputs:
     solution: '$(paramToolsSolution)'
-    platform: 'Any CPU'
+    platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     msbuildArguments: '-t:restore'
 
