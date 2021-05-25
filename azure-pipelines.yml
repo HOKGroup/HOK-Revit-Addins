@@ -30,9 +30,11 @@ pool:
   vmImage: 'vs2017-win2016'
 
 variables:
-  solution: '**/HOK.!(ParameterTools).sln'
+  solution: '**/HOK.*.sln'
+  nugetSolutions: '**/HOK.!(ParameterTools).sln'
   coreSolution: '**/HOK.Core.sln'
   MCsolution: '**/HOK.MissionControl.sln'
+  paramToolsSolutions: '**/HOK.ParameterTools.sln'
   feedbackSolution: '**/HOK.Feedback.sln'
   buildPlatform: 'x64'
   BUILD_ENV: 'AzureDevOps'
@@ -109,7 +111,7 @@ steps:
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
-    restoreSolution: '$(solution)'
+    restoreSolution: '$(nugetSolutions)'
     feedsToUse: 'select'
     noCache: true
 
@@ -142,6 +144,13 @@ steps:
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
+
+- task: MSBuild@1
+  inputs:
+    solution: '$(paramToolsSolution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArguments: '-t:restore'
 
 - task: VSBuild@1
   inputs:
