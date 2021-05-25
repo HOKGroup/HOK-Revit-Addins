@@ -34,7 +34,7 @@ variables:
   nugetSolutions: '**/HOK.!(ParameterTools).sln'
   coreSolution: '**/HOK.Core.sln'
   MCsolution: '**/HOK.MissionControl.sln'
-  paramToolsSolutions: '**/HOK.ParameterTools.sln'
+  paramToolsSolution: '**/HOK.ParameterTools.sln'
   feedbackSolution: '**/HOK.Feedback.sln'
   buildPlatform: 'x64'
   BUILD_ENV: 'AzureDevOps'
