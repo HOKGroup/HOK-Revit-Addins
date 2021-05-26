@@ -44,15 +44,6 @@ Public Class form_ElemAttachmentManager
 
         Dim docUI As UIDocument = mSettings.UIdoc
 
-#If RELEASE2013 Or RELEASE2014 Then
-        'In case anything was already slected by accident
-        'Process for each selection.
-        For Each listItem As String In listBoxDwg.SelectedItems
-            elementId = New ElementId(CInt(Convert.ToInt64(listItem.Substring(0, listItem.IndexOf(" ")))))
-            '' ''elementId.Value = CInt(Convert.ToInt64(listItem.Substring(0, listItem.IndexOf(" "))))
-            docUI.Selection.Elements.Add(mSettings.Document.GetElement(elementId))
-        Next
-#Else
         Dim elementIds As New List(Of ElementId)
 
         For Each listItem As String In listBoxDwg.SelectedItems
@@ -61,7 +52,6 @@ Public Class form_ElemAttachmentManager
             elementIds.Add(elementId)
         Next
         docUI.Selection.SetElementIds(elementIds)
-#End If
 
     End Sub
 
