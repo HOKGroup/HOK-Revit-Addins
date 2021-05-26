@@ -11,6 +11,8 @@ namespace HOK.Core.Utilities
         public string ClarityMachine { get; set; }
         public string[] ClarityServers { get; set; }
         public string ModelReportingServiceEndpoint { get; set; }
+        public string CitrixDesktopConnectorKey { get; set; }
+        public string CitrixDesktopConnectorValue { get; set; }
         public string FileOnOpeningFmeUserId { get; set; }
         public string FileOnOpeningFmePassword { get; set; }
         public string FileOnOpeningFmeApiToken { get; set; }
