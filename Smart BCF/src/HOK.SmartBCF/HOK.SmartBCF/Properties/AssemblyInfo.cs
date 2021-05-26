@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.SmartBCF")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2016")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2016.0.1.5")]
-[assembly: AssemblyFileVersion("2016.0.1.5")]
+[assembly: AssemblyVersion("2022.1.0.16")]
+[assembly: AssemblyFileVersion("2022.1.0.16")]

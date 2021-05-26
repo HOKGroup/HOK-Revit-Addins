@@ -14,7 +14,7 @@ namespace HOK.BetaToolsManager
 {
     public class AddinInstallerModel
     {
-#if Release15 || Release16 || Release17 || Release18 || Release19 || Release20
+#if Release18 || Release19 || Release20 || Release21 || Release22
         public string BetaDirectory { get; set; } = @"\\group\sysvol\group.hok.com\HOK\Tools\Revit\";
 #else
         public string BetaDirectory { get; set; } = @"C:\Users\" + Environment.UserName + @"\Desktop\BetaFiles Testing\";
@@ -34,7 +34,7 @@ namespace HOK.BetaToolsManager
                                + @"\Autodesk\Revit\Addins\"
                                + VersionNumber + @"\"; // user roaming location
             TempDirectory = InstallDirectory + @"Temp\";
-            
+
             LoadAddinsOnStartup();
         }
 
@@ -228,7 +228,7 @@ namespace HOK.BetaToolsManager
                 {
                     var dllRelativePath = ParseXml(file); // relative to temp
                     var dllPath = TempDirectory + dllRelativePath;
-                    if(!File.Exists(dllPath)) continue;
+                    if (!File.Exists(dllPath)) continue;
 
                     // (Konrad) Using LoadFrom() instead of LoadFile() because
                     // LoadFile() doesn't load dependent assemblies causing exception later.
@@ -247,17 +247,17 @@ namespace HOK.BetaToolsManager
                                                         x.GetInterface("IExternalApplication") != null)))
                     {
                         MemberInfo info = t;
-                        var nameAttr = (NameAttribute) info.GetCustomAttributes(typeof(NameAttribute), true).FirstOrDefault();
-                        var descAttr = (DescriptionAttribute) t.GetCustomAttributes(typeof(DescriptionAttribute), true).FirstOrDefault();
-                        var imageAttr = (ImageAttribute) t.GetCustomAttributes(typeof(ImageAttribute), true).FirstOrDefault();
-                        var namespaceAttr = (NamespaceAttribute) t.GetCustomAttributes(typeof(NamespaceAttribute), true).FirstOrDefault();
-                        var panelNameAttr = (PanelNameAttribute) t.GetCustomAttributes(typeof(PanelNameAttribute), true).FirstOrDefault();
+                        var nameAttr = (NameAttribute)info.GetCustomAttributes(typeof(NameAttribute), true).FirstOrDefault();
+                        var descAttr = (DescriptionAttribute)t.GetCustomAttributes(typeof(DescriptionAttribute), true).FirstOrDefault();
+                        var imageAttr = (ImageAttribute)t.GetCustomAttributes(typeof(ImageAttribute), true).FirstOrDefault();
+                        var namespaceAttr = (NamespaceAttribute)t.GetCustomAttributes(typeof(NamespaceAttribute), true).FirstOrDefault();
+                        var panelNameAttr = (PanelNameAttribute)t.GetCustomAttributes(typeof(PanelNameAttribute), true).FirstOrDefault();
 
                         if (nameAttr == null || descAttr == null || imageAttr == null ||
                             namespaceAttr == null || panelNameAttr == null) continue;
 
                         var bitmap =
-                            (BitmapSource) ButtonUtil.LoadBitmapImage(assembly, namespaceAttr.Namespace,
+                            (BitmapSource)ButtonUtil.LoadBitmapImage(assembly, namespaceAttr.Namespace,
                                 imageAttr.ImageName);
                         var version = assembly.GetName().Version.ToString();
                         var installed = false;
@@ -309,14 +309,14 @@ namespace HOK.BetaToolsManager
                         if (t.GetInterface("IExternalCommand") != null)
                         {
                             var buttonTextAttr =
-                                (ButtonTextAttribute) t.GetCustomAttributes(typeof(ButtonTextAttribute), true)
+                                (ButtonTextAttribute)t.GetCustomAttributes(typeof(ButtonTextAttribute), true)
                                     .FirstOrDefault();
-                            
+
                             aw.ButtonText = buttonTextAttr?.ButtonText;
                         }
                         else
                         {
-                            var additionalButtonNamesAttr = (AdditionalButtonNamesAttribute) t
+                            var additionalButtonNamesAttr = (AdditionalButtonNamesAttribute)t
                                 .GetCustomAttributes(typeof(AdditionalButtonNamesAttribute), true)
                                 .FirstOrDefault();
 

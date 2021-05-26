@@ -113,10 +113,10 @@ namespace HOK.MissionControl.FamilyPublish
                         {
                             if (string.IsNullOrWhiteSpace(famDoc.Title)) continue; // could cause an exception
 
-                            var myDocPath = IsCitrixMachine() 
+                            var myDocPath = IsCitrixMachine()
                                 ? AppSettings.Instance.TempLocation.TempPath
                                 : Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                            
+
                             var path = myDocPath + "\\temp_" + famDoc.Title;
                             if (path.IndexOfAny(Path.GetInvalidPathChars()) != -1) continue; // could cause an exception
 
@@ -153,14 +153,9 @@ namespace HOK.MissionControl.FamilyPublish
                         nestedFamilies = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(Family))
                             .GetElementCount();
-#if RELEASE2015
-                        //(Konrad) Since Revit 2015 API doesn't support this we will just skip it.
-                        parameters = 0; 
-#else
                         parameters = new FilteredElementCollector(famDoc)
                             .OfClass(typeof(ParameterElement))
                             .GetElementCount();
-#endif
                         famDoc.Close(false);
 
                         sizeStr = StringUtilities.BytesToString(size);
@@ -205,7 +200,7 @@ namespace HOK.MissionControl.FamilyPublish
                     Log.AppendLog(LogMessageType.ERROR, "Failed to retrieve Families data.");
                     return;
                 }
-                
+
                 var famDict = new Dictionary<string, FamilyItem>();
                 if (famStat != null)
                 {

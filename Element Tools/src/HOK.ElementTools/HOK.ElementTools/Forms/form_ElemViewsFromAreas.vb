@@ -317,11 +317,7 @@ Public Class form_ElemViewsFromAreas
                 viewElementId3dBoxCrop = "*"
 
                 'Only include properly placed and bounded Areas
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter("Area")
-#Else
                 parameter = RmElement.LookupParameter("Area")
-#End If
 
                 If parameter.AsDouble() = 0 Then
                     'Assuming that this means it is not placed or not bounded
@@ -332,11 +328,7 @@ Public Class form_ElemViewsFromAreas
 
                 'Get view name and determine if a view already exists
                 'In case of blank view name skip the Area
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter(textBoxParameterViewName.Text)
-#Else
                 parameter = RmElement.LookupParameter(textBoxParameterViewName.Text)
-#End If
 
                 If parameter Is Nothing Then
                     viewNameShort = ""
@@ -430,11 +422,7 @@ Public Class form_ElemViewsFromAreas
                 End If
 
                 'Get the Area name value (we are assuming it is a string
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter(textBoxParameterAreaName.Text)
-#Else
                 parameter = RmElement.LookupParameter(textBoxParameterAreaName.Text)
-#End If
 
                 If parameter Is Nothing Then
                     areaName = ""
@@ -443,11 +431,7 @@ Public Class form_ElemViewsFromAreas
                 End If
 
                 'Get list values
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter(textBoxParameterList1.Text)
-#Else
                 parameter = RmElement.LookupParameter(textBoxParameterList1.Text)
-#End If
 
                 If parameter Is Nothing Then
                     listBy1 = ""
@@ -470,11 +454,7 @@ Public Class form_ElemViewsFromAreas
                         PadZeros(listBy1, padZeros1)
                     End If
                 End If
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter(textBoxParameterList2.Text)
-#Else
                 parameter = RmElement.LookupParameter(textBoxParameterList2.Text)
-#End If
 
                 If parameter Is Nothing Then
                     listBy2 = ""
@@ -544,11 +524,7 @@ Public Class form_ElemViewsFromAreas
                 viewElementId3dCrop = "*"
                 viewElementId3dBoxCrop = "*"
 
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = element.Parameter(parameterNameGroupBy)
-#Else
                 parameter = element.LookupParameter(parameterNameGroupBy)
-#End If
 
                 If parameter Is Nothing Then
                     Continue For
@@ -563,11 +539,7 @@ Public Class form_ElemViewsFromAreas
                     Continue For
                 End If
                 'allowing blank is trouble; user should have a value like "<none>".
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = element.Parameter("Area")
-#Else
                 parameter = element.LookupParameter("Area")
-#End If
 
                 'Only include properly placed and bounded Areas
                 If parameter.AsDouble() = 0 Then
@@ -1077,16 +1049,8 @@ Public Class form_ElemViewsFromAreas
                         For Each boundarySegmentList As List(Of Autodesk.Revit.DB.BoundarySegment) In AreaProcess.GetBoundarySegments(New SpatialElementBoundaryOptions)
                             For Each boundarySegment As Autodesk.Revit.DB.BoundarySegment In boundarySegmentList
 
-#If RELEASE2013 Then
-                                Dim curve As Curve = boundarySegment.Curve
-                                Dim endPoint As XYZ = curve.EndPoint(0)
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
-                                Dim curve As Curve = boundarySegment.Curve
-                                Dim endPoint As XYZ = curve.GetEndPoint(0)
-#Else
                                 Dim curve As Curve = boundarySegment.GetCurve()
                                 Dim endPoint As XYZ = curve.GetEndPoint(0)
-#End If
 
                                 xyzVertex.Add(endPoint)
                                 Dim newVertex As XYZ = New XYZ(endPoint.X, endPoint.Y, endPoint.Z + height)
@@ -1148,11 +1112,7 @@ Public Class form_ElemViewsFromAreas
                     view2d.Name = viewNameComposite
                     'view3d.get_Parameter(BuiltInParameter.VIEW_DETAIL_LEVEL).Set(1);
                     view2d.Scale = scale
-#If RELEASE2013 Or RELEASE2014 Then
-                    parameter = view2d.Parameter("Title on Sheet")
-#Else
                     parameter = view2d.LookupParameter("Title on Sheet")
-#End If
 
                     If parameter IsNot Nothing Then
                         parameter.[Set](areaName)
@@ -1186,33 +1146,18 @@ Public Class form_ElemViewsFromAreas
                         'Note the there is no crop box being set here.
 
                         'Setup and activate the section box
-#If RELEASE2013 Then
-                        view3d.SectionBox.Enabled = True
-                        view3d.SectionBox = boundingBoxBox
-#Else
                         view3d.IsSectionBoxActive = True
                         view3d.SetSectionBox(boundingBoxBox)
-#End If
                         
                         Dim param(1) As Object
                         param(0) = categorySectionBox
                         param(1) = True
 
                         If checkBoxBoxShow.Checked Then
-#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
-                            view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
-                            'view3d.SetVisibility(categorySectionBox, True)
-#Else
                             view3d.SetCategoryHidden(categorySectionBox.Id, False)
-#End If
                         Else
                             param(1) = False
-#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
-                            view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
-                            'view3d.SetVisibility(categorySectionBox, False)
-#Else
                             view3d.SetCategoryHidden(categorySectionBox.Id, True)
-#End If
                         End If
 
                         view3d.Name = viewNameComposite
@@ -1249,13 +1194,8 @@ Public Class form_ElemViewsFromAreas
                         'Setup and activate the section box in 3D Box case
                         If radioButtonType3dBoxCrop.Checked Then
                             '3DBC case
-#If RELEASE2013 Then
-                            view3d.SectionBox.Enabled = True
-                            view3d.SectionBox = boundingBoxBox
-#Else
                             view3d.IsSectionBoxActive = True
                             view3d.SetSectionBox(boundingBoxBox)
-#End If
                             
 
                             Dim param(1) As Object
@@ -1263,20 +1203,10 @@ Public Class form_ElemViewsFromAreas
                             param(1) = True
 
                             If checkBoxBoxShow.Checked Then
-#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
-                                view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
-                                'view3d.SetVisibility(categorySectionBox, True)
-#Else
                             view3d.SetCategoryHidden(categorySectionBox.Id, False)
-#End If
                             Else
                                 param(1) = False
-#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
-                                view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
-                                'view3d.SetVisibility(categorySectionBox, False)
-#Else
                             view3d.SetCategoryHidden(categorySectionBox.Id, True)
-#End If
                             End If
                         End If
 

@@ -62,11 +62,7 @@ namespace HOK.RoomMeasure
                 ElementId categoryId = new ElementId((int)BuiltInCategory.OST_Mass);
                 if (DirectShape.IsValidCategoryId(categoryId, room.Document))
                 {
-#if RELEASE2015 || RELEASE2016
-                    roomShape = DirectShape.CreateElement(room.Document, categoryId, "Measure", room.UniqueId);
-#else
                     roomShape = DirectShape.CreateElement(room.Document, categoryId);
-#endif
                 }
                 roomShape.SetShape(geoList);
             }
@@ -118,7 +114,7 @@ namespace HOK.RoomMeasure
                     firstPt = secondPt;
                     secondPt = tempPt;
                 }
-              
+
                 XYZ vector = secondPt.Subtract(firstPt);
                 angle = vector.AngleOnPlaneTo(XYZ.BasisX, XYZ.BasisZ);
                 axis = Line.CreateBound(firstPt, new XYZ(firstPt.X, firstPt.Y, firstPt.Z + 10));
@@ -164,7 +160,7 @@ namespace HOK.RoomMeasure
                         if (geoObj is Solid)
                         {
                             Solid roomSolid = geoObj as Solid;
-                            
+
                             foreach (Face roomFace in roomSolid.Faces)
                             {
                                 XYZ normal = roomFace.ComputeNormal(new UV(0, 0));
@@ -190,7 +186,7 @@ namespace HOK.RoomMeasure
             Curve longestCurve = null;
             try
             {
-                
+
                 IList<CurveLoop> curveLoopList = roomFace.GetEdgesAsCurveLoops();
 
                 List<Curve> outerCurves = new List<Curve>();

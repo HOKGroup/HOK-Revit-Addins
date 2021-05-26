@@ -369,7 +369,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 
@@ -463,7 +463,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 
@@ -562,7 +562,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 
@@ -582,7 +582,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch(Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 
@@ -602,7 +602,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 
@@ -624,7 +624,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 
@@ -646,7 +646,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 

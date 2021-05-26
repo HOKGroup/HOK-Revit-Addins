@@ -47,15 +47,11 @@ namespace HOK.LevelManager
                     {
                         if (boundaryListList.Count > 0)
                         {
-                            foreach ( var boundaryList in boundaryListList)
+                            foreach (var boundaryList in boundaryListList)
                             {
                                 foreach (var segment in boundaryList)
                                 {
-#if RELEASE2015
-                                    var element = segment.Element;
-#else
                                     var element = m_doc.GetElement(segment.ElementId);
-#endif
                                     if (null != element)
                                     {
                                         if (element.Category.Id.IntegerValue == (int)BuiltInCategory.OST_RoomSeparationLines)
@@ -76,7 +72,7 @@ namespace HOK.LevelManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect rooms.\n"+ex.Message, "Collect Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to collect rooms.\n" + ex.Message, "Collect Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -113,7 +109,7 @@ namespace HOK.LevelManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to delete rooms.\n"+ex.Message, "Delete Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to delete rooms.\n" + ex.Message, "Delete Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -131,8 +127,8 @@ namespace HOK.LevelManager
                 {
                     var rp = RoomDictionary[roomId];
                     var sourceView = rp.SourceView;
-                    
-                    if(rp.RoomSeparationLinesIds.Count>0)
+
+                    if (rp.RoomSeparationLinesIds.Count > 0)
                     {
                         var boundariesToCopy = new List<ElementId>();
                         foreach (var eId in rp.RoomSeparationLinesIds)
@@ -151,7 +147,7 @@ namespace HOK.LevelManager
 
                     var elementsToCopy = new List<ElementId>();
                     elementsToCopy.Add(rp.RoomObject.Id);
-                    var copiedRooms=ElementTransformUtils.CopyElements(sourceView, elementsToCopy, destinationView, transform, opt).ToList();
+                    var copiedRooms = ElementTransformUtils.CopyElements(sourceView, elementsToCopy, destinationView, transform, opt).ToList();
                     NewRooms.AddRange(copiedRooms);
                     var element = m_doc.GetElement(copiedRooms.First());
                     if (null != element)
@@ -167,7 +163,7 @@ namespace HOK.LevelManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to recreate rooms.\n"+ex.Message, "Recreate Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to recreate rooms.\n" + ex.Message, "Recreate Rooms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 succeed = false;
             }
             return succeed;
@@ -197,7 +193,7 @@ namespace HOK.LevelManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to find a view Plan.\n"+ex.Message, "Find View Plan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to find a view Plan.\n" + ex.Message, "Find View Plan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             return viewPlan;
         }

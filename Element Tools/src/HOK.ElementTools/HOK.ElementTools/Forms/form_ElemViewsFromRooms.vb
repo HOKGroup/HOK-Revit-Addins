@@ -617,11 +617,7 @@ Public Class form_ElemViewsFromRooms
                                     'view3d.get_Parameter(BuiltInParameter.VIEW_DETAIL_LEVEL).Set(1);
                                     view2d.Scale = scale
 
-#If RELEASE2013 Or RELEASE2014 Then
-                                    parameter = view2d.Parameter("Title on Sheet")
-#Else
                                     parameter = view2d.LookupParameter("Title on Sheet")
-#End If
 
                                     If parameter IsNot Nothing Then
                                         parameter.[Set](roomName)
@@ -659,11 +655,7 @@ Public Class form_ElemViewsFromRooms
                                         For index As Integer = 0 To 3
                                             Dim viewElevation As ViewSection = marker.CreateElevation(m_Settings.Document, m_Settings.ActiveViewPlan.Id, index)
                                             viewElevation.Name = viewNameComposite & surfix(index)
-#If RELEASE2013 Or RELEASE2014 Then
-                                            parameter = viewElevation.Parameter("Title on Sheet")
-#Else
                                             parameter = viewElevation.LookupParameter("Title on Sheet")
-#End If
                                             If parameter IsNot Nothing Then
                                                 parameter.[Set](roomName)
                                             End If
@@ -736,11 +728,7 @@ Public Class form_ElemViewsFromRooms
                                             For index As Integer = 0 To 3
                                                 Dim viewElevation As ViewSection = marker.CreateElevation(m_Settings.Document, m_Settings.ActiveViewPlan.Id, index)
                                                 viewElevation.Name = viewNameComposite & surfix(index)
-#If RELEASE2013 Or RELEASE2014 Then
-                                                parameter = viewElevation.Parameter("Title on Sheet")
-#Else
                                                 parameter = viewElevation.LookupParameter("Title on Sheet")
-#End If
                                                 If parameter IsNot Nothing Then
                                                     parameter.[Set](roomName)
                                                 End If
@@ -768,11 +756,7 @@ Public Class form_ElemViewsFromRooms
                                                 End If
 
                                                 viewElevation.Name = viewNameComposite & surfix(index)
-#If RELEASE2013 Or RELEASE2014 Then
-                                                parameter = viewElevation.Parameter("Title on Sheet")
-#Else
                                                 parameter = viewElevation.LookupParameter("Title on Sheet")
-#End If
                                                 If parameter IsNot Nothing Then
                                                     parameter.[Set](roomName)
                                                 End If
@@ -832,13 +816,8 @@ Public Class form_ElemViewsFromRooms
                                     If (solid IsNot Nothing) Then
                                         For Each edge As Edge In solid.Edges
                                             Dim curve As Curve = edge.AsCurve()
-#If RELEASE2013 Then
-                                            vertices.Add(curve.EndPoint(0))
-                                            vertices.Add(curve.EndPoint(1))
-#Else
                                             vertices.Add(curve.GetEndPoint(0))
                                             vertices.Add(curve.GetEndPoint(1))
-#End If
 
                                         Next
                                     End If
@@ -937,13 +916,8 @@ Public Class form_ElemViewsFromRooms
                                         'Note the there is no crop box being set here.
 
                                         'Setup and activate the section box
-#If RELEASE2013 Then
-                        view3d.SectionBox.Enabled = True
-                        view3d.SectionBox = boundingBoxBox
-#Else
                                         view3d.IsSectionBoxActive = True
                                         view3d.SetSectionBox(boundingBoxBox)
-#End If
 
                                         Dim param(1) As Object
                                         param(0) = categorySectionBox
@@ -951,20 +925,10 @@ Public Class form_ElemViewsFromRooms
 
 
                                         If checkBoxBoxShow.Checked Then
-#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
-                                            view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
-                                            'view3d.SetVisibility(categorySectionBox, True)
-#Else
                                             view3d.SetCategoryHidden(categorySectionBox.Id, False)
-#End If
                                         Else
                                             param(1) = False
-#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
-                                            view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
-                                            'view3d.SetVisibility(categorySectionBox, False)
-#Else
                                             view3d.SetCategoryHidden(categorySectionBox.Id, True)
-#End If
                                         End If
 
                                         view3d.Name = viewNameComposite
@@ -1001,33 +965,18 @@ Public Class form_ElemViewsFromRooms
                                         'Setup and activate the section box in 3D Box case
                                         If radioButtonType3dBoxCrop.Checked Then
                                             '3DBC case
-#If RELEASE2013 Then
-                            view3d.SectionBox.Enabled = True
-                            view3d.SectionBox = boundingBoxBox
-#Else
                                             view3d.IsSectionBoxActive = True
                                             view3d.SetSectionBox(boundingBoxBox)
-#End If
 
                                             Dim param(1) As Object
                                             param(0) = categorySectionBox
                                             param(1) = True
 
                                             If checkBoxBoxShow.Checked Then
-#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
-                                                view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
-                                                'view3d.SetVisibility(categorySectionBox, True)
-#Else
                                                 view3d.SetCategoryHidden(categorySectionBox.Id, False)
-#End If
                                             Else
                                                 param(1) = False
-#If RELEASE2013 Or RELEASE2014 Or RELEASE2015 Or RELEASE2016 Or RELEASE2017 Then
-                                                view3d.GetType().InvokeMember("SetVisibility", Reflection.BindingFlags.InvokeMethod, Nothing, view3d, param)
-                                                'view3d.SetVisibility(categorySectionBox, False)
-#Else
                                                 view3d.SetCategoryHidden(categorySectionBox.Id, True)
-#End If
                                             End If
                                         End If
 
@@ -1398,11 +1347,7 @@ Public Class form_ElemViewsFromRooms
                 viewElementId3dBoxCrop = "*"
 
                 'Only include properly placed and bounded rooms
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter("Area")
-#Else
                 parameter = RmElement.LookupParameter("Area")
-#End If
 
                 If parameter.AsDouble() = 0 Then
                     'Assuming that this means it is not placed or not bounded
@@ -1413,11 +1358,7 @@ Public Class form_ElemViewsFromRooms
 
                 'Get view name and determine if a view already exists
                 'In case of blank view name skip the room
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter(textBoxParameterViewName.Text)
-#Else
                 parameter = RmElement.LookupParameter(textBoxParameterViewName.Text)
-#End If
 
                 If parameter Is Nothing Then
                     viewNameShort = ""
@@ -1583,11 +1524,7 @@ Public Class form_ElemViewsFromRooms
                 End If
 
                 'Get the room name value (we are assuming it is a string
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter(textBoxParameterRoomName.Text)
-#Else
                 parameter = RmElement.LookupParameter(textBoxParameterRoomName.Text)
-#End If
 
                 If parameter Is Nothing Then
                     roomName = ""
@@ -1596,11 +1533,7 @@ Public Class form_ElemViewsFromRooms
                 End If
 
                 'Get list values
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter(textBoxParameterList1.Text)
-#Else
                 parameter = RmElement.LookupParameter(textBoxParameterList1.Text)
-#End If
 
                 If parameter Is Nothing Then
                     listBy1 = ""
@@ -1623,11 +1556,7 @@ Public Class form_ElemViewsFromRooms
                         PadZeros(listBy1, padZeros1)
                     End If
                 End If
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = RmElement.Parameter(textBoxParameterList2.Text)
-#Else
                 parameter = RmElement.LookupParameter(textBoxParameterList2.Text)
-#End If
 
                 If parameter Is Nothing Then
                     listBy2 = ""
@@ -1705,11 +1634,7 @@ Public Class form_ElemViewsFromRooms
                 viewElementId3dCrop = "*"
                 viewElementId3dBoxCrop = "*"
 
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = element.Parameter(parameterNameGroupBy)
-#Else
                 parameter = element.LookupParameter(parameterNameGroupBy)
-#End If
                 If parameter Is Nothing Then
                     Continue For
                 End If
@@ -1723,11 +1648,7 @@ Public Class form_ElemViewsFromRooms
                     Continue For
                 End If
                 'allowing blank is trouble; user should have a value like "<none>".
-#If RELEASE2013 Or RELEASE2014 Then
-                parameter = element.Parameter("Area")
-#Else
                 parameter = element.LookupParameter("Area")
-#End If
 
                 'Only include properly placed and bounded rooms
                 If parameter.AsDouble() = 0 Then

@@ -116,7 +116,7 @@ namespace HOK.ModelReporting
                     // ignored
                 }
 
-                if(string.IsNullOrEmpty(ProjectNumber))
+                if (string.IsNullOrEmpty(ProjectNumber))
                 {
                     ProjectName = GetProjectName(DocCentralPath);
                     const string projectNumberRegPattern = @"\d{2}\.\d{5}\.\d{2}";
@@ -124,7 +124,7 @@ namespace HOK.ModelReporting
                     var match = regex.Match(Doc.ProjectInformation.Number);
                     if (match.Success)
                     {
-                        ProjectNumber = match.Value; 
+                        ProjectNumber = match.Value;
                     }
                     else
                     {
@@ -148,7 +148,7 @@ namespace HOK.ModelReporting
             try
             {
                 var projectLocation = Doc.ActiveProjectLocation;
-#if RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#if RELEASE2018
                 var site = projectLocation.SiteLocation;
 #else
                 var site = projectLocation.GetSiteLocation();
@@ -182,7 +182,7 @@ namespace HOK.ModelReporting
             {
                 // ignored
             }
-           
+
         }
 
         private static string GetFileLocation(string path)
@@ -226,7 +226,7 @@ namespace HOK.ModelReporting
             NetworkInterface[] nis = NetworkInterface.GetAllNetworkInterfaces()
                 .Where(x => x.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || x.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
                 .Where(ni => ni.OperationalStatus == OperationalStatus.Up)
-                .Where(ni => (ni.Description.StartsWith("PANGP") || !ni.Description.Contains("Virtual")) &&  !ni.Description.Contains("VMware"))
+                .Where(ni => (ni.Description.StartsWith("PANGP") || !ni.Description.Contains("Virtual")) && !ni.Description.Contains("VMware"))
                 .ToArray();
 
             foreach (NetworkInterface ni in nis)
@@ -252,7 +252,7 @@ namespace HOK.ModelReporting
                 //Find E-BIM or E-CAD and get preceding values
                 for (var i = 0; i < paths.Length; i++)
                 {
-                    if(_prefixes.ContainsKey(paths[i]))
+                    if (_prefixes.ContainsKey(paths[i]))
                     {
                         return paths[i - 1];
                     }

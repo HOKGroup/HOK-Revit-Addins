@@ -118,7 +118,7 @@ Public Class clsSettings
                 Continue For
             End If
             'We don't want to get any of the sheets in case they had the same name 
-#If RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Then
+#If RELEASE2018 Then
             If Not m_Views.ContainsKey(m_dView.ViewName) Then
                 m_Views.Add(m_dView.ViewName, m_dView)
             End If
@@ -137,7 +137,7 @@ Public Class clsSettings
 
         For Each element As Element In m_dSchedules
             Dim schedule As ViewSchedule = TryCast(element, ViewSchedule)
-#If RELEASE2015 Or RELEASE2016 Or RELEASE2017 Or RELEASE2018 Then
+#If RELEASE2018 Then
             If Not m_Views.ContainsKey(schedule.ViewName) Then
                 m_Views.Add(schedule.ViewName, schedule)
             End If

@@ -28,7 +28,7 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var textTypes = new FilteredElementCollector(doc)
                     .OfClass(typeof(TextNoteType))
-                    .ToDictionary(x => x.Id.IntegerValue, x => new Tuple<Element,int>(x, 0));
+                    .ToDictionary(x => x.Id.IntegerValue, x => new Tuple<Element, int>(x, 0));
 
                 var textInstances = new FilteredElementCollector(doc)
                     .OfClass(typeof(TextNote))
@@ -44,7 +44,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     }
                 }
 
-                var textStats = textTypes.Select(x => new TextNoteTypeInfo(x.Value.Item1) {Instances = x.Value.Item2})
+                var textStats = textTypes.Select(x => new TextNoteTypeInfo(x.Value.Item1) { Instances = x.Value.Item2 })
                     .ToList();
 
                 #endregion
@@ -94,13 +94,13 @@ namespace HOK.MissionControl.Tools.HealthReport
                         // dim w/ zero segments
                         dimSegmentStats.Add(new DimensionSegmentInfo(d)
                         {
-#if RELEASE2021
+#if RELEASE2021 || RELEASE2022
                             ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)d.Value, false),
 #else
                             ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),
 #endif
-                            OwnerViewType = d.ViewSpecific 
-                                ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
+                            OwnerViewType = d.ViewSpecific
+                                ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString()
                                 : string.Empty,
                             OwnerViewId = d.OwnerViewId.IntegerValue
                         });
@@ -115,13 +115,13 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                             dimSegmentStats.Add(new DimensionSegmentInfo(s)
                             {
-#if RELEASE2021
+#if RELEASE2021 || RELEASE2022
                                 ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)d.Value, false),
 #else
                                 ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),
 #endif
-                                OwnerViewType = d.ViewSpecific 
-                                    ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString() 
+                                OwnerViewType = d.ViewSpecific
+                                    ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString()
                                     : string.Empty,
                                 OwnerViewId = d.OwnerViewId.IntegerValue
                             });
@@ -132,13 +132,13 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var dimStats = dimTypes.Select(x => new DimensionTypeInfo(x.Value.Item1) { Instances = x.Value.Item2 })
                     .ToList();
 
-#endregion
+                #endregion
 
-#region Line Style stats
+                #region Line Style stats
 
                 //TODO: Finish this out.
 
-#endregion
+                #endregion
 
                 var stylesStats = new StylesDataItem
                 {

@@ -104,13 +104,9 @@ namespace HOK.SmartBCF.AddIn
                         .WhereElementIsNotElementType()
                         .WhereElementIsViewIndependent()
                         .WherePasses(new LogicalOrFilter(new ElementIsElementTypeFilter(false), new ElementIsElementTypeFilter(true))).ToElements();
-                    
+
                     var distinctElements = from elem in foundElements select elem;
-#if RELEASE2014
-                    var elementsFiltered = from elem in distinctElements where null != elem.Category select elem;
-#else
                     var elementsFiltered = from elem in distinctElements where null != elem.Category && elem.Category.CategoryType == CategoryType.Model select elem;
-#endif
 
                     if (elementsFiltered.Count() > 0)
                     {
@@ -118,7 +114,7 @@ namespace HOK.SmartBCF.AddIn
                         {
                             RevitComponent rvtComp = new RevitComponent()
                             {
-                                ElementId=element.Id,
+                                ElementId = element.Id,
                                 IfcGuid = element.IfcGUID(),
                                 IfcProjectGuid = rlp.IfcProjectGuid
                             };
@@ -183,7 +179,7 @@ namespace HOK.SmartBCF.AddIn
         {
             try
             {
-                if (null != param && null!=componentViewModel)
+                if (null != param && null != componentViewModel)
                 {
                     if (!componentViewModel.UIChanged)
                     {

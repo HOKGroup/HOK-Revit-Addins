@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace HOK.XYZLocator
 {
-    public class ProjectLocationProperties:INotifyPropertyChanged
+    public class ProjectLocationProperties : INotifyPropertyChanged
     {
         private string name;
         private Transform transformValue;
@@ -23,18 +23,14 @@ namespace HOK.XYZLocator
         public ProjectPosition Position
         {
             get => position;
-            set { position = value; NotifyPropertyChanged("Position");  }
+            set { position = value; NotifyPropertyChanged("Position"); }
         }
 
         public ProjectLocationProperties(ProjectLocation location)
         {
             name = location.Name;
             transformValue = location.GetTransform();
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
-            position = location.get_ProjectPosition(XYZ.Zero);
-#else
             position = location.GetProjectPosition(XYZ.Zero);
-#endif
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

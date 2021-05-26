@@ -250,7 +250,7 @@ namespace HOK.LPDCalculator
                     fromHost = collector.WherePasses(paramFilter).ToElements().ToList();
                     fromHost = GetPolygonIntersect(topFace, fromHost);
                 }
-                
+
                 if (lightingSelection != ModelSelection.Host)
                 {
                     if (linkedDocuments.Count > 0)
@@ -328,11 +328,7 @@ namespace HOK.LPDCalculator
                             double length = 0;
                             foreach (var boundarySegment in boundarySegments)
                             {
-#if RELEASE2015
-                                var curve = boundarySegment.Curve;
-#else
                                 var curve = boundarySegment.GetCurve();
-#endif
                                 profile.Append(curve);
                                 length += curve.Length;
                             }
@@ -531,15 +527,15 @@ namespace HOK.LPDCalculator
                         trans.Start("Update Annotation");
 
                         var annotation = new AnnotationProperties(annotationType, CalculationTypes.SpaceBySpace)
-                            {
-                                TotalAllowableLightingLoad = allowableLightingLoad,
-                                TotalActualLightingLoad = actualLightingLoad,
-                                TotalSavingsOverage = savings,
-                                Area = area,
-                                ActualLPD = actualLPD,
-                                Reduction = reduction,
-                                LPDCalculatedBy = Environment.UserName
-                            };
+                        {
+                            TotalAllowableLightingLoad = allowableLightingLoad,
+                            TotalActualLightingLoad = actualLightingLoad,
+                            TotalSavingsOverage = savings,
+                            Area = area,
+                            ActualLPD = actualLPD,
+                            Reduction = reduction,
+                            LPDCalculatedBy = Environment.UserName
+                        };
 
                         trans.Commit();
                     }
@@ -578,16 +574,16 @@ namespace HOK.LPDCalculator
                         trans.Start("Update Annotation");
 
                         var annotation = new AnnotationProperties(annotationType, CalculationTypes.BuildingArea)
-                            {
-                                ASHRAELPDCategory = category,
-                                ASHRAEAllowableLPD = allowableLPD,
-                                TargetLPD = targetLPD,
-                                ActualLightingLoad = actualLightingLoad,
-                                Area = area,
-                                ActualLPD = actualLPD,
-                                Reduction = reduction,
-                                LPDCalculatedBy = Environment.UserName
-                            };
+                        {
+                            ASHRAELPDCategory = category,
+                            ASHRAEAllowableLPD = allowableLPD,
+                            TargetLPD = targetLPD,
+                            ActualLightingLoad = actualLightingLoad,
+                            Area = area,
+                            ActualLPD = actualLPD,
+                            Reduction = reduction,
+                            LPDCalculatedBy = Environment.UserName
+                        };
 
                         trans.Commit();
                     }

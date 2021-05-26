@@ -38,19 +38,10 @@ namespace HOK.RoomsToMass.ToMass
                         roomGeometries.Add(roomSolid);
                     }
                 }
-#if RELEASE2015 || RELEASE2016
-                DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory), appGuid, rp.RoomId.ToString());
-#else
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = rp.RoomId.ToString();
-#endif
 
-#if RELEASE2016
-                DirectShapeOptions options = createdShape.GetOptions();
-                options.ReferencingOption = DirectShapeReferencingOption.Referenceable;
-                createdShape.SetOptions(options);
-#endif
                 createdShape.SetShape(roomGeometries);
                 createdShape.SetName(rp.RoomName);
 
@@ -68,7 +59,7 @@ namespace HOK.RoomsToMass.ToMass
             {
                 MessageBox.Show("Failed to create room solid.\n" + ex.Message, "Create Room Solid", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            
+
             return created;
         }
 
@@ -90,13 +81,9 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     IList<GeometryObject> roomGeometries = GetGeometryObjectsFromFace(rp.BottomFace);
 
-#if RELEASE2015 || RELEASE2016
-                    DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory), appGuid, rp.RoomId.ToString());
-#else
                     DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                     createdShape.ApplicationId = appGuid;
                     createdShape.ApplicationDataId = rp.RoomId.ToString();
-#endif
                     createdShape.SetShape(roomGeometries);
                     createdShape.SetName(rp.RoomName);
 
@@ -143,20 +130,11 @@ namespace HOK.RoomsToMass.ToMass
                         areaGeometries.Add(areaSolid);
                     }
                 }
-#if RELEASE2015 || RELEASE2016
-                DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory), appGuid, ap.AreaId.ToString());
-#else
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = ap.AreaId.ToString();
-#endif
 
 
-#if RELEASE2016
-                    DirectShapeOptions options = createdShape.GetOptions();
-                    options.ReferencingOption = DirectShapeReferencingOption.Referenceable;
-                    createdShape.SetOptions(options);
-#endif
                 createdShape.SetShape(areaGeometries);
                 createdShape.SetName(ap.AreaName);
 
@@ -194,19 +172,10 @@ namespace HOK.RoomsToMass.ToMass
 
                 IList<GeometryObject> areaGeometries = GetGeometryObjectsFromFace(ap.AreaFace);
 
-#if RELEASE2015 || RELEASE2016
-                DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory), appGuid, ap.AreaId.ToString());
-#else
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = ap.AreaId.ToString();
-#endif
 
-#if RELEASE2016
-                DirectShapeOptions options = createdShape.GetOptions();
-                options.ReferencingOption = DirectShapeReferencingOption.Referenceable;
-                createdShape.SetOptions(options);
-#endif
                 createdShape.SetShape(areaGeometries);
                 createdShape.SetName(ap.AreaName);
 
@@ -215,7 +184,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     createdMass = new MassProperties(massElement);
                     createdMass.MassElementType = MassType.MASS2D;
-                    createdMass.SetHostInfo(ap.AreaUniqueId, SourceType.Areas, ap.AreaCenterPoint,0);
+                    createdMass.SetHostInfo(ap.AreaUniqueId, SourceType.Areas, ap.AreaCenterPoint, 0);
                     bool stored = MassDataStorageUtil.SetLinkedHostInfo(massElement, SourceType.Areas.ToString(), ap.AreaUniqueId, ap.AreaCenterPoint, 0);
                     created = true;
                 }
@@ -253,19 +222,9 @@ namespace HOK.RoomsToMass.ToMass
                         floorGeometries.Add(floorSolid);
                     }
                 }
-#if RELEASE2015 || RELEASE2016
-                DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory), appGuid, fp.FloorId.ToString());
-#else
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = fp.FloorId.ToString();
-#endif
-
-#if RELEASE2016
-                    DirectShapeOptions options = createdShape.GetOptions();
-                    options.ReferencingOption = DirectShapeReferencingOption.Referenceable;
-                    createdShape.SetOptions(options);
-#endif
                 createdShape.SetShape(floorGeometries);
                 createdShape.SetName(fp.FloorName);
 
@@ -303,19 +262,9 @@ namespace HOK.RoomsToMass.ToMass
 
                 IList<GeometryObject> floorGeometries = GetGeometryObjectsFromFace(fp.TopFace);
 
-#if RELEASE2015 || RELEASE2016
-                DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory), appGuid, fp.FloorId.ToString());
-#else
                 DirectShape createdShape = DirectShape.CreateElement(doc, new ElementId(massCategory));
                 createdShape.ApplicationId = appGuid;
                 createdShape.ApplicationDataId = fp.FloorId.ToString();
-#endif
-
-#if RELEASE2016
-                DirectShapeOptions options = createdShape.GetOptions();
-                options.ReferencingOption = DirectShapeReferencingOption.Referenceable;
-                createdShape.SetOptions(options);
-#endif
                 createdShape.SetShape(floorGeometries);
                 createdShape.SetName(fp.FloorName);
 
@@ -345,7 +294,7 @@ namespace HOK.RoomsToMass.ToMass
             {
                 List<CurveLoop> profiles = new List<CurveLoop>();
                 XYZ normal = face.ComputeNormal(new UV(0, 0));
- 
+
                 IList<CurveLoop> curveLoops = face.GetEdgesAsCurveLoops();
                 IList<IList<CurveLoop>> sortedCurveLoops = ExporterIFCUtils.SortCurveLoops(curveLoops);
                 foreach (IList<CurveLoop> curveLoopList in sortedCurveLoops)
@@ -387,15 +336,10 @@ namespace HOK.RoomsToMass.ToMass
                 }
 
                 builder.CloseConnectedFaceSet();
-#if RELEASE2015 || RELEASE2016
-                TessellatedShapeBuilderResult result = builder.Build(TessellatedShapeBuilderTarget.AnyGeometry, TessellatedShapeBuilderFallback.Mesh, ElementId.InvalidElementId);
-
-#else
                 builder.Target = TessellatedShapeBuilderTarget.AnyGeometry;
                 builder.Fallback = TessellatedShapeBuilderFallback.Mesh;
                 builder.Build();
                 TessellatedShapeBuilderResult result = builder.GetBuildResult();
-#endif
                 shapeGeometries = result.GetGeometricalObjects();
 
             }
@@ -488,7 +432,7 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 

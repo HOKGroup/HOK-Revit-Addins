@@ -97,11 +97,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                 // (Konrad) Register Updaters that are in the config file.
                 CommunicatorUtilities.LaunchCommunicator();
                 ApplyConfiguration(doc);
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
-                // (Konrad) We are not going to process warnings here.
-#else
                 CollectWarnings(doc);
-#endif
                 EnableMissionControl();
 
                 Log.AppendLog(LogMessageType.INFO, "Mission Control check in succeeded.");
@@ -136,7 +132,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                             AppCommand.Instance.DoorUpdaterInstance.Register(doc, updater);
                         });
                     }
-                    else if (string.Equals(updater.UpdaterId, AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(), 
+                    else if (string.Equals(updater.UpdaterId, AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(),
                         StringComparison.OrdinalIgnoreCase))
                     {
                         ProcessTriggerRecords(centralPath);
@@ -149,29 +145,25 @@ namespace HOK.MissionControl.Tools.MissionControl
                         DTMTool.DtmSynchOverrides.CreateReloadLatestOverride();
                         DTMTool.DtmSynchOverrides.CreateSynchToCentralOverride();
                     }
-                    else if (string.Equals(updater.UpdaterId, Properties.Resources.LinkUnloadTrackerGuid, 
+                    else if (string.Equals(updater.UpdaterId, Properties.Resources.LinkUnloadTrackerGuid,
                         StringComparison.OrdinalIgnoreCase))
                     {
                         AppCommand.EnqueueTask(LinkUnloadMonitor.LinkUnloadMonitor.CreateLinkUnloadOverride);
                     }
-                    else if (string.Equals(updater.UpdaterId, Properties.Resources.SheetsTrackerGuid, 
+                    else if (string.Equals(updater.UpdaterId, Properties.Resources.SheetsTrackerGuid,
                         StringComparison.OrdinalIgnoreCase))
                     {
                         ProcessSheets(ActionType.CheckIn, doc, centralPath);
 
                         launchSockets = true;
                     }
-                    else if (string.Equals(updater.UpdaterId, Properties.Resources.HealthReportTrackerGuid, 
+                    else if (string.Equals(updater.UpdaterId, Properties.Resources.HealthReportTrackerGuid,
                         StringComparison.OrdinalIgnoreCase))
                     {
                         // (Konrad) These are read-only methods so they don't need to run in Revit context.
                         ProcessModels(ActionType.CheckIn, doc, centralPath);
                         ProcessWorksets(ActionType.CheckIn, doc, centralPath);
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
-                        // (Konrad) We are not going to process warnings here.
-#else
                         ProcessWarnings(ActionType.CheckIn, doc, centralPath);
-#endif
                         ProcessFamilies(centralPath);
                         ProcessStyle(doc, centralPath);
                         ProcessLinks(doc, centralPath);
@@ -183,7 +175,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                 }
 
                 // (Konrad) This tool will reset Shared Parameters Location to one specified in Mission Control
-                if (config.GetType().GetProperty("sharedParamMonitor") != null && 
+                if (config.GetType().GetProperty("sharedParamMonitor") != null &&
                     config.SharedParamMonitor.IsMonitorOn)
                 {
                     if (File.Exists(config.SharedParamMonitor.FilePath))
@@ -336,9 +328,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                 }.Start();
             }
         }
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
-        // (Konrad) We are not going to process warnings here.
-#else
         /// <summary>
         /// Adds Warnings to a collection in database. If warnings exist it updates their status.
         /// </summary>
@@ -373,7 +362,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                     throw new ArgumentOutOfRangeException(nameof(action), action, null);
             }
         }
-#endif
         /// <summary>
         /// Adds Groups data to collection if such exists, otherwise creates a new one.
         /// </summary>
@@ -509,7 +497,7 @@ namespace HOK.MissionControl.Tools.MissionControl
         /// </summary>
         public static void ProcessWorksets(ActionType action, Document doc, string centralPath)
         {
-            var data = new DataRangeRequest(centralPath.ToLower()){ From = null, To = null };
+            var data = new DataRangeRequest(centralPath.ToLower()) { From = null, To = null };
             switch (action)
             {
                 case ActionType.CheckIn:
@@ -556,7 +544,7 @@ namespace HOK.MissionControl.Tools.MissionControl
         /// </summary>
         public static void ProcessModels(ActionType action, Document doc, string centralPath)
         {
-            var data = new DataRangeRequest(centralPath.ToLower()){ From = null, To = null };
+            var data = new DataRangeRequest(centralPath.ToLower()) { From = null, To = null };
             switch (action)
             {
                 case ActionType.CheckIn:
@@ -665,9 +653,6 @@ namespace HOK.MissionControl.Tools.MissionControl
             MissionControlSetup.ClearAll();
             AppCommand.ClearAll();
         }
-#if RELEASE2015 || RELEASE2016 || RELEASE2017
-        // (Konrad) We are not going to process warnings here.
-#else
         /// <summary>
         /// Collects all currently existing warnings in the file and sets them on AppCommand.
         /// </summary>
@@ -678,7 +663,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                 .Select(x => new WarningItem(x, doc))
                 .ToDictionary(x => x.UniqueId, x => x);
         }
-#endif
     }
     /// <summary>
     /// Specified the type of interaction that we want to execute. 
