@@ -38,13 +38,14 @@ namespace HOK.DesktopConnectorLauncher
         private void EventAppInitialize(object sender, ApplicationInitializedEventArgs arg)
         {
             // Get registry key
-            string keyName = @"HKEY_CURRENT_USER\SOFTWARE\HOK\BIM\";
-            string valueName = @"DesktopConnectorPath_Citrix";
-            string path = (string)Registry.GetValue(keyName, valueName, null);
-            if (path != null && System.IO.File.Exists(path)) {
+            var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
+            string RegistryKey = Json.Deserialize<Settings>(settingsString)?.CitrixDesktopConnectorKey;
+            string RegistryValue = Json.Deserialize<Settings>(settingsString)?.CitrixDesktopConnectorValue;
+            string path = (string)Registry.GetValue(RegistryKey, RegistryValue, null);
+            if (path != null && System.IO.File.Exists(path))
+            {
                 CreatePushButton();
             }
-            // If exists + is valid path
         }
 
         /// <summary>
@@ -87,7 +88,7 @@ namespace HOK.DesktopConnectorLauncher
                         LargeImage = pbAddinManager.LargeImage,
                         Image = pbAddinManager.Image,
                         ToolTip = pbAddinManager.ToolTip
-                        
+
                     };
                     newAddinManagerButton.SetContextualHelp(pbAddinManager.GetContextualHelp());
                     pbAddinManager.Enabled = false;
@@ -95,9 +96,10 @@ namespace HOK.DesktopConnectorLauncher
                     splitButton.AddPushButton(newAddinManagerButton);
                     splitButton.AddPushButton(buttonData);
 
-                } else
+                }
+                else
                 {
-                    desktopConnectorButton = addinsPanel.AddItem(buttonData) as PushButton; 
+                    desktopConnectorButton = addinsPanel.AddItem(buttonData) as PushButton;
                 }
             }
             catch (Exception ex)
