@@ -27,6 +27,8 @@ Most of the tools in this repository have a reference to HOK.Core. This is becau
   "FeedbackToken": "<access token>",
   "FeedbackPath": "/repos/<user>/<repo name>/",
   "ModelReportingServiceEndpoint": "<reporting server endpoint>",
+  "CitrixDesktopConnectorKey": "<registry key path>",
+  "CitrixDesktopConnectorValue": "<registry value name>",
   "FileOnOpeningFmeUserId": "<fme user id>",
   "FileOnOpeningFmePassword": "<fme password>",
   "FileOnOpeningFmeHost": "<fme endpoint>",
