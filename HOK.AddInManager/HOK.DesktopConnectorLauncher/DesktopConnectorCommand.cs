@@ -20,12 +20,14 @@ namespace HOK.DesktopConnectorLauncher
 
             try
             {
-                // (Konrad) We are gathering information about the addin use. This allows us to
-                // better maintain the most used plug-ins or discontiue the unused ones.
-                string keyName = @"HKEY_CURRENT_USER\SOFTWARE\HOK\BIM\";
-                string valueName = "DesktopConnectorPath_Citrix";
-                string path = (string)Registry.GetValue(keyName, valueName, null);
-                if (path != null && System.IO.File.Exists(path)) {
+                // (Dan) All HOK specific settings are stored in a Settings.json file and referenced
+                // inside of the HOK.Core. We can retrieve them by deserializing the resource.
+                var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
+                string RegistryKey = Json.Deserialize<Settings>(settingsString)?.CitrixDesktopConnectorKey;
+                string RegistryValue = Json.Deserialize<Settings>(settingsString)?.CitrixDesktopConnectorValue;
+                string path = (string)Registry.GetValue(RegistryKey, RegistryValue, null);
+                if (path != null && System.IO.File.Exists(path))
+                {
                     Process.Start(path);
                 }
             }
