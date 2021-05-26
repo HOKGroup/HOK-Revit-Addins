@@ -94,12 +94,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HOK.Core">
-      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\$(RevitVersion)\HOK.Core.dll</HintPath>
+      <HintPath>..\..\HOK.Core\HOK.Core\bin\$(RevitVersion)\HOK.Core.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
-      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\$(RevitVersion)\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath>..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\$(RevitVersion)\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="RevitAPIUI">
