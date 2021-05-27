@@ -6,6 +6,7 @@ HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,GalaSoft.MvvmLight.dll,
 HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,GalaSoft.MvvmLight.Extras.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,GalaSoft.MvvmLight.Platform.dll,HOK-Addin.bundle\Contents\
 HOK.AddInManager\HOK.AddInManager\bin\,HOK.AddInManager.dll,HOK-Addin.bundle\Contents\
+HOK.AddInManager\HOK.DesktopConnectorLauncher\bin\,HOK.DesktopConnectorLauncher.dll,HOK-Addin.bundle\Contents\
 Utility_Tools\src\HOK.Utilities\HOK.Arrowhead\bin\,HOK.Arrowhead.dll,HOK-Addin.bundle\Contents\
 HOK.BetaToolsManager\HOK.BetaToolsManager\bin\,HOK.BetaToolsManager.dll,HOK-Addin.bundle\Contents\
 Utility_Tools\src\HOK.Utilities\HOK.CameraDuplicator\bin\,HOK.CameraDuplicator.dll,HOK-Addin.bundle\Contents\
@@ -54,6 +55,7 @@ Smart_BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,System.Data.SQLite.Linq.dll,H
 HOK.MissionControl\HOK.MissionControl\bin\,System.Windows.Interactivity.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,WebSocket4Net.dll,HOK-Addin.bundle\Contents\
 HOK.AddInManager\HOK.AddInManager\bin\,HOK.AddInManager.addin,\
+HOK.AddInManager\HOK.DesktopConnectorLauncher\bin\,HOK.DesktopConnectorLauncher.addin,\
 HOK.BetaToolsManager\HOK.BetaToolsManager\bin\,HOK.BetaToolsManager.addin,\
 Utility_Tools\src\HOK.ElementMover\HOK.ElementMover\bin\,HOK.ElementMover.addin,\
 Utility_Tools\src\HOK.FileOnpeningMonitor\HOK.FileOnpeningMonitor\bin\,HOK.FileOpeningMonitor.addin,\
