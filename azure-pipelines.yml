@@ -135,7 +135,7 @@ steps:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
-- task: MSBuild@1
+- task: VSBuild@1
   inputs:
     solution: '$(MCsolution)'
     platform: '$(buildPlatform)'
