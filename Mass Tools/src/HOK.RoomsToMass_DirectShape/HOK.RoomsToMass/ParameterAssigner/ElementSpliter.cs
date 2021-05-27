@@ -204,7 +204,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     List<Curve> curves = new List<Curve>();
                     foreach (Curve curve in profile)
                     {
-                        curves.Append(curve);
+                        curves.Add(curve);
                     }
                     CurveLoop curveLoop = CurveLoop.Create(curves);
                     loopProfile.Add(curveLoop);
@@ -246,7 +246,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     List<Curve> curves = new List<Curve>();
                     foreach (Curve curve in profile)
                     {
-                        curves.Append(curve);
+                        curves.Add(curve);
                     }
                     CurveLoop curveLoop = CurveLoop.Create(curves);
                     loopProfile.Add(curveLoop);
