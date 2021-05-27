@@ -140,7 +140,7 @@ steps:
     solution: '$(MCsolution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    msbuildArguments: '/target:HOK_MissionControl_Core'
+    msbuildArgs: '/target:HOK_MissionControl_Core'
     clean: true
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
