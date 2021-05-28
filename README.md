@@ -1,4 +1,12 @@
+<<<<<<< Updated upstream
+
 # HOK-Revit-Addins 2022.0.0.X
+
+=======
+
+# HOK-Revit-Addins 2019.0.0.X
+
+> > > > > > > Stashed changes
 
 ### Code Signing
 
@@ -51,13 +59,12 @@ Actual values can be found here: [HOK Teams](https://teams.microsoft.com/l/chann
 ### Links to release notes
 
 1. <b>On Opening Monitor:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/tree/master/Utility%20Tools/src/HOK.FileOnpeningMonitor)
-2. <b>Mission Control:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/Project%20Monitor/src/HOK.MissionControl/README.md)
+2. <b>Mission Control:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.MissionControl/README.md)
 3. <b>HOK Core:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.Core/README.md)
-4. <b>Beta Installer:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK%20Beta%20Tools/README.md)
-5. <b>Addins Installer:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/tree/master/HOK%20AddIns%20Installer/README.md)
-6. <b>Element Mover:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/Utility%20Tools/src/HOK.ElementMover/Readme.md)
-7. <b>Mass Tools:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/Mass%20Tools/README.MD)
-8. <b>Move Backup:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.MoveBackup/README.md)
+4. <b>Beta Tools Manager:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.BetaToolsManager/README.md)
+5. <b>Element Mover:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/Utility%20Tools/src/HOK.ElementMover/Readme.md)
+6. <b>Mass Tools:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/Mass%20Tools/README.MD)
+7. <b>Move Backup:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.MoveBackup/README.md)
 
 ### Tips
 
