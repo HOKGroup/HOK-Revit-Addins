@@ -1,12 +1,4 @@
-<<<<<<< Updated upstream
-
-# HOK-Revit-Addins 2022.0.0.X
-
-=======
-
-# HOK-Revit-Addins 2019.0.0.X
-
-> > > > > > > Stashed changes
+# HOK-Revit-Addins 2022.1.0.16
 
 ### Code Signing
 
