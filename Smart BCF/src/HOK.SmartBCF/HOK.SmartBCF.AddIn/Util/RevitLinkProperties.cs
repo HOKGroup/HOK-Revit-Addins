@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if RELEASE2022 
+using Revit.IFC.Export.Utility;
+#endif
 
 namespace HOK.SmartBCF.AddIn.Util
 {
@@ -39,7 +42,11 @@ namespace HOK.SmartBCF.AddIn.Util
         {
             isLinked = false;
             linkedDocument = doc;
+#if RELEASE2022
+            ifcProjectGuid = GUIDUtil.CreateProjectLevelGUID(linkedDocument, GUIDUtil.ProjectLevelGUIDType.Project);
+#else
             ifcProjectGuid = ExporterIFCUtils.CreateProjectLevelGUID(linkedDocument, IFCProjectLevelGUIDType.Project);
+#endif
 
         }
 
@@ -66,9 +73,13 @@ namespace HOK.SmartBCF.AddIn.Util
 
                 if (null != linkedDocument)
                 {
+#if RELEASE2022
+                    ifcProjectGuid = GUIDUtil.CreateProjectLevelGUID(linkedDocument, GUIDUtil.ProjectLevelGUIDType.Project);
+#else
                     ifcProjectGuid = ExporterIFCUtils.CreateProjectLevelGUID(linkedDocument, IFCProjectLevelGUIDType.Project);
+#endif
                 }
-                
+
             }
             catch (Exception ex)
             {

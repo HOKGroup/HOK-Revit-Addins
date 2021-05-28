@@ -89,7 +89,7 @@ namespace HOK.FinishCreator
                         var floorType = FindFloorType(room);
                         var newFloor = CreateNewFloor(room, curveArrayList, floorType);
 
-                        
+
                         if (null != newFloor)
                         {
                             createdFloors.Add(newFloor);
@@ -118,11 +118,27 @@ namespace HOK.FinishCreator
                         if (null != floorType && ElementId.InvalidElementId != room.LevelId)
                         {
                             var roomLevel = m_doc.GetElement(room.LevelId) as Level;
+#if RELEASE2022
+                            var loopProfile = new List<CurveLoop>(1);
+                            List<Curve> curves = new List<Curve>();
+                            foreach (Curve curve in curveArrayList[0])
+                            {
+                                curves.Add(curve);
+                            }
+                            CurveLoop curveLoop = CurveLoop.Create(curves);
+                            loopProfile.Add(curveLoop);
+                            newFloor = Floor.Create(m_doc, loopProfile, floorType.Id, roomLevel.Id);
+#else
                             newFloor = m_doc.Create.NewFloor(curveArrayList[0], floorType, roomLevel, false);
+#endif
                         }
                         else
                         {
+#if RELEASE2022
+                            throw new Exception("FloorTypeId or RoomLevelId was not valid");
+#else
                             newFloor = m_doc.Create.NewFloor(curveArrayList[0], false);
+#endif
                         }
                         trans.Commit();
                     }

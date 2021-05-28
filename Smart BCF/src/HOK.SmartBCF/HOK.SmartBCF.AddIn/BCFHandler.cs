@@ -51,7 +51,7 @@ namespace HOK.SmartBCF.AddIn
                         if (null != BCFOrthoView)
                         {
                             CleanViewSettings(BCFOrthoView, true, true, true);
-                            
+
                             SetDefaultView();
                             if (ViewModel.IsHighlightChecked) HighlightElements();
                             if (ViewModel.IsIsolateChecked) IsolateElement(BCFOrthoView);
@@ -59,11 +59,11 @@ namespace HOK.SmartBCF.AddIn
                         }
                         break;
                     case RequestId.HighlightElement:
-                         if (null != BCFOrthoView)
-                         {
-                             CleanViewSettings(BCFOrthoView, true, false, false);
-                             if (ViewModel.IsHighlightChecked) HighlightElements();
-                         }
+                        if (null != BCFOrthoView)
+                        {
+                            CleanViewSettings(BCFOrthoView, true, false, false);
+                            if (ViewModel.IsHighlightChecked) HighlightElements();
+                        }
                         break;
                     case RequestId.IsolateElement:
                         if (null != BCFOrthoView)
@@ -76,14 +76,14 @@ namespace HOK.SmartBCF.AddIn
                         }
                         break;
                     case RequestId.PlaceSectionBox:
-                         if (null != BCFOrthoView)
-                         {
-                             CleanViewSettings(BCFOrthoView, false, true, true);
-                             SetDefaultView();
+                        if (null != BCFOrthoView)
+                        {
+                            CleanViewSettings(BCFOrthoView, false, true, true);
+                            SetDefaultView();
 
-                             if (ViewModel.IsSectionBoxChecked) PlaceSectionBox(BCFOrthoView);
-                             else SetViewPointView();
-                         }
+                            if (ViewModel.IsSectionBoxChecked) PlaceSectionBox(BCFOrthoView);
+                            else SetViewPointView();
+                        }
                         break;
                     case RequestId.WriteParameters:
                         WriteParameters();
@@ -102,7 +102,7 @@ namespace HOK.SmartBCF.AddIn
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to execute the external event.\n"+ex.Message, "Execute Event", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to execute the external event.\n" + ex.Message, "Execute Event", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -182,7 +182,7 @@ namespace HOK.SmartBCF.AddIn
                         var boundingBox = element.get_BoundingBox(null);
                         var minXYZ = transform.OfPoint(boundingBox.Min);
                         var maxXYZ = transform.OfPoint(boundingBox.Max);
-                            
+
 
                         var offsetBox = new BoundingBoxXYZ();
                         offsetBox.Min = new XYZ(minXYZ.X - 3, minXYZ.Y - 3, minXYZ.Z - 3);
@@ -311,7 +311,7 @@ namespace HOK.SmartBCF.AddIn
                     }
                     else
                     {
-                       
+
                         var originalDefinitionFile = m_app.Application.SharedParametersFilename;
                         m_app.Application.SharedParametersFilename = addinDefinitionFile;
                         var definitionFile = m_app.Application.OpenSharedParameterFile();
@@ -343,7 +343,7 @@ namespace HOK.SmartBCF.AddIn
                         m_app.Application.SharedParametersFilename = originalDefinitionFile;
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -394,7 +394,7 @@ namespace HOK.SmartBCF.AddIn
 
                         updated = SetPerspectiveView(BCFPersView, visInfo.PerspectiveCamera);
                         m_app.ActiveUIDocument.ActiveView = BCFPersView;
-                        BCFUIView = FindDefaultUIView(BCFPersView);    
+                        BCFUIView = FindDefaultUIView(BCFPersView);
                     }
                     else if (!visInfo.IsPersepective && null != BCFOrthoView)
                     {
@@ -513,7 +513,7 @@ namespace HOK.SmartBCF.AddIn
             return result;
         }
 
-        private bool SetPerspectiveView(View3D bcfView,  PerspectiveCamera camera)
+        private bool SetPerspectiveView(View3D bcfView, PerspectiveCamera camera)
         {
             var result = false;
             try
@@ -535,7 +535,7 @@ namespace HOK.SmartBCF.AddIn
                         if (bcfView.get_Parameter(BuiltInParameter.VIEWER_BOUND_ACTIVE_FAR).HasValue)
                         {
                             var m_farClip = bcfView.get_Parameter(BuiltInParameter.VIEWER_BOUND_ACTIVE_FAR);
-                            m_farClip.Set(0); 
+                            m_farClip.Set(0);
                         }
 
                         bcfView.CropBoxActive = true;
@@ -686,7 +686,7 @@ namespace HOK.SmartBCF.AddIn
                 var viewName = "SmartBCF - Orthogonal - " + Environment.UserName;
                 var collector = new FilteredElementCollector(ActiveDoc);
                 var view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
-#if RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#if RELEASE2018
                 var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.ViewName == viewName select view;
 #else
                 var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.Name == viewName select view;
@@ -719,7 +719,7 @@ namespace HOK.SmartBCF.AddIn
             }
             catch (Exception)
             {
-               // ignored
+                // ignored
             }
 
             return view3D;
@@ -734,7 +734,7 @@ namespace HOK.SmartBCF.AddIn
                 var collector = new FilteredElementCollector(ActiveDoc);
                 var view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
                 //by the limitation of perspective view, create isometric instead
-#if RELEASE2015 || RELEASE2016 || RELEASE2017 || RELEASE2018
+#if RELEASE2018
                 var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.ViewName == viewName select view;
 #else
                 var viewfound = from view in view3ds where view.IsTemplate == false && view.IsPerspective == false && view.Name == viewName select view;
@@ -784,7 +784,7 @@ namespace HOK.SmartBCF.AddIn
                 if (viewFound.Any())
                 {
                     uiview = viewFound.First();
-                }   
+                }
             }
             catch (Exception)
             {
@@ -1000,18 +1000,18 @@ namespace HOK.SmartBCF.AddIn
                 var upVector = new Direction
                 {
                     Guid = Guid.NewGuid().ToString(),
-                    X=up.X.ToMeters(),
-                    Y=up.Y.ToMeters(),
-                    Z=up.Z.ToMeters()
+                    X = up.X.ToMeters(),
+                    Y = up.Y.ToMeters(),
+                    Z = up.Z.ToMeters()
                 };
                 camera.CameraUpVector = upVector;
 
                 var direction = new Direction
                 {
                     Guid = Guid.NewGuid().ToString(),
-                    X= -(vi.X.ToMeters()),
-                    Y=-(vi.Y.ToMeters()),
-                    Z=-(vi.Z.ToMeters())
+                    X = -(vi.X.ToMeters()),
+                    Y = -(vi.Y.ToMeters()),
+                    Z = -(vi.Z.ToMeters())
                 };
                 camera.CameraDirection = direction;
 
@@ -1096,7 +1096,7 @@ namespace HOK.SmartBCF.AddIn
 
             return camera;
         }
-       
+
         public string GetName()
         {
             return "BCF Event Handler";

@@ -283,7 +283,7 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 
@@ -304,7 +304,7 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 
@@ -325,7 +325,7 @@ namespace HOK.RoomsToMass.ToMass
             }
             catch (Exception ex)
             {
-                string message = ex.Message;
+                _ = ex.Message;
             }
         }
 

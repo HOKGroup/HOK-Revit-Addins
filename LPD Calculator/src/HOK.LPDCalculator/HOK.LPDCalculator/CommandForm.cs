@@ -30,7 +30,7 @@ namespace HOK.LPDCalculator
         {
             m_app = uiapp;
             m_doc = m_app.ActiveUIDocument.Document;
-           
+
             InitializeComponent();
             Text = "LPD Analysis - v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
             progressBar.Visible = false;
@@ -46,8 +46,13 @@ namespace HOK.LPDCalculator
                 var collector = new FilteredElementCollector(m_doc);
                 var area = collector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList().First() as Area;
 
+#if RELEASE2022
+                var param1Found = FindParameter(area, "ActualLightingLoad", SpecTypeId.ApparentPower);
+                var param2Found = FindParameter(area, "ActualLPD", SpecTypeId.ElectricalPowerDensity);
+#else
                 var param1Found = FindParameter(area, "ActualLightingLoad", ParameterType.ElectricalApparentPower);
                 var param2Found = FindParameter(area, "ActualLPD", ParameterType.ElectricalPowerDensity);
+#endif
 
                 if (param1Found && param2Found)
                 {
@@ -100,7 +105,7 @@ namespace HOK.LPDCalculator
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to run Building Area method.\n"+ex.Message, "Building Area Method", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Failed to run Building Area method.\n" + ex.Message, "Building Area Method", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 
@@ -108,14 +113,19 @@ namespace HOK.LPDCalculator
         {
             try
             {
-                
+
                 var selection = GetModelSelection();
 
                 var collector = new FilteredElementCollector(m_doc);
                 var area = collector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList().First() as Area;
 
+#if RELEASE2022
+                var param1Found = FindParameter(area, "ActualLightingLoad", SpecTypeId.ApparentPower);
+                var param2Found = FindParameter(area, "ActualLPD", SpecTypeId.ElectricalPowerDensity);
+#else
                 var param1Found = FindParameter(area, "ActualLightingLoad", ParameterType.ElectricalApparentPower);
                 var param2Found = FindParameter(area, "ActualLPD", ParameterType.ElectricalPowerDensity);
+#endif
 
                 if (param1Found && param2Found)
                 {
@@ -231,16 +241,25 @@ namespace HOK.LPDCalculator
             return selection;
         }
 
+#if RELEASE2022
+        private bool FindParameter(Area area, string paramName, ForgeTypeId paramType)
+        {
+#else
         private bool FindParameter(Area area, string paramName, ParameterType paramType)
         {
+#endif
             var result = false;
             try
             {
                 var param = area.LookupParameter(paramName);
-                
+
                 if (null != param)
                 {
+#if RELEASE2022
+                    if (param.Definition.GetDataType() == paramType)
+#else
                     if (param.Definition.ParameterType == paramType)
+#endif
                     {
                         return true;
                     }
@@ -261,8 +280,13 @@ namespace HOK.LPDCalculator
             return result;
         }
 
+#if RELEASE2022
+        private bool FindParameter(Room room, string paramName, ForgeTypeId paramType)
+        {
+#else
         private bool FindParameter(Room room, string paramName, ParameterType paramType)
         {
+#endif
             var result = false;
             try
             {
@@ -270,7 +294,11 @@ namespace HOK.LPDCalculator
 
                 if (null != param)
                 {
+#if RELEASE2022
+                    if (param.Definition.GetDataType() == paramType)
+#else
                     if (param.Definition.ParameterType == paramType)
+#endif
                     {
                         return true;
                     }
@@ -328,6 +356,6 @@ namespace HOK.LPDCalculator
             }
         }
 
-        
+
     }
 }

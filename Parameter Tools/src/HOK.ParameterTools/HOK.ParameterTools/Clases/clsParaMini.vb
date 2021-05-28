@@ -71,7 +71,13 @@ Public Class clsParaMini
     Public ReadOnly Property DisplayUnitType() As String
         Get
             Try
-                Return m_parameter.DisplayUnitType.ToString
+#If RELEASE2022 Then
+                Return m_parameter.Definition.GetDataType().ToString
+#Else
+                Return m_parameter.Definition.ParameterType.ToString
+#End If
+            Catch
+                Return Nothing
             Catch
                 Return Nothing
             End Try

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,10 +10,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.SheetManager.Core</RootNamespace>
     <AssemblyName>HOK.SheetManager.Core</AssemblyName>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2016'">v4.6</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2017'">v4.6</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2018'">v4.6</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -25,6 +22,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RevitVersion>2022</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DebugType>pdbonly</DebugType>
@@ -33,24 +32,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2016|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\2016\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2017|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\2017\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2022</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -60,6 +43,8 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2018</RevitVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2019|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -69,7 +54,42 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2019</RevitVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2020|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2020\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2020</RevitVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2021|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2021\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2021</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+  </PopertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2022|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2022\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2022</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+  </PopertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
@@ -252,22 +272,11 @@
   <PropertyGroup>
     <PostBuildEvent>echo Configuration: $(Configuration)
 
-if $(Configuration) == 2016 goto Build2016
-if $(Configuration) == 2017 goto Build2017
 if $(Configuration) == 2018 goto Build2018
 if $(Configuration) == 2019 goto Build2019
-
-:Build2016
-echo Copying results to Build2016
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2016\HOK-Addin.bundle\Contents"
-goto exit
-
-:Build2017
-echo Copying results to Build2017
-if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2017\HOK-Addin.bundle\Contents"
-goto exit
+if $(Configuration) == 2020 goto Build2020
+if $(Configuration) == 2022 goto Build2021
+if $(Configuration) == 2022 goto Build2022
 
 :Build2018
 echo Copying results to Build2018
@@ -279,6 +288,24 @@ goto exit
 echo Copying results to Build2019
 if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
 copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2019\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2020
+echo Copying results to Build2020
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2020\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2020\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2020\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2021
+echo Copying results to Build2021
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2021\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2021\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2021\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2022
+echo Copying results to Build2022
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2022\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2022\HOK-Addin.bundle\Contents"
+copy /Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2022\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>

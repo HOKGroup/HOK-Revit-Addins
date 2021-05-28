@@ -132,11 +132,7 @@ Public Class form_ElemPlaceUnplacedRooms
             Dim elemId As New ElementId(CInt(Convert.ToInt64(listItem.Substring(listItem.IndexOf("<") + 1, listItem.Length - listItem.IndexOf("<") - 2))))
 
             Dim roomToPlace As Architecture.Room = DirectCast(m_Settings.Document.GetElement(elemId), Architecture.Room)
-#If RELEASE2013 Or RELEASE2014 Then
-            Dim parameterArea As Parameter = roomToPlace.Parameter(textBoxParameterRequiredArea.Text)
-#Else
             Dim parameterArea As Parameter = roomToPlace.LookupParameter(textBoxParameterRequiredArea.Text)
-#End If
 
             Dim areaCurrent As Double
             If parameterArea Is Nothing Then
@@ -156,17 +152,10 @@ Public Class form_ElemPlaceUnplacedRooms
             Dim ptCurrentInsert As UV = New UV(ptCurrentBox1.X + sideCurrent / 2, ptCurrentBox1.Y - sideCurrent / 2)
 
             'Place boundary curves
-#If RELEASE2013 Then
-            Dim line1 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox1, ptCurrentBox2, True)
-            Dim line2 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox2, ptCurrentBox3, True)
-            Dim line3 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox3, ptCurrentBox4, True)
-            Dim line4 As Curve = m_Settings.Application.Application.Create.NewLine(ptCurrentBox4, ptCurrentBox1, True)
-#Else
             Dim line1 As Curve = Line.CreateBound(ptCurrentBox1, ptCurrentBox2)
             Dim line2 As Curve = Line.CreateBound(ptCurrentBox2, ptCurrentBox3)
             Dim line3 As Curve = Line.CreateBound(ptCurrentBox3, ptCurrentBox4)
             Dim line4 As Curve = Line.CreateBound(ptCurrentBox4, ptCurrentBox1)
-#End If
             
 
             ' Normal is always up in our case
@@ -284,12 +273,8 @@ Public Class form_ElemPlaceUnplacedRooms
             Next
 
             'Tag the new room
-#If RELEASE2013 Then
-            Dim roomTag As Architecture.RoomTag = m_Settings.Document.Create.NewRoomTag(roomNew, ptCurrentInsert, m_Settings.ActiveView)
-#Else
             Dim roomId As LinkElementId = New LinkElementId(roomNew.Id)
             Dim roomTag As Architecture.RoomTag = m_Settings.Document.Create.NewRoomTag(roomId, ptCurrentInsert, m_Settings.ActiveView.Id)
-#End If
             roomTag.HasLeader = False
 
             'Delete the old area
@@ -390,31 +375,11 @@ Public Class form_ElemPlaceUnplacedRooms
     Public Function CreateSketchPlane(ByVal normal As XYZ, ByVal origin As XYZ) As SketchPlane
         Try
 
-#If RELEASE2013 Then
-             ' First create a Geometry.Plane which need in NewSketchPlane() method
-            Dim geometryPlane As Plane = m_Settings.Application.Application.Create.NewPlane(normal, origin)
-            If geometryPlane Is Nothing Then
-                ' assert the creation is successful
-                Throw New Exception("Create the geometry plane failed.")
-            End If
-            ' Then create a sketch plane using the Geometry.Plane
-            Dim sPlane As SketchPlane = m_Settings.Document.Create.NewSketchPlane(geometryPlane)
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
-             ' First create a Geometry.Plane which need in NewSketchPlane() method
-            Dim geometryPlane As Plane = m_Settings.Application.Application.Create.NewPlane(normal, origin)
-            If geometryPlane Is Nothing Then
-                ' assert the creation is successful
-                Throw New Exception("Create the geometry plane failed.")
-            End If
-            ' Then create a sketch plane using the Geometry.Plane
-            Dim sPlane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
-#Else
             Dim geometryPlane As Plane = Plane.CreateByNormalAndOrigin(normal, origin)
             If geometryPlane Is Nothing Then
                 Throw New Exception("Create the geometry plane failed.")
             End If
             Dim sPlane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
-#End If
 
             If sPlane Is Nothing Then
                 ' assert the creation is successful
@@ -438,7 +403,6 @@ Public Class form_ElemPlaceUnplacedRooms
     Public Function CreateSketchPlaneByCurve(ByVal curve As CurveArray) As SketchPlane
         Try
             ' First create a Geometry.Plane which need in NewSketchPlane() method
-#If RELEASE2017 Or RELEASE2018 Or RELEASE2019 Or RELEASE2020 Or RELEASE2021 Then
             Dim curveList As List(Of Curve) = New List(Of Curve)
             Dim curveIterator As CurveArrayIterator = curve.ForwardIterator
             While (curveIterator.MoveNext())
@@ -453,20 +417,8 @@ Public Class form_ElemPlaceUnplacedRooms
                 Throw New Exception("Create the geometry plane failed.")
             End If
             ' Then create a sketch plane using the Geometry.Plane
-#Else
-             Dim geometryPlane As Plane = m_Settings.Application.Application.Create.NewPlane(curve)
-            If geometryPlane Is Nothing Then
-                ' assert the creation is successful
-                Throw New Exception("Create the geometry plane failed.")
-            End If
-            ' Then create a sketch plane using the Geometry.Plane
-#End If
 
-#If RELEASE2013 Then
-            Dim plane As SketchPlane = m_Settings.Document.Create.NewSketchPlane(geometryPlane)
-#Else
             Dim plane As SketchPlane = SketchPlane.Create(m_Settings.Document, geometryPlane)
-#End If
 
             If plane Is Nothing Then
                 ' assert the creation is successful

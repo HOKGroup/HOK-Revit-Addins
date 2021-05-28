@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0"
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,12 +10,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HOK.MissionControl.StylesManager</RootNamespace>
     <AssemblyName>HOK.MissionControl.StylesManager</AssemblyName>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2016'">v4.5.2</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2017'">v4.5.2</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2018'">v4.5.2</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2019'">v4.7.1</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2020'">v4.7.2</TargetFrameworkVersion>
-    <TargetFrameworkVersion Condition="'$(Configuration)' == '2021'">v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -27,6 +22,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RevitVersion>2022</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +32,8 @@
     <DefineConstants>DEBUG;TRACE;RELEASE2016</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RevitVersion>2022</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2018|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -44,24 +43,8 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2017|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\2017\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2017</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2016|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\2016\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;RELEASE2016</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2018</RevitVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2019|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -71,6 +54,8 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2019</RevitVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2020|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -80,6 +65,8 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2020</RevitVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2021|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -89,6 +76,19 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2021</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2022|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2022\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2022</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2022</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight, Version=5.3.0.19026, Culture=neutral, PublicKeyToken=e7570ab207bcb616, processorArchitecture=MSIL">
@@ -100,63 +100,13 @@
     <Reference Include="GalaSoft.MvvmLight.Platform, Version=5.3.0.19032, Culture=neutral, PublicKeyToken=5f873c45e98af8a1, processorArchitecture=MSIL">
       <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\GalaSoft.MvvmLight.Platform.dll</HintPath>
     </Reference>
-    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2016'">
-      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\2016\HOK.Feedback.dll</HintPath>
+    <Reference Include="HOK.Feedback">
+      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\$(RevitVersion)\HOK.Feedback.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2017'">
-      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\2017\HOK.Feedback.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2018'">
-      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\2018\HOK.Feedback.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2019'">
-      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\2019\HOK.Feedback.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2020'">
-      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\2020\HOK.Feedback.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Feedback" Condition="'$(Configuration)' == '2021'">
-      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\2021\HOK.Feedback.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2016'">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\2016\HOK.Core.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2017'">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\2017\HOK.Core.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2018'">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\2018\HOK.Core.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2019'">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\2019\HOK.Core.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2020'">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\2020\HOK.Core.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="HOK.Core" Condition="'$(Configuration)' == '2021'">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\2021\HOK.Core.dll</HintPath>
+    <Reference Include="HOK.Core">
+      <HintPath>..\..\HOK.Core\HOK.Core\bin\$(RevitVersion)\HOK.Core.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -165,68 +115,20 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPI.dll</HintPath>
+    <Reference Include="RevitAPI">
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">C:\Program Files\Autodesk\Revit $(RevitVersion)\RevitAPI.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\$(RevitVersion)\RevitAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2016'">
-      <HintPath>..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2016\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2017'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2017\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2017'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2017\RevitAPIUI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2017\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2018'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2018\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2018'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2018\RevitAPIUI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2018\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2019'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2019\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2019'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2019\RevitAPIUI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2019\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2020'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2020\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2020'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2020\RevitAPIUI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2020\RevitAPIUI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPI" Condition="'$(Configuration)' == '2021'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2021\RevitAPI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="RevitAPIUI" Condition="'$(Configuration)' == '2021'">
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\RevitAPIUI.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\2021\RevitAPIUI.dll</HintPath>
+    <Reference Include="RevitAPIUI">
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">C:\Program Files\Autodesk\Revit $(RevitVersion)\RevitAPIUI.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\$(RevitVersion)\RevitAPIUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MvvmLightLibs.5.3.0.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+      <HintPath>..\packages\Expression.Blend.Sdk.1.0.2\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -332,7 +234,7 @@
   </PropertyGroup>
   <Target Name="CopyFiles" AfterTargets="AfterBuild">
     <Exec Command="&quot;$(SolutionDir)..\_postBuild\codeSigning.bat&quot; &quot;$(TargetPath)&quot;" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
-    <Copy SourceFiles="$(TargetDir)$(TargetName).addin" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(Configuration)" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(RevitVersion)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).addin" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(RevitVersion)" ContinueOnError="true" />
   </Target>
 </Project>

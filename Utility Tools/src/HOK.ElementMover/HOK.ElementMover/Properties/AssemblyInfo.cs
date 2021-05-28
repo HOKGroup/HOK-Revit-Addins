@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.ElementMover")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2015")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2021")]
 [assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2021.1.0.13")]
-[assembly: AssemblyFileVersion("2021.1.0.13")]
+[assembly: AssemblyVersion("2022.1.0.16")]
+[assembly: AssemblyFileVersion("2022.1.0.16")]

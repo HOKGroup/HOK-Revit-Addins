@@ -81,11 +81,11 @@ namespace HOK.ViewAnalysis
                         }
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Cannot find room face: "+ex.Message);
+                Debug.WriteLine("Cannot find room face: " + ex.Message);
             }
             return bottomFace;
         }
@@ -103,11 +103,7 @@ namespace HOK.ViewAnalysis
                     foreach (var segment in segmentList)
                     {
                         var sData = new SegmentData(segment);
-#if RELEASE2015
-                        Element element = segment.Element;
-#else
                         var element = RoomDocument.GetElement(segment.ElementId);
-#endif
 
                         if (null != element)
                         {
@@ -216,8 +212,8 @@ namespace HOK.ViewAnalysis
                 var instances = new List<FamilyInstance>();
                 foreach (var elementId in insertedElementIds)
                 {
-                    var instance = wall.Document.GetElement(elementId)  as FamilyInstance;
-                    if(null!=instance)
+                    var instance = wall.Document.GetElement(elementId) as FamilyInstance;
+                    if (null != instance)
                     {
                         if (instance.Category.Id.IntegerValue == (int)BuiltInCategory.OST_Windows || instance.Category.Id.IntegerValue == (int)BuiltInCategory.OST_Doors)
                         {
@@ -255,7 +251,7 @@ namespace HOK.ViewAnalysis
                     var bb = instace.get_BoundingBox(null);
 
                     var minPoint = transform.OfPoint(bb.Min);
-                    double startParam =0;
+                    double startParam = 0;
                     XYZ startPoint = null;
                     result = segmentCurve.Project(minPoint);
                     if (null != result)
@@ -318,23 +314,12 @@ namespace HOK.ViewAnalysis
         public SegmentData(Autodesk.Revit.DB.BoundarySegment segment)
         {
             SegmentObj = segment;
-#if RELEASE2015
-            BoundaryCurve = segment.Curve;
-#else
             BoundaryCurve = segment.GetCurve();
-#endif
 
-#if RELEASE2015
-            if (null == segment.Element)
-            {
-                VisibleCurves.Add(BoundaryCurve);
-            }
-#else
             if (ElementId.InvalidElementId != segment.ElementId)
             {
                 VisibleCurves.Add(BoundaryCurve);
             }
-#endif
         }
 
         public void GetViewPoints(bool isCurtainWall)
@@ -346,7 +331,7 @@ namespace HOK.ViewAnalysis
                     if (isCurtainWall)
                     {
                         double interval = IsExteriror ? 2 : 1;
-                        
+
                         var startParam = curve.GetEndParameter(0);
                         var endParam = curve.GetEndParameter(1);
 
@@ -370,7 +355,7 @@ namespace HOK.ViewAnalysis
                             ViewPoints.Add(point);
                         }
                     }
-                    
+
                 }
             }
             catch (Exception ex)

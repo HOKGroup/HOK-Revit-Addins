@@ -10,7 +10,7 @@ using Autodesk.Revit.UI.Selection;
 
 namespace HOK.ElementMover
 {
-    public class MoverHandler:IExternalEventHandler
+    public class MoverHandler : IExternalEventHandler
     {
         private UIApplication m_app;
         private LinkedInstanceProperties selectedLink;
@@ -38,7 +38,7 @@ namespace HOK.ElementMover
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to initialize the external event hanlder.\n"+ex.Message, "External Event Hanlder", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to initialize the external event hanlder.\n" + ex.Message, "External Event Hanlder", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -66,7 +66,7 @@ namespace HOK.ElementMover
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to collect Revit Link Instances.\n"+ex.Message, "Collect Revit Links", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to collect Revit Link Instances.\n" + ex.Message, "Collect Revit Links", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -152,7 +152,7 @@ namespace HOK.ElementMover
                                 catch (Exception ex)
                                 {
                                     trans.RollBack();
-                                    MessageBox.Show("Failed to delete element maps.\n"+ex.Message, "Delete Element Maps", MessageBoxButton.OK, MessageBoxImage.Warning);
+                                    MessageBox.Show("Failed to delete element maps.\n" + ex.Message, "Delete Element Maps", MessageBoxButton.OK, MessageBoxImage.Warning);
                                 }
                             }
                             MappingWindowInstance.RefreshLinkInstance();
@@ -206,7 +206,7 @@ namespace HOK.ElementMover
                                 }
                             }
                         }
-                      
+
                         FamilyWindowInstance.WakeUp();
                         break;
                     case RequestId.DeleteFamilyMapping:
@@ -251,7 +251,7 @@ namespace HOK.ElementMover
                         return;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show("Failed to execute external event handler.\n" + ex.Message, "Execute External Event Handler", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
@@ -293,7 +293,7 @@ namespace HOK.ElementMover
         {
             var picked = false;
             sourceElement = null;
-            targetElement = null; 
+            targetElement = null;
             using (var trans = new Transaction(CurrentDocument))
             {
                 trans.Start("Pick Mapping Elements");
@@ -304,7 +304,7 @@ namespace HOK.ElementMover
                     if (null != reference)
                     {
                         var linkedInstanceId = reference.ElementId;
-                        if (LinkInstances.ContainsKey(linkedInstanceId) && reference.LinkedElementId!=ElementId.InvalidElementId)
+                        if (LinkInstances.ContainsKey(linkedInstanceId) && reference.LinkedElementId != ElementId.InvalidElementId)
                         {
                             var lip = LinkInstances[linkedInstanceId];
                             var linkedDoc = lip.LinkedDocument;
@@ -312,12 +312,12 @@ namespace HOK.ElementMover
                             var linkedElement = linkedDoc.GetElement(reference.LinkedElementId); //element in linked model
                             if (null != linkedElement)
                             {
-                                if(null!=linkedElement.Category)
+                                if (null != linkedElement.Category)
                                 {
                                     var categoryId = linkedElement.Category.Id;
                                     var categoryName = linkedElement.Category.Name;
                                     ISelectionFilter selFilter = new TargetElementSelectionFilter(categoryId);
-                                    var secondReference = selection.PickObject(ObjectType.Element, "Pick a target item in the host model. The required category should be "+categoryName);
+                                    var secondReference = selection.PickObject(ObjectType.Element, "Pick a target item in the host model. The required category should be " + categoryName);
                                     if (null != secondReference)
                                     {
                                         var eId = secondReference.ElementId;
@@ -340,7 +340,7 @@ namespace HOK.ElementMover
                                                 targetTypeInfo = new ElementTypeInfo(targetType);
                                             }
 
-                                            if (null!=sourceTypeInfo && null!=targetType) 
+                                            if (null != sourceTypeInfo && null != targetType)
                                             {
                                                 sourceElement = linkedElement;
                                                 targetElement = element;
@@ -389,7 +389,7 @@ namespace HOK.ElementMover
                 catch (Exception ex)
                 {
                     trans.RollBack();
-                    MessageBox.Show("Failed to pick mapping elements.\n"+ex.Message, "Pick Mapping Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Failed to pick mapping elements.\n" + ex.Message, "Pick Mapping Elements", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
             return picked;
@@ -432,22 +432,11 @@ namespace HOK.ElementMover
                 try
                 {
                     var uidoc = new UIDocument(CurrentDocument);
-#if RELEASE2014
-                    Element element = m_doc.GetElement(selectedLinkedInfo.LinkedElementId);
-                    if(null!=element)
-                    {
-                        SelElementSet selElements = uidoc.Selection.Elements;
-                        selElements.Insert(element);
-
-                        uidoc.Selection.Elements = selElements;
-                    }
-#else
                     var selectedIds = new List<ElementId>
                     {
                         SelectedLinkedInfo.LinkedElementId
                     };
                     uidoc.Selection.SetElementIds(selectedIds);
-#endif
                     uidoc.ShowElements(SelectedLinkedInfo.LinkedElementId);
                     trans.Commit();
                 }
@@ -472,7 +461,7 @@ namespace HOK.ElementMover
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to apply changes made on the current document.\n"+ex.Message, "Apply Document Changes", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to apply changes made on the current document.\n" + ex.Message, "Apply Document Changes", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
@@ -491,7 +480,7 @@ namespace HOK.ElementMover
         DeleteMappingElements = 4,
         ShowElement = 5,
         AddFamilyMapping = 6,
-        DeleteFamilyMapping =7
+        DeleteFamilyMapping = 7
     }
 
     public class Request
@@ -540,5 +529,5 @@ namespace HOK.ElementMover
         {
             return false;
         }
-    }   
+    }
 }

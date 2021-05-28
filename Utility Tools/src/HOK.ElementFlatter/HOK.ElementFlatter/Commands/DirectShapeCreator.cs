@@ -90,19 +90,11 @@ namespace HOK.ElementFlatter.Commands
                     try
                     {
                         DirectShape directShape = null;
-#if RELEASE2015 || RELEASE2016
-                        var shapeTypeId = ElementId.InvalidElementId;
-                        var appDataGUID = element.Id.IntegerValue.ToString();
-#endif
                         var shapeGeometries = FindElementGeometry(geoElement);
-                        
+
                         if (shapeGeometries.Count > 0)
                         {
-#if RELEASE2015 || RELEASE2016
-                            directShape = DirectShape.CreateElement(doc, element.Category.Id, appDataGUID, appDataGUID);
-#else
                             directShape = DirectShape.CreateElement(doc, element.Category.Id);
-#endif
                             directShape.SetShape(shapeGeometries);
                         }
 
@@ -196,7 +188,7 @@ namespace HOK.ElementFlatter.Commands
                     case BuiltInCategory.OST_Stairs:
                         if (Stairs.IsByComponent(doc, element.Id))
                         {
-                            var stair = (Stairs) element;
+                            var stair = (Stairs)element;
                             var railingIds = stair.GetAssociatedRailings();
                             if (railingIds.Count > 0)
                             {

@@ -348,12 +348,8 @@ Public Class form_ElemTagViews
                     roomBoundingBox = roomToTag.BoundingBox(viewToUse)
                     Dim uvPointInsertion As New DB.UV((roomBoundingBox.Max.X + roomBoundingBox.Min.X) / 2, (roomBoundingBox.Max.Y + roomBoundingBox.Min.Y) / 2)
 
-#If RELEASE2013 Then
-                    roomTag = m_Settings.Document.Create.NewRoomTag(roomToTag, uvPointInsertion, viewToUse)
-#Else
                     Dim linkId As LinkElementId = New LinkElementId(roomToTag.Id)
                     roomTag = m_Settings.Document.Create.NewRoomTag(linkId, uvPointInsertion, viewToUse.Id)
-#End If
                     
                     roomTag.RoomTagType = roomTagType
                 End If

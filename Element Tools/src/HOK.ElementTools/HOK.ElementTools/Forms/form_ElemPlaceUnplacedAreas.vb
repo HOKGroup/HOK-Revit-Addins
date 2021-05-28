@@ -299,11 +299,7 @@ Public Class form_ElemPlaceUnplacedAreas
                 'Get the existing area
                 elemId = New DB.ElementId(CInt(Convert.ToInt64(listItem.Substring(listItem.IndexOf("<") + 1, listItem.Length - listItem.IndexOf("<") - 2))))
                 areaToPlace = DirectCast(m_Settings.Document.GetElement(elemId), DB.Area)
-#If RELEASE2013 Or RELEASE2014 Then
-                parameterArea = areaToPlace.Parameter(textBoxParameterRequiredArea.Text)
-#Else
                 parameterArea = areaToPlace.LookupParameter(textBoxParameterRequiredArea.Text)
-#End If
 
                 If parameterArea Is Nothing Then
                     areaCurrent = CDbl(Convert.ToDouble(textBoxParameterRequiredDefault.Text))
@@ -324,33 +320,6 @@ Public Class form_ElemPlaceUnplacedAreas
 
                 'Place the boundary line
 
-#If RELEASE2013 Then
-                curves.Clear()
-                line = m_Settings.Application.Application.Create.NewLine(ptCurrentBox1, ptCurrentBox2, True)
-                curves.Add(line)
-                line = m_Settings.Application.Application.Create.NewLine(ptCurrentBox2, ptCurrentBox3, True)
-                curves.Add(line)
-                line = m_Settings.Application.Application.Create.NewLine(ptCurrentBox3, ptCurrentBox4, True)
-                curves.Add(line)
-                line = m_Settings.Application.Application.Create.NewLine(ptCurrentBox4, ptCurrentBox1, True)
-                curves.Add(line)
-
-                Dim plane As DB.Plane = m_Settings.Document.Application.Create.NewPlane(norm, origin)
-                Dim sketchPlane As DB.SketchPlane = m_Settings.Document.Create.NewSketchPlane(plane)
-#ElseIf RELEASE2014 Or RELEASE2015 Or RELEASE2016 Then
-                curves.Clear()
-                line = DB.Line.CreateBound(ptCurrentBox1, ptCurrentBox2)
-                curves.Add(line)
-                line = DB.Line.CreateBound(ptCurrentBox2, ptCurrentBox3)
-                curves.Add(line)
-                line = DB.Line.CreateBound(ptCurrentBox3, ptCurrentBox4)
-                curves.Add(line)
-                line = DB.Line.CreateBound(ptCurrentBox4, ptCurrentBox1)
-                curves.Add(line)
-
-                Dim plane As DB.Plane = m_Settings.Document.Application.Create.NewPlane(norm, origin)
-                Dim sketchPlane As DB.SketchPlane = SketchPlane.Create(m_Settings.Document, plane)
-#Else
                 curves.Clear()
                 line = DB.Line.CreateBound(ptCurrentBox1, ptCurrentBox2)
                 curves.Add(line)
@@ -363,7 +332,6 @@ Public Class form_ElemPlaceUnplacedAreas
 
                 Dim plane As DB.Plane = Plane.CreateByNormalAndOrigin(norm, origin)
                 Dim sketchPlane As DB.SketchPlane = sketchPlane.Create(m_Settings.Document, plane)
-#End If
 
                 For Each curve As DB.Curve In curves
                     areaBoundaryLine = m_Settings.Document.Create.NewAreaBoundaryLine(sketchPlane, curve, m_Settings.ActiveViewPlan)
