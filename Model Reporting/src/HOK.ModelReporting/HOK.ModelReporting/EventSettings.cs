@@ -194,8 +194,8 @@ namespace HOK.ModelReporting
                 {
                     var regServer =
                         new Regex(
-                            @"^\\\\group\\hok\\(.+?(?=\\))|[\\|/](\w{2,3})-\d{2}svr(\.group\.hok\.com)?[\\|/]|^[rR]:\\(\w{2,3})\\",
-                            RegexOptions.IgnoreCase);
+                        @"^\\\\group\\hok\\(.+?(?=\\))|[\\|/](\w{2,3})-\d{2}svr(\.group\.hok\.com)?[\\|/]|^[rR]:\\(\w{2,3})\\",
+                        RegexOptions.IgnoreCase);
                     var regMatch = regServer.Match(path);
                     if (regMatch.Success)
                     {
@@ -297,27 +297,15 @@ namespace HOK.ModelReporting
                 var systemInfo = new ActiveDs.ADSystemInfo();
                 var siteName = systemInfo.SiteName;
                 UserLocation = !string.IsNullOrEmpty(siteName) ? siteName : "UNKNOWN";
-                if (UserLocation == "LON")
+                if (IpAddress == "")
                 {
-                    if (IpAddress == "")
-                    {
-                        GetIpAddress();
-                    }
-                    if (IpAddress.StartsWith("172.30.56."))
-                    {
-                        UserLocation = "VPN";
-                    }
+                    GetIpAddress();
                 }
-                if (UserLocation == "HK")
+                // Match IP addresses in ranges 172.30.56.0-254 or 172.30.56.0-254
+                string vpnSubnetRegex = @"^(172)\.(30)\.(5[6-7])\.(25[0-4]|2[0-4][0-9]|[01]?[0-9][0-9]?)$";
+                if (Regex.IsMatch(IpAddress, vpnSubnetRegex))
                 {
-                    if (IpAddress == "")
-                    {
-                        GetIpAddress();
-                    }
-                    if (IpAddress.StartsWith("172.30.57."))
-                    {
-                        UserLocation = "VPN";
-                    }
+                    UserLocation = "VPN";
                 }
             }
             catch
