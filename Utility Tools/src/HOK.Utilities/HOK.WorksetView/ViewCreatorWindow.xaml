@@ -19,6 +19,7 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"/>
@@ -26,8 +27,9 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Create View By:" HorizontalAlignment="Right" VerticalAlignment="Center" />
                 <ComboBox x:Name="comboBoxViewBy" Grid.Column="1" Margin="5,0,15,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{x:Null}" SelectionChanged="comboBoxViewBy_SelectionChanged"/>
-                <Label Grid.Row="1" Content="View Type:" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                <RadioButton x:Name="radioButton3D" Grid.Row="1" Grid.Column="1" Content="3D Views" VerticalAlignment="Center" Margin="5,0,0,0" IsChecked="True">
+                <Button Width="100" Height="20" IsEnabled="False" x:Name="ChooseFile" Grid.Row="1" Grid.Column="1" Margin="145,0,0,0" Click="ChooseFile_Click">Choose File</Button>
+                <Label Grid.Row="2" Content="View Type:" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                <RadioButton x:Name="radioButton3D" Grid.Row="2" Grid.Column="1" Content="3D Views" VerticalAlignment="Center" Margin="5,0,0,0" IsChecked="True">
                     <RadioButton.Style>
                         <Style TargetType="RadioButton">
                             <Style.Triggers>
@@ -38,7 +40,7 @@
                         </Style>
                     </RadioButton.Style>
                 </RadioButton>
-                <RadioButton x:Name="radioButtonPlan" Grid.Row="1" Grid.Column="1" Content="Plan Views" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="100,0,0,0">
+                <RadioButton x:Name="radioButtonPlan" Grid.Row="2" Grid.Column="1" Content="Plan Views" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="100,0,0,0">
                     <RadioButton.Style>
                         <Style TargetType="RadioButton">
                             <Style.Triggers>
@@ -50,8 +52,8 @@
                         </Style>
                     </RadioButton.Style>
                 </RadioButton>
-                <Label Grid.Row="2" Content="Level:" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                <ComboBox x:Name="comboBoxLevel" Grid.Row="2" Grid.Column="1" Margin="5,0,15,0" Background="{x:Null}" VerticalAlignment="Center" DisplayMemberPath="Name">
+                <Label Grid.Row="3" Content="Level:" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                <ComboBox x:Name="comboBoxLevel" Grid.Row="3" Grid.Column="1" Margin="5,0,15,0" Background="{x:Null}" VerticalAlignment="Center" DisplayMemberPath="Name">
                     <ComboBox.Style>
                         <Style TargetType="ComboBox">
                             <Style.Triggers>
@@ -65,21 +67,27 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Header="Source Items" Grid.Row="1" Margin="5,0,5,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <GroupBox Header="Create Views" Grid.Row="1" Margin="5,0,5,0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <ListBox x:Name="listBoxItems" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <ListBoxItem>
-                                <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Content="{Binding Path=ItemName}"/>
-                            </ListBoxItem>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+
+                <DataGrid ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                          x:Name="listBoxItems" CanUserAddRows="False" CanUserReorderColumns="True"
+                          CanUserResizeColumns="True" AlternatingRowBackground="#eee" AutoGenerateColumns="True"
+                          VerticalGridLinesBrush="Black" GridLinesVisibility="All">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Templates" Visibility="Hidden">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox ItemsSource="{Binding Templates, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" x:Name="TemplateCombo"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
                 <Button x:Name="buttonCheckAll" Grid.Row="1" Height="20" Width="20" Margin="5,0,0,0" HorizontalAlignment="Left" Click="buttonCheckAll_Click">
                     <Image Source="Image/checkbox_yes.png"/>
                 </Button>

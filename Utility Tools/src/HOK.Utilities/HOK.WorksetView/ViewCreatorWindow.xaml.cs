@@ -16,6 +16,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using System.IO;
+using Newtonsoft.Json;
+using System.Drawing;
 
 namespace HOK.WorksetView
 {
@@ -29,19 +32,26 @@ namespace HOK.WorksetView
   
         private ViewFamilyType view3dFamilyType = null;
         private ViewFamilyType viewPlanFamilyType = null;
-        private List<string> viewByList = new List<string>() { "Design Options","Phase","RVT Links", "Workset"};
+        private List<string> viewByList = new List<string>() { "Design Options","Phase","RVT Links", "Workset","From File"};
         private List<ItemInfo> sourceItems = new List<ItemInfo>();
         private ObservableCollection<ItemInfo> selectedItems = new ObservableCollection<ItemInfo>();
+        private ObservableCollection<DataGrid> selectedItemsGrid = new ObservableCollection<DataGrid>();
         private ObservableCollection<Level> levelItems = new ObservableCollection<Level>();
+        private JsonFileParameters Data= null;
+        private List<View> TemplateViews= new List<View>();
+        public List<List<Category>> CategoryList2D = new List<List<Category>>();
+        public List<List<Category>> CategoryList3D = new List<List<Category>>();
+        public List<TemplateChoosedDataGrid> templateChoosedDataGrids = new List<TemplateChoosedDataGrid>();
 
         private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
-
+        public ObservableCollection<string> Templates { get; private set; }
         public ViewCreatorWindow(UIApplication uiapp)
         {
             m_app = uiapp;
             m_doc = m_app.ActiveUIDocument.Document;
             InitializeComponent();
-
+            
+            var tr = System.Reflection.Assembly.GetExecutingAssembly().GetName();
             this.Title = "View Creator v" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             GetViewFamilyType();
@@ -139,6 +149,23 @@ namespace HOK.WorksetView
                     sourceItems.Add(info);
                 }
 
+                //All Views
+                collector = new FilteredElementCollector(m_doc);
+                IList<View> Views = collector.OfClass(typeof(View)).ToElements().Cast<View>().ToList();
+                foreach (View V in Views)
+                {
+                    if (V.IsTemplate)
+                    {
+                        TemplateViews.Add(V);
+                    }
+                    else
+                    {
+                        ItemInfo info = new ItemInfo(V, ViewBy.Category);
+                        sourceItems.Add(info);
+                    }
+
+                }
+
                 sourceItems = sourceItems.OrderBy(o => o.ItemName).ToList();
             }
             catch (Exception ex)
@@ -171,14 +198,106 @@ namespace HOK.WorksetView
                             radioButton3D.IsChecked = true;
                             selectedType = ViewBy.Link;
                             break;
+                        case "From File":
+                            radioButton3D.IsChecked = true;
+                            selectedType = ViewBy.Category;
+                            break;
                     }
 
                     listBoxItems.ItemsSource = null;
-                    var sources = from item in sourceItems where item.ItemType == selectedType select item;
-                    if (sources.Count() > 0)
+                    List<ItemInfo> sources = new List<ItemInfo>();
+                    if (viewByList[index] == "From File")
                     {
+                        Categories DocCategories = m_doc.Settings.Categories;
+                        List<Category> Categories = new List<Category>();
+                        foreach(Category category in DocCategories)
+                        {
+                            Categories.Add(category);
+                        }
+                        if (Data != null)
+                        {
+                            foreach(var Da in Data.data.views)
+                            {
+                                ItemInfo item = new ItemInfo(Da.viewname,ViewBy.Category);
+                                item.ItemName = Da.viewname;
+                                item.IsSelected = false;
+                                List<Category> TwoDCats = new List<Category>();
+                                List<Category> ThreeDCats = new List<Category>();
+                                if (Da.visible2Dcateogries.Count > 0)
+                                {
+                                    foreach(var JsonTwoDCat in Da.visible2Dcateogries)
+                                    {
+                                        var TwoDCat = Categories.Where(m => m.Name == JsonTwoDCat).FirstOrDefault();
+                                        
+                                        if(TwoDCat != null)
+                                        {
+                                            TwoDCats.Add(TwoDCat);
+                                        }
+                                    }
+                                }
+                                if (Da.visible3Dcateogries.Count > 0)
+                                {
+                                    foreach (var JsonThreeDCat in Da.visible3Dcateogries)
+                                    {
+                                        var ThreeDCat = Categories.Where(m => m.Name == JsonThreeDCat).FirstOrDefault();
+                                        if (ThreeDCat != null)
+                                        {
+                                            ThreeDCats.Add(ThreeDCat);
+                                        }
+
+                                    }
+                                }
+                                CategoryList2D.Add(TwoDCats);
+                                CategoryList3D.Add(ThreeDCats);
+                                sources.Add(item);
+                            }
+                            
+                           /* var items = (from item in sourceItems where item.ItemType == selectedType select item).ToList();
+                            foreach (var item in items)
+                            {
+                                var ViewName = (item.ItemObj as View).Name;
+                                var DataNames=Data.data.views.Select(m=>m.viewname).ToList();
+                                if (DataNames.Contains(ViewName))
+                                {
+                                    sources.Add(item);
+                                }
+                            }*/
+
+                        }
+                    }
+                    else
+                    {
+                        sources = (from item in sourceItems where item.ItemType == selectedType select item).ToList();
+                    }
+
+                    if (sources.Count() > 0)
+                    {   
+                        List<DataGrid> dataGrids = new List<DataGrid>();
+                        foreach (var item in sources)
+                        {
+                            DataGrid dataGrid = new DataGrid();
+                            dataGrid.CheckBox = false;
+                            dataGrid.ItemName=item.ItemName;
+                            dataGrids.Add(dataGrid);
+                        }
                         selectedItems = new ObservableCollection<ItemInfo>(sources);
-                        listBoxItems.ItemsSource = selectedItems;
+                        selectedItemsGrid = new ObservableCollection<DataGrid>(dataGrids);
+                        listBoxItems.ItemsSource = selectedItemsGrid;
+                        ObservableCollection<string> templates= new ObservableCollection<string>();
+                        templates.Add("None");
+                        foreach(var template in TemplateViews)
+                        {
+                            templates.Add(template.Name);
+                        }
+
+                        Templates =templates;
+                        listBoxItems.Columns[0].Visibility = System.Windows.Visibility.Visible;
+                        listBoxItems.Columns[0].DisplayIndex= 2;
+
+                        listBoxItems.Columns[0].Width = 400 - 205;
+                        listBoxItems.Columns[2].Width = 100;
+                        //listBoxItems.Columns[2].Width = 400-205;
+                        
                     }
                 }
               
@@ -196,7 +315,16 @@ namespace HOK.WorksetView
                 if (null != comboBoxViewBy.SelectedItem)
                 {
                     DisplaySourceItems();
+                    if (comboBoxViewBy.SelectedItem.ToString()=="From File")
+                    {
+                        ChooseFile.IsEnabled = true;
+                    }
+                    else
+                    {
+                        ChooseFile.IsEnabled = false;
+                    }
                 }
+
             }
             catch (Exception ex)
             {
@@ -243,7 +371,23 @@ namespace HOK.WorksetView
         {
             try
             {
-                var checkedItems = from item in selectedItems where item.IsSelected select item;
+                var checkedItemsGrids = from item in selectedItemsGrid where item.CheckBox select item;
+                List<int> CheckItemsCount= new List<int>();
+                int CheckedCOunt= 0;
+                foreach(var CheckedItem in selectedItemsGrid)
+                {
+                    if (CheckedItem.CheckBox)
+                    {
+                        CheckItemsCount.Add(CheckedCOunt);
+                    }
+                    CheckedCOunt++;
+                }
+                var checkedItems=new List<ItemInfo>();
+                foreach(var checkedItem in checkedItemsGrids)
+                {
+                    var Item = selectedItems.Where(m => m.ItemName == checkedItem.ItemName).FirstOrDefault();
+                    checkedItems.Add(Item);
+                }
                 if (checkedItems.Count() > 0)
                 {
                     List<View> createdViews = new List<View>();
@@ -258,13 +402,18 @@ namespace HOK.WorksetView
                     progressBar.Value = 0;
 
                     double value = 0;
-
+                    int count = 0;
                     foreach (ItemInfo item in checkedItems)
                     {
-                        
+                        string TemplateChoosed = templateChoosedDataGrids.Where(m => m.RowNumber == CheckItemsCount[count]).Select(m => m.SelectedValue).FirstOrDefault();
+                        if (TemplateChoosed == null)
+                        {
+                            TemplateChoosed = "None";
+                        }
+                        View TemplateView=TemplateViews.Where(m=>m.Name == TemplateChoosed).FirstOrDefault();
                         if (create3dView)
                         {
-                            View3D viewCreated = ViewCreator.Create3DView(m_doc, item, view3dFamilyType, overwrite);
+                            View3D viewCreated = ViewCreator.Create3DView(m_doc, item, view3dFamilyType, overwrite,CategoryList2D[count],CategoryList3D[count],TemplateView);
                             if (null != viewCreated)
                             {
                                 createdViews.Add(viewCreated);
@@ -274,7 +423,7 @@ namespace HOK.WorksetView
                         {
                             if(null!= comboBoxLevel.SelectedItem)
                             {
-                                ViewPlan viewCreated = ViewCreator.CreateFloorPlan(m_doc, item, viewPlanFamilyType, (Level)comboBoxLevel.SelectedItem, overwrite);
+                                ViewPlan viewCreated = ViewCreator.CreateFloorPlan(m_doc, item, viewPlanFamilyType, (Level)comboBoxLevel.SelectedItem, overwrite, CategoryList2D[count], CategoryList3D[count], TemplateView);
                                 if (null != viewCreated)
                                 {
                                     createdViews.Add(viewCreated);
@@ -282,6 +431,7 @@ namespace HOK.WorksetView
                             }
                         }
                         value++;
+                        count++;
                         Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background, new object[] { ProgressBar.ValueProperty, value });
                     }
 
@@ -299,11 +449,52 @@ namespace HOK.WorksetView
                 MessageBox.Show("Failed to create views.\n" + ex.Message, "Create Views", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
+
+        private void ChooseFile_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            openFileDialog.Filter = "Json files (*.json)|*.json|All files (*.*)|*.*";
+            openFileDialog.ShowDialog();
+            string JsonLocation = openFileDialog.FileName;
+            if(JsonLocation != null)
+            {
+                string path = Environment.ExpandEnvironmentVariables(JsonLocation);
+                string jsonFromFileUpdated;
+                using (var reader = new StreamReader(path))
+                {
+                    jsonFromFileUpdated = reader.ReadToEnd();
+                }
+                Data= JsonConvert.DeserializeObject<JsonFileParameters>(jsonFromFileUpdated);
+                if (Data != null)
+                {
+                    DisplaySourceItems();
+                }
+            }
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string SelectedValue= (sender as System.Windows.Controls.ComboBox).SelectedValue.ToString();
+            var RowNumber = (((sender as System.Windows.Controls.ComboBox).BindingGroup.Owner) as DataGridRow).AlternationIndex;
+            var CheckTemplateChoosed = templateChoosedDataGrids.Where(m => m.RowNumber == RowNumber).FirstOrDefault();
+            if(CheckTemplateChoosed != null)
+            {
+                CheckTemplateChoosed.SelectedValue = SelectedValue;
+            }
+            else
+            {
+                templateChoosedDataGrids.Add(new TemplateChoosedDataGrid
+                {
+                    RowNumber = RowNumber,
+                    SelectedValue = SelectedValue
+                });
+            } 
+        }
     }
 
     public enum ViewBy
     {
-        DesignOption, Phase, Workset, Link, None
+        DesignOption, Phase, Workset, Link,Category, None
     }
 
     public class ItemInfo : INotifyPropertyChanged
@@ -358,6 +549,14 @@ namespace HOK.WorksetView
                         itemId = linktype.Id.IntegerValue;
                     }
                     break;
+                case ViewBy.Category:
+                    View View = obj as View;
+                    if (null != View)
+                    {
+                        itemName = View.Name;
+                        itemId = View.Id.IntegerValue;
+                    }
+                    break;
             }
         }
 
@@ -371,4 +570,17 @@ namespace HOK.WorksetView
             }
         }
     }
+
+    public class DataGrid
+    {
+        public bool CheckBox { get; set; }
+        public string ItemName { get; set; }
+
+    }
+    public class TemplateChoosedDataGrid
+    {
+        public string SelectedValue { get; set; }
+        public int RowNumber { get; set; }
+    }
+
 }
