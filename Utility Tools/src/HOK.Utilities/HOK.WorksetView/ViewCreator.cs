@@ -8,7 +8,7 @@ namespace HOK.WorksetView
 {
     public static class ViewCreator
     {
-        public static View3D Create3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite)
+        public static View3D Create3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite, List<Category> List2DCategories, List<Category> List3DCategories, Autodesk.Revit.DB.View TemplateView)
         {
             View3D view3D = null;
             try
@@ -26,6 +26,9 @@ namespace HOK.WorksetView
                         break;
                     case ViewBy.Link:
                         view3D = CreateLink3DView(doc, itemInfo, view3dFamilyType, overwrite);
+                        break;
+                    case ViewBy.Category:
+                        view3D = CreateCategory3DView(doc, itemInfo, view3dFamilyType, overwrite, List2DCategories, List3DCategories, TemplateView);
                         break;
                 }
             }
@@ -315,7 +318,7 @@ namespace HOK.WorksetView
                             }
                         }
 
-                        
+
                         using (Transaction trans = new Transaction(doc))
                         {
                             trans.Start("Set SectionBox");
@@ -323,7 +326,125 @@ namespace HOK.WorksetView
                             {
                                 collector = new FilteredElementCollector(doc);
                                 List<Element> linkInstances = collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().ToElements().ToList();
-                                var selectedLinks = from link in linkInstances where link.Name.Contains(itemInfo.ItemName) && null!=link.Location select link;
+                                var selectedLinks = from link in linkInstances where link.Name.Contains(itemInfo.ItemName) && null != link.Location select link;
+                                if (selectedLinks.Count() > 0)
+                                {
+                                    BoundingBoxXYZ boundingBox = GetBoundingBox(selectedLinks.ToList());
+                                    if (null != boundingBox)
+                                    {
+                                        view3D.SetSectionBox(boundingBox);
+                                    }
+                                }
+                                trans.Commit();
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.RollBack();
+                                MessageBox.Show("Failed to set sectionbox.\n" + ex.Message, "Set Sectionbox", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Failed to create 3d views by worksets.\n" + ex.Message, "Create 3D Views by Worksets", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        tg.RollBack();
+                    }
+                    tg.Assimilate();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create workset views.\n" + ex.Message, "Create Workset 3D View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return view3D;
+        }
+
+        public static View3D CreateCategory3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite, List<Category> List2DCategories, List<Category> List3DCategories, Autodesk.Revit.DB.View TemplateView)
+        {
+            View3D view3D = null;
+            try
+            {
+                string viewName = itemInfo.ItemName;
+                using (TransactionGroup tg = new TransactionGroup(doc))
+                {
+                    tg.Start("Create 3D View");
+                    try
+                    {
+                        FilteredElementCollector collector = new FilteredElementCollector(doc);
+                        List<View3D> view3ds = collector.OfClass(typeof(View3D)).ToElements().Cast<View3D>().ToList();
+                        var views = from view in view3ds where view.Name == viewName select view;
+                        if (views.Count() > 0)
+                        {
+                            if (overwrite)
+                            {
+                                view3D = views.First();
+                            }
+                            else
+                            {
+                                return view3D;
+                            }
+                        }
+                        if (null == view3D)
+                        {
+                            using (Transaction trans = new Transaction(doc))
+                            {
+                                trans.Start("Create Isometric");
+                                try
+                                {
+                                    view3D = View3D.CreateIsometric(doc, view3dFamilyType.Id);
+                                    view3D.Name = viewName;
+                                    if (TemplateView != null)
+                                    {
+                                        view3D.ViewTemplateId = TemplateView.Id;
+                                    }
+                                    trans.Commit();
+
+                                    trans.Start("Create Isometric");
+                                    view3D.ViewTemplateId = new ElementId(-1);
+                                    #region Isolate Categories
+                                    Categories Cats = doc.Settings.Categories;
+                                    foreach (Category cat in Cats)
+                                    {
+                                        Category catCheck = null;
+                                        if (cat.CategoryType == CategoryType.Annotation)
+                                        {
+                                            catCheck = List2DCategories.Where(m => m.Name == cat.Name).FirstOrDefault();
+                                        }
+                                        else if (cat.CategoryType == CategoryType.Model)
+                                        {
+                                            catCheck = List3DCategories.Where(m => m.Name == cat.Name).FirstOrDefault();
+                                        }
+                                        if (catCheck == null)
+                                        {
+                                            try
+                                            {
+                                                cat.set_Visible(view3D, false);
+                                            }
+                                            catch { }
+
+                                        }
+                                    }
+                                    #endregion
+                                    trans.Commit();
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    trans.RollBack();
+                                    MessageBox.Show("Failed to create Isometric.\n" + ex.Message, "Create Isometric", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                }
+                            }
+                        }
+
+
+                        using (Transaction trans = new Transaction(doc))
+                        {
+                            trans.Start("Set SectionBox");
+                            try
+                            {
+                                collector = new FilteredElementCollector(doc);
+                                List<Element> linkInstances = collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().ToElements().ToList();
+                                var selectedLinks = from link in linkInstances where link.Name.Contains(itemInfo.ItemName) && null != link.Location select link;
                                 if (selectedLinks.Count() > 0)
                                 {
                                     BoundingBoxXYZ boundingBox = GetBoundingBox(selectedLinks.ToList());
@@ -418,7 +539,7 @@ namespace HOK.WorksetView
             return boundingBox;
         }
 
-        public static ViewPlan CreateFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite)
+        public static ViewPlan CreateFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite, List<Category> List2DCategories, List<Category> List3DCategories, Autodesk.Revit.DB.View TemplateView)
         {
             ViewPlan viewPlan = null;
             try
@@ -433,6 +554,9 @@ namespace HOK.WorksetView
                         break;
                     case ViewBy.DesignOption:
                         viewPlan = CreateDesignOptionFloorPlan(doc, itemInfo, viewPlanFamilyType, planLevel, overwrite);
+                        break;
+                    case ViewBy.Category:
+                        viewPlan = CreateCategoryFloorPlan(doc, itemInfo, viewPlanFamilyType, overwrite, List2DCategories, List3DCategories, planLevel, TemplateView); ;
                         break;
                 }
             }
@@ -615,7 +739,7 @@ namespace HOK.WorksetView
                             viewPlan.Name = viewName;
                             trans.Commit();
                         }
-                        
+
                     }
                     catch (Exception ex)
                     {
@@ -627,6 +751,87 @@ namespace HOK.WorksetView
             catch (Exception ex)
             {
                 MessageBox.Show("Failed to create floor plans by design options.\n" + ex.Message, "Create Floor Plans by Design Options", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            return viewPlan;
+        }
+
+        public static ViewPlan CreateCategoryFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, bool overwrite, List<Category> List2DCategories, List<Category> List3DCategories, Level planLevel, Autodesk.Revit.DB.View TemplateView)
+        {
+            ViewPlan viewPlan = null;
+            try
+            {
+                string viewName = itemInfo.ItemName;
+                using (Transaction trans = new Transaction(doc))
+                {
+                    try
+                    {
+                        FilteredElementCollector collector = new FilteredElementCollector(doc);
+                        List<ViewPlan> viewPlans = collector.OfClass(typeof(ViewPlan)).ToElements().Cast<ViewPlan>().ToList();
+                        var views = from view in viewPlans where view.Name == viewName select view;
+                        if (views.Count() > 0)
+                        {
+                            if (overwrite)
+                            {
+                                viewPlan = views.First();
+                            }
+                            else
+                            {
+                                return viewPlan;
+                            }
+                        }
+
+                        if (null == viewPlan)
+                        {
+                            trans.Start("Create Plan View");
+                            Autodesk.Revit.DB.View V = itemInfo.ItemObj as Autodesk.Revit.DB.View;
+                            viewPlan = ViewPlan.Create(doc, viewPlanFamilyType.Id, planLevel.Id);
+                            viewPlan.Name = viewName;
+                            if (TemplateView != null)
+                            {
+                                viewPlan.ViewTemplateId = TemplateView.Id;
+                            }
+                            trans.Commit();
+
+                            trans.Start("Create Plan View");
+                            viewPlan.ViewTemplateId = new ElementId(-1);
+                            #region Isolate Categories
+                            Categories Cats = doc.Settings.Categories;
+                            foreach (Category cat in Cats)
+                            {
+                                Category catCheck = null;
+                                if (cat.CategoryType == CategoryType.Annotation)
+                                {
+                                    catCheck = List2DCategories.Where(m => m.Name == cat.Name).FirstOrDefault();
+                                }
+                                else if (cat.CategoryType == CategoryType.Model)
+                                {
+                                    catCheck = List3DCategories.Where(m => m.Name == cat.Name).FirstOrDefault();
+                                }
+                                if (catCheck == null)
+                                {
+                                    try
+                                    {
+                                        cat.set_Visible(viewPlan, false);
+                                    }
+                                    catch { }
+
+                                }
+                            }
+                            #endregion
+                            trans.Commit();
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.RollBack();
+                        MessageBox.Show("Failed to create a plan view, " + itemInfo.ItemName + "\n" + ex.Message, "Create Plan View", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to create floor plans by categories.\n" + ex.Message, "Create Floor Plans by Categories", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             return viewPlan;
         }

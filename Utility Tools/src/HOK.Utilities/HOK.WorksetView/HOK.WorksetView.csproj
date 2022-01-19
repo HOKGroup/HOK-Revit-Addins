@@ -91,13 +91,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="HOK.Core">
-      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\$(RevitVersion)\HOK.Core.dll</HintPath>
+      <HintPath>C:\Users\h\Downloads\Revit Addins2019_2022\2021\HOK-Addin.bundle\Contents\HOK.Core.dll</HintPath>
       <Private>True</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
-      <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\$(RevitVersion)\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath>C:\Users\h\Downloads\Revit Addins2019_2022\2021\HOK-Addin.bundle\Contents\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="RevitAPI">
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">C:\Program Files\Autodesk\Revit $(RevitVersion)\RevitAPI.dll</HintPath>
@@ -127,6 +130,7 @@
     <Compile Include="..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="JsonFileParameters.cs" />
     <Compile Include="ViewCreator.cs" />
     <Compile Include="ViewCreatorWindow.xaml.cs">
       <DependentUpon>ViewCreatorWindow.xaml</DependentUpon>
@@ -148,6 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image\checkbox_yes.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
