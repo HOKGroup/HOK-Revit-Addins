@@ -281,6 +281,7 @@ namespace HOK.WorksetView
                             if (view3D.CanModifyViewDiscipline())
                             {
                                 view3D.Discipline = ViewDiscipline.Coordination;
+
                             }
 
                             trans.Commit();
