@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             Width="400" Height="600" Title="View Creator" Icon="Image/hoklogo.ico" WindowStartupLocation="CenterScreen">
+             Width="400" Height="600" Title="View Creator" Icon="Image/hoklogo.ico" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="0.5*"/>
@@ -27,7 +27,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="Create View By:" HorizontalAlignment="Right" VerticalAlignment="Center" />
                 <ComboBox x:Name="comboBoxViewBy" Grid.Column="1" Margin="5,0,15,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="{x:Null}" SelectionChanged="comboBoxViewBy_SelectionChanged"/>
-                <Button Width="100" Height="20" IsEnabled="False" x:Name="ChooseFile" Grid.Row="1" Grid.Column="1" Margin="145,0,0,0" Click="ChooseFile_Click">Choose File</Button>
+                <Button Width="100" Height="20" Visibility="Hidden" x:Name="ChooseFile" Grid.Row="1" Grid.Column="1" Margin="145,0,0,0" Click="ChooseFile_Click">Choose File</Button>
                 <Label Grid.Row="2" Content="View Type:" HorizontalAlignment="Right" VerticalAlignment="Center" />
                 <RadioButton x:Name="radioButton3D" Grid.Row="2" Grid.Column="1" Content="3D Views" VerticalAlignment="Center" Margin="5,0,0,0" IsChecked="True">
                     <RadioButton.Style>

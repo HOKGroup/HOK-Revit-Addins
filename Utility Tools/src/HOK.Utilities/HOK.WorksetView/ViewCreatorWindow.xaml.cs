@@ -216,16 +216,16 @@ namespace HOK.WorksetView
                         }
                         if (Data != null)
                         {
-                            foreach(var Da in Data.data.views)
+                            foreach(var Da in Data.Data.Views)
                             {
-                                ItemInfo item = new ItemInfo(Da.viewname,ViewBy.Category);
-                                item.ItemName = Da.viewname;
+                                ItemInfo item = new ItemInfo(Da.Viewname,ViewBy.Category);
+                                item.ItemName = Da.Viewname;
                                 item.IsSelected = false;
                                 List<Category> TwoDCats = new List<Category>();
                                 List<Category> ThreeDCats = new List<Category>();
-                                if (Da.visible2Dcateogries.Count > 0)
+                                if (Da.Visible2Dcateogries.Count > 0)
                                 {
-                                    foreach(var JsonTwoDCat in Da.visible2Dcateogries)
+                                    foreach(var JsonTwoDCat in Da.Visible2Dcateogries)
                                     {
                                         var TwoDCat = Categories.Where(m => m.Name == JsonTwoDCat).FirstOrDefault();
                                         
@@ -235,9 +235,9 @@ namespace HOK.WorksetView
                                         }
                                     }
                                 }
-                                if (Da.visible3Dcateogries.Count > 0)
+                                if (Da.Visible3Dcateogries.Count > 0)
                                 {
-                                    foreach (var JsonThreeDCat in Da.visible3Dcateogries)
+                                    foreach (var JsonThreeDCat in Da.Visible3Dcateogries)
                                     {
                                         var ThreeDCat = Categories.Where(m => m.Name == JsonThreeDCat).FirstOrDefault();
                                         if (ThreeDCat != null)
@@ -291,13 +291,29 @@ namespace HOK.WorksetView
                         }
 
                         Templates =templates;
-                        listBoxItems.Columns[0].Visibility = System.Windows.Visibility.Visible;
-                        listBoxItems.Columns[0].DisplayIndex= 2;
+                        if (listBoxItems.Columns.Count <= 1)
+                        {
+                            listBoxItems.Columns[0].Visibility = System.Windows.Visibility.Hidden;
+                            listBoxItems.Columns[0].Header = " ";
+                        }
+                        else
+                        {
+                            listBoxItems.Columns[0].Header = "Templates";
+                            listBoxItems.Columns[0].Visibility = System.Windows.Visibility.Visible;
+                            listBoxItems.Columns[0].DisplayIndex = 2;
+                            listBoxItems.Columns[1].Header = " ";
+                            listBoxItems.Columns[2].Header = "Item Name";
+                            listBoxItems.Columns[0].Width = 400 - 205;
+                            listBoxItems.Columns[1].Width = 20;
+                            listBoxItems.Columns[2].Width = 140;
+                        }
 
-                        listBoxItems.Columns[0].Width = 400 - 205;
-                        listBoxItems.Columns[2].Width = 100;
-                        //listBoxItems.Columns[2].Width = 400-205;
-                        
+
+                    }
+                    else
+                    {
+                        listBoxItems.Columns[0].Visibility = System.Windows.Visibility.Hidden;
+                        listBoxItems.Columns[0].Header = " ";
                     }
                 }
               
@@ -317,11 +333,11 @@ namespace HOK.WorksetView
                     DisplaySourceItems();
                     if (comboBoxViewBy.SelectedItem.ToString()=="From File")
                     {
-                        ChooseFile.IsEnabled = true;
+                        ChooseFile.Visibility = System.Windows.Visibility.Visible;
                     }
                     else
                     {
-                        ChooseFile.IsEnabled = false;
+                        ChooseFile.Visibility = System.Windows.Visibility.Hidden;
                     }
                 }
 
@@ -403,14 +419,27 @@ namespace HOK.WorksetView
 
                     double value = 0;
                     int count = 0;
+                    foreach(ItemInfo item in checkedItems)
+                    {
+                        List<Category> CatTwoD = new List<Category>();
+                        List<Category> CatThreeD = new List<Category>();
+                        if (CategoryList2D.Count == 0)
+                        {
+                            Category cat = null;
+                            CatTwoD.Add(cat);
+                        }
+                        if (CategoryList3D.Count == 0)
+                        {
+                            Category cat = null;
+                            CatThreeD.Add(cat);
+                        }
+                        CategoryList2D.Add(CatTwoD);
+                        CategoryList3D.Add(CatThreeD);
+                    }
                     foreach (ItemInfo item in checkedItems)
                     {
                         string TemplateChoosed = templateChoosedDataGrids.Where(m => m.RowNumber == CheckItemsCount[count]).Select(m => m.SelectedValue).FirstOrDefault();
-                        if (TemplateChoosed == null)
-                        {
-                            TemplateChoosed = "None";
-                        }
-                        View TemplateView=TemplateViews.Where(m=>m.Name == TemplateChoosed).FirstOrDefault();
+                        List<View> TemplateView=TemplateViews.Where(m=>m.Name == TemplateChoosed).ToList();
                         if (create3dView)
                         {
                             View3D viewCreated = ViewCreator.Create3DView(m_doc, item, view3dFamilyType, overwrite,CategoryList2D[count],CategoryList3D[count],TemplateView);
@@ -489,6 +518,27 @@ namespace HOK.WorksetView
                     SelectedValue = SelectedValue
                 });
             } 
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (listBoxItems.Columns.Count <= 1)
+            {
+                listBoxItems.Columns[0].Visibility=System.Windows.Visibility.Hidden;
+                listBoxItems.Columns[0].Header = " ";
+            }
+            else
+            {
+                listBoxItems.Columns[0].Header = "Templates";
+                listBoxItems.Columns[0].Visibility = System.Windows.Visibility.Visible;
+                listBoxItems.Columns[0].DisplayIndex = 2;
+                listBoxItems.Columns[1].Header = " ";
+                listBoxItems.Columns[2].Header = "Item Name";
+                listBoxItems.Columns[0].Width = 400 - 205;
+                listBoxItems.Columns[1].Width = 20;
+                listBoxItems.Columns[2].Width = 140;
+            }
+
         }
     }
 
