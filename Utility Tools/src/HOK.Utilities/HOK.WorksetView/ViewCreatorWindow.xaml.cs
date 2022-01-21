@@ -307,6 +307,14 @@ namespace HOK.WorksetView
                             {
                                 ViewBy = "Name";
                             }
+                            else if(ViewBy == "RVT Links")
+                            {
+                                ViewBy = "Link";
+                            }
+                            else if (ViewBy == "Phases")
+                            {
+                                ViewBy = "Phase";
+                            }
                             listBoxItems.Columns[2].Header = ViewBy;
                             listBoxItems.Columns[0].Width = 400 - 205;
                             listBoxItems.Columns[1].Width = 20;
@@ -538,7 +546,7 @@ namespace HOK.WorksetView
                 listBoxItems.Columns[0].Visibility = System.Windows.Visibility.Visible;
                 listBoxItems.Columns[0].DisplayIndex = 2;
                 listBoxItems.Columns[1].Header = " ";
-                listBoxItems.Columns[2].Header = "Design Options";
+                listBoxItems.Columns[2].Header = "Design Option";
                 listBoxItems.Columns[0].Width = 400 - 205;
                 listBoxItems.Columns[1].Width = 20;
                 listBoxItems.Columns[2].Width = 140;
