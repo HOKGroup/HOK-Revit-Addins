@@ -281,7 +281,9 @@ namespace HOK.WorksetView
                             if (view3D.CanModifyViewDiscipline())
                             {
                                 view3D.Discipline = ViewDiscipline.Coordination;
-
+                              /*  var coll = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_DesignOptions).FirstOrDefault() ;
+                                var dd = view3D.LookupParameter("Design Option");
+                                dd.Set(coll.Id);*/
                             }
 
                             trans.Commit();
