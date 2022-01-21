@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,21 +14,26 @@ namespace HOK.WorksetView
         public string Date { get; set; }
         public string SchemaVersion { get; set; }
         public string FileVersion { get; set; }
-        public string UniuqeID { get; set; }
+        public string UniqueID { get; set; }
         public string Author { get; set; }
         public string ViewPrefix { get; set; }
         public string ViewSuffix { get; set; }
-        public data data { get; set; }
+        [JsonProperty("data")]
+        public Data Data { get; set; }
         
     }
-    public class data
+    public class Data
     {
-        public List<views> views { get; set; }
+        [JsonProperty("views")]
+        public List<Views> Views { get; set; }
     }
-    public class views
+    public class Views
     {
-        public string viewname { get; set; }
-        public List<string> visible3Dcateogries { get; set; }
-        public List<string> visible2Dcateogries { get; set; }
+        [JsonProperty("viewname")]
+        public string Viewname { get; set; }
+        [JsonProperty("visible3Dcateogries")]
+        public List<string> Visible3Dcateogries { get; set; }
+        [JsonProperty("visible2Dcateogries")]
+        public List<string> Visible2Dcateogries { get; set; }
     }
 }
