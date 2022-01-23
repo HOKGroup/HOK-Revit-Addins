@@ -35,7 +35,7 @@ namespace HOK.WorksetView
         private List<string> viewByList = new List<string>() { "Design Options","Phase","RVT Links", "Workset","From File"};
         private List<ItemInfo> sourceItems = new List<ItemInfo>();
         private ObservableCollection<ItemInfo> selectedItems = new ObservableCollection<ItemInfo>();
-        private ObservableCollection<DataGrid> selectedItemsGrid = new ObservableCollection<DataGrid>();
+        TestDataRowItemCollection m_colData = new TestDataRowItemCollection();
         private ObservableCollection<Level> levelItems = new ObservableCollection<Level>();
         private JsonFileParameters Data= null;
         private List<View> TemplateViews= new List<View>();
@@ -275,14 +275,14 @@ namespace HOK.WorksetView
                         List<DataGrid> dataGrids = new List<DataGrid>();
                         foreach (var item in sources)
                         {
+                            m_colData.Add(new TestDataRowItem(false,item.ItemName));
                             DataGrid dataGrid = new DataGrid();
                             dataGrid.CheckBox = false;
                             dataGrid.ItemName=item.ItemName;
                             dataGrids.Add(dataGrid);
                         }
                         selectedItems = new ObservableCollection<ItemInfo>(sources);
-                        selectedItemsGrid = new ObservableCollection<DataGrid>(dataGrids);
-                        listBoxItems.ItemsSource = selectedItemsGrid;
+                        listBoxItems.ItemsSource = m_colData;
                         ObservableCollection<string> templates= new ObservableCollection<string>();
                         templates.Add("None");
                         foreach(var template in TemplateViews)
@@ -365,9 +365,9 @@ namespace HOK.WorksetView
         {
             try
             {
-                for (int i = 0; i < selectedItems.Count; i++)
+                for (int i = 0; i < m_colData.Count; i++)
                 {
-                    selectedItems[i].IsSelected = true;
+                    m_colData[i].CheckItem = true;
                 }
             }
             catch (Exception ex)
@@ -380,9 +380,9 @@ namespace HOK.WorksetView
         {
             try
             {
-                for (int i = 0; i < selectedItems.Count; i++)
+                for (int i = 0; i < m_colData.Count; i++)
                 {
-                    selectedItems[i].IsSelected = false;
+                    m_colData[i].CheckItem = false;
                 }
             }
             catch (Exception ex)
@@ -400,12 +400,12 @@ namespace HOK.WorksetView
         {
             try
             {
-                var checkedItemsGrids = from item in selectedItemsGrid where item.CheckBox select item;
+                var checkedItemsGrids = from item in m_colData where item.CheckItem select item;
                 List<int> CheckItemsCount= new List<int>();
                 int CheckedCOunt= 0;
-                foreach(var CheckedItem in selectedItemsGrid)
+                foreach(var CheckedItem in m_colData)
                 {
-                    if (CheckedItem.CheckBox)
+                    if (CheckedItem.CheckItem)
                     {
                         CheckItemsCount.Add(CheckedCOunt);
                     }
@@ -414,7 +414,7 @@ namespace HOK.WorksetView
                 var checkedItems=new List<ItemInfo>();
                 foreach(var checkedItem in checkedItemsGrids)
                 {
-                    var Item = selectedItems.Where(m => m.ItemName == checkedItem.ItemName).FirstOrDefault();
+                    var Item = selectedItems.Where(m => m.ItemName == checkedItem.Field1).FirstOrDefault();
                     checkedItems.Add(Item);
                 }
                 if (checkedItems.Count() > 0)
@@ -552,6 +552,69 @@ namespace HOK.WorksetView
                 listBoxItems.Columns[2].Width = 140;
             }
 
+        }
+        private void listBoxItems_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Add && listBoxItems.SelectedCells != null && listBoxItems.SelectedCells.Count == 1 && listBoxItems.SelectedCells[0].Column is DataGridCheckBoxColumn)
+            {
+                TestDataRowItem row = listBoxItems.SelectedCells[0].Item as TestDataRowItem;
+                if (row != null)
+                {
+                    row.CheckItem = !row.CheckItem;
+                }
+            }
+        }
+        }
+
+    public class TestDataRowItem : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private bool m_bCheckItem;
+        private string ItemName;
+
+
+        public TestDataRowItem(bool bCheckItem,string strField1)
+        {
+            m_bCheckItem = bCheckItem;
+            ItemName = strField1;
+        }
+
+        public bool CheckItem
+        {
+            get { return m_bCheckItem; }
+            set
+            {
+                m_bCheckItem = value;
+                FirePropertyChanged("CheckItem");
+            }
+        }
+
+        public string Field1
+        {
+            get { return ItemName; }
+            set
+            {
+                ItemName = value;
+                FirePropertyChanged("Field1");
+            }
+        }
+
+
+        private void FirePropertyChanged(string strProperty)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(strProperty));
+            }
+        }
+    }
+
+    public class TestDataRowItemCollection : ObservableCollection<TestDataRowItem>
+    {
+        public TestDataRowItemCollection()
+            : base()
+        {
         }
     }
 

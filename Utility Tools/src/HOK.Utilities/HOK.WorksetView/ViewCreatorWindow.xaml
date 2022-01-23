@@ -77,7 +77,8 @@
                 <DataGrid ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                           x:Name="listBoxItems" CanUserAddRows="False" CanUserReorderColumns="True"
                           CanUserResizeColumns="True" AlternatingRowBackground="#eee" AutoGenerateColumns="True"
-                          VerticalGridLinesBrush="Black" GridLinesVisibility="All">
+                          VerticalGridLinesBrush="Black" GridLinesVisibility="All" PreviewKeyDown="listBoxItems_PreviewKeyDown" 
+                          SelectionUnit="CellOrRowHeader">
                     <DataGrid.Columns>
                         <DataGridTemplateColumn Header="Templates" Visibility="Hidden">
                             <DataGridTemplateColumn.CellTemplate>
