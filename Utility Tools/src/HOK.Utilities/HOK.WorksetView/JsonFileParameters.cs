@@ -18,22 +18,17 @@ namespace HOK.WorksetView
         public string Author { get; set; }
         public string ViewPrefix { get; set; }
         public string ViewSuffix { get; set; }
-        [JsonProperty("data")]
         public Data Data { get; set; }
         
     }
     public class Data
     {
-        [JsonProperty("views")]
         public List<Views> Views { get; set; }
     }
     public class Views
     {
-        [JsonProperty("viewname")]
         public string Viewname { get; set; }
-        [JsonProperty("visible3Dcateogries")]
         public List<string> Visible3Dcateogries { get; set; }
-        [JsonProperty("visible2Dcateogries")]
         public List<string> Visible2Dcateogries { get; set; }
     }
 }
