@@ -19,7 +19,7 @@ namespace HOK.WorksetView
         public string ViewPrefix { get; set; }
         public string ViewSuffix { get; set; }
         public Data Data { get; set; }
-        
+
     }
     public class Data
     {
@@ -27,8 +27,11 @@ namespace HOK.WorksetView
     }
     public class Views
     {
-        public string Viewname { get; set; }
-        public List<string> Visible3Dcateogries { get; set; }
-        public List<string> Visible2Dcateogries { get; set; }
+        [JsonProperty("viewname")]
+        public string ViewName { get; set; }
+        [JsonProperty("visible3Dcategories")]
+        public List<string> Visible3DCategories { get; set; }
+        [JsonProperty("visible2Dcategories")]
+        public List<string> Visible2DCategories { get; set; }
     }
 }
