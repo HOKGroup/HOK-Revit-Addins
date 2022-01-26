@@ -57,8 +57,17 @@ namespace HOK.WorksetView
                         {
                             if (overwrite)
                             {
-                                MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                
                                 view3D = views.First();
+                                if (TemplateView.Count > 0)
+                                {
+                                    view3D.ViewTemplateId = TemplateView.FirstOrDefault().Id;
+                                }
+                                tg.Commit();
+                                tg.Start("Set Template");
+                                view3D.ViewTemplateId = new ElementId(-1);
+                                tg.Commit();
+                                MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                             {
@@ -182,8 +191,18 @@ namespace HOK.WorksetView
                     {
                         if (overwrite)
                         {
-                            MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            trans.Start("Create 3D View");
                             view3D = views.First();
+                            if (TemplateView.Count > 0)
+                            {
+                                view3D.ViewTemplateId = TemplateView.FirstOrDefault().Id;
+                            }
+                            trans.Commit();
+                            trans.Start("Set Template");
+                            view3D.ViewTemplateId = new ElementId(-1);
+                            trans.Commit();
+                            MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         else
                         {
@@ -256,8 +275,17 @@ namespace HOK.WorksetView
                         {
                             if (overwrite)
                             {
-                                MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
                                 view3D = views.First();
+                                if (TemplateView.Count > 0)
+                                {
+                                    view3D.ViewTemplateId = TemplateView.FirstOrDefault().Id;
+                                }
+                                trans.Commit();
+                                trans.Start("Set Template");
+                                view3D.ViewTemplateId = new ElementId(-1);
+                                trans.Commit();
+                                MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                
                             }
                             else
                             {
@@ -321,8 +349,17 @@ namespace HOK.WorksetView
                         {
                             if (overwrite)
                             {
-                                MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                
                                 view3D = views.First();
+                                if (TemplateView.Count > 0)
+                                {
+                                    view3D.ViewTemplateId = TemplateView.FirstOrDefault().Id;
+                                }
+                                tg.Commit();
+                                tg.Start("Set Template");
+                                view3D.ViewTemplateId = new ElementId(-1);
+                                tg.Commit();
+                                MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                             {
@@ -420,8 +457,17 @@ namespace HOK.WorksetView
                         {
                             if (overwrite)
                             {
-                                MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                
                                 view3D = views.First();
+                                if (TemplateView.Count > 0)
+                                {
+                                    view3D.ViewTemplateId = TemplateView.FirstOrDefault().Id;
+                                }
+                                tg.Commit();
+                                tg.Start("Set Template");
+                                view3D.ViewTemplateId = new ElementId(-1);
+                                tg.Commit();
+                                MessageBox.Show("View Overwritten", "Create 3D View", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                             {
@@ -629,8 +675,17 @@ namespace HOK.WorksetView
                     {
                         if (overwrite)
                         {
-                            MessageBox.Show("View Overwritten", "Create View Plan", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            
                             viewPlan = views.First();
+                            if (TemplateView.Count > 0)
+                            {
+                                viewPlan.ViewTemplateId = TemplateView.FirstOrDefault().Id;
+                            }
+                            tg.Commit();
+                            tg.Start("Set Template");
+                            viewPlan.ViewTemplateId = new ElementId(-1);
+                            tg.Commit();
+                            MessageBox.Show("View Overwritten", "Create View Plan", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         else
                         {
@@ -726,8 +781,17 @@ namespace HOK.WorksetView
                         {
                             if (overwrite)
                             {
-                                MessageBox.Show("View Overwritten", "Create View Plan", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                trans.Start("Create Plan View");
                                 viewPlan = views.First();
+                                if (TemplateView.Count > 0)
+                                {
+                                    viewPlan.ViewTemplateId = TemplateView.FirstOrDefault().Id;
+                                }
+                                trans.Commit();
+                                trans.Start("Set Template");
+                                viewPlan.ViewTemplateId = new ElementId(-1);
+                                trans.Commit();
+                                MessageBox.Show("View Overwritten", "Create View Plan", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                             {
@@ -791,8 +855,18 @@ namespace HOK.WorksetView
                         {
                             if (overwrite)
                             {
-                                MessageBox.Show("View Overwritten", "Create View Plan", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                
+                                trans.Start("Create Plan View");
                                 viewPlan = views.First();
+                                if (TemplateView.Count > 0)
+                                {
+                                    viewPlan.ViewTemplateId = TemplateView.FirstOrDefault().Id;
+                                }
+                                trans.Commit();
+                                trans.Start("Set Template");
+                                viewPlan.ViewTemplateId = new ElementId(-1);
+                                trans.Commit();
+                                MessageBox.Show("View Overwritten", "Create View Plan", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                             else
                             {
@@ -856,14 +930,23 @@ namespace HOK.WorksetView
                         {
                             if (overwrite)
                             {
-                                MessageBox.Show("View Overwritten", "Create View Plan", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                
+                                trans.Start("Create Plan View");
                                 viewPlan = views.First();
+                                if (TemplateView.Count > 0)
+                                {
+                                    viewPlan.ViewTemplateId = TemplateView.FirstOrDefault().Id;
+                                }
+                                trans.Commit();
+                                trans.Start("Set Template");
+                                viewPlan.ViewTemplateId = new ElementId(-1);
+                                trans.Commit();
                             }
                             else
                             {
                                 MessageBox.Show("View Already Exists", "Create View Plan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                                 return viewPlan;
-
+                                MessageBox.Show("View Overwritten", "Create View Plan", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                         }
 
