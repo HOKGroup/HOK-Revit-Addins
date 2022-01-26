@@ -8,7 +8,7 @@ namespace HOK.WorksetView
 {
     public static class ViewCreator
     {
-        public static View3D Create3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite, List<Category> List2DCategories, List<Category> List3DCategories, List<Autodesk.Revit.DB.View> TemplateView)
+        public static View3D Create3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite, List<Autodesk.Revit.DB.View> TemplateView)
         {
             View3D view3D = null;
             try
@@ -28,7 +28,7 @@ namespace HOK.WorksetView
                         view3D = CreateLink3DView(doc, itemInfo, view3dFamilyType, overwrite, TemplateView);
                         break;
                     case ViewBy.Category:
-                        view3D = CreateCategory3DView(doc, itemInfo, view3dFamilyType, overwrite,List2DCategories,List3DCategories,TemplateView);
+                        view3D = CreateCategory3DView(doc, itemInfo, view3dFamilyType, overwrite, TemplateView);
                         break;
                 }
             }
@@ -39,7 +39,7 @@ namespace HOK.WorksetView
             return view3D;
         }
 
-        public static View3D CreateWorkset3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite,List<Autodesk.Revit.DB.View> TemplateView)
+        public static View3D CreateWorkset3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite, List<Autodesk.Revit.DB.View> TemplateView)
         {
             View3D view3D = null;
             try
@@ -176,7 +176,7 @@ namespace HOK.WorksetView
             return view3D;
         }
 
-        public static View3D CreatePhase3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite,List<Autodesk.Revit.DB.View> TemplateView)
+        public static View3D CreatePhase3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite, List<Autodesk.Revit.DB.View> TemplateView)
         {
             View3D view3D = null;
             try
@@ -219,6 +219,15 @@ namespace HOK.WorksetView
                         {
                             view3D = View3D.CreateIsometric(doc, view3dFamilyType.Id);
                             view3D.Name = viewName;
+
+                            Parameter param = view3D.get_Parameter(BuiltInParameter.VIEW_PHASE);
+                            if (null != param)
+                            {
+                                if (!param.IsReadOnly)
+                                {
+                                    param.Set(itemInfo.ItemId);
+                                }
+                            }
                             if (TemplateView.Count > 0)
                             {
                                 view3D.ViewTemplateId = TemplateView.FirstOrDefault().Id;
@@ -229,15 +238,6 @@ namespace HOK.WorksetView
                             if (view3D.CanModifyViewDiscipline())
                             {
                                 view3D.Discipline = ViewDiscipline.Coordination;
-                            }
-
-                            Parameter param = view3D.get_Parameter(BuiltInParameter.VIEW_PHASE);
-                            if (null != param)
-                            {
-                                if (!param.IsReadOnly)
-                                {
-                                    param.Set(itemInfo.ItemId);
-                                }
                             }
                             trans.Commit();
                         }
@@ -257,7 +257,7 @@ namespace HOK.WorksetView
             return view3D;
         }
 
-        public static View3D CreateDesignOption3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite,List<Autodesk.Revit.DB.View> TemplateView)
+        public static View3D CreateDesignOption3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite, List<Autodesk.Revit.DB.View> TemplateView)
         {
             View3D view3D = null;
             try
@@ -439,12 +439,14 @@ namespace HOK.WorksetView
             return view3D;
         }
 
-        public static View3D CreateCategory3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite,List<Category> List2DCategories, List<Category> List3DCategories,List<Autodesk.Revit.DB.View> TemplateView)
+        public static View3D CreateCategory3DView(Document doc, ItemInfo itemInfo, ViewFamilyType view3dFamilyType, bool overwrite, List<Autodesk.Revit.DB.View> TemplateView)
         {
             View3D view3D = null;
             try
             {
-                string viewName =itemInfo.ItemName;
+                string viewName = itemInfo.ItemName;
+                List<Category> List2DCategories = itemInfo.Categories2D;
+                List<Category> List3DCategories = itemInfo.Categories3D;
                 using (TransactionGroup tg = new TransactionGroup(doc))
                 {
                     tg.Start("Create 3D View");
@@ -631,7 +633,7 @@ namespace HOK.WorksetView
             return boundingBox;
         }
 
-        public static ViewPlan CreateFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite, List<Category> List2DCategories, List<Category> List3DCategories, List<Autodesk.Revit.DB.View> TemplateView)
+        public static ViewPlan CreateFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, Level planLevel, bool overwrite, List<Autodesk.Revit.DB.View> TemplateView)
         {
             ViewPlan viewPlan = null;
             try
@@ -648,7 +650,7 @@ namespace HOK.WorksetView
                         viewPlan = CreateDesignOptionFloorPlan(doc, itemInfo, viewPlanFamilyType, planLevel, overwrite, TemplateView);
                         break;
                     case ViewBy.Category:
-                        viewPlan = CreateCategoryFloorPlan(doc, itemInfo, viewPlanFamilyType, overwrite,List2DCategories,List3DCategories, planLevel,TemplateView); ;
+                        viewPlan = CreateCategoryFloorPlan(doc, itemInfo, viewPlanFamilyType, overwrite, planLevel,TemplateView); ;
                         break;
                 }
             }
@@ -913,12 +915,14 @@ namespace HOK.WorksetView
             return viewPlan;
         }
 
-        public static ViewPlan CreateCategoryFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, bool overwrite, List<Category> List2DCategories, List<Category> List3DCategories, Level planLevel, List<Autodesk.Revit.DB.View> TemplateView)
+        public static ViewPlan CreateCategoryFloorPlan(Document doc, ItemInfo itemInfo, ViewFamilyType viewPlanFamilyType, bool overwrite, Level planLevel, List<Autodesk.Revit.DB.View> TemplateView)
         {
             ViewPlan viewPlan = null;
             try
             {
                 string viewName = itemInfo.ItemName;
+                List<Category> List2DCategories = itemInfo.Categories2D;
+                List<Category> List3DCategories = itemInfo.Categories3D;
                 using (Transaction trans = new Transaction(doc))
                 {
                     try
