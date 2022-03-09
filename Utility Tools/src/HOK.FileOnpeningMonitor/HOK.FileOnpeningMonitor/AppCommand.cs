@@ -61,7 +61,14 @@ namespace HOK.FileOnpeningMonitor
                 var fileInfo = new CentralFileInfo(openedDocument);
                 var unused = new Dictionary<string, string>();
 
-                FMEServerUtil.RunFMEWorkspaceHTTP(fileInfo, "buildingSMART Notifications", "OpenCentralFileNotification.fmw", out unused);
+                try
+                {
+                    FMEServerUtil.RunFMEWorkspaceHTTP(fileInfo, "buildingSMART Notifications", "OpenCentralFileNotification.fmw", out unused);
+                }
+                catch (Exception ex)
+                {
+                    Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                }
 
                 if (!openedCentralFiles.ContainsKey(fileInfo.DocCentralPath))
                 {
