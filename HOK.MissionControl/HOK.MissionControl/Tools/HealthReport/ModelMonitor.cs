@@ -107,7 +107,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                         var result = ServerUtilities.GetFileInfoFromRevitServer<RsFileInfo>(clientPath, requestPath);
                         fileSize = result.ModelSize - result.SupportSize;
                     }
-                    else if (!isRevitServer && filePath.Contains("://", StringComparison.OrdinalIgnoreCase))
+                    else if (!isRevitServer && filePath.Contains("://"))
                     {
                         // (Konrad) For BIM 360 files, we can just pull the file size from local cached file.
                         // It's pretty much what is stored in the web, so will work for our purpose.

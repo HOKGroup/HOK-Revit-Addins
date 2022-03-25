@@ -81,7 +81,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
                         else if (AppSettings.Instance.LocalPathRgx.Any(x =>
                             Regex.IsMatch(CentralPath, x, RegexOptions.IgnoreCase)))
                             key = "local";
-                        else if (CentralPath.Contains("://", StringComparison.OrdinalIgnoreCase))
+                        else if (CentralPath.Contains("://"))
                             key = "bimThreeSixty";
                         else return;
 
@@ -154,7 +154,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
             {
                 result = true;
             }
-            else if (!isRevitServer && centralPath.Contains("://", StringComparison.OrdinalIgnoreCase))
+            else if (!isRevitServer && centralPath.Contains("://"))
             {
                 result = true;
             }
