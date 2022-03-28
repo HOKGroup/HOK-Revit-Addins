@@ -1,11 +1,5 @@
 ﻿sourcePath,fileName,destination
 Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\Resources,Addins Shared Parameters.txt,HOK-Addin.bundle\Contents\Resources\
-Data Editor\src\HOK.RevitDBManager\RevitDBManager\Resources,default.bmp,HOK-Addin.bundle\Contents\Resources\
-AVF Manager\src\HOK.AVFManager\HOK.AVFManager\Resources,DefaultSettings.xml,HOK-Addin.bundle\Contents\Resources\
-Data Editor\src\HOK.RevitDBManager\RevitDBManager\Resources,eye.ico,HOK-Addin.bundle\Contents\Resources\
 Navigator\src\HOK.Navigator\HOK.Navigator\Resources,HOK.Help.txt,HOK-Addin.bundle\Contents\Resources\
 Navigator\src\HOK.Navigator\HOK.Navigator\Resources,HOK.Installer.txt,HOK-Addin.bundle\Contents\Resources\
 HOK.RibbonTab\HOK.RibbonTab\Resources,HOK.Tooltip.txt,HOK-Addin.bundle\Contents\Resources\
-BCF Reader\src\HOK.SmartBCF\HOK.SmartBCF\BCFClasses,markup.xsd,HOK-Addin.bundle\Contents\Resources\
-AVF Manager\src\HOK.AVFManager\HOK.AVFManager\Resources,PointOfView.rfa,HOK-Addin.bundle\Contents\Resources\
-BCF Reader\src\HOK.SmartBCF\HOK.SmartBCF\BCFClasses,visinfo.xsd,HOK-Addin.bundle\Contents\Resources\
