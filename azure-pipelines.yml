@@ -23,8 +23,6 @@ strategy:
       buildConfiguration: '2020'
     2019:
       buildConfiguration: '2019'
-    2018:
-      buildConfiguration: '2018'
 
 pool:
   vmImage: 'windows-latest'

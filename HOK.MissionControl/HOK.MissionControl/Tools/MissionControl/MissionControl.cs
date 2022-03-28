@@ -60,7 +60,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                 // - not detached
                 // - not a family
                 // - is work-shared
-                // - is saved on the network, revit server or bim 360 server
+                // - is saved on the network, revit server or a cloud model
                 if (!doc.IsDetached && !doc.IsFamilyDocument && doc.IsWorkshared && FilePathItem.IsValidFilePath(centralPath))
                 {
                     if (!ServerUtilities.Post(new FilePathItem(centralPath, doc.Application.VersionNumber), "filepaths/add", out FilePathItem unused))

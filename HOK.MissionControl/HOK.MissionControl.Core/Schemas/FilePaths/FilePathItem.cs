@@ -81,7 +81,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
                         else if (AppSettings.Instance.LocalPathRgx.Any(x =>
                             Regex.IsMatch(CentralPath, x, RegexOptions.IgnoreCase)))
                             key = "local";
-                        else if (CentralPath.StartsWith("bim 360://", StringComparison.OrdinalIgnoreCase))
+                        else if (CentralPath.Contains("://"))
                             key = "bimThreeSixty";
                         else return;
 
@@ -138,14 +138,15 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
         }
 
         /// <summary>
-        /// Validates a file path, making sure that its either a revit server file, bim 360 or hok network location.
+        /// Validates a file path, making sure that its either a revit server file, cloud model or hok network location.
         /// </summary>
         /// <param name="centralPath">Central Path to validate.</param>
         /// <returns>True if file path is valid, otherwise false.</returns>
         public static bool IsValidFilePath(string centralPath)
         {
             var result = false;
-            if (centralPath.StartsWith("rsn://", StringComparison.OrdinalIgnoreCase))
+            bool isRevitServer = centralPath.StartsWith("rsn://", StringComparison.OrdinalIgnoreCase);
+            if (isRevitServer)
             {
                 result = true;
             }
@@ -153,7 +154,7 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
             {
                 result = true;
             }
-            else if (centralPath.StartsWith("bim 360://", StringComparison.OrdinalIgnoreCase))
+            else if (!isRevitServer && centralPath.Contains("://"))
             {
                 result = true;
             }

@@ -23,7 +23,7 @@ $msg = "Copying {0} to {1}" -f $p,$d
 Write-Debug $msg
 Copy-Item $p -Destination $d
 
-$p = ".\Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\{0}\x86\ " -f $buildConfiguration
-Copy-Item -Path $p -Destination $libraryFolder -Filter '*.dll' -Container -Recurse
-$p = ".\Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\{0}\x64\ " -f $buildConfiguration
-Copy-Item -Path $p -Destination $libraryFolder -Filter '*.dll' -Container -Recurse
+$p = ".\Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.Manager\x86"
+Copy-Item -Path $p -Destination $libraryFolder -Recurse
+$p = ".\Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.Manager\x64"
+Copy-Item -Path $p -Destination $libraryFolder -Recurse
