@@ -257,7 +257,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>echo Signing...
-"$(SolutionDir)..\..\..\_postBuild\codeSigning.bat" "$(TargetPath)"
+"$(SolutionDir)..\..\..\_postBuild\codeSigning.ps1" "$(TargetPath)"
 
 echo Configuration: $(Configuration)
 

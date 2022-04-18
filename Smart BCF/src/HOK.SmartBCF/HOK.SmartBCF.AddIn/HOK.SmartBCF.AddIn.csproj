@@ -252,7 +252,7 @@
   </PropertyGroup>
   <Target Name="CopyFiles" AfterTargets="AfterBuild">
     <Message Text="Signing file..." Importance="high" />
-    <Exec Command="&quot;$(SolutionDir)..\..\..\_postBuild\codeSigning.bat&quot; &quot;$(TargetPath)&quot;" />
+    <Exec Command="&quot;powershell.exe&quot; &quot;$(SolutionDir)..\..\..\_postBuild\codeSigning.ps1&quot; &quot;$(TargetPath)&quot;" />
     <Message Text="Copy files..." Importance="high" />
     <Message Text="$(TargetPath) copied" Importance="high" />
     <Message Text="!!!--- Make sure to copy x64/x86 SQLite.Interop.dll files. ---!!!" Importance="high" />
