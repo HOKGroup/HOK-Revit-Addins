@@ -120,7 +120,7 @@ steps:
     configuration: '$(buildConfiguration)'
     maximumCpuCount: true
   env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PASS: $(CERT_SIGNING_PASS_2022)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: MSBuild@1
@@ -130,7 +130,7 @@ steps:
     configuration: '$(buildConfiguration)'
     msbuildArguments: '/target:HOK_MissionControl'
   env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PASS: $(CERT_SIGNING_PASS_2022)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
@@ -141,7 +141,7 @@ steps:
     msbuildArgs: '/target:HOK_MissionControl_Core'
     clean: true
   env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PASS: $(CERT_SIGNING_PASS_2022)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: MSBuild@1
@@ -158,7 +158,7 @@ steps:
     configuration: '$(buildConfiguration)'
     maximumCpuCount: true
   env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PASS: $(CERT_SIGNING_PASS_2022)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
@@ -168,7 +168,7 @@ steps:
     configuration: '$(buildConfiguration)'
     maximumCpuCount: true
   env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PASS: $(CERT_SIGNING_PASS_2022)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
@@ -178,7 +178,7 @@ steps:
     configuration: '$(buildConfiguration)'
     maximumCpuCount: true
   env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PASS: $(CERT_SIGNING_PASS_2022)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: PowerShell@2
