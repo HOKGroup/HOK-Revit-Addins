@@ -28,15 +28,25 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/HOK.*.sln'
-  nugetSolutions: '**/HOK.!(ParameterTools).sln'
-  coreSolution: '**/HOK.Core.sln'
-  MCsolution: '**/HOK.MissionControl.sln'
-  paramToolsSolution: '**/HOK.ParameterTools.sln'
-  feedbackSolution: '**/HOK.Feedback.sln'
-  buildPlatform: 'x64'
-  BUILD_ENV: 'AzureDevOps'
-  HOKDepsDirectory: '$(Build.SourcesDirectory)'
+- group: code-signing
+- name: solution
+  value: '**/HOK.*.sln'
+- name: nugetSolutions
+  value: '**/HOK.!(ParameterTools).sln'
+- name: coreSolution
+  value: '**/HOK.Core.sln'
+- name: MCsolution
+  value: '**/HOK.MissionControl.sln'
+- name: paramToolsSolution
+  value: '**/HOK.ParameterTools.sln'
+- name: feedbackSolution
+  value: '**/HOK.Feedback.sln'
+- name: buildPlatform
+  value: 'x64'
+- name: BUILD_ENV
+  value: AzureDevOps'
+- name: HOKDepsDirectory
+  value: '$(Build.SourcesDirectory)'
 
 steps:
 - task: PowerShell@2
