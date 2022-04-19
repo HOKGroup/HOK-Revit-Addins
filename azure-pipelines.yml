@@ -44,7 +44,7 @@ variables:
 - name: buildPlatform
   value: 'x64'
 - name: BUILD_ENV
-  value: AzureDevOps'
+  value: AzureDevOps
 - name: HOKDepsDirectory
   value: '$(Build.SourcesDirectory)'
 
