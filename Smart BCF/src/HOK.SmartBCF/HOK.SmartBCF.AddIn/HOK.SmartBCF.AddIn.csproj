@@ -21,7 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RevitVersion>2022</RevitVersion>
+    <RevitVersion>2023</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
@@ -31,7 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RevitVersion>2022</RevitVersion>
+    <RevitVersion>2023</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup>
@@ -96,6 +96,17 @@
     <RevitVersion>2022</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2023|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2023\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2023</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2023</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
@@ -114,7 +125,7 @@
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\$(RevitVersion)\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Revit.IFC.Export" Condition="'$(RevitVersion)' == '2022'">
+    <Reference Include="Revit.IFC.Export" Condition="'$(RevitVersion)' == '2022' || '$(RevitVersion)' == '2023'">
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\__ref\revit-ifc\Source\Revit.IFC.Export\bin\Release\Revit.IFC.Export.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\$(RevitVersion)\Revit.IFC.Export.dll</HintPath>
     </Reference>

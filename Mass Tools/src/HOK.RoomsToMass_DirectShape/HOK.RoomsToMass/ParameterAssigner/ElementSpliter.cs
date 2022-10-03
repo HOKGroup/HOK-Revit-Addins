@@ -199,7 +199,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var structural = floortype.IsFoundationSlab;
                 foreach (var profile in profiles)
                 {
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023
                     var loopProfile = new List<CurveLoop>(1);
                     List<Curve> curves = new List<Curve>();
                     foreach (Curve curve in profile)
@@ -241,7 +241,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var structural = floortype.IsFoundationSlab;
                 foreach (var profile in profiles)
                 {
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023
                     var loopProfile = new List<CurveLoop>(1);
                     List<Curve> curves = new List<Curve>();
                     foreach (Curve curve in profile)

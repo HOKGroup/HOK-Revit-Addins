@@ -23,7 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RevitVersion>2022</RevitVersion>
+    <RevitVersion>2023</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
@@ -33,7 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RevitVersion>2022</RevitVersion>
+    <RevitVersion>2023</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
 
@@ -90,6 +90,17 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RevitVersion>2022</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2023|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\2023\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;RELEASE2023</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2023</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -266,6 +277,7 @@ if $(Configuration) == 2019 goto Build2019
 if $(Configuration) == 2020 goto Build2020
 if $(Configuration) == 2021 goto Build2021
 if $(Configuration) == 2022 goto Build2022
+if $(Configuration) == 2023 goto Build2023
 
 :Build2018
 echo Copying results to Build2018
@@ -320,6 +332,17 @@ xcopy /Q/Y "$(TargetDir)System.Data.SQLite.EF6.dll" "%25ALLUSERSPROFILE%25\Autod
 xcopy /Q/Y "$(TargetDir)System.Data.SQLite.Linq.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2022\HOK-Addin.bundle\Contents"
 xcopy /Q/Y "$(TargetDir)EntityFramework.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2022\HOK-Addin.bundle\Contents"
 xcopy /Q/Y "$(TargetDir)EntityFramework.SqlServer.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2022\HOK-Addin.bundle\Contents"
+goto exit
+
+:Build2023
+echo Copying results to Build2023
+if not exist "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2023\HOK-Addin.bundle\Contents" mkdir "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2022\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetPath)" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2023\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)System.Data.SQLite.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2023\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)System.Data.SQLite.EF6.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2023\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)System.Data.SQLite.Linq.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2023\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)EntityFramework.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2023\HOK-Addin.bundle\Contents"
+xcopy /Q/Y "$(TargetDir)EntityFramework.SqlServer.dll" "%25ALLUSERSPROFILE%25\Autodesk\Revit\Addins\2023\HOK-Addin.bundle\Contents"
 goto exit
 
 :exit</PostBuildEvent>

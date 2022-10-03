@@ -35,7 +35,7 @@ namespace HOK.CeilingHeight
             {
                 var uidoc = m_app.ActiveUIDocument;
                 var room = new FilteredElementCollector(m_doc).OfCategory(BuiltInCategory.OST_Rooms).FirstElement() as Room;
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023
                 var parameterRequirements = new Dictionary<string, ForgeTypeId>
                 {
                     {"Ceiling Height", SpecTypeId.Length},
@@ -136,7 +136,7 @@ namespace HOK.CeilingHeight
             return Result.Succeeded;
         }
 
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023
         private static bool FindParameter(Room room, string paramName, ForgeTypeId paramType)
         {
 #else
@@ -146,7 +146,7 @@ namespace HOK.CeilingHeight
             try
             {
                 var param = room.LookupParameter(paramName);
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023
                 return param?.Definition.GetDataType() == paramType;
 #else
                 return param?.Definition.ParameterType == paramType;
