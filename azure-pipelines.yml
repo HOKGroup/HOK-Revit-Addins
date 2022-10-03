@@ -130,6 +130,7 @@ steps:
     configuration: '$(buildConfiguration)'
     maximumCpuCount: true
   env:
+    HOKDepsDirectory: $(Build.SourcesDirectory)
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
@@ -140,6 +141,7 @@ steps:
     configuration: '$(buildConfiguration)'
     msbuildArguments: '/target:HOK_MissionControl'
   env:
+    HOKDepsDirectory: $(Build.SourcesDirectory)
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
@@ -151,6 +153,7 @@ steps:
     msbuildArgs: '/target:HOK_MissionControl_Core'
     clean: true
   env:
+    HOKDepsDirectory: $(Build.SourcesDirectory)
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
@@ -168,6 +171,7 @@ steps:
     configuration: '$(buildConfiguration)'
     maximumCpuCount: true
   env:
+    HOKDepsDirectory: $(Build.SourcesDirectory)
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
@@ -178,6 +182,7 @@ steps:
     configuration: '$(buildConfiguration)'
     maximumCpuCount: true
   env:
+    HOKDepsDirectory: $(Build.SourcesDirectory)
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
@@ -188,6 +193,7 @@ steps:
     configuration: '$(buildConfiguration)'
     maximumCpuCount: true
   env:
+    HOKDepsDirectory: $(Build.SourcesDirectory)
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 

@@ -222,7 +222,7 @@
     </PostBuildEvent>
   </PropertyGroup>
   <Target Name="CopyFiles" AfterTargets="AfterBuild">
-    <Exec Command="&quot;$(SolutionDir)..\_postBuild\codeSigning.bat&quot; &quot;$(TargetPath)&quot;" />
+    <Exec Command="&quot;powershell.exe&quot; &quot;$(SolutionDir)..\_postBuild\codeSigning.ps1&quot; &quot;$(TargetPath)&quot;" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ALLUSERSPROFILE)\Autodesk\Revit\Addins\$(RevitVersion)\HOK-Addin.bundle\Contents" ContinueOnError="true" />
   </Target>
 </Project>
