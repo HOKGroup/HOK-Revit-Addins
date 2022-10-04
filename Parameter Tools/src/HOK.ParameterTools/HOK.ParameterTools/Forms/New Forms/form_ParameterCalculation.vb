@@ -59,7 +59,7 @@ Public Class form_ParameterCalculation
                             Select Case p.Definition.GetDataType()
 #Else
                             Select Case p.Definition.ParameterType
-#EndIf
+#End If
                                 Case 0 ' Invalid
                                     Continue For
                                 Case 8 ' YesNo
@@ -85,7 +85,7 @@ Public Class form_ParameterCalculation
                             Select Case p.Definition.GetDataType()
 #Else
                             Select Case p.Definition.ParameterType
-#EndIf
+#End If
                                 Case 0
                                     Continue For
                                 Case 8
