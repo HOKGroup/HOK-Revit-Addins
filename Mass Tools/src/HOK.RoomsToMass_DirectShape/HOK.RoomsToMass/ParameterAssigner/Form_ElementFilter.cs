@@ -742,14 +742,23 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         if (emptyValue)
                         {
                             FilterStringRuleEvaluator fsre = new FilterStringGreater();
+#if RELEASE2023 || RELEASE2022
+                            FilterStringRule stringRule = new FilterStringRule(pvp, fsre, "");
+#else
                             FilterStringRule stringRule = new FilterStringRule(pvp, fsre, "", false);
+#endif
                             return new ElementParameterFilter(stringRule, true);
+
                         }
 
                         FilterStringRuleEvaluator fnre4 = FindFilterStringRuleEvaluator(strOperator);
                         string strValue = paramValue;
+#if RELEASE2023 || RELEASE2022
+                        FilterStringRule filterRule4 = new FilterStringRule(pvp, fnre4, strValue);
+#else
                         FilterStringRule filterRule4 = new FilterStringRule(pvp, fnre4, strValue, false);
-                        
+#endif
+
                         if (strOperator.Contains("does not"))
                         {
                             return new ElementParameterFilter(filterRule4, true);

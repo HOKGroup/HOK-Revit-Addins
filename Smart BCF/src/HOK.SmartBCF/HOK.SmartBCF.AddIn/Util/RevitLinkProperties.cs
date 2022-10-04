@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if RELEASE2022 
+#if RELEASE2022  || RELEASE2023
 using Revit.IFC.Export.Utility;
 #endif
 

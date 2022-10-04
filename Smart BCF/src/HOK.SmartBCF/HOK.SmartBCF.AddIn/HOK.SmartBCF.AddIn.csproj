@@ -125,7 +125,7 @@
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\$(RevitVersion)\AdWindows.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Revit.IFC.Export" Condition="'$(RevitVersion)' == '2022' || '$(RevitVersion)' == '2023'">
+    <Reference Include="Revit.IFC.Export" Condition="'$(RevitVersion)' == '2022' Or '$(RevitVersion)' == '2023'">
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\..\..\..\__ref\revit-ifc\Source\Revit.IFC.Export\bin\Release\Revit.IFC.Export.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\$(RevitVersion)\Revit.IFC.Export.dll</HintPath>
     </Reference>
