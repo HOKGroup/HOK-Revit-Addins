@@ -51,7 +51,7 @@ Public Class clsPara
     Public ReadOnly Property DisplayUnitType() As String
         Get
             Try
-#If 2022 Or 2023 Then
+#If RELEASE2022 Or RELEASE2023 Then
                 Return m_parameter.Definition.GetDataType().ToString
 #Else
                 Return m_parameter.Definition.ParameterType.ToString
