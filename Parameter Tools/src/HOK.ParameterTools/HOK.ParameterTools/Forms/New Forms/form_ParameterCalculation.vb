@@ -55,7 +55,11 @@ Public Class form_ParameterCalculation
                     For Each p As Parameter In e.Parameters
                         Try
                             Dim m_Para As New clsParaMini(p)
+#If RELEASE2022 Or RELEASE2023 Then
+                            Select Case p.Definition.GetDataType()
+#Else
                             Select Case p.Definition.ParameterType
+#EndIf
                                 Case 0 ' Invalid
                                     Continue For
                                 Case 8 ' YesNo
@@ -77,7 +81,11 @@ Public Class form_ParameterCalculation
                     For Each p As Parameter In e.Parameters
                         Try
                             Dim m_Para As New clsParaMini(p)
+#If RELEASE2022 Or RELEASE2023 Then
+                            Select Case p.Definition.GetDataType()
+#Else
                             Select Case p.Definition.ParameterType
+#EndIf
                                 Case 0
                                     Continue For
                                 Case 8
