@@ -57,17 +57,25 @@ Public Class form_ParameterCalculation
                             Dim m_Para As New clsParaMini(p)
 #If RELEASE2022 Or RELEASE2023 Then
                             Select Case p.Definition.GetDataType()
+                                Case New ForgeTypeId() ' Invalid
+                                    Continue For
+                                Case SpecTypeId.Boolean.YesNo ' YesNo
+                                    Continue For
+                                Case SpecTypeId.String.Url ' URL
+                                    Continue For
+                                Case UnitTypeId.Currency ' Currency
+                                    Continue For
 #Else
                             Select Case p.Definition.ParameterType
-#End If
                                 Case 0 ' Invalid
                                     Continue For
-                                Case 8 ' YesNo
+                                Case 8 ' URL
                                     Continue For
-                                Case 10
+                                Case 10 ' YesNo
                                     Continue For
                                 Case 172 ' Currency
                                     Continue For
+#End If
                             End Select
                             ' Add it to the dictionary
                             If m_Para.Format.ToUpper <> "ELEMENTID" Then m_Params.Add(m_Para.Name, m_Para)
@@ -83,9 +91,16 @@ Public Class form_ParameterCalculation
                             Dim m_Para As New clsParaMini(p)
 #If RELEASE2022 Or RELEASE2023 Then
                             Select Case p.Definition.GetDataType()
+                                Case New ForgeTypeId() ' Invalid
+                                    Continue For
+                                Case SpecTypeId.Boolean.YesNo ' YesNo
+                                    Continue For
+                                Case SpecTypeId.String.Url ' URL
+                                    Continue For
+                                Case UnitTypeId.Currency ' Currency
+                                    Continue For
 #Else
                             Select Case p.Definition.ParameterType
-#End If
                                 Case 0
                                     Continue For
                                 Case 8
@@ -94,6 +109,7 @@ Public Class form_ParameterCalculation
                                     Continue For
                                 Case 172
                                     Continue For
+#End If
                             End Select
                             ' Add it to the dictionary
                             If m_Para.Format.ToUpper <> "ELEMENTID" Then m_Params.Add(m_Para.Name, m_Para)
