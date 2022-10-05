@@ -33,8 +33,6 @@ variables:
 - group: code-signing
 - name: solution
   value: '**/HOK.*.sln'
-- name: nugetSolutions
-  value: '**/HOK.!(ParameterTools).sln'
 - name: coreSolution
   value: '**/HOK.Core.sln'
 - name: MCsolution
@@ -125,7 +123,7 @@ steps:
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
-    restoreSolution: '$(nugetSolutions)'
+    restoreSolution: '$(solution)'
     feedsToUse: 'select'
     noCache: true
 
