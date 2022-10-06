@@ -78,8 +78,6 @@ Public Class clsParaMini
 #End If
             Catch
                 Return Nothing
-            Catch
-                Return Nothing
             End Try
         End Get
     End Property

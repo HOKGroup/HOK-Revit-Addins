@@ -58,8 +58,6 @@ Public Class clsPara
 #End If
             Catch
                 Return Nothing
-            Catch
-                Return Nothing
             End Try
         End Get
     End Property
