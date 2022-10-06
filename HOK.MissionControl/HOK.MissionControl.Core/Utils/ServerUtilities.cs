@@ -18,6 +18,8 @@ namespace HOK.MissionControl.Core.Utils
     {
         public static string RestApiBaseUrl { get; set; }
         public const string ApiVersion = "api/v2";
+        private static Func<NewtonsoftJsonSerializer> serializerFactory = () => { return new NewtonsoftJsonSerializer(); };
+
         private static Settings Settings { get; set; }
 
         static ServerUtilities()
@@ -132,11 +134,11 @@ namespace HOK.MissionControl.Core.Utils
 
                 var client = new RestClient(RestApiBaseUrl);
                 client.ClearHandlers();
-                client.AddHandler("application/json", new NewtonsoftJsonSerializer());
-                client.AddHandler("text/json", new NewtonsoftJsonSerializer());
-                client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
-                client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
-                client.AddHandler("*+json", new NewtonsoftJsonSerializer());
+                client.AddHandler("application/json", serializerFactory);
+                client.AddHandler("text/json", serializerFactory);
+                client.AddHandler("text/x-json", serializerFactory);
+                client.AddHandler("text/javascript", serializerFactory);
+                client.AddHandler("*+json", serializerFactory);
 
                 var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET)
                 {
@@ -183,11 +185,11 @@ namespace HOK.MissionControl.Core.Utils
             {
                 var client = new RestClient(RestApiBaseUrl);
                 client.ClearHandlers();
-                client.AddHandler("application/json", new NewtonsoftJsonSerializer());
-                client.AddHandler("text/json", new NewtonsoftJsonSerializer());
-                client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
-                client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
-                client.AddHandler("*+json", new NewtonsoftJsonSerializer());
+                client.AddHandler("application/json", serializerFactory);
+                client.AddHandler("text/json", serializerFactory);
+                client.AddHandler("text/x-json", serializerFactory);
+                client.AddHandler("text/javascript", serializerFactory);
+                client.AddHandler("*+json", serializerFactory);
 
                 var request = new RestRequest(ApiVersion + "/" + route, Method.PUT)
                 {
@@ -196,7 +198,7 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddHeader("Content-type", "application/json");
                 request.RequestFormat = DataFormat.Json;
                 request.JsonSerializer = new NewtonsoftJsonSerializer();
-                request.AddBody(body);
+                request.AddJsonBody(body);
 
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.Created)
@@ -225,11 +227,11 @@ namespace HOK.MissionControl.Core.Utils
         {
             var client = new RestClient(RestApiBaseUrl);
             client.ClearHandlers();
-            client.AddHandler("application/json", new NewtonsoftJsonSerializer());
-            client.AddHandler("text/json", new NewtonsoftJsonSerializer());
-            client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
-            client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
-            client.AddHandler("*+json", new NewtonsoftJsonSerializer());
+            client.AddHandler("application/json", serializerFactory);
+            client.AddHandler("text/json", serializerFactory);
+            client.AddHandler("text/x-json", serializerFactory);
+            client.AddHandler("text/javascript", serializerFactory);
+            client.AddHandler("*+json", serializerFactory);
 
             var request = new RestRequest(ApiVersion + "/" + route, Method.POST)
             {
@@ -238,9 +240,9 @@ namespace HOK.MissionControl.Core.Utils
             request.AddHeader("Content-type", "application/json");
             request.RequestFormat = DataFormat.Json;
             request.JsonSerializer = new NewtonsoftJsonSerializer();
-            request.AddBody(body);
+            request.AddJsonBody(body);
 
-            var response = await client.ExecuteTaskAsync<T>(request);
+            var response = await client.ExecuteAsync<T>(request);
             if (response.StatusCode != HttpStatusCode.Created)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, response.StatusDescription);
@@ -267,11 +269,11 @@ namespace HOK.MissionControl.Core.Utils
             {
                 var client = new RestClient(RestApiBaseUrl);
                 client.ClearHandlers();
-                client.AddHandler("application/json", new NewtonsoftJsonSerializer());
-                client.AddHandler("text/json", new NewtonsoftJsonSerializer());
-                client.AddHandler("text/x-json", new NewtonsoftJsonSerializer());
-                client.AddHandler("text/javascript", new NewtonsoftJsonSerializer());
-                client.AddHandler("*+json", new NewtonsoftJsonSerializer());
+                client.AddHandler("application/json", serializerFactory);
+                client.AddHandler("text/json", serializerFactory);
+                client.AddHandler("text/x-json", serializerFactory);
+                client.AddHandler("text/javascript", serializerFactory);
+                client.AddHandler("*+json", serializerFactory);
 
                 var request = new RestRequest(ApiVersion + "/" + route, Method.POST)
                 {
@@ -280,7 +282,7 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddHeader("Content-type", "application/json");
                 request.RequestFormat = DataFormat.Json;
                 request.JsonSerializer = new NewtonsoftJsonSerializer();
-                request.AddBody(body);
+                request.AddJsonBody(body);
 
                 var response = client.Execute<T>(request);
                 if (response.StatusCode != HttpStatusCode.Created) return false;
