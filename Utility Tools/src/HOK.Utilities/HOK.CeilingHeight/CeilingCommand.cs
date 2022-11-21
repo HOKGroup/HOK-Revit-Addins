@@ -35,6 +35,11 @@ namespace HOK.CeilingHeight
             {
                 var uidoc = m_app.ActiveUIDocument;
                 var room = new FilteredElementCollector(m_doc).OfCategory(BuiltInCategory.OST_Rooms).FirstElement() as Room;
+                if (null == room)
+                {
+                    MessageBox.Show("There are no rooms in the model. Add one to use this tool.", "Find Parameters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return Result.Failed;
+                }
 #if RELEASE2022 || RELEASE2023
                 var parameterRequirements = new Dictionary<string, ForgeTypeId>
                 {
