@@ -104,7 +104,7 @@ namespace HOK.CeilingHeight
                 }
                 else
                 {
-                    var dr = MessageBox.Show("Start selecting rooms to create floors and click Finish on the options bar.The windowed area will filter out Room category only.", 
+                    var dr = MessageBox.Show("Start selecting rooms to measure ceiling heights and click Finish on the options bar.The windowed area will filter out Room category only.", 
                         "Select Rooms", 
                         MessageBoxButtons.OK, 
                         MessageBoxIcon.Information);
