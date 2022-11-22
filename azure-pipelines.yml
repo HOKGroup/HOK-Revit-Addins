@@ -15,6 +15,8 @@ trigger:
 
 strategy:
   matrix:
+    2023:
+      buildConfiguration: '2023'
     2022:
       buildConfiguration: '2022'
     2021:
@@ -31,8 +33,6 @@ variables:
 - group: code-signing
 - name: solution
   value: '**/HOK.*.sln'
-- name: nugetSolutions
-  value: '**/HOK.!(ParameterTools).sln'
 - name: coreSolution
   value: '**/HOK.Core.sln'
 - name: MCsolution
@@ -74,6 +74,10 @@ steps:
 - task: DownloadSecureFile@1
   inputs:
     secureFile: 'HOK Addins Deps03.zip'
+
+- task: DownloadSecureFile@1
+  inputs:
+    secureFile: 'HOK Addins Deps04.zip'
 
 - task: DownloadSecureFile@1
   inputs:
@@ -119,7 +123,7 @@ steps:
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
-    restoreSolution: '$(nugetSolutions)'
+    restoreSolution: '$(solution)'
     feedsToUse: 'select'
     noCache: true
 

@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build"
-  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
@@ -38,9 +37,9 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
     <TargetFrameworks>net48</TargetFrameworks>
-    <Configurations>Debug;Release;2018;2019;2020;2021;2022</Configurations>
+    <Configurations>Debug;Release;2018;2019;2020;2021;2022;2023</Configurations>
     <OutputPath>bin\Debug\</OutputPath>
-    <Platforms />
+    <Platforms>x64</Platforms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,7 +51,7 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
-    <RevitVersion>2022</RevitVersion>
+    <RevitVersion>2023</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworks>net48</TargetFrameworks>
   </PropertyGroup>
@@ -66,7 +65,7 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
-    <RevitVersion>2022</RevitVersion>
+    <RevitVersion>2023</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworks>net48</TargetFrameworks>
   </PropertyGroup>
@@ -145,12 +144,32 @@
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworks>net48</TargetFrameworks>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2023|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\2023\</OutputPath>
+    <DefineConstants>RELEASE2023</DefineConstants>
+    <DocumentationFile>HOK.ParameterTools.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <RevitVersion>2023</RevitVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworks>net48</TargetFrameworks>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="HOK.Core">
       <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\$(RevitVersion)\HOK.Core.dll</HintPath>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
       <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\$(RevitVersion)\HOK.MissionControl.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.12.0.4518.1014\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <Private>True</Private>
+      <SpecificVersion>True</SpecificVersion>
     </Reference>
     <Reference Include="RevitAPIUI">
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">C:\Program Files\Autodesk\Revit $(RevitVersion)\RevitAPIUI.dll</HintPath>
@@ -320,6 +339,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -337,11 +357,6 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Office.Interop.Excel">
-      <Version>12.0.4518.1014</Version>
-    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup>

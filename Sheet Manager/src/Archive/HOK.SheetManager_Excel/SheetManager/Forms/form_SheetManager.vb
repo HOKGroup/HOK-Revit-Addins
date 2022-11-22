@@ -1010,14 +1010,14 @@ Public Class form_SheetManager
                     'See if sheet exists, otherwise ignore it.  If found renumber and update dictionary
                     If m_Settings.Views.ContainsKey(oldName) And Not m_Settings.Views.ContainsKey(newName) Then
                         m_View = m_Settings.Views(oldName)
-#If RELEASE2022 Or RELEASE2021 Or RELEASE2020 Or RELEASE2019 Then
+#If RELEASE2023 Or RELEASE2022 Or RELEASE2021 Or RELEASE2020 Or RELEASE2019 Then
                         m_View.Name = newName
 #Else
                         m_View.ViewName = newName
 #End If
                         m_Settings.Views.Add(newName, m_Settings.Views(oldName))
                         m_Settings.Views.Remove(oldName)
-#If RELEASE2022 Or RELEASE2021 Or RELEASE2020 Or RELEASE2019 Then
+#If RELEASE2023 Or RELEASE2022 Or RELEASE2021 Or RELEASE2020 Or RELEASE2019 Then
                         m_View.Name = newName
 #Else
                         m_View.ViewName = newName

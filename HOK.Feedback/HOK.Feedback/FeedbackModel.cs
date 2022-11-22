@@ -43,7 +43,7 @@ namespace HOK.Feedback
             request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
             request.RequestFormat = DataFormat.Json;
 
-            request.AddBody(new DeleteObject
+            request.AddJsonBody(new DeleteObject
             {
                 path = att.UploadImageContent.path,
                 message = "removing an image",
@@ -51,7 +51,7 @@ namespace HOK.Feedback
                 branch = "master"
             });
 
-            var response = await client.ExecuteTaskAsync<T>(request);
+            var response = await client.ExecuteAsync<T>(request);
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, response.StatusDescription);
@@ -114,7 +114,7 @@ namespace HOK.Feedback
             request.AddHeader("Content-type", "application/json");
             request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
             request.RequestFormat = DataFormat.Json;
-            request.AddBody(body);
+            request.AddJsonBody(body);
 
             try
             {
@@ -125,7 +125,7 @@ namespace HOK.Feedback
                 Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
             }
 
-            var response = await client.ExecuteTaskAsync<T>(request);
+            var response = await client.ExecuteAsync<T>(request);
             if (response.StatusCode != HttpStatusCode.Created)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, response.StatusDescription);
@@ -176,9 +176,9 @@ namespace HOK.Feedback
             request.AddHeader("Content-type", "application/json");
             request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
             request.RequestFormat = DataFormat.Json;
-            request.AddBody(body);
+            request.AddJsonBody(body);
 
-            var response = await client.ExecuteTaskAsync<T>(request);
+            var response = await client.ExecuteAsync<T>(request);
             if (response.StatusCode != HttpStatusCode.Created)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, response.StatusDescription);
