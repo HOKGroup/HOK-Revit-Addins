@@ -1,6 +1,5 @@
 $version = $args[0]
 $prevVersion = "2023"
-
 #================= Add new version to .sln files ===================
 ## Find all .sln files
 $slnFiles = Get-ChildItem -Path . -Filter *.sln -Recurse
@@ -71,3 +70,10 @@ foreach ($csprojFile in $csprojFiles) {
     }
     Set-Content $csprojFile $newVersionXml.OwnerDocument.OuterXml
 }
+
+#================= Add new version to Azure Pipelines Build ===================
+$azurePipelinesBuildFile = Get-ChildItem -Path . -Filter azure-pipelines.yml -Recurse
+$yamlSearchRegex = "matrix:((\r?\n\s+)" + $([regex]::escape($prevVersion)) + ":(\r?\n\s+)buildConfiguration:\s*'" + $([regex]::escape($prevVersion)) + "')"
+$yamlReplaceRegex = "matrix:`$2 REMOVE " + $([regex]::escape($version)) + ":`$3buildConfiguration: '" + $([regex]::escape($version)) + "'`$1"
+$content = (Get-Content -Raw $azurePipelinesBuildFile) -replace $yamlSearchRegex, $yamlReplaceRegex 
+$content -replace " REMOVE ", "" | Set-Content $azurePipelinesBuildFile

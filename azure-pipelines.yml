@@ -15,6 +15,8 @@ trigger:
 
 strategy:
   matrix:
+    2024:
+      buildConfiguration: '2024'
     2023:
       buildConfiguration: '2023'
     2022:
@@ -213,4 +215,5 @@ steps:
     PathtoPublish: '$(Build.SourcesDirectory)/_artifacts'
     ArtifactName: '$(Build.SourceBranchName)'
     publishLocation: 'Container'
+
 
