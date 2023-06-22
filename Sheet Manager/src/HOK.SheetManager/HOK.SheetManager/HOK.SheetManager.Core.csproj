@@ -78,7 +78,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <RevitVersion>2021</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-  </PopertyGroup>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2022|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\2022\</OutputPath>
