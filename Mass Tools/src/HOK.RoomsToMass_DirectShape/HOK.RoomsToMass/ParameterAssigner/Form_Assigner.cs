@@ -576,7 +576,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             elementParamFilters.Add(filter);
                             break;
                         case StorageType.String:
-#if RELEASE2022 || RELEASE2023
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                             var stringRule = new FilterStringRule(provider, new FilterStringEquals(), "");
 #else
                             var stringRule = new FilterStringRule(provider, new FilterStringEquals(), "", false);

@@ -386,7 +386,7 @@ namespace HOK.CeilingHeight
                         parameter.Set(rp.CeilingHeight);
                         trans.Commit();
                     }
-#if RELEASE2022 || RELEASE2023
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     else if (CreateSharedParameter(paramName, SpecTypeId.Length, BuiltInParameterGroup.PG_GEOMETRY))
                     {
 #else
@@ -446,7 +446,7 @@ namespace HOK.CeilingHeight
                         parameter.Set(ceilingHeights);
                         trans.Commit();
                     }
-#if RELEASE2022 || RELEASE2023
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.PG_GEOMETRY))
                     {
 #else
@@ -498,7 +498,7 @@ namespace HOK.CeilingHeight
                             trans.Commit();
                         }
                     }
-#if RELEASE2022 || RELEASE2023
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.INVALID))
                     {
 #else
@@ -564,7 +564,7 @@ namespace HOK.CeilingHeight
                             trans.RollBack();
                         }
                     }
-#if RELEASE2022 || RELEASE2023
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.INVALID))
                     {
 #else
@@ -594,7 +594,7 @@ namespace HOK.CeilingHeight
             }
         }
 
-#if RELEASE2022 || RELEASE2023
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
         private bool CreateSharedParameter(string paramName, ForgeTypeId paramType, BuiltInParameterGroup pramGroup)
         {
 #else
