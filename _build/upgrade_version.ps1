@@ -23,7 +23,7 @@ foreach ($slnFile in $slnFiles) {
 }
 
 #================= Add new version to .csproj files ===================
-$csprojFiles = Get-ChildItem -Path . -Filter *.csproj -Recurse
+$csprojFiles = Get-ChildItem -Path . -Filter *.??proj -Recurse
 $Namespace = @{msbuild ='http://schemas.microsoft.com/developer/msbuild/2003'}
 [System.Xml.XmlNamespaceManager]$ns = New-Object System.Xml.XmlNamespaceManager(New-Object System.Xml.NameTable)
 $ns.AddNamespace('msbuild', $Namespace.msbuild)
