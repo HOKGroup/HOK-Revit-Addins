@@ -129,7 +129,7 @@ Public Class form_ParamStringCalculate
 
                 Exit Select
             Case "ElementId"
-                valueToAssign = element.Id.IntegerValue.ToString
+                valueToAssign = element.Id.Value.ToString
                 Exit Select
             Case Else
                 Exit Select
@@ -352,7 +352,7 @@ Public Class form_ParamStringCalculate
 
         ' New filtered element collector by category, category must be an actual db.Category
         Dim filCollector As New DB.FilteredElementCollector(m_Settings.Document)
-        filCollector.OfCategory(category.Id.IntegerValue)
+        filCollector.OfCategory(category.Id.Value)
         elementsModel = filCollector.ToElements
 
         ' '' '' Old Way Removed...
@@ -397,7 +397,7 @@ Public Class form_ParamStringCalculate
 
             'Process the element
             If Not ProcessOneElement(element) Then
-                MessageBox.Show("Error processing element with element ID: " & element.Id.IntegerValue.ToString & ". Processing stopped.", m_Settings.ProgramName)
+                MessageBox.Show("Error processing element with element ID: " & element.Id.Value.ToString & ". Processing stopped.", m_Settings.ProgramName)
                 progressBarForm.Close()
                 Exit Sub
             End If

@@ -589,7 +589,7 @@ Public Class form_ParamCalculate
 
         ' New filtered element collector by category, category must be an actual Category
         Dim filCollector As New FilteredElementCollector(m_Settings.Document)
-        filCollector.OfCategory(mCategory.Id.IntegerValue)
+        filCollector.OfCategory(mCategory.Id.Value)
         mElementsModel = filCollector.ToElements
 
         ' '' '' Old Way Removed...

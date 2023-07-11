@@ -224,6 +224,7 @@
     <Compile Include="Clases\clsSortableBindingList.vb" />
     <Compile Include="cmdParameterTools.vb" />
     <Compile Include="constParameterTools.vb" />
+    <Compile Include="ElementIdExtensionModule.vb" />
     <Compile Include="Clases\clsParaMini.vb" />
     <Compile Include="Forms\form_ParamParent.Designer.vb">
       <DependentUpon>form_ParamParent.vb</DependentUpon>

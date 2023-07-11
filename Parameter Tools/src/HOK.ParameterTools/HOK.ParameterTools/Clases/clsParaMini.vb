@@ -93,7 +93,7 @@ Public Class clsParaMini
             Case StorageType.[Double]
                 Return parameter.AsDouble
             Case StorageType.ElementId
-                Return parameter.AsElementId.IntegerValue
+                Return parameter.AsElementId.Value
             Case StorageType.[Integer]
                 Return parameter.AsInteger
             Case StorageType.None

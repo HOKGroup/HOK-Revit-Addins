@@ -39,7 +39,7 @@ Public Class form_ParameterCalculation
             ' Build the List from the category name
             For Each cat As Category In m_Settings.Document.Settings.Categories
                 If cat.Name.ToUpper = CatName.ToUpper Then
-                    m_Col.OfCategory(cat.Id.IntegerValue)
+                    m_Col.OfCategory(cat.Id.Value)
                     m_Elements = m_Col.ToElements
                 End If
             Next
@@ -172,7 +172,7 @@ Public Class form_ParameterCalculation
         For Each cat As Category In m_Settings.Document.Settings.Categories
             If cat.Name.ToUpper = CategoryName.ToUpper Then
                 Dim m_Col As New FilteredElementCollector(m_Settings.Document)
-                m_Col.OfCategory(cat.Id.IntegerValue)
+                m_Col.OfCategory(cat.Id.Value)
                 m_Elements = m_Col.ToElements
                 ' This will return the contents of the category
                 Return m_Elements

@@ -79,7 +79,7 @@ Public Class form_ParamWriteToExcel
 
         ' Select all elements by category
         Dim filCollector As New FilteredElementCollector(m_Settings.Document)
-        filCollector.OfCategory(m_category.Id.IntegerValue)
+        filCollector.OfCategory(m_category.Id.Value)
         Dim m_CatElements As New List(Of Element)
         m_CatElements = filCollector.ToElements
 
@@ -126,7 +126,7 @@ Public Class form_ParamWriteToExcel
             For Each Elem As Element In m_SelElements
                 If m_InstProps.Count > 0 And m_TypeProps.Count > 0 Then Exit For
 
-                If Elem.GetTypeId.IntegerValue.ToString = "-1" Then
+                If Elem.GetTypeId.Value.ToString = "-1" Then
                     If m_TypeProps.Count = 0 Then
                         ' Get the Type Properties
                         m_TypeProps = m_Properties.GetPropNames(Elem)
@@ -149,7 +149,7 @@ Public Class form_ParamWriteToExcel
                 Me.ProgressBar1.Increment(1)
 
                 ' Skip proper elements
-                If Elem.GetTypeId.IntegerValue.ToString = "-1" Then
+                If Elem.GetTypeId.Value.ToString = "-1" Then
                     ' Type - skip if inst is checked
                     If Me.CheckBoxInstance.Checked = True Then Continue For
                 Else
@@ -194,7 +194,7 @@ Public Class form_ParamWriteToExcel
 
                 ' Get property values and write them to a new line in Excel
                 column = 1
-                m_ExcelWorksheet.Cells(row, 1) = Elem.Id.IntegerValue.ToString
+                m_ExcelWorksheet.Cells(row, 1) = Elem.Id.Value.ToString
                 m_ExcelWorksheet.Cells(row, 2) = Elem.Name
                 column = 3
                 If Me.CheckBoxInstance.Checked = True Then
