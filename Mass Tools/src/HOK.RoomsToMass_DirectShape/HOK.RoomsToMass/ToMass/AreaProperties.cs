@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Autodesk.Revit.DB;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ToMass
 {
@@ -11,7 +12,7 @@ namespace HOK.RoomsToMass.ToMass
         private Area m_area = null;
         private string areaDocument = "";
         private ElementId areaElementId = ElementId.InvalidElementId;
-        private int areaId = -1;
+        private long areaId = -1;
         private string areaUniqueId = "";
         private string areaName = "";
         private string areaNumber = "";
@@ -37,7 +38,7 @@ namespace HOK.RoomsToMass.ToMass
         public Area AreaElement { get { return m_area; } set { m_area = value; } }
         public string AreaDocument { get { return areaDocument; } set { areaDocument = value; } }
         public ElementId AreaElementId { get { return areaElementId; } set { areaElementId = value; } }
-        public int AreaId { get { return areaId; } set { areaId = value; } }
+        public long AreaId { get { return areaId; } set { areaId = value; } }
         public string AreaUniqueId { get { return areaUniqueId; } set { areaUniqueId = value; } }
         public string AreaName { get { return areaName; } set { areaName = value; } }
         public string AreaNumber { get { return areaNumber; } set { areaNumber = value; } }
@@ -97,7 +98,7 @@ namespace HOK.RoomsToMass.ToMass
             try
             {
                 areaElementId = m_area.Id;
-                areaId = m_area.Id.IntegerValue;
+                areaId = GetElementIdValue(m_area.Id);
                 areaUniqueId = m_area.UniqueId;
                 areaName = m_area.Name;
                 areaNumber = m_area.Number;

@@ -7,6 +7,7 @@ using System.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB.Architecture;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.LevelManager
 {
@@ -16,7 +17,7 @@ namespace HOK.LevelManager
         private Document m_doc;
         private Dictionary<string, Level> levels = new Dictionary<string, Level>();
         private Dictionary<string, Level> selectedLevels = new Dictionary<string, Level>();
-        private Dictionary<int/*elementId*/, Element> modelGroups = new Dictionary<int, Element>();
+        private Dictionary<long/*elementId*/, Element> modelGroups = new Dictionary<long, Element>();
         private XYZ moveDirection = null;
         
         private bool maintain = false;
@@ -197,7 +198,7 @@ namespace HOK.LevelManager
 
                 var levelFilter = new ElementLevelFilter(levelFrom.Id);
 
-                var pvp = new ParameterValueProvider(new ElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
+                var pvp = new ParameterValueProvider(NewElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
                 FilterNumericRuleEvaluator fnrv = new FilterNumericEquals();
                 var rulevalId = levelFrom.Id;
                 FilterRule paramFr = new FilterElementIdRule(pvp, fnrv, rulevalId);
@@ -493,7 +494,7 @@ namespace HOK.LevelManager
 
                         var levelFilter = new ElementLevelFilter(levelFrom.Id);
 
-                        var pvp = new ParameterValueProvider(new ElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
+                        var pvp = new ParameterValueProvider(NewElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
                         FilterNumericRuleEvaluator fnrv = new FilterNumericEquals();
                         var rulevalId = levelFrom.Id;
                         FilterRule paramFr = new FilterElementIdRule(pvp, fnrv, rulevalId);
@@ -672,7 +673,7 @@ namespace HOK.LevelManager
 
                 var levelFilter = new ElementLevelFilter(levelFrom.Id);
 
-                var pvp = new ParameterValueProvider(new ElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
+                var pvp = new ParameterValueProvider(NewElementId((int)BuiltInParameter.RBS_START_LEVEL_PARAM));
                 FilterNumericRuleEvaluator fnrv = new FilterNumericEquals();
                 var rulevalId = levelFrom.Id;
                 FilterRule paramFr = new FilterElementIdRule(pvp, fnrv, rulevalId);
@@ -987,9 +988,9 @@ namespace HOK.LevelManager
                                     var writable = LevelManager.MoveGroups(m_doc, element, toLevel, maintain);
                                     if (writable)
                                     {
-                                        if (!modelGroups.ContainsKey(element.Id.IntegerValue))
+                                        if (!modelGroups.ContainsKey(GetElementIdValue(element.Id)))
                                         {
-                                            modelGroups.Add(element.Id.IntegerValue, element);//for warning message
+                                            modelGroups.Add(GetElementIdValue(element.Id), element);//for warning message
                                         }
                                     }
                                     break;

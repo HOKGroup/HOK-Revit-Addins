@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -146,7 +146,8 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <RevitVersion>2023</RevitVersion>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-  </PropertyGroup><PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2024|x64'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == '2024|x64'">
     <DebugSymbols>true</DebugSymbols>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
@@ -206,6 +207,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="constElementTools.vb" />
+    <Compile Include="ElementIdExtensionModule.vb" />
     <Compile Include="Forms\form_ElemAttachmentManager.Designer.vb">
       <DependentUpon>form_ElemAttachmentManager.vb</DependentUpon>
     </Compile>
@@ -421,4 +423,3 @@
   </Target>
   -->
 </Project>
-

@@ -7,6 +7,7 @@ using System.Windows;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.ExtensibleStorage;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomElevation
 {
@@ -24,9 +25,9 @@ namespace HOK.RoomElevation
         private static string s_KeyMarkId = "KeyMarkId";
 
 
-        public static Dictionary<int, RoomElevationProperties> GetRoomElevationProperties(Document doc, Dictionary<int, LinkedInstanceProperties> linkedDocs)
+        public static Dictionary<long, RoomElevationProperties> GetRoomElevationProperties(Document doc, Dictionary<long, LinkedInstanceProperties> linkedDocs)
         {
-            Dictionary<int, RoomElevationProperties> pDictionary = new Dictionary<int, RoomElevationProperties>();
+            Dictionary<long, RoomElevationProperties> pDictionary = new Dictionary<long, RoomElevationProperties>();
             try
             {
                 if (null == m_schema)
@@ -56,13 +57,13 @@ namespace HOK.RoomElevation
                             {
                                 Room room = null;
                                 RoomElevationProperties rep = null;
-                                if (isLinked && linkedDocs.ContainsKey(rvtInstanceId.IntegerValue))
+                                if (isLinked && linkedDocs.ContainsKey(GetElementIdValue(rvtInstanceId)))
                                 {
-                                    LinkedInstanceProperties lip = linkedDocs[rvtInstanceId.IntegerValue];
+                                    LinkedInstanceProperties lip = linkedDocs[GetElementIdValue(rvtInstanceId)];
                                     room = lip.LinkedDocument.GetElement(roomId) as Room;
                                     if (null != room)
                                     {
-                                        rep = new RoomElevationProperties(room, rvtInstanceId.IntegerValue);
+                                        rep = new RoomElevationProperties(room, GetElementIdValue(rvtInstanceId));
                                     }
                                 }
                                 else
@@ -76,20 +77,20 @@ namespace HOK.RoomElevation
 
                                 if (null != rep)
                                 {
-                                    rep.KeyMarkId = keyMarkId.IntegerValue;
+                                    rep.KeyMarkId = GetElementIdValue(keyMarkId);
                                     Dictionary<int, Dictionary<int, ElevationViewProperties>> elevationDictionary = new Dictionary<int, Dictionary<int, ElevationViewProperties>>();
                                     foreach (int viewId in elevations.Keys)
                                     {
                                         int elevationViewId = viewId;
                                         int markId = elevations[elevationViewId];
 
-                                        ViewSection viewSection = doc.GetElement(new ElementId(elevationViewId)) as ViewSection;
+                                        ViewSection viewSection = doc.GetElement(NewElementId(elevationViewId)) as ViewSection;
                                         if (null != viewSection)
                                         {
                                             ElevationViewProperties evp = new ElevationViewProperties(viewSection);
                                             if (!rep.ElevationViews.ContainsKey(markId))
                                             {
-                                                Dictionary<int, ElevationViewProperties> elevationViews = new Dictionary<int, ElevationViewProperties>();
+                                                Dictionary<long, ElevationViewProperties> elevationViews = new Dictionary<long, ElevationViewProperties>();
                                                 elevationViews.Add(evp.ViewId, evp);
                                                 rep.ElevationViews.Add(markId, elevationViews);
                                             }
@@ -166,10 +167,10 @@ namespace HOK.RoomElevation
                                 Entity entity = new Entity(schemaId);
                                 entity.Set<string>(s_RoomNumber, rep.RoomNumber);
                                 entity.Set<string>(s_RoomName, rep.RoomName);
-                                entity.Set<ElementId>(s_RoomId, new ElementId(rep.RoomId));
+                                entity.Set<ElementId>(s_RoomId, NewElementId(rep.RoomId));
                                 entity.Set<bool>(s_IsLinked,rep.IsLinked);
-                                entity.Set<ElementId>(s_KeyMarkId, new ElementId(rep.KeyMarkId));
-                                entity.Set<ElementId>(s_RvtInstanceId, new ElementId(rep.RvtLinkId));
+                                entity.Set<ElementId>(s_KeyMarkId, NewElementId(rep.KeyMarkId));
+                                entity.Set<ElementId>(s_RvtInstanceId, NewElementId(rep.RvtLinkId));
 
                                 IDictionary<int, int> elevationViews = new Dictionary<int, int>();
                                 foreach (int markId in rep.ElevationViews.Keys)
@@ -229,7 +230,7 @@ namespace HOK.RoomElevation
                                 {
                                     Entity entity = ds.GetEntity(m_schema);
                                     ElementId roomId = entity.Get<ElementId>(m_schema.GetField(s_RoomId));
-                                    if (rep.RoomId == roomId.IntegerValue)
+                                    if (rep.RoomId == GetElementIdValue(roomId))
                                     {
                                         storageToDelete = ds;
                                          break;
@@ -261,10 +262,10 @@ namespace HOK.RoomElevation
                             Entity entity = new Entity(schemaId);
                             entity.Set<string>(s_RoomNumber, rep.RoomNumber);
                             entity.Set<string>(s_RoomName, rep.RoomName);
-                            entity.Set<ElementId>(s_RoomId, new ElementId(rep.RoomId));
+                            entity.Set<ElementId>(s_RoomId, NewElementId(rep.RoomId));
                             entity.Set<bool>(s_IsLinked, rep.IsLinked);
-                            entity.Set<ElementId>(s_KeyMarkId, new ElementId(rep.KeyMarkId));
-                            entity.Set<ElementId>(s_RvtInstanceId, new ElementId(rep.RvtLinkId));
+                            entity.Set<ElementId>(s_KeyMarkId, NewElementId(rep.KeyMarkId));
+                            entity.Set<ElementId>(s_RvtInstanceId, NewElementId(rep.RvtLinkId));
 
                             IDictionary<int, int> elevationViews = new Dictionary<int, int>();
                             foreach (int markId in rep.ElevationViews.Keys)
@@ -342,28 +343,28 @@ namespace HOK.RoomElevation
         private Room m_room = null;
         private string roomName = "";
         private string roomNumber = "";
-        private int roomId = -1;
+        private long roomId = -1;
         private bool isLinked = false;
         private Document document = null;
         private string documentTitle = "";
-        private int rvtLinkId = -1;
-        private int keyMarkId = -1;
-        private Dictionary<int/*markId*/, Dictionary<int/*viewId*/, ElevationViewProperties>> elevationViews = new Dictionary<int, Dictionary<int, ElevationViewProperties>>();
+        private long rvtLinkId = -1;
+        private long keyMarkId = -1;
+        private Dictionary<long, Dictionary<long, ElevationViewProperties>> elevationViews = new Dictionary<long, Dictionary<long, ElevationViewProperties>>();
 
         public Room RoomObj { get { return m_room; } set { m_room = value; } }
         public string RoomName { get { return roomName; } set { roomName = value; } }
         public string RoomNumber { get { return roomNumber; } set { roomNumber = value; } }
-        public int RoomId { get { return roomId; } set { roomId = value; } }
+        public long RoomId { get { return roomId; } set { roomId = value; } }
         public bool IsLinked { get { return isLinked; } set { isLinked = value; } }
         public string DocumentTitle { get { return documentTitle; } set { documentTitle = value; } }
-        public int RvtLinkId { get { return rvtLinkId; } set { rvtLinkId = value; } }
-        public int KeyMarkId { get { return keyMarkId; } set { keyMarkId = value; } }
-        public Dictionary<int, Dictionary<int, ElevationViewProperties>> ElevationViews { get { return elevationViews; } set { elevationViews = value; } }
+        public long RvtLinkId { get { return rvtLinkId; } set { rvtLinkId = value; } }
+        public long KeyMarkId { get { return keyMarkId; } set { keyMarkId = value; } }
+        public Dictionary<long, Dictionary<long, ElevationViewProperties>> ElevationViews { get { return elevationViews; } set { elevationViews = value; } }
 
         public RoomElevationProperties(Room room)
         {
             m_room = room;
-            roomId = m_room.Id.IntegerValue;
+            roomId = GetElementIdValue(m_room.Id);
 
             roomName = m_room.Name;
             roomNumber = m_room.Number;
@@ -385,10 +386,10 @@ namespace HOK.RoomElevation
 
         }
 
-        public RoomElevationProperties(Room room, int rvtInstanceId)
+        public RoomElevationProperties(Room room, long rvtInstanceId)
         {
             m_room = room;
-            roomId = m_room.Id.IntegerValue;
+            roomId = GetElementIdValue(m_room.Id);
             
             roomName = m_room.Name;
             roomNumber = m_room.Number;
@@ -429,23 +430,23 @@ namespace HOK.RoomElevation
     {
         private ViewSection m_view = null;
         private string viewName = "";
-        private int viewId = -1;
+        private long viewId = -1;
         private int viewIndex = -1;
         private bool createdByWall = false;
-        private int wallId = -1;
+        private long wallId = -1;
 
         public ViewSection ViewObj { get { return m_view; } set { m_view = value; } }
         public string ViewName { get { return viewName; } set { viewName = value; } }
-        public int ViewId { get { return viewId; } set { viewId = value; } }
+        public long ViewId { get { return viewId; } set { viewId = value; } }
         public int ViewIndex { get { return viewIndex; } set { viewIndex = value; } }
         public bool CreatedByWall { get { return createdByWall; } set { createdByWall = value; } }
-        public int WallId { get { return wallId; } set { wallId = value; } }
+        public long WallId { get { return wallId; } set { wallId = value; } }
 
         public ElevationViewProperties(ViewSection viewSection)
         {
             m_view = viewSection;
             viewName = m_view.Name;
-            viewId = m_view.Id.IntegerValue;
+            viewId = GetElementIdValue(m_view.Id);
         }
 
         public ElevationViewProperties(ElevationViewProperties evp)
@@ -574,8 +575,8 @@ namespace HOK.RoomElevation
                             Entity entity = new Entity(schemaId);
                             entity.Set<bool>(s_IsLinkedRoom, settings.IsLinkedRoom);
                             entity.Set<bool>(s_IsLinkedWall, settings.IsLInkedWall);
-                            entity.Set<int>(s_ViewFamilyId, settings.ViewFamilyId);
-                            entity.Set<int>(s_ViewTemplateId, settings.ViewTemplateId);
+                            entity.Set<long>(s_ViewFamilyId, settings.ViewFamilyId);
+                            entity.Set<long>(s_ViewTemplateId, settings.ViewTemplateId);
                             entity.Set<bool>(s_SacleByTemplate, settings.ScaleByTemplate);
                             entity.Set<int>(s_CustomRatio, settings.CustomScale);
                             entity.Set<int>(s_SpaceAround, settings.SpaceAround);
@@ -661,8 +662,8 @@ namespace HOK.RoomElevation
     {
         private bool isLinkedRoom = false;
         private bool isLinkedWall = false;
-        private int viewFamilyId = -1;
-        private int viewTemplateId = -1;
+        private long viewFamilyId = -1;
+        private long viewTemplateId = -1;
         private bool scaleByTemplate = true;
         private int customScale = 96;
         private int spaceAround = 10;
@@ -683,8 +684,8 @@ namespace HOK.RoomElevation
 
         public bool IsLinkedRoom { get { return isLinkedRoom; } set { isLinkedRoom = value; } }
         public bool IsLInkedWall { get { return isLinkedWall; } set { isLinkedWall = value; } }
-        public int ViewFamilyId { get { return viewFamilyId; } set { viewFamilyId = value; } }
-        public int ViewTemplateId { get { return viewTemplateId; } set { viewTemplateId = value; } }
+        public long ViewFamilyId { get { return viewFamilyId; } set { viewFamilyId = value; } }
+        public long ViewTemplateId { get { return viewTemplateId; } set { viewTemplateId = value; } }
         public bool ScaleByTemplate { get { return scaleByTemplate; } set { scaleByTemplate = value; } }
         public int CustomScale { get { return customScale; } set { customScale = value; } }
         public int SpaceAround { get { return spaceAround; } set { spaceAround = value; } }

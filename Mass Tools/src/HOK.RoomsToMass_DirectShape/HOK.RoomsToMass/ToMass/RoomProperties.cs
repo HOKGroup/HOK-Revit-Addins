@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ToMass
 {
@@ -12,7 +13,7 @@ namespace HOK.RoomsToMass.ToMass
         private Room m_room = null;
         private string roomDocument = "";
         private ElementId roomElementId = ElementId.InvalidElementId;
-        private int roomId = -1;
+        private long roomId = -1;
         private string roomUniqueId = "";
         private string roomName = "";
         private string roomNumber = "";
@@ -42,7 +43,7 @@ namespace HOK.RoomsToMass.ToMass
         public Room RoomElement { get { return m_room; } set { m_room = value; } }
         public string RoomDocument { get { return roomDocument; } set { roomDocument = value; } }
         public ElementId RoomElementId { get { return roomElementId; } set { roomElementId = value; } }
-        public int RoomId { get { return roomId; } set { roomId = value; } }
+        public long RoomId { get { return roomId; } set { roomId = value; } }
         public string RoomUniqueId { get { return roomUniqueId; } set { roomUniqueId = value; } }
         public string RoomName { get { return roomName; } set { roomName = value; } }
         public string RoomNumber { get { return roomNumber; } set { roomNumber = value; } }
@@ -110,7 +111,7 @@ namespace HOK.RoomsToMass.ToMass
             try
             {
                 roomElementId = m_room.Id;
-                roomId = m_room.Id.IntegerValue;
+                roomId = GetElementIdValue(m_room.Id);
                 roomUniqueId = m_room.UniqueId;
 
                 Parameter nameParam = m_room.get_Parameter(BuiltInParameter.ROOM_NAME);

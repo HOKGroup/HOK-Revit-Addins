@@ -90,7 +90,7 @@ Public Class form_ElemSheetsFromViews
         '' ''filterViewSheets = mSettings.Application.Create.Filter.NewCategoryFilter(BuiltInCategory.OST_Sheets)
         '' ''mSettings.Application.ActiveDocument.get_Elements(filterViewSheets, elementsViewSheetsRaw)
         For Each viewSheet As DB.ViewSheet In elementsViewSheetsRaw
-            viewSheets.Add(viewSheet.Name, viewSheet.Id.IntegerValue.ToString())
+            viewSheets.Add(viewSheet.Name, viewSheet.Id.Value.ToString())
         Next
 
         'Prepare the list box
@@ -134,7 +134,7 @@ Public Class form_ElemSheetsFromViews
             Next
 
             'Add the entry to the list box   
-            viewElementId = viewPlan.Id.IntegerValue.ToString
+            viewElementId = viewPlan.Id.Value.ToString
             elementData = "<" & viewElementId & "|" & sheetElementId & "|" & sheetName & ">"
             If sheetExists Then
                 mListItems.Add(viewPlan.Name + " (E)" & Convert.ToString(m_Settings.Spacer) & elementData)
@@ -244,13 +244,13 @@ Public Class form_ElemSheetsFromViews
             sheetName = elementData
 
             'Get the view
-            elementId = New DB.ElementId(CInt(Convert.ToInt64(viewElementId)))
+            elementId = NewElementId(Convert.ToInt64(viewElementId))
             viewToUse = DirectCast(m_Settings.Document.GetElement(elementId), DB.View)
 
             'If it is an existing sheet, delete it
             If sheetElementId <> "*" Then
                 '"*" indicates no existing sheet with the same name.
-                elementId = New DB.ElementId(CInt(Convert.ToInt64(sheetElementId)))
+                elementId = NewElementId(Convert.ToInt64(sheetElementId))
                 m_Settings.Document.Delete(elementId)
             End If
 

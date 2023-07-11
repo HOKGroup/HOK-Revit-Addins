@@ -5,6 +5,7 @@ Imports Autodesk.Revit.DB.Architecture
 Imports System.Windows.Forms
 Imports HOK.MissionControl.Core.Schemas
 Imports HOK.MissionControl.Core.Utils
+Imports HOK.ElementTools.ElementIdExtensionModule
 
 Public Class form_ElemViewsFromRooms
 
@@ -13,7 +14,7 @@ Public Class form_ElemViewsFromRooms
     Private mDictGroupedByRooms As New Dictionary(Of String, List(Of Room))
     Private mRoomsToProcess As New List(Of Room)
     Private mViewTemplates As New Dictionary(Of ViewType, Dictionary(Of String, ElementId))
-    Private mElevationMaps As New Dictionary(Of Integer, Integer) 'viewid, markerid
+    Private mElevationMaps As New Dictionary(Of Long, Long) 'viewid, markerid
     Private initializing As Boolean = True
     Private view2dFamilyType As ViewFamilyType = Nothing
     Private view3dFamilyType As ViewFamilyType = Nothing
@@ -188,8 +189,8 @@ Public Class form_ElemViewsFromRooms
                 If marker.CurrentViewCount > 0 Then
                     For index As Integer = 0 To marker.CurrentViewCount - 1
                         Dim elevationId As ElementId = marker.GetViewId(index)
-                        If elevationId <> ElementId.InvalidElementId And Not mElevationMaps.ContainsKey(elevationId.IntegerValue) Then
-                            mElevationMaps.Add(elevationId.IntegerValue, marker.Id.IntegerValue)
+                        If elevationId <> ElementId.InvalidElementId And Not mElevationMaps.ContainsKey(elevationId.Value) Then
+                            mElevationMaps.Add(elevationId.Value, marker.Id.Value)
                         End If
                     Next
                 End If
@@ -301,7 +302,7 @@ Public Class form_ElemViewsFromRooms
 
                 'Get scale
                 Try
-                    scale = CInt(Convert.ToInt16(textBoxScale.Text))
+                    scale = Convert.ToInt16(textBoxScale.Text)
                 Catch
                     MessageBox.Show("Error interpreting scale value as a number.", m_Settings.ProgramName)
                     Return
@@ -331,7 +332,7 @@ Public Class form_ElemViewsFromRooms
                             Return
                         End If
                         Try
-                            spaceBox = CDbl(Convert.ToDouble(textBoxBoxSpace.Text))
+                            spaceBox = Convert.ToDouble(textBoxBoxSpace.Text)
                         Catch
                             MessageBox.Show("Error interpreting Space value at Dynamic Section Box Size.", m_Settings.ProgramName)
                             Return
@@ -361,7 +362,7 @@ Public Class form_ElemViewsFromRooms
                         Return
                     End If
                     Try
-                        spaceCrop = CDbl(Convert.ToDouble(textBoxCropSpace.Text))
+                        spaceCrop = Convert.ToDouble(textBoxCropSpace.Text)
                     Catch
                         MessageBox.Show("Error interpreting Space value at Fixed Dimension Crop Size.", m_Settings.ProgramName)
                         Return
@@ -438,7 +439,7 @@ Public Class form_ElemViewsFromRooms
                     'This has to be done here in order to get the extremities and to use the level when creating the view
                     If radioButtonGroupSingle.Checked Then
                         'single room case
-                        elementIdOfRoom = New DB.ElementId(CInt(Convert.ToInt64(roomElementId)))
+                        elementIdOfRoom = NewElementId(Convert.ToInt64(roomElementId))
                         '(Note get_Element() is supposed to take a string but doesn't seem to work)
                         roomToUse = DirectCast(m_Settings.Document.GetElement(elementIdOfRoom), Room)
                     Else
@@ -560,7 +561,7 @@ Public Class form_ElemViewsFromRooms
 
                     'Create the view
                     Try
-                        
+
 
                         If radioButtonType2d.Checked Then
 
@@ -574,7 +575,7 @@ Public Class form_ElemViewsFromRooms
                                         view2d = ViewPlan.Create(m_Settings.Document, view2dFamilyType.Id, roomToUse.Level.Id)
 
                                     Else
-                                        elementIdOfView = New DB.ElementId(CInt(Convert.ToInt64(viewElementId2d)))
+                                        elementIdOfView = NewElementId(Convert.ToInt64(viewElementId2d))
                                         view2d = TryCast(m_Settings.Document.GetElement(elementIdOfView), DB.View)
                                         If checkBoxReplaceExisting.Checked Then
                                             m_Settings.Document.Delete(view2d.Id)
@@ -627,7 +628,7 @@ Public Class form_ElemViewsFromRooms
                                     trans.RollBack()
                                 End Try
                             End Using
-                           
+
 
                         ElseIf RadioButtonTypeElevation.Checked Then
                             Dim createdElevations As List(Of ViewSection) = New List(Of ViewSection)
@@ -675,48 +676,48 @@ Public Class form_ElemViewsFromRooms
                                         Next
                                     Else
                                         'replace or skip
-                                        Dim elevationId_A As Integer = 0
-                                        Dim elevationId_B As Integer = 0
-                                        Dim elevationId_C As Integer = 0
-                                        Dim elevationId_D As Integer = 0
+                                        Dim elevationId_A As Long = 0
+                                        Dim elevationId_B As Long = 0
+                                        Dim elevationId_C As Long = 0
+                                        Dim elevationId_D As Long = 0
 
-                                        Integer.TryParse(viewElementIdElevation_A, elevationId_A)
-                                        Integer.TryParse(viewElementIdElevation_B, elevationId_B)
-                                        Integer.TryParse(viewElementIdElevation_C, elevationId_C)
-                                        Integer.TryParse(viewElementIdElevation_D, elevationId_D)
+                                        Long.TryParse(viewElementIdElevation_A, elevationId_A)
+                                        Long.TryParse(viewElementIdElevation_B, elevationId_B)
+                                        Long.TryParse(viewElementIdElevation_C, elevationId_C)
+                                        Long.TryParse(viewElementIdElevation_D, elevationId_D)
 
                                         'find elevation marker
                                         Dim marker As ElevationMarker = Nothing
                                         If mElevationMaps.ContainsKey(elevationId_A) Then
-                                            Dim markerId As ElementId = New ElementId(mElevationMaps(elevationId_A))
+                                            Dim markerId As ElementId = NewElementId(mElevationMaps(elevationId_A))
                                             marker = m_Settings.Document.GetElement(markerId)
                                         ElseIf mElevationMaps.ContainsKey(elevationId_B) Then
-                                            Dim markerId As ElementId = New ElementId(mElevationMaps(elevationId_B))
+                                            Dim markerId As ElementId = NewElementId(mElevationMaps(elevationId_B))
                                             marker = m_Settings.Document.GetElement(markerId)
                                         ElseIf mElevationMaps.ContainsKey(elevationId_C) Then
-                                            Dim markerId As ElementId = New ElementId(mElevationMaps(elevationId_C))
+                                            Dim markerId As ElementId = NewElementId(mElevationMaps(elevationId_C))
                                             marker = m_Settings.Document.GetElement(markerId)
                                         ElseIf mElevationMaps.ContainsKey(elevationId_D) Then
-                                            Dim markerId As ElementId = New ElementId(mElevationMaps(elevationId_D))
+                                            Dim markerId As ElementId = NewElementId(mElevationMaps(elevationId_D))
                                             marker = m_Settings.Document.GetElement(markerId)
                                         End If
 
                                         If checkBoxReplaceExisting.Checked Then
                                             'delete existing views and elevation marker
                                             If elevationId_A <> 0 Then
-                                                elementIdOfView = New DB.ElementId(elevationId_A)
+                                                elementIdOfView = NewElementId(elevationId_A)
                                                 m_Settings.Document.Delete(elementIdOfView)
                                             End If
                                             If elevationId_B <> 0 Then
-                                                elementIdOfView = New DB.ElementId(elevationId_B)
+                                                elementIdOfView = NewElementId(elevationId_B)
                                                 m_Settings.Document.Delete(elementIdOfView)
                                             End If
                                             If elevationId_C <> 0 Then
-                                                elementIdOfView = New DB.ElementId(elevationId_C)
+                                                elementIdOfView = NewElementId(elevationId_C)
                                                 m_Settings.Document.Delete(elementIdOfView)
                                             End If
                                             If elevationId_D <> 0 Then
-                                                elementIdOfView = New DB.ElementId(elevationId_D)
+                                                elementIdOfView = NewElementId(elevationId_D)
                                                 m_Settings.Document.Delete(elementIdOfView)
                                             End If
                                             If marker IsNot Nothing Then
@@ -776,7 +777,7 @@ Public Class form_ElemViewsFromRooms
                                             Next
                                         End If
                                     End If
-                                   
+
                                     'set view template
                                     If ComboBoxViewTemplate.SelectedItem IsNot Nothing Then
                                         Dim selectedTemplateName As String = ComboBoxViewTemplate.SelectedItem.ToString
@@ -901,14 +902,14 @@ Public Class form_ElemViewsFromRooms
                                         viewNameComposite = viewName & "-3DB"
                                         If viewElementId3dB = "*" Then
                                             '"*" indicates that no existing view exists.
-                                            view3d = view3d.CreateIsometric(m_Settings.Document, view3dFamilyType.Id)
+                                            view3d = View3D.CreateIsometric(m_Settings.Document, view3dFamilyType.Id)
                                             'view3d.SetOrientation(New ViewOrientation3D(eyeposition, updirection, forwarddirection))
                                         Else
-                                            elementIdOfView = New DB.ElementId(CInt(Convert.ToInt64(viewElementId3dB)))
+                                            elementIdOfView = NewElementId(Convert.ToInt64(viewElementId3dB))
                                             view3d = TryCast(m_Settings.Document.GetElement(elementIdOfView), DB.View3D)
                                             If checkBoxReplaceExisting.Checked Then
                                                 m_Settings.Document.Delete(view3d.Id)
-                                                view3d = view3d.CreateIsometric(m_Settings.Document, view3dFamilyType.Id)
+                                                view3d = View3D.CreateIsometric(m_Settings.Document, view3dFamilyType.Id)
                                                 'view3d.SetOrientation(New ViewOrientation3D(eyeposition, updirection, forwarddirection))
                                             End If
                                         End If
@@ -945,19 +946,19 @@ Public Class form_ElemViewsFromRooms
                                         'radioButtonType3dBoxCrop.Checked)                            
                                         If (radioButtonType3dCrop.Checked AndAlso viewElementId3dC = "*") OrElse (radioButtonType3dBoxCrop.Checked AndAlso viewElementId3dBC = "*") Then
                                             '"*" indicates that no existing view exists.
-                                            view3d = view3d.CreateIsometric(m_Settings.Document, view3dFamilyType.Id)
+                                            view3d = View3D.CreateIsometric(m_Settings.Document, view3dFamilyType.Id)
                                             'view3d.SetOrientation(New ViewOrientation3D(eyeposition, updirection, forwarddirection))
                                         Else
                                             If radioButtonType3dCrop.Checked Then
-                                                elementIdOfView = New DB.ElementId(CInt(Convert.ToInt64(viewElementId3dC)))
+                                                elementIdOfView = NewElementId(Convert.ToInt64(viewElementId3dC))
                                             Else
-                                                elementIdOfView = New DB.ElementId(CInt(Convert.ToInt64(viewElementId3dBC)))
+                                                elementIdOfView = NewElementId(Convert.ToInt64(viewElementId3dBC))
                                             End If
                                             '(radioButtonType3dBoxCrop.Checked)
                                             view3d = TryCast(m_Settings.Document.GetElement(elementIdOfView), DB.View3D)
                                             If checkBoxReplaceExisting.Checked Then
                                                 m_Settings.Document.Delete(view3d.Id)
-                                                view3d = view3d.CreateIsometric(m_Settings.Document, view3dFamilyType.Id)
+                                                view3d = View3D.CreateIsometric(m_Settings.Document, view3dFamilyType.Id)
                                                 'view3d.SetOrientation(New ViewOrientation3D(eyeposition, updirection, forwarddirection))
                                             End If
                                         End If
@@ -1095,9 +1096,9 @@ Public Class form_ElemViewsFromRooms
             Catch ex As Exception
                 transGroup.RollBack()
             End Try
-            
+
         End Using
-        
+
     End Sub
 
 
@@ -1269,7 +1270,7 @@ Public Class form_ElemViewsFromRooms
             CollectorRooms.OfCategory(DB.BuiltInCategory.OST_Rooms)
             elementsRooms = CollectorRooms.ToElements
         End If
-        
+
 
         Dim CollectorViews As New DB.FilteredElementCollector(m_Settings.Document)
         CollectorViews.OfCategory(DB.BuiltInCategory.OST_Views)
@@ -1306,12 +1307,12 @@ Public Class form_ElemViewsFromRooms
             'single room case
             labelListTitle.Text = "Select Rooms For Which to Create a View:"
             Try
-                padZeros1 = CInt(Convert.ToInt16(textBoxPad1.Text))
+                padZeros1 = Convert.ToInt16(textBoxPad1.Text)
             Catch
                 padZeros1 = 0
             End Try
             Try
-                padZeros2 = CInt(Convert.ToInt16(textBoxPad2.Text))
+                padZeros2 = Convert.ToInt16(textBoxPad2.Text)
             Catch
                 padZeros2 = 0
             End Try
@@ -1390,7 +1391,7 @@ Public Class form_ElemViewsFromRooms
                     'Seem to pick up some elements that are not views                               
                     If viewNameLong2d = testView.Name.ToString Then
                         existingView2d = True
-                        viewElementId2d = testView.Id.IntegerValue.ToString
+                        viewElementId2d = testView.Id.Value.ToString
                         buildCode = buildCode & " (E-2D"
                         Exit For
                     End If
@@ -1403,7 +1404,7 @@ Public Class form_ElemViewsFromRooms
                     'Seem to pick up some elements that are not views                               
                     If testView.Name.Contains(viewNameLongElevation_A) Then
                         existingViewElevation_A = True
-                        viewElementIdElevation_A = testView.Id.IntegerValue.ToString
+                        viewElementIdElevation_A = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-Elev-A"
                         Else
@@ -1420,7 +1421,7 @@ Public Class form_ElemViewsFromRooms
                     'Seem to pick up some elements that are not views                               
                     If testView.Name.Contains(viewNameLongElevation_B) Then
                         existingViewElevation_B = True
-                        viewElementIdElevation_B = testView.Id.IntegerValue.ToString
+                        viewElementIdElevation_B = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-Elev-B"
                         Else
@@ -1437,7 +1438,7 @@ Public Class form_ElemViewsFromRooms
                     'Seem to pick up some elements that are not views                               
                     If testView.Name.Contains(viewNameLongElevation_C) Then
                         existingViewElevation_C = True
-                        viewElementIdElevation_C = testView.Id.IntegerValue.ToString
+                        viewElementIdElevation_C = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-Elev-C"
                         Else
@@ -1454,7 +1455,7 @@ Public Class form_ElemViewsFromRooms
                     'Seem to pick up some elements that are not views                               
                     If testView.Name.Contains(viewNameLongElevation_D) Then
                         existingViewElevation_D = True
-                        viewElementIdElevation_D = testView.Id.IntegerValue.ToString
+                        viewElementIdElevation_D = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-Elev-D"
                         Else
@@ -1471,7 +1472,7 @@ Public Class form_ElemViewsFromRooms
                     'Seem to pick up some elements that are not views                               
                     If viewNameLong3dBox = testView.Name.ToString Then
                         existingView3dBox = True
-                        viewElementId3dBox = testView.Id.IntegerValue.ToString
+                        viewElementId3dBox = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-3DB"
                         Else
@@ -1488,7 +1489,7 @@ Public Class form_ElemViewsFromRooms
                     'Seem to pick up some elements that are not views                               
                     If viewNameLong3dCrop = testView.Name.ToString Then
                         existingView3dCrop = True
-                        viewElementId3dCrop = testView.Id.IntegerValue.ToString
+                        viewElementId3dCrop = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-3DC"
                         Else
@@ -1505,7 +1506,7 @@ Public Class form_ElemViewsFromRooms
                     'Seem to pick up some elements that are not views                               
                     If viewNameLong3dBoxCrop = testView.Name.ToString Then
                         existingView3dBoxCrop = True
-                        viewElementId3dBoxCrop = testView.Id.IntegerValue.ToString
+                        viewElementId3dBoxCrop = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-3DBC"
                         Else
@@ -1585,7 +1586,7 @@ Public Class form_ElemViewsFromRooms
                 'if (notPlaced) continue;
                 'if (blankViewName) continue;
                 'if ((existingView2d || existingView3dBox || existingView3dCrop || existingView3dBoxCrop) && !checkBoxListExisting.Checked) continue;
-                roomElementId = RmElement.Id.IntegerValue.ToString
+                roomElementId = RmElement.Id.Value.ToString
                 elementData = "<" & roomElementId & "|" & viewElementId2d & "|" & viewElementIdElevation_A & "|" & viewElementIdElevation_B & "|" & viewElementIdElevation_C & "|" & viewElementIdElevation_D & "|" & viewElementId3dBox & "|" & viewElementId3dCrop & "|" & viewElementId3dBoxCrop & "|" & viewNameShort & "|" & roomName & ">"
                 mListItems.Add(listBy1 & " + " & listBy2 & buildCode & Convert.ToString(m_Settings.Spacer) & elementData)
             Next
@@ -1688,7 +1689,7 @@ Public Class form_ElemViewsFromRooms
                         'Seem to pick up some elements that are not views                               
                         If viewNameLong2d = testView.Name.ToString Then
                             existingView2d = True
-                            viewElementId2d = testView.Id.IntegerValue.ToString
+                            viewElementId2d = testView.Id.Value.ToString
                             buildCode = buildCode & " (E-2D"
                             Exit For
                         End If
@@ -1701,7 +1702,7 @@ Public Class form_ElemViewsFromRooms
                         'Seem to pick up some elements that are not views                               
                         If viewNameLongElevation_A = testView.Name.ToString Then
                             existingViewElevation_A = True
-                            viewElementIdElevation_A = testView.Id.IntegerValue.ToString
+                            viewElementIdElevation_A = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-Elev-A"
                             Else
@@ -1718,7 +1719,7 @@ Public Class form_ElemViewsFromRooms
                         'Seem to pick up some elements that are not views                               
                         If viewNameLongElevation_B = testView.Name.ToString Then
                             existingViewElevation_B = True
-                            viewElementIdElevation_B = testView.Id.IntegerValue.ToString
+                            viewElementIdElevation_B = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-Elev-B"
                             Else
@@ -1735,7 +1736,7 @@ Public Class form_ElemViewsFromRooms
                         'Seem to pick up some elements that are not views                               
                         If viewNameLongElevation_C = testView.Name.ToString Then
                             existingViewElevation_C = True
-                            viewElementIdElevation_C = testView.Id.IntegerValue.ToString
+                            viewElementIdElevation_C = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-Elev-C"
                             Else
@@ -1752,7 +1753,7 @@ Public Class form_ElemViewsFromRooms
                         'Seem to pick up some elements that are not views                               
                         If viewNameLongElevation_D = testView.Name.ToString Then
                             existingViewElevation_D = True
-                            viewElementIdElevation_D = testView.Id.IntegerValue.ToString
+                            viewElementIdElevation_D = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-Elev-D"
                             Else
@@ -1769,7 +1770,7 @@ Public Class form_ElemViewsFromRooms
                         'Seem to pick up some elements that are not views                               
                         If viewNameLong3dBox = testView.Name.ToString Then
                             existingView3dBox = True
-                            viewElementId3dBox = testView.Id.IntegerValue.ToString
+                            viewElementId3dBox = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-3DB"
                             Else
@@ -1786,7 +1787,7 @@ Public Class form_ElemViewsFromRooms
                         'Seem to pick up some elements that are not views                               
                         If viewNameLong3dCrop = testView.Name.ToString Then
                             existingView3dCrop = True
-                            viewElementId3dCrop = testView.Id.IntegerValue.ToString
+                            viewElementId3dCrop = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-3DC"
                             Else
@@ -1803,7 +1804,7 @@ Public Class form_ElemViewsFromRooms
                         'Seem to pick up some elements that are not views                               
                         If viewNameLong3dBoxCrop = testView.Name.ToString Then
                             existingView3dBoxCrop = True
-                            viewElementId3dBoxCrop = testView.Id.IntegerValue.ToString
+                            viewElementId3dBoxCrop = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-3DBC"
                             Else

@@ -6,6 +6,7 @@ using Autodesk.Revit.DB;
 using System.Windows.Forms;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.FinishCreator
 {
@@ -145,7 +146,7 @@ namespace HOK.FinishCreator
                     catch (Exception ex)
                     {
                         trans.RollBack();
-                        MessageBox.Show("Cannot create floor from a room.\nRoom ElementId:" + room.Id.IntegerValue + "\n\n" + ex.Message, "Create Floor", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Cannot create floor from a room.\nRoom ElementId:" + GetElementIdValue(room.Id) + "\n\n" + ex.Message, "Create Floor", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
 
@@ -166,7 +167,7 @@ namespace HOK.FinishCreator
                     catch (Exception ex)
                     {
                         trans.RollBack();
-                        MessageBox.Show("Cannot create openings.\nRoom ElementId:" + room.Id.IntegerValue + "\n\n" + ex.Message, "Create Openings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Cannot create openings.\nRoom ElementId:" + GetElementIdValue(room.Id) + "\n\n" + ex.Message, "Create Openings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
 
@@ -187,7 +188,7 @@ namespace HOK.FinishCreator
                     catch (Exception ex)
                     {
                         trans.RollBack();
-                        MessageBox.Show("Cannot move floors.\nRoom ElementId:" + room.Id.IntegerValue + "\n\n" + ex.Message, "Move Floors", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        MessageBox.Show("Cannot move floors.\nRoom ElementId:" + GetElementIdValue(room.Id) + "\n\n" + ex.Message, "Move Floors", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }

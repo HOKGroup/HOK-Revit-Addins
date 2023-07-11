@@ -129,7 +129,7 @@ Public Class form_ElemPlaceUnplacedRooms
         For Each listItem As String In listBoxRooms.SelectedItems
 
             'Get the existing room
-            Dim elemId As New ElementId(CInt(Convert.ToInt64(listItem.Substring(listItem.IndexOf("<") + 1, listItem.Length - listItem.IndexOf("<") - 2))))
+            Dim elemId = NewElementId(Convert.ToInt64(listItem.Substring(listItem.IndexOf("<") + 1, listItem.Length - listItem.IndexOf("<") - 2)))
 
             Dim roomToPlace As Architecture.Room = DirectCast(m_Settings.Document.GetElement(elemId), Architecture.Room)
             Dim parameterArea As Parameter = roomToPlace.LookupParameter(textBoxParameterRequiredArea.Text)
@@ -524,7 +524,7 @@ Public Class form_ElemPlaceUnplacedRooms
                 End If
             Next
             If notPlaced Then
-                mListItems.Add((listBy1 & " + " & listBy2 & Convert.ToString(m_Settings.Spacer) & "<") + x_Room.Id.IntegerValue.ToString & ">")
+                mListItems.Add((listBy1 & " + " & listBy2 & Convert.ToString(m_Settings.Spacer) & "<") + x_Room.Id.Value.ToString & ">")
             End If
         Next
 

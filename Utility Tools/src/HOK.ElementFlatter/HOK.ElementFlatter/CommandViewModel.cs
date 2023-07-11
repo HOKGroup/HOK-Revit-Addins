@@ -78,7 +78,11 @@ namespace HOK.ElementFlatter
                 {
                     try
                     {
+#if RELEASE2024
+                        var bltCat = (BuiltInCategory)id.Value;
+#else
                         var bltCat = (BuiltInCategory)id.IntegerValue;
+#endif
                         if (categoriesToSkip.Contains(bltCat)) { continue; }
                         if (bltCat != BuiltInCategory.INVALID)
                         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Autodesk.Revit.DB;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ToMass
 {
@@ -11,7 +12,7 @@ namespace HOK.RoomsToMass.ToMass
         private Floor m_floor = null;
         private string floorDocument = "";
         private ElementId floorElementId = ElementId.InvalidElementId;
-        private int floorId = -1;
+        private long floorId = -1;
         private string floorUniqueId = "";
         private string floorName = "";
         private string floorTypeName = "";
@@ -40,7 +41,7 @@ namespace HOK.RoomsToMass.ToMass
         public Floor FloorElement { get { return m_floor; } set { m_floor = value; } }
         public string FloorDocument { get { return floorDocument; } set { floorDocument = value; } }
         public ElementId FloorElementId { get { return floorElementId; } set { floorElementId = value; } }
-        public int FloorId { get { return floorId; } set { floorId = value; } }
+        public long FloorId { get { return floorId; } set { floorId = value; } }
         public string FloorUniqueId { get { return floorUniqueId; } set { floorUniqueId = value; } }
         public string FloorName { get { return floorName; } set { floorName = value; } }
         public string FloorTypeName { get { return floorTypeName; } set { floorTypeName = value; } }
@@ -105,7 +106,7 @@ namespace HOK.RoomsToMass.ToMass
             try
             {
                 floorElementId = m_floor.Id;
-                floorId = m_floor.Id.IntegerValue;
+                floorId = GetElementIdValue(m_floor.Id);
                 floorUniqueId = m_floor.UniqueId;
                 floorName = m_floor.Name;
                 floorTypeName = m_floor.FloorType.Name;

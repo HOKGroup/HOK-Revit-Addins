@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomElevation
 {
@@ -64,7 +65,7 @@ namespace HOK.RoomElevation
     public class LinkedInstanceProperties
     {
         public RevitLinkInstance Instance { get; set; }
-        public int InstanceId { get; set; }
+        public long InstanceId { get; set; }
         public Document LinkedDocument { get; set; }
         public string DocumentTitle { get; set; }
         public Transform TransformValue { get; set; }
@@ -72,7 +73,7 @@ namespace HOK.RoomElevation
         public LinkedInstanceProperties(RevitLinkInstance instance)
         {
             Instance = instance;
-            InstanceId = instance.Id.IntegerValue;
+            InstanceId = GetElementIdValue(instance.Id);
             LinkedDocument = instance.GetLinkDocument();
             DocumentTitle = LinkedDocument.Title;
             TransformValue = instance.GetTotalTransform();

@@ -7,6 +7,7 @@ using HOK.LPDCalculator.Schedule;
 using System.Windows.Forms;
 using Autodesk.Revit.DB.Architecture;
 using HOK.Core.Utilities;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 
 namespace HOK.LPDCalculator
@@ -18,8 +19,8 @@ namespace HOK.LPDCalculator
         private readonly List<Element> selectedAreas;
         private readonly ModelSelection lightingSelection;
         private readonly FamilySymbol annotationType;
-        private readonly Dictionary<int/*areaId*/, AreaProperties> areaDictionary = new Dictionary<int, AreaProperties>();
-        private readonly Dictionary<int/*lighting typeId*/, double/*Apparent Load*/> lightingTypeDictionary = new Dictionary<int, double>();
+        private readonly Dictionary<long/*areaId*/, AreaProperties> areaDictionary = new Dictionary<long, AreaProperties>();
+        private readonly Dictionary<long/*lighting typeId*/, double/*Apparent Load*/> lightingTypeDictionary = new Dictionary<long, double>();
         private readonly List<string> linkedDocuments = new List<string>();
 
         public CalculatorMethods(UIApplication uiApp, List<Element> areas, FamilySymbol symbolType, ModelSelection lightingFrom)
@@ -81,9 +82,9 @@ namespace HOK.LPDCalculator
                         if (null == param) continue;
 
                         var apparentLoad = param.AsDouble();
-                        if (!lightingTypeDictionary.ContainsKey(etype.Id.IntegerValue))
+                        if (!lightingTypeDictionary.ContainsKey(GetElementIdValue(etype.Id)))
                         {
-                            lightingTypeDictionary.Add(etype.Id.IntegerValue, apparentLoad);
+                            lightingTypeDictionary.Add(GetElementIdValue(etype.Id), apparentLoad);
                         }
                     }
                 }
@@ -132,7 +133,7 @@ namespace HOK.LPDCalculator
                                         rp.UpdateAreaParameter(area);
                                     }
 
-                                    var lightingDictionary = new Dictionary<int, LightingProperties>();
+                                    var lightingDictionary = new Dictionary<long, LightingProperties>();
                                     double totalAL = 0;
                                     foreach (var element in elementList)
                                     {
@@ -223,19 +224,19 @@ namespace HOK.LPDCalculator
                 var roomsFound = roomCollector.WherePasses(orFilter).ToElements().Cast<Room>().ToList();
                 foreach (var room in roomsFound)
                 {
-                    if (area.LevelId.IntegerValue == room.LevelId.IntegerValue)
+                    if (GetElementIdValue(area.LevelId) == GetElementIdValue(room.LevelId))
                     {
                         correlatedRoom = room; break;
                     }
                 }
 
                 var bltParam1 = BuiltInParameter.INSTANCE_SCHEDULE_ONLY_LEVEL_PARAM;
-                var pvp1 = new ParameterValueProvider(new ElementId((int)bltParam1));
+                var pvp1 = new ParameterValueProvider(NewElementId((long)bltParam1));
                 var bltParam2 = BuiltInParameter.FAMILY_LEVEL_PARAM;
-                var pvp2 = new ParameterValueProvider(new ElementId((int)bltParam2));
+                var pvp2 = new ParameterValueProvider(NewElementId((long)bltParam2));
 
                 FilterNumericRuleEvaluator fnrv = new FilterNumericEquals();
-                var ruleValueId = new ElementId(area.LevelId.IntegerValue);
+                var ruleValueId = NewElementId(GetElementIdValue(area.LevelId));
 
                 FilterRule filterRule1 = new FilterElementIdRule(pvp1, fnrv, ruleValueId);
                 FilterRule filterRule2 = new FilterElementIdRule(pvp2, fnrv, ruleValueId);
@@ -266,7 +267,7 @@ namespace HOK.LPDCalculator
                                     roomsFound = roomCollector.WherePasses(orFilter).ToElements().Cast<Room>().ToList();
                                     foreach (var room in roomsFound)
                                     {
-                                        if (area.LevelId.IntegerValue == room.LevelId.IntegerValue)
+                                        if (GetElementIdValue(area.LevelId) == GetElementIdValue(room.LevelId))
                                         {
                                             correlatedRoom = room; break;
                                         }
@@ -607,18 +608,18 @@ namespace HOK.LPDCalculator
     public class AreaProperties
     {
         public Area AreaElement { get; set; }
-        public int AreaId { get; set; }
+        public long AreaId { get; set; }
         public string AreaName { get; set; }
         public double Area { get; set; }
         public double ActualLightingLoad { get; set; }
         public double LPD { get; set; }
-        public Dictionary<int, LightingProperties> LightingFixtures { get; set; } = new Dictionary<int, LightingProperties>();
+        public Dictionary<long, LightingProperties> LightingFixtures { get; set; } = new Dictionary<long, LightingProperties>();
         public RoomProperties CorrelatedRoom { get; set; } = null;
 
         public AreaProperties(Area areaObj)
         {
             AreaElement = areaObj;
-            AreaId = AreaElement.Id.IntegerValue;
+            AreaId = GetElementIdValue(AreaElement.Id);
             AreaName = AreaElement.Name;
             Area = AreaElement.Area;
         }
@@ -627,29 +628,29 @@ namespace HOK.LPDCalculator
     public class LightingProperties
     {
         public Element LightingElement { get; set; }
-        public int LightingId { get; set; }
-        public int LightingTypeId { get; set; }
+        public long LightingId { get; set; }
+        public long LightingTypeId { get; set; }
         public double ApparentLoad { get; set; }
 
         public LightingProperties(Element element)
         {
             LightingElement = element;
-            LightingId = LightingElement.Id.IntegerValue;
-            LightingTypeId = LightingElement.GetTypeId().IntegerValue;
+            LightingId = GetElementIdValue(LightingElement.Id);
+            LightingTypeId = GetElementIdValue(LightingElement.GetTypeId());
         }
     }
 
     public class RoomProperties
     {
         public Room RoomObj { get; set; }
-        public int RoomId { get; set; }
+        public long RoomId { get; set; }
         public string RoomName { get; set; }
         public string RoomNumber { get; set; }
 
         public RoomProperties(Room roomElement)
         {
             RoomObj = roomElement;
-            RoomId = RoomObj.Id.IntegerValue;
+            RoomId = GetElementIdValue(RoomObj.Id);
             GetRoomInfo();
         }
 

@@ -130,6 +130,10 @@
       <HintPath>..\..\..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\$(RevitVersion)\HOK.MissionControl.Core.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="HOK.Core">
+      <HintPath>..\..\..\..\HOK.Core\HOK.Core\bin\$(RevitVersion)\HOK.Core.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="AdWindows">
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">C:\Program Files\Autodesk\Revit $(RevitVersion)\AdWindows.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(HOKDepsDirectory)\HOK Addins Deps\Revit\$(RevitVersion)\AdWindows.dll</HintPath>

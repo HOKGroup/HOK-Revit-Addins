@@ -15,7 +15,7 @@ namespace HOK.MissionControl.Core.Schemas.Links
         public string Name { get; set; }
 
         [JsonProperty("elementId")]
-        public int ElementId { get; set; }
+        public long ElementId { get; set; }
 
         [JsonProperty("instances")]
         public int Instances { get; set; }

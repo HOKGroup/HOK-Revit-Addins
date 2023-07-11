@@ -3,6 +3,7 @@ using Autodesk.Revit.DB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.MissionControl.Core.Schemas.Groups
 {
@@ -20,7 +21,7 @@ namespace HOK.MissionControl.Core.Schemas.Groups
         public string CreatedBy { get; set; }
 
         [JsonProperty("ownerViewId")]
-        public int OwnerViewId { get; set; }
+        public long OwnerViewId { get; set; }
 
         [JsonProperty("level")]
         public string Level { get; set; }
@@ -43,7 +44,7 @@ namespace HOK.MissionControl.Core.Schemas.Groups
             Level = levelName;
             OwnerViewId = group.OwnerViewId == null 
                 ? -1 
-                : group.OwnerViewId.IntegerValue;
+                : GetElementIdValue(group.OwnerViewId);
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using HOK.Core.Utilities;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -22,24 +23,24 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private List<Element> selectedMass = new List<Element>();
         private Dictionary<string/*worksetName*/, int/*worksetId*/ > worksetDictionary = new Dictionary<string, int>();
         private List<MassProperties> integratedMassList = new List<MassProperties>(); //mass from host projects
-        private Dictionary<int/*instanceId*/, LinkedInstanceProperties> linkedMassDictionary = new Dictionary<int, LinkedInstanceProperties>(); //mass from linked models
-        private Dictionary<int/*elementId*/, ElementProperties> elementDictionary = new Dictionary<int, ElementProperties>(); //all intersecting elements
+        private Dictionary<long/*instanceId*/, LinkedInstanceProperties> linkedMassDictionary = new Dictionary<long, LinkedInstanceProperties>(); //mass from linked models
+        private Dictionary<long/*elementId*/, ElementProperties> elementDictionary = new Dictionary<long, ElementProperties>(); //all intersecting elements
         private Dictionary<Category, bool> elementCategories = new Dictionary<Category, bool>();
         private List<string> massParameters = new List<string>();
         private MassSource selectedSourceType;
         private Form_ProgressBar progressForm = new Form_ProgressBar();
         private bool progressFormOpend = false;
-        private List<int> categoryIds = new List<int>();
-        private Dictionary<int/*categoryId*/, Dictionary<int, ParameterProperties>> parameterMaps = new Dictionary<int, Dictionary<int, ParameterProperties>>();
+        private List<long> categoryIds = new List<long>();
+        private Dictionary<long/*categoryId*/, Dictionary<long, ParameterProperties>> parameterMaps = new Dictionary<long, Dictionary<long, ParameterProperties>>();
 
         public Dictionary<string, int> WorksetDictionary { get { return worksetDictionary; } set { worksetDictionary = value; } }
         public List<MassProperties> IntegratedMassList { get { return integratedMassList; } set { integratedMassList = value; } }
-        public Dictionary<int, LinkedInstanceProperties> LinkedMassDictionary { get { return linkedMassDictionary; } set { linkedMassDictionary = value; } }
-        public Dictionary<int, ElementProperties> ElementDictionary { get { return elementDictionary; } set { elementDictionary = value; } }
+        public Dictionary<long, LinkedInstanceProperties> LinkedMassDictionary { get { return linkedMassDictionary; } set { linkedMassDictionary = value; } }
+        public Dictionary<long, ElementProperties> ElementDictionary { get { return elementDictionary; } set { elementDictionary = value; } }
         public Dictionary<Category, bool> ElementCategories { get { return elementCategories; } set { elementCategories = value; } }
         public List<string> MassParameters { get { return massParameters; } set { massParameters = value; } }
         public MassSource SelectedSourceType { get { return selectedSourceType; } set { selectedSourceType = value; } }
-        public Dictionary<int, Dictionary<int, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
+        public Dictionary<long, Dictionary<long, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
         
 
         public Form_LinkedFiles(UIApplication uiapp)
@@ -83,7 +84,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 collector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType();
                 List<RevitLinkInstance> revitLinkInstances = collector.ToElements().Cast<RevitLinkInstance>().ToList();
 
-                Dictionary<int/*typeId*/, RevitLinkType> linkTypes = new Dictionary<int, RevitLinkType>();
+                Dictionary<long/*typeId*/, RevitLinkType> linkTypes = new Dictionary<long, RevitLinkType>();
                 foreach (RevitLinkInstance instance in revitLinkInstances)
                 {
                     LinkedInstanceProperties lip = new LinkedInstanceProperties(instance);
@@ -91,11 +92,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
                    
                     RevitLinkType linkType = m_doc.GetElement(typeId) as RevitLinkType;
                     lip.FileName = linkType.Name;
-                    lip.TypeId = linkType.Id.IntegerValue;
+                    lip.TypeId = GetElementIdValue(linkType.Id);
 
-                    if (!linkTypes.ContainsKey(linkType.Id.IntegerValue))
+                    if (!linkTypes.ContainsKey(GetElementIdValue(linkType.Id)))
                     {
-                        linkTypes.Add(linkType.Id.IntegerValue, linkType);
+                        linkTypes.Add(GetElementIdValue(linkType.Id), linkType);
                     }
 
                     Parameter nameParam = instance.get_Parameter(BuiltInParameter.RVT_LINK_INSTANCE_NAME);
@@ -332,7 +333,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             try
             {
-                List<int> selectedMass = new List<int>();
+                List<long> selectedMass = new List<long>();
                 foreach (TreeNode typeNode in treeViewLinkedFile.Nodes)
                 {
                     foreach (TreeNode instanceNode in typeNode.Nodes)
@@ -362,14 +363,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     progressFormOpend = true;
                     progressForm.Refresh();
 
-                    List<int> instanceIds = linkedMassDictionary.Keys.ToList();
-                    foreach (int instanceId in instanceIds)
+                    List<long> instanceIds = linkedMassDictionary.Keys.ToList();
+                    foreach (long instanceId in instanceIds)
                     {
                         LinkedInstanceProperties lip = linkedMassDictionary[instanceId];
-                        Dictionary<int, MassProperties> massDictionary = new Dictionary<int, MassProperties>();
+                        Dictionary<long, MassProperties> massDictionary = new Dictionary<long, MassProperties>();
                         foreach (Element massElement in lip.MassElements)
                         {
-                            if (!selectedMass.Contains(massElement.Id.IntegerValue)) { continue; }
+                            if (!selectedMass.Contains(GetElementIdValue(massElement.Id))) { continue; }
 
                             progressForm.PerformStep();
                             MassProperties mp = new MassProperties(massElement);
@@ -443,7 +444,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             }
         }
 
-        private List<Element> FindElementsInMass(Document doc, Solid massSolid, int massId, bool linkedElement)
+        private List<Element> FindElementsInMass(Document doc, Solid massSolid, long massId, bool linkedElement)
         {
             List<Element> elementList = new List<Element>();
             try
@@ -455,7 +456,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                 foreach (Element element in elementList)
                 {
-                    int elementId = element.Id.IntegerValue;
+                    long elementId = GetElementIdValue(element.Id);
                     if (!elementDictionary.ContainsKey(elementId))
                     {
                         ElementProperties ep = new ElementProperties(element);
@@ -465,18 +466,18 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         FamilyInstance fi = element as FamilyInstance;
                         if (null != fi)
                         {
-                            if (null != fi.Host) { ep.HostElementId = fi.Host.Id.IntegerValue; }
+                            if (null != fi.Host) { ep.HostElementId = GetElementIdValue(fi.Host.Id); }
                         }
 
-                        Dictionary<int, Solid> massContainers = new Dictionary<int, Solid>();
+                        Dictionary<long, Solid> massContainers = new Dictionary<long, Solid>();
                         massContainers.Add(massId, massSolid);
                         ep.MassContainers = massContainers;
                         elementDictionary.Add(ep.ElementId, ep);
 
-                        if (!categoryIds.Contains(element.Category.Id.IntegerValue) && null != element.Category.Name)
+                        if (!categoryIds.Contains(GetElementIdValue(element.Category.Id)) && null != element.Category.Name)
                         {
                             elementCategories.Add(element.Category, false);
-                            categoryIds.Add(element.Category.Id.IntegerValue);
+                            categoryIds.Add(GetElementIdValue(element.Category.Id));
                         }
                     }
                     else
@@ -544,7 +545,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                             foreach (Element element in elementList)
                             {
-                                int elementId = element.Id.IntegerValue;
+                                long elementId = GetElementIdValue(element.Id);
                                 if (!elementDictionary.ContainsKey(elementId))
                                 {
                                     ElementProperties ep = new ElementProperties(element);
@@ -557,26 +558,26 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                     FamilyInstance fi = element as FamilyInstance;
                                     if (null != fi)
                                     {
-                                        if (null != fi.Host) { ep.HostElementId = fi.Host.Id.IntegerValue; }
+                                        if (null != fi.Host) { ep.HostElementId = GetElementIdValue(fi.Host.Id); }
                                     }
 
-                                    Dictionary<int, Solid> massContainers = new Dictionary<int, Solid>();
-                                    massContainers.Add(massInstance.Id.IntegerValue, originalSolid); //adjusted to the host coordinate system
+                                    Dictionary<long, Solid> massContainers = new Dictionary<long, Solid>();
+                                    massContainers.Add(GetElementIdValue(massInstance.Id), originalSolid); //adjusted to the host coordinate system
                                     ep.MassContainers = massContainers;
                                     elementDictionary.Add(ep.ElementId, ep);
 
-                                    if (!categoryIds.Contains(element.Category.Id.IntegerValue) && null != element.Category.Name)
+                                    if (!categoryIds.Contains(GetElementIdValue(element.Category.Id)) && null != element.Category.Name)
                                     {
                                         elementCategories.Add(element.Category, false);
-                                        categoryIds.Add(element.Category.Id.IntegerValue);
+                                        categoryIds.Add(GetElementIdValue(element.Category.Id));
                                     }
                                 }
                                 else
                                 {
                                     ElementProperties ep = elementDictionary[elementId];
-                                    if (!ep.MassContainers.ContainsKey(massInstance.Id.IntegerValue))
+                                    if (!ep.MassContainers.ContainsKey(GetElementIdValue(massInstance.Id)))
                                     {
-                                        ep.MassContainers.Add(massInstance.Id.IntegerValue, originalSolid);
+                                        ep.MassContainers.Add(GetElementIdValue(massInstance.Id), originalSolid);
                                         elementDictionary.Remove(elementId);
                                         elementDictionary.Add(elementId, ep);
                                     }
@@ -633,27 +634,27 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 if (null != element.Category)
                 {
                     Category category = element.Category;
-                    Dictionary<int, ParameterProperties> paramDictionary = new Dictionary<int, ParameterProperties>();
-                    if (parameterMaps.ContainsKey(category.Id.IntegerValue))
+                    Dictionary<long, ParameterProperties> paramDictionary = new Dictionary<long, ParameterProperties>();
+                    if (parameterMaps.ContainsKey(GetElementIdValue(category.Id)))
                     {
-                        paramDictionary = parameterMaps[category.Id.IntegerValue];
+                        paramDictionary = parameterMaps[GetElementIdValue(category.Id)];
                         foreach (Parameter param in element.Parameters)
                         {
                             if (param.StorageType == StorageType.ElementId)
                             {
-                                if (param.Id.IntegerValue != (int)BuiltInParameter.PHASE_CREATED && param.Id.IntegerValue != (int)BuiltInParameter.PHASE_DEMOLISHED) { continue; }
+                                if (GetElementIdValue(param.Id) != (int)BuiltInParameter.PHASE_CREATED && GetElementIdValue(param.Id) != (int)BuiltInParameter.PHASE_DEMOLISHED) { continue; }
                             }
 
-                            if (paramDictionary.ContainsKey(param.Id.IntegerValue))
+                            if (paramDictionary.ContainsKey(GetElementIdValue(param.Id)))
                             {
-                                //paramDictionary[param.Id.IntegerValue].AddValue(param);
-                                paramDictionary.Remove(param.Id.IntegerValue);
+                                //paramDictionary[GetElementIdValue(param.Id)].AddValue(param);
+                                paramDictionary.Remove(GetElementIdValue(param.Id));
                             }
                             ParameterProperties pp = new ParameterProperties(param);
                             pp.AddValue(param);
                             paramDictionary.Add(pp.ParamId, pp);
                         }
-                        parameterMaps.Remove(category.Id.IntegerValue);
+                        parameterMaps.Remove(GetElementIdValue(category.Id));
                     }
                     else
                     {
@@ -661,11 +662,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         {
                             if (param.StorageType == StorageType.ElementId)
                             {
-                                if (param.Id.IntegerValue != (int)BuiltInParameter.PHASE_CREATED && param.Id.IntegerValue != (int)BuiltInParameter.PHASE_DEMOLISHED) { continue; }
+                                if (GetElementIdValue(param.Id) != (int)BuiltInParameter.PHASE_CREATED && GetElementIdValue(param.Id) != (int)BuiltInParameter.PHASE_DEMOLISHED) { continue; }
                             }
 
                             if (param.Definition.Name.Contains("Extensions.")) { continue; }
-                            if (!paramDictionary.ContainsKey(param.Id.IntegerValue))
+                            if (!paramDictionary.ContainsKey(GetElementIdValue(param.Id)))
                             {
                                 ParameterProperties pp = new ParameterProperties(param);
                                 pp.AddValue(param);
@@ -673,7 +674,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             }
                         }
                     }
-                    parameterMaps.Add(category.Id.IntegerValue, paramDictionary);
+                    parameterMaps.Add(GetElementIdValue(category.Id), paramDictionary);
                 }
             }
             catch (Exception ex)
@@ -699,8 +700,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     progressForm.Refresh();
                 }
 
-                List<int> elementIds = elementDictionary.Keys.ToList();
-                foreach (int elementId in elementIds)
+                List<long> elementIds = elementDictionary.Keys.ToList();
+                foreach (long elementId in elementIds)
                 {
                     progressForm.PerformStep();
                     ElementProperties ep = elementDictionary[elementId];
@@ -732,7 +733,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         }
                         ep.ElementSolid = unionSolid;
 
-                        Dictionary<int, double> overlapMap = new Dictionary<int, double>();
+                        Dictionary<long, double> overlapMap = new Dictionary<long, double>();
                         if (unionSolid != null)
                         {
                             if (unionSolid.Volume > 0)

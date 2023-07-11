@@ -6,6 +6,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using HOK.Core.Utilities;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomElevation
 {
@@ -15,10 +16,10 @@ namespace HOK.RoomElevation
         private UIDocument uidoc;
         private Document m_doc;
         private ElevationCreatorSettings toolSettings;
-        private Dictionary<int, LinkedInstanceProperties> linkedDocuments = new Dictionary<int, LinkedInstanceProperties>();
-        private Dictionary<int, RoomElevationProperties> roomDictionary = new Dictionary<int, RoomElevationProperties>();
+        private Dictionary<long, LinkedInstanceProperties> linkedDocuments = new Dictionary<long, LinkedInstanceProperties>();
+        private Dictionary<long, RoomElevationProperties> roomDictionary = new Dictionary<long, RoomElevationProperties>();
 
-        public ElevationByPickElements(UIApplication uiapp, ElevationCreatorSettings settings, Dictionary<int,LinkedInstanceProperties> linkedInstances, Dictionary<int, RoomElevationProperties> roomProperties)
+        public ElevationByPickElements(UIApplication uiapp, ElevationCreatorSettings settings, Dictionary<long,LinkedInstanceProperties> linkedInstances, Dictionary<long, RoomElevationProperties> roomProperties)
         {
             m_app = uiapp;
             uidoc = m_app.ActiveUIDocument;
@@ -108,7 +109,7 @@ namespace HOK.RoomElevation
 
                         if (null != roomElement && null != wallElement && null != pickPoint)
                         {
-                            int roomId = roomElement.Id.IntegerValue;
+                            long roomId = GetElementIdValue(roomElement.Id);
                             RoomElevationProperties rep = null;
                             if (roomDictionary.ContainsKey(roomId))
                             {

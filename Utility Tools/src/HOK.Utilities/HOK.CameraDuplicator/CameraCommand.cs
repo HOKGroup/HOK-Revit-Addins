@@ -10,6 +10,7 @@ using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 #endregion
 
@@ -58,10 +59,10 @@ namespace HOK.CameraDuplicator
 
     public class CameraViewInfo
     {
-        public int ViewId { get; set; }
+        public long ViewId { get; set; }
         public string ViewName { get; set; }
 
-        public int LinkedViewId { get; set; } = -1;
+        public long LinkedViewId { get; set; } = -1;
         public bool Linked { get; set; }
 
         public ElementId ViewTemplateId { get; set; }
@@ -79,7 +80,7 @@ namespace HOK.CameraDuplicator
 
         public CameraViewInfo(View3D view3d)
         {
-            ViewId = view3d.Id.IntegerValue;
+            ViewId = GetElementIdValue(view3d.Id);
             ViewName = view3d.Name;
 
             ViewTemplateId = view3d.ViewTemplateId;
@@ -118,7 +119,7 @@ namespace HOK.CameraDuplicator
                 {
                     var paramName = param.Definition.Name;
                     if (paramName.Contains(".Extensions")) { continue; }
-                    if (param.Id.IntegerValue == (int)BuiltInParameter.VIEW_PHASE) { PhaseId = param.AsElementId(); }
+                    if (GetElementIdValue(param.Id) == (int)BuiltInParameter.VIEW_PHASE) { PhaseId = param.AsElementId(); }
                     if (param.StorageType == StorageType.None || param.StorageType  == StorageType.ElementId) { continue; }
 
                     if (!ViewParameters.ContainsKey(paramName) && param.HasValue)
@@ -154,11 +155,11 @@ namespace HOK.CameraDuplicator
 
     public class PlanViewInfo
     {
-        public int ViewId { get; set; }
+        public long ViewId { get; set; }
         public string ViewName { get; set; }
         public ViewType PlanViewType { get; set; }
 
-        public int LinkedViewId { get; set; } = -1;
+        public long LinkedViewId { get; set; } = -1;
         public bool Linked { get; set; }
 
         public ElementId LevelId { get; set; } = ElementId.InvalidElementId;
@@ -179,7 +180,7 @@ namespace HOK.CameraDuplicator
 
         public PlanViewInfo(ViewPlan planView)
         {
-            ViewId = planView.Id.IntegerValue;
+            ViewId = GetElementIdValue(planView.Id);
             ViewName = planView.Name;
             PlanViewType = planView.ViewType;
 
@@ -230,8 +231,8 @@ namespace HOK.CameraDuplicator
                 {
                     var paramName = param.Definition.Name;
                     if (paramName.Contains(".Extensions")) { continue; }
-                    if (param.Id.IntegerValue == (int)BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP) { ScopeBoxId = param.AsElementId(); continue; }
-                    if (param.Id.IntegerValue == (int)BuiltInParameter.VIEW_PHASE) { PhaseId = param.AsElementId(); continue; }
+                    if (GetElementIdValue(param.Id) == (int)BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP) { ScopeBoxId = param.AsElementId(); continue; }
+                    if (GetElementIdValue(param.Id) == (int)BuiltInParameter.VIEW_PHASE) { PhaseId = param.AsElementId(); continue; }
                     if (param.StorageType == StorageType.None || param.StorageType == StorageType.ElementId) { continue; }
                     if (!ViewParameters.ContainsKey(paramName) && param.HasValue)
                     {
@@ -271,8 +272,8 @@ namespace HOK.CameraDuplicator
         public string ModelId { get; set; }
         public string ModelName { get; set; }
         public Document ModelDoc { get; set; }
-        public Dictionary<int, CameraViewInfo> CameraViews { get; set; } = new Dictionary<int, CameraViewInfo>();
-        public Dictionary<int, PlanViewInfo> PlanViews { get; set; } = new Dictionary<int, PlanViewInfo>();
+        public Dictionary<long, CameraViewInfo> CameraViews { get; set; } = new Dictionary<long, CameraViewInfo>();
+        public Dictionary<long, PlanViewInfo> PlanViews { get; set; } = new Dictionary<long, PlanViewInfo>();
 
         public ModelInfo(Document doc, string id)
         {
@@ -347,7 +348,7 @@ namespace HOK.CameraDuplicator
                         if (parentParam.HasValue) { continue; }
                     }
 
-                    if (!PlanViews.ContainsKey(pView.Id.IntegerValue))
+                    if (!PlanViews.ContainsKey(GetElementIdValue(pView.Id)))
                     {
                         var pvi = new PlanViewInfo(pView);
                         if (worksetIds.Count > 0)
@@ -386,8 +387,8 @@ namespace HOK.CameraDuplicator
         public string SourceModelId { get; set; } = "";
         public string RecipientModelId { get; set; } = "";
         public MapType MapItemType { get; set; } = MapType.None;
-        public int SourceItemId { get; set; } = -1;
-        public int RecipientItemId { get; set; } = -1;
+        public long SourceItemId { get; set; } = -1;
+        public long RecipientItemId { get; set; } = -1;
         public string SourceItemName { get; set; } = "";
         public string RecipientItemName { get; set; } = "";
     }

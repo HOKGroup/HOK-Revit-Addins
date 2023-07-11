@@ -47,7 +47,7 @@ Public Class form_ElemAttachmentManager
         Dim elementIds As New List(Of ElementId)
 
         For Each listItem As String In listBoxDwg.SelectedItems
-            elementId = New ElementId(CInt(Convert.ToInt64(listItem.Substring(0, listItem.IndexOf(" ")))))
+            elementId = NewElementId(Convert.ToInt64(listItem.Substring(0, listItem.IndexOf(" "))))
             '' ''elementId.Value = CInt(Convert.ToInt64(listItem.Substring(0, listItem.IndexOf(" "))))
             elementIds.Add(elementId)
         Next
@@ -114,7 +114,7 @@ Public Class form_ElemAttachmentManager
                                 include = True
                             End If
                             If include Then
-                                elementId = PadWithBlanks(importInstance.Id.IntegerValue.ToString, 10)
+                                elementId = PadWithBlanks(importInstance.Id.Value.ToString, 10)
                                 name = PadWithBlanks(name, 35)
                                 workset = Convert.ToString(importInstance.Parameter(BuiltInParameter.ELEM_PARTITION_PARAM).AsInteger())
                                 mListItems.Add(elementId & "instance    " & name & " " & workset)
@@ -152,7 +152,7 @@ Public Class form_ElemAttachmentManager
                             If include Then
                                 'if (name.Substring(name.Length - 4, 4).ToUpper() == ".DWG") {
                                 name = PadWithBlanks(symbol.Name, 35)
-                                elementId = PadWithBlanks(symbol.Id.IntegerValue.ToString, 10)
+                                elementId = PadWithBlanks(symbol.Id.Value.ToString, 10)
                                 workset = Convert.ToString(symbol.Parameter(BuiltInParameter.ELEM_PARTITION_PARAM).AsInteger())
                                 mListItems.Add(elementId & "definition  " & name & " " & workset)
                                 streamWriter.WriteLine(elementId & "definition  " & name & " " & workset)

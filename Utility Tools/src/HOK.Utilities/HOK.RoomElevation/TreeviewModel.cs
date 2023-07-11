@@ -71,7 +71,7 @@ namespace HOK.RoomElevation
             IsEnabled = false;
         }
 
-        public static List<TreeviewModel> SetTreeView(Dictionary<int, RoomElevationProperties> dictionary, bool isLinkedRoom)
+        public static List<TreeviewModel> SetTreeView(Dictionary<long, RoomElevationProperties> dictionary, bool isLinkedRoom)
         {
             List<TreeviewModel> treeView = new List<TreeviewModel>();
             try

@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using System.Windows.Forms;
 using Autodesk.Revit.DB.Architecture;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 
 namespace HOK.DoorRoom
@@ -27,7 +28,7 @@ namespace HOK.DoorRoom
         private const string fromRoomNumber="FromRoomNumber";
         private const string fromRoomName = "FromRoomName";
 
-        private Dictionary<int, DoorProperties> doorDictionary = new Dictionary<int, DoorProperties>();
+        private Dictionary<long, DoorProperties> doorDictionary = new Dictionary<long, DoorProperties>();
         
         public DoorLinkManager(UIApplication uiapp, DoorLinkType linkType)
         {
@@ -132,7 +133,7 @@ namespace HOK.DoorRoom
                                 catch (Exception ex)
                                 {
                                     result = false;
-                                    strBuilder.AppendLine(door.Id.IntegerValue + "\t" + door.Name + ": " + ex.Message);
+                                    strBuilder.AppendLine(door.Id + "\t" + door.Name + ": " + ex.Message);
                                     trans.RollBack();
                                 }
                             }
@@ -243,7 +244,7 @@ namespace HOK.DoorRoom
             bool result = true;
             try
             {
-                Dictionary<int, LinkedInstanceProperties> linkedInstanceDictionary = CollectLinkedInstances();
+                Dictionary<long, LinkedInstanceProperties> linkedInstanceDictionary = CollectLinkedInstances();
 
                 StringBuilder strBuilder = new StringBuilder();
                 using (TransactionGroup tg = new TransactionGroup(m_doc, "Set Door Parameters"))
@@ -265,7 +266,7 @@ namespace HOK.DoorRoom
                                         GeometryElement geomElem = door.get_Geometry(new Options());
                                         XYZ direction = door.FacingOrientation;
 
-                                        Dictionary<int, LinkedRoomProperties> linkedRooms = new Dictionary<int, LinkedRoomProperties>();
+                                        Dictionary<long, LinkedRoomProperties> linkedRooms = new Dictionary<long, LinkedRoomProperties>();
                                         foreach (LinkedInstanceProperties lip in linkedInstanceDictionary.Values)
                                         {
                                             GeometryElement trnasformedElem = geomElem.GetTransformed(lip.TransformValue.Inverse);
@@ -361,7 +362,7 @@ namespace HOK.DoorRoom
                                     trans.RollBack();
                                     string message = ex.Message;
                                     result = false;
-                                    strBuilder.AppendLine(door.Id.IntegerValue + "\t" + door.Name + ": " + ex.Message);
+                                    strBuilder.AppendLine(GetElementIdValue(door.Id) + "\t" + door.Name + ": " + ex.Message);
                                 }
                             }
                         }
@@ -386,9 +387,9 @@ namespace HOK.DoorRoom
             return result;
         }
 
-        private Dictionary<int, LinkedInstanceProperties> CollectLinkedInstances()
+        private Dictionary<long, LinkedInstanceProperties> CollectLinkedInstances()
         {
-            Dictionary<int, LinkedInstanceProperties> linkedInstanceDictionary = new Dictionary<int, LinkedInstanceProperties>();
+            Dictionary<long, LinkedInstanceProperties> linkedInstanceDictionary = new Dictionary<long, LinkedInstanceProperties>();
             try
             {
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
@@ -423,14 +424,14 @@ namespace HOK.DoorRoom
     public class DoorProperties
     {
         private FamilyInstance doorInstance = null;
-        private int doorId = 0;
+        private long doorId = 0;
         private Room toRoom = null;
         private Room fromRoom = null;
         private XYZ toPoint = null;
         private XYZ fromPoint = null;
 
         public FamilyInstance DoorInstance { get { return doorInstance; } set { doorInstance = value; } }
-        public int DoorId { get { return doorId; } set { doorId = value; } }
+        public long DoorId { get { return doorId; } set { doorId = value; } }
         public Room ToRoom { get { return toRoom; } set { toRoom = value; } }
         public Room FromRoom { get { return fromRoom; } set { fromRoom = value; } }
         public XYZ ToPoint { get { return toPoint; } set { toPoint = value; } }
@@ -439,7 +440,7 @@ namespace HOK.DoorRoom
         public DoorProperties(FamilyInstance instance)
         {
             doorInstance = instance;
-            doorId = instance.Id.IntegerValue;
+            doorId = GetElementIdValue(instance.Id);
 
             CreateDoorPoints();
         }
@@ -470,13 +471,13 @@ namespace HOK.DoorRoom
     public class LinkedRoomProperties
     {
         private Room roomObject = null;
-        private int roomId = 0;
+        private long roomId = 0;
         private string roomName = "";
         private string roomNumber = "";
         private LinkedInstanceProperties lip = null;
 
         public Room RoomObject { get { return roomObject; } set { roomObject = value; } }
-        public int RoomId { get { return roomId; } set { roomId = value; } }
+        public long RoomId { get { return roomId; } set { roomId = value; } }
         public string RoomName { get { return roomName; } set { roomName = value; } }
         public string RoomNumber { get { return roomNumber; } set { roomNumber = value; } }
         public LinkedInstanceProperties LinkedInstance { get { return lip; } set { lip = value; } }
@@ -484,7 +485,7 @@ namespace HOK.DoorRoom
         public LinkedRoomProperties(Room room)
         {
             roomObject = room;
-            roomId = room.Id.IntegerValue;
+            roomId = GetElementIdValue(room.Id);
             Parameter param = room.get_Parameter(BuiltInParameter.ROOM_NAME);
             if (null != param)
             {
@@ -501,13 +502,13 @@ namespace HOK.DoorRoom
     public class LinkedInstanceProperties
     {
         private RevitLinkInstance m_instance = null;
-        private int instanceId = -1;
+        private long instanceId = -1;
         private Document linkedDocument = null;
         private string documentTitle = "";
         private Autodesk.Revit.DB.Transform transformValue = null;
 
         public RevitLinkInstance Instance { get { return m_instance; } set { m_instance = value; } }
-        public int InstanceId { get { return instanceId; } set { instanceId = value; } }
+        public long InstanceId { get { return instanceId; } set { instanceId = value; } }
         public Document LinkedDocument { get { return linkedDocument; } set { linkedDocument = value; } }
         public string DocumentTitle { get { return documentTitle; } set { documentTitle = value; } }
         public Autodesk.Revit.DB.Transform TransformValue { get { return transformValue; } set { transformValue = value; } }
@@ -515,7 +516,7 @@ namespace HOK.DoorRoom
         public LinkedInstanceProperties(RevitLinkInstance instance)
         {
             m_instance = instance;
-            instanceId = instance.Id.IntegerValue;
+            instanceId = GetElementIdValue(instance.Id);
             linkedDocument = instance.GetLinkDocument();
             documentTitle = linkedDocument.Title;
             transformValue = instance.GetTotalTransform();

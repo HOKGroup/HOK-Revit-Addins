@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Autodesk.Revit.DB.IFC;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomMeasure
 {
@@ -59,7 +60,7 @@ namespace HOK.RoomMeasure
                     geoList = solidGeometries.ToList();
                 }
 
-                ElementId categoryId = new ElementId((int)BuiltInCategory.OST_Mass);
+                ElementId categoryId = NewElementId((int)BuiltInCategory.OST_Mass);
                 if (DirectShape.IsValidCategoryId(categoryId, room.Document))
                 {
                     roomShape = DirectShape.CreateElement(room.Document, categoryId);

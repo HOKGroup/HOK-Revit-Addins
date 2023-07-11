@@ -12,6 +12,7 @@ using Autodesk.Revit.UI.Selection;
 using HOK.RoomsToMass.ToMass;
 using System.IO;
 using HOK.Core.Utilities;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 
 namespace HOK.RoomsToMass.ParameterAssigner
@@ -23,16 +24,16 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         private Dictionary<string/*worksetName*/, int/*worksetId*/ > worksetDictionary = new Dictionary<string, int>();
         private List<MassProperties> integratedMassList = new List<MassProperties>(); //mass from host projects and linked files
-        private Dictionary<int/*instanceId*/, LinkedInstanceProperties> linkedMassDictionary = new Dictionary<int, LinkedInstanceProperties>(); //mass from linked models
-        private Dictionary<int/*elementId*/, ElementProperties> elementDictionary = new Dictionary<int, ElementProperties>();
-        private Dictionary<int/*elementId*/, ElementProperties> intersectingElements = new Dictionary<int, ElementProperties>();
-        private Dictionary<int/*elementId*/, ElementProperties> unassignedElements = new Dictionary<int, ElementProperties>();
-        private Dictionary<int/*categoryId*/, Dictionary<int, ParameterProperties>> parameterMaps = new Dictionary<int, Dictionary<int, ParameterProperties>>();
+        private Dictionary<long/*instanceId*/, LinkedInstanceProperties> linkedMassDictionary = new Dictionary<long, LinkedInstanceProperties>(); //mass from linked models
+        private Dictionary<long/*elementId*/, ElementProperties> elementDictionary = new Dictionary<long, ElementProperties>();
+        private Dictionary<long/*elementId*/, ElementProperties> intersectingElements = new Dictionary<long, ElementProperties>();
+        private Dictionary<long/*elementId*/, ElementProperties> unassignedElements = new Dictionary<long, ElementProperties>();
+        private Dictionary<long/*categoryId*/, Dictionary<long, ParameterProperties>> parameterMaps = new Dictionary<long, Dictionary<long, ParameterProperties>>();
         private List<string> massParameters = new List<string>();
         private Dictionary<string/*massParam*/, string/*elemParam*/> selectedParameters = new Dictionary<string, string>();
         //private Dictionary<int/*elementId*/, int/*massId*/> elementMassMap = new Dictionary<int, int>();
         private Dictionary<Category, bool> elementCategories = new Dictionary<Category, bool>();
-        private List<int/*categoryId*/> selectedCategoryIds = new List<int>();
+        private List<long/*categoryId*/> selectedCategoryIds = new List<long>();
         private StringBuilder failureMessage = new StringBuilder();
         private MassSource selectedSource;
         private List<string> splitCategories = new List<string>();
@@ -43,12 +44,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         public Dictionary<string, int> WorksetDictionary { get { return worksetDictionary; } set { worksetDictionary = value; } }
         public List<MassProperties> IntegratedMassList { get { return integratedMassList; } set { integratedMassList = value; } }
-        public Dictionary<int, LinkedInstanceProperties> LinkedMassDictionary { get { return linkedMassDictionary; } set { linkedMassDictionary = value; } }
-        public Dictionary<int, ElementProperties> ElementDictionary { get { return elementDictionary; } set { elementDictionary = value; } }
+        public Dictionary<long, LinkedInstanceProperties> LinkedMassDictionary { get { return linkedMassDictionary; } set { linkedMassDictionary = value; } }
+        public Dictionary<long, ElementProperties> ElementDictionary { get { return elementDictionary; } set { elementDictionary = value; } }
         public Dictionary<Category, bool> ElementCategories { get { return elementCategories; } set { elementCategories = value; } }
         public List<string> MassParameters { get { return massParameters; } set { massParameters = value; } }
         public MassSource SelectedSourceType { get { return selectedSource; } set { selectedSource = value; } }
-        public Dictionary<int, Dictionary<int, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
+        public Dictionary<long, Dictionary<long, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
 
         public Form_Assigner(UIApplication uiapp)
         {
@@ -348,9 +349,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             {
                                 toolStripProgressBar.PerformStep();
                                 //if (ElementId.InvalidElementId!=element.GroupId) {  modelGroupExist = true; continue;  }
-                                if (intersectingElements.ContainsKey(element.Id.IntegerValue))
+                                if (intersectingElements.ContainsKey(GetElementIdValue(element.Id)))
                                 {
-                                    var ep = intersectingElements[element.Id.IntegerValue];
+                                    var ep = intersectingElements[GetElementIdValue(element.Id)];
                                     if (ep.CategoryName == "Model Groups") { modelGroupExist = true; continue; }
                                     if (ep.SelectedMassId != mp.MassId) { continue; } //if an element already assigned to another mass to propagate parameters
                                 }
@@ -533,7 +534,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             {
                 var parameterNames = selectedParameters.Values.ToList();
                 var categoryNames = new List<string>();
-                var paramDictionary = new Dictionary<int, Parameter>();
+                var paramDictionary = new Dictionary<long, Parameter>();
 
                 foreach (var element in selectedElements)
                 {
@@ -546,10 +547,10 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                             if (null != param)
                             {
-                                if (paramDictionary.ContainsKey(param.Id.IntegerValue)) { continue; }
+                                if (paramDictionary.ContainsKey(GetElementIdValue(param.Id))) { continue; }
                                 else
                                 {
-                                    paramDictionary.Add(param.Id.IntegerValue, param);
+                                    paramDictionary.Add(GetElementIdValue(param.Id), param);
                                 }
                             }
                         }
@@ -753,9 +754,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
             var result = false;
             try
             {
-                intersectingElements = new Dictionary<int, ElementProperties>();
+                intersectingElements = new Dictionary<long, ElementProperties>();
                 var intersectingCategories = new List<string>();
-                var massIds = new List<int>();//massIds that will be displayed in the overapping form
+                var massIds = new List<long>();//massIds that will be displayed in the overapping form
                 foreach (var elementId in elementDictionary.Keys)
                 {
                     var ep = elementDictionary[elementId];
@@ -792,7 +793,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                 if (intersectingElements.Count > 0)
                 {
-                    var massdictionary = new Dictionary<int, MassProperties>();
+                    var massdictionary = new Dictionary<long, MassProperties>();
                     foreach (DataGridViewRow row in dataGridViewMass.Rows)
                     {
                         if (null != row.Tag)
@@ -814,8 +815,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                     if (overlapForm.ShowDialog() == DialogResult.OK)
                     {
-                        intersectingElements = new Dictionary<int, ElementProperties>();
-                        unassignedElements = new Dictionary<int, ElementProperties>();
+                        intersectingElements = new Dictionary<long, ElementProperties>();
+                        unassignedElements = new Dictionary<long, ElementProperties>();
                         intersectingElements = overlapForm.IntersectingElements;
                         unassignedElements = overlapForm.UnassignedElements;
                         splitCategories = overlapForm.CategoriesToSplit;
@@ -850,9 +851,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
             var result = false;
             try
             {
-                intersectingElements = new Dictionary<int, ElementProperties>();
+                intersectingElements = new Dictionary<long, ElementProperties>();
                 var intersectingCategories = new List<string>();
-                var massIds = new List<int>();//massIds that will be displayed in the overapping form
+                var massIds = new List<long>();//massIds that will be displayed in the overapping form
                 foreach (var elementId in elementDictionary.Keys)
                 {
                     var ep = elementDictionary[elementId];
@@ -889,7 +890,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                 if (intersectingElements.Count > 0)
                 {
-                    var massdictionary = new Dictionary<int, MassProperties>();
+                    var massdictionary = new Dictionary<long, MassProperties>();
                     foreach (DataGridViewRow row in dataGridViewMass.Rows)
                     {
                         if (null != row.Tag)
@@ -911,8 +912,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                     if (overlapForm.ShowDialog() == DialogResult.OK)
                     {
-                        intersectingElements = new Dictionary<int, ElementProperties>();
-                        unassignedElements = new Dictionary<int, ElementProperties>();
+                        intersectingElements = new Dictionary<long, ElementProperties>();
+                        unassignedElements = new Dictionary<long, ElementProperties>();
                         intersectingElements = overlapForm.IntersectingElements;
                         unassignedElements = overlapForm.UnassignedElements;
                         splitCategories = overlapForm.CategoriesToSplit;
@@ -1015,12 +1016,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                     DisplayMassList(selectedSource);
 
-                    selectedCategoryIds = new List<int>();
+                    selectedCategoryIds = new List<long>();
                     foreach (var category in elementCategories.Keys)
                     {
                         if (elementCategories[category])
                         {
-                            selectedCategoryIds.Add(category.Id.IntegerValue);
+                            selectedCategoryIds.Add(GetElementIdValue(category.Id));
                         }
                     }
                 }

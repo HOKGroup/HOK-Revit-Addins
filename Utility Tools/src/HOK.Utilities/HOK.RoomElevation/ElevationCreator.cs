@@ -7,6 +7,7 @@ using System.Windows;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomElevation
 {
@@ -22,7 +23,7 @@ namespace HOK.RoomElevation
         private LinkedInstanceProperties wallLink = null;
         private ViewPlan m_viewPlan = null;
         private ElementId m_viewFamilyTypeId = null;
-        private Dictionary<int, LinkedInstanceProperties> linkedDocuments = new Dictionary<int, LinkedInstanceProperties>();
+        private Dictionary<long, LinkedInstanceProperties> linkedDocuments = new Dictionary<long, LinkedInstanceProperties>();
         private ElevationCreatorSettings toolSettings = null;
         private XYZ pickPoint = null;
 
@@ -30,7 +31,7 @@ namespace HOK.RoomElevation
         public RoomElevationProperties RoomProperties { get { return roomProperties; } set { roomProperties = value; } }
         public XYZ PickPoint { get { return pickPoint; } set { pickPoint = value; } }
 
-        public ElevationCreator(UIApplication uiapp, RoomElevationProperties rep, Wall wall, ElevationCreatorSettings settings, Dictionary<int, LinkedInstanceProperties> linkedInstances)
+        public ElevationCreator(UIApplication uiapp, RoomElevationProperties rep, Wall wall, ElevationCreatorSettings settings, Dictionary<long, LinkedInstanceProperties> linkedInstances)
         {
             //create by pick elements
             m_app = uiapp;
@@ -41,11 +42,11 @@ namespace HOK.RoomElevation
             toolSettings = settings;
             linkedDocuments = linkedInstances;
             m_viewPlan = toolSettings.ActiveViewPlan;
-            m_viewFamilyTypeId = new ElementId(toolSettings.ViewFamilyId);
+            m_viewFamilyTypeId = NewElementId(toolSettings.ViewFamilyId);
             
         }
 
-        public ElevationCreator(UIApplication uiapp, RoomElevationProperties rep, ElevationCreatorSettings settings, Dictionary<int, LinkedInstanceProperties> linkedInstances)
+        public ElevationCreator(UIApplication uiapp, RoomElevationProperties rep, ElevationCreatorSettings settings, Dictionary<long, LinkedInstanceProperties> linkedInstances)
         {
             //create by room list
             m_app = uiapp;
@@ -55,7 +56,7 @@ namespace HOK.RoomElevation
             toolSettings = settings;
             linkedDocuments = linkedInstances;
             m_viewPlan = toolSettings.ActiveViewPlan;
-            m_viewFamilyTypeId = new ElementId(toolSettings.ViewFamilyId);
+            m_viewFamilyTypeId = NewElementId(toolSettings.ViewFamilyId);
 
         }
 
@@ -67,7 +68,7 @@ namespace HOK.RoomElevation
                 //delete existing elevation views created by List
                 if (roomProperties.KeyMarkId != -1)
                 {
-                    int markId = roomProperties.KeyMarkId;
+                    long markId = roomProperties.KeyMarkId;
                     if (roomProperties.ElevationViews.ContainsKey(markId))
                     {
                         using (Transaction trans = new Transaction(m_doc, "Delete Elevation Mark"))
@@ -77,7 +78,7 @@ namespace HOK.RoomElevation
                             failureOptions.SetFailuresPreprocessor(new DeleteViewsPreprocessor());
                             try
                             {
-                                m_doc.Delete(new ElementId(markId));
+                                m_doc.Delete(NewElementId(markId));
                                 trans.Commit(failureOptions);
                             }
                             catch (Exception ex)
@@ -161,7 +162,7 @@ namespace HOK.RoomElevation
                             int viewCount = marker.MaximumViewCount < 4 ? marker.MaximumViewCount : 4;
 
                             Dictionary<int, Dictionary<int, ElevationViewProperties>> elevationDictionary = new Dictionary<int, Dictionary<int, ElevationViewProperties>>();
-                            Dictionary<int, ElevationViewProperties> elevationViews = new Dictionary<int, ElevationViewProperties>();
+                            Dictionary<long, ElevationViewProperties> elevationViews = new Dictionary<long, ElevationViewProperties>();
 
                             for (int i = 0; i < viewCount; i++)
                             {
@@ -176,7 +177,7 @@ namespace HOK.RoomElevation
                                 viewElevation.Name = GetViewName(prefix, intermediateText, elevationIndex, indexText, suffix);
                                 if (toolSettings.ViewTemplateId != -1)
                                 {
-                                    viewElevation.ViewTemplateId = new ElementId(toolSettings.ViewTemplateId);
+                                    viewElevation.ViewTemplateId = NewElementId(toolSettings.ViewTemplateId);
                                 }
 
                                 Parameter param = viewElevation.LookupParameter("Title on Sheet");
@@ -193,10 +194,10 @@ namespace HOK.RoomElevation
                                 }
                             }
 
-                            if (elevationViews.Count > 0  && !roomProperties.ElevationViews.ContainsKey(marker.Id.IntegerValue))
+                            if (elevationViews.Count > 0  && !roomProperties.ElevationViews.ContainsKey(GetElementIdValue(marker.Id)))
                             {
-                                roomProperties.KeyMarkId = marker.Id.IntegerValue;
-                                roomProperties.ElevationViews.Add(marker.Id.IntegerValue, elevationViews);
+                                roomProperties.KeyMarkId = GetElementIdValue(marker.Id);
+                                roomProperties.ElevationViews.Add(GetElementIdValue(marker.Id), elevationViews);
                             }
                             
                             trans.Commit();
@@ -213,7 +214,7 @@ namespace HOK.RoomElevation
 
                 if (null != marker && null != markerLocation)
                 {
-                    if (ModifyCropBox(roomProperties, marker.Id.IntegerValue))
+                    if (ModifyCropBox(roomProperties, GetElementIdValue(marker.Id)))
                     {
                         if (ElevationCreatorDataStorageUtil.StoreRoomElevationProperties(m_doc, roomProperties))
                         {
@@ -239,7 +240,7 @@ namespace HOK.RoomElevation
             {
                 ElevationMarker marker = null;
                 XYZ markerLocation = null;
-                Dictionary<int, ElevationViewProperties> elevationViews = new Dictionary<int, ElevationViewProperties>();
+                Dictionary<long, ElevationViewProperties> elevationViews = new Dictionary<long, ElevationViewProperties>();
                 ApplyTemplateSettings();
 
                 using (Transaction trans = new Transaction(m_doc, "Elevation Creator"))
@@ -284,7 +285,7 @@ namespace HOK.RoomElevation
                                     viewElevation.Name = GetViewName(prefix, intermediateText, elevationIndex, indexLabels[index], suffix);
                                     if (toolSettings.ViewTemplateId != -1)
                                     {
-                                        viewElevation.ViewTemplateId = new ElementId(toolSettings.ViewTemplateId);
+                                        viewElevation.ViewTemplateId = NewElementId(toolSettings.ViewTemplateId);
                                     }
 
                                     Parameter param = viewElevation.LookupParameter("Title on Sheet");
@@ -312,7 +313,7 @@ namespace HOK.RoomElevation
                                     }
 
                                     ElevationViewProperties viewProperties = new ElevationViewProperties(viewElevation);
-                                    viewProperties.WallId = m_wall.Id.IntegerValue;
+                                    viewProperties.WallId = GetElementIdValue(m_wall.Id);
                                     if (!elevationViews.ContainsKey(viewProperties.ViewId))
                                     {
                                         elevationViews.Add(viewProperties.ViewId, viewProperties);
@@ -320,9 +321,9 @@ namespace HOK.RoomElevation
                                 }
                             }
 
-                            if (elevationViews.Count>0 && !roomProperties.ElevationViews.ContainsKey(marker.Id.IntegerValue))
+                            if (elevationViews.Count>0 && !roomProperties.ElevationViews.ContainsKey(GetElementIdValue(marker.Id)))
                             {
-                                roomProperties.ElevationViews.Add(marker.Id.IntegerValue, elevationViews);
+                                roomProperties.ElevationViews.Add(GetElementIdValue(marker.Id), elevationViews);
                             }
                         }
                     }
@@ -336,7 +337,7 @@ namespace HOK.RoomElevation
 
                 if (null != marker && null != markerLocation)
                 {
-                    if (ModifyCropBox(roomProperties , marker.Id.IntegerValue))
+                    if (ModifyCropBox(roomProperties , GetElementIdValue(marker.Id)))
                     {
                         if (ElevationCreatorDataStorageUtil.StoreRoomElevationProperties(m_doc, roomProperties))
                         {
@@ -360,15 +361,15 @@ namespace HOK.RoomElevation
             {
                 if (toolSettings.ViewTemplateId != -1)
                 {
-                    ViewSection viewSection = m_doc.GetElement(new ElementId(toolSettings.ViewTemplateId)) as ViewSection;
+                    ViewSection viewSection = m_doc.GetElement(NewElementId(toolSettings.ViewTemplateId)) as ViewSection;
                     if (null != viewSection)
                     {
                         ICollection<ElementId> parameterIds = viewSection.GetTemplateParameterIds();
-                        int viewScaleImperial = (int)BuiltInParameter.VIEW_SCALE_PULLDOWN_IMPERIAL;
-                        int viewScaleMetric = (int)BuiltInParameter.VIEW_SCALE_PULLDOWN_METRIC;
-                        int viewScale = (int)BuiltInParameter.VIEW_SCALE;
+                        long viewScaleImperial = (int)BuiltInParameter.VIEW_SCALE_PULLDOWN_IMPERIAL;
+                        long viewScaleMetric = (int)BuiltInParameter.VIEW_SCALE_PULLDOWN_METRIC;
+                        long viewScale = (int)BuiltInParameter.VIEW_SCALE;
 
-                        var selectedIds = from paramId in parameterIds where paramId.IntegerValue == viewScaleImperial || paramId.IntegerValue == viewScaleMetric || paramId.IntegerValue == viewScale select paramId;
+                        var selectedIds = from paramId in parameterIds where GetElementIdValue(paramId) == viewScaleImperial || GetElementIdValue(paramId) == viewScaleMetric || GetElementIdValue(paramId) == viewScale select paramId;
                         if (selectedIds.Count() > 0)
                         {
                             using (Transaction trans = new Transaction(m_doc, "SetViewTemplate"))
@@ -633,7 +634,7 @@ namespace HOK.RoomElevation
             return rotated;
         }
 
-        public bool ModifyCropBox(RoomElevationProperties rep, int markerId)
+        public bool ModifyCropBox(RoomElevationProperties rep, long markerId)
         {
             bool result = false;
             try
@@ -665,7 +666,7 @@ namespace HOK.RoomElevation
                 {
                     if (rep.ElevationViews.ContainsKey(markerId))
                     {
-                        Dictionary<int, ElevationViewProperties> elevationViews = rep.ElevationViews[markerId];
+                        Dictionary<long, ElevationViewProperties> elevationViews = rep.ElevationViews[markerId];
                         foreach (ElevationViewProperties evp in elevationViews.Values)
                         {
                             ViewSection elevationView = evp.ViewObj;

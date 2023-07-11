@@ -156,7 +156,7 @@ Public Class form_ElemImagesFromViews
             imageName = elementData
 
             'Get the view
-            elementId = New DB.ElementId(CInt(Convert.ToInt64(stringElementId)))
+            elementId = NewElementId(Convert.ToInt64(stringElementId))
             '' ''elementId.Value = CInt(Convert.ToInt64(stringElementId))
             viewToUse = DirectCast(m_Settings.Document.GetElement(elementId), DB.View)
 
@@ -264,7 +264,7 @@ Public Class form_ElemImagesFromViews
                 Continue For
             End If
 
-            elementData = ("<" + viewPlan.Id.IntegerValue.ToString & "|") + viewPlan.Name & ">"
+            elementData = ("<" + viewPlan.Id.Value.ToString & "|") + viewPlan.Name & ">"
             If imageExists Then
                 mListItems.Add(viewPlan.Name + " (E)" & Convert.ToString(m_Settings.Spacer) & elementData)
             Else

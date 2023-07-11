@@ -8,6 +8,7 @@ using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Tools.DTMTool.DTMUtils;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Utils;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.MissionControl.Tools.DTMTool
 {
@@ -241,7 +242,7 @@ namespace HOK.MissionControl.Tools.DTMTool
             try
             {
                 var doc = data.GetDocument();
-                var bltCategory = (BuiltInCategory)element.Category.Id.IntegerValue;
+                var bltCategory = (BuiltInCategory)GetElementIdValue(element.Category.Id);
                 switch (bltCategory)
                 {
                     case BuiltInCategory.OST_Grids:

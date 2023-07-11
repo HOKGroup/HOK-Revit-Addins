@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -17,16 +18,16 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private bool paramFilterActivated = false;
         private List<MassProperties> integratedMassList = new List<MassProperties>(); //mass from host projects
         private Dictionary<Category, bool> elementCategories = new Dictionary<Category, bool>();
-        private Dictionary<int/*categoryId*/, Dictionary<int, ParameterProperties>> parameterMaps = new Dictionary<int, Dictionary<int, ParameterProperties>>();
-        private Dictionary<int, ParameterProperties> selectedParameters = new Dictionary<int, ParameterProperties>();
-        private Dictionary<int/*phaseId*/, Phase> phases = new Dictionary<int, Phase>();
+        private Dictionary<long/*categoryId*/, Dictionary<long, ParameterProperties>> parameterMaps = new Dictionary<long, Dictionary<long, ParameterProperties>>();
+        private Dictionary<long, ParameterProperties> selectedParameters = new Dictionary<long, ParameterProperties>();
+        private Dictionary<long/*phaseId*/, Phase> phases = new Dictionary<long, Phase>();
         private Dictionary<int/*worksetId*/, Workset> worksets = new Dictionary<int, Workset>();
 
         public List<MassProperties> IntegratedMassDictionary { get { return integratedMassList; } set { integratedMassList = value; } }
         public Dictionary<Category, bool> ElementCategories { get { return elementCategories; } set { elementCategories = value; } }
-        public Dictionary<int, Dictionary<int, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
+        public Dictionary<long, Dictionary<long, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
 
-        public Form_ElementFilter(Document document, List<MassProperties> integratedMass, Dictionary<Category, bool> categories, Dictionary<int, Dictionary<int, ParameterProperties>> paramMaps)
+        public Form_ElementFilter(Document document, List<MassProperties> integratedMass, Dictionary<Category, bool> categories, Dictionary<long, Dictionary<long, ParameterProperties>> paramMaps)
         {
             m_doc = document;
             integratedMassList = integratedMass;
@@ -75,9 +76,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     Phase ph = element as Phase;
                     if (null != ph)
                     {
-                        if (!phases.ContainsKey(ph.Id.IntegerValue))
+                        if (!phases.ContainsKey(GetElementIdValue(ph.Id)))
                         {
-                            phases.Add(ph.Id.IntegerValue, ph);
+                            phases.Add(GetElementIdValue(ph.Id), ph);
                         }
                     }
                 }
@@ -108,16 +109,16 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 cmbOperation2.Items.Clear();
                 cmbValue2.Items.Clear();
 
-                selectedParameters = new Dictionary<int, ParameterProperties>();
+                selectedParameters = new Dictionary<long, ParameterProperties>();
                 if (listViewCategory.CheckedItems.Count > 0)
                 {
                     ListViewItem firstItem = listViewCategory.CheckedItems[0];
                     if (null != firstItem.Tag)
                     {
                         Category category = firstItem.Tag as Category;
-                        if (parameterMaps.ContainsKey(category.Id.IntegerValue))
+                        if (parameterMaps.ContainsKey(GetElementIdValue(category.Id)))
                         {
-                            selectedParameters = parameterMaps[category.Id.IntegerValue];
+                            selectedParameters = parameterMaps[GetElementIdValue(category.Id)];
                         }
                     }
 
@@ -129,16 +130,16 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             if (null != item.Tag)
                             {
                                 Category category = item.Tag as Category;
-                                if (parameterMaps.ContainsKey(category.Id.IntegerValue))
+                                if (parameterMaps.ContainsKey(GetElementIdValue(category.Id)))
                                 {
-                                    Dictionary<int, ParameterProperties> paramDictionary = new Dictionary<int, ParameterProperties>();
-                                    paramDictionary = parameterMaps[category.Id.IntegerValue];
+                                    Dictionary<long, ParameterProperties> paramDictionary = new Dictionary<long, ParameterProperties>();
+                                    paramDictionary = parameterMaps[GetElementIdValue(category.Id)];
 
                                     var commonDictionary = selectedParameters.Keys.Intersect(paramDictionary.Keys).ToDictionary(t => t, t => selectedParameters[t]);
                                     selectedParameters = commonDictionary.ToDictionary(x => x.Key, x => x.Value);
 
                                     //to fill out union of parameter values
-                                    List<int> paramIds = selectedParameters.Keys.ToList();
+                                    List<long> paramIds = selectedParameters.Keys.ToList();
                                     foreach (int paramId in paramIds)
                                     {
                                         ParameterProperties pp = selectedParameters[paramId];
@@ -592,9 +593,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
             {
                 foreach (ElementId eId in pp.ElementIDValues)
                 {
-                    if (phases.ContainsKey(eId.IntegerValue))
+                    if (phases.ContainsKey(GetElementIdValue(eId)))
                     {
-                        Phase phase = phases[eId.IntegerValue];
+                        Phase phase = phases[GetElementIdValue(eId)];
                         if (isFirstParam) { cmbValue1.Items.Add(phase.Name); }
                         else { cmbValue2.Items.Add(phase.Name); }
                     }
@@ -655,7 +656,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             try
             {
                 ParameterProperties pp = selectedParameters[paramId];
-                ParameterValueProvider pvp = new ParameterValueProvider(new ElementId(pp.ParamId));
+                ParameterValueProvider pvp = new ParameterValueProvider(NewElementId(pp.ParamId));
 
                 switch (pp.ParamStorageType)
                 {
@@ -665,8 +666,8 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             FilterNumericRuleEvaluator fnre1 = new FilterNumericEquals();
 
                             var phaseId = from phase in phases where phase.Value.Name == paramValue select phase.Key;
-                            int pId = phaseId.First();
-                            ElementId ruleValId = new ElementId(pId);
+                            long pId = phaseId.First();
+                            ElementId ruleValId = NewElementId(pId);
 
                             FilterRule filterRule1 = new FilterElementIdRule(pvp, fnre1, ruleValId);
 

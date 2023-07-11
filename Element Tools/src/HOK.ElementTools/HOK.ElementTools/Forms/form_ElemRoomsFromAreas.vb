@@ -99,7 +99,7 @@ Public Class form_ElemRoomsFromAreas
 
             Dim filCollector As New DB.FilteredElementCollector(m_Settings.Document)
             ' Add the category to the filter
-            filCollector.OfCategory(category.Id.IntegerValue)
+            filCollector.OfCategory(category.Id.Value)
             ' Return the list of elements from the filter collector
             elements = filCollector.ToElements
 
@@ -203,7 +203,7 @@ Public Class form_ElemRoomsFromAreas
                 Next
 
                 'Add to the list
-                mListItems.Add((listBy1 & " + " & listBy2 & Convert.ToString(m_Settings.Spacer) & "<") + element.Id.IntegerValue.ToString & ">")
+                mListItems.Add((listBy1 & " + " & listBy2 & Convert.ToString(m_Settings.Spacer) & "<") + element.Id.Value.ToString & ">")
             Next
 
             mListItems.Sort()
@@ -304,7 +304,7 @@ Public Class form_ElemRoomsFromAreas
         For Each listItem As String In listBoxAreas.SelectedItems
 
             'Get the area
-            elemId = New DB.ElementId(CInt(Convert.ToInt64(listItem.Substring(listItem.IndexOf("<") + 1, listItem.Length - listItem.LastIndexOf("<") - 2))))
+            elemId = NewElementId(Convert.ToInt64(listItem.Substring(listItem.IndexOf("<") + 1, listItem.Length - listItem.LastIndexOf("<") - 2)))
             areaToConvert = DirectCast(m_Settings.Document.GetElement(elemId), DB.Area)
 
 
