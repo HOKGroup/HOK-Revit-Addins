@@ -100,7 +100,15 @@ namespace HOK.RoomsToMass.ToMass
                 areaElementId = m_area.Id;
                 areaId = GetElementIdValue(m_area.Id);
                 areaUniqueId = m_area.UniqueId;
-                areaName = m_area.Name;
+                Parameter areaNameParam = m_area.get_Parameter(BuiltInParameter.ROOM_NAME);
+                if (null != areaNameParam)
+                {
+                    areaName = areaNameParam.AsValueString();
+                }
+                else
+                {
+                    areaName = m_area.Name;
+                }
                 areaNumber = m_area.Number;
 
                 Parameter areaTypeParam = m_area.get_Parameter(BuiltInParameter.AREA_TYPE);
