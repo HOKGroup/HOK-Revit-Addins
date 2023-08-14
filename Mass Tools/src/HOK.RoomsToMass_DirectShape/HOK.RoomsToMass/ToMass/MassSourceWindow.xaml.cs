@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -157,16 +157,25 @@ namespace HOK.RoomsToMass.ToMass
             }
         }
 
-        private void CollectRoomsInfo(List<Room> roomList, Autodesk.Revit.DB.Transform roomTransform)
+        private void CollectRoomsInfo(List<Room> roomList, Autodesk.Revit.DB.Transform transform)
         {
             try
             {
+                MassConfiguration massConfig = MassConfigDataStorageUtil.GetMassConfiguration(m_doc, SourceType.Rooms);
+                SpatialElementBoundaryLocation boundaryLocation = massConfig.RoomBoundaryAtCenterLine ? SpatialElementBoundaryLocation.Center : SpatialElementBoundaryLocation.Finish;
+
+                SpatialElementBoundaryOptions spatialOpts = new SpatialElementBoundaryOptions();
+                spatialOpts.SpatialElementBoundaryLocation = boundaryLocation;
+
+                SpatialElementGeometryCalculator calculator = new SpatialElementGeometryCalculator(m_doc, spatialOpts);
+
                 foreach (Room room in roomList)
                 {
                     if (room.Area == 0) { continue; }
    
                     RoomProperties rp = new RoomProperties(room);
-                    rp.GetRoomGeometry(roomTransform);
+                    rp.RoomTransform = transform;
+                    rp.GetRoomGeometry(transform, calculator);
 
                     StringBuilder strBuilder = new StringBuilder();
                     var mass3dFound = from mass in massList 

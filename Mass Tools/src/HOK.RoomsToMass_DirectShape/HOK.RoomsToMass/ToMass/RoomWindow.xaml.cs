@@ -26,6 +26,7 @@ namespace HOK.RoomsToMass.ToMass
         private UIApplication m_app = null;
         private Document m_doc= null;
         private RevitDocumentProperties selectedModel = null;
+        private SpatialElementBoundaryLocation selectedRoomBoundary = SpatialElementBoundaryLocation.Center;
         private Dictionary<string, RevitDocumentProperties> modelDictionary = new Dictionary<string, RevitDocumentProperties>();
         private Dictionary<string/*roomUniqueId*/, RoomProperties> roomDictionary = new Dictionary<string, RoomProperties>();
         private MassConfiguration massConfig = null;
@@ -68,6 +69,16 @@ namespace HOK.RoomsToMass.ToMass
             }
             dataGridParameters.ItemsSource = null;
             dataGridParameters.ItemsSource = massConfig.MassParameters;
+
+            List<KeyValuePair<string, SpatialElementBoundaryLocation>> boundaryLocations = new List<KeyValuePair<string, SpatialElementBoundaryLocation>>()
+            {
+                new KeyValuePair<string, SpatialElementBoundaryLocation>("At wall finish", SpatialElementBoundaryLocation.Finish),
+                new KeyValuePair<string, SpatialElementBoundaryLocation>("At wall center", SpatialElementBoundaryLocation.Center),
+            };
+            comboBoxRoomBoundary.ItemsSource = boundaryLocations;
+            comboBoxRoomBoundary.DisplayMemberPath = "Key";
+            comboBoxRoomBoundary.SelectedValuePath = "Value";
+            comboBoxRoomBoundary.SelectedIndex = massConfig.RoomBoundaryAtCenterLine ? 1 : 0;
         }
 
         private void DisplayRoomInfo()
@@ -189,6 +200,11 @@ namespace HOK.RoomsToMass.ToMass
                             for (int i = 0; i < selectedRooms.Count; i++)
                             {
                                 RoomProperties rp = selectedRooms[i];
+
+                                SpatialElementBoundaryOptions spatialOpts = new SpatialElementBoundaryOptions();
+                                spatialOpts.SpatialElementBoundaryLocation = selectedRoomBoundary;
+                                SpatialElementGeometryCalculator calculator = new SpatialElementGeometryCalculator(m_doc, spatialOpts);
+                                rp.GetRoomGeometry(rp.RoomTransform, calculator);
                                 if (useDefaultHeight)
                                 {
                                     rp.UserHeight = defaultHeight;
@@ -775,6 +791,21 @@ namespace HOK.RoomsToMass.ToMass
         private void buttonClose_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-        } 
+        }
+
+        private void comboBoxRoomBoundary_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (null != comboBoxRoomBoundary.SelectedItem)
+            {
+                KeyValuePair<string, SpatialElementBoundaryLocation> selected = (KeyValuePair<string, SpatialElementBoundaryLocation>)comboBoxRoomBoundary.SelectedItem;
+                if (massConfig != null)
+                {
+                    massConfig.RoomBoundaryAtCenterLine = selected.Value == SpatialElementBoundaryLocation.Center;
+                    MassConfigDataStorageUtil.StoreMassConfiguration(m_doc, massConfig);
+                }
+                selectedRoomBoundary = selected.Value;
+            }
+
+        }
     }
 }

@@ -34,7 +34,10 @@
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
                 <Label Content="Source Model:" HorizontalAlignment="Left" Margin="10,15,0,0" VerticalAlignment="Top"/>
-                <ComboBox x:Name="comboBoxModel" HorizontalAlignment="Left" Margin="100,15,0,0" VerticalAlignment="Top" Width="250" IsReadOnly="True" DisplayMemberPath="DocumentTitle" SelectionChanged="comboBoxModel_SelectionChanged"/>
+                <ComboBox x:Name="comboBoxModel" HorizontalAlignment="Left" Margin="100,15,0,0" VerticalAlignment="Top" Width="200" IsReadOnly="True" DisplayMemberPath="DocumentTitle" SelectionChanged="comboBoxModel_SelectionChanged"/>
+
+                <Label Content="Room Boundary:" HorizontalAlignment="Left" Margin="310,15,0,0" VerticalAlignment="Top"/>
+                <ComboBox x:Name="comboBoxRoomBoundary" HorizontalAlignment="Left" Margin="420,15,0,0" VerticalAlignment="Top" Width="150" IsReadOnly="True" DisplayMemberPath="DocumentTitle" SelectionChanged="comboBoxRoomBoundary_SelectionChanged"/>
                 
                 <CheckBox x:Name="checkBoxDefaultHeight" Content="Default Height:" HorizontalAlignment="Right" Margin="0,20,100,0"/>
                 <TextBox x:Name="textBoxHeight" HorizontalAlignment="Right" Height="23" Margin="0,17,20,0" TextWrapping="Wrap" VerticalAlignment="top" Width="70" />
