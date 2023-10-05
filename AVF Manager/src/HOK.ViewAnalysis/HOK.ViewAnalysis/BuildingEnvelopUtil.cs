@@ -7,6 +7,7 @@ using System.Windows;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.DB.Architecture;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.ViewAnalysis
 {
@@ -145,7 +146,7 @@ namespace HOK.ViewAnalysis
                             {
                                 if (null != element.Category)
                                 {
-                                    if (element.Category.Id.IntegerValue == (int)BuiltInCategory.OST_Floors || element.Category.Id.IntegerValue == (int)BuiltInCategory.OST_Roofs)
+                                    if (GetElementIdValue(element.Category.Id) == (int)BuiltInCategory.OST_Floors || GetElementIdValue(element.Category.Id) == (int)BuiltInCategory.OST_Roofs)
                                     {
                                         floorHeight = context.Proximity; break;
                                     }
@@ -164,7 +165,7 @@ namespace HOK.ViewAnalysis
             return floorHeight;
         }
 
-        public static List<LinkElementId> FindExteriorWallsByParameter(Document doc, Dictionary<int, LinkedInstanceData> linkedInstances ,bool includeLinkedWall)
+        public static List<LinkElementId> FindExteriorWallsByParameter(Document doc, Dictionary<long, LinkedInstanceData> linkedInstances ,bool includeLinkedWall)
         {
             List<LinkElementId> exteriorElementIds = new List<LinkElementId>();
             try

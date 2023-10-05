@@ -173,7 +173,7 @@ Public Class form_ElemPlaceUnplacedAreas
                 End If
             Next
             If notPlaced Then
-                mListItems.Add((listBy1 & " + " & listBy2 & Convert.ToString(m_Settings.Spacer) & "<") + element.Id.IntegerValue.ToString & ">")
+                mListItems.Add((listBy1 & " + " & listBy2 & Convert.ToString(m_Settings.Spacer) & "<") + element.Id.Value.ToString & ">")
             End If
         Next
 
@@ -297,7 +297,7 @@ Public Class form_ElemPlaceUnplacedAreas
             Dim transaction As New Transaction(m_Settings.Document)
             If transaction.Start("Add New Areas") = TransactionStatus.Started Then
                 'Get the existing area
-                elemId = New DB.ElementId(CInt(Convert.ToInt64(listItem.Substring(listItem.IndexOf("<") + 1, listItem.Length - listItem.IndexOf("<") - 2))))
+                elemId = NewElementId(Convert.ToInt64(listItem.Substring(listItem.IndexOf("<") + 1, listItem.Length - listItem.IndexOf("<") - 2)))
                 areaToPlace = DirectCast(m_Settings.Document.GetElement(elemId), DB.Area)
                 parameterArea = areaToPlace.LookupParameter(textBoxParameterRequiredArea.Text)
 

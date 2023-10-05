@@ -181,7 +181,7 @@ Public Class form_ElemTagViews
             Next
 
             'Add the entry to the list box          
-            viewToUseElementId = view.Id.IntegerValue.ToString
+            viewToUseElementId = view.Id.Value.ToString
             elementData = "<" & viewToUseElementId & "|" & nameRoot & "|" & suffix & ">"
 
             If checkBoxIncludeExisting.Checked = True Then
@@ -312,7 +312,7 @@ Public Class form_ElemTagViews
             If roomTest IsNot Nothing Then
                 For Each parameterTest As DB.Parameter In roomTest.Parameters
                     If parameterTest.Definition.Name = textBoxParameterViewName.Text Then
-                        roomsIdLookup.Add(parameterTest.AsString(), roomTest.Id.IntegerValue.ToString)
+                        roomsIdLookup.Add(parameterTest.AsString(), roomTest.Id.Value.ToString)
                         Exit For
                     End If
                 Next
@@ -333,7 +333,7 @@ Public Class form_ElemTagViews
             '***Note that we don't actually use the suffix value.  Leaving in place in case a reason arises, such as adding to tag?
 
             'Get the view to use
-            elementId = New DB.ElementId(CInt(Convert.ToInt64(viewToUseElementId)))
+            elementId = NewElementId(Convert.ToInt64(viewToUseElementId))
             viewToUse = DirectCast(m_Settings.Document.GetElement(elementId), DB.View)
 
             'Add the room data tag
@@ -343,7 +343,7 @@ Public Class form_ElemTagViews
             If roomTagType IsNot Nothing Then
                 'test shouldn't be necessary
                 If roomsIdLookup.TryGetValue(nameRoot, roomElementId) Then
-                    elementId = New DB.ElementId(CInt(Convert.ToInt64(roomElementId)))
+                    elementId = NewElementId(Convert.ToInt64(roomElementId))
                     roomToTag = DirectCast(m_Settings.Document.GetElement(elementId), DB.Architecture.Room)
                     roomBoundingBox = roomToTag.BoundingBox(viewToUse)
                     Dim uvPointInsertion As New DB.UV((roomBoundingBox.Max.X + roomBoundingBox.Min.X) / 2, (roomBoundingBox.Max.Y + roomBoundingBox.Min.Y) / 2)

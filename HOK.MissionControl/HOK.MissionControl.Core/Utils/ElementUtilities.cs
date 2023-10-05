@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.MissionControl.Utils
 {
@@ -67,7 +68,7 @@ namespace HOK.MissionControl.Utils
                 case StorageType.String:
                     return p.AsString();
                 case StorageType.ElementId:
-                    return p.AsElementId().IntegerValue;
+                    return GetElementIdValue(p.AsElementId());
                 default:
                     throw new System.ArgumentOutOfRangeException();
             }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ToMass
 {
@@ -12,7 +13,7 @@ namespace HOK.RoomsToMass.ToMass
         private Room m_room = null;
         private string roomDocument = "";
         private ElementId roomElementId = ElementId.InvalidElementId;
-        private int roomId = -1;
+        private long roomId = -1;
         private string roomUniqueId = "";
         private string roomName = "";
         private string roomNumber = "";
@@ -28,6 +29,7 @@ namespace HOK.RoomsToMass.ToMass
         private XYZ roomSolidCentroid = null;
         private Face bottomFace = null;
         private IList<CurveLoop> roomProfiles = new List<CurveLoop>();
+        private Transform roomTransform = Autodesk.Revit.DB.Transform.Identity;
 
         private MassProperties linked3dMass = null;
         private MassProperties linked2dMass = null;
@@ -42,7 +44,7 @@ namespace HOK.RoomsToMass.ToMass
         public Room RoomElement { get { return m_room; } set { m_room = value; } }
         public string RoomDocument { get { return roomDocument; } set { roomDocument = value; } }
         public ElementId RoomElementId { get { return roomElementId; } set { roomElementId = value; } }
-        public int RoomId { get { return roomId; } set { roomId = value; } }
+        public long RoomId { get { return roomId; } set { roomId = value; } }
         public string RoomUniqueId { get { return roomUniqueId; } set { roomUniqueId = value; } }
         public string RoomName { get { return roomName; } set { roomName = value; } }
         public string RoomNumber { get { return roomNumber; } set { roomNumber = value; } }
@@ -58,6 +60,7 @@ namespace HOK.RoomsToMass.ToMass
         public XYZ RoomSolidCentroid { get { return roomSolidCentroid; } set { roomSolidCentroid = value; } }
         public Face BottomFace { get { return bottomFace; } set { bottomFace = value; } }
         public IList<CurveLoop> RoomProfiles { get { return roomProfiles; } set { roomProfiles = value; } }
+        public Transform RoomTransform {  get { return roomTransform; } set {  roomTransform = value; } }
 
         public MassProperties Linked3dMass { get { return linked3dMass; } set { linked3dMass = value; } }
         public MassProperties Linked2dMass { get { return linked2dMass; } set { linked2dMass = value; } }
@@ -95,6 +98,7 @@ namespace HOK.RoomsToMass.ToMass
             this.RoomSolid = rp.RoomSolid;
             this.RoomSolidCentroid = rp.RoomSolidCentroid;
             this.RoomProfiles = rp.RoomProfiles;
+            this.RoomTransform = rp.RoomTransform;
             this.Linked3dMass = rp.Linked3dMass;
             this.Linked2dMass = rp.Linked2dMass;
             this.Linked3d = rp.Linked3d;
@@ -110,7 +114,7 @@ namespace HOK.RoomsToMass.ToMass
             try
             {
                 roomElementId = m_room.Id;
-                roomId = m_room.Id.IntegerValue;
+                roomId = GetElementIdValue(m_room.Id);
                 roomUniqueId = m_room.UniqueId;
 
                 Parameter nameParam = m_room.get_Parameter(BuiltInParameter.ROOM_NAME);
@@ -154,25 +158,21 @@ namespace HOK.RoomsToMass.ToMass
             }
         }
 
-        public void GetRoomGeometry(Transform linkTransform)
+        public void GetRoomGeometry(Transform linkTransform, SpatialElementGeometryCalculator calculator)
         {
             try
             {
-                if (null != m_room.ClosedShell)
+                if (SpatialElementGeometryCalculator.CanCalculateGeometry(m_room))
                 {
-                    GeometryElement geomElem = m_room.ClosedShell;
-                    if (geomElem != null)
+                    var results = calculator.CalculateSpatialElementGeometry(m_room);
+                    if (null != results)
                     {
-                        geomElem = geomElem.GetTransformed(linkTransform);
-                        foreach (GeometryObject geomObj in geomElem)
+                        Solid solid = results.GetGeometry();
+                        if (null != solid)
                         {
-                            Solid solid = geomObj as Solid;
-                            if (null != solid)
+                            if (solid.Volume > 0)
                             {
-                                if (solid.Volume > 0)
-                                {
-                                    roomSolid = solid; break;
-                                }
+                                roomSolid = SolidUtils.CreateTransformed(solid, linkTransform);
                             }
                         }
                     }

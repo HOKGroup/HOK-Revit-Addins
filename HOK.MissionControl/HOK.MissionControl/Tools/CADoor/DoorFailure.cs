@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HOK.Core;
 using HOK.Core.Utilities;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.MissionControl.Tools.CADoor
 {
@@ -37,7 +38,7 @@ namespace HOK.MissionControl.Tools.CADoor
                     {
                         foreach (var id in failure.GetFailingElementIds())
                         {
-                            if (failingDoorId.IntegerValue == id.IntegerValue) { foundFailingElement = true; }
+                            if (GetElementIdValue(failingDoorId) == GetElementIdValue(id)) { foundFailingElement = true; }
                         }
                     }
                     if (foundFailingElement)

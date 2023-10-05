@@ -95,7 +95,7 @@ namespace HOK.ViewAnalysis
             }
         }
 
-        private bool SaveResultData(Dictionary<int,RoomData> roomDictionary)
+        private bool SaveResultData(Dictionary<long,RoomData> roomDictionary)
         {
             bool saved = false;
             try

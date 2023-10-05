@@ -15,15 +15,23 @@ trigger:
 
 strategy:
   matrix:
+    2024:
+      condition: eq(variables['build.sourceBranch'], 'refs/heads/revit-2024')
+      buildConfiguration: '2024'
     2023:
+      dependsOn: 2024
       buildConfiguration: '2023'
     2022:
+      dependsOn: 2024
       buildConfiguration: '2022'
     2021:
+      dependsOn: 2024
       buildConfiguration: '2021'
     2020:
+      dependsOn: 2024
       buildConfiguration: '2020'
     2019:
+      dependsOn: 2024
       buildConfiguration: '2019'
 
 pool:
@@ -213,4 +221,5 @@ steps:
     PathtoPublish: '$(Build.SourcesDirectory)/_artifacts'
     ArtifactName: '$(Build.SourceBranchName)'
     publishLocation: 'Container'
+
 

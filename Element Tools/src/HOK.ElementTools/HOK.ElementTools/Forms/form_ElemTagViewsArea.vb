@@ -168,7 +168,7 @@ Public Class form_ElemTagViewsArea
             Next
 
             'Add the entry to the list box          
-            viewToUseElementId = view.Id.IntegerValue.ToString
+            viewToUseElementId = view.Id.Value.ToString
             elementData = "<" & viewToUseElementId & "|" & nameRoot & "|" & suffix & ">"
 
             If checkBoxIncludeExisting.Checked = True Then
@@ -309,7 +309,7 @@ Public Class form_ElemTagViewsArea
                 If areaTest IsNot Nothing Then
                     For Each parameterTest As DB.Parameter In areaTest.Parameters
                         If parameterTest.Definition.Name = textBoxParameterViewName.Text Then
-                            areasIdLookup.Add(parameterTest.AsString(), areaTest.Id.IntegerValue.ToString)
+                            areasIdLookup.Add(parameterTest.AsString(), areaTest.Id.Value.ToString)
                             Exit For
                         End If
                     Next
@@ -330,7 +330,7 @@ Public Class form_ElemTagViewsArea
                 '***Note that we don't actually use the suffix value.  Leaving in place in case a reason arises, such as adding to tag?
 
                 'Get the view to use
-                elementId = New DB.ElementId(CInt(Convert.ToInt64(viewToUseElementId)))
+                elementId = NewElementId(Convert.ToInt64(viewToUseElementId))
                 viewToUse = DirectCast(m_Settings.Document.GetElement(elementId), DB.View)
 
                 'Add the Area data tag
@@ -340,7 +340,7 @@ Public Class form_ElemTagViewsArea
                 If areaTagType IsNot Nothing Then
                     'test shouldn't be necessary
                     If areasIdLookup.TryGetValue(nameRoot, areaElementId) Then
-                        elementId = New DB.ElementId(CInt(Convert.ToInt64(areaElementId)))
+                        elementId = NewElementId(Convert.ToInt64(areaElementId))
                         areaToTag = DirectCast(m_Settings.Document.GetElement(elementId), Area)
                         areaBoundingBox = areaToTag.BoundingBox(viewToUse)
                         Dim uvPointInsertion As New DB.UV((areaBoundingBox.Max.X + areaBoundingBox.Min.X) / 2, (areaBoundingBox.Max.Y + areaBoundingBox.Min.Y) / 2)

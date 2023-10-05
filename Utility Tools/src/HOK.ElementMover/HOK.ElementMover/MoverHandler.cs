@@ -502,7 +502,11 @@ namespace HOK.ElementMover
     {
         public bool AllowElement(Element elem)
         {
+#if RELEASE2024
+            return elem.Category.Id.Value == (long)BuiltInCategory.OST_RvtLinks;
+#else
             return elem.Category.Id.IntegerValue == (int)BuiltInCategory.OST_RvtLinks;
+#endif
         }
 
         public bool AllowReference(Reference reference, XYZ position)

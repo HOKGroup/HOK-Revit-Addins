@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Autodesk.Revit.DB;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.CameraDuplicator
 {
@@ -15,8 +16,8 @@ namespace HOK.CameraDuplicator
         private ModelInfo sModelInfo;
         private ModelInfo rModelInfo;
 
-        private Dictionary<int, ItemInfo> sourceItems = new Dictionary<int, ItemInfo>();
-        private Dictionary<int, ItemInfo> recipientItems = new Dictionary<int, ItemInfo>();
+        private Dictionary<long, ItemInfo> sourceItems = new Dictionary<long, ItemInfo>();
+        private Dictionary<long, ItemInfo> recipientItems = new Dictionary<long, ItemInfo>();
 
         private MapType currentType = MapType.None;
 
@@ -543,7 +544,7 @@ namespace HOK.CameraDuplicator
         public Element Item { get; set; }
         public Workset WorksetItem { get; set; }
         public string ItemName { get; set; } = "";
-        public int ItemId { get; set; } = -1;
+        public long ItemId { get; set; } = -1;
         public ElementId ItemElementId { get; set; } = ElementId.InvalidElementId;
         public WorksetId WorksetItemId { get; set; } = WorksetId.InvalidWorksetId;
         public MapType MapTypeEnum { get; set; } = MapType.None;
@@ -557,7 +558,7 @@ namespace HOK.CameraDuplicator
             Item = elem;
             ItemName = elem.Name;
             ItemElementId = elem.Id;
-            ItemId = ItemElementId.IntegerValue;
+            ItemId = GetElementIdValue(ItemElementId);
             MapTypeEnum = mType;
         }
 

@@ -199,7 +199,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var structural = floortype.IsFoundationSlab;
                 foreach (var profile in profiles)
                 {
-#if RELEASE2022 || RELEASE2023
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     var loopProfile = new List<CurveLoop>(1);
                     List<Curve> curves = new List<Curve>();
                     foreach (Curve curve in profile)
@@ -241,7 +241,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var structural = floortype.IsFoundationSlab;
                 foreach (var profile in profiles)
                 {
-#if RELEASE2022 || RELEASE2023
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     var loopProfile = new List<CurveLoop>(1);
                     List<Curve> curves = new List<Curve>();
                     foreach (Curve curve in profile)
@@ -716,11 +716,20 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             newRoof = primaryDoc.Create.NewFootPrintRoof(profile, roofLevel, footPrintRoof.RoofType, out modelCurveMapping);
                             if (null != newRoof)
                             {
+#if RELEASE2024
+                                var slabShapeEditor = footPrintRoof.GetSlabShapeEditor();
+                                if (slabShapeEditor.IsEnabled)
+                                {
+                                    var intersectFace = GetIntersectFace(ep.MassContainers[ep.SelectedMassId], profile);
+                                    EditSlabShape(intersectFace, slabShapeEditor, newRoof.GetSlabShapeEditor());
+                                }
+#else
                                 if (footPrintRoof.SlabShapeEditor.IsEnabled)
                                 {
                                     var intersectFace = GetIntersectFace(ep.MassContainers[ep.SelectedMassId], profile);
                                     EditSlabShape(intersectFace, footPrintRoof.SlabShapeEditor, newRoof.SlabShapeEditor);
                                 }
+#endif
                                 primaryElements.Add(newRoof);
                             }
                         }
@@ -756,11 +765,20 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             newRoof = primaryDoc.Create.NewFootPrintRoof(profile, roofLevel, footPrintRoof.RoofType, out modelCurveMapping);
                             if (null != newRoof)
                             {
+#if RELEASE2024
+                                var slabShapeEditor = footPrintRoof.GetSlabShapeEditor();
+                                if (slabShapeEditor.IsEnabled)
+                                {
+                                    var intersectFace = GetIntersectFace(ep.MassContainers[ep.SelectedMassId], profile);
+                                    EditSlabShape(intersectFace, slabShapeEditor, newRoof.GetSlabShapeEditor());
+                                }
+#else
                                 if (footPrintRoof.SlabShapeEditor.IsEnabled)
                                 {
                                     var intersectFace = GetIntersectFace(ep.MassContainers[ep.SelectedMassId], profile);
                                     EditSlabShape(intersectFace, footPrintRoof.SlabShapeEditor, newRoof.SlabShapeEditor);
                                 }
+#endif
                                 secondaryElements.Add(newRoof);
                             }
                         }
@@ -904,7 +922,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
             return intersectFace;
         }
 
-        #endregion
+#endregion
 
         #region new structural framing
         private void SplitBeam(ElementProperties ep, out List<Element> primaryElementsList, out List<Element> secondaryElementsList)

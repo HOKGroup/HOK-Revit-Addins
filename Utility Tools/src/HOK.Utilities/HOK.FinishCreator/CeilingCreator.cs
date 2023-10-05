@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.FinishCreator
 {
@@ -16,9 +17,9 @@ namespace HOK.FinishCreator
         private readonly List<Room> SelectedRooms = new List<Room>();
         private List<LinkedRoomProperties> selectedLinkedRooms = new List<LinkedRoomProperties>();
         private readonly List<CeilingType> CeilingTypes;
-        private Dictionary<int/*roomId*/, List<Ceiling>> createdCeilings = new Dictionary<int, List<Ceiling>>();
+        private Dictionary<long/*roomId*/, List<Ceiling>> createdCeilings = new Dictionary<long, List<Ceiling>>();
 
-        public Dictionary<int, List<Ceiling>> CreatedCeilings { get { return createdCeilings; } set { createdCeilings = value; } }
+        public Dictionary<long, List<Ceiling>> CreatedCeilings { get { return createdCeilings; } set { createdCeilings = value; } }
 
         /// <summary>
         /// 
@@ -89,9 +90,9 @@ namespace HOK.FinishCreator
                         if (ceilingsFound.Count > 0 && null != ceilingType)
                         {
                             var copiedCeilings = CreateCeilings(room, ceilingsFound, ceilingType, ref failureMessages);
-                            if (copiedCeilings.Count > 0 && !createdCeilings.ContainsKey(room.Id.IntegerValue))
+                            if (copiedCeilings.Count > 0 && !createdCeilings.ContainsKey(GetElementIdValue(room.Id)))
                             {
-                                createdCeilings.Add(room.Id.IntegerValue, copiedCeilings);
+                                createdCeilings.Add(GetElementIdValue(room.Id), copiedCeilings);
                                 created = true;
                             }
                         }
@@ -144,9 +145,9 @@ namespace HOK.FinishCreator
                         if (ceilingsFound.Count > 0 && null != ceilingType)
                         {
                             var copiedCeilings = CreateCeilings(room, ceilingsFound, ceilingType, ref failureMessages);
-                            if (copiedCeilings.Count > 0 && !createdCeilings.ContainsKey(room.Id.IntegerValue))
+                            if (copiedCeilings.Count > 0 && !createdCeilings.ContainsKey(GetElementIdValue(room.Id)))
                             {
-                                createdCeilings.Add(room.Id.IntegerValue, copiedCeilings);
+                                createdCeilings.Add(GetElementIdValue(room.Id), copiedCeilings);
                                 created = true;
                             }
                         }
@@ -202,7 +203,7 @@ namespace HOK.FinishCreator
                         }
                         catch (Exception ex)
                         {
-                            msgBuilder.AppendLine(ceiling.Name + " [" + ceiling.Id.IntegerValue + "]: cannot be copied\n" + ex.Message);
+                            msgBuilder.AppendLine(ceiling.Name + " [" + GetElementIdValue(ceiling.Id) + "]: cannot be copied\n" + ex.Message);
                             trans.RollBack();
                         }
                     }
@@ -210,7 +211,7 @@ namespace HOK.FinishCreator
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Cannot create ceilings from the selected rooms.\nRoom Id:"+room.Id.IntegerValue+"\n\n" + ex.Message, "Create Ceilings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Cannot create ceilings from the selected rooms.\nRoom Id:"+GetElementIdValue(room.Id) +"\n\n" + ex.Message, "Create Ceilings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             return copiedCeilings;
         }

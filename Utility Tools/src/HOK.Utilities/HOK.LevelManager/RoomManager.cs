@@ -5,6 +5,7 @@ using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Windows.Forms;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.LevelManager
 {
@@ -14,7 +15,7 @@ namespace HOK.LevelManager
         private readonly Document m_doc;
 
         public List<Room> RoomElements { get; set; } = new List<Room>();
-        public Dictionary<int, RoomProperties> RoomDictionary { get; set; } = new Dictionary<int, RoomProperties>();
+        public Dictionary<long, RoomProperties> RoomDictionary { get; set; } = new Dictionary<long, RoomProperties>();
         public List<ElementId> NewRooms { get; set; } = new List<ElementId>();
 
         public RoomManager(UIApplication application)
@@ -31,7 +32,7 @@ namespace HOK.LevelManager
                 {
                     var rp = new RoomProperties();
                     rp.RoomObject = room;
-                    rp.RoomId = room.Id.IntegerValue;
+                    rp.RoomId = GetElementIdValue(room.Id);
                     rp.RoomName = room.Name;
                     rp.RoomNumber = room.Number;
                     rp.SourceView = FindViewSource(room);
@@ -54,7 +55,7 @@ namespace HOK.LevelManager
                                     var element = m_doc.GetElement(segment.ElementId);
                                     if (null != element)
                                     {
-                                        if (element.Category.Id.IntegerValue == (int)BuiltInCategory.OST_RoomSeparationLines)
+                                        if (GetElementIdValue(element.Category.Id) == (int)BuiltInCategory.OST_RoomSeparationLines)
                                         {
                                             var modelCurve = element as ModelCurve;
                                             roomSeparations.Add(modelCurve);
@@ -84,7 +85,7 @@ namespace HOK.LevelManager
                 var curveIds = new List<ElementId>();
                 foreach (var roomId in RoomDictionary.Keys)
                 {
-                    var eId = new ElementId(roomId);
+                    var eId = NewElementId(roomId);
                     roomIds.Add(eId);
 
                     var rp = RoomDictionary[roomId];
@@ -234,7 +235,7 @@ namespace HOK.LevelManager
     public class RoomProperties
     {
         public Room RoomObject { get; set; }
-        public int RoomId { get; set; }
+        public long RoomId { get; set; }
         public string RoomName { get; set; }
         public string RoomNumber { get; set; }
         public ViewPlan SourceView { get; set; }

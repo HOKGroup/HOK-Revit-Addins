@@ -13,6 +13,7 @@ using Autodesk.Revit.UI;
 using HOK.SmartBCF.AddIn.Util;
 using HOK.SmartBCF.Schemas;
 using HOK.SmartBCF.Utils;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 #endregion
 
@@ -934,7 +935,7 @@ namespace HOK.SmartBCF.AddIn
                                 comp.Selected = false;
                                 comp.Visible = true;
                                 comp.OriginatingSystem = m_app.Application.VersionName;
-                                comp.AuthoringToolId = element.Id.IntegerValue.ToString();
+                                comp.AuthoringToolId = GetElementIdValue(element.Id).ToString();
                                 comp.ViewPointGuid = viewpoint_Guid;
                                 comp.ElementName = element.Name;
 
@@ -954,7 +955,7 @@ namespace HOK.SmartBCF.AddIn
                             comp.Selected = false;
                             comp.Visible = true;
                             comp.OriginatingSystem = m_app.Application.VersionName;
-                            comp.AuthoringToolId = element.Id.IntegerValue.ToString();
+                            comp.AuthoringToolId = GetElementIdValue(element.Id).ToString();
                             comp.ViewPointGuid = viewpoint_Guid;
                             comp.ElementName = element.Name;
 

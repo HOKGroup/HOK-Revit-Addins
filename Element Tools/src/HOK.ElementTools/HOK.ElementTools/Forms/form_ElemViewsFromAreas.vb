@@ -284,12 +284,12 @@ Public Class form_ElemViewsFromAreas
             'single Area case
             labelListTitle.Text = "Select Areas For Which to Create a View:"
             Try
-                padZeros1 = CInt(Convert.ToInt16(textBoxPad1.Text))
+                padZeros1 = Convert.ToInt16(textBoxPad1.Text)
             Catch
                 padZeros1 = 0
             End Try
             Try
-                padZeros2 = CInt(Convert.ToInt16(textBoxPad2.Text))
+                padZeros2 = Convert.ToInt16(textBoxPad2.Text)
             Catch
                 padZeros2 = 0
             End Try
@@ -356,7 +356,7 @@ Public Class form_ElemViewsFromAreas
                     'Seem to pick up some elements that are not views                               
                     If viewNameLong2d = testView.Name.ToString Then
                         existingView2d = True
-                        viewElementId2d = testView.Id.IntegerValue.ToString
+                        viewElementId2d = testView.Id.Value.ToString
                         buildCode = buildCode & " (E-2D"
                         Exit For
                     End If
@@ -369,7 +369,7 @@ Public Class form_ElemViewsFromAreas
                     'Seem to pick up some elements that are not views                               
                     If viewNameLong3dBox = testView.Name.ToString Then
                         existingView3dBox = True
-                        viewElementId3dBox = testView.Id.IntegerValue.ToString
+                        viewElementId3dBox = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-3DB"
                         Else
@@ -386,7 +386,7 @@ Public Class form_ElemViewsFromAreas
                     'Seem to pick up some elements that are not views                               
                     If viewNameLong3dCrop = testView.Name.ToString Then
                         existingView3dCrop = True
-                        viewElementId3dCrop = testView.Id.IntegerValue.ToString
+                        viewElementId3dCrop = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-3DC"
                         Else
@@ -403,7 +403,7 @@ Public Class form_ElemViewsFromAreas
                     'Seem to pick up some elements that are not views                               
                     If viewNameLong3dBoxCrop = testView.Name.ToString Then
                         existingView3dBoxCrop = True
-                        viewElementId3dBoxCrop = testView.Id.IntegerValue.ToString
+                        viewElementId3dBoxCrop = testView.Id.Value.ToString
                         If buildCode = "" Then
                             buildCode = buildCode & " (E-3DBC"
                         Else
@@ -483,7 +483,7 @@ Public Class form_ElemViewsFromAreas
                 'if (notPlaced) continue;
                 'if (blankViewName) continue;
                 'if ((existingView2d || existingView3dBox || existingView3dCrop || existingView3dBoxCrop) && !checkBoxListExisting.Checked) continue;
-                areaElementId = RmElement.Id.IntegerValue.ToString
+                areaElementId = RmElement.Id.Value.ToString
                 elementData = "<" & areaElementId & "|" & viewElementId2d & "|" & viewElementId3dBox & "|" & viewElementId3dCrop & "|" & viewElementId3dBoxCrop & "|" & viewNameShort & "|" & areaName & ">"
                 mListItems.Add(listBy1 & " + " & listBy2 & buildCode & Convert.ToString(m_Settings.Spacer) & elementData)
             Next
@@ -575,7 +575,7 @@ Public Class form_ElemViewsFromAreas
                         'Seem to pick up some elements that are not views                               
                         If viewNameLong2d = testView.Name.ToString Then
                             existingView2d = True
-                            viewElementId2d = testView.Id.IntegerValue.ToString
+                            viewElementId2d = testView.Id.Value.ToString
                             buildCode = buildCode & " (E-2D"
                             Exit For
                         End If
@@ -588,7 +588,7 @@ Public Class form_ElemViewsFromAreas
                         'Seem to pick up some elements that are not views                               
                         If viewNameLong3dBox = testView.Name.ToString Then
                             existingView3dBox = True
-                            viewElementId3dBox = testView.Id.IntegerValue.ToString
+                            viewElementId3dBox = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-3DB"
                             Else
@@ -605,7 +605,7 @@ Public Class form_ElemViewsFromAreas
                         'Seem to pick up some elements that are not views                               
                         If viewNameLong3dCrop = testView.Name.ToString Then
                             existingView3dCrop = True
-                            viewElementId3dCrop = testView.Id.IntegerValue.ToString
+                            viewElementId3dCrop = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-3DC"
                             Else
@@ -622,7 +622,7 @@ Public Class form_ElemViewsFromAreas
                         'Seem to pick up some elements that are not views                               
                         If viewNameLong3dBoxCrop = testView.Name.ToString Then
                             existingView3dBoxCrop = True
-                            viewElementId3dBoxCrop = testView.Id.IntegerValue.ToString
+                            viewElementId3dBoxCrop = testView.Id.Value.ToString
                             If buildCode = "" Then
                                 buildCode = buildCode & " (E-3DBC"
                             Else
@@ -779,7 +779,7 @@ Public Class form_ElemViewsFromAreas
 
         'Get scale
         Try
-            scale = CInt(Convert.ToInt16(textBoxScale.Text))
+            scale = Convert.ToInt16(textBoxScale.Text)
         Catch
             MessageBox.Show("Error interpreting scale value as a number.", m_Settings.ProgramName)
             Return
@@ -904,7 +904,7 @@ Public Class form_ElemViewsFromAreas
                 'This has to be done here in order to get the extremities and to use the level when creating the view
                 If radioButtonGroupSingle.Checked Then
                     'single Area case
-                    elementIdOfArea = New DB.ElementId(CInt(Convert.ToInt64(areaElementId)))
+                    elementIdOfArea = NewElementId(Convert.ToInt64(areaElementId))
                     '(Note get_Element() is supposed to take a string but doesn't seem to work)
                     areaToUse = DirectCast(m_Settings.Document.GetElement(elementIdOfArea), Area)
                 Else
@@ -1091,7 +1091,7 @@ Public Class form_ElemViewsFromAreas
                         view2d = ViewPlan.Create(m_Settings.Document, view2dFamilyType.Id, areaToUse.Level.Id)
 
                     Else
-                        elementIdOfView = New DB.ElementId(CInt(Convert.ToInt64(viewElementId2d)))
+                        elementIdOfView = NewElementId(Convert.ToInt64(viewElementId2d))
                         view2d = TryCast(m_Settings.Document.GetElement(elementIdOfView), DB.View)
                         If checkBoxReplaceExisting.Checked Then
                             m_Settings.Document.Delete(view2d.Id)
@@ -1134,7 +1134,7 @@ Public Class form_ElemViewsFromAreas
                             view3d = view3d.CreateIsometric(m_Settings.Document, view3dFamilyType.Id)
                             'view3d.SetOrientation(New ViewOrientation3D(eyeposition, updirection, forwarddirection))
                         Else
-                            elementIdOfView = New DB.ElementId(CInt(Convert.ToInt64(viewElementId3dB)))
+                            elementIdOfView = NewElementId(Convert.ToInt64(viewElementId3dB))
                             view3d = TryCast(m_Settings.Document.GetElement(elementIdOfView), DB.View3D)
                             If checkBoxReplaceExisting.Checked Then
                                 m_Settings.Document.Delete(view3d.Id)
@@ -1178,9 +1178,9 @@ Public Class form_ElemViewsFromAreas
                             'view3d.SetOrientation(New ViewOrientation3D(eyeposition, updirection, forwarddirection))
                         Else
                             If radioButtonType3dCrop.Checked Then
-                                elementIdOfView = New DB.ElementId(CInt(Convert.ToInt64(viewElementId3dC)))
+                                elementIdOfView = NewElementId(Convert.ToInt64(viewElementId3dC))
                             Else
-                                elementIdOfView = New DB.ElementId(CInt(Convert.ToInt64(viewElementId3dBC)))
+                                elementIdOfView = NewElementId(Convert.ToInt64(viewElementId3dBC))
                             End If
                             '(radioButtonType3dBoxCrop.Checked)
                             view3d = TryCast(m_Settings.Document.GetElement(elementIdOfView), DB.View3D)

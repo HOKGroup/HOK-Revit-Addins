@@ -120,8 +120,8 @@ namespace HOK.CameraDuplicator
                                 subEntity.Set<string>(s_SourceModelId, mapItemInfo.SourceModelId);
                                 subEntity.Set<string>(s_RecipientModelId, mapItemInfo.RecipientModelId);
                                 subEntity.Set<string>(s_MapItemType, mapItemInfo.MapItemType.ToString());
-                                subEntity.Set<int>(s_SourceItemId, mapItemInfo.SourceItemId);
-                                subEntity.Set<int>(s_RecipientItemId, mapItemInfo.RecipientItemId);
+                                subEntity.Set<long>(s_SourceItemId, mapItemInfo.SourceItemId);
+                                subEntity.Set<long>(s_RecipientItemId, mapItemInfo.RecipientItemId);
                                 subEntity.Set<string>(s_SourceItemName, mapItemInfo.SourceItemName);
                                 subEntity.Set<string>(s_RecipientItemName, mapItemInfo.RecipientItemName);
                                 subEntities.Add(subEntity);

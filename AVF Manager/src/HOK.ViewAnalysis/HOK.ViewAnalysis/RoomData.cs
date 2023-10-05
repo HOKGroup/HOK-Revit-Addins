@@ -5,6 +5,7 @@ using System.Linq;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.DB.Architecture;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.ViewAnalysis
 {
@@ -17,7 +18,7 @@ namespace HOK.ViewAnalysis
 
         public Document RoomDocument { get; set; }
         public Room RoomObj { get; set; }
-        public int RoomId { get; set; }
+        public long RoomId { get; set; }
         public Face RoomFace { get; set; }
         public List<SegmentData> BoundarySegments { get; set; } = new List<SegmentData>();
         public List<PointData> PointDataList { get; set; } = new List<PointData>();
@@ -30,7 +31,7 @@ namespace HOK.ViewAnalysis
             RoomDocument = doc;
             RoomObj = room;
 
-            RoomId = RoomObj.Id.IntegerValue;
+            RoomId = GetElementIdValue(RoomObj.Id);
             RoomArea = RoomObj.Area;
 
             tolerance = double.Epsilon;
@@ -111,7 +112,7 @@ namespace HOK.ViewAnalysis
                             {
                                 Wall wall = null;
                                 var transform = Transform.Identity;
-                                if (element.Category.Id.IntegerValue == (int)(BuiltInCategory.OST_Walls))
+                                if (GetElementIdValue(element.Category.Id) == (int)(BuiltInCategory.OST_Walls))
                                 {
                                     wall = element as Wall;
                                     if (null != wall)
@@ -123,7 +124,7 @@ namespace HOK.ViewAnalysis
                                         }
                                     }
                                 }
-                                else if (includeLinkedModel && element.Category.Id.IntegerValue == (int)(BuiltInCategory.OST_RvtLinks))
+                                else if (includeLinkedModel && GetElementIdValue(element.Category.Id) == (int)(BuiltInCategory.OST_RvtLinks))
                                 {
                                     var instance = element as RevitLinkInstance;
                                     transform = instance.GetTotalTransform();
@@ -215,7 +216,7 @@ namespace HOK.ViewAnalysis
                     var instance = wall.Document.GetElement(elementId) as FamilyInstance;
                     if (null != instance)
                     {
-                        if (instance.Category.Id.IntegerValue == (int)BuiltInCategory.OST_Windows || instance.Category.Id.IntegerValue == (int)BuiltInCategory.OST_Doors)
+                        if (GetElementIdValue(instance.Category.Id) == (int)BuiltInCategory.OST_Windows || GetElementIdValue(instance.Category.Id) == (int)BuiltInCategory.OST_Doors)
                         {
                             var isInsideSegment = false;
 
@@ -226,7 +227,7 @@ namespace HOK.ViewAnalysis
 
                             if (isInsideSegment)
                             {
-                                if (instance.Category.Id.IntegerValue == (int)BuiltInCategory.OST_Windows)
+                                if (GetElementIdValue(instance.Category.Id) == (int)BuiltInCategory.OST_Windows)
                                 {
                                     instances.Add(instance);
                                 }

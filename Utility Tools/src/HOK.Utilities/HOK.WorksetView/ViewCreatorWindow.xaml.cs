@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.WorksetView
 {
@@ -311,13 +312,13 @@ namespace HOK.WorksetView
         private object itemObj = null;
         private ViewBy itemType = ViewBy.None;
         private string itemName = "";
-        private int itemId = -1;
+        private long itemId = -1;
         private bool isSelected = false;
 
         public object ItemObj { get { return itemObj; } set { itemObj = value; NotifyPropertyChanged("ItemObj"); } }
         public ViewBy ItemType { get { return itemType; } set { itemType = value; NotifyPropertyChanged("ItemType"); } }
         public string ItemName { get { return itemName; } set { itemName = value; NotifyPropertyChanged("ItemName"); } }
-        public int ItemId { get { return itemId; } set { itemId = value; NotifyPropertyChanged("ItemId"); } }
+        public long ItemId { get { return itemId; } set { itemId = value; NotifyPropertyChanged("ItemId"); } }
         public bool IsSelected { get { return isSelected; } set { isSelected = value; NotifyPropertyChanged("IsSelected"); } }
 
         public ItemInfo(object obj, ViewBy type)
@@ -339,7 +340,7 @@ namespace HOK.WorksetView
                     if (null != phase)
                     {
                         itemName = phase.Name;
-                        itemId = phase.Id.IntegerValue;
+                        itemId = GetElementIdValue(phase.Id);
                     }
                     break;
                 case ViewBy.DesignOption:
@@ -347,7 +348,7 @@ namespace HOK.WorksetView
                     if (null != designOption)
                     {
                         itemName = designOption.Name;
-                        itemId = designOption.Id.IntegerValue;
+                        itemId = GetElementIdValue(designOption.Id);
                     }
                     break;
                 case ViewBy.Link:
@@ -355,7 +356,7 @@ namespace HOK.WorksetView
                     if (null != linktype)
                     {
                         itemName = linktype.Name;
-                        itemId = linktype.Id.IntegerValue;
+                        itemId = GetElementIdValue(linktype.Id);
                     }
                     break;
             }

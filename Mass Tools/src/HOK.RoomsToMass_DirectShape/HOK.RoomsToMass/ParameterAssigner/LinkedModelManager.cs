@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -16,14 +17,14 @@ namespace HOK.RoomsToMass.ParameterAssigner
             catch { }
         }
 
-        public int TypeId { get; set; }
-        public int InstanceId { get { try { return m_instance.Id.IntegerValue; } catch { return 0; } } }
+        public long TypeId { get; set; }
+        public long InstanceId { get { try { return GetElementIdValue(m_instance.Id); } catch { return 0; } } }
         public string InstanceName { get; set; }
         public string FileName { get; set; }
         public Document LinkedDocument { get; set; }
         public Transform TransformValue { get { try { return m_instance.GetTotalTransform(); } catch { return null; } } }
         public List<Element> MassElements { get; set; }
-        public Dictionary<int/*massId*/, MassProperties> MassContainers { get; set; }
+        public Dictionary<long/*massId*/, MassProperties> MassContainers { get; set; }
     }
 
     public class MassProperties
@@ -37,7 +38,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         }
 
         public Element MassInstance { get{try{return m_mass;}catch{return null;}} set{m_mass=value;} } //from linked document
-        public int MassId { get { try { return m_mass.Id.IntegerValue; } catch { return 0; } } } //from linked document
+        public long MassId { get { try { return GetElementIdValue(m_mass.Id); } catch { return 0; } } } //from linked document
         public string MassName { get { try { return m_mass.Name; } catch { return ""; } }  }
         public int WorksetId { get; set; } //from host project/linked document
         public Solid MassSolid { get; set; } //from linked document
@@ -50,7 +51,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 {
                     if (param.StorageType == StorageType.ElementId) { continue; }
                     if (param.Definition.Name.Contains("Extensions.")) { continue; }
-                    if (param.Id.IntegerValue == (int)BuiltInParameter.ELEM_PARTITION_PARAM) { continue; }
+                    if (GetElementIdValue(param.Id) == (int)BuiltInParameter.ELEM_PARTITION_PARAM) { continue; }
                     parameters.Add(param);
                 }
                 return parameters;
@@ -68,25 +69,25 @@ namespace HOK.RoomsToMass.ParameterAssigner
     public class ElementProperties
     {
         public Document Doc { get; set; } = null;
-        public int ElementId { get; set; } = -1;
+        public long ElementId { get; set; } = -1;
         public string ElementName { get; set; } = "";
-        public int HostElementId { get; set; } = -1;
+        public long HostElementId { get; set; } = -1;
         public Element ElementObj { get; set; } = null;
 
         public Element CopiedElement { get; set; } = null;
         public ElementId CopiedElementId { get; set; } = Autodesk.Revit.DB.ElementId.InvalidElementId;
         public Transform TransformValue { get; set; } = Transform.Identity;
 
-        public int CategoryId { get; set; } = -1;
+        public long CategoryId { get; set; } = -1;
         public string CategoryName { get; set; } = "";
-        public Dictionary<int/*massId*/, Solid/*MassSolid*/> MassContainers { get; set; } = new Dictionary<int, Solid>();
+        public Dictionary<long/*massId*/, Solid/*MassSolid*/> MassContainers { get; set; } = new Dictionary<long, Solid>();
         public Solid ElementSolid { get; set; } = null;
-        public Dictionary<int/*massId*/, double/*percentage of intersected*/> OpverappingMaps { get; set; } = new Dictionary<int, double>();
+        public Dictionary<long/*massId*/, double/*percentage of intersected*/> OpverappingMaps { get; set; } = new Dictionary<long, double>();
 
         //use for split options
         public bool LinkedElement { get; set; } = false;
 
-        public int SelectedMassId { get; set; } = -1;
+        public long SelectedMassId { get; set; } = -1;
         public List<Element> PrimaryElements { get; set; } = new List<Element>();
 //splited element from selected mass
         public List<Element> SecondaryElements { get; set; } = new List<Element>();
@@ -98,12 +99,12 @@ namespace HOK.RoomsToMass.ParameterAssigner
         {
             ElementObj = element;
             Doc = ElementObj.Document;
-            ElementId = ElementObj.Id.IntegerValue;
+            ElementId = GetElementIdValue(ElementObj.Id);
             ElementName=element.Name;
 
             if (null != ElementObj.Category)
             {
-                CategoryId = ElementObj.Category.Id.IntegerValue;
+                CategoryId = GetElementIdValue(ElementObj.Category.Id);
                 CategoryName = ElementObj.Category.Name;
             }
            
@@ -138,7 +139,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
         public string ParamName { get { return m_param.Definition.Name; } }
 
-        public int ParamId { get { return m_param.Id.IntegerValue; } }
+        public long ParamId { get { return GetElementIdValue(m_param.Id); } }
 
         public StorageType ParamStorageType { get { return m_param.StorageType; } }
 

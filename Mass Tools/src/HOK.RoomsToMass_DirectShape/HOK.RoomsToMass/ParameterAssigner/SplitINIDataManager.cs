@@ -7,6 +7,7 @@ using Autodesk.Revit.DB;
 using System.IO;
 using System.Windows.Forms;
 using HOK.Core.Utilities;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
@@ -15,10 +16,10 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private UIApplication m_app;
         private Document m_doc;
         private string iniPath = "";
-        private Dictionary<int/*elementId*/, SplitINIData> splitDictionary = new Dictionary<int, SplitINIData>();
+        private Dictionary<long/*elementId*/, SplitINIData> splitDictionary = new Dictionary<long, SplitINIData>();
         private string[] splitter = new string[] { "##" };
 
-        public Dictionary<int, SplitINIData> SplitDictionary { get { return splitDictionary; } set { splitDictionary = value; } }
+        public Dictionary<long, SplitINIData> SplitDictionary { get { return splitDictionary; } set { splitDictionary = value; } }
 
         public SplitINIDataManager(UIApplication uiapp)
         {
@@ -88,19 +89,19 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                 splitData.ElementId = int.Parse(strSplitInfo[1]);
 
                                 string[] strPrimary = strSplitInfo[2].Split(',');
-                                List<int> primaryElements = new List<int>();
+                                List<long> primaryElements = new List<long>();
                                 foreach (string primary in strPrimary)
                                 {
-                                    int elementId = int.Parse(primary);
+                                    long elementId = long.Parse(primary);
                                     primaryElements.Add(elementId);
                                 }
                                 splitData.PrimaryElementIds = primaryElements;
 
                                 string[] strSecondary = strSplitInfo[3].Split(',');
-                                List<int> secondaryElements = new List<int>();
+                                List<long> secondaryElements = new List<long>();
                                 foreach (string secondary in strSecondary)
                                 {
-                                    int elementId = int.Parse(secondary);
+                                    long elementId = long.Parse(secondary);
                                     secondaryElements.Add(elementId);
                                 }
                                 splitData.SecondaryElementIds = secondaryElements;
@@ -129,17 +130,17 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 splitData.CategoryName = ep.CategoryName;
                 splitData.ElementId = ep.ElementId;
 
-                List<int> primaryElementIds = new List<int>();
+                List<long> primaryElementIds = new List<long>();
                 foreach (Element element in ep.PrimaryElements)
                 {
-                    primaryElementIds.Add(element.Id.IntegerValue);
+                    primaryElementIds.Add(GetElementIdValue(element.Id));
                 }
                 splitData.PrimaryElementIds = primaryElementIds;
 
-                List<int> secondaryElementIds = new List<int>();
+                List<long> secondaryElementIds = new List<long>();
                 foreach (Element element in ep.SecondaryElements)
                 {
-                    secondaryElementIds.Add(element.Id.IntegerValue);
+                    secondaryElementIds.Add(GetElementIdValue(element.Id));
                 }
                 splitData.SecondaryElementIds = secondaryElementIds;
 
@@ -230,9 +231,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
     public class SplitINIData
     {
-        public int ElementId { get; set; }
+        public long ElementId { get; set; }
         public string CategoryName { get; set; }
-        public List<int> PrimaryElementIds { get; set; }
-        public List<int> SecondaryElementIds { get; set; }
+        public List<long> PrimaryElementIds { get; set; }
+        public List<long> SecondaryElementIds { get; set; }
     }
 }

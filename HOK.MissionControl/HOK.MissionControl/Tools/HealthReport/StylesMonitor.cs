@@ -6,6 +6,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Styles;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -28,7 +29,7 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var textTypes = new FilteredElementCollector(doc)
                     .OfClass(typeof(TextNoteType))
-                    .ToDictionary(x => x.Id.IntegerValue, x => new Tuple<Element, int>(x, 0));
+                    .ToDictionary(x => GetElementIdValue(x.Id), x => new Tuple<Element, int>(x, 0));
 
                 var textInstances = new FilteredElementCollector(doc)
                     .OfClass(typeof(TextNote))
@@ -36,7 +37,7 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 foreach (var t in textInstances)
                 {
-                    var key = t.GetTypeId().IntegerValue;
+                    var key = GetElementIdValue(t.GetTypeId());
                     if (textTypes.ContainsKey(key))
                     {
                         // increment instance count
@@ -55,7 +56,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                     .OfClass(typeof(DimensionType))
                     .Cast<DimensionType>()
                     .Where(x => !string.IsNullOrEmpty(x.get_Parameter(BuiltInParameter.SYMBOL_NAME_PARAM).AsString()))
-                    .ToDictionary(x => x.Id.IntegerValue, x => new Tuple<DimensionType, int>(x, 0));
+                    .ToDictionary(x => GetElementIdValue(x.Id), x => new Tuple<DimensionType, int>(x, 0));
 
                 var dimInstances = new FilteredElementCollector(doc)
                     .OfClass(typeof(Dimension))
@@ -79,7 +80,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var dimSegmentStats = new List<DimensionSegmentInfo>();
                 foreach (var d in dimInstances)
                 {
-                    var key = d.GetTypeId().IntegerValue;
+                    var key = GetElementIdValue(d.GetTypeId());
                     if (dimTypes.ContainsKey(key))
                     {
                         // increment instance count
@@ -94,7 +95,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                         // dim w/ zero segments
                         dimSegmentStats.Add(new DimensionSegmentInfo(d)
                         {
-#if RELEASE2021 || RELEASE2022 || RELEASE2023
+#if RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
                             ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)d.Value, false),
 #else
                             ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),
@@ -102,7 +103,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                             OwnerViewType = d.ViewSpecific
                                 ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString()
                                 : string.Empty,
-                            OwnerViewId = d.OwnerViewId.IntegerValue
+                            OwnerViewId = GetElementIdValue(d.OwnerViewId)
                         });
                     }
                     else
@@ -115,7 +116,7 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                             dimSegmentStats.Add(new DimensionSegmentInfo(s)
                             {
-#if RELEASE2021 || RELEASE2022 || RELEASE2023
+#if RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
                                 ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)d.Value, false),
 #else
                                 ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),
@@ -123,7 +124,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                                 OwnerViewType = d.ViewSpecific
                                     ? ((View)doc.GetElement(d.OwnerViewId)).ViewType.ToString()
                                     : string.Empty,
-                                OwnerViewId = d.OwnerViewId.IntegerValue
+                                OwnerViewId = GetElementIdValue(d.OwnerViewId)
                             });
                         }
                     }

@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.ViewDepth
 {
@@ -70,7 +71,7 @@ namespace HOK.ViewDepth
                         {
                             Entity entity = storage.GetEntity(m_schema);
                             ElementId vId = entity.Get<ElementId>(m_schema.GetField(s_ViewId));
-                            if (vId.IntegerValue == viewId.IntegerValue)
+                            if (GetElementIdValue(vId) == GetElementIdValue(viewId))
                             {
                                 viewOverriden = entity.Get<bool>(m_schema.GetField(s_ViewOverriden));
                                 break;
@@ -112,7 +113,7 @@ namespace HOK.ViewDepth
                                     DataStorage storage = savedStorage[i];
                                     Entity entity = storage.GetEntity(m_schema);
                                     ElementId vId = entity.Get<ElementId>(m_schema.GetField(s_ViewId));
-                                    if (vId.IntegerValue == viewId.IntegerValue)
+                                    if (GetElementIdValue(vId) == GetElementIdValue(viewId))
                                     {
                                         entity.Set<bool>(s_ViewOverriden, viewOverriden);
                                         storage.SetEntity(entity);

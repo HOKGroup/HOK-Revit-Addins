@@ -71,7 +71,7 @@ Public Class clsParaMini
     Public ReadOnly Property DisplayUnitType() As String
         Get
             Try
-#If RELEASE2022 Or RELEASE2023 Then
+#If RELEASE2022 Or RELEASE2023 Or RELEASE2024 Then
                 Return m_parameter.Definition.GetDataType().ToString
 #Else
                 Return m_parameter.Definition.ParameterType.ToString
@@ -93,7 +93,7 @@ Public Class clsParaMini
             Case StorageType.[Double]
                 Return parameter.AsDouble
             Case StorageType.ElementId
-                Return parameter.AsElementId.IntegerValue
+                Return parameter.AsElementId.Value
             Case StorageType.[Integer]
                 Return parameter.AsInteger
             Case StorageType.None

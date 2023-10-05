@@ -12,6 +12,6 @@ REM for /f "tokens=3" %%a in ('reg query %KEY_NAME% /V %VALUE_NAME% ^|findstr /r
 IF DEFINED BUILD_ENV (
 "C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe" sign /f "%PFX_PATH%" /p %PFX_PASS% /t http://timestamp.comodoca.com/authenticode "%DLL_PATH%"
 ) ELSE (
-"C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86\signtool.exe" sign /c "2021 Code Signing - DTM " /t http://timestamp.comodoca.com/authenticode %DLL_PATH%
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.18362.0\x86\signtool.exe" sign /c "Code Signing - DTM HOK-CA" /t http://timestamp.comodoca.com/authenticode %DLL_PATH%
 )
 endlocal

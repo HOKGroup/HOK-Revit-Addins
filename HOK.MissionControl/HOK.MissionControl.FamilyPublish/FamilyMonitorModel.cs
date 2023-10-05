@@ -13,6 +13,7 @@ using HOK.MissionControl.Core.Schemas.Configurations;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Settings;
 using HOK.MissionControl.Core.Utils;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 #endregion
 
@@ -176,7 +177,7 @@ namespace HOK.MissionControl.FamilyPublish
                     var famItem = new FamilyItem
                     {
                         Name = family.Name,
-                        ElementId = family.Id.IntegerValue,
+                        ElementId = GetElementIdValue(family.Id),
                         Size = sizeStr,
                         SizeValue = size,
                         Instances = instances,

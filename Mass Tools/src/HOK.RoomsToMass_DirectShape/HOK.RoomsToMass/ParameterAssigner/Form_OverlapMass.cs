@@ -10,28 +10,29 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 using HOK.Core.Utilities;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {
     public partial class Form_OverlapMass : System.Windows.Forms.Form
     {
-        private Dictionary<int/*elementId*/, ElementProperties> intersectingElements = new Dictionary<int, ElementProperties>();
-        private Dictionary<int, MassProperties> massDictionary = new Dictionary<int, MassProperties>();
+        private Dictionary<long/*elementId*/, ElementProperties> intersectingElements = new Dictionary<long, ElementProperties>();
+        private Dictionary<long, MassProperties> massDictionary = new Dictionary<long, MassProperties>();
         private List<string> intersectingCategories = new List<string>();
-        private List<int> massIds = new List<int>();
+        private List<long> massIds = new List<long>();
         private double determinant = 0;
         private UIApplication m_app;
         private bool splitOption = false;
         private string[] categoryNames = new string[] { "Columns", "Conduits", "Ducts", "Floors", "Pipes", "Roofs", "Structural Columns", "Structural Framing", "Walls" };
         private List<string> categoriesToSplit = new List<string>();
-        private Dictionary<int/*hostId*/, Dictionary<int/*elementId*/, int/*index*/>> hostMaps = new Dictionary<int, Dictionary<int, int>>();
-        private Dictionary<int/*elemntId*/, ElementProperties> unassignedElements = new Dictionary<int, ElementProperties>();
+        private Dictionary<long/*hostId*/, Dictionary<long/*elementId*/, int/*index*/>> hostMaps = new Dictionary<long, Dictionary<long, int>>();
+        private Dictionary<long/*elemntId*/, ElementProperties> unassignedElements = new Dictionary<long, ElementProperties>();
 
-        public Dictionary<int, ElementProperties> IntersectingElements { get { return intersectingElements; } set { intersectingElements = value; } }
+        public Dictionary<long, ElementProperties> IntersectingElements { get { return intersectingElements; } set { intersectingElements = value; } }
         public List<string> CategoriesToSplit { get { return categoriesToSplit; } set { categoriesToSplit = value; } }
-        public Dictionary<int, ElementProperties> UnassignedElements { get { return unassignedElements; } set { unassignedElements = value; } }
+        public Dictionary<long, ElementProperties> UnassignedElements { get { return unassignedElements; } set { unassignedElements = value; } }
 
-        public Form_OverlapMass(UIApplication uiapp, bool splitOn, Dictionary<int, ElementProperties> elements, Dictionary<int, MassProperties> masses, List<int> massIdList, List<string> categoryList)
+        public Form_OverlapMass(UIApplication uiapp, bool splitOn, Dictionary<long, ElementProperties> elements, Dictionary<long, MassProperties> masses, List<long> massIdList, List<string> categoryList)
         {
             m_app = uiapp;
             splitOption = splitOn;
@@ -254,7 +255,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             }
                             else
                             {
-                                Dictionary<int, int> elementMap = new Dictionary<int, int>();
+                                Dictionary<long, int> elementMap = new Dictionary<long, int>();
                                 elementMap.Add(ep.ElementId, row.Index);
                                 hostMaps.Add(ep.HostElementId, elementMap);
                             }
@@ -294,7 +295,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 DataGridViewTextBoxCell cell = (DataGridViewTextBoxCell)dataGridViewElement.Rows[currentCell.Y].Cells["MassId"];
                 int selectedIndex = ((System.Windows.Forms.ComboBox)sender).SelectedIndex;
 
-                int selectedMassId = 0;
+                long selectedMassId = 0;
                 if (null != dataGridViewElement.Rows[currentCell.Y].Tag && selectedIndex != -1)
                 {
                     if (selectedIndex == 0) //mass name: <None>
@@ -345,7 +346,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     if (null != row.Tag)
                     {
                         ElementProperties ep = row.Tag as ElementProperties;
-                        ElementId elementId = new ElementId(ep.ElementId);
+                        ElementId elementId = NewElementId(ep.ElementId);
                         elementIds.Add(elementId);
                     }
                 }
