@@ -258,7 +258,7 @@ Public Class form_ParamScheduleKey
                     Exit While
                 End If
 
-                elementId = New DB.ElementId(CInt(Convert.ToInt64(cellValue)))
+                elementId = NewElementId(Convert.ToInt64(cellValue))
                 element = mSettings.Document.GetElement(elementId)
 
                 If element IsNot Nothing Then
@@ -415,7 +415,7 @@ Public Class form_ParamScheduleKey
                 'Since headings was 1
                 indexColumn = 1
                 For Each scheduleKeyItem As clsScheduleKeyItem In scheduleKeySet.ScheduleKeyItems
-                    worksheet.Cells.set_Item(indexRow, indexColumn, scheduleKeyItem.ElementId.IntegerValue.ToString)
+                    worksheet.Cells.set_Item(indexRow, indexColumn, scheduleKeyItem.ElementId.Value.ToString)
                     indexColumn += 1
                     worksheet.Cells.set_Item(indexRow, indexColumn, scheduleKeyItem.KeyValue)
                     indexColumn += 1

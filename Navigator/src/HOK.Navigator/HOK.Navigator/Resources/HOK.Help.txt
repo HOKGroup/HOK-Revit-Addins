@@ -2,39 +2,27 @@ Email Help and Support
 mailto:helpdesk@hok.com
 -------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------
-HOK buildingSMART Home (Must be inside HOK firewall)
-https://hub.hok.com/buildingsmart/Pages/default.aspx
+HOK Design Technology Home (Must be inside HOK firewall)
+https://hub.hok.com/designtech/Pages/home.aspx
 HOK BIM Standards (Must be inside HOK firewall)
-https://hub.hok.com/buildingsmart/Standards/Home.aspx
-HOK BIM Solutions
-http://hokbimsolutions.blogspot.com/
+https://hub.hok.com/designtech/revit/Pages/HOK-Standards.aspx
 HOK Training 
-https://hub.hok.com/buildingsmart/Education/Home.aspx
-HOK Global eTraining
-https://www.globaletraining.net/#/login
-HOK rGuide Library
-http://hok.rguidelibrary.com/LoginForm.spr
+https://hub.hok.com/designtech/Pages/Guides-and-Slides.aspx
+LinkedIn Learning
+https://hub.hok.com/designtech/Pages/LinkedIn-Learning.aspx
 --------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------
 Autodesk User Group International (AUGI)
 http://www.augi.com/
-Autodesk Revit Site
-http://www.autodesk.com/products/autodesk-revit-family/overview
-Autodesk 360
-https://360.autodesk.com/Login
+BIM 360 / ACC 
+https://acc.autodesk.com/
 Autodesk Community
 http://forums.autodesk.com/
-Autodesk Labs
-https://beta.autodesk.com/callout/?callid=73A1E2A95B1848FC8E4FE48D12A4D95A
 --------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------
 dRofus Install Instructions:
 https://docs.google.com/document/d/11FKqTT-YxJr5jWeaHQmWFPLCPABr5A69580ANcVig9Y/pub
 --------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------
-Email Help
-Email Help
---------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------
-Version 2015-07-09
+Version 2022-11-22
 ------------------

@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
 [assembly: AssemblyProduct("HOK.ViewAnalysis")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2021")]
-[assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2022")]
+[assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon, Dan Siroky")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("2022.1.0.16")]
-[assembly: AssemblyFileVersion("2022.1.0.16")]
+[assembly: AssemblyVersion("2023.1.0.19")]
+[assembly: AssemblyFileVersion("2023.1.0.19")]

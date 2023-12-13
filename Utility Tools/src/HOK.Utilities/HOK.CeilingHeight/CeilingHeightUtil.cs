@@ -6,6 +6,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using System.Windows.Forms;
 using Autodesk.Revit.DB.Architecture;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.CeilingHeight
 {
@@ -16,7 +17,7 @@ namespace HOK.CeilingHeight
         private List<Element> selectedRooms = new List<Element>();
         private Dictionary<Level, double/*elevation*/> levels = new Dictionary<Level, double>();
         private List<ViewPlan> viewPlans = new List<ViewPlan>();
-        public Dictionary<int, RoomProperties> RoomDictionary { get; set; } = new Dictionary<int, RoomProperties>();
+        public Dictionary<long, RoomProperties> RoomDictionary { get; set; } = new Dictionary<long, RoomProperties>();
 
         public CeilingHeightUtil(UIApplication uiapp, List<Element> rooms)
         {
@@ -81,7 +82,7 @@ namespace HOK.CeilingHeight
                     {
                         var rp = new RoomProperties
                         {
-                            RoomId = room.Id.IntegerValue,
+                            RoomId = GetElementIdValue(room.Id),
                             RoomName = room.Name,
                             RoomObj = room,
                             MainCeiling = mainCeiling
@@ -89,16 +90,16 @@ namespace HOK.CeilingHeight
                         rp.CeilingHeight = GetCeilingHeight(rp.MainCeiling, room);
                         rp.MainCeilingPlan = FindCeilingPlan(rp.MainCeiling);
 
-                        var ceilingProperties = new Dictionary<int, CeilingProperties>();
+                        var ceilingProperties = new Dictionary<long, CeilingProperties>();
                         foreach (var elem in ceilings)
                         {
                             var cp = new CeilingProperties();
-                            cp.CeilingId = elem.Id.IntegerValue;
+                            cp.CeilingId = GetElementIdValue(elem.Id);
                             cp.CeilingObj = elem;
                             cp.HeightOffsetFromLevel = elem.get_Parameter(BuiltInParameter.CEILING_HEIGHTABOVELEVEL_PARAM).AsDouble();
                             cp.CeilingHeight = GetCeilingHeight(elem, room);
                             cp.CeilingType = GetCeilingType(elem);
-                            cp.RoomId = room.Id.IntegerValue;
+                            cp.RoomId = GetElementIdValue(room.Id);
 
                             if (!ceilingProperties.ContainsKey(cp.CeilingId))
                             {
@@ -159,7 +160,7 @@ namespace HOK.CeilingHeight
 
                 if (elementList.Count > 0)
                 {
-                    var ceilings = from validCeiling in elementList where validCeiling.LevelId.IntegerValue == room.LevelId.IntegerValue select validCeiling;
+                    var ceilings = from validCeiling in elementList where GetElementIdValue(validCeiling.LevelId) == GetElementIdValue(room.LevelId) select validCeiling;
                     intersectsCeilings = ceilings.ToList();
 
                     if (intersectsCeilings.Count > 0)
@@ -291,7 +292,7 @@ namespace HOK.CeilingHeight
                 var roomLevel = m_doc.GetElement(room.LevelId) as Level;
                 foreach (var level in levels.Keys)
                 {
-                    if (level.Id.IntegerValue == roomLevel.Id.IntegerValue)
+                    if (GetElementIdValue(level.Id) == GetElementIdValue(roomLevel.Id))
                     {
                         break;
                     }
@@ -316,7 +317,7 @@ namespace HOK.CeilingHeight
                     {
                         var collector = new FilteredElementCollector(m_doc, view.Id);
                         var elementIds = collector.OfClass(typeof(Ceiling)).ToElementIds().ToList();
-                        var ceilingIds = from ceilingId in elementIds where ceilingId.IntegerValue == ceiling.Id.IntegerValue select ceilingId;
+                        var ceilingIds = from ceilingId in elementIds where GetElementIdValue(ceilingId) == GetElementIdValue(ceiling.Id) select ceilingId;
                         var results = ceilingIds.ToList();
                         if (results.Count > 0)
                         {
@@ -338,8 +339,8 @@ namespace HOK.CeilingHeight
             double height = 0;
             try
             {
-                var ceilingLevelId = ceiling.LevelId.IntegerValue;
-                var roomLevelId = room.LevelId.IntegerValue;
+                var ceilingLevelId = GetElementIdValue(ceiling.LevelId);
+                var roomLevelId = GetElementIdValue(room.LevelId);
                 var roomBaseOffset = room.get_Parameter(BuiltInParameter.ROOM_LOWER_OFFSET).AsDouble();
                 var ceilingHeightOffset = ceiling.get_Parameter(BuiltInParameter.CEILING_HEIGHTABOVELEVEL_PARAM).AsDouble();
                 height = ceilingHeightOffset - roomBaseOffset;
@@ -386,7 +387,7 @@ namespace HOK.CeilingHeight
                         parameter.Set(rp.CeilingHeight);
                         trans.Commit();
                     }
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     else if (CreateSharedParameter(paramName, SpecTypeId.Length, BuiltInParameterGroup.PG_GEOMETRY))
                     {
 #else
@@ -446,7 +447,7 @@ namespace HOK.CeilingHeight
                         parameter.Set(ceilingHeights);
                         trans.Commit();
                     }
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.PG_GEOMETRY))
                     {
 #else
@@ -498,7 +499,7 @@ namespace HOK.CeilingHeight
                             trans.Commit();
                         }
                     }
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.INVALID))
                     {
 #else
@@ -564,7 +565,7 @@ namespace HOK.CeilingHeight
                             trans.RollBack();
                         }
                     }
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.INVALID))
                     {
 #else
@@ -594,7 +595,7 @@ namespace HOK.CeilingHeight
             }
         }
 
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
         private bool CreateSharedParameter(string paramName, ForgeTypeId paramType, BuiltInParameterGroup pramGroup)
         {
 #else
@@ -648,23 +649,23 @@ namespace HOK.CeilingHeight
 
     public class RoomProperties
     {
-        public int RoomId { get; set; }
+        public long RoomId { get; set; }
         public string RoomName { get; set; }
         public Element RoomObj { get; set; }
         public Element MainCeiling { get; set; }
         public string MainCeilingPlan { get; set; }
-        public Dictionary<int/*ceilingId*/, CeilingProperties> IntersectCeilings { get; set; }
+        public Dictionary<long/*ceilingId*/, CeilingProperties> IntersectCeilings { get; set; }
         public double CeilingHeight { get; set; }
     }
 
     public class CeilingProperties
     {
-        public int CeilingId { get; set; }
+        public long CeilingId { get; set; }
         public Element CeilingObj { get; set; }
         public double HeightOffsetFromLevel { get; set; }
         public double CeilingHeight { get; set; }
         public string CeilingPlan { get; set; }
         public string CeilingType { get; set; }
-        public int RoomId { get; set; }
+        public long RoomId { get; set; }
     }
 }

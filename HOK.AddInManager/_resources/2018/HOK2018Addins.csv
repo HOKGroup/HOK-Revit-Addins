@@ -1,5 +1,5 @@
 icon,name,addin,order,tooltip,url,requiresRestart
-Ideate.png,Ideate Tools,IdeateSoftwareISW.addin,1,"The entire suite of Ideate tools: Apps, BIMLink, Explorer, Sticky & StyleManager",https://ideatesoftware.com,FALSE
+Ideate.png,Ideate Tools,IdeateSoftwareISW.addin,1,"The entire suite of Ideate tools: Apps, BIMLink, Explorer, Sticky & StyleManager",https://ideatesoftware.com,TRUE
 eTransmit.png,eTransmit,Autodesk.eTransmitApplication.addin,2,Prepare models to be archived or transmitted to outside team members,https://hub.hok.com/designtech/educationwiki/revit-addin-eTransmit.aspx,FALSE
 TransferSingle.png,TransferSingle,TransferSingle2018.addin,3,Use this tool to Transfer Project Standards on a single item instead of an entire category,https://apps.autodesk.com/RVT/en/Detail/Index?id=1090472181312958476&appLang=en&os=Win64,FALSE
 ScopeBoxSync.png,Scope Box Synchronizer,ScopeBoxSynchronizer.addin,4,Keep scope boxes in linked models synchronized with those in the host model,https://apps.autodesk.com/RVT/en/Detail/Index?id=6897465823377340538&appLang=en&os=Win64,FALSE

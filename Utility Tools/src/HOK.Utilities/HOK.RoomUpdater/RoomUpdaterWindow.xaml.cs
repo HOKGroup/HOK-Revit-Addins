@@ -17,6 +17,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.DB.Mechanical;
 using Autodesk.Revit.UI;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomUpdater
 {
@@ -89,7 +90,7 @@ namespace HOK.RoomUpdater
                 {
                     try
                     {
-                        BuiltInCategory bltCat = (BuiltInCategory)id.IntegerValue;
+                        BuiltInCategory bltCat = (BuiltInCategory)GetElementIdValue(id);
                         Category category = categories.get_Item(bltCat);
                         if (null != category)
                         {
@@ -154,9 +155,9 @@ namespace HOK.RoomUpdater
                 ICollection<ElementId> supportedParams = ParameterFilterUtilities.GetFilterableParametersInCommon(m_doc, categoryIds);
                 foreach (ElementId eId in supportedParams)
                 {
-                    if (eId.IntegerValue < 0)
+                    if (GetElementIdValue(eId) < 0)
                     {
-                        BuiltInParameter bltParam = (BuiltInParameter)eId.IntegerValue;
+                        BuiltInParameter bltParam = (BuiltInParameter)GetElementIdValue(eId);
                         string paramName = LabelUtils.GetLabelFor(bltParam);
 
                         if (paramName.Contains("Extensions.")) { continue; }
@@ -245,7 +246,7 @@ namespace HOK.RoomUpdater
                                     FamilyInstance firstFamilyInstance = familyInstances.First() as FamilyInstance;
                                     foreach (Parameter param in firstFamilyInstance.Parameters)
                                     {
-                                        if (param.Id.IntegerValue > 0)
+                                        if (GetElementIdValue(param.Id) > 0)
                                         {
                                             ParameterProperties pp = new ParameterProperties(param);
                                             pp.IsInstance = true;
@@ -256,7 +257,7 @@ namespace HOK.RoomUpdater
                                     FamilySymbol firstFamilySymbol = firstFamilyInstance.Symbol;
                                     foreach (Parameter param in firstFamilySymbol.Parameters)
                                     {
-                                        if (param.Id.IntegerValue > 0)
+                                        if (GetElementIdValue(param.Id) > 0)
                                         {
                                             ParameterProperties pp = new ParameterProperties(param);
                                             pp.IsInstance = false;
@@ -825,19 +826,19 @@ namespace HOK.RoomUpdater
     {
         private Category m_cat = null;
         private string categoryName = "";
-        private int categoryId = -1;
+        private long categoryId = -1;
         private Dictionary<string/*paramName*/, ParameterProperties> paramDictionary = new Dictionary<string, ParameterProperties>();
 
         public Category CategoryObj { get { return m_cat; } set { m_cat = value; } }
         public string CategoryName { get { return categoryName; } set { categoryName = value; } }
-        public int CategoryId { get { return categoryId; } set { categoryId = value; } }
+        public long CategoryId { get { return categoryId; } set { categoryId = value; } }
         public Dictionary<string/*paramName*/, ParameterProperties> ParamDictionary { get { return paramDictionary; } set { paramDictionary = value; } }
 
         public CategoryProperties(Category cat)
         {
             m_cat = cat;
             categoryName = cat.Name;
-            categoryId = cat.Id.IntegerValue;
+            categoryId = GetElementIdValue(cat.Id);
         }
     }
 
@@ -846,7 +847,7 @@ namespace HOK.RoomUpdater
         private Parameter m_param = null;
         private string paramName = "";
         private StorageType paramType = StorageType.None;
-        private int paramId = -1;
+        private long paramId = -1;
         private BuiltInParameter bltParameter = BuiltInParameter.INVALID;
         private bool isInstance = true;
         private bool isReadOnly = false;
@@ -856,7 +857,7 @@ namespace HOK.RoomUpdater
         public Parameter ParameterObj { get { return m_param; } set { m_param = value; } }
         public string ParameterName { get { return paramName; } set { paramName = value; } }
         public StorageType ParamType { get { return paramType; } set { paramType = value; } }
-        public int ParamId { get { return paramId; } set { paramId = value; } }
+        public long ParamId { get { return paramId; } set { paramId = value; } }
         public BuiltInParameter BltParameter { get { return bltParameter; } set { bltParameter = value; } }
         public bool IsInstance { get { return isInstance; } set { isInstance = value; } }
         public bool IsReadOnly { get { return isReadOnly; } set { isReadOnly = value; } }
@@ -891,7 +892,7 @@ namespace HOK.RoomUpdater
             m_param = param;
             paramName = m_param.Definition.Name;
             paramType = m_param.StorageType;
-            paramId = m_param.Id.IntegerValue;
+            paramId = GetElementIdValue(m_param.Id);
             isReadOnly = param.IsReadOnly;
         }
 
@@ -951,14 +952,14 @@ namespace HOK.RoomUpdater
     {
         private SpatialElement elementObj = null;
         private string elementName = "";
-        private int categoryId = -1;
+        private long categoryId = -1;
         private bool isLinked = false;
         private double spaceArea = 0;
         private LinkedInstanceProperties linkProperties = null;
 
         public SpatialElement ElementObj { get { return elementObj; } set { elementObj = value; } }
         public string ElementName { get { return elementName; } set { elementName = value; } }
-        public int CategoryId { get { return categoryId; } set { categoryId = value; } }
+        public long CategoryId { get { return categoryId; } set { categoryId = value; } }
         public bool IsLinked { get { return isLinked; } set { isLinked = value; } }
         public double SpaceArea { get { return spaceArea; } set { spaceArea = value; } }
         public LinkedInstanceProperties LinkProperties { get { return linkProperties; } set { linkProperties = value; } }
@@ -973,7 +974,7 @@ namespace HOK.RoomUpdater
             }
             if (null != element.Category)
             {
-                categoryId = element.Category.Id.IntegerValue;
+                categoryId = GetElementIdValue(element.Category.Id);
             }
 
             if (element.Area>0)
@@ -986,13 +987,13 @@ namespace HOK.RoomUpdater
     public class LinkedInstanceProperties
     {
         private RevitLinkInstance m_instance = null;
-        private int instanceId = -1;
+        private long instanceId = -1;
         private Document linkedDocument = null;
         private string documentTitle = "";
         private Autodesk.Revit.DB.Transform transformValue = null;
 
         public RevitLinkInstance Instance { get { return m_instance; } set { m_instance = value; } }
-        public int InstanceId { get { return instanceId; } set { instanceId = value; } }
+        public long InstanceId { get { return instanceId; } set { instanceId = value; } }
         public Document LinkedDocument { get { return linkedDocument; } set { linkedDocument = value; } }
         public string DocumentTitle { get { return documentTitle; } set { documentTitle = value; } }
         public Autodesk.Revit.DB.Transform TransformValue { get { return transformValue; } set { transformValue = value; } }
@@ -1000,7 +1001,7 @@ namespace HOK.RoomUpdater
         public LinkedInstanceProperties(RevitLinkInstance instance)
         {
             m_instance = instance;
-            instanceId = instance.Id.IntegerValue;
+            instanceId = GetElementIdValue(instance.Id);
             linkedDocument = instance.GetLinkDocument();
             if (null != linkedDocument)
             {

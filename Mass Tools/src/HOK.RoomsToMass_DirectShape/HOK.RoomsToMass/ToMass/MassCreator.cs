@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Autodesk.Revit.DB;
 using System.Windows.Forms;
 using Autodesk.Revit.DB.IFC;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ToMass
 {
@@ -21,7 +22,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     //delete existing mass first
                     MassProperties existingMass = rp.Linked3dMass;
-                    doc.Delete(new ElementId(existingMass.MassId));
+                    doc.Delete(NewElementId(existingMass.MassId));
                 }
 
                 IList<GeometryObject> roomGeometries = new List<GeometryObject>();
@@ -74,7 +75,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     //delete existing mass first
                     MassProperties existingMass = rp.Linked2dMass;
-                    doc.Delete(new ElementId(existingMass.MassId));
+                    doc.Delete(NewElementId(existingMass.MassId));
                 }
 
                 if (null != rp.BottomFace)
@@ -117,7 +118,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     //delete existing mass first
                     MassProperties existingMass = ap.Linked3dMass;
-                    doc.Delete(new ElementId(existingMass.MassId));
+                    doc.Delete(NewElementId(existingMass.MassId));
                 }
 
                 IList<GeometryObject> areaGeometries = new List<GeometryObject>();
@@ -167,7 +168,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     //delete existing mass first
                     MassProperties existingMass = ap.Linked2dMass;
-                    doc.Delete(new ElementId(existingMass.MassId));
+                    doc.Delete(NewElementId(existingMass.MassId));
                 }
 
                 IList<GeometryObject> areaGeometries = GetGeometryObjectsFromFace(ap.AreaFace);
@@ -209,7 +210,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     //delete existing mass first
                     MassProperties existingMass = fp.Linked3dMass;
-                    doc.Delete(new ElementId(existingMass.MassId));
+                    doc.Delete(NewElementId(existingMass.MassId));
                 }
 
                 IList<GeometryObject> floorGeometries = new List<GeometryObject>();
@@ -257,7 +258,7 @@ namespace HOK.RoomsToMass.ToMass
                 {
                     //delete existing mass first
                     MassProperties existingMass = fp.Linked2dMass;
-                    doc.Delete(new ElementId(existingMass.MassId));
+                    doc.Delete(NewElementId(existingMass.MassId));
                 }
 
                 IList<GeometryObject> floorGeometries = GetGeometryObjectsFromFace(fp.TopFace);
@@ -361,7 +362,7 @@ namespace HOK.RoomsToMass.ToMass
     {
         private Element massElement = null;
         private MassType massElementType = MassType.NONE;
-        private int massId = -1;
+        private long massId = -1;
         private string massUniqueId = "";
         private string hostUniqueId = "";
         private SourceType hostType = SourceType.None;
@@ -372,7 +373,7 @@ namespace HOK.RoomsToMass.ToMass
 
         public Element MassElement { get { return massElement; } set { massElement = value; } }
         public MassType MassElementType { get { return massElementType; } set { massElementType = value; } }
-        public int MassId { get { return massId; } set { massId = value; } }
+        public long MassId { get { return massId; } set { massId = value; } }
         public string MassUniqueId { get { return massUniqueId; } set { massUniqueId = value; } }
         public string HostUniqueId { get { return hostUniqueId; } set { hostUniqueId = value; } }
         public SourceType HostType { get { return hostType; } set { hostType = value; } }
@@ -384,7 +385,7 @@ namespace HOK.RoomsToMass.ToMass
         public MassProperties(Element element)
         {
             massElement = element;
-            massId = element.Id.IntegerValue;
+            massId = GetElementIdValue(element.Id);
             massUniqueId = element.UniqueId;
             GetMassGeometry();
         }

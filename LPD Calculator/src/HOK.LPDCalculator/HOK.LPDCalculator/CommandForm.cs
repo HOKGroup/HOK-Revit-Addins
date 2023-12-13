@@ -46,7 +46,7 @@ namespace HOK.LPDCalculator
                 var collector = new FilteredElementCollector(m_doc);
                 var area = collector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList().First() as Area;
 
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                 var param1Found = FindParameter(area, "ActualLightingLoad", SpecTypeId.ApparentPower);
                 var param2Found = FindParameter(area, "ActualLPD", SpecTypeId.ElectricalPowerDensity);
 #else
@@ -119,7 +119,7 @@ namespace HOK.LPDCalculator
                 var collector = new FilteredElementCollector(m_doc);
                 var area = collector.OfCategory(BuiltInCategory.OST_Areas).ToElements().ToList().First() as Area;
 
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                 var param1Found = FindParameter(area, "ActualLightingLoad", SpecTypeId.ApparentPower);
                 var param2Found = FindParameter(area, "ActualLPD", SpecTypeId.ElectricalPowerDensity);
 #else
@@ -241,7 +241,7 @@ namespace HOK.LPDCalculator
             return selection;
         }
 
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
         private bool FindParameter(Area area, string paramName, ForgeTypeId paramType)
         {
 #else
@@ -255,7 +255,7 @@ namespace HOK.LPDCalculator
 
                 if (null != param)
                 {
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     if (param.Definition.GetDataType() == paramType)
 #else
                     if (param.Definition.ParameterType == paramType)
@@ -280,7 +280,7 @@ namespace HOK.LPDCalculator
             return result;
         }
 
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
         private bool FindParameter(Room room, string paramName, ForgeTypeId paramType)
         {
 #else
@@ -294,7 +294,7 @@ namespace HOK.LPDCalculator
 
                 if (null != param)
                 {
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                     if (param.Definition.GetDataType() == paramType)
 #else
                     if (param.Definition.ParameterType == paramType)

@@ -288,7 +288,7 @@ namespace HOK.ElementMover
     {
         //For Tree View
 
-        private int[] customCategories = new int[] { (int)BuiltInCategory.OST_Rooms, (int)BuiltInCategory.OST_Levels, (int)BuiltInCategory.OST_Grids, (int)BuiltInCategory.OST_VolumeOfInterest };
+        private long[] customCategories = new long[] { (long)BuiltInCategory.OST_Rooms, (long)BuiltInCategory.OST_Levels, (long)BuiltInCategory.OST_Grids, (long)BuiltInCategory.OST_VolumeOfInterest };
 
         public LinkType LinkElementType { get; set; } = LinkType.None;
         public ElementId SourceElementId { get; set; } = ElementId.InvalidElementId;
@@ -323,7 +323,11 @@ namespace HOK.ElementMover
 
             //tree view
             CategoryName = linkedElement.Category.Name;
+#if RELEASE2024
+            if (customCategories.Contains(linkedElement.Category.Id.Value))
+#else
             if (customCategories.Contains(linkedElement.Category.Id.IntegerValue))
+#endif
             {
                 LinkDisplayText = "Source Element: " + sourceElement.Name + ", Target Element: " + linkedElement.Name;
             }

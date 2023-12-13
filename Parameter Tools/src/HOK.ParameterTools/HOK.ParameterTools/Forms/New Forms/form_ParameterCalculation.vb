@@ -39,7 +39,7 @@ Public Class form_ParameterCalculation
             ' Build the List from the category name
             For Each cat As Category In m_Settings.Document.Settings.Categories
                 If cat.Name.ToUpper = CatName.ToUpper Then
-                    m_Col.OfCategory(cat.Id.IntegerValue)
+                    m_Col.OfCategory(cat.Id.Value)
                     m_Elements = m_Col.ToElements
                 End If
             Next
@@ -55,15 +55,27 @@ Public Class form_ParameterCalculation
                     For Each p As Parameter In e.Parameters
                         Try
                             Dim m_Para As New clsParaMini(p)
+#If RELEASE2022 Or RELEASE2023 Or RELEASE2024 Then
+                            Select Case p.Definition.GetDataType()
+                                Case New ForgeTypeId() ' Invalid
+                                    Continue For
+                                Case SpecTypeId.Boolean.YesNo ' YesNo
+                                    Continue For
+                                Case SpecTypeId.String.Url ' URL
+                                    Continue For
+                                Case UnitTypeId.Currency ' Currency
+                                    Continue For
+#Else
                             Select Case p.Definition.ParameterType
                                 Case 0 ' Invalid
                                     Continue For
-                                Case 8 ' YesNo
+                                Case 8 ' URL
                                     Continue For
-                                Case 10
+                                Case 10 ' YesNo
                                     Continue For
                                 Case 172 ' Currency
                                     Continue For
+#End If
                             End Select
                             ' Add it to the dictionary
                             If m_Para.Format.ToUpper <> "ELEMENTID" Then m_Params.Add(m_Para.Name, m_Para)
@@ -77,6 +89,17 @@ Public Class form_ParameterCalculation
                     For Each p As Parameter In e.Parameters
                         Try
                             Dim m_Para As New clsParaMini(p)
+#If RELEASE2022 Or RELEASE2023 Or RELEASE2024 Then
+                            Select Case p.Definition.GetDataType()
+                                Case New ForgeTypeId() ' Invalid
+                                    Continue For
+                                Case SpecTypeId.Boolean.YesNo ' YesNo
+                                    Continue For
+                                Case SpecTypeId.String.Url ' URL
+                                    Continue For
+                                Case UnitTypeId.Currency ' Currency
+                                    Continue For
+#Else
                             Select Case p.Definition.ParameterType
                                 Case 0
                                     Continue For
@@ -86,6 +109,7 @@ Public Class form_ParameterCalculation
                                     Continue For
                                 Case 172
                                     Continue For
+#End If
                             End Select
                             ' Add it to the dictionary
                             If m_Para.Format.ToUpper <> "ELEMENTID" Then m_Params.Add(m_Para.Name, m_Para)
@@ -148,7 +172,7 @@ Public Class form_ParameterCalculation
         For Each cat As Category In m_Settings.Document.Settings.Categories
             If cat.Name.ToUpper = CategoryName.ToUpper Then
                 Dim m_Col As New FilteredElementCollector(m_Settings.Document)
-                m_Col.OfCategory(cat.Id.IntegerValue)
+                m_Col.OfCategory(cat.Id.Value)
                 m_Elements = m_Col.ToElements
                 ' This will return the contents of the category
                 Return m_Elements

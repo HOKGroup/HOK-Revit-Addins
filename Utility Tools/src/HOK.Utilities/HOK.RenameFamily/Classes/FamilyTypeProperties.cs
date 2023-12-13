@@ -6,7 +6,7 @@ namespace HOK.RenameFamily.Classes
     public class FamilyTypeProperties : INotifyPropertyChanged
     {
         private ElementId familyTypeId = ElementId.InvalidElementId;
-        private int familyTypeIdInt;
+        private long familyTypeIdInt;
         private string modelName;
         private string categoryName = "";
         private string familyName; //from Excel
@@ -19,7 +19,7 @@ namespace HOK.RenameFamily.Classes
         private bool isLinked;
 
         public ElementId FamilyTypeId { get { return familyTypeId; } set { familyTypeId = value; NotifyPropertyChanged("FamilyTypeId"); } }
-        public int FamilyTypeIdInt { get { return familyTypeIdInt; } set { familyTypeIdInt = value; NotifyPropertyChanged("FamilyTypeIdInt"); } }
+        public long FamilyTypeIdInt { get { return familyTypeIdInt; } set { familyTypeIdInt = value; NotifyPropertyChanged("FamilyTypeIdInt"); } }
         public string ModelName { get { return modelName; } set { modelName = value; NotifyPropertyChanged("ModelName"); } }
         public string CategoryName { get { return categoryName; } set { categoryName = value; NotifyPropertyChanged("CategoryName"); } }
         public string FamilyName { get { return familyName; } set { familyName = value; NotifyPropertyChanged("FamilyName"); } }
@@ -31,7 +31,7 @@ namespace HOK.RenameFamily.Classes
         public bool IsSelected { get { return isSelected; } set { isSelected = value; NotifyPropertyChanged("IsSelected"); } }
         public bool IsLinked { get { return isLinked; } set { isLinked = value; NotifyPropertyChanged("IsLinked"); } }
 
-        public FamilyTypeProperties(string model, int typeId, string fName, string tName)
+        public FamilyTypeProperties(string model, long typeId, string fName, string tName)
         {
             modelName = model;
             familyTypeIdInt = typeId;

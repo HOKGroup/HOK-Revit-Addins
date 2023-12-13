@@ -10,6 +10,7 @@ using Autodesk.Revit.DB.Analysis;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using System.Windows.Threading;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 
 namespace HOK.ViewAnalysis
@@ -29,14 +30,14 @@ namespace HOK.ViewAnalysis
         private bool overwriteData = false;
 
         private ElementId occupiedParamId = ElementId.InvalidElementId;
-        private Dictionary<int/*roomId*/, RoomData> roomDictionary = new Dictionary<int, RoomData>();
+        private Dictionary<long/*roomId*/, RoomData> roomDictionary = new Dictionary<long, RoomData>();
         private List<ElementFilter> categoryFilters = new List<ElementFilter>();
-        private Dictionary<int, LinkedInstanceData> linkedInstances = new Dictionary<int, LinkedInstanceData>();
+        private Dictionary<long, LinkedInstanceData> linkedInstances = new Dictionary<long, LinkedInstanceData>();
         private double offsetHeight = 3.5; //42 inches above from floor
         private double epsilon = 0;
         private int minTransparency = 20;
 
-        public Dictionary<int, RoomData> RoomDictionary { get { return roomDictionary; } set { roomDictionary = value; } }
+        public Dictionary<long, RoomData> RoomDictionary { get { return roomDictionary; } set { roomDictionary = value; } }
 
         private delegate void UpdateLableDelegate(System.Windows.DependencyProperty dp, Object value);
         private delegate void UpdateProgressDelegate(System.Windows.DependencyProperty dp, Object value);
@@ -94,9 +95,9 @@ namespace HOK.ViewAnalysis
             }
         }
 
-        private Dictionary<int, LinkedInstanceData> GetLinkedInstancesInfo()
+        private Dictionary<long, LinkedInstanceData> GetLinkedInstancesInfo()
         {
-            Dictionary<int, LinkedInstanceData> linkedInstances = new Dictionary<int, LinkedInstanceData>();
+            Dictionary<long, LinkedInstanceData> linkedInstances = new Dictionary<long, LinkedInstanceData>();
             try
             {
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc);
@@ -202,9 +203,9 @@ namespace HOK.ViewAnalysis
             return sfm;
         }
 
-        private Dictionary<int, RoomData> GetRoomData(List<Room> rooms)
+        private Dictionary<long, RoomData> GetRoomData(List<Room> rooms)
         {
-            Dictionary<int, RoomData> dictionary = new Dictionary<int, RoomData>();
+            Dictionary<long, RoomData> dictionary = new Dictionary<long, RoomData>();
             try
             {
                 foreach (Room room in rooms)
@@ -250,7 +251,7 @@ namespace HOK.ViewAnalysis
                 {
                     UpdateLableDelegate updateLabelDelegate = new UpdateLableDelegate(statusLable.SetValue);
 
-                    List<int> keys = roomDictionary.Keys.ToList();
+                    List<long> keys = roomDictionary.Keys.ToList();
                     int finishedRoom = 0;
                     foreach (int roomId in keys)
                     {
@@ -557,9 +558,9 @@ namespace HOK.ViewAnalysis
                                 if (reference.LinkedElementId != ElementId.InvalidElementId)
                                 {
                                     //element from linked models
-                                    if (linkedInstances.ContainsKey(reference.ElementId.IntegerValue))
+                                    if (linkedInstances.ContainsKey(GetElementIdValue(reference.ElementId)))
                                     {
-                                        LinkedInstanceData lid = linkedInstances[reference.ElementId.IntegerValue];
+                                        LinkedInstanceData lid = linkedInstances[GetElementIdValue(reference.ElementId)];
                                         element = lid.LinkedDocument.GetElement(reference.LinkedElementId);
                                     }
                                 }
@@ -571,7 +572,7 @@ namespace HOK.ViewAnalysis
 
                                 if (null != element)
                                 {
-                                    int categoryId = element.Category.Id.IntegerValue;
+                                    long categoryId = GetElementIdValue(element.Category.Id);
                                     if (categoryId == (int)BuiltInCategory.OST_Walls)
                                     {
                                         Wall wall = element as Wall;

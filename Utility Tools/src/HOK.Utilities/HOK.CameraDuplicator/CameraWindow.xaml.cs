@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.CameraDuplicator
 {
@@ -21,7 +22,7 @@ namespace HOK.CameraDuplicator
         private ViewConfiguration viewConfig = new ViewConfiguration();
 
         private List<MissingItem> missingItems = new List<MissingItem>();
-        private int[] parametersToSkip = new int[] { (int)BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP/*scope box*/, (int)BuiltInParameter.VIEW_NAME, (int)BuiltInParameter.VIEW_TEMPLATE, (int)BuiltInParameter.VIEW_PHASE };
+        private long[] parametersToSkip = new long[] { (long)BuiltInParameter.VIEWER_VOLUME_OF_INTEREST_CROP/*scope box*/, (long)BuiltInParameter.VIEW_NAME, (long)BuiltInParameter.VIEW_TEMPLATE, (long)BuiltInParameter.VIEW_PHASE };
 
         private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
 
@@ -422,7 +423,7 @@ namespace HOK.CameraDuplicator
                         {
                             Parameter sourceParam = cameraInfo.ViewParameters[paramName];
                             Parameter recipientParam = createdView.LookupParameter(paramName);
-                            if (parametersToSkip.Contains(sourceParam.Id.IntegerValue)) { continue; }
+                            if (parametersToSkip.Contains(GetElementIdValue(sourceParam.Id))) { continue; }
 
                             if (null != recipientParam && sourceParam.HasValue)
                             {
@@ -659,7 +660,7 @@ namespace HOK.CameraDuplicator
                                 {
                                     Parameter sourceParam = planInfo.ViewParameters[paramName];
                                     Parameter recipientParam = createdView.LookupParameter(paramName);
-                                    if (parametersToSkip.Contains(sourceParam.Id.IntegerValue)) { continue; }
+                                    if (parametersToSkip.Contains(GetElementIdValue(sourceParam.Id))) { continue; }
 
                                     if (null != recipientParam && sourceParam.HasValue)
                                     {
@@ -805,11 +806,11 @@ namespace HOK.CameraDuplicator
             var mapItems = from map in viewConfig.MapItems
                            where map.MapItemType == mapType
                                && map.SourceModelId == sModel.ModelId && map.RecipientModelId == rModel.ModelId
-                               && map.SourceItemId == sourceItemId.IntegerValue
+                               && map.SourceItemId == GetElementIdValue(sourceItemId)
                            select map;
             if (mapItems.Count() > 0)
             {
-                linkedId = new ElementId(mapItems.First().RecipientItemId);
+                linkedId = NewElementId(mapItems.First().RecipientItemId);
             }
             return linkedId;
         }
@@ -824,7 +825,7 @@ namespace HOK.CameraDuplicator
                            select map;
             if (mapItems.Count() > 0)
             {
-                linkedWorksetId = new WorksetId(mapItems.First().RecipientItemId);
+                linkedWorksetId = new WorksetId((int)mapItems.First().RecipientItemId);
             }
             return linkedWorksetId;
         }

@@ -200,13 +200,13 @@ namespace HOK.ViewAnalysis
 
     public class AnalysisData
     {
-        private int roomId = -1;
+        private long roomId = -1;
         private double roomArea = 0;
         private double visibleArea = 0;
         private List<FMEArea> roomFace = new List<FMEArea>();
         private List<FMEPoint> pointValues = new List<FMEPoint>();
 
-        public int RoomId { get { return roomId; } set { roomId = value; } }
+        public long RoomId { get { return roomId; } set { roomId = value; } }
         public double RoomArea { get { return roomArea; } set { roomArea = value; } }
         public double VisibleArea { get { return visibleArea; } set { visibleArea = value; } }
         public List<FMEArea> RoomFace { get { return roomFace; } set { roomFace = value; } }

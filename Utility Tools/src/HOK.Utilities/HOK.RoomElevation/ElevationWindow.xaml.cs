@@ -11,11 +11,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-
 using System.Windows.Shapes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomElevation
 {
@@ -32,12 +32,12 @@ namespace HOK.RoomElevation
         //private ViewFamilyType viewElevationFamilyType = null;
         private ElevationCreatorSettings toolSettings = null;
         private Room sampleRoom = null;
-        private Dictionary<int, RoomElevationProperties> roomDictionary = new Dictionary<int, RoomElevationProperties>();
-        private Dictionary<int, LinkedInstanceProperties> linkedDocuments = new Dictionary<int, LinkedInstanceProperties>();
+        private Dictionary<long, RoomElevationProperties> roomDictionary = new Dictionary<long, RoomElevationProperties>();
+        private Dictionary<long, LinkedInstanceProperties> linkedDocuments = new Dictionary<long, LinkedInstanceProperties>();
 
         public ElevationCreatorSettings ToolSettings { get { return toolSettings; } set { toolSettings = value; } }
-        public Dictionary<int, RoomElevationProperties> RoomDictionary { get { return roomDictionary; } set { roomDictionary = value; } }
-        public Dictionary<int, LinkedInstanceProperties> LinkedDocuments { get { return linkedDocuments; } set { linkedDocuments = value; } }
+        public Dictionary<long, RoomElevationProperties> RoomDictionary { get { return roomDictionary; } set { roomDictionary = value; } }
+        public Dictionary<long, LinkedInstanceProperties> LinkedDocuments { get { return linkedDocuments; } set { linkedDocuments = value; } }
 
         public ElevationWindow(UIApplication uiapp)
         {
@@ -124,7 +124,7 @@ namespace HOK.RoomElevation
             try
             {
                 
-                Dictionary<int/*roomId*/, RoomElevationProperties> roomsStored = ElevationCreatorDataStorageUtil.GetRoomElevationProperties(m_doc, linkedDocuments);
+                Dictionary<long/*roomId*/, RoomElevationProperties> roomsStored = ElevationCreatorDataStorageUtil.GetRoomElevationProperties(m_doc, linkedDocuments);
                 roomDictionary = GetRoomsProperties(roomsStored);
 
                 treeViewRoom.ItemsSource = TreeviewModel.SetTreeView(roomDictionary, toolSettings.IsLinkedRoom );
@@ -137,16 +137,16 @@ namespace HOK.RoomElevation
             return result;
         }
 
-        private Dictionary<int, RoomElevationProperties> GetRoomsProperties(Dictionary<int, RoomElevationProperties> roomsStored)
+        private Dictionary<long, RoomElevationProperties> GetRoomsProperties(Dictionary<long, RoomElevationProperties> roomsStored)
         {
-            Dictionary<int, RoomElevationProperties> dictionary = new Dictionary<int, RoomElevationProperties>();
+            Dictionary<long, RoomElevationProperties> dictionary = new Dictionary<long, RoomElevationProperties>();
             try
             {
                 FilteredElementCollector collector = new FilteredElementCollector(m_doc, viewPlan.Id);
                 List<Room> rooms = collector.OfCategory(BuiltInCategory.OST_Rooms).ToElements().Cast<Room>().ToList();
                 foreach (Room room in rooms)
                 {
-                    int roomId = room.Id.IntegerValue;
+                    long roomId = GetElementIdValue(room.Id);
                     if (room.Area > 0)
                     {
                         //skip unplaced rooms
@@ -169,7 +169,7 @@ namespace HOK.RoomElevation
                     List<Room> linkedRooms = collector.OfCategory(BuiltInCategory.OST_Rooms).ToElements().Cast<Room>().ToList();
                     foreach (Room room in linkedRooms)
                     {
-                        int roomId = room.Id.IntegerValue;
+                        long roomId = GetElementIdValue(room.Id);
                         if (room.Area > 0)
                         {
                             RoomElevationProperties rep = new RoomElevationProperties(room, linkedInstance.InstanceId);
@@ -403,7 +403,7 @@ namespace HOK.RoomElevation
                 for (int i = 0; i < comboBoxViewFamily.Items.Count; i++)
                 {
                     ViewFamilyType vft = comboBoxViewFamily.Items[i] as ViewFamilyType;
-                    if (vft.Id.IntegerValue == toolSettings.ViewFamilyId)
+                    if (GetElementIdValue(vft.Id) == toolSettings.ViewFamilyId)
                     {
                         comboBoxViewFamily.SelectedIndex = i; break;
                     }
@@ -412,7 +412,7 @@ namespace HOK.RoomElevation
                 for (int i = 0; i < comboBoxViewTemplate.Items.Count; i++)
                 {
                     ViewTemplateProperties vtp = comboBoxViewTemplate.Items[i] as ViewTemplateProperties;
-                    if (vtp.TemplateId.IntegerValue == toolSettings.ViewTemplateId)
+                    if (GetElementIdValue(vtp.TemplateId) == toolSettings.ViewTemplateId)
                     {
                         comboBoxViewTemplate.SelectedIndex = i; break;
                     }
@@ -469,12 +469,12 @@ namespace HOK.RoomElevation
                 ViewFamilyType vft = (ViewFamilyType)comboBoxViewFamily.SelectedItem;
                 if (null != vft)
                 {
-                    toolSettings.ViewFamilyId = vft.Id.IntegerValue;
+                    toolSettings.ViewFamilyId = GetElementIdValue(vft.Id);
                 }
                 ViewTemplateProperties vtp = (ViewTemplateProperties) comboBoxViewTemplate.SelectedItem;
                 if (null != vtp)
                 {
-                    toolSettings.ViewTemplateId = vtp.TemplateId.IntegerValue;
+                    toolSettings.ViewTemplateId = GetElementIdValue(vtp.TemplateId);
                 }
 
                 toolSettings.ScaleByTemplate = (bool)radioBttnTemplate.IsChecked;

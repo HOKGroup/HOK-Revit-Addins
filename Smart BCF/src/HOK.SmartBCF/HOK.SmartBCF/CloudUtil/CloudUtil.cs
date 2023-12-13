@@ -41,7 +41,7 @@ namespace HOK.SmartBCF.CloudUtil
                 var request = new RestRequest(collectionName, Method.PUT);
 
                 request.RequestFormat = DataFormat.Json;
-                request.AddBody(component);
+                request.AddJsonBody(component);
 
                 IRestResponse response = client.Execute(request);
                 content = response.Content;
@@ -62,7 +62,7 @@ namespace HOK.SmartBCF.CloudUtil
                 var request = new RestRequest(collectionName, Method.POST);
 
                 request.RequestFormat = DataFormat.Json;
-                request.AddBody(component);
+                request.AddJsonBody(component);
 
                 IRestResponse response = client.Execute(request);
                 content = response.Content;

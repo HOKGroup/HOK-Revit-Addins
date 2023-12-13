@@ -36,7 +36,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
 
         [DataMember(Name = "elementId")]
         [JsonProperty("elementId")]
-        public int ElementId { get; set; }
+        public long ElementId { get; set; }
 
         [DataMember(Name = "refPlaneCount")]
         [JsonProperty("refPlaneCount")]

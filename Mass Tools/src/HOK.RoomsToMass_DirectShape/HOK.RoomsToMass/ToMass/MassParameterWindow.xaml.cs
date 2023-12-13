@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass.ToMass
 {
@@ -69,7 +70,7 @@ namespace HOK.RoomsToMass.ToMass
                 if (!string.IsNullOrEmpty(massConfig.HostCategory))
                 {
                     Category hostCategory = categories.get_Item(massConfig.HostCategory);
-                    BuiltInCategory bltCategory = (BuiltInCategory)hostCategory.Id.IntegerValue;
+                    BuiltInCategory bltCategory = (BuiltInCategory)GetElementIdValue(hostCategory.Id);
                     List<ElementId> categoryIds = new List<ElementId>();
                     categoryIds.Add(hostCategory.Id);
                     List<ElementId> parameterIds = ParameterFilterUtilities.GetFilterableParametersInCommon(m_doc, categoryIds).ToList();
@@ -97,7 +98,7 @@ namespace HOK.RoomsToMass.ToMass
                 if (!string.IsNullOrEmpty(massConfig.MassCategory))
                 {
                     Category massCategory = categories.get_Item(massConfig.MassCategory);
-                    BuiltInCategory bltCategory = (BuiltInCategory)massCategory.Id.IntegerValue;
+                    BuiltInCategory bltCategory = (BuiltInCategory)GetElementIdValue(massCategory.Id);
                     List<ElementId> categoryIds = new List<ElementId>();
                     categoryIds.Add(massCategory.Id);
                     List<ElementId> parameterIds = ParameterFilterUtilities.GetFilterableParametersInCommon(m_doc, categoryIds).ToList();
@@ -119,12 +120,12 @@ namespace HOK.RoomsToMass.ToMass
                     }
                     else
                     {
-                        if (parameterIds.Contains(new ElementId((int)BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)))
+                        if (parameterIds.Contains(NewElementId((int)BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS)))
                         {
                             ParameterInfo commentsParamInfo = new ParameterInfo();
                             commentsParamInfo.ParameterName = "Comments";
                             commentsParamInfo.ParamStorageType = StorageType.String;
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                             commentsParamInfo.ParamType = SpecTypeId.String.Text;
 #else
                             commentsParamInfo.ParamType = ParameterType.Text;
@@ -133,12 +134,12 @@ namespace HOK.RoomsToMass.ToMass
                         }
 
 
-                        if (parameterIds.Contains(new ElementId((int)BuiltInParameter.ALL_MODEL_MARK)))
+                        if (parameterIds.Contains(NewElementId((int)BuiltInParameter.ALL_MODEL_MARK)))
                         {
                             ParameterInfo markParamInfo = new ParameterInfo();
                             markParamInfo.ParameterName = "Mark";
                             markParamInfo.ParamStorageType = StorageType.String;
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                             markParamInfo.ParamType = SpecTypeId.String.Text;
 #else
                             markParamInfo.ParamType = ParameterType.Text;
@@ -160,7 +161,7 @@ namespace HOK.RoomsToMass.ToMass
                                     if (paramDefinition.Name.Contains("Extensions.")) { continue; }
                                     ParameterInfo paramInfo = new ParameterInfo();
                                     paramInfo.ParameterName = paramDefinition.Name;
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                                     paramInfo.ParamType = paramDefinition.GetDataType();
 #else
                                     paramInfo.ParamType = paramDefinition.ParameterType;
@@ -365,7 +366,7 @@ namespace HOK.RoomsToMass.ToMass
     public class ParameterInfo
     {
         private string parameterName = "";
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
         private ForgeTypeId paramType = null;
 #else
         private ParameterType paramType = ParameterType.Invalid;
@@ -374,7 +375,7 @@ namespace HOK.RoomsToMass.ToMass
         private bool enabled = true;
 
         public string ParameterName { get { return parameterName; } set { parameterName = value; } }
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
         public ForgeTypeId ParamType { get { return paramType; } set { paramType = value; } }
 #else
         public ParameterType ParamType { get { return paramType; } set { paramType = value; } }
@@ -390,7 +391,7 @@ namespace HOK.RoomsToMass.ToMass
         public ParameterInfo(Parameter param)
         {
             parameterName = param.Definition.Name;
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
             paramType = param.Definition.GetDataType();
 #else
             paramType = param.Definition.ParameterType;

@@ -9,6 +9,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.RoomsToMass.ToMass;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RoomsToMass
 {
@@ -122,7 +123,7 @@ namespace HOK.RoomsToMass
         public bool IsLinked { get; set; }
         public Document DocumentObj { get; set; }
         public string DocumentTitle { get; set; }
-        public Dictionary<int, LinkedInstanceProperties> LinkedInstances { get; set; } = new Dictionary<int,LinkedInstanceProperties>();
+        public Dictionary<long, LinkedInstanceProperties> LinkedInstances { get; set; } = new Dictionary<long,LinkedInstanceProperties>();
 
         public RevitDocumentProperties(Document doc)
         {
@@ -136,13 +137,13 @@ namespace HOK.RoomsToMass
     public class LinkedInstanceProperties
     {
         public RevitLinkInstance Instance { get; set; }
-        public int InstanceId { get; set; }
+        public long InstanceId { get; set; }
         public Transform TransformValue { get; set; }
 
         public LinkedInstanceProperties(RevitLinkInstance instance)
         {
             Instance = instance;
-            InstanceId = instance.Id.IntegerValue;
+            InstanceId = GetElementIdValue(instance.Id);
             
             if (null != instance.GetTotalTransform())
             {

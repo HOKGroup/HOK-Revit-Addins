@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.RenameFamily
 {
@@ -149,7 +150,7 @@ namespace HOK.RenameFamily
                                 string typeName = fields[3];
 
                                 FamilyTypeProperties ftp = new FamilyTypeProperties(modelName, typeId, familyName, typeName);
-                                var symbolFound = from elementType in elementTypes where elementType.Id.IntegerValue == typeId select elementType;
+                                var symbolFound = from elementType in elementTypes where GetElementIdValue(elementType.Id) == typeId select elementType;
                                 if (symbolFound.Count() > 0)
                                 {
                                     ftp.SetCurrentFamily(symbolFound.First());

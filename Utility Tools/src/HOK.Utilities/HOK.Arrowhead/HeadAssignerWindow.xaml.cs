@@ -53,7 +53,7 @@ namespace HOK.Arrowhead
                 var eId = new ElementId(BuiltInParameter.ALL_MODEL_FAMILY_NAME);
                 var provider = new ParameterValueProvider(eId);
                 FilterStringRuleEvaluator evaluator = new FilterStringEquals();
-#if RELEASE2022
+#if RELEASE2022 || RELEASE2023 || RELEASE2024
                 FilterRule rule = new FilterStringRule(provider, evaluator, "Arrowhead");
 #else
                 FilterRule rule = new FilterStringRule(provider, evaluator, "Arrowhead", false);

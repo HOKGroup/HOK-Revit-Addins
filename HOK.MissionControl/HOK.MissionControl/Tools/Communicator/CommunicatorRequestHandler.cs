@@ -16,6 +16,7 @@ using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Utils.StatusReporter;
+using static HOK.Core.Utilities.ElementIdExtension;
 #endregion
 
 namespace HOK.MissionControl.Tools.Communicator
@@ -307,7 +308,7 @@ namespace HOK.MissionControl.Tools.Communicator
             var doc = app.ActiveUIDocument.Document;
             if (doc == null || doc.IsFamilyDocument) return;
 
-            var family = new FilteredElementCollector(doc).OfClass(typeof(Family)).FirstOrDefault(x => x.Id.IntegerValue == FamilyItem.ElementId);
+            var family = new FilteredElementCollector(doc).OfClass(typeof(Family)).FirstOrDefault(x => GetElementIdValue(x.Id) == FamilyItem.ElementId);
             if (family == null) return;
 
             var famDoc = doc.EditFamily((Family)family);

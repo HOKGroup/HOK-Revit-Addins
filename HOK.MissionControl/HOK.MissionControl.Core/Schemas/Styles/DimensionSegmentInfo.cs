@@ -35,7 +35,7 @@ namespace HOK.MissionControl.Core.Schemas.Styles
         public string ValueOverride { get; set; }
 
         [JsonProperty("ownerViewId")]
-        public int OwnerViewId { get; set; } //not set in constructor
+        public long OwnerViewId { get; set; } //not set in constructor
 
         [JsonProperty("ownerViewType")]
         public string OwnerViewType { get; set; } //not set in constructor

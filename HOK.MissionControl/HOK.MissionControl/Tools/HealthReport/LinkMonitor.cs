@@ -4,6 +4,7 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Links;
 using HOK.MissionControl.Core.Utils;
+using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.MissionControl.Tools.HealthReport
 {
@@ -55,14 +56,14 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                 var cadLinksDic = new FilteredElementCollector(doc)
                     .OfClass(typeof(CADLinkType))
-                    .Select(x => new DwgFileInfo { Name = x.Name, ElementId = x.Id.IntegerValue })
+                    .Select(x => new DwgFileInfo { Name = x.Name, ElementId = GetElementIdValue(x.Id) })
                     .ToDictionary(key => key.ElementId, value => value);
 
                 var totalImportInstance = 0;
                 foreach (var ii in new FilteredElementCollector(doc).OfClass(typeof(ImportInstance)))
                 {
                     totalImportInstance++;
-                    var id = ii.GetTypeId().IntegerValue;
+                    var id = GetElementIdValue(ii.GetTypeId());
                     if (!cadLinksDic.ContainsKey(id)) continue;
 
                     if (cadLinksDic[id].Instances == 0)
