@@ -35,3 +35,4 @@ dbLink.png,Revit DB Link,Autodesk.RevitDBLink.addinZZZ,33,"Export Revit project 
 Lumion.png,Lumion Exporter,RevitToLumionBridge.addin,34,Export to Lumion,https://www.youtube.com/watch?v=wjI4vM6HYjA,FALSE
 NBS.png,NBS Plugin,NBS2018.addin,35,Coordinate element data with the NBS Specification & access the National BIM Library,https://www.nationalbimlibrary.com/nbs-plug-in-for-autodesk-revit,FALSE
 TrimbleConnect.png,Trimble Connect Uploader,RVT2BSQPlugin2019.addin,36,"Export to Trimble Connect to visualize the model in a browser, markup, and create To Dos",https://community.trimble.com/docs/DOC-10018-trimble-connect-for-revit,FALSE
+BCFExpress.png,BCF Express,BCFExpress.addin,37,"Navigate BCF issues easily and directly in Revit",https://github.com/HOKGroup/bcfexpress,FALSE
