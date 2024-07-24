@@ -1,7 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Text;
+using System.IO;
 
 namespace HOK.Core.Utilities
 {

@@ -1,5 +1,4 @@
-﻿using System;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 namespace HOK.Core.Utilities
 {
