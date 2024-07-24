@@ -130,13 +130,6 @@ steps:
     cleanDestinationFolder: false
     destinationFolder: '$(Build.SourcesDirectory)'
 
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '$(solution)'
-    feedsToUse: 'select'
-    noCache: true
-
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
