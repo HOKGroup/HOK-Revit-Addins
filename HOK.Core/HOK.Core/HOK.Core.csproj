@@ -18,26 +18,34 @@
     <Version>0.1.0.23</Version>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$(Configuration.Contains('R19'))">
+      <RevitVersion>2019</RevitVersion>
+      <TargetFramework>net471</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R20'))">
+      <RevitVersion>2020</RevitVersion>
+      <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R21'))">
-        <RevitVersion>2021</RevitVersion>
-        <TargetFramework>net48</TargetFramework>
-    </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration.Contains('R22'))">
-        <RevitVersion>2022</RevitVersion>
-        <TargetFramework>net48</TargetFramework>
-    </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration.Contains('R23'))">
-        <RevitVersion>2023</RevitVersion>
-        <TargetFramework>net48</TargetFramework>
-    </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration.Contains('R24'))">
-        <RevitVersion>2024</RevitVersion>
-        <TargetFramework>net48</TargetFramework>
-    </PropertyGroup>
-    <PropertyGroup Condition="$(Configuration.Contains('R25'))">
-        <RevitVersion>2025</RevitVersion>
-        <TargetFramework>net8.0-windows</TargetFramework>
-    </PropertyGroup>
+      <RevitVersion>2021</RevitVersion>
+      <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R22'))">
+      <RevitVersion>2022</RevitVersion>
+      <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R23'))">
+      <RevitVersion>2023</RevitVersion>
+      <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R24'))">
+      <RevitVersion>2024</RevitVersion>
+      <TargetFramework>net48</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R25'))">
+      <RevitVersion>2025</RevitVersion>
+      <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="ElementWrappers\" />
