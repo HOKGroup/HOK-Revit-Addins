@@ -1,16 +1,11 @@
 ﻿#region References
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas.Families;
@@ -166,7 +161,7 @@ namespace HOK.MissionControl
                 Socket?.Kill();
 
                 // (Konrad) If any task windows are still open, let's shut them down.
-                Messenger.Default.Send(new DocumentClosed { CloseWindow = true });
+                WeakReferenceMessenger.Default.Send(new DocumentClosed { CloseWindow = true });
             }
             catch (Exception ex)
             {

@@ -4,9 +4,9 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 
@@ -14,7 +14,7 @@ using HOK.MissionControl.Tools.Communicator.Messaging;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
 {
-    public class FamilyTaskAssistantViewModel : ViewModelBase
+    public class FamilyTaskAssistantViewModel : ObservableRecipient
     {
         public string Title { get; set; }
         public Window Win { get; set; }
@@ -30,14 +30,14 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
         public ObservableCollection<CheckWrapper> Checks
         {
             get { return _checks; }
-            set { _checks = value; RaisePropertyChanged(() => Checks); }
+            set { _checks = value; OnPropertyChanged(nameof(Checks)); Broadcast(_checks, value, nameof(Checks)); }
         }
 
         private FamilyTaskWrapper _wrapper;
         public FamilyTaskWrapper Wrapper
         {
             get { return _wrapper; }
-            set { _wrapper = value; RaisePropertyChanged(() => Wrapper); }
+            set { _wrapper = value; OnPropertyChanged(nameof(Wrapper)); Broadcast(_wrapper, value, nameof(Wrapper)); }
         }
 
         public FamilyTaskAssistantViewModel(FamilyTaskWrapper wrapper)
@@ -55,8 +55,8 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
 
             // (Konrad) So we don't know what the central path is. We can toss this into the external
             // event to get that back. when it returns with a result we can update the UI
-            Messenger.Default.Register<CentralPathObtained>(this, OnCentralPathObtained);
-            Messenger.Default.Register<DocumentClosed>(this, OnDocumentClosed);
+            WeakReferenceMessenger.Default.Register<FamilyTaskAssistantViewModel, CentralPathObtained>(this, static (r, m) => r.OnCentralPathObtained(m));
+            WeakReferenceMessenger.Default.Register<FamilyTaskAssistantViewModel, DocumentClosed>(this, static (r, m) => r.OnDocumentClosed(m));
             AppCommand.CommunicatorHandler.Request.Make(RequestId.GetCentralPath);
             AppCommand.CommunicatorEvent.Raise();
         }
@@ -69,10 +69,10 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
         private void OnWindowClosed(Window win)
         {
             // (Konrad) We notify the Communicator View Model that window has closed so View gets set to null and selection is reset.
-            Messenger.Default.Send(new TaskAssistantClosedMessage { IsClosed = true });
+            WeakReferenceMessenger.Default.Send(new TaskAssistantClosedMessage { IsClosed = true });
 
             // (Konrad) We need to unregister the event handler when window is closed, otherwise it will add another one next time.
-            Cleanup();
+            OnDeactivated();
         }
 
         private static void OnClose(Window win)

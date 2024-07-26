@@ -3,15 +3,15 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using Autodesk.Revit.DB;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.DTMTool
 {
-    public class DTMViewModel : ViewModelBase
+    public class DTMViewModel : ObservableRecipient
     {
         private Document Doc { get; }
         private readonly ReportingElementInfo reportingInfo;

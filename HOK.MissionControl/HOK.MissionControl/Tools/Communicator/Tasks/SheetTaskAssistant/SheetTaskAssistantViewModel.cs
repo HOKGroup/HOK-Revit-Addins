@@ -3,16 +3,16 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.MissionControl.Core.Schemas.Sheets;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 #endregion
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
 {
-    public class SheetTaskAssistantViewModel: ViewModelBase
+    public class SheetTaskAssistantViewModel: ObservableRecipient
     {
         public string Title { get; set; }
         public SheetTaskAssistantModel Model { get; set; }
@@ -38,17 +38,17 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             WindowClosed = new RelayCommand<Window>(OnWindowClosed);
 
             // (Konrad) Event handlers for when Revit finishes approving a sheet task, or when document is closed.
-            Messenger.Default.Register<SheetTaskCompletedMessage>(this, OnSheetTaskCompleted);
-            Messenger.Default.Register<DocumentClosed>(this, OnDocumentClosed);
+            WeakReferenceMessenger.Default.Register<SheetTaskAssistantViewModel, SheetTaskCompletedMessage>(this, static (r, m) => r.OnSheetTaskCompleted(m));
+            WeakReferenceMessenger.Default.Register<SheetTaskAssistantViewModel, DocumentClosed>(this, static (r, m) => r.OnDocumentClosed(m));
         }
 
         private void OnWindowClosed(Window win)
         {
             // (Konrad) We notify the Communicator View Model that window has closed so View gets set to null and selection is reset.
-            Messenger.Default.Send(new TaskAssistantClosedMessage { IsClosed = true });
+            WeakReferenceMessenger.Default.Send(new TaskAssistantClosedMessage { IsClosed = true });
 
             // (Konrad) We need to unregister Messenger handlers or they get duplicated.
-            Cleanup();
+            OnDeactivated();
         }
 
         private void OnWindowLoaded(Window win)
@@ -76,14 +76,14 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         public SheetTaskWrapper Wrapper
         {
             get { return _wrapper; }
-            set { _wrapper = value; RaisePropertyChanged(() => Wrapper); }
+            set { _wrapper = value; OnPropertyChanged(nameof(Wrapper)); Broadcast(_wrapper, value, nameof(Wrapper)); }
         }
 
         private string _okText;
         public string OkText
         {
             get { return _okText; }
-            set { _okText = value; RaisePropertyChanged(() => OkText); }
+            set { _okText = value; OnPropertyChanged(nameof(OkText)); Broadcast(_okText, value, nameof(OkText)); }
         }
 
         #region Message Handlers

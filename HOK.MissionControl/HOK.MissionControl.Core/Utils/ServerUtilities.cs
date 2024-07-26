@@ -20,14 +20,14 @@ namespace HOK.MissionControl.Core.Utils
         public const string ApiVersion = "api/v2";
         private static Func<NewtonsoftJsonSerializer> serializerFactory = () => { return new NewtonsoftJsonSerializer(); };
 
-        private static Settings Settings { get; set; }
+        private static HOK.Core.Utilities.Settings Settings { get; set; }
 
         static ServerUtilities()
         {
             var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
-            RestApiBaseUrl = Json.Deserialize<Settings>(settingsString)?.HttpAddress; //production
+            RestApiBaseUrl = Json.Deserialize<HOK.Core.Utilities.Settings>(settingsString)?.HttpAddress; //production
             //RestApiBaseUrl = Json.Deserialize<Settings>(settingsString)?.HttpAddressDebug; //debug
-            Settings = Json.Deserialize<Settings>(settingsString);
+            Settings = Json.Deserialize<HOK.Core.Utilities.Settings>(settingsString);
         }
 
         #region GET

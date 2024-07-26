@@ -12,7 +12,7 @@ namespace HOK.MissionControl.Core.Utils
         public List<string> LocalPathRgx { get; set; } = new List<string>();
         public UserLocation UserLocation { get; set; }
         public TempLocation TempLocation { get; set; }
-        public ProjectInfo ProjectInfo { get; set; }
+        public HOK.MissionControl.Core.Schemas.Settings.ProjectInfo ProjectInfo { get; set; }
 
         static AppSettings()
         {
@@ -26,7 +26,7 @@ namespace HOK.MissionControl.Core.Utils
         /// Utility for passing Settings properties into the Static class.
         /// </summary>
         /// <param name="settings"></param>
-        public void SetSettings(Settings settings)
+        public void SetSettings(HOK.MissionControl.Core.Schemas.Settings.Settings settings)
         {
             LocalPathRgx = settings.LocalPathRgx;
             UserLocation = settings.UserLocation;

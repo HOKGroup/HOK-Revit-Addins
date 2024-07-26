@@ -8,7 +8,7 @@ using System.Windows.Interop;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Families;
 using HOK.MissionControl.Core.Schemas.Sheets;
@@ -106,7 +106,7 @@ namespace HOK.MissionControl.Tools.Communicator
             var doc = app.ActiveUIDocument.Document;
             CentralPath = FileInfoUtil.GetCentralFilePath(doc);
 
-            Messenger.Default.Send(new CentralPathObtained
+            WeakReferenceMessenger.Default.Send(new CentralPathObtained
             {
                 CentralPath = CentralPath
             });
@@ -173,7 +173,7 @@ namespace HOK.MissionControl.Tools.Communicator
                         if (titleblock == null)
                         {
                             IsUpdatingSheet = false;
-                            Messenger.Default.Send(new SheetTaskCompletedMessage
+                            WeakReferenceMessenger.Default.Send(new SheetTaskCompletedMessage
                             {
                                 Completed = false,
                                 Message = "Could not find a valid TitleBlock.",
@@ -206,7 +206,7 @@ namespace HOK.MissionControl.Tools.Communicator
                     IsUpdatingSheet = false;
 
                     Log.AppendLog(LogMessageType.EXCEPTION, "Failed to create sheet.");
-                    Messenger.Default.Send(new SheetTaskCompletedMessage
+                    WeakReferenceMessenger.Default.Send(new SheetTaskCompletedMessage
                     {
                         Completed = false,
                         Message = e.Message,
@@ -237,7 +237,7 @@ namespace HOK.MissionControl.Tools.Communicator
                 if (WorksharingUtils.GetCheckoutStatus(doc, view.Id) == CheckoutStatus.OwnedByOtherUser)
                 {
                     IsUpdatingSheet = false;
-                    Messenger.Default.Send(new SheetTaskCompletedMessage
+                    WeakReferenceMessenger.Default.Send(new SheetTaskCompletedMessage
                     {
                         Completed = false,
                         Message = "Element owned by another user. Try reloading latest.",
@@ -271,7 +271,7 @@ namespace HOK.MissionControl.Tools.Communicator
                         IsUpdatingSheet = false;
 
                         Log.AppendLog(LogMessageType.EXCEPTION, "Failed to " + action + " sheet.");
-                        Messenger.Default.Send(new SheetTaskCompletedMessage
+                        WeakReferenceMessenger.Default.Send(new SheetTaskCompletedMessage
                         {
                             Completed = false,
                             Message = e.Message,
@@ -368,7 +368,7 @@ namespace HOK.MissionControl.Tools.Communicator
             if (fmas.Count == 0)
             {
                 args.SetProcessingResult(FailureProcessingResult.Continue);
-                if (IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage
+                if (IsUpdatingSheet) WeakReferenceMessenger.Default.Send(new SheetTaskCompletedMessage
                 {
                     Completed = true,
                     Message = "Success!",
@@ -393,7 +393,7 @@ namespace HOK.MissionControl.Tools.Communicator
 
             if (count > 0)
             {
-                if (IsUpdatingSheet) Messenger.Default.Send(new SheetTaskCompletedMessage
+                if (IsUpdatingSheet) WeakReferenceMessenger.Default.Send(new SheetTaskCompletedMessage
                 {
                     Completed = false,
                     Message = "Could not commit transaction. Try reloading latest.",

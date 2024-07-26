@@ -2,13 +2,13 @@
 using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.MissionControl.Tools.Communicator;
 
 namespace HOK.MissionControl.Utils.StatusReporter
 {
-    public class StatusReporterViewModel : ViewModelBase
+    public class StatusReporterViewModel : ObservableRecipient
     {
         public RelayCommand<Window> WindowLoaded { get; set; }
         private Storyboard FadeInStoryboard { get; set; }
@@ -98,13 +98,13 @@ namespace HOK.MissionControl.Utils.StatusReporter
         private Status _status;
         public Status Status {
             get { return _status; }
-            set { _status = value; RaisePropertyChanged(() => Status); }
+            set { _status = value; OnPropertyChanged(nameof(Status)); Broadcast(_status, value, nameof(Status)); }
         }
 
         private string _message;
         public string Message {
             get { return _message; }
-            set { _message = value; RaisePropertyChanged(() => Message); }
+            set { _message = value; OnPropertyChanged(nameof(Message)); Broadcast(_message, value, nameof(Message)); }
         }
     }
 }

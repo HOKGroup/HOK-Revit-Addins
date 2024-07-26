@@ -7,9 +7,9 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 using HOK.MissionControl.Core.Schemas.Families;
@@ -20,7 +20,7 @@ using HOK.MissionControl.Core.Utils;
 
 namespace HOK.MissionControl.Tools.Communicator.Tasks
 {
-    public class CommunicatorTasksViewModel : ViewModelBase
+    public class CommunicatorTasksViewModel : ObservableRecipient
     {
         public CommunicatorTasksModel Model { get; set; }
         public RelayCommand<TaskWrapper> LaunchTaskAssistant { get; set; }
@@ -40,16 +40,16 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
             WindowLoaded = new RelayCommand<UserControl>(OnWindowLoaded);
             WindowClosed = new RelayCommand<UserControl>(OnWindowClosed);
 
-            Messenger.Default.Register<CommunicatorDataDownloaded>(this, OnCommunicatorDataDownloaded);
-            Messenger.Default.Register<FamilyTaskDeletedMessage>(this, OnFamilyTaskDeleted);
-            Messenger.Default.Register<FamilyTaskAddedMessage>(this, OnFamilyTaskAdded);
-            Messenger.Default.Register<FamilyTaskUpdatedMessage>(this, OnFamilyTaskUpdated);
-            Messenger.Default.Register<TaskAssistantClosedMessage>(this, OnFamilyTaskAssistantClosed);
-            Messenger.Default.Register<SheetsTaskAddedMessage>(this, OnSheetTaskAdded);
-            Messenger.Default.Register<SheetsTaskUpdatedMessage>(this, OnSheetTaskUpdated);
-            Messenger.Default.Register<SheetsTaskDeletedMessage>(this, OnSheetsTaskDeleted);
-            Messenger.Default.Register<SheetTaskSheetsCreatedMessage>(this, OnSheetTaskSheetsCreated);
-            Messenger.Default.Register<SheetTaskSheetDeletedMessage>(this, OnSheetTaskSheetDeleted);
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, CommunicatorDataDownloaded>(this, static (r, m) => r.OnCommunicatorDataDownloaded(m));
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, FamilyTaskDeletedMessage>(this, static (r, m) => r.OnFamilyTaskDeleted(m));
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, FamilyTaskAddedMessage>(this, static (r, m) => r.OnFamilyTaskAdded(m));
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, FamilyTaskUpdatedMessage>(this, static (r, m) => r.OnFamilyTaskUpdated(m));
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, TaskAssistantClosedMessage>(this, static (r, m) => r.OnFamilyTaskAssistantClosed(m));
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, SheetsTaskAddedMessage>(this, static (r, m) => r.OnSheetTaskAdded(m));
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, SheetsTaskUpdatedMessage>(this, static (r, m) => r.OnSheetTaskUpdated(m));
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, SheetsTaskDeletedMessage>(this, static (r, m) => r.OnSheetsTaskDeleted(m));
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, SheetTaskSheetsCreatedMessage>(this, static (r, m) => r.OnSheetTaskSheetsCreated(m));
+            WeakReferenceMessenger.Default.Register<CommunicatorTasksViewModel, SheetTaskSheetDeletedMessage>(this, static (r, m) => r.OnSheetTaskSheetDeleted(m));
         }
 
         private void OnWindowLoaded(UserControl win)
@@ -61,7 +61,7 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         private void OnWindowClosed(UserControl win)
         {
             // (Konrad) We need to unregister the event handler when window is closed, otherwise it will add another one next time.
-            Cleanup();
+            OnDeactivated();
         }
 
         private static void OnMouseEnter(DataGridExtension dg)
@@ -79,14 +79,14 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         public ObservableCollection<TaskWrapper> Tasks
         {
             get { return _tasks; }
-            set { _tasks = value; RaisePropertyChanged(() => Tasks); }
+            set { _tasks = value; OnPropertyChanged(nameof(Tasks)); Broadcast(_tasks, value, nameof(Tasks)); }
         }
 
         private TaskWrapper _selectedTask;
         public TaskWrapper SelectedTask
         {
             get { return _selectedTask; }
-            set { _selectedTask = value; RaisePropertyChanged(() => SelectedTask); }
+            set { _selectedTask = value; OnPropertyChanged(nameof(SelectedTask)); Broadcast(_selectedTask, value, nameof(SelectedTask)); }
         }
 
         #region Message Handlers

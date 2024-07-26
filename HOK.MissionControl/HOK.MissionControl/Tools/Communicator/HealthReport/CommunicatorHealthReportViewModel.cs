@@ -1,14 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using System.Windows.Data;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 
 namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
-    public class CommunicatorHealthReportViewModel : ViewModelBase
+    public class CommunicatorHealthReportViewModel : ObservableRecipient
     {
         public CommunicatorHealthReportModel Model { get; set; } = new CommunicatorHealthReportModel();
         public RelayCommand<UserControl> WindowClosed { get; set; }
@@ -19,7 +19,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
             BindingOperations.EnableCollectionSynchronization(_healthReports, _lock);
             WindowClosed = new RelayCommand<UserControl>(OnWindowClosed);
 
-            Messenger.Default.Register<HealthReportSummaryAdded>(this, OnHealthReportSummaryAdded);
+            WeakReferenceMessenger.Default.Register<CommunicatorHealthReportViewModel, HealthReportSummaryAdded>(this, static (r, m) => r.OnHealthReportSummaryAdded(m));
         }
 
         private void OnHealthReportSummaryAdded(HealthReportSummaryAdded obj)
@@ -36,7 +36,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         private void OnWindowClosed(UserControl win)
         {
             // (Konrad) We need to unregister the event handler when window is closed, otherwise it will add another one next time.
-            Cleanup();
+            OnDeactivated();
         }
 
         private ObservableCollection<HealthReportSummaryViewModel> _healthReports =
@@ -44,7 +44,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         public ObservableCollection<HealthReportSummaryViewModel> HealthReports
         {
             get { return _healthReports; }
-            set { _healthReports = value; RaisePropertyChanged(() => HealthReports); }
+            set { _healthReports = value; OnPropertyChanged(nameof(HealthReports)); Broadcast(_healthReports, value, nameof(HealthReports)); }
         }
     }
 }
