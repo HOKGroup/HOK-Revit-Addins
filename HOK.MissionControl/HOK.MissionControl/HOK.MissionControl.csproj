@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="HOK.Core">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\$(Configuration)\HOK.Core.dll</HintPath>
+      <HintPath>..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
