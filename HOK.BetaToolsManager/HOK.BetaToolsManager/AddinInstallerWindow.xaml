@@ -5,18 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:ex="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d" Title="{Binding Title, Mode=OneWay}" Icon="Resources/hoklogo.ico"
         BorderThickness="0,5,0,0" BorderBrush="#C45C44" WindowStartupLocation="CenterOwner"
         d:DesignHeight="360" d:DesignWidth="885" Width="885" MinWidth="885" SizeToContent="Height">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
-        </i:EventTrigger>
-        <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding WindowClosing}" CommandParameter="{Binding ElementName=Win}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+    <Behaviors:Interaction.Triggers>
+        <Behaviors:EventTrigger EventName="Loaded">
+            <Behaviors:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
+        </Behaviors:EventTrigger>
+        <Behaviors:EventTrigger EventName="Closing">
+            <Behaviors:InvokeCommandAction Command="{Binding WindowClosing}" CommandParameter="{Binding ElementName=Win}"/>
+        </Behaviors:EventTrigger>
+    </Behaviors:Interaction.Triggers>
     <Grid>
         <Grid.Resources>
             <Style x:Key="CenterGridHeaderStyle1" TargetType="DataGridColumnHeader">

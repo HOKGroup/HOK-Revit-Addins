@@ -8,17 +8,17 @@ using System.Windows;
 using System.Windows.Interop;
 using HOK.AddInManager.Classes;
 using HOK.Core.Utilities;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.Core.WpfUtilities;
 using HOK.Feedback;
-using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
+using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 #endregion
 
 namespace HOK.AddInManager.UserControls
 {
-    public class AddInViewModel : ViewModelBase
+    public class AddInViewModel : ObservableRecipient
     {
         #region Properties
 
@@ -36,14 +36,14 @@ namespace HOK.AddInManager.UserControls
         public Addins AddinsObj
         {
             get { return _addins; }
-            set { _addins = value; RaisePropertyChanged(() => AddinsObj); }
+            set { _addins = value; OnPropertyChanged(nameof(AddinsObj)); }
         }
 
         private ObservableCollection<AddinInfo> _selectedAddins = new ObservableCollection<AddinInfo>();
         public ObservableCollection<AddinInfo> SelectedAddins
         {
             get { return _selectedAddins; }
-            set { _selectedAddins = value; RaisePropertyChanged(() => SelectedAddins); }
+            set { _selectedAddins = value; OnPropertyChanged(nameof(SelectedAddins)); }
         }
 
         #endregion
