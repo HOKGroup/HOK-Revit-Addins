@@ -8,6 +8,7 @@
     <ImplicitUsings>true</ImplicitUsings>
     <Nullable>disable</Nullable>
     <PublishAddinFiles>true</PublishAddinFiles>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     <Configurations>Debug R19; Debug R20;Debug R21;Debug R22;Debug R23;Debug R24;Debug R25</Configurations>
     <Configurations>$(Configurations);Release R19; Release R20;Release R21;Release R22;Release R23;Release R24;Release R25</Configurations>
     <Product>HOK Revit Add-ins</Product>
@@ -86,6 +87,7 @@
     <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="2.0.2" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.7" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
   </ItemGroup>
 
   <!-- Revit APIs -->
