@@ -4,7 +4,7 @@ using System.Reflection;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.GroupsManager.Utilities;
 
@@ -46,7 +46,7 @@ namespace HOK.MissionControl.GroupsManager
 
         private void OnDocumentChanged(object sender, DocumentChangedEventArgs e)
         {
-            Messenger.Default.Send(new DocumentChanged(e.GetDeletedElementIds(), e.GetAddedElementIds(), e.GetDocument()));
+            WeakReferenceMessenger.Default.Send(new DocumentChanged(e.GetDeletedElementIds(), e.GetAddedElementIds(), e.GetDocument()));
         }
 
         public Result OnShutdown(UIControlledApplication application)
