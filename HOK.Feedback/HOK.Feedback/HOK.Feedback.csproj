@@ -51,11 +51,9 @@
   <ItemGroup>
     <Reference Include="HOK.Core">
       <HintPath>..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
       <HintPath>..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
