@@ -66,21 +66,6 @@ steps:
   env:
     BUILD_CONFIGURATION: $(buildConfiguration)
 
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'HOK Addins Deps01.zip'
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'HOK Addins Deps02.zip'
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'HOK Addins Deps03.zip'
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'HOK Addins Deps04.zip'
 
 - task: DownloadSecureFile@1
   inputs:
@@ -112,16 +97,6 @@ steps:
     targetType: 'inline'
     script: 'Get-ChildItem -Directory | Where-Object { $_.Name.Contains(" ") } | Rename-Item -NewName { $_.Name.Replace(" ", "_") }'
 
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: 'Get-ChildItem -Path **/packages/* -Directory | ForEach-Object { Remove-Item -Recurse -LiteralPath $_.FullName }'
-
-- task: ExtractFiles@1
-  inputs:
-    archiveFilePatterns: '$(Agent.TempDirectory)/*.zip'
-    cleanDestinationFolder: false
-    destinationFolder: '$(Build.SourcesDirectory)'
 
 - task: DotNetCoreCLI@2
   inputs:
