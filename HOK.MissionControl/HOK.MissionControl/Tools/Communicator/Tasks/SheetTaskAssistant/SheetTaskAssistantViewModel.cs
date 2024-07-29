@@ -76,14 +76,14 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
         public SheetTaskWrapper Wrapper
         {
             get { return _wrapper; }
-            set { _wrapper = value; OnPropertyChanged(nameof(Wrapper)); Broadcast(_wrapper, value, nameof(Wrapper)); }
+            set { _wrapper = value; OnPropertyChanged(nameof(Wrapper)); }
         }
 
         private string _okText;
         public string OkText
         {
             get { return _okText; }
-            set { _okText = value; OnPropertyChanged(nameof(OkText)); Broadcast(_okText, value, nameof(OkText)); }
+            set { _okText = value; OnPropertyChanged(nameof(OkText)); }
         }
 
         #region Message Handlers

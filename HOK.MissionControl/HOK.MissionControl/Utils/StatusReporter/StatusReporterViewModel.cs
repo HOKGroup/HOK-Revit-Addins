@@ -98,13 +98,13 @@ namespace HOK.MissionControl.Utils.StatusReporter
         private Status _status;
         public Status Status {
             get { return _status; }
-            set { _status = value; OnPropertyChanged(nameof(Status)); Broadcast(_status, value, nameof(Status)); }
+            set { _status = value; OnPropertyChanged(nameof(Status)); }
         }
 
         private string _message;
         public string Message {
             get { return _message; }
-            set { _message = value; OnPropertyChanged(nameof(Message)); Broadcast(_message, value, nameof(Message)); }
+            set { _message = value; OnPropertyChanged(nameof(Message)); }
         }
     }
 }

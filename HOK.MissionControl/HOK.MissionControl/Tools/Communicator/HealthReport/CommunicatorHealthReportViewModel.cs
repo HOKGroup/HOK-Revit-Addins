@@ -44,7 +44,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         public ObservableCollection<HealthReportSummaryViewModel> HealthReports
         {
             get { return _healthReports; }
-            set { _healthReports = value; OnPropertyChanged(nameof(HealthReports)); Broadcast(_healthReports, value, nameof(HealthReports)); }
+            set { _healthReports = value; OnPropertyChanged(nameof(HealthReports)); }
         }
     }
 }

@@ -79,14 +79,14 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks
         public ObservableCollection<TaskWrapper> Tasks
         {
             get { return _tasks; }
-            set { _tasks = value; OnPropertyChanged(nameof(Tasks)); Broadcast(_tasks, value, nameof(Tasks)); }
+            set { _tasks = value; OnPropertyChanged(nameof(Tasks)); }
         }
 
         private TaskWrapper _selectedTask;
         public TaskWrapper SelectedTask
         {
             get { return _selectedTask; }
-            set { _selectedTask = value; OnPropertyChanged(nameof(SelectedTask)); Broadcast(_selectedTask, value, nameof(SelectedTask)); }
+            set { _selectedTask = value; OnPropertyChanged(nameof(SelectedTask)); }
         }
 
         #region Message Handlers

@@ -30,14 +30,14 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.FamilyTaskAssistant
         public ObservableCollection<CheckWrapper> Checks
         {
             get { return _checks; }
-            set { _checks = value; OnPropertyChanged(nameof(Checks)); Broadcast(_checks, value, nameof(Checks)); }
+            set { _checks = value; OnPropertyChanged(nameof(Checks)); }
         }
 
         private FamilyTaskWrapper _wrapper;
         public FamilyTaskWrapper Wrapper
         {
             get { return _wrapper; }
-            set { _wrapper = value; OnPropertyChanged(nameof(Wrapper)); Broadcast(_wrapper, value, nameof(Wrapper)); }
+            set { _wrapper = value; OnPropertyChanged(nameof(Wrapper)); }
         }
 
         public FamilyTaskAssistantViewModel(FamilyTaskWrapper wrapper)
