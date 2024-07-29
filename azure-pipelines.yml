@@ -142,16 +142,7 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '**/HOK.MissionControl.csproj'
-    arguments: '-c "$(buildConfiguration)"'
-  env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '**/HOK.MissionControl.Core.csproj'
+    projects: '$(MCsolution)'
     arguments: '-c "$(buildConfiguration)"'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
