@@ -42,7 +42,7 @@ pool:
 variables:
 - group: code-signing
 - name: solution
-  value: '**/HOK.*.sln'
+  value: 'HOK.*/**/HOK.*.sln'
 - name: coreSolution
   value: '**/HOK.Core.sln'
 - name: MCsolution
@@ -153,31 +153,11 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '**/HOK.AddInManager.sln'
+    projects: '$(solution)'
     arguments: '-c "$(buildConfiguration)"'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '**/HOK.BetaToolsManager.sln'
-    arguments: '-c "$(buildConfiguration)"'
-  env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-# - task: VSBuild@1
-#   inputs:
-#     solution: '$(solution)'
-#     platform: '$(buildPlatform)'
-#     configuration: '$(buildConfiguration)'
-#     maximumCpuCount: true
-#   env:
-#     HOKDepsDirectory: $(Build.SourcesDirectory)
-#     PFX_PASS: $(CERT_SIGNING_PASS)
-#     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 # - task: PowerShell@2
 #   inputs:
