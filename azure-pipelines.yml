@@ -55,7 +55,7 @@ variables:
   value: 'x64'
 - name: BUILD_ENV
   value: AzureDevOps
-- name: HOKDepsDirectory
+- name: SOURCE_DIR
   value: '$(Build.SourcesDirectory)'
 
 steps:
@@ -158,7 +158,6 @@ steps:
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-    SOURCE_DIR: $(Build.SourcesDirectory)
 
 - task: DotNetCoreCLI@2
   inputs:
