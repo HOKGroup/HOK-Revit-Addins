@@ -11,13 +11,13 @@ namespace HOK.Feedback
 {
     public class FeedbackModel
     {
-        private Settings Settings { get; set; }
+        private HOK.Core.Utilities.Settings Settings { get; set; }
         private const string baseUrl = "https://api.github.com";
 
         public FeedbackModel()
         {
             var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
-            Settings = Json.Deserialize<Settings>(settingsString);
+            Settings = Json.Deserialize<HOK.Core.Utilities.Settings>(settingsString);
         }
 
         /// <summary>

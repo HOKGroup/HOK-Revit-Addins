@@ -142,35 +142,38 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(MCsolution)'
+    projects: '**/HOK.MissionControl.Core.csproj'
     arguments: '-c "$(buildConfiguration)"'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/HOK.MissionControl.csproj'
+    arguments: '-c "$(buildConfiguration)"'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
-# - task: MSBuild@1
-#   inputs:
-#     solution: '$(MCsolution)'
-#     platform: '$(buildPlatform)'
-#     configuration: '$(buildConfiguration)'
-#     msbuildArguments: '/target:HOK_MissionControl'
-#   env:
-#     HOKDepsDirectory: $(Build.SourcesDirectory)
-#     PFX_PASS: $(CERT_SIGNING_PASS)
-#     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(feedbackSolution)'
+    arguments: '-c "$(buildConfiguration)"'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
-# - task: VSBuild@1
-#   inputs:
-#     solution: '$(MCsolution)'
-#     platform: '$(buildPlatform)'
-#     configuration: '$(buildConfiguration)'
-#     msbuildArgs: '/target:HOK_MissionControl_Core'
-#     clean: true
-#   env:
-#     HOKDepsDirectory: $(Build.SourcesDirectory)
-#     PFX_PASS: $(CERT_SIGNING_PASS)
-#     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(MCsolution)'
+    arguments: '-c "$(buildConfiguration)"'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 # - task: MSBuild@1
 #   inputs:
