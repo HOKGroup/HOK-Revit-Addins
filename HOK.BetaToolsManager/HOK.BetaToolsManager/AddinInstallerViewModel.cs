@@ -3,16 +3,16 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Interop;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 using HOK.Feedback;
-using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
+using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace HOK.BetaToolsManager
 {
-    public class AddinInstallerViewModel : ViewModelBase
+    public class AddinInstallerViewModel : ObservableRecipient
     {
         public AddinInstallerModel Model;
         public string Title { get; set; }
@@ -112,7 +112,7 @@ namespace HOK.BetaToolsManager
         public ObservableCollection<AddinWrapper> Addins
         {
             get { return _addins; }
-            set { _addins = value; RaisePropertyChanged(() => Addins); }
+            set { _addins = value; OnPropertyChanged(nameof(Addins)); }
         }
     }
 }

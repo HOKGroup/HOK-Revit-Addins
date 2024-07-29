@@ -176,27 +176,23 @@ steps:
 #     configuration: '$(buildConfiguration)'
 #     msbuildArguments: '-t:restore'
 
-# - task: VSBuild@1
-#   inputs:
-#     solution: '$(feedbackSolution)'
-#     platform: '$(buildPlatform)'
-#     configuration: '$(buildConfiguration)'
-#     maximumCpuCount: true
-#   env:
-#     HOKDepsDirectory: $(Build.SourcesDirectory)
-#     PFX_PASS: $(CERT_SIGNING_PASS)
-#     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/HOK.AddInManager.sln'
+    arguments: '-c "$(buildConfiguration)"'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
-# - task: VSBuild@1
-#   inputs:
-#     solution: '$(MCsolution)'
-#     platform: '$(buildPlatform)'
-#     configuration: '$(buildConfiguration)'
-#     maximumCpuCount: true
-#   env:
-#     HOKDepsDirectory: $(Build.SourcesDirectory)
-#     PFX_PASS: $(CERT_SIGNING_PASS)
-#     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/HOK.BetaToolsManager.sln'
+    arguments: '-c "$(buildConfiguration)"'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 # - task: VSBuild@1
 #   inputs:
