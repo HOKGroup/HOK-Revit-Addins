@@ -160,7 +160,7 @@ steps:
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
-    script: 'Get-ChildItem -Path $(Build.SourcesDirectory)/HOK.MissionControl/HOK.MissionControl.Core/bin/'
+    script: 'Get-ChildItem -Path $(Build.SourcesDirectory)/HOK.MissionControl/HOK.MissionControl.Core/bin/$(Configuration)'
 
 - task: DotNetCoreCLI@2
   inputs:
