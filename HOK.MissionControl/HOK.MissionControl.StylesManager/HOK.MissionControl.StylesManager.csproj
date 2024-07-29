@@ -58,6 +58,8 @@
     <Reference Include="HOK.Feedback">
       <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\x64\$(Configuration)\HOK.Feedback.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
