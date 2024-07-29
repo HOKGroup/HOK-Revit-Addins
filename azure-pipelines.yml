@@ -165,6 +165,7 @@ steps:
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
+    SOURCE_DIR: $(Build.SourcesDirectory)
 
 - task: DotNetCoreCLI@2
   inputs:
