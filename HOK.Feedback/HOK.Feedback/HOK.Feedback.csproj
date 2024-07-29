@@ -53,7 +53,7 @@
       <HintPath>..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
-      <HintPath>..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath>..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\publish\Revit $(RevitVersion) $(Configuration) addin\HOK.MissionControl.Core\MissionControl.Core.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
