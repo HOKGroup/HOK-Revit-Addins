@@ -26,7 +26,7 @@ namespace HOK.ElementFlatter.Class
         {
             Name = category.Name;
             CategoryId = category.Id;
-#if RELEASE2024
+#if REVIT2024_OR_GREATER
             BltCategory = (BuiltInCategory)CategoryId.Value;
 #else
             BltCategory = (BuiltInCategory)CategoryId.IntegerValue;

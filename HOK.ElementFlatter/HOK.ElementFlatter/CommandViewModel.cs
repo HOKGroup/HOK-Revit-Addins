@@ -10,6 +10,7 @@ using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 using HOK.ElementFlatter.Class;
 using HOK.ElementFlatter.Commands;
+using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 namespace HOK.ElementFlatter
 {
@@ -78,7 +79,7 @@ namespace HOK.ElementFlatter
                 {
                     try
                     {
-#if RELEASE2024
+#if REVIT2024_OR_GREATER
                         var bltCat = (BuiltInCategory)id.Value;
 #else
                         var bltCat = (BuiltInCategory)id.IntegerValue;
@@ -181,7 +182,7 @@ namespace HOK.ElementFlatter
         /// Flatten only selected Categories.
         /// </summary>
         /// <param name="param"></param>
-        public void FlattenCategoryExecuted(object param)
+        public void FlattenCategoryExecuted()
         {
             try
             {
@@ -200,7 +201,7 @@ namespace HOK.ElementFlatter
         /// Flattens entire model.
         /// </summary>
         /// <param name="param"></param>
-        public void FlattenModelExecuted(object param)
+        public void FlattenModelExecuted()
         {
             try
             {
@@ -216,7 +217,7 @@ namespace HOK.ElementFlatter
         /// Check all Categories.
         /// </summary>
         /// <param name="param"></param>
-        public void CheckAllExecuted(object param)
+        public void CheckAllExecuted()
         {
             try
             {
@@ -235,7 +236,7 @@ namespace HOK.ElementFlatter
         /// Uncheck all Categories.
         /// </summary>
         /// <param name="param"></param>
-        public void UncheckAllExecuted(object param)
+        public void UncheckAllExecuted()
         {
             try
             {
