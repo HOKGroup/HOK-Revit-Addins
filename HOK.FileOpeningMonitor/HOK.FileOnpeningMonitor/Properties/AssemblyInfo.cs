@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("HOK.FileOnpeningMonitor")]
+[assembly: AssemblyTitle("HOK.FileOpeningMonitor")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
-[assembly: AssemblyProduct("HOK.FileOnpeningMonitor")]
+[assembly: AssemblyProduct("HOK.FileOpeningMonitor")]
 [assembly: AssemblyCopyright("Copyright © HOK Group 2021")]
 [assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon")]
 [assembly: AssemblyCulture("")]

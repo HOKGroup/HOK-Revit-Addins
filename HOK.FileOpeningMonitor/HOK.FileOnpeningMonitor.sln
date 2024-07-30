@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.FileOnpeningMonitor", "HOK.FileOnpeningMonitor\HOK.FileOnpeningMonitor.csproj", "{97100534-BD15-43FB-B05E-0B42FDCBA3A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.FileOpeningMonitor", "HOK.FileOpeningMonitor\HOK.FileOpeningMonitor.csproj", "{97100534-BD15-43FB-B05E-0B42FDCBA3A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

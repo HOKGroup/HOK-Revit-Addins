@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Autodesk.Revit.DB;
 
-namespace HOK.FileOnpeningMonitor
+namespace HOK.FileOpeningMonitor
 {
     /// <summary>
     /// Interaction logic for TimedWarningWindow.xaml

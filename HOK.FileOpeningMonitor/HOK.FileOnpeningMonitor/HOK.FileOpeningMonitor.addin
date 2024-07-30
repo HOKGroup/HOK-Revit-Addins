@@ -2,9 +2,9 @@
 <RevitAddIns>
   <AddIn Type="Application">
     <Name>File Opening Monitor</Name>
-    <Assembly>HOK-Addin.bundle\Contents\HOK.FileOnpeningMonitor.dll</Assembly>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.FileOpeningMonitor.dll</Assembly>
     <AddInId>65651F57-F594-42E4-8D9E-AF02BA11B37B</AddInId>
-    <FullClassName>HOK.FileOnpeningMonitor.AppCommand</FullClassName>
+    <FullClassName>HOK.FileOpeningMonitor.AppCommand</FullClassName>
     <VendorId>JKIM</VendorId>
     <VendorDescription>JKIM</VendorDescription>
   </AddIn>

@@ -7,8 +7,8 @@
     <ProjectGuid>{97100534-BD15-43FB-B05E-0B42FDCBA3A5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HOK.FileOnpeningMonitor</RootNamespace>
-    <AssemblyName>HOK.FileOnpeningMonitor</AssemblyName>
+    <RootNamespace>HOK.FileOpeningMonitor</RootNamespace>
+    <AssemblyName>HOK.FileOpeningMonitor</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>

@@ -17,7 +17,7 @@ HOK.ElementFlatter\HOK.ElementFlatter\bin\,HOK.ElementFlatter.dll,HOK-Addin.bund
 HOK.ElementMover\HOK.ElementMover\bin\,HOK.ElementMover.dll,HOK-Addin.bundle\Contents\
 HOK.ElementTools\HOK.ElementTools\bin\,HOK.ElementTools.dll,HOK-Addin.bundle\Contents\
 HOK.Feedback\HOK.Feedback\bin\,HOK.Feedback.dll,HOK-Addin.bundle\Contents\
-HOK.FileOnpeningMonitor\HOK.FileOnpeningMonitor\bin\,HOK.FileOnpeningMonitor.dll,HOK-Addin.bundle\Contents\
+HOK.FileOpeningMonitor\HOK.FileOpeningMonitor\bin\,HOK.FileOpeningMonitor.dll,HOK-Addin.bundle\Contents\
 HOK.Utilities\HOK.FinishCreator\bin\,HOK.FinishCreator.dll,HOK-Addin.bundle\Contents\
 HOK.Utilities\HOK.LevelManager\bin\,HOK.LevelManager.dll,HOK-Addin.bundle\Contents\
 HOK.LPDCalculator\HOK.LPDCalculator\bin\,HOK.LPDCalculator.dll,HOK-Addin.bundle\Contents\
@@ -58,7 +58,7 @@ HOK.AddInManager\HOK.AddInManager\bin\,HOK.AddInManager.addin,\
 HOK.AddInManager\HOK.DesktopConnectorLauncher\bin\,HOK.DesktopConnectorLauncher.addin,\
 HOK.BetaToolsManager\HOK.BetaToolsManager\bin\,HOK.BetaToolsManager.addin,\
 HOK.ElementMover\HOK.ElementMover\bin\,HOK.ElementMover.addin,\
-HOK.FileOnpeningMonitor\HOK.FileOnpeningMonitor\bin\,HOK.FileOpeningMonitor.addin,\
+HOK.FileOpeningMonitor\HOK.FileOpeningMonitor\bin\,HOK.FileOpeningMonitor.addin,\
 HOK.MissionControl\HOK.MissionControl\bin\,HOK.MissionControl.addin,\
 HOK.MissionControl\HOK.MissionControl.GroupsManager\bin\,HOK.MissionControl.GroupsManager.addin,\
 HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,HOK.MissionControl.StylesManager.addin,\

@@ -6,7 +6,7 @@ using RestSharp;
 using HOK.Core.Utilities;
 using System.Net;
 
-namespace HOK.FileOnpeningMonitor
+namespace HOK.FileOpeningMonitor
 {
     public static class FMEServerUtil
     {

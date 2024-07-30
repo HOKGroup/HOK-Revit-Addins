@@ -8,7 +8,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using HOK.Core.Utilities;
 
-namespace HOK.FileOnpeningMonitor
+namespace HOK.FileOpeningMonitor
 {
     public class AppCommand : IExternalApplication
     {

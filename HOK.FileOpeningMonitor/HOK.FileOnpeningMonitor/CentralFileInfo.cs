@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 
-namespace HOK.FileOnpeningMonitor
+namespace HOK.FileOpeningMonitor
 {
     public class CentralFileInfo
     {
