@@ -26,7 +26,7 @@ namespace HOK.ElementMover
         public List<TreeViewElementModel> ChildrenNodes { get; private set; }
         public TreeViewNodeType NodeType { get; private set; }
         public string ToolTip { get; private set; }
-        public Visibility ToolTipVisibility { get; private set; }
+        public System.Windows.Visibility ToolTipVisibility { get; private set; }
         public bool? isChecked = false;
 
         public TreeViewElementModel(string nodeName)
@@ -98,7 +98,7 @@ namespace HOK.ElementMover
                     {
                         var categoryNode = new TreeViewElementModel(categoryName);
                         categoryNode.NodeType = TreeViewNodeType.Category;
-                        categoryNode.ToolTipVisibility = Visibility.Hidden;
+                        categoryNode.ToolTipVisibility = System.Windows.Visibility.Hidden;
                         treeView.Add(categoryNode);
 
                         if (customCategories.Contains(categoryName))
@@ -115,7 +115,7 @@ namespace HOK.ElementMover
                                 elementNode.NodeType = TreeViewNodeType.ElementMapping;
                                 elementNode.Matched = linkInfo.Matched;
                                 elementNode.ToolTip = linkInfo.ToolTipText;
-                                elementNode.ToolTipVisibility = Visibility.Visible;
+                                elementNode.ToolTipVisibility = System.Windows.Visibility.Visible;
 
                                 categoryNode.ChildrenNodes.Add(elementNode);
                             }
@@ -132,7 +132,7 @@ namespace HOK.ElementMover
                             {
                                 var familyNode = new TreeViewElementModel(familyName);
                                 familyNode.NodeType = TreeViewNodeType.Family;
-                                familyNode.ToolTipVisibility = Visibility.Hidden;
+                                familyNode.ToolTipVisibility = System.Windows.Visibility.Hidden;
                                 categoryNode.ChildrenNodes.Add(familyNode);
 
                                 var familyTypes = from linkedElement in lip.LinkedElements.Values
@@ -145,7 +145,7 @@ namespace HOK.ElementMover
                                     {
                                         var familyTypeNode = new TreeViewElementModel(familyTypeName);
                                         familyTypeNode.NodeType = TreeViewNodeType.FamilyType;
-                                        familyTypeNode.ToolTipVisibility = Visibility.Hidden;
+                                        familyTypeNode.ToolTipVisibility = System.Windows.Visibility.Hidden;
                                         familyNode.ChildrenNodes.Add(familyTypeNode);
 
                                         var mappings = from linkedElement in lip.LinkedElements.Values
@@ -161,7 +161,7 @@ namespace HOK.ElementMover
                                                 elementNode.NodeType = TreeViewNodeType.ElementMapping;
                                                 elementNode.Matched = linkInfo.Matched;
                                                 elementNode.ToolTip = linkInfo.ToolTipText;
-                                                elementNode.ToolTipVisibility = Visibility.Visible;
+                                                elementNode.ToolTipVisibility = System.Windows.Visibility.Visible;
 
                                                 familyTypeNode.ChildrenNodes.Add(elementNode);
                                             }

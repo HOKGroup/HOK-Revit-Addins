@@ -502,7 +502,7 @@ namespace HOK.ElementMover
     {
         public bool AllowElement(Element elem)
         {
-#if RELEASE2024
+#if REVIT2024_OR_GREATER
             return elem.Category.Id.Value == (long)BuiltInCategory.OST_RvtLinks;
 #else
             return elem.Category.Id.IntegerValue == (int)BuiltInCategory.OST_RvtLinks;

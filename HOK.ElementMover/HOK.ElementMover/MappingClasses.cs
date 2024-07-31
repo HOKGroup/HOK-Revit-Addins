@@ -323,7 +323,7 @@ namespace HOK.ElementMover
 
             //tree view
             CategoryName = linkedElement.Category.Name;
-#if RELEASE2024
+#if REVIT2024_OR_GREATER
             if (customCategories.Contains(linkedElement.Category.Id.Value))
 #else
             if (customCategories.Contains(linkedElement.Category.Id.IntegerValue))
@@ -342,7 +342,11 @@ namespace HOK.ElementMover
                         var typeInfo = new ElementTypeInfo(elementType);
                         FamilyName = typeInfo.FamilyName;
                         FamilyTypeName = typeInfo.Name;
+#if REVIT2024_OR_GREATER
+                        LinkDisplayText = "Source Id: " + SourceElementId.Value + ", Target Id: " + LinkedElementId.Value;
+#else
                         LinkDisplayText = "Source Id: " + SourceElementId.IntegerValue + ", Target Id: " + LinkedElementId.IntegerValue;
+#endif
                     }
                 }
             }
