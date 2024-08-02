@@ -51,7 +51,7 @@ Public Class clsPara
     Public ReadOnly Property DisplayUnitType() As String
         Get
             Try
-#If RELEASE2022 Or RELEASE2023 Or RELEASE2024 Then
+#If REVIT2022_OR_GREATER
                 Return m_parameter.Definition.GetDataType().ToString
 #Else
                 Return m_parameter.Definition.ParameterType.ToString

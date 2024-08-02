@@ -55,7 +55,7 @@ Public Class form_ParameterCalculation
                     For Each p As Parameter In e.Parameters
                         Try
                             Dim m_Para As New clsParaMini(p)
-#If RELEASE2022 Or RELEASE2023 Or RELEASE2024 Then
+#If REVIT2022_OR_GREATER
                             Select Case p.Definition.GetDataType()
                                 Case New ForgeTypeId() ' Invalid
                                     Continue For
@@ -89,7 +89,7 @@ Public Class form_ParameterCalculation
                     For Each p As Parameter In e.Parameters
                         Try
                             Dim m_Para As New clsParaMini(p)
-#If RELEASE2022 Or RELEASE2023 Or RELEASE2024 Then
+#If REVIT2022_OR_GREATER
                             Select Case p.Definition.GetDataType()
                                 Case New ForgeTypeId() ' Invalid
                                     Continue For

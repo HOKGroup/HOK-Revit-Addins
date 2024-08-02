@@ -148,7 +148,7 @@ Public Class clsSettings
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    Private Function ParametersBoundByCategory() As Boolean
+    Private Sub ParametersBoundByCategory()
         Dim iterCategory As Category
         Try
             ' Binding Map
@@ -188,7 +188,7 @@ Public Class clsSettings
             MessageBox.Show(ex.Message, "clsSettings:ParametersBoundByCategory", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End Try
 
-    End Function
+    End Sub
 
     ''' <summary>
     ''' Gets Revit settings for document, view, etc; 

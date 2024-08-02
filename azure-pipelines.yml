@@ -42,7 +42,7 @@ pool:
 variables:
 - group: code-signing
 - name: solution
-  value: '**/HOK.+(AddInManager|BetaToolsManager|ElementFlatter|ElementMover|MoveBackup|RibbonTab|ElementTools|LPDCalculator|Navigator).sln'
+  value: '**/HOK.+(AddInManager|BetaToolsManager|ElementFlatter|ElementMover|MoveBackup|RibbonTab|ElementTools|LPDCalculator|Navigator|ParameterTools).sln'
 - name: coreSolution
   value: '**/HOK.Core.sln'
 - name: MCsolution
