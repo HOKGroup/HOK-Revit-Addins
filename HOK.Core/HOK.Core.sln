@@ -6,7 +6,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.Core", "HOK.Core\HOK.Co
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug R18|x64 = Debug R18|x64
 		Debug R19|x64 = Debug R19|x64
 		Debug R20|x64 = Debug R20|x64
 		Debug R21|x64 = Debug R21|x64
@@ -14,7 +13,6 @@ Global
 		Debug R23|x64 = Debug R23|x64
 		Debug R24|x64 = Debug R24|x64
 		Debug R25|x64 = Debug R25|x64
-		Release R18|x64 = Release R18|x64
 		Release R19|x64 = Release R19|x64
 		Release R20|x64 = Release R20|x64
 		Release R21|x64 = Release R21|x64
@@ -24,8 +22,6 @@ Global
 		Release R25|x64 = Release R25|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug R18|x64.ActiveCfg = Debug R18|x64
-		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug R18|x64.Build.0 = Debug R18|x64
 		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug R19|x64.ActiveCfg = Debug R19|x64
 		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug R19|x64.Build.0 = Debug R19|x64
 		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug R20|x64.ActiveCfg = Debug R20|x64
@@ -40,8 +36,6 @@ Global
 		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug R24|x64.Build.0 = Debug R24|x64
 		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug R25|x64.ActiveCfg = Debug R25|x64
 		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Debug R25|x64.Build.0 = Debug R25|x64
-		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Release R18|x64.ActiveCfg = Release R18|x64
-		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Release R18|x64.Build.0 = Release R18|x64
 		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Release R19|x64.ActiveCfg = Release R19|x64
 		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Release R19|x64.Build.0 = Release R19|x64
 		{A57DF876-56B5-4F48-87D6-7006CFA68FC6}.Release R20|x64.ActiveCfg = Release R20|x64
