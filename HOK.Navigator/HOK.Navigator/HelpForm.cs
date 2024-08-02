@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO;
 using HOK.Core.Utilities;
+using Form = System.Windows.Forms.Form;
 
 namespace HOK.Navigator
 {
