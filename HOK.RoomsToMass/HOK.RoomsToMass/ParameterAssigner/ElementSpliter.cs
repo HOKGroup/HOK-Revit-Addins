@@ -199,7 +199,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var structural = floortype.IsFoundationSlab;
                 foreach (var profile in profiles)
                 {
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2022_OR_GREATER
                     var loopProfile = new List<CurveLoop>(1);
                     List<Curve> curves = new List<Curve>();
                     foreach (Curve curve in profile)
@@ -241,7 +241,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                 var structural = floortype.IsFoundationSlab;
                 foreach (var profile in profiles)
                 {
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2022_OR_GREATER
                     var loopProfile = new List<CurveLoop>(1);
                     List<Curve> curves = new List<Curve>();
                     foreach (Curve curve in profile)
@@ -716,7 +716,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             newRoof = primaryDoc.Create.NewFootPrintRoof(profile, roofLevel, footPrintRoof.RoofType, out modelCurveMapping);
                             if (null != newRoof)
                             {
-#if RELEASE2024
+#if REVIT2024_OR_GREATER
                                 var slabShapeEditor = footPrintRoof.GetSlabShapeEditor();
                                 if (slabShapeEditor.IsEnabled)
                                 {
@@ -765,7 +765,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                             newRoof = primaryDoc.Create.NewFootPrintRoof(profile, roofLevel, footPrintRoof.RoofType, out modelCurveMapping);
                             if (null != newRoof)
                             {
-#if RELEASE2024
+#if REVIT2024_OR_GREATER
                                 var slabShapeEditor = footPrintRoof.GetSlabShapeEditor();
                                 if (slabShapeEditor.IsEnabled)
                                 {
@@ -867,7 +867,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
                     {
                         if (vertex.VertexType == SlabShapeVertexType.Interior)
                         {
+#if REVIT2025_OR_GREATER
+                            try { newEditor.AddPoint(vertex.Position); }
+#else
                             try { newEditor.DrawPoint(vertex.Position); }
+#endif
                             catch { continue; }
                         }
                     }
@@ -883,7 +887,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
                                 try
                                 {
                                     var intersectPoint = resultArray.get_Item(0).XYZPoint;
+#if REVIT2025_OR_GREATER
+                                    newEditor.AddPoint(intersectPoint);
+#else
                                     newEditor.DrawPoint(intersectPoint);
+#endif
                                 }
                                 catch { continue; }
                             }

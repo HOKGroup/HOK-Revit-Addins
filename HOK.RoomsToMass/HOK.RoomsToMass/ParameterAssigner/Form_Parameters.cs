@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using HOK.Core.Utilities;
+using Form = System.Windows.Forms.Form;
 
 namespace HOK.RoomsToMass.ParameterAssigner
 {

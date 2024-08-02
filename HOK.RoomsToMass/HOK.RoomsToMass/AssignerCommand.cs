@@ -8,6 +8,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.RoomsToMass.ParameterAssigner;
+using Form = System.Windows.Forms.Form;
 
 namespace HOK.RoomsToMass
 {

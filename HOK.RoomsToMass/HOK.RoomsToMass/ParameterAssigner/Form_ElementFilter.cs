@@ -743,7 +743,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
                         if (emptyValue)
                         {
                             FilterStringRuleEvaluator fsre = new FilterStringGreater();
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2022_OR_GREATER
                             FilterStringRule stringRule = new FilterStringRule(pvp, fsre, "");
 #else
                             FilterStringRule stringRule = new FilterStringRule(pvp, fsre, "", false);
@@ -754,7 +754,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
 
                         FilterStringRuleEvaluator fnre4 = FindFilterStringRuleEvaluator(strOperator);
                         string strValue = paramValue;
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2022_OR_GREATER
                         FilterStringRule filterRule4 = new FilterStringRule(pvp, fnre4, strValue);
 #else
                         FilterStringRule filterRule4 = new FilterStringRule(pvp, fnre4, strValue, false);
