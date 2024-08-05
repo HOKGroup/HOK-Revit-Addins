@@ -40,7 +40,7 @@ namespace HOK.CeilingHeight
                     MessageBox.Show("There are no rooms in the model. Add one to use this tool.", "Find Parameters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return Result.Failed;
                 }
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2022_OR_GREATER
                 var parameterRequirements = new Dictionary<string, ForgeTypeId>
                 {
                     {"Ceiling Height", SpecTypeId.Length},
@@ -141,7 +141,7 @@ namespace HOK.CeilingHeight
             return Result.Succeeded;
         }
 
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2022_OR_GREATER
         private static bool FindParameter(Room room, string paramName, ForgeTypeId paramType)
         {
 #else
@@ -151,7 +151,7 @@ namespace HOK.CeilingHeight
             try
             {
                 var param = room.LookupParameter(paramName);
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2022_OR_GREATER
                 return param?.Definition.GetDataType() == paramType;
 #else
                 return param?.Definition.ParameterType == paramType;

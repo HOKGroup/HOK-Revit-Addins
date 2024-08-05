@@ -387,8 +387,9 @@ namespace HOK.CeilingHeight
                         parameter.Set(rp.CeilingHeight);
                         trans.Commit();
                     }
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
-                    else if (CreateSharedParameter(paramName, SpecTypeId.Length, BuiltInParameterGroup.PG_GEOMETRY))
+#if REVIT2022_OR_GREATER
+                    else if (CreateSharedParameter(paramName, SpecTypeId.Length, GroupTypeId.Geometry))
+
                     {
 #else
                     else if (CreateSharedParameter(paramName, ParameterType.Length, BuiltInParameterGroup.PG_GEOMETRY))
@@ -447,8 +448,8 @@ namespace HOK.CeilingHeight
                         parameter.Set(ceilingHeights);
                         trans.Commit();
                     }
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
-                    else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.PG_GEOMETRY))
+#if REVIT2022_OR_GREATER
+                    else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, GroupTypeId.Geometry))
                     {
 #else
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.PG_GEOMETRY))
@@ -499,8 +500,8 @@ namespace HOK.CeilingHeight
                             trans.Commit();
                         }
                     }
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
-                    else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.INVALID))
+#if REVIT2022_OR_GREATER
+                    else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, new ForgeTypeId()))
                     {
 #else
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.INVALID))
@@ -565,8 +566,8 @@ namespace HOK.CeilingHeight
                             trans.RollBack();
                         }
                     }
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
-                    else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, BuiltInParameterGroup.INVALID))
+#if REVIT2022_OR_GREATER
+                    else if (CreateSharedParameter(paramName, SpecTypeId.String.Text, new ForgeTypeId()))
                     {
 #else
                     else if (CreateSharedParameter(paramName, ParameterType.Text, BuiltInParameterGroup.INVALID))
@@ -595,8 +596,8 @@ namespace HOK.CeilingHeight
             }
         }
 
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
-        private bool CreateSharedParameter(string paramName, ForgeTypeId paramType, BuiltInParameterGroup pramGroup)
+#if REVIT2022_OR_GREATER
+        private bool CreateSharedParameter(string paramName, ForgeTypeId paramType, ForgeTypeId pramGroup)
         {
 #else
         private bool CreateSharedParameter(string paramName, ParameterType paramType, BuiltInParameterGroup pramGroup)
