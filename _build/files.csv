@@ -1,7 +1,5 @@
 ﻿sourcePath,fileName,destination
 HOK.MissionControl\HOK.MissionControl\bin\,EngineIoClientDotNet.dll,HOK-Addin.bundle\Contents\
-HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,EntityFramework.dll,HOK-Addin.bundle\Contents\
-HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,EntityFramework.SqlServer.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,GalaSoft.MvvmLight.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,GalaSoft.MvvmLight.Extras.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,GalaSoft.MvvmLight.Platform.dll,HOK-Addin.bundle\Contents\
@@ -38,8 +36,6 @@ HOK.Utilities\HOK.RoomMeasure\bin\,HOK.RoomMeasure.dll,HOK-Addin.bundle\Contents
 HOK.RoomsToMass\HOK.RoomsToMass\bin\,HOK.RoomsToMass.dll,HOK-Addin.bundle\Contents\
 HOK.Utilities\HOK.RoomUpdater\bin\,HOK.RoomUpdater.dll,HOK-Addin.bundle\Contents\
 HOK.SheetManager\SheetManager\bin\,HOK.SheetManager.dll,HOK-Addin.bundle\Contents\
-HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,HOK.SmartBCF.AddIn.dll,HOK-Addin.bundle\Contents\
-HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,HOK.SmartBCF.dll,HOK-Addin.bundle\Contents\
 HOK.ViewAnalysis\HOK.ViewAnalysis\bin\,HOK.ViewAnalysis.dll,HOK-Addin.bundle\Contents\
 HOK.Utilities\HOK.ViewDepth\bin\,HOK.ViewDepth.dll,HOK-Addin.bundle\Contents\
 HOK.Utilities\HOK.WorksetView\bin\,HOK.WorksetView.dll,HOK-Addin.bundle\Contents\
@@ -49,9 +45,6 @@ HOK.MissionControl\HOK.MissionControl\bin\,MongoDB.Bson.dll,HOK-Addin.bundle\Con
 HOK.MissionControl\HOK.MissionControl\bin\,Newtonsoft.Json.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,RestSharp.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,SocketIoClientDotNet.dll,HOK-Addin.bundle\Contents\
-HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,System.Data.SQLite.dll,HOK-Addin.bundle\Contents\
-HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,System.Data.SQLite.EF6.dll,HOK-Addin.bundle\Contents\
-HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,System.Data.SQLite.Linq.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,System.Windows.Interactivity.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,WebSocket4Net.dll,HOK-Addin.bundle\Contents\
 HOK.AddInManager\HOK.AddInManager\bin\,HOK.AddInManager.addin,\
@@ -66,4 +59,3 @@ HOK.ModelReporting\HOK.ModelReporting\bin\,HOK.ModelReporting.addin,\
 HOK.MoveBackup\HOK.MoveBackup\bin\,HOK.MoveBackup.addin,\
 HOK.Navigator\HOK.Navigator\bin\,HOK.Navigator.addin,\
 HOK.RibbonTab\HOK.RibbonTab\bin\,HOK.RibbonTab.addin,\
-HOK.SmartBCF\HOK.SmartBCF.AddIn\bin\,HOK.SmartBCF.addin,\
