@@ -52,9 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="HOK.Core">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\bin\HOK.Core\$(Configuration)\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
     </Reference>
     <Reference Include="HOK.Feedback">
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\bin\HOK.Feedback\$(Configuration)\HOK.Feedback.dll</HintPath>
       <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\x64\$(Configuration)\HOK.Feedback.dll</HintPath>
     </Reference>
   </ItemGroup>
