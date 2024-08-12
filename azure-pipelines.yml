@@ -42,7 +42,7 @@ pool:
 variables:
 - group: code-signing
 - name: solution
-  value: '**/HOK.!(FileOpeningMonitor|ModelReporting|SheetManager|Utilities|ViewAnalysis).sln'
+  value: '**/HOK.!(FileOpeningMonitor|ModelReporting|SheetManager|ViewAnalysis).sln'
 - name: coreSolution
   value: '**/HOK.Core.sln'
 - name: MCsolution
