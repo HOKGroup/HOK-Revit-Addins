@@ -119,7 +119,7 @@ namespace HOK.FinishCreator
                         if (null != floorType && ElementId.InvalidElementId != room.LevelId)
                         {
                             var roomLevel = m_doc.GetElement(room.LevelId) as Level;
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2022_OR_GREATER
                             var loopProfile = new List<CurveLoop>(1);
                             List<Curve> curves = new List<Curve>();
                             foreach (Curve curve in curveArrayList[0])
@@ -135,7 +135,7 @@ namespace HOK.FinishCreator
                         }
                         else
                         {
-#if RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2022_OR_GREATER
                             throw new Exception("FloorTypeId or RoomLevelId was not valid");
 #else
                             newFloor = m_doc.Create.NewFloor(curveArrayList[0], false);

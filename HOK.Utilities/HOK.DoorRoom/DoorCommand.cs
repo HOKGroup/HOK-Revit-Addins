@@ -33,7 +33,7 @@ namespace HOK.DoorRoom
             if (toNumberFound && toNameFound && fromNumberFound && fromNameFound)
             {
                 var taskDialog =
-                    new TaskDialog("Door Link Command")
+                    new Autodesk.Revit.UI.TaskDialog("Door Link Command")
                     {
                         MainInstruction = "Select a mode for the Door Link Command",
                         MainContent =

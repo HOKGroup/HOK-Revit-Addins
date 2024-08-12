@@ -35,7 +35,7 @@ namespace HOK.FinishCreator
 
                 var uidoc = m_app.ActiveUIDocument;
                 var title = "Finish Creator v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                var mainDialog = new TaskDialog(title)
+                var mainDialog = new Autodesk.Revit.UI.TaskDialog(title)
                 {
                     MainInstruction = "Select a Finish Type",
                     MainContent =
