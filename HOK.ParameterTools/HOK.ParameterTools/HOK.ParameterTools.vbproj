@@ -56,10 +56,11 @@
 
   <ItemGroup>
     <Reference Include="HOK.Core">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\bin\HOK.Core\$(Configuration)\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\HOK.MissionControl\HOK.MissionControl.Core\bin\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\bin\HOK.MissionControl.Core\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
