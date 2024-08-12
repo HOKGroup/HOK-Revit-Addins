@@ -138,7 +138,7 @@ Public Class form_Main
         Next
 
         'Fill the m_TitleBlock list box
-        For Each fs As DB.FamilySymbol In m_Settings.Application.ActiveUIDocument.Document.TitleBlocks
+        For Each fs In m_TitleBlocks
             listBoxTitleblocks.Items.Add(fs.Name.ToString)
         Next
         If listBoxTitleblocks.Items.Count = 0 Then
@@ -274,8 +274,8 @@ Public Class form_Main
                         Continue For
                     End If
                     'We don't want to get any of the sheets in case they had the same name
-                    If Not mDictionaryViews.ContainsKey(mView.ViewName) Then 'Not sure if this could ever happen
-                        mDictionaryViews.Add(mView.ViewName, mView)
+                    If Not mDictionaryViews.ContainsKey(mView.Name) Then 'Not sure if this could ever happen
+                        mDictionaryViews.Add(mView.Name, mView)
                     End If
                 Next
 
@@ -292,11 +292,12 @@ Public Class form_Main
 
     Private Sub buttonAddViews_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles buttonAddViews.Click
         Dim dataTableLocal As System.Data.DataTable
-        Dim pointInsert As New DB.UV
+        Dim pointInsert As Autodesk.Revit.DB.XYZ = new Autodesk.Revit.DB.XYZ(0,0,0)
         Dim parameterViewSheetInfo As DB.Parameter
         Dim offsetU As Double = 0
         Dim offsetV As Double = 0
         Dim viewsNotPlaced As String = ""
+        Dim doc as Autodesk.Revit.DB.Document
 
         'Do not allow Access case
         If m_isExcel = False Then
@@ -345,71 +346,80 @@ Public Class form_Main
             Return
         End If
 
-        'Process each row in rename table
-        For Each row As DataRow In dataTableLocal.Rows
+        doc = m_Settings.Application.ActiveUIDocument.Document
+        Using trans As New DB.Transaction(doc, "Create Sheet")
+            trans.Start()
 
-            'Increment the progress bar
-            Me.ProgressBar1.Increment(1)
+            'Process each row in rename table
+            For Each row As DataRow In dataTableLocal.Rows
 
-            'Check for missing values and ignore them
-            If row("Sheet Number").ToString = "" Then
-                Continue For
-            End If
-            If row("View Name").ToString = "" Then
-                Continue For
-            End If
-            If row("U").ToString = "" Then
-                Continue For
-            End If
-            If row("V").ToString = "" Then
-                Continue For
-            End If
+                'Increment the progress bar
+                Me.ProgressBar1.Increment(1)
 
-            'See if sheet and view exist; if not ignore step
-            If Not mDictionarySheets.ContainsKey(row("Sheet Number").ToString) Then
-                Continue For
-            End If
-            If Not mDictionaryViews.ContainsKey(row("View Name").ToString) Then
-                Continue For
-            End If
-
-            'Get the sheet and view and place view
-            mViewSheet = mDictionarySheets(row("Sheet Number").ToString)
-            mView = mDictionaryViews(row("View Name").ToString)
-
-            'Confirm that UV values are good numbers and get the values
-            Try
-                offsetU = Convert.ToDouble(row("U").ToString)
-                offsetV = Convert.ToDouble(row("V").ToString)
-            Catch exception As Exception
-                MessageBox.Show("Error in 'Start.buttonAddViews_Click' while converting U or V value to number. Processing stopped." & vbLf & vbLf & "System message: " & exception.Message, m_Settings.ProgramName)
-                Me.ProgressBar1.Visible = False
-                Return
-            End Try
-
-            'place the view
-            Try
-                parameterViewSheetInfo = mView.Parameter(DB.BuiltInParameter.VIEW_SHEET_VIEWPORT_INFO)
-                If parameterViewSheetInfo.AsString.ToUpper = "NOT IN A SHEET" Then
-                    pointInsert = New DB.UV(offsetU - mView.Outline.Min.U, offsetV - mView.Outline.Min.V)
-                    mViewSheet.AddView(mView, pointInsert)
-                Else
-                    If viewsNotPlaced = "" Then
-                        viewsNotPlaced = "The following views were not placed because they have already been placed on a sheet:" & vbLf & Convert.ToString(mView.Name)
-                    Else
-                        viewsNotPlaced = viewsNotPlaced & "; " & Convert.ToString(mView.Name)
-                    End If
+                'Check for missing values and ignore them
+                If row("Sheet Number").ToString = "" Then
+                    Continue For
                 End If
-                'catch {
-                '    //For now we are ignoring this error since it occurs when the view has already been placed
-                '    continue;
+                If row("View Name").ToString = "" Then
+                    Continue For
+                End If
+                If row("U").ToString = "" Then
+                    Continue For
+                End If
+                If row("V").ToString = "" Then
+                    Continue For
+                End If
 
-            Catch exception As Exception
-                MessageBox.Show((("Error in 'Start.buttonAddViews_Click' while placing view.  Processing stopped." & vbLf & "Sheet Number: """ & row("Sheet Number").ToString & """" & vbLf & "View Name: """ & row("View Name").ToString & """" & vbLf & "U: """ & row("U").ToString & """" & vbLf & "V: """ & row("V").ToString & """" & vbLf & "pointInsert.U: """) + pointInsert.U.ToString & """" & vbLf & "pointInsert.V: """) + pointInsert.V.ToString & """" & vbLf & vbLf & "System message: " & exception.Message, m_Settings.ProgramName)
-                Me.ProgressBar1.Visible = False
-                Return
-            End Try
-        Next
+                'See if sheet and view exist; if not ignore step
+                If Not mDictionarySheets.ContainsKey(row("Sheet Number").ToString) Then
+                    Continue For
+                End If
+                If Not mDictionaryViews.ContainsKey(row("View Name").ToString) Then
+                    Continue For
+                End If
+
+                'Get the sheet and view and place view
+                mViewSheet = mDictionarySheets(row("Sheet Number").ToString)
+                mView = mDictionaryViews(row("View Name").ToString)
+
+                'Confirm that UV values are good numbers and get the values
+                Try
+                    offsetU = Convert.ToDouble(row("U").ToString)
+                    offsetV = Convert.ToDouble(row("V").ToString)
+                Catch exception As Exception
+                    MessageBox.Show("Error in 'Start.buttonAddViews_Click' while converting U or V value to number. Processing stopped." & vbLf & vbLf & "System message: " & exception.Message, m_Settings.ProgramName)
+                    Me.ProgressBar1.Visible = False
+                    Return
+                End Try
+
+                'place the view
+                Try
+                    parameterViewSheetInfo = mView.Parameter(DB.BuiltInParameter.VIEW_SHEET_VIEWPORT_INFO)
+                    If parameterViewSheetInfo.AsString.ToUpper = "NOT IN A SHEET" Then
+                        pointInsert = New Autodesk.Revit.DB.XYZ(offsetU - mView.Outline.Min.U, offsetV - mView.Outline.Min.V, 0)
+                        Dim viewport As Autodesk.Revit.DB.Viewport = Autodesk.Revit.DB.Viewport.Create(doc, mViewSheet.Id, mView.Id, pointInsert)
+                        doc.Regenerate()
+                    Else
+                        If viewsNotPlaced = "" Then
+                            viewsNotPlaced = "The following views were not placed because they have already been placed on a sheet:" & vbLf & Convert.ToString(mView.Name)
+                        Else
+                            viewsNotPlaced = viewsNotPlaced & "; " & Convert.ToString(mView.Name)
+                        End If
+                    End If
+                    'catch {
+                    '    //For now we are ignoring this error since it occurs when the view has already been placed
+                    '    continue;
+                ' Commit the transaction
+                trans.Commit()
+
+                Catch exception As Exception
+                    trans.RollBack()
+                    MessageBox.Show((("Error in 'Start.buttonAddViews_Click' while placing view.  Processing stopped." & vbLf & "Sheet Number: """ & row("Sheet Number").ToString & """" & vbLf & "View Name: """ & row("View Name").ToString & """" & vbLf & "U: """ & row("U").ToString & """" & vbLf & "V: """ & row("V").ToString & """" & vbLf & "pointInsert.U: """) + pointInsert.X.ToString & """" & vbLf & "pointInsert.V: """) + pointInsert.Y.ToString & """" & vbLf & vbLf & "System message: " & exception.Message, m_Settings.ProgramName)
+                    Me.ProgressBar1.Visible = False
+                    Return
+                End Try
+            Next
+        End Using
 
         'Empty the data table since it seems to fill up with repeated use of the command
         dataTableLocal.Clear()
@@ -691,8 +701,12 @@ Public Class form_Main
             .Visible = True
         End With
 
+        Dim colTitleblocks As New DB.FilteredElementCollector(m_Settings.Application.ActiveUIDocument.Document)
+        colTitleblocks.OfCategory(DB.BuiltInCategory.OST_TitleBlocks)
+        m_TitleBlocks = colTitleblocks.OfClass(GetType(DB.FamilySymbol)).ToElements()
+
         'Get titleblock selection
-        For Each titleBlockTest As DB.FamilySymbol In m_Settings.Application.ActiveUIDocument.Document.TitleBlocks
+        For Each titleBlockTest As DB.FamilySymbol In m_TitleBlocks
             If titleBlockTest.Name.ToString = listBoxTitleblocks.SelectedItem.ToString Then
                 m_TitleBlock = titleBlockTest
                 Exit For
@@ -728,10 +742,25 @@ Public Class form_Main
                     Continue For
                 End If
             Else
+                ' Start a transaction for creating the sheet
+                Dim doc as DB.Document = m_Settings.Application.ActiveUIDocument.Document
+                Using trans As New DB.Transaction(doc, "Create Sheet")
+                    trans.Start()
+                    ' Ensure the title block is activated
+                    If Not m_TitleBlock.IsActive Then
+                        m_TitleBlock.Activate()
+                        doc.Regenerate()
+                    End If
+                    mViewSheet = DB.ViewSheet.Create(doc, m_TitleBlock.Id)
 
-                Dim docCreation As Autodesk.Revit.Creation.Document = m_Settings.Application.ActiveUIDocument.Document.Create
-                mViewSheet = docCreation.NewViewSheet(m_TitleBlock)
-
+                    If mViewSheet IsNot Nothing Then
+                        ' Commit the transaction
+                        trans.Commit()
+                    Else
+                        ' Rollback the transaction in case of failure
+                        trans.RollBack()
+                    End If
+                End Using
             End If
 
             'Determine parameter list from matching parameters and fields

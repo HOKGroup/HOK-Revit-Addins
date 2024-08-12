@@ -4,6 +4,7 @@ Imports System.Data
 Imports System.IO
 Imports Microsoft.Office.Interop
 Imports System.Text
+Imports TaskDialog = Autodesk.Revit.UI.TaskDialog
 
 
 ' Update INI functionality

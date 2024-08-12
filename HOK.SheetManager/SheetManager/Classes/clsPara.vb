@@ -52,7 +52,7 @@ Public Class clsPara
     Public ReadOnly Property DisplayUnitType() As String
         Get
             Try
-#If RELEASE2022 Or RELEASE2023 Or RELEASE2024 Then
+#If REVIT2022_OR_GREATER
                 Return m_parameter.Definition.GetDataType().ToString
 #Else
                 Return m_parameter.Definition.ParameterType.ToString
@@ -192,7 +192,7 @@ Public Class clsPara
             Case StorageType.Double
                 Return parameter.AsDouble.ToString
             Case StorageType.ElementId
-#If RELEASE2024 Then
+#If REVIT2024_OR_GREATER
                 Return parameter.AsElementId.Value.ToString
 #Else
                 Return parameter.AsElementId.IntegerValue.ToString
@@ -225,15 +225,19 @@ Public Class clsPara
                         parameter.Set(m_Double)
                     End If
                 Case StorageType.ElementId
-#If RELEASE2024 Then
+#If REVIT2024_OR_GREATER Then
                     Dim m_ElementId As Long
+                    If Long.TryParse(value.ToString, m_ElementId) Then
+                        Dim myElementId As ElementId = New ElementId(m_ElementId)
+                        parameter.[Set](myElementId)
+                    End If
 #Else
                     Dim m_ElementId As Integer
-#End If
                     If Integer.TryParse(value.ToString, m_ElementId) Then
                         Dim myElementId As ElementId = New ElementId(m_ElementId)
                         parameter.[Set](myElementId)
                     End If
+#End If
                 Case StorageType.Integer
                     Dim m_Int As Integer = 0
                     Select Case value.ToString.ToUpper
