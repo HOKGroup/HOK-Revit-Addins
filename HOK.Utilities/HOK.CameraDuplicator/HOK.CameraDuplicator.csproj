@@ -53,7 +53,7 @@
     </Reference>
     <Reference Include="HOK.Feedback">
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\bin\HOK.Feedback\$(Configuration)\HOK.Feedback.dll</HintPath>
-      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\x64\$(Configuration)\HOK.Feedback.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Feedback\HOK.Feedback\bin\x64\$(Configuration)\HOK.Feedback.dll</HintPath>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\bin\HOK.MissionControl.Core\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
