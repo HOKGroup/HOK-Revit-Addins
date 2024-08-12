@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.ExtensibleStorage;
 using static HOK.Core.Utilities.ElementIdExtension;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace HOK.ViewDepth
 {
