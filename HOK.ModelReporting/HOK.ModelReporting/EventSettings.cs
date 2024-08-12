@@ -148,11 +148,7 @@ namespace HOK.ModelReporting
             try
             {
                 var projectLocation = Doc.ActiveProjectLocation;
-#if RELEASE2018
-                var site = projectLocation.SiteLocation;
-#else
                 var site = projectLocation.GetSiteLocation();
-#endif
                 const double angleRatio = Math.PI / 180;
                 ProjectLatitude = site.Latitude / angleRatio;
                 ProjectLongitude = site.Longitude / angleRatio;
