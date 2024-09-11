@@ -49,7 +49,7 @@ pool:
 variables:
 - group: code-signing
 - name: solution
-  value: '**/HOK.!(FileOpeningMonitor|ModelReporting).sln'
+  value: '**/HOK.!(Core|MissionControl|Feedback|ParameterTools|FileOpeningMonitor|ModelReporting).sln'
 - name: coreSolution
   value: '**/HOK.Core.sln'
 - name: MCsolution
