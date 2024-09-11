@@ -22,8 +22,3 @@ $d = "{0}\Resources" -f $libraryFolder
 $msg = "Copying {0} to {1}" -f $p,$d
 Write-Debug $msg
 Copy-Item $p -Destination $d
-
-$p = ".\Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.Manager\x86"
-Copy-Item -Path $p -Destination $libraryFolder -Recurse
-$p = ".\Smart BCF\src\HOK.SmartBCF\HOK.SmartBCF.Manager\x64"
-Copy-Item -Path $p -Destination $libraryFolder -Recurse

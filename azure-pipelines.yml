@@ -96,7 +96,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(coreSolution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts"'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -105,7 +105,7 @@ steps:
   inputs:
     command: 'build'
     projects: '**/HOK.MissionControl.Core.csproj'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts"'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -114,7 +114,7 @@ steps:
   inputs:
     command: 'build'
     projects: '**/HOK.MissionControl.csproj'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts"'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -123,7 +123,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(feedbackSolution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts"'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -132,7 +132,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(MCsolution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts"'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -141,7 +141,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(solution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts"'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx

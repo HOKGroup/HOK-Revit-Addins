@@ -1,8 +1,4 @@
 ﻿sourcePath,fileName,destination
-HOK.MissionControl\HOK.MissionControl\bin\,EngineIoClientDotNet.dll,HOK-Addin.bundle\Contents\
-HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,GalaSoft.MvvmLight.dll,HOK-Addin.bundle\Contents\
-HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,GalaSoft.MvvmLight.Extras.dll,HOK-Addin.bundle\Contents\
-HOK.MissionControl\HOK.MissionControl.StylesManager\bin\,GalaSoft.MvvmLight.Platform.dll,HOK-Addin.bundle\Contents\
 HOK.AddInManager\HOK.AddInManager\bin\,HOK.AddInManager.dll,HOK-Addin.bundle\Contents\
 HOK.AddInManager\HOK.DesktopConnectorLauncher\bin\,HOK.DesktopConnectorLauncher.dll,HOK-Addin.bundle\Contents\
 HOK.Utilities\HOK.Arrowhead\bin\,HOK.Arrowhead.dll,HOK-Addin.bundle\Contents\
