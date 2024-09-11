@@ -7,6 +7,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ImplicitUsings>true</ImplicitUsings>
     <Nullable>disable</Nullable>
+    <DisableAddinBundleGeneration>true</DisableAddinBundleGeneration>
     <Configurations>Debug R19; Debug R20;Debug R21;Debug R22;Debug R23;Debug R24;Debug R25</Configurations>
     <Configurations>$(Configurations);Release R19; Release R20;Release R21;Release R22;Release R23;Release R24;Release R25</Configurations>
     <Product>HOK Revit Add-ins</Product>
@@ -49,10 +50,12 @@
     <!-- HOK Libraries -->
   <ItemGroup>
     <Reference Include="HOK.Core">
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Core.dll</HintPath>      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.MissionControl.Core.dll</HintPath>      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 
