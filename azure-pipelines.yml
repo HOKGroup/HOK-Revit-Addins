@@ -71,7 +71,7 @@ steps:
     filePath: '$(Build.SourcesDirectory)/_build/copy_resources.ps1'
     errorActionPreference: 'continue'
   env:
-    BUILD_CONFIGURATION: $(buildConfiguration)
+    BUILD_CONFIGURATION: $(revitVersion)
 
 
 - task: DownloadSecureFile@1
@@ -153,12 +153,12 @@ steps:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
-# - task: PowerShell@2
-#   inputs:
-#     filePath: '$(Build.SourcesDirectory)/_build/copy_artifacts.ps1'
-#     errorActionPreference: 'continue'
-#   env:
-#     BUILD_CONFIGURATION: $(buildConfiguration)
+- task: PowerShell@2
+  inputs:
+    filePath: '$(Build.SourcesDirectory)/_build/cleanup_artifacts.ps1'
+    errorActionPreference: 'continue'
+  env:
+    BUILD_CONFIGURATION: $(revitVersion)
 
 - task: PublishBuildArtifacts@1
   inputs:
