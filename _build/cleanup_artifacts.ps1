@@ -18,5 +18,5 @@ foreach ($file in $files) {
 $dlls = Get-ChildItem $libraryFolder -Filter "HOK.*.dll"
 
 foreach ($dll in $dlls) {
-   & "$PSScriptRoot\..\_postBuild\codeSigning.ps1" $dll
+   & "$PSScriptRoot\..\_postBuild\codeSigning.ps1" $dll.FullName
 }
