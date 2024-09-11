@@ -53,16 +53,13 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="HOK.Core">
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\bin\HOK.Core\$(Configuration)\HOK.Core.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Core.dll</HintPath>      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
     </Reference>
     <Reference Include="HOK.Feedback">
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\bin\HOK.Feedback\$(Configuration)\HOK.Feedback.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Feedback\HOK.Feedback\bin\x64\$(Configuration)\HOK.Feedback.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Feedback.dll</HintPath>      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Feedback\HOK.Feedback\bin\x64\$(Configuration)\HOK.Feedback.dll</HintPath>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\bin\HOK.MissionControl.Core\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.MissionControl.Core.dll</HintPath>      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
