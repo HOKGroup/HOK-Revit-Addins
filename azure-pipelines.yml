@@ -17,24 +17,31 @@ strategy:
   matrix:
     2025:
       buildConfiguration: 'Release R25'
+      revitVersion: '2025'
     2024:
       dependsOn: 2025
       buildConfiguration: 'Release R24'
+      revitVersion: '2024'
     2023:
       dependsOn: 2024
       buildConfiguration: 'Release R23'
+      revitVersion: '2023'
     2022:
       dependsOn: 2023
       buildConfiguration: 'Release R22'
+      revitVersion: '2022'
     2021:
       dependsOn: 2022
       buildConfiguration: 'Release R21'
+      revitVersion: '2021'
     2020:
       dependsOn: 2021
       buildConfiguration: 'Release R20'
+      revitVersion: '2020'
     2019:
       dependsOn: 2020
       buildConfiguration: 'Release R19'
+      revitVersion: '2019'
 
 pool:
   vmImage: 'windows-latest'
@@ -96,7 +103,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(coreSolution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -105,7 +112,7 @@ steps:
   inputs:
     command: 'build'
     projects: '**/HOK.MissionControl.Core.csproj'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -114,7 +121,7 @@ steps:
   inputs:
     command: 'build'
     projects: '**/HOK.MissionControl.csproj'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -123,7 +130,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(feedbackSolution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -132,7 +139,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(MCsolution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
@@ -141,7 +148,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(solution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --output "$(Agent.JobName)'
+    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
