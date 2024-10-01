@@ -58,6 +58,8 @@ variables:
   value: '**/HOK.ParameterTools.sln'
 - name: feedbackSolution
   value: '**/HOK.Feedback.sln'
+- name: sheetManagerSolution
+  value: '**/HOK.SheetManager.sln'
 - name: buildPlatform
   value: 'x64'
 - name: BUILD_ENV
@@ -149,6 +151,25 @@ steps:
     command: 'build'
     projects: '$(solution)'
     arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '$(sheetManagerSolution)'
+    feedsToUse: 'select'
+    noCache: true
+
+- task: MSBuild@1
+  inputs:
+    solution: '$(sheetManagerSolution)'
+    msbuildArchitecture: 'x64'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArguments: '/property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
+    maximumCpuCount: true
   env:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
