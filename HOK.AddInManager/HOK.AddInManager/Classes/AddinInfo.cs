@@ -153,12 +153,12 @@ namespace HOK.AddInManager.Classes
             set { _loadTypes = value; NotifyPropertyChanged("LoadTypes"); }
         }
 
-        private bool _requiresRestart;
+        private bool _dropdownOptionsFlag;
         [XmlIgnore]
-        public bool RequiresRestart
+        public bool DropdownOptionsFlag
         {
-            get { return _requiresRestart; }
-            set { _requiresRestart = value; NotifyPropertyChanged("RequiresRestart"); }
+            get { return _dropdownOptionsFlag; }
+            set { _dropdownOptionsFlag = value; NotifyPropertyChanged("DropdownOptionsFlag"); }
         }
 
         #region Utilities

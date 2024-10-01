@@ -31,7 +31,7 @@ namespace HOK.AddInManager.UserControls
                 {
                     foreach (AddinInfo info in dataGridAddins.SelectedItems)
                     {
-                        if (info.RequiresRestart && selectedValue == LoadType.Always)
+                        if (info.DropdownOptionsFlag && selectedValue == LoadType.Always)
                         {
                             StatusBarManager.StatusLabel.Text =
                                 "One/more selected Addins will need Revit restart.";
@@ -44,7 +44,7 @@ namespace HOK.AddInManager.UserControls
                 _userSelection = false;
                 foreach (AddinInfo info in dataGridAddins.SelectedItems)
                 {
-                    if (info.RequiresRestart && selectedValue == LoadType.Always) postMessage = true;
+                    if (info.DropdownOptionsFlag && selectedValue == LoadType.Always) postMessage = true;
                     var rowIndex = dataGridAddins.Items.IndexOf(info);
                     var row = (DataGridRow)dataGridAddins.ItemContainerGenerator.ContainerFromIndex(rowIndex);
                     var rowComboBox = DataGridUtilities.FindVisualChild<ComboBox>(row);
