@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
     <TargetFramework>net8.0</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
+    <Platforms>AnyCPU;x64</Platforms>
     <ImplicitUsings>true</ImplicitUsings>
     <Nullable>disable</Nullable>
     <DisableAddinBundleGeneration>true</DisableAddinBundleGeneration>
@@ -83,7 +84,7 @@
 
   <!-- Other Packages -->
   <ItemGroup>
-    <PackageReference Include="RestSharp" Version="106.12.0" />
+    <PackageReference Include="RestSharp" Version="112.0.0" />
     <PackageReference Include="Costura.Fody" Version="5.7.0" />
   </ItemGroup>
 

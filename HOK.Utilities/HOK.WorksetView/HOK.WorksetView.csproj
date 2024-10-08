@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
     <TargetFramework>net8.0</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
+    <Platforms>AnyCPU;x64</Platforms>
     <ImplicitUsings>true</ImplicitUsings>
     <Nullable>disable</Nullable>
     <DisableAddinBundleGeneration>true</DisableAddinBundleGeneration>
