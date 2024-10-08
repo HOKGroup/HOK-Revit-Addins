@@ -162,17 +162,14 @@ steps:
     feedsToUse: 'select'
     noCache: true
 
-- task: MSBuild@1
+- task: VSBuild@1
   inputs:
     solution: '$(sheetManagerSolution)'
-    msbuildArchitecture: 'x64'
+    msbuildArgs: '/property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    msbuildArguments: '/property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
-    maximumCpuCount: true
-  env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
+    restoreNugetPackages: true
+    msbuildArchitecture: 'x64'
 
 - task: PowerShell@2
   inputs:
