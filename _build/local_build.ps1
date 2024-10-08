@@ -11,7 +11,7 @@ $sourceDir = $pwd
 ## Copy Resources to artifacts folder
 & "$sourceDir/_build/copy_resources.ps1"
 
-dotnet build "\HOK.Core\HOK.Core.sln" -c "$buildConfiguration" --artifacts-path "$sourceDir/_artifacts" --property:OutputPath="$sourceDir/_artifacts/$revitVersion"
+dotnet build "HOK.Core\HOK.Core.sln" -c "$buildConfiguration" --artifacts-path "$sourceDir/_artifacts" --property:OutputPath="$sourceDir/_artifacts/$revitVersion"
 
 dotnet build "HOK.MissionControl\HOK.MissionControl.Core\HOK.MissionControl.Core.csproj" -c "$buildConfiguration" --artifacts-path "$sourceDir/_artifacts" --property:OutputPath="$sourceDir/_artifacts/$revitVersion"
 
@@ -29,5 +29,7 @@ foreach ($solution in $solutions) {
 }
 
 & "$sourceDir/_build/cleanup_artifacts.ps1"
+
+Copy-Item ".\_artifacts\$revitVersion\HOK-Addin.bundle\Contents\*" "C:\ProgramData\Autodesk\Revit\Addins\$revitVersion\HOK-Addin.bundle\Contents\"
 
 Remove-Item Env:\BUILD_CONFIGURATION
