@@ -155,12 +155,13 @@ steps:
     PFX_PASS: $(CERT_SIGNING_PASS)
     PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
-    restoreSolution: '$(sheetManagerSolution)'
-    feedsToUse: 'select'
-    noCache: true
+    projects: '$(sheetManagerSolution)'
+  env:
+    PFX_PASS: $(CERT_SIGNING_PASS)
+    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
 - task: VSBuild@1
   inputs:
@@ -168,7 +169,6 @@ steps:
     msbuildArgs: '/property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    restoreNugetPackages: true
     msbuildArchitecture: 'x64'
 
 - task: PowerShell@2
