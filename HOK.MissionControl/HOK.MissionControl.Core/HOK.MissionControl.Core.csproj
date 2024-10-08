@@ -74,8 +74,8 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="2.0.2" />
-    <PackageReference Include="RestSharp" Version="106.12.0.0" />
-    <PackageReference Include="MongoDB.Bson" Version="2.28.0" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="MongoDB.Bson" Version="2.29.0" />
 
   </ItemGroup>
 

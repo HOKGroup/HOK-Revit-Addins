@@ -18,7 +18,6 @@ namespace HOK.MissionControl.Core.Utils
     {
         public static string RestApiBaseUrl { get; set; }
         public const string ApiVersion = "api/v2";
-        private static Func<NewtonsoftJsonSerializer> serializerFactory = () => { return new NewtonsoftJsonSerializer(); };
 
         private static HOK.Core.Utilities.Settings Settings { get; set; }
 
@@ -45,7 +44,7 @@ namespace HOK.MissionControl.Core.Utils
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/" + path, Method.GET);
+                var request = new RestRequest(ApiVersion + "/" + path, Method.Get);
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.OK) return false;
 
@@ -83,7 +82,7 @@ namespace HOK.MissionControl.Core.Utils
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
-                var request = new RestRequest(ApiVersion + "/" + path, Method.GET);
+                var request = new RestRequest(ApiVersion + "/" + path, Method.Get);
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.OK) return false;
 
@@ -133,20 +132,9 @@ namespace HOK.MissionControl.Core.Utils
                 }
 
                 var client = new RestClient(RestApiBaseUrl);
-                client.ClearHandlers();
-                client.AddHandler("application/json", serializerFactory);
-                client.AddHandler("text/json", serializerFactory);
-                client.AddHandler("text/x-json", serializerFactory);
-                client.AddHandler("text/javascript", serializerFactory);
-                client.AddHandler("*+json", serializerFactory);
 
-                var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.GET)
-                {
-                    OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
-                };
-                request.AddHeader("Content-type", "application/json");
+                var request = new RestRequest(ApiVersion + "/" + path + "/" + filePath, Method.Get);
                 request.RequestFormat = DataFormat.Json;
-                request.JsonSerializer = new NewtonsoftJsonSerializer();
 
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.OK) return false;
@@ -179,25 +167,14 @@ namespace HOK.MissionControl.Core.Utils
         /// </summary>
         /// <param name="body"></param>
         /// <param name="route"></param>
-        public static bool Put<T>(T body, string route)
+        public static bool Put<T>(T body, string route) where T : class
         {
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
-                client.ClearHandlers();
-                client.AddHandler("application/json", serializerFactory);
-                client.AddHandler("text/json", serializerFactory);
-                client.AddHandler("text/x-json", serializerFactory);
-                client.AddHandler("text/javascript", serializerFactory);
-                client.AddHandler("*+json", serializerFactory);
 
-                var request = new RestRequest(ApiVersion + "/" + route, Method.PUT)
-                {
-                    OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
-                };
-                request.AddHeader("Content-type", "application/json");
+                var request = new RestRequest(ApiVersion + "/" + route, Method.Put);
                 request.RequestFormat = DataFormat.Json;
-                request.JsonSerializer = new NewtonsoftJsonSerializer();
                 request.AddJsonBody(body);
 
                 var response = client.Execute(request);
@@ -226,20 +203,9 @@ namespace HOK.MissionControl.Core.Utils
         public static async Task<T> PostAsync<T>(object body, string route) where T : new()
         {
             var client = new RestClient(RestApiBaseUrl);
-            client.ClearHandlers();
-            client.AddHandler("application/json", serializerFactory);
-            client.AddHandler("text/json", serializerFactory);
-            client.AddHandler("text/x-json", serializerFactory);
-            client.AddHandler("text/javascript", serializerFactory);
-            client.AddHandler("*+json", serializerFactory);
 
-            var request = new RestRequest(ApiVersion + "/" + route, Method.POST)
-            {
-                OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
-            };
-            request.AddHeader("Content-type", "application/json");
+            var request = new RestRequest(ApiVersion + "/" + route, Method.Post);
             request.RequestFormat = DataFormat.Json;
-            request.JsonSerializer = new NewtonsoftJsonSerializer();
             request.AddJsonBody(body);
 
             var response = await client.ExecuteAsync<T>(request);
@@ -268,20 +234,9 @@ namespace HOK.MissionControl.Core.Utils
             try
             {
                 var client = new RestClient(RestApiBaseUrl);
-                client.ClearHandlers();
-                client.AddHandler("application/json", serializerFactory);
-                client.AddHandler("text/json", serializerFactory);
-                client.AddHandler("text/x-json", serializerFactory);
-                client.AddHandler("text/javascript", serializerFactory);
-                client.AddHandler("*+json", serializerFactory);
 
-                var request = new RestRequest(ApiVersion + "/" + route, Method.POST)
-                {
-                    OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
-                };
-                request.AddHeader("Content-type", "application/json");
+                var request = new RestRequest(ApiVersion + "/" + route, Method.Post);
                 request.RequestFormat = DataFormat.Json;
-                request.JsonSerializer = new NewtonsoftJsonSerializer();
                 request.AddJsonBody(body);
 
                 var response = client.Execute<T>(request);
@@ -316,7 +271,7 @@ namespace HOK.MissionControl.Core.Utils
             try
             {
                 var client = new RestClient(clientPath);
-                var request = new RestRequest(requestPath, Method.GET);
+                var request = new RestRequest(requestPath, Method.Get);
                 request.AddHeader("User-Name", Environment.UserName);
                 request.AddHeader("Operation-GUID", Guid.NewGuid().ToString());
                 string[] clarityServers = Settings.ClarityServers;

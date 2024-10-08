@@ -35,11 +35,7 @@ namespace HOK.Feedback
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             var client = new RestClient(baseUrl);
-            var request = new RestRequest(Settings.FeedbackPath + "contents/" + att.UploadImageContent.path, Method.DELETE)
-            {
-                OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
-            };
-            request.AddHeader("Content-type", "application/json");
+            var request = new RestRequest(Settings.FeedbackPath + "contents/" + att.UploadImageContent.path, Method.Delete);
             request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
             request.RequestFormat = DataFormat.Json;
 
@@ -107,11 +103,7 @@ namespace HOK.Feedback
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             var client = new RestClient(baseUrl);
-            var request = new RestRequest(Settings.FeedbackPath + "contents/" + body.path, Method.PUT)
-            {
-                OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
-            };
-            request.AddHeader("Content-type", "application/json");
+            var request = new RestRequest(Settings.FeedbackPath + "contents/" + body.path, Method.Put);
             request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
             request.RequestFormat = DataFormat.Json;
             request.AddJsonBody(body);
@@ -169,11 +161,7 @@ namespace HOK.Feedback
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             var client = new RestClient(baseUrl);
-            var request = new RestRequest(Settings.FeedbackPath + "issues", Method.POST)
-            {
-                OnBeforeDeserialization = resp => { resp.ContentType = "application/json"; }
-            };
-            request.AddHeader("Content-type", "application/json");
+            var request = new RestRequest(Settings.FeedbackPath + "issues", Method.Post);
             request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
             request.RequestFormat = DataFormat.Json;
             request.AddJsonBody(body);
