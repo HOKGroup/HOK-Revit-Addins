@@ -42,7 +42,8 @@ namespace HOK.MissionControl.Tools.WebsiteLink
                         if (MissionControlSetup.Projects.ContainsKey(centralPath))
                         {
                             var id = MissionControlSetup.Projects[centralPath].Id;
-                            Process.Start(ServerUtilities.RestApiBaseUrl + "/#/projects/edit/" + id);
+                            var url = ServerUtilities.RestApiBaseUrl + "/#/projects/edit/" + id;
+                            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
                         }
                         else launchHome = true;
                     }
@@ -50,7 +51,7 @@ namespace HOK.MissionControl.Tools.WebsiteLink
                 }
                 else launchHome = true;
 
-                if(launchHome) Process.Start(ServerUtilities.RestApiBaseUrl + "/#/home");
+                if(launchHome) Process.Start(new ProcessStartInfo(ServerUtilities.RestApiBaseUrl + "/#/home") { UseShellExecute = true });
             }
             catch (Exception e)
             {

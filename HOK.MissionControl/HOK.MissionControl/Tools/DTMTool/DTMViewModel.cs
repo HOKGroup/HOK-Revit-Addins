@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
@@ -114,7 +115,7 @@ namespace HOK.MissionControl.Tools.DTMTool
         {
             try
             {
-                System.Diagnostics.Process.Start("https://youtu.be/qyUnSuYYs18");
+                System.Diagnostics.Process.Start(new ProcessStartInfo("https://youtu.be/qyUnSuYYs18") { UseShellExecute = true });
             }
             catch (Exception ex)
             {

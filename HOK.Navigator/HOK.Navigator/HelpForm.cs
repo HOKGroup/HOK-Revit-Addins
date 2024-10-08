@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO;
@@ -91,7 +92,7 @@ namespace HOK.Navigator
                 {
                     if (null != item.Tag && !item.Text.Contains("---------") && !item.Text.Contains("Version"))
                     {
-                        System.Diagnostics.Process.Start(item.Tag.ToString());
+                        System.Diagnostics.Process.Start(new ProcessStartInfo(item.Tag.ToString()) { UseShellExecute = true });
                     }
                 }
             }

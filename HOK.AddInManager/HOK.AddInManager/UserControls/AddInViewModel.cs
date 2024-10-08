@@ -101,7 +101,7 @@ namespace HOK.AddInManager.UserControls
                 var ttt = AppCommand.thisApp.addinManagerToolTip;
                 if (!string.IsNullOrEmpty(ttt.HelpUrl))
                 {
-                    Process.Start(ttt.HelpUrl);
+                    Process.Start(new ProcessStartInfo(ttt.HelpUrl) { UseShellExecute = true });
                 }
             }
             catch (Exception ex)
