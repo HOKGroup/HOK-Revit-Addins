@@ -12,170 +12,32 @@ trigger:
     include:
     - 0.*
 
-
-strategy:
-  matrix:
-    2025:
-      buildConfiguration: 'Release R25'
+jobs:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '$(buildConfig) R25'
       revitVersion: '2025'
-    2024:
-      dependsOn: 2025
-      buildConfiguration: 'Release R24'
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '$(buildConfig) R24'
       revitVersion: '2024'
-    2023:
-      dependsOn: 2024
-      buildConfiguration: 'Release R23'
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '$(buildConfig) R23'
       revitVersion: '2023'
-    2022:
-      dependsOn: 2023
-      buildConfiguration: 'Release R22'
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '$(buildConfig) R22'
       revitVersion: '2022'
-    2021:
-      dependsOn: 2022
-      buildConfiguration: 'Release R21'
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '$(buildConfig) R21'
       revitVersion: '2021'
-    2020:
-      dependsOn: 2021
-      buildConfiguration: 'Release R20'
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '$(buildConfig) R20'
       revitVersion: '2020'
-    2019:
-      dependsOn: 2020
-      buildConfiguration: 'Release R19'
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '$(buildConfig) R19'
       revitVersion: '2019'
-
-pool:
-  vmImage: 'windows-latest'
-
-variables:
-- group: code-signing
-- name: solution
-  value: '**/HOK.!(Core|MissionControl|Feedback|ParameterTools|FileOpeningMonitor|ModelReporting|SheetManager).sln'
-- name: coreSolution
-  value: '**/HOK.Core.sln'
-- name: MCsolution
-  value: '**/HOK.MissionControl.sln'
-- name: paramToolsSolution
-  value: '**/HOK.ParameterTools.sln'
-- name: feedbackSolution
-  value: '**/HOK.Feedback.sln'
-- name: sheetManagerSolution
-  value: '**/HOK.SheetManager.sln'
-- name: buildPlatform
-  value: 'x64'
-- name: BUILD_ENV
-  value: AzureDevOps
-- name: SOURCE_DIR
-  value: '$(Build.SourcesDirectory)'
-
-steps:
-- task: PowerShell@2
-  inputs:
-    filePath: '$(Build.SourcesDirectory)/_build/copy_resources.ps1'
-    errorActionPreference: 'continue'
-  env:
-    BUILD_CONFIGURATION: $(revitVersion)
-
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: '$(SettingsFileName)'
-
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(Agent.TempDirectory)'
-    Contents: '$(SettingsFileName)'
-    TargetFolder: '$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources'
-
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: 'Rename-Item –Path "$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources/$(SettingsFileName)" -NewName "Settings.json"'
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'CISign.pfx'
-
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(Agent.TempDirectory)'
-    Contents: 'CISign.pfx'
-    TargetFolder: '$(Build.SourcesDirectory)/_cert'
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(coreSolution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
-  env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '**/HOK.MissionControl.Core.csproj'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
-  env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '**/HOK.MissionControl.csproj'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
-  env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(feedbackSolution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
-  env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(MCsolution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
-  env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '$(solution)'
-    arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
-  env:
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(sheetManagerSolution)'
-    msbuildArgs: '/t:Restore /property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildArchitecture: 'x64'
-
-- task: PowerShell@2
-  inputs:
-    filePath: '$(Build.SourcesDirectory)/_build/cleanup_artifacts.ps1'
-    errorActionPreference: 'continue'
-  env:
-    BUILD_CONFIGURATION: $(revitVersion)
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)/_artifacts'
-    ArtifactName: '$(Build.SourceBranchName)'
-    publishLocation: 'Container'
-
-
