@@ -8,10 +8,13 @@ parameters:
   - name: isLatestVersion
     type: boolean
     default: false
+  - name: lastestVersionOnly
+    type: string
+    default: ''
 
 jobs:
 - job: 'Revit_${{parameters.revitVersion}}'
-  condition: or(ne('$(lastestVersionOnly)', 'true'), and(eq('$(lastestVersionOnly)', 'true'), eq('${{ parameters.isLatestVersion }}', true)))
+  condition: or(ne('${{ parameters.lastestVersionOnly }}', 'true'), and(eq('${{ parameters.lastestVersionOnly }}', 'true'), eq('${{ parameters.isLatestVersion }}', true)))
   pool:
     vmImage: 'windows-latest'
 
