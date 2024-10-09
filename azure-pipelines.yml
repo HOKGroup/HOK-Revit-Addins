@@ -17,6 +17,7 @@ jobs:
     parameters:
       buildConfiguration: '$(buildConfig) R25'
       revitVersion: '2025'
+      isLatestVersion: true
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R24'

@@ -1,9 +1,17 @@
 parameters:
-  buildConfiguration: ''
-  revitVersion: ''
+  - name: buildConfiguration
+    type: string
+    default: ''
+  - name: revitVersion
+    type: string
+    default: ''
+  - name: isLatestVersion
+    type: boolean
+    default: false
 
 jobs:
 - job: 'Revit_${{parameters.revitVersion}}'
+  condition: or(neq('$(lastestVersionOnly)', 'true')), and(eq('$(lastestVersionOnly)', 'true'), eq('${{ parameters.isLatestVersion }}', true))
   pool:
     vmImage: 'windows-latest'
 
