@@ -3,7 +3,7 @@ parameters:
   revitVersion: ''
 
 jobs:
-- job: 'Revit ${{parameters.revitVersion}}'
+- job: 'Revit_${{parameters.revitVersion}}'
   pool:
     vmImage: 'windows-latest'
 
