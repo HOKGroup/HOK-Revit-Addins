@@ -10,13 +10,14 @@ using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.RoomsToMass.ToMass;
 using static HOK.Core.Utilities.ElementIdExtension;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.RoomsToMass
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class Command : IExternalCommand
+    public class Command : ExternalCommand
     {
         private UIApplication m_app;
         private Document m_doc;
@@ -26,18 +27,18 @@ namespace HOK.RoomsToMass
         private Dictionary<string, AreaProperties> areaDictionary = new Dictionary<string, AreaProperties>();
         private Dictionary<string, FloorProperties> floorDictionary = new Dictionary<string, FloorProperties>();
       
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public override void Execute()
         {
             try
             {
-                m_app = commandData.Application;
-                m_doc = m_app.ActiveUIDocument.Document;
+                m_app = Context.UiApplication;
+                m_doc = Context.ActiveDocument;
                 Log.AppendLog(LogMessageType.INFO, "Started");
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("MassTools-CreateMass", commandData.Application.Application.VersionNumber));
+                    new AddinLog("MassTools-CreateMass", Application.VersionNumber));
 
                 GetModelInformation();
                 var sourceWindow = new MassSourceWindow(m_app, modelDictionary);
@@ -65,12 +66,10 @@ namespace HOK.RoomsToMass
                 }
 
                 Log.AppendLog(LogMessageType.INFO, "Ended.");
-                return Result.Succeeded;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-                return Result.Failed;
             }
         }
 

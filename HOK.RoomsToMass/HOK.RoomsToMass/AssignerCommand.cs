@@ -9,29 +9,30 @@ using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.RoomsToMass.ParameterAssigner;
 using Form = System.Windows.Forms.Form;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.RoomsToMass
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class AssignerCommand : IExternalCommand
+    public class AssignerCommand : ExternalCommand
     {
         private UIApplication m_app;
         private Document m_doc;
 
-        Result IExternalCommand.Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public override void Execute()
         {
             try
             {
-                m_app = commandData.Application;
-                m_doc = m_app.ActiveUIDocument.Document;
+                m_app = Context.UiApplication;
+                m_doc = Context.ActiveDocument;
                 Log.AppendLog(LogMessageType.INFO, "Started");
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("MassTools-MassCommands", commandData.Application.Application.VersionNumber));
+                    new AddinLog("MassTools-MassCommands", Application.VersionNumber));
 
                 m_app.Application.FailuresProcessing += OnFailuresProcessing;
                 var linkedFilesForm = new Form_LinkedFiles(m_app);
@@ -58,12 +59,10 @@ namespace HOK.RoomsToMass
                 }
 
                 Log.AppendLog(LogMessageType.INFO, "Ended.");
-                return Result.Succeeded;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-                return Result.Failed;
             }
         }
 

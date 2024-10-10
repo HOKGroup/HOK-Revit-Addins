@@ -23,21 +23,21 @@ namespace HOK.ViewAnalysis
     }
 
     [Transaction(TransactionMode.Manual)]
-    public class Command : IExternalCommand
+    public class Command : ExternalCommand
     {
         private UIApplication m_app;
         private Document m_doc;
         private const string sharedParameterFileName = "Addins Shared Parameters.txt";
 
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public override void Execute()
         {
-            m_app = commandData.Application;
+            m_app = Context.UiApplication;
             m_doc = m_app.ActiveUIDocument.Document;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
-            AddinUtilities.PublishAddinLog(new AddinLog("ViewAnalysis-LEED Analysis", commandData.Application.Application.VersionNumber));
+            AddinUtilities.PublishAddinLog(new AddinLog("ViewAnalysis-LEED Analysis", Application.VersionNumber));
 
             if (AddSharedParameters() == false)
             {

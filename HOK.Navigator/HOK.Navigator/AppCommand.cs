@@ -5,32 +5,29 @@ using System.Reflection;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB.Events;
 using HOK.Core.Utilities;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.Navigator
 {
-    public class AppCommand : IExternalApplication
+    public class AppCommand : ExternalApplication
     {
         private UIControlledApplication m_app;
         private string tabName = "";
         private string currentAssembly = "";
         public PushButton helpButton;
 
-        public Result OnStartup(UIControlledApplication application)
+        public override void OnStartup()
         {
-            m_app = application;
+            m_app = Application;
             tabName = "   HOK   ";
             currentAssembly = Assembly.GetAssembly(GetType()).Location;
 
-            application.ControlledApplication.ApplicationInitialized += EventAppInitialize;
-
-            return Result.Succeeded;
+            Application.ControlledApplication.ApplicationInitialized += EventAppInitialize;
         }
 
-        public Result OnShutdown(UIControlledApplication application)
+        public override void OnShutdown()
         {
-            application.ControlledApplication.ApplicationInitialized -= EventAppInitialize;
-
-            return Result.Succeeded;
+            Application.ControlledApplication.ApplicationInitialized -= EventAppInitialize;
         }
 
         private void EventAppInitialize(object sender, ApplicationInitializedEventArgs arg)

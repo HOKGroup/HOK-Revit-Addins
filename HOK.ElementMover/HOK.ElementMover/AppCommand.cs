@@ -7,10 +7,12 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
+using Nice3point.Revit.Toolkit.External;
+
 
 namespace HOK.ElementMover
 {
-    public class AppCommand : IExternalApplication
+    public class AppCommand : ExternalApplication
     {
         internal static AppCommand thisApp;
         private ControlledApplication ctrApp;
@@ -18,23 +20,23 @@ namespace HOK.ElementMover
         private MoverHandler handler;
         private const string tabName = "   HOK   ";
 
-        public Result OnStartup(UIControlledApplication application)
+        public override void OnStartup()
         {
             thisApp = this;
             mainWindow = null;
-            ctrApp = application.ControlledApplication;
+            ctrApp = Application.ControlledApplication;
 
             try
             {
-                application.CreateRibbonTab(tabName);
+                Application.CreateRibbonTab(tabName);
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
 
-            var created = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Customizations");
-            var panel = created ?? application.CreateRibbonPanel(tabName, "Customizations");
+            var created = Application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Customizations");
+            var panel = created ?? Application.CreateRibbonPanel(tabName, "Customizations");
 
             var currentAssembly = Assembly.GetAssembly(GetType());
             var moverImage = ButtonUtil.LoadBitmapImage(currentAssembly, typeof(AppCommand).Namespace, "elementMover_32.png");
@@ -54,13 +56,11 @@ namespace HOK.ElementMover
             }
 
             ctrApp.DocumentChanged += CtrApp_DocumentChanged;
-            return Result.Succeeded;
         }
 
-        public Result OnShutdown(UIControlledApplication application)
+        public override void OnShutdown()
         {
             ctrApp.DocumentChanged -= CtrApp_DocumentChanged;
-            return Result.Succeeded;
         }
 
         public void ShowMover(UIApplication uiapp)

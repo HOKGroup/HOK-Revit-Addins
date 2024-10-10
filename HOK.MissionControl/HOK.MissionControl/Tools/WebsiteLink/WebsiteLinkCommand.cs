@@ -9,6 +9,7 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Utils;
+using Nice3point.Revit.Toolkit.External;
 // ReSharper disable UnusedMember.Global
 
 #endregion
@@ -18,12 +19,11 @@ namespace HOK.MissionControl.Tools.WebsiteLink
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class WebsiteLinkCommand : IExternalCommand
+    public class WebsiteLinkCommand : ExternalCommand
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public override void Execute()
         {
-            var uiApp = commandData.Application;
-            var doc = uiApp.ActiveUIDocument.Document;
+            var doc = Context.ActiveDocument;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
@@ -31,7 +31,7 @@ namespace HOK.MissionControl.Tools.WebsiteLink
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontinue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("MissionControl-WebsiteLink", commandData.Application.Application.VersionNumber));
+                    new AddinLog("MissionControl-WebsiteLink", Context.Application.VersionNumber));
 
                 var launchHome = false;
                 if (!string.IsNullOrWhiteSpace(doc.PathName))
@@ -59,7 +59,6 @@ namespace HOK.MissionControl.Tools.WebsiteLink
             }
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
-            return Result.Succeeded;
         }
     }
 }

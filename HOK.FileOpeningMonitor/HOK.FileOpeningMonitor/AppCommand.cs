@@ -10,7 +10,7 @@ using HOK.Core.Utilities;
 
 namespace HOK.FileOpeningMonitor
 {
-    public class AppCommand : IExternalApplication
+    public class AppCommand : ExternalApplication
     {
         private readonly Dictionary<string/*filePath*/, CentralFileInfo> openedCentralFiles = new Dictionary<string, CentralFileInfo>();
         private Document openedDocument;
@@ -27,7 +27,7 @@ namespace HOK.FileOpeningMonitor
             return Result.Succeeded;
         }
 
-        public Result OnStartup(UIControlledApplication application)
+        public override void OnStartup()
         {
             try
             {

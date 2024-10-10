@@ -10,28 +10,29 @@ using Autodesk.Revit.UI.Selection;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.FinishCreator
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class FinishCommand : IExternalCommand
+    public class FinishCommand : ExternalCommand
     {
         private UIApplication m_app;
         private Document m_doc;
 
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public override void Execute()
         {
             try
             {
-                m_app = commandData.Application;
+                m_app = Context.UiApplication;
                 m_doc = m_app.ActiveUIDocument.Document;
                 Log.AppendLog(LogMessageType.INFO, "Started");
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
-                AddinUtilities.PublishAddinLog(new AddinLog("Utilities-FinishCreator", commandData.Application.Application.VersionNumber));
+                AddinUtilities.PublishAddinLog(new AddinLog("Utilities-FinishCreator", Application.VersionNumber));
 
                 var uidoc = m_app.ActiveUIDocument;
                 var title = "Finish Creator v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
@@ -160,12 +161,10 @@ namespace HOK.FinishCreator
                 }
 
                 Log.AppendLog(LogMessageType.INFO, "Ended");
-                return Result.Succeeded;
             }
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
-                return Result.Failed;
             }
         }
     }

@@ -1,9 +1,8 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HOK.ElementTools", "HOK.ElementTools\HOK.ElementTools.vbproj", "{5E2C8756-742E-4726-8736-F150469B6C3A}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "HOK.ElementTools", "HOK.ElementTools\HOK.ElementTools.vbproj", "{5E2C8756-742E-4726-8736-F150469B6C3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +50,7 @@ Global
 		{5E2C8756-742E-4726-8736-F150469B6C3A}.Release R24|x64.Build.0 = Release R24|x64
 		{5E2C8756-742E-4726-8736-F150469B6C3A}.Release R25|x64.ActiveCfg = Release R25|x64
 		{5E2C8756-742E-4726-8736-F150469B6C3A}.Release R25|x64.Build.0 = Release R25|x64
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection

@@ -28,6 +28,8 @@ foreach ($solution in $solutions) {
 
 }
 
+& "$sourceDir/_build/copy_artifacts.ps1"
+
 & "$sourceDir/_build/cleanup_artifacts.ps1"
 
 Copy-Item ".\_artifacts\$revitVersion\HOK-Addin.bundle\Contents\*" "C:\ProgramData\Autodesk\Revit\Addins\$revitVersion\HOK-Addin.bundle\Contents\"

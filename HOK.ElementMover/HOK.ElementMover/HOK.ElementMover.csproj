@@ -3,7 +3,7 @@
   <PropertyGroup>
     <UseWPF>true</UseWPF>
     <LangVersion>latest</LangVersion>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <Platforms>AnyCPU;x64</Platforms>
     <ImplicitUsings>true</ImplicitUsings>
@@ -67,6 +67,7 @@
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
     <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*"/>
+    <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*"/>
     <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="2.*"/>
   </ItemGroup>
 

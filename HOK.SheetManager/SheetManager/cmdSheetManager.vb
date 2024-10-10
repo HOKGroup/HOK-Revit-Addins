@@ -11,13 +11,13 @@ Imports HOK.MissionControl.Core.Schemas
 Imports HOK.MissionControl.Core.Utils
 
 ''' <summary>
-''' Implements the Revit add-in interface IExternalCommand
+''' Implements the Revit add-in interface ExternalCommand
 ''' </summary>
 ''' <remarks></remarks>
 <Transaction(TransactionMode.Manual)>
 Public Class cmdSheetManager
 
-    Implements IExternalCommand
+    Implements ExternalCommand
 
     ''' <summary>
     ''' Command Entry Point
@@ -33,7 +33,7 @@ Public Class cmdSheetManager
                             ByRef message As String,
                             ByVal elements As ElementSet) As Result Implements IExternalCommand.Execute
         Try
-            AddinUtilities.PublishAddinLog(New AddinLog("Sheet Manager-Excel", commandData.Application.Application.VersionNumber))
+            AddinUtilities.PublishAddinLog(New AddinLog("Sheet Manager-Excel", Application.VersionNumber))
 
             ' Construct the settings class used to manage the Revit environment and document
             Dim m_Settings As New clsSettings(commandData)
