@@ -22,12 +22,12 @@ jobs:
       buildConfiguration: '$(buildConfig) R25'
       revitVersion: '2025'
       isLatestVersion: true
-      latestVersionOnly: '$(variables.shouldRun)'
+      latestVersionOnly: $(variables.shouldRun)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R24'
       revitVersion: '2024'
-      latestVersionOnly: '$(shouldRun)'
+      latestVersionOnly: $(shouldRun)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R23'
