@@ -23,7 +23,7 @@ parameters:
   displayName: '2024'
 - name: 'Build2023'
   type: boolean
-  default: true
+  default: false
   displayName: '2023'
 - name: 'Build2022'
   type: boolean
@@ -35,7 +35,7 @@ parameters:
   displayName: '2021'
 - name: 'Build2020'
   type: boolean
-  default: true
+  default: false
   displayName: '2020'
 - name: 'Build2019'
   type: boolean
