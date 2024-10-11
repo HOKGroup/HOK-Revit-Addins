@@ -22,7 +22,7 @@ jobs:
       buildConfiguration: '$(buildConfig) R25'
       revitVersion: '2025'
       isLatestVersion: true
-      latestVersionOnly: $(variables.shouldRun)
+      latestVersionOnly: $(shouldRun)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R24'
@@ -32,7 +32,7 @@ jobs:
     parameters:
       buildConfiguration: '$(buildConfig) R23'
       revitVersion: '2023'
-      latestVersionOnly: $(variables.shouldRun)
+      latestVersionOnly: $(shouldRun)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R22'
@@ -42,14 +42,14 @@ jobs:
     parameters:
       buildConfiguration: '$(buildConfig) R21'
       revitVersion: '2021'
-      latestVersionOnly: $(variables.shouldRun)
+      latestVersionOnly: $(shouldRun)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R20'
       revitVersion: '2020'
-      latestVersionOnly: $(variables.shouldRun)
+      latestVersionOnly: $(shouldRun)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R19'
       revitVersion: '2019'
-      latestVersionOnly: $(variables.shouldRun)
+      latestVersionOnly: $(shouldRun)
