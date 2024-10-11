@@ -5,17 +5,9 @@ parameters:
   - name: revitVersion
     type: string
     default: ''
-  - name: isLatestVersion
-    type: boolean
-    default: false
-  - name: latestVersionOnly
-    type: boolean
-    default: false
 
 jobs:
 - job: 'Revit_${{parameters.revitVersion}}'
-  # condition: or(ne('${{ parameters.latestVersionOnly }}', 'true'), and(eq('${{ parameters.latestVersionOnly }}', 'true'), eq(${{ parameters.isLatestVersion }}, true)))
-  condition: and(eq('${{ parameters.latestVersionOnly }}', 'True'), eq('${{ parameters.isLatestVersion }}', 'True'))
   pool:
     vmImage: 'windows-latest'
 
@@ -45,16 +37,6 @@ jobs:
     value: '${{parameters.revitVersion}}'
 
   steps:
-  - task: PowerShell@2
-    inputs:
-      targetType: 'inline'
-      script: |
-        $latestVersionOnlyEnabled = $('${{ parameters.latestVersionOnly }}' -eq 'true')
-        $isLatestVersion = $('${{ parameters.isLatestVersion }}' -eq 'true')
-        Write-Host 'LatestVersionEnabled: $latestVersionOnlyEnabled'
-        Write-Host 'IsLatestVersion: $isLatestVersion'
-        Write-Host 'Should run: $latestVersionOnlyEnabled -And $isLatestVersion'
-
   - task: PowerShell@2
     inputs:
       filePath: '$(Build.SourcesDirectory)/_build/copy_resources.ps1'
