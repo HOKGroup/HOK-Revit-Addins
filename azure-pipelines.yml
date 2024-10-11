@@ -18,34 +18,34 @@ jobs:
       buildConfiguration: '$(buildConfig) R25'
       revitVersion: '2025'
       isLatestVersion: true
-      latestVersionOnly: '$(latestVersionOnly)'
+      latestVersionOnly: $(latestVersionOnly)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R24'
       revitVersion: '2024'
-      latestVersionOnly: '$(latestVersionOnly)'
+      latestVersionOnly: $(latestVersionOnly)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R23'
       revitVersion: '2023'
-      latestVersionOnly: '$(latestVersionOnly)'
+      latestVersionOnly: $(latestVersionOnly)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R22'
       revitVersion: '2022'
-      latestVersionOnly: '$(latestVersionOnly)'
+      latestVersionOnly: $(latestVersionOnly)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R21'
       revitVersion: '2021'
-      latestVersionOnly: '$(latestVersionOnly)'
+      latestVersionOnly: $(latestVersionOnly)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R20'
       revitVersion: '2020'
-      latestVersionOnly: '$(latestVersionOnly)'
+      latestVersionOnly: $(latestVersionOnly)
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R19'
       revitVersion: '2019'
-      latestVersionOnly: '$(latestVersionOnly)'
+      latestVersionOnly: $(latestVersionOnly)
