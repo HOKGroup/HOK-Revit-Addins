@@ -13,48 +13,68 @@ trigger:
     - 0.*
 
 parameters:
-  - name: versions
-    type: string
-    values: 
-      - '2024'
-      - '2023'
-      - '2022'
-      - '2021'
-      - '2020'
-      - '2019'
-    default: '2024'
+- name: 'Build2025'
+  type: boolean
+  default: true
+  displayName: '2025'
+- name: 'Build2024'
+  type: boolean
+  default: false
+  displayName: '2024'
+- name: 'Build2023'
+  type: boolean
+  default: true
+  displayName: '2023'
+- name: 'Build2022'
+  type: boolean
+  default: false
+  displayName: '2022'
+- name: 'Build2021'
+  type: boolean
+  default: false
+  displayName: '2021'
+- name: 'Build2020'
+  type: boolean
+  default: true
+  displayName: '2020'
+- name: 'Build2019'
+  type: boolean
+  default: false
+  displayName: '2019'
+
 
 jobs:
-- template: _build/build.yml
-  parameters:
-    buildConfiguration: '$(buildConfig) R25'
-    revitVersion: '2025'
-- ${{ if containsValue(parameters.versions, '2024' ) }}:
+- ${{ if eq(parameters.Build2025, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '$(buildConfig) R25'
+      revitVersion: '2025'
+- ${{ if eq(parameters.Build2024, 'true') }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R24'
       revitVersion: '2024'
-- ${{ if containsValue(parameters.versions, '2023' ) }}:
+- ${{ if eq(parameters.Build2023, 'true') }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R23'
       revitVersion: '2023'
-- ${{ if containsValue(parameters.versions, '2022' ) }}:
+- ${{ if eq(parameters.Build2022, 'true') }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R22'
       revitVersion: '2022'
-- ${{ if containsValue(parameters.versions, '2021' ) }}:
+- ${{ if eq(parameters.Build2021, 'true') }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R21'
       revitVersion: '2021'
-- ${{ if containsValue(parameters.versions, '2020' ) }}:
+- ${{ if eq(parameters.Build2020, 'true') }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R20'
       revitVersion: '2020'
-- ${{ if containsValue(parameters.versions, '2019' ) }}:
+- ${{ if eq(parameters.Build2019, 'true') }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R19'
