@@ -12,44 +12,50 @@ trigger:
     include:
     - 0.*
 
-variables: 
-  latestVersionOnly: $(latestVersionOnly)
-  shouldRun: $[eq(variables['latestVersionOnly'], 'true')]
+parameters:
+  - name: versions
+    type: string
+    values: 
+      - '2024'
+      - '2023'
+      - '2022'
+      - '2021'
+      - '2020'
+      - '2019'
+    default: '2024'
 
 jobs:
-  - template: _build/build.yml
-    parameters:
-      buildConfiguration: '$(buildConfig) R25'
-      revitVersion: '2025'
-      isLatestVersion: true
-      latestVersionOnly: $[eq(variables['latestVersionOnly'], 'true')]
+- template: _build/build.yml
+  parameters:
+    buildConfiguration: '$(buildConfig) R25'
+    revitVersion: '2025'
+- ${{ if containsValue(parameters.versions, '2024' ) }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R24'
       revitVersion: '2024'
-      latestVersionOnly: $(shouldRun)
+- ${{ if containsValue(parameters.versions, '2023' ) }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R23'
       revitVersion: '2023'
-      latestVersionOnly: $(shouldRun)
+- ${{ if containsValue(parameters.versions, '2022' ) }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R22'
       revitVersion: '2022'
-      latestVersionOnly: '$(buildConfig) R22'
+- ${{ if containsValue(parameters.versions, '2021' ) }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R21'
       revitVersion: '2021'
-      latestVersionOnly: $(shouldRun)
+- ${{ if containsValue(parameters.versions, '2020' ) }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R20'
       revitVersion: '2020'
-      latestVersionOnly: $(shouldRun)
+- ${{ if containsValue(parameters.versions, '2019' ) }}:
   - template: _build/build.yml
     parameters:
       buildConfiguration: '$(buildConfig) R19'
       revitVersion: '2019'
-      latestVersionOnly: $(shouldRun)
