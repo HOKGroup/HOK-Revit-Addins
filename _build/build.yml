@@ -15,7 +15,7 @@ parameters:
 jobs:
 - job: 'Revit_${{parameters.revitVersion}}'
   # condition: or(ne('${{ parameters.latestVersionOnly }}', 'true'), and(eq('${{ parameters.latestVersionOnly }}', 'true'), eq(${{ parameters.isLatestVersion }}, true)))
-  condition: and(eq('${{ parameters.latestVersionOnly }}', 'true'), eq('${{ parameters.isLatestVersion }}', 'true'))
+  condition: and(eq('${{ parameters.latestVersionOnly }}', 'true'), eq('${{ parameters.isLatestVersion }}', 'True'))
   pool:
     vmImage: 'windows-latest'
 
