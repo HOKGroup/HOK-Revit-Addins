@@ -50,10 +50,10 @@ jobs:
       # script: "or(ne('${{ parameters.lastestVersionOnly }}', 'true'), and(eq('${{ parameters.lastestVersionOnly }}', 'true'), eq(${{ parameters.isLatestVersion }}, true)))"
       script: |
         Write-Host '${{ parameters.lastestVersionOnly}}'
-        Write-Host '${{ parameters.lastestVersionOnly}}' -eq 'true'
+        Write-Host $('${{ parameters.lastestVersionOnly}}' -eq 'true')
         Write-Host '${{ parameters.isLatestVersion}}'
-        Write-Host ${{ parameters.isLatestVersion}} -eq true
-        Write-Host '${{ parameters.isLatestVersion}}' -eq 'true'
+        Write-Host $(${{ parameters.isLatestVersion}} -eq true)
+        Write-Host $('${{ parameters.isLatestVersion}}' -eq 'true')
 
   - task: PowerShell@2
     inputs:
