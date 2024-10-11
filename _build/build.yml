@@ -9,13 +9,13 @@ parameters:
     type: boolean
     default: false
   - name: latestVersionOnly
-    type: string
-    default: ''
+    type: boolean
+    default: false
 
 jobs:
 - job: 'Revit_${{parameters.revitVersion}}'
   # condition: or(ne('${{ parameters.latestVersionOnly }}', 'true'), and(eq('${{ parameters.latestVersionOnly }}', 'true'), eq(${{ parameters.isLatestVersion }}, true)))
-  condition: and(eq('${{ parameters.latestVersionOnly }}', 'true'), eq('${{ parameters.isLatestVersion }}', 'True'))
+  condition: and(eq('${{ parameters.latestVersionOnly }}', 'True'), eq('${{ parameters.isLatestVersion }}', 'True'))
   pool:
     vmImage: 'windows-latest'
 
