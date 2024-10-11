@@ -41,41 +41,48 @@ parameters:
   type: boolean
   default: false
   displayName: '2019'
+- name: 'buildConfig'
+  type: string
+  default: 'Release'
+  values:
+  - 'Release'
+  - 'Debug'
+  displayName: 'Build Configuration'
 
 
 jobs:
 - ${{ if eq(parameters.Build2025, 'true') }}:
   - template: _build/build.yml
     parameters:
-      buildConfiguration: '$(buildConfig) R25'
+      buildConfiguration: '$(parameters.buildConfig) R25'
       revitVersion: '2025'
 - ${{ if eq(parameters.Build2024, 'true') }}:
   - template: _build/build.yml
     parameters:
-      buildConfiguration: '$(buildConfig) R24'
+      buildConfiguration: '$(parameters.buildConfig) R24'
       revitVersion: '2024'
 - ${{ if eq(parameters.Build2023, 'true') }}:
   - template: _build/build.yml
     parameters:
-      buildConfiguration: '$(buildConfig) R23'
+      buildConfiguration: '$(parameters.buildConfig) R23'
       revitVersion: '2023'
 - ${{ if eq(parameters.Build2022, 'true') }}:
   - template: _build/build.yml
     parameters:
-      buildConfiguration: '$(buildConfig) R22'
+      buildConfiguration: '$(parameters.buildConfig) R22'
       revitVersion: '2022'
 - ${{ if eq(parameters.Build2021, 'true') }}:
   - template: _build/build.yml
     parameters:
-      buildConfiguration: '$(buildConfig) R21'
+      buildConfiguration: '$(parameters.buildConfig) R21'
       revitVersion: '2021'
 - ${{ if eq(parameters.Build2020, 'true') }}:
   - template: _build/build.yml
     parameters:
-      buildConfiguration: '$(buildConfig) R20'
+      buildConfiguration: '$(parameters.buildConfig) R20'
       revitVersion: '2020'
 - ${{ if eq(parameters.Build2019, 'true') }}:
   - template: _build/build.yml
     parameters:
-      buildConfiguration: '$(buildConfig) R19'
+      buildConfiguration: '$(parameters.buildConfig) R19'
       revitVersion: '2019'
