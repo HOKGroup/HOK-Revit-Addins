@@ -12,6 +12,9 @@ trigger:
     include:
     - 0.*
 
+variables: 
+  latestVersionOnly: $(latestVersionOnly)
+
 jobs:
   - template: _build/build.yml
     parameters:
