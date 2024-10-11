@@ -12,6 +12,7 @@ using Autodesk.Revit.UI.Selection;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.ViewAnalysis
 {
@@ -57,13 +58,13 @@ namespace HOK.ViewAnalysis
                     MessageBoxButtons.OKCancel, 
                     MessageBoxIcon.Information);
 
-                if (result != DialogResult.OK) return Result.Succeeded;
+                //if (result != DialogResult.OK) return Result.Succeeded;
 
                 var selectedElements = uidoc.Selection.PickObjects(ObjectType.Element, 
                     new RoomElementFilter(), 
                     "Select rooms to calculate the area with views. Click Finish on the options bar when you're done selecting rooms.");
 
-                if (!selectedElements.Any()) return Result.Succeeded;
+                //if (!selectedElements.Any()) return Result.Succeeded;
 
                 var selectedRooms = new List<Room>();
                 //ray tracing is only available in 3d views
@@ -76,7 +77,7 @@ namespace HOK.ViewAnalysis
                     }
                 }
 
-                if (!selectedRooms.Any()) return Result.Succeeded;
+                //if (!selectedRooms.Any()) return Result.Succeeded;
 
                 var mainWindow = new MainWindow(m_app, selectedRooms);
                 if (mainWindow.ShowDialog() == true)
@@ -96,7 +97,7 @@ namespace HOK.ViewAnalysis
             }
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
-            return Result.Succeeded;
+            //return Result.Succeeded;
         }
 
         private bool IsViewForAnalysis(Autodesk.Revit.DB.View activeView)
