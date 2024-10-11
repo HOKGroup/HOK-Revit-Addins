@@ -8,14 +8,14 @@ parameters:
   - name: isLatestVersion
     type: boolean
     default: false
-  - name: lastestVersionOnly
+  - name: latestVersionOnly
     type: string
     default: ''
 
 jobs:
 - job: 'Revit_${{parameters.revitVersion}}'
-  # condition: or(ne('${{ parameters.lastestVersionOnly }}', 'true'), and(eq('${{ parameters.lastestVersionOnly }}', 'true'), eq(${{ parameters.isLatestVersion }}, true)))
-  condition: and(eq('${{ parameters.lastestVersionOnly }}', 'true'), eq('${{ parameters.isLatestVersion }}', 'true'))
+  # condition: or(ne('${{ parameters.latestVersionOnly }}', 'true'), and(eq('${{ parameters.latestVersionOnly }}', 'true'), eq(${{ parameters.isLatestVersion }}, true)))
+  condition: and(eq('${{ parameters.latestVersionOnly }}', 'true'), eq('${{ parameters.isLatestVersion }}', 'true'))
   pool:
     vmImage: 'windows-latest'
 
@@ -49,7 +49,7 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
-        $latestVersionOnlyEnabled = $('${{ parameters.lastVersionOnly }}' -eq 'true')
+        $latestVersionOnlyEnabled = $('${{ parameters.latestVersionOnly }}' -eq 'true')
         $isLatestVersion = $('${{ parameters.isLatestVersion }}' -eq 'true')
         Write-Host 'LatestVersionEnabled: $latestVersionOnlyEnabled'
         Write-Host 'IsLatestVersion: $isLatestVersion'
