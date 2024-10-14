@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Data;
@@ -11,8 +10,8 @@ namespace HOK.Core.WpfUtilities
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null) return new SolidColorBrush(Color.FromRgb(255, 255, 255));
-            var c = (Color)value;
+            if (value == null) return new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 255, 255));
+            var c = (System.Windows.Media.Color)value;
             return new SolidColorBrush(c);
         }
 
@@ -28,14 +27,14 @@ namespace HOK.Core.WpfUtilities
         {
             if (value is bool && (bool)value)
             {
-                return Visibility.Visible;
+                return System.Windows.Visibility.Visible;
             }
-            return Visibility.Collapsed;
+            return System.Windows.Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is Visibility && (Visibility)value == Visibility.Visible;
+            return value is System.Windows.Visibility && (System.Windows.Visibility)value == System.Windows.Visibility.Visible;
         }
     }
 

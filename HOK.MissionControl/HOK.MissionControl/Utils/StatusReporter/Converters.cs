@@ -18,11 +18,11 @@ namespace HOK.MissionControl.Utils.StatusReporter
             switch (status)
             {
                 case Status.Error:
-                    return new SolidColorBrush(Color.FromRgb(217, 83, 79));
+                    return new SolidColorBrush(System.Windows.Media.Color.FromRgb(217, 83, 79));
                 case Status.Info:
                     return new SolidColorBrush(Colors.DarkGray);
                 case Status.Success:
-                    return new SolidColorBrush(Color.FromRgb(103, 184, 87));
+                    return new SolidColorBrush(System.Windows.Media.Color.FromRgb(103, 184, 87));
                 default:
                     throw new ArgumentOutOfRangeException();
             }

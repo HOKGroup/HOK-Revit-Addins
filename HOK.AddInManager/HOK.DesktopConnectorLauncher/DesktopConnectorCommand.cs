@@ -6,15 +6,16 @@ using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using System.Diagnostics;
 using Microsoft.Win32;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.DesktopConnectorLauncher
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class DesktopConnectorCommand : IExternalCommand
+    public class DesktopConnectorCommand : ExternalCommand
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        public override void Execute()
         {
             Log.AppendLog(LogMessageType.INFO, "Started");
 
@@ -37,7 +38,6 @@ namespace HOK.DesktopConnectorLauncher
             }
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
-            return Result.Succeeded;
         }
     }
 }

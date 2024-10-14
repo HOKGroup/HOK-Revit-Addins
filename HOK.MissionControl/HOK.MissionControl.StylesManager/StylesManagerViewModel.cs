@@ -5,8 +5,8 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using Autodesk.Revit.DB;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.MissionControl.StylesManager.DimensionsTab;
 using HOK.MissionControl.StylesManager.Tabs;
 
@@ -14,7 +14,7 @@ using HOK.MissionControl.StylesManager.Tabs;
 
 namespace HOK.MissionControl.StylesManager
 {
-    public class StylesManagerViewModel : ViewModelBase
+    public class StylesManagerViewModel : ObservableRecipient
     {
         public RelayCommand<Window> WindowLoaded { get; set; }
         public RelayCommand<Window> ControlClosing { get; set; }

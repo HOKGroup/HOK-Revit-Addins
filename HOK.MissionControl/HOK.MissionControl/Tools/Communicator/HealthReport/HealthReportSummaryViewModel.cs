@@ -1,10 +1,10 @@
 ﻿using System.Windows.Controls;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 
 namespace HOK.MissionControl.Tools.Communicator.HealthReport
 {
-    public class HealthReportSummaryViewModel : ViewModelBase
+    public class HealthReportSummaryViewModel : ObservableRecipient
     {
         public HealthReportSummaryModel Model { get; set; }
         public RelayCommand<Button> LaunchTool { get; set; }
@@ -33,42 +33,42 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         private System.Windows.Media.Color _fillColor;
         public System.Windows.Media.Color FillColor {
             get { return _fillColor; }
-            set { _fillColor = value; RaisePropertyChanged(() => FillColor); }
+            set { _fillColor = value; OnPropertyChanged(nameof(FillColor)); }
         }
 
         private string _toolName;
         public string ToolName
         {
             get { return _toolName; }
-            set { _toolName = value; RaisePropertyChanged(() => ToolName); }
+            set { _toolName = value; OnPropertyChanged(nameof(ToolName)); }
         }
 
         private bool _showButton;
         public bool ShowButton
         {
             get { return _showButton; }
-            set { _showButton = value; RaisePropertyChanged(() => ShowButton); }
+            set { _showButton = value; OnPropertyChanged(nameof(ShowButton)); }
         }
 
         private string _title;
         public string Title
         {
             get { return _title; }
-            set { _title = value; RaisePropertyChanged(() => Title); }
+            set { _title = value; OnPropertyChanged(nameof(Title)); }
         }
 
         private string _count;
         public string Count
         {
             get { return _count; }
-            set { _count = value; RaisePropertyChanged(() => Count); }
+            set { _count = value; OnPropertyChanged(nameof(Count)); }
         }
 
         private string _score;
         public string Score
         {
             get { return _score; }
-            set { _score = value; RaisePropertyChanged(() => Score); }
+            set { _score = value; OnPropertyChanged(nameof(Score)); }
         }
     }
 }

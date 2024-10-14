@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace HOK.Core.Utilities
+﻿namespace HOK.Core.Utilities
 {
     public static class StringUtilities
     {

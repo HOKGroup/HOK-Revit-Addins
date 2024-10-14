@@ -8,10 +8,11 @@ using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.RibbonTab
 {
-    public class AppCommand : IExternalApplication
+    public class AppCommand : ExternalApplication
     {
         private UIControlledApplication m_app;
         private string tabName = "";
@@ -22,11 +23,11 @@ namespace HOK.RibbonTab
         private readonly Dictionary<string, ButtonData> buttonDictionary = new Dictionary<string, ButtonData>();
 
 
-        Result IExternalApplication.OnStartup(UIControlledApplication application)
+        public override void OnStartup()
         {
-            application.ControlledApplication.DocumentOpening += OnDocumentOpening;
-            application.ControlledApplication.DocumentCreating += OnDocumentCreating;
-            m_app = application;
+            Application.ControlledApplication.DocumentOpening += OnDocumentOpening;
+            Application.ControlledApplication.DocumentCreating += OnDocumentCreating;
+            m_app = Application;
             tabName = "   HOK   ";
             
             try
@@ -50,8 +51,6 @@ namespace HOK.RibbonTab
             //CreateDataPushButtons();
             CreateAvfPushButtons();
             //CreateMissionControlPushButtons();
-
-            return Result.Succeeded;
         }
 
         private static void OnDocumentCreating(object sender, DocumentCreatingEventArgs args)
@@ -83,12 +82,11 @@ namespace HOK.RibbonTab
             }
         }
 
-        Result IExternalApplication.OnShutdown(UIControlledApplication application)
+        public override void OnShutdown()
         {
-            application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
+            Application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
 
             Log.WriteLog();
-            return Result.Succeeded;
         }
 
         /// <summary>

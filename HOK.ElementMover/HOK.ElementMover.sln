@@ -1,0 +1,60 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35312.102
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.ElementMover", "HOK.ElementMover\HOK.ElementMover.csproj", "{25D25B28-451B-4933-AED8-11275AE2E5E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug R19|x64 = Debug R19|x64
+		Debug R20|x64 = Debug R20|x64
+		Debug R21|x64 = Debug R21|x64
+		Debug R22|x64 = Debug R22|x64
+		Debug R23|x64 = Debug R23|x64
+		Debug R24|x64 = Debug R24|x64
+		Debug R25|x64 = Debug R25|x64
+		Release R19|x64 = Release R19|x64
+		Release R20|x64 = Release R20|x64
+		Release R21|x64 = Release R21|x64
+		Release R22|x64 = Release R22|x64
+		Release R23|x64 = Release R23|x64
+		Release R24|x64 = Release R24|x64
+		Release R25|x64 = Release R25|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R19|x64.ActiveCfg = Debug R19|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R19|x64.Build.0 = Debug R19|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R20|x64.ActiveCfg = Debug R20|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R20|x64.Build.0 = Debug R20|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R21|x64.ActiveCfg = Debug R21|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R21|x64.Build.0 = Debug R21|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R22|x64.ActiveCfg = Debug R22|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R22|x64.Build.0 = Debug R22|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R23|x64.ActiveCfg = Debug R23|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R23|x64.Build.0 = Debug R23|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R24|x64.ActiveCfg = Debug R24|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R24|x64.Build.0 = Debug R24|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R25|x64.ActiveCfg = Debug R25|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Debug R25|x64.Build.0 = Debug R25|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R19|x64.ActiveCfg = Release R19|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R19|x64.Build.0 = Release R19|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R20|x64.ActiveCfg = Release R20|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R20|x64.Build.0 = Release R20|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R21|x64.ActiveCfg = Release R21|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R21|x64.Build.0 = Release R21|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R22|x64.ActiveCfg = Release R22|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R22|x64.Build.0 = Release R22|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R23|x64.ActiveCfg = Release R23|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R23|x64.Build.0 = Release R23|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R24|x64.ActiveCfg = Release R24|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R24|x64.Build.0 = Release R24|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R25|x64.ActiveCfg = Release R25|x64
+		{25D25B28-451B-4933-AED8-11275AE2E5E5}.Release R25|x64.Build.0 = Release R25|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {249AAA4A-44AA-4482-9494-E82EE277FDA7}
+	EndGlobalSection
+EndGlobal

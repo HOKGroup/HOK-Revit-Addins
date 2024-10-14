@@ -95,7 +95,7 @@ namespace HOK.MissionControl.Tools.HealthReport
                         // dim w/ zero segments
                         dimSegmentStats.Add(new DimensionSegmentInfo(d)
                         {
-#if RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2021_OR_GREATER
                             ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)d.Value, false),
 #else
                             ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),
@@ -116,7 +116,7 @@ namespace HOK.MissionControl.Tools.HealthReport
 
                             dimSegmentStats.Add(new DimensionSegmentInfo(s)
                             {
-#if RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2021_OR_GREATER
                                 ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)d.Value, false),
 #else
                                 ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),

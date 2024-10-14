@@ -1,4 +1,4 @@
-# HOK-Revit-Addins 2024.1.0.22
+# HOK-Revit-Addins 2024.1.0.23
 
 ### Code Signing
 
@@ -50,7 +50,7 @@ Actual values can be found here: [HOK Teams](https://teams.microsoft.com/l/chann
 
 ### Links to release notes
 
-1. <b>On Opening Monitor:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/tree/master/Utility%20Tools/src/HOK.FileOnpeningMonitor)
+1. <b>On Opening Monitor:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/tree/master/HOK.FileOpeningMonitor)
 2. <b>Mission Control:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.MissionControl/README.md)
 3. <b>HOK Core:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.Core/README.md)
 4. <b>Beta Tools Manager:</b> [Tool Page and Release notes.](https://github.com/HOKGroup/HOK-Revit-Addins/blob/master/HOK.BetaToolsManager/README.md)

@@ -5,14 +5,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:healthReport="clr-namespace:HOK.MissionControl.Tools.Communicator.HealthReport"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Closed">
-            <i:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Control}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+    <Behaviors:Interaction.Triggers>
+        <Behaviors:EventTrigger EventName="Closed">
+            <Behaviors:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Control}"/>
+        </Behaviors:EventTrigger>
+    </Behaviors:Interaction.Triggers>
     <Grid>
         <ItemsControl ItemsSource="{Binding HealthReports}" 
                       Margin="10,10,10,10">

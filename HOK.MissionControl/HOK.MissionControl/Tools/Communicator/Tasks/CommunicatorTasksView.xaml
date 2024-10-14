@@ -6,17 +6,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:wpfUtilities="clr-namespace:HOK.Core.WpfUtilities;assembly=HOK.Core"
              xmlns:tasks="clr-namespace:HOK.MissionControl.Tools.Communicator.Tasks"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Control}"/>
-        </i:EventTrigger>
-        <i:EventTrigger EventName="Closed">
-            <i:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Control}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+    <Behaviors:Interaction.Triggers>
+        <Behaviors:EventTrigger EventName="Loaded">
+            <Behaviors:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Control}"/>
+        </Behaviors:EventTrigger>
+        <Behaviors:EventTrigger EventName="Closed">
+            <Behaviors:InvokeCommandAction Command="{Binding WindowClosed}" CommandParameter="{Binding ElementName=Control}"/>
+        </Behaviors:EventTrigger>
+    </Behaviors:Interaction.Triggers>
     <UserControl.Resources>
         <tasks:TypeToResourceConverter x:Key="TypeToResource"/>
     </UserControl.Resources>
@@ -36,16 +36,16 @@
                                         SelectionMode="Single"
                                         Margin="10,10,10,0" 
                                         VerticalAlignment="Top">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding LaunchTaskAssistant}" 
+            <Behaviors:Interaction.Triggers>
+                <Behaviors:EventTrigger EventName="SelectionChanged">
+                    <Behaviors:InvokeCommandAction Command="{Binding LaunchTaskAssistant}" 
                                            CommandParameter="{Binding Path=SelectedItem, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=wpfUtilities:DataGridExtension}}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseEnter">
-                    <i:InvokeCommandAction Command="{Binding MouseEnter}" 
+                </Behaviors:EventTrigger>
+                <Behaviors:EventTrigger EventName="MouseEnter">
+                    <Behaviors:InvokeCommandAction Command="{Binding MouseEnter}" 
                                            CommandParameter="{Binding ElementName=DataGridTasks}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
+                </Behaviors:EventTrigger>
+            </Behaviors:Interaction.Triggers>
             <wpfUtilities:DataGridExtension.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="BorderThickness" Value="0"/>

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 using HOK.MissionControl.StylesManager.Utilities;
@@ -112,7 +112,7 @@ namespace HOK.MissionControl.StylesManager
                 trans.Commit();
             }
 
-            Messenger.Default.Send(new DimensionsDeleted { Dimensions = deleted });
+            WeakReferenceMessenger.Default.Send(new DimensionsDeleted { Dimensions = deleted });
         }
         
         /// <summary>
@@ -168,7 +168,7 @@ namespace HOK.MissionControl.StylesManager
                 trans.Commit();
             }
 
-            Messenger.Default.Send(new TextStylesDeleted { TextStyles = deleted });
+            WeakReferenceMessenger.Default.Send(new TextStylesDeleted { TextStyles = deleted });
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace HOK.MissionControl.StylesManager
                 trans.Commit();
             }
 
-            Messenger.Default.Send(new OverridesCleared { Dimensions = cleared });
+            WeakReferenceMessenger.Default.Send(new OverridesCleared { Dimensions = cleared });
         }
 
         /// <summary>

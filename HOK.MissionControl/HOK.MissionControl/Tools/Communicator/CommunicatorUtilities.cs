@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using Autodesk.Revit.UI;
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm;
 using HOK.Core.Utilities;
 
 namespace HOK.MissionControl.Tools.Communicator
@@ -55,8 +55,8 @@ namespace HOK.MissionControl.Tools.Communicator
                     var tabItems = AppCommand.CommunicatorWindow.MainControl.Items.SourceCollection;
                     foreach (var ti in tabItems)
                     {
-                        var content = ((UserControl)((TabItem)ti).Content).DataContext as ViewModelBase;
-                        content?.Cleanup();
+                        var content = ((UserControl)((TabItem)ti).Content).DataContext as ObservableRecipient;
+                        // content?.OnDeactivated();
                     }
                 }
 

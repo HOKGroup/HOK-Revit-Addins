@@ -21,11 +21,7 @@ namespace HOK.MissionControl.StylesManager.Utilities
             Name = dt.Name;
             Id = dt.Id;
             Type = dt.StyleType.ToString();
-#if RELEASE2018
-            IsUsingProjectUnits = dt.GetUnitsFormatOptions().UseDefault;
-#else
             IsUsingProjectUnits = null;
-#endif
         }
 
         private bool _isEnabled = true;

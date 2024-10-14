@@ -1,10 +1,11 @@
-﻿using GalaSoft.MvvmLight;
+﻿using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 
 namespace HOK.Feedback
 {
-    public class AttachmentViewModel : ViewModelBase
+    public class AttachmentViewModel : ObservableRecipient
     {
-        public GalaSoft.MvvmLight.Command.RelayCommand Delete { get; set; }
+        public RelayCommand Delete { get; set; }
         public FeedbackViewModel ViewModel { get; set; }
         public string HtmlLink { get; set; }
         public UploadImageContent UploadImageContent { get; set; }
@@ -12,7 +13,7 @@ namespace HOK.Feedback
         public AttachmentViewModel(FeedbackViewModel vm)
         {
             ViewModel = vm;
-            Delete = new GalaSoft.MvvmLight.Command.RelayCommand(OnDelete);
+            Delete = new RelayCommand(OnDelete);
         }
 
         private void OnDelete()
@@ -24,7 +25,7 @@ namespace HOK.Feedback
         public string FilePath
         {
             get { return _filePath; }
-            set { _filePath = value; RaisePropertyChanged(() => FilePath); }
+            set { _filePath = value; OnPropertyChanged(nameof(FilePath)); }
         }
     }
 }

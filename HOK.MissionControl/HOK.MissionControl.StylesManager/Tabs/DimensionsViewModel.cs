@@ -7,20 +7,20 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.WpfUtilities;
 using HOK.Feedback;
 using HOK.MissionControl.StylesManager.Tabs;
 using HOK.MissionControl.StylesManager.Utilities;
-using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
+using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 #endregion
 
 namespace HOK.MissionControl.StylesManager.DimensionsTab
 {
-    public class DimensionsViewModel : ViewModelBase
+    public class DimensionsViewModel : ObservableRecipient
     {
         #region Properties
 
@@ -36,14 +36,14 @@ namespace HOK.MissionControl.StylesManager.DimensionsTab
         public ObservableCollection<DimensionTypeWrapper> Dimensions
         {
             get { return _dimensions; }
-            set { _dimensions = value; RaisePropertyChanged(() => Dimensions); }
+            set { _dimensions = value; OnPropertyChanged(nameof(Dimensions)); }
         }
 
         private ObservableCollection<DimensionTypeWrapper> _replacementDimensions;
         public ObservableCollection<DimensionTypeWrapper> ReplacementDimensions
         {
             get { return _replacementDimensions; }
-            set { _replacementDimensions = value; RaisePropertyChanged(() => ReplacementDimensions); }
+            set { _replacementDimensions = value; OnPropertyChanged(nameof(ReplacementDimensions)); }
         }
 
         #endregion
@@ -61,7 +61,7 @@ namespace HOK.MissionControl.StylesManager.DimensionsTab
             CheckReplacementDimension = new RelayCommand<bool>(OnCheckReplacementDimension);
             ControlClosed = new RelayCommand<UserControl>(OnControlClosed);
 
-            Messenger.Default.Register<DimensionsDeleted>(this, OnDimensionsDeleted);
+            WeakReferenceMessenger.Default.Register<DimensionsViewModel, DimensionsDeleted>(this, static (r, m) => r.OnDimensionsDeleted(m));
         }
 
         #region Message Handlers
@@ -188,8 +188,8 @@ namespace HOK.MissionControl.StylesManager.DimensionsTab
 
         private void OnControlClosed(UserControl control)
         {
-            // (Konrad) Unregistered any Messenger handlers.
-            Cleanup();
+            // (Konrad) Unregistered any WeakReferenceMessenger handlers.
+            OnDeactivated();
         }
 
         #endregion

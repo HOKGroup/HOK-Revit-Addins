@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Autodesk.Revit.DB;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Schemas.Configurations;
@@ -95,7 +95,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                 AppCommand.CommunicatorEvent.Raise();
 
                 // (Konrad) Register Updaters that are in the config file.
-                CommunicatorUtilities.LaunchCommunicator();
                 ApplyConfiguration(doc);
                 CollectWarnings(doc);
                 EnableMissionControl();
@@ -268,7 +267,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                             MissionControlSetup.SheetsData.Remove(centralPath);
                         MissionControlSetup.SheetsData.Add(centralPath, sData); // store sheets record
 
-                        Messenger.Default.Send(new CommunicatorDataDownloaded
+                        WeakReferenceMessenger.Default.Send(new CommunicatorDataDownloaded
                         {
                             CentralPath = centralPath,
                             Type = DataType.Sheets
@@ -319,7 +318,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.ViewsData.Remove(centralPath);
                 MissionControlSetup.ViewsData.Add(centralPath, vData); // store views record
 
-                Messenger.Default.Send(new HealthReportSummaryAdded { Data = vData, Type = SummaryType.Views });
+                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = vData, Type = SummaryType.Views });
 
                 new Thread(() => new ViewMonitor().PublishData(doc, vData.Id))
                 {
@@ -383,7 +382,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.GroupsData.Remove(centralPath);
                 MissionControlSetup.GroupsData.Add(centralPath, gData); // store groups record
 
-                Messenger.Default.Send(new HealthReportSummaryAdded { Data = gData, Type = SummaryType.Groups });
+                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = gData, Type = SummaryType.Groups });
 
                 new Thread(() => new GroupMonitor().PublishData(doc, gData.Id))
                 {
@@ -419,8 +418,8 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.FamilyData.Remove(centralPath);
                 MissionControlSetup.FamilyData.Add(centralPath, fData); // store families record
 
-                Messenger.Default.Send(new HealthReportSummaryAdded { Data = fData, Type = SummaryType.Families });
-                Messenger.Default.Send(new CommunicatorDataDownloaded { CentralPath = centralPath, Type = DataType.Families });
+                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = fData, Type = SummaryType.Families });
+                WeakReferenceMessenger.Default.Send(new CommunicatorDataDownloaded { CentralPath = centralPath, Type = DataType.Families });
             }
         }
 
@@ -448,7 +447,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.StylesData.Remove(centralPath);
                 MissionControlSetup.StylesData.Add(centralPath, sData); // store styles record
 
-                Messenger.Default.Send(new HealthReportSummaryAdded { Data = sData, Type = SummaryType.Styles });
+                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = sData, Type = SummaryType.Styles });
 
                 new Thread(() => new StylesMonitor().PublishData(doc, sData.Id))
                 {
@@ -482,7 +481,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.LinksData.Remove(centralPath);
                 MissionControlSetup.LinksData.Add(centralPath, lData); // store links record
 
-                Messenger.Default.Send(new HealthReportSummaryAdded { Data = lData, Type = SummaryType.Links });
+                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = lData, Type = SummaryType.Links });
 
                 new Thread(() => new LinkMonitor().PublishData(doc, lData.Id))
                 {
@@ -512,7 +511,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                             MissionControlSetup.WorksetsData.Remove(centralPath);
                         MissionControlSetup.WorksetsData.Add(centralPath, wData.First()); // store workset record
 
-                        Messenger.Default.Send(new HealthReportSummaryAdded { Data = wData.First(), Type = SummaryType.Worksets });
+                        WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = wData.First(), Type = SummaryType.Worksets });
 
                         new Thread(() => new WorksetItemCount().PublishData(doc, centralPath))
                         {
@@ -559,7 +558,7 @@ namespace HOK.MissionControl.Tools.MissionControl
                             MissionControlSetup.ModelsData.Remove(centralPath);
                         MissionControlSetup.ModelsData.Add(centralPath, mData.First()); // store model record
 
-                        Messenger.Default.Send(new HealthReportSummaryAdded { Data = mData.First(), Type = SummaryType.Models });
+                        WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = mData.First(), Type = SummaryType.Models });
 
                         new Thread(() => new ModelMonitor().PublishModelSize(doc, centralPath, doc.Application.VersionNumber))
                         {
@@ -614,7 +613,6 @@ namespace HOK.MissionControl.Tools.MissionControl
         private static void EnableMissionControl()
         {
             AppCommand.Instance.WebsiteButton.Enabled = true;
-            AppCommand.Instance.CommunicatorButton.Enabled = true;
             AppCommand.Instance.FamilyPublishButton.Enabled = true;
         }
 

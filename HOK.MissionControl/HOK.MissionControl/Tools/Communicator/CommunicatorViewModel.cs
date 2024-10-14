@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Controls;
-using GalaSoft.MvvmLight;
+using CommunityToolkit.Mvvm;
 using HOK.MissionControl.Tools.Communicator.HealthReport;
 using HOK.MissionControl.Tools.Communicator.Tasks;
 
 namespace HOK.MissionControl.Tools.Communicator
 {
-    public class CommunicatorViewModel : ViewModelBase
+    public class CommunicatorViewModel : ObservableRecipient
     {
         public ObservableCollection<TabItem> TabItems { get; set; } = new ObservableCollection<TabItem>();
 

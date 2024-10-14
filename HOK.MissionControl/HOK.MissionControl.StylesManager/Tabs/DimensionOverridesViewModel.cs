@@ -9,19 +9,19 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Interop;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.WpfUtilities;
 using HOK.Feedback;
 using HOK.MissionControl.StylesManager.Utilities;
-using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
+using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 #endregion
 
 namespace HOK.MissionControl.StylesManager.Tabs
 {
-    public class DimensionOverridesViewModel : ViewModelBase
+    public class DimensionOverridesViewModel : ObservableRecipient
     {
         #region Properties
 
@@ -42,7 +42,7 @@ namespace HOK.MissionControl.StylesManager.Tabs
         public ObservableCollection<DimensionWrapper> DimensionOverrides
         {
             get { return _dimensionOverrides; }
-            set { _dimensionOverrides = value; RaisePropertyChanged(() => DimensionOverrides); }
+            set { _dimensionOverrides = value; OnPropertyChanged(nameof(DimensionOverrides)); }
         }
 
         #endregion
@@ -63,7 +63,7 @@ namespace HOK.MissionControl.StylesManager.Tabs
             FindDimension = new RelayCommand<DimensionWrapper>(OnFindDimension);
             ControlClosed = new RelayCommand<UserControl>(OnControlClosed);
 
-            Messenger.Default.Register<OverridesCleared>(this, OnOverridesCleared);
+            WeakReferenceMessenger.Default.Register<DimensionOverridesViewModel, OverridesCleared>(this, static (r, m) => r.OnOverridesCleared(m));
         }
 
         #region Message Handlers
@@ -169,8 +169,8 @@ namespace HOK.MissionControl.StylesManager.Tabs
 
         private void OnControlClosed(UserControl control)
         {
-            // (Konrad) Unregistered any Messenger handlers.
-            Cleanup();
+            // (Konrad) Unregistered any WeakReferenceMessenger handlers.
+            OnDeactivated();
         }
 
         #endregion

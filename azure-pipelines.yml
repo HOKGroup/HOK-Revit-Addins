@@ -12,214 +12,77 @@ trigger:
     include:
     - 0.*
 
-
-strategy:
-  matrix:
-    2024:
-      condition: eq(variables['build.sourceBranch'], 'refs/heads/revit-2024')
-      buildConfiguration: '2024'
-    2023:
-      dependsOn: 2024
-      buildConfiguration: '2023'
-    2022:
-      dependsOn: 2024
-      buildConfiguration: '2022'
-    2021:
-      dependsOn: 2024
-      buildConfiguration: '2021'
-    2020:
-      dependsOn: 2024
-      buildConfiguration: '2020'
-    2019:
-      dependsOn: 2024
-      buildConfiguration: '2019'
-
-pool:
-  vmImage: 'windows-latest'
-
-variables:
-- group: code-signing
-- name: solution
-  value: '**/HOK.*.sln'
-- name: coreSolution
-  value: '**/HOK.Core.sln'
-- name: MCsolution
-  value: '**/HOK.MissionControl.sln'
-- name: paramToolsSolution
-  value: '**/HOK.ParameterTools.sln'
-- name: feedbackSolution
-  value: '**/HOK.Feedback.sln'
-- name: buildPlatform
-  value: 'x64'
-- name: BUILD_ENV
-  value: AzureDevOps
-- name: HOKDepsDirectory
-  value: '$(Build.SourcesDirectory)'
-
-steps:
-- task: PowerShell@2
-  inputs:
-    filePath: '$(Build.SourcesDirectory)/_build/copy_resources.ps1'
-    errorActionPreference: 'continue'
-  env:
-    BUILD_CONFIGURATION: $(buildConfiguration)
-
-- task: PowerShell@2
-  inputs:
-    filePath: '$(Build.SourcesDirectory)/_build/remove_unused_folders.ps1'
-    errorActionPreference: 'continue'
-  env:
-    BUILD_SOURCESDIRECTORY: $(Build.SourcesDirectory)
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'HOK Addins Deps01.zip'
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'HOK Addins Deps02.zip'
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'HOK Addins Deps03.zip'
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'HOK Addins Deps04.zip'
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: '$(SettingsFileName)'
-
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(Agent.TempDirectory)'
-    Contents: '$(SettingsFileName)'
-    TargetFolder: '$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources'
-
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: 'Rename-Item –Path "$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources/$(SettingsFileName)" -NewName "Settings.json"'
-
-- task: DownloadSecureFile@1
-  inputs:
-    secureFile: 'CISign.pfx'
-
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(Agent.TempDirectory)'
-    Contents: 'CISign.pfx'
-    TargetFolder: '$(Build.SourcesDirectory)/_cert'
-
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: 'Get-ChildItem -Directory | Where-Object { $_.Name.Contains(" ") } | Rename-Item -NewName { $_.Name.Replace(" ", "_") }'
-
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: 'Get-ChildItem -Path **/packages/* -Directory | ForEach-Object { Remove-Item -Recurse -LiteralPath $_.FullName }'
-
-- task: ExtractFiles@1
-  inputs:
-    archiveFilePatterns: '$(Agent.TempDirectory)/*.zip'
-    cleanDestinationFolder: false
-    destinationFolder: '$(Build.SourcesDirectory)'
-
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '$(solution)'
-    feedsToUse: 'select'
-    noCache: true
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(coreSolution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    maximumCpuCount: true
-  env:
-    HOKDepsDirectory: $(Build.SourcesDirectory)
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: MSBuild@1
-  inputs:
-    solution: '$(MCsolution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildArguments: '/target:HOK_MissionControl'
-  env:
-    HOKDepsDirectory: $(Build.SourcesDirectory)
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(MCsolution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildArgs: '/target:HOK_MissionControl_Core'
-    clean: true
-  env:
-    HOKDepsDirectory: $(Build.SourcesDirectory)
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: MSBuild@1
-  inputs:
-    solution: '$(paramToolsSolution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildArguments: '-t:restore'
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(feedbackSolution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    maximumCpuCount: true
-  env:
-    HOKDepsDirectory: $(Build.SourcesDirectory)
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(MCsolution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    maximumCpuCount: true
-  env:
-    HOKDepsDirectory: $(Build.SourcesDirectory)
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    maximumCpuCount: true
-  env:
-    HOKDepsDirectory: $(Build.SourcesDirectory)
-    PFX_PASS: $(CERT_SIGNING_PASS)
-    PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
-
-- task: PowerShell@2
-  inputs:
-    filePath: '$(Build.SourcesDirectory)/_build/copy_artifacts.ps1'
-    errorActionPreference: 'continue'
-  env:
-    BUILD_CONFIGURATION: $(buildConfiguration)
-
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.SourcesDirectory)/_artifacts'
-    ArtifactName: '$(Build.SourceBranchName)'
-    publishLocation: 'Container'
+parameters:
+- name: 'Build2025'
+  type: boolean
+  default: true
+  displayName: '2025'
+- name: 'Build2024'
+  type: boolean
+  default: false
+  displayName: '2024'
+- name: 'Build2023'
+  type: boolean
+  default: false
+  displayName: '2023'
+- name: 'Build2022'
+  type: boolean
+  default: false
+  displayName: '2022'
+- name: 'Build2021'
+  type: boolean
+  default: false
+  displayName: '2021'
+- name: 'Build2020'
+  type: boolean
+  default: false
+  displayName: '2020'
+- name: 'Build2019'
+  type: boolean
+  default: false
+  displayName: '2019'
+- name: 'buildConfig'
+  type: string
+  default: 'Release'
+  values:
+  - 'Release'
+  - 'Debug'
+  displayName: 'Build Configuration'
 
 
+jobs:
+- ${{ if eq(parameters.Build2025, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R25'
+      revitVersion: '2025'
+- ${{ if eq(parameters.Build2024, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R24'
+      revitVersion: '2024'
+- ${{ if eq(parameters.Build2023, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R23'
+      revitVersion: '2023'
+- ${{ if eq(parameters.Build2022, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R22'
+      revitVersion: '2022'
+- ${{ if eq(parameters.Build2021, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R21'
+      revitVersion: '2021'
+- ${{ if eq(parameters.Build2020, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R20'
+      revitVersion: '2020'
+- ${{ if eq(parameters.Build2019, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R19'
+      revitVersion: '2019'

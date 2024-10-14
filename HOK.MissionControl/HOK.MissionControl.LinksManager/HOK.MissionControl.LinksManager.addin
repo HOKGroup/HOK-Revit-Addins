@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
   <AddIn Type="Application">
-    <Name>Family Publish</Name>
-    <Assembly>HOK.MissionControl.LinksManager\HOK.MissionControl.LinksManager.dll</Assembly>
+    <Name>Links Manager</Name>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.MissionControl.LinksManager.dll</Assembly>
     <AddInId>22fe8cc0-814b-4832-88b0-f87500f54175</AddInId>
     <FullClassName>HOK.MissionControl.LinksManager.LinksManagerCommand</FullClassName>
     <VendorId>Konrad K Sobon</VendorId>

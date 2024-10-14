@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 using System.Windows;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.Core.WpfUtilities;
 
 namespace HOK.MissionControl.FamilyPublish
 {
-    public class FamilyMonitorViewModel : ViewModelBase
+    public class FamilyMonitorViewModel : ObservableRecipient
     {
         public RelayCommand<Window> Close { get; }
         public RelayCommand<Window> Cancel { get; }
@@ -61,7 +61,7 @@ namespace HOK.MissionControl.FamilyPublish
         public string Message
         {
             get { return _message; }
-            set { _message = value; RaisePropertyChanged(() => Message); }
+            set { _message = value; OnPropertyChanged(nameof(Message)); }
         }
     }
 }

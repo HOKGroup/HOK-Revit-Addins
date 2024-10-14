@@ -3,15 +3,15 @@ using System.Reflection;
 using System.Windows.Controls;
 using System.Windows;
 using Autodesk.Revit.DB;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.MissionControl.LinksManager.ImagesTab;
 using HOK.MissionControl.LinksManager.StylesTab;
 using HOK.MissionControl.LinksManager.ImportsTab;
 
 namespace HOK.MissionControl.LinksManager
 {
-    public class LinksManagerViewModel : ViewModelBase
+    public class LinksManagerViewModel : ObservableRecipient
     {
         public string Title { get; set; }
         public ObservableCollection<TabItem> TabItems { get; set; }

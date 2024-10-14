@@ -8,9 +8,9 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Interop;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Feedback;
 using HOK.MissionControl.GroupsManager.Utilities;
 
@@ -18,7 +18,7 @@ using HOK.MissionControl.GroupsManager.Utilities;
 
 namespace HOK.MissionControl.GroupsManager
 {
-    public class GroupsManagerViewModel : ViewModelBase
+    public class GroupsManagerViewModel : ObservableRecipient
     {
         #region Properties
 
@@ -42,7 +42,7 @@ namespace HOK.MissionControl.GroupsManager
         public ObservableCollection<GroupTypeWrapper> Groups
         {
             get { return _groups;}
-            set { _groups = value; RaisePropertyChanged(() => Groups); }
+            set { _groups = value; OnPropertyChanged(nameof(Groups)); }
         }
 
         #endregion
@@ -66,8 +66,8 @@ namespace HOK.MissionControl.GroupsManager
             FindGroup = new RelayCommand<GroupTypeWrapper>(OnFindGroup);
             IsolateGroup = new RelayCommand<GroupTypeWrapper>(OnIsolateGroup);
 
-            Messenger.Default.Register<GroupsDeleted>(this, OnGroupsDeleted);
-            Messenger.Default.Register<DocumentChanged>(this, OnDocumentChanged);
+            WeakReferenceMessenger.Default.Register<GroupsManagerViewModel, GroupsDeleted>(this, static (r, m) => r.OnGroupsDeleted(m));
+            WeakReferenceMessenger.Default.Register<GroupsManagerViewModel, DocumentChanged>(this, static (r, m) => r.OnDocumentChanged(m));
         }
 
         #region Message Handlers
@@ -168,7 +168,7 @@ namespace HOK.MissionControl.GroupsManager
         private void OnWindowClosed(Window win)
         {
             // (Konrad) Unregisters any Messanger handlers.
-            Cleanup();
+            OnDeactivated();
         }
 
         private static void OnSubmitComment()

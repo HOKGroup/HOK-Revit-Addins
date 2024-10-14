@@ -7,19 +7,19 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.WpfUtilities;
 using HOK.Feedback;
 using HOK.MissionControl.StylesManager.Utilities;
-using RelayCommand = GalaSoft.MvvmLight.Command.RelayCommand;
+using RelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
 
 #endregion
 
 namespace HOK.MissionControl.StylesManager.Tabs
 {
-    public class TextViewModel : ViewModelBase
+    public class TextViewModel : ObservableRecipient
     {
         public TextModel Model { get; set; }
         public RelayCommand Replace { get; set; }
@@ -33,14 +33,14 @@ namespace HOK.MissionControl.StylesManager.Tabs
         public ObservableCollection<TextStyleWrapper> TextStyles
         {
             get { return _textStyles; }
-            set { _textStyles = value; RaisePropertyChanged(() => TextStyles); }
+            set { _textStyles = value; OnPropertyChanged(nameof(TextStyles)); }
         }
 
         private ObservableCollection<TextStyleWrapper> _replacementTextStyles;
         public ObservableCollection<TextStyleWrapper> ReplacementTextStyles
         {
             get { return _replacementTextStyles; }
-            set { _replacementTextStyles = value; RaisePropertyChanged(() => ReplacementTextStyles); }
+            set { _replacementTextStyles = value; OnPropertyChanged(nameof(ReplacementTextStyles)); }
         }
 
         public TextViewModel(TextModel model)
@@ -56,7 +56,7 @@ namespace HOK.MissionControl.StylesManager.Tabs
             CheckReplacementStyle = new RelayCommand<bool>(OnCheckReplacementStyle);
             ControlClosed = new RelayCommand<UserControl>(OnControlClosed);
 
-            Messenger.Default.Register<TextStylesDeleted>(this, OnTextStylesDeleted);
+            WeakReferenceMessenger.Default.Register<TextViewModel, TextStylesDeleted>(this, static (r, m) => r.OnTextStylesDeleted(m));
         }
 
         #region Message Handlers
@@ -153,8 +153,8 @@ namespace HOK.MissionControl.StylesManager.Tabs
 
         private void OnControlClosed(UserControl control)
         {
-            // (Konrad) Unregistered any Messenger handlers.
-            Cleanup();
+            // (Konrad) Unregistered any WeakReferenceMessenger handlers.
+            OnDeactivated();
         }
 
         #endregion

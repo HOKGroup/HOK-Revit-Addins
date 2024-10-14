@@ -114,7 +114,7 @@ namespace HOK.MissionControl.StylesManager.Tabs
                             ? ((View)_doc.GetElement(d.OwnerViewId)).ViewType.ToString()
                             : string.Empty,
                         OwnerViewId = d.OwnerViewId,
-#if RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2021_OR_GREATER
                         ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)d.Value, false),
 #else
                         ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)d.Value, false, false),
@@ -139,7 +139,7 @@ namespace HOK.MissionControl.StylesManager.Tabs
                                 ? ((View)_doc.GetElement(d.OwnerViewId)).ViewType.ToString()
                                 : string.Empty,
                             OwnerViewId = d.OwnerViewId,
-#if RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2021_OR_GREATER
                             ValueString = UnitFormatUtils.Format(units, d.DimensionType.GetSpecTypeId(), (double)s.Value, false),
 #else
                             ValueString = UnitFormatUtils.Format(units, d.DimensionType.UnitType, (double)s.Value, false, false),
@@ -255,7 +255,7 @@ namespace HOK.MissionControl.StylesManager.Tabs
             var verify = Regex.Match(s, @"^[0-9\'\-\/\""\s]*$", RegexOptions.IgnoreCase);
             if (!verify.Success) return false;
 
-#if RELEASE2021 || RELEASE2022 || RELEASE2023 || RELEASE2024
+#if REVIT2021_OR_GREATER
             if (!UnitFormatUtils.TryParse(_doc.GetUnits(), SpecTypeId.Length, s,
                 new ValueParsingOptions(),
                 out var second)) return false;
