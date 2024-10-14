@@ -32,6 +32,6 @@ foreach ($solution in $solutions) {
 
 & "$sourceDir/_build/cleanup_artifacts.ps1"
 
-Copy-Item ".\_artifacts\$revitVersion\HOK-Addin.bundle\Contents\*" "C:\ProgramData\Autodesk\Revit\Addins\$revitVersion\HOK-Addin.bundle\Contents\"
+Copy-Item ".\_artifacts\$revitVersion\HOK-Addin.bundle\Contents\*" "C:\ProgramData\Autodesk\Revit\Addins\$revitVersion\HOK-Addin.bundle\Contents\" -Exclude Resources*
 
 Remove-Item Env:\BUILD_CONFIGURATION
