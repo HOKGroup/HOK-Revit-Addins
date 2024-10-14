@@ -122,7 +122,6 @@ namespace HOK.MissionControl.Tools.Communicator
             if (dp == null) return;
 
             dp.Hide();
-            AppCommand.Instance.CommunicatorButton.Enabled = false;
         }
 
         /// <summary>

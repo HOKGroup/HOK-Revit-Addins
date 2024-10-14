@@ -79,16 +79,19 @@ namespace HOK.RoomElevation
                     result = false;
                 }
 
-                FilteredElementCollector linkCollector = new FilteredElementCollector(m_doc, viewPlan.Id);
-                List<RevitLinkInstance> linkInstances = linkCollector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().Cast<RevitLinkInstance>().ToList();
-                foreach (RevitLinkInstance instance in linkInstances)
+                if (null != viewPlan)
                 {
-                    LinkedInstanceProperties lip = new LinkedInstanceProperties(instance);
-                    if (null != lip.LinkedDocument)
+                    FilteredElementCollector linkCollector = new FilteredElementCollector(m_doc, viewPlan.Id);
+                    List<RevitLinkInstance> linkInstances = linkCollector.OfCategory(BuiltInCategory.OST_RvtLinks).WhereElementIsNotElementType().Cast<RevitLinkInstance>().ToList();
+                    foreach (RevitLinkInstance instance in linkInstances)
                     {
-                        if (!linkedDocuments.ContainsKey(lip.InstanceId))
+                        LinkedInstanceProperties lip = new LinkedInstanceProperties(instance);
+                        if (null != lip.LinkedDocument)
                         {
-                            linkedDocuments.Add(lip.InstanceId, lip);
+                            if (!linkedDocuments.ContainsKey(lip.InstanceId))
+                            {
+                                linkedDocuments.Add(lip.InstanceId, lip);
+                            }
                         }
                     }
                 }
@@ -96,7 +99,7 @@ namespace HOK.RoomElevation
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to check prereauisites.\n" + ex.Message, "Check Prerequisites", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Failed to check prerequisites.\n" + ex.Message, "Check Prerequisites", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             return result;
         }

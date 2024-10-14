@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
+﻿using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using Autodesk.Revit.UI;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.UI.Selection;
 
 
 namespace HOK.LPDCalculator
@@ -348,7 +341,7 @@ namespace HOK.LPDCalculator
             try
             {
                 var helpPath = @"V:\RVT-Data\HOK Program\Documentation\LPD Calculator_Instruction.pdf";
-                System.Diagnostics.Process.Start(helpPath);
+                System.Diagnostics.Process.Start("explorer.exe", helpPath);
             }
             catch
             {

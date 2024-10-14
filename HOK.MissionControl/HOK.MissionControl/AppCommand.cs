@@ -271,9 +271,6 @@ namespace HOK.MissionControl
             var assembly = Assembly.GetAssembly(GetType());
             var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
                         ?? application.CreateRibbonPanel(tabName, "Mission Control");
-            CommunicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command",
-                "Show/Hide" + Environment.NewLine + "Communicator",
-                assembly.Location, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
 
             WebsiteButton = (PushButton)panel.AddItem(new PushButtonData("WebsiteLink_Command",
                 "Launch" + Environment.NewLine + "MissionControl",

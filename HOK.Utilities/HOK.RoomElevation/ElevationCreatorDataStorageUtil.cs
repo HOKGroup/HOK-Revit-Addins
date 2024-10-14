@@ -505,8 +505,8 @@ namespace HOK.RoomElevation
 
                         settings.IsLinkedRoom  = entity.Get<bool>(m_schema.GetField(s_IsLinkedRoom));
                         settings.IsLInkedWall = entity.Get<bool>(m_schema.GetField(s_IsLinkedWall));
-                        settings.ViewFamilyId = entity.Get<int>(m_schema.GetField(s_ViewFamilyId));
-                        settings.ViewTemplateId = entity.Get<int>(m_schema.GetField(s_ViewTemplateId));
+                        settings.ViewFamilyId = entity.Get<long>(m_schema.GetField(s_ViewFamilyId));
+                        settings.ViewTemplateId = entity.Get<long>(m_schema.GetField(s_ViewTemplateId));
                         settings.ScaleByTemplate = entity.Get<bool>(m_schema.GetField(s_SacleByTemplate));
                         settings.CustomScale = entity.Get<int>(m_schema.GetField(s_CustomRatio));
                         settings.SpaceAround = entity.Get<int>(m_schema.GetField(s_SpaceAround));
@@ -621,8 +621,8 @@ namespace HOK.RoomElevation
                 schemaBuilder.SetSchemaName("RoomElevationCreatorSettings");
                 schemaBuilder.AddSimpleField(s_IsLinkedRoom, typeof(bool));
                 schemaBuilder.AddSimpleField(s_IsLinkedWall, typeof(bool));
-                schemaBuilder.AddSimpleField(s_ViewFamilyId, typeof(int));
-                schemaBuilder.AddSimpleField(s_ViewTemplateId, typeof(int));
+                schemaBuilder.AddSimpleField(s_ViewFamilyId, typeof(long));
+                schemaBuilder.AddSimpleField(s_ViewTemplateId, typeof(long));
                 schemaBuilder.AddSimpleField(s_SacleByTemplate, typeof(bool));
                 schemaBuilder.AddSimpleField(s_CustomRatio, typeof(int));
                 schemaBuilder.AddSimpleField(s_SpaceAround, typeof(int));

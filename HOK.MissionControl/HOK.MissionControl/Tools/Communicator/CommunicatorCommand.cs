@@ -43,8 +43,6 @@ namespace HOK.MissionControl.Tools.Communicator
             if (dp.IsShown())
             {
                 dp.Hide();
-                AppCommand.Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", "communicatorOff_32x32.png");
-                AppCommand.Instance.CommunicatorButton.ItemText = "Show" + Environment.NewLine + "Communicator";
             }
             else
             {

@@ -41,7 +41,7 @@
                 </Grid.RowDefinitions>
                 <Label Content="Category:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="comboBoxSpace" HorizontalAlignment="Left" Margin="76,13,0,0" VerticalAlignment="Top" Width="150" SelectionChanged="comboBoxSpace_SelectionChanged"/>
-                <DataGrid x:Name="dataGridSpatial" HorizontalAlignment="Stretch" Margin="10,10,10,5" Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="dataGridSpatial_SelectionChanged" HorizontalGridLinesBrush="{x:Null}">
+                <DataGrid x:Name="dataGridSpatial" HorizontalAlignment="Stretch" Margin="10,10,10,5" Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="dataGridSpatial_SelectionChanged" HorizontalGridLinesBrush="{x:Null}" IsReadOnly="True">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Parameter Name" Width="1*" Binding="{Binding ParameterName}" />
                     </DataGrid.Columns>
@@ -58,7 +58,7 @@
                 </Grid.RowDefinitions>
                 <Label Content="Category:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
                 <ComboBox x:Name="comboBoxRevit" HorizontalAlignment="Left" Margin="76,13,0,0" VerticalAlignment="Top" Width="150" SelectionChanged="comboBoxRevit_SelectionChanged"/>
-                <DataGrid x:Name="dataGridRevit" HorizontalAlignment="Stretch" Margin="10,10,10,5" Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="dataGridRevit_SelectionChanged" HorizontalGridLinesBrush="{x:Null}">
+                <DataGrid x:Name="dataGridRevit" HorizontalAlignment="Stretch" Margin="10,10,10,5" Grid.Row="1" VerticalAlignment="Stretch" SelectionChanged="dataGridRevit_SelectionChanged" HorizontalGridLinesBrush="{x:Null}" IsReadOnly="True">
                     <DataGrid.RowStyle>
                         <Style TargetType="DataGridRow">
                             <Setter Property="TextElement.Foreground" Value="{Binding TextColor}"/>

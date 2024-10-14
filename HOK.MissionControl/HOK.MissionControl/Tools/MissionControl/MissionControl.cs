@@ -95,7 +95,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                 AppCommand.CommunicatorEvent.Raise();
 
                 // (Konrad) Register Updaters that are in the config file.
-                CommunicatorUtilities.LaunchCommunicator();
                 ApplyConfiguration(doc);
                 CollectWarnings(doc);
                 EnableMissionControl();
@@ -614,7 +613,6 @@ namespace HOK.MissionControl.Tools.MissionControl
         private static void EnableMissionControl()
         {
             AppCommand.Instance.WebsiteButton.Enabled = true;
-            AppCommand.Instance.CommunicatorButton.Enabled = true;
             AppCommand.Instance.FamilyPublishButton.Enabled = true;
         }
 
