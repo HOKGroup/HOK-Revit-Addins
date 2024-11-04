@@ -61,10 +61,10 @@ namespace HOK.AddInManager.Utils
                                 Index = int.Parse(fields[3]),
                                 Tooltip = fields[4],
                                 Url = fields[5],
-                                DropdownOptionsFlag = restart == 1,
-                                LoadTypes = restart == 0
-                                    ? new[]{LoadType.Never, LoadType.Always, LoadType.ThisSessionOnly} 
-                                    : new[]{LoadType.Never, restart == 1 ? LoadType.Always : LoadType.ThisSessionOnly} 
+                                DropdownOptionsFlag = restart,
+                                LoadTypes = restart == 1
+                                    ? new[]{LoadType.Never, LoadType.Always } 
+                                    : new[]{LoadType.Never, LoadType.Always, LoadType.ThisSessionOnly} 
                             };
 
                             var names = fields[2];

@@ -98,7 +98,22 @@ namespace HOK.AddInManager
                 SettingUtil.ReadConfig(settingPath, ref addins);
 
                 //add addins
-                addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Always).ToList().ForEach(AddPlugin);
+                addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Always && x.DropdownOptionsFlag == 1).ToList().ForEach(AddPlugin);
+                var addinsToLoad = addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Always && x.DropdownOptionsFlag == 2).ToList();
+                foreach (var addin in addinsToLoad)
+                {
+                    foreach (var addinPath in addin.AddInPaths)
+                    {
+                        try
+                        {
+                            m_app.LoadAddIn(addinPath);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -135,7 +150,21 @@ namespace HOK.AddInManager
                         }
                         break;
                     case LoadType.Always:
-                        AddPlugin(addin);
+                        if (addin.DropdownOptionsFlag == 2) {
+                            foreach (var addinPath in addin.AddInPaths)
+                            {
+                                try
+                                {
+                                    m_app.LoadAddIn(addinPath);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                                }
+                            }
+                        } else {
+                            AddPlugin(addin); // Copy to user profile method
+                        }
                         break;
                 }
             }

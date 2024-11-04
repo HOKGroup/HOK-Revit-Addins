@@ -153,9 +153,9 @@ namespace HOK.AddInManager.Classes
             set { _loadTypes = value; NotifyPropertyChanged("LoadTypes"); }
         }
 
-        private bool _dropdownOptionsFlag;
+        private int _dropdownOptionsFlag;
         [XmlIgnore]
-        public bool DropdownOptionsFlag
+        public int DropdownOptionsFlag
         {
             get { return _dropdownOptionsFlag; }
             set { _dropdownOptionsFlag = value; NotifyPropertyChanged("DropdownOptionsFlag"); }
