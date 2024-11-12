@@ -48,7 +48,7 @@ namespace HOK.AddInManager
                 installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber;
                 addinResources = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber + "\\HOK-Addin.bundle\\Contents\\Resources";
 
-                Application.ControlledApplication.ApplicationInitialized += ReadAddinSettingsOnInitialized;
+                Application.ControlledApplication.ApplicationInitialized += async (source, args) => { await ReadAddinSettingsOnInitialized(source, args); };
                 Application.ApplicationClosing += ApplicationOnClosing;
 
                 //ribbon panel
@@ -74,14 +74,14 @@ namespace HOK.AddInManager
 
         public override void OnShutdown()
         {
-            Application.ControlledApplication.ApplicationInitialized -= ReadAddinSettingsOnInitialized;
+            Application.ControlledApplication.ApplicationInitialized -= async (source, args) => { await ReadAddinSettingsOnInitialized(source, args); };
             Application.ApplicationClosing -= ApplicationOnClosing;
         }
 
         /// <summary>
         /// Reads in the XML Settings file.
         /// </summary>
-        private void ReadAddinSettingsOnInitialized(object source, ApplicationInitializedEventArgs args)
+        private async Task ReadAddinSettingsOnInitialized(object source, ApplicationInitializedEventArgs args)
         {
             try
             {
@@ -106,6 +106,7 @@ namespace HOK.AddInManager
                     {
                         try
                         {
+                            await Task.Delay(2500);
                             m_app.LoadAddIn(addinPath);
                         }
                         catch (Exception e)
