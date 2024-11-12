@@ -37,6 +37,7 @@ namespace HOK.LevelManager
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                Result = Result.Cancelled;
             }
         }
     }

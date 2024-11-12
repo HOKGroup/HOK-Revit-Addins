@@ -3,7 +3,7 @@ Imports System.Runtime.CompilerServices
 
 Public Module ElementIdExtensionModule
 
-#If REVIT2024_OR_GREATER
+#If REVIT2024_OR_GREATER Then
     <Extension>
     Public Function NewElementId(L As Long) As ElementId
         Return New ElementId(L)

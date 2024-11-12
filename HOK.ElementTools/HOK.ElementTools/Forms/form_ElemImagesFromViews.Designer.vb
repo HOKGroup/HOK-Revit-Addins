@@ -23,188 +23,203 @@ Partial Class form_ElemImagesFromViews
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(form_ElemImagesFromViews))
-        Me.groupBox1 = New System.Windows.Forms.GroupBox()
-        Me.checkBoxRestrictPrefix = New System.Windows.Forms.CheckBox()
-        Me.textBoxRestrictPrefixValue = New System.Windows.Forms.TextBox()
-        Me.checkBoxIncludeExisting = New System.Windows.Forms.CheckBox()
-        Me.checkBoxListReverse = New System.Windows.Forms.CheckBox()
-        Me.buttonBrowse = New System.Windows.Forms.Button()
-        Me.folderBrowserDialogImages = New System.Windows.Forms.FolderBrowserDialog()
-        Me.textBoxFolderPath = New System.Windows.Forms.TextBox()
-        Me.buttonCreate = New System.Windows.Forms.Button()
-        Me.listBoxViews = New System.Windows.Forms.ListBox()
-        Me.buttonClose = New System.Windows.Forms.Button()
-        Me.label4 = New System.Windows.Forms.Label()
-        Me.label1 = New System.Windows.Forms.Label()
-        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
-        Me.ToolStripProgressBar1 = New System.Windows.Forms.ToolStripProgressBar()
-        Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
-        Me.groupBox1.SuspendLayout()
-        Me.StatusStrip1.SuspendLayout()
-        Me.SuspendLayout()
-        '
-        'groupBox1
-        '
-        Me.groupBox1.Controls.Add(Me.checkBoxRestrictPrefix)
-        Me.groupBox1.Controls.Add(Me.textBoxRestrictPrefixValue)
-        Me.groupBox1.Controls.Add(Me.checkBoxIncludeExisting)
-        Me.groupBox1.Controls.Add(Me.checkBoxListReverse)
-        Me.groupBox1.ForeColor = System.Drawing.SystemColors.ControlText
-        Me.groupBox1.Location = New System.Drawing.Point(327, 69)
-        Me.groupBox1.Name = "groupBox1"
-        Me.groupBox1.Size = New System.Drawing.Size(177, 155)
-        Me.groupBox1.TabIndex = 42
-        Me.groupBox1.TabStop = False
-        Me.groupBox1.Text = "List Selection Options"
-        '
-        'checkBoxRestrictPrefix
-        '
-        Me.checkBoxRestrictPrefix.AutoSize = True
-        Me.checkBoxRestrictPrefix.Location = New System.Drawing.Point(11, 64)
-        Me.checkBoxRestrictPrefix.Name = "checkBoxRestrictPrefix"
-        Me.checkBoxRestrictPrefix.Size = New System.Drawing.Size(158, 17)
-        Me.checkBoxRestrictPrefix.TabIndex = 29
-        Me.checkBoxRestrictPrefix.Text = "Restrict to Names w/ Prefix:"
-        Me.checkBoxRestrictPrefix.UseVisualStyleBackColor = True
-        '
-        'textBoxRestrictPrefixValue
-        '
-        Me.textBoxRestrictPrefixValue.Location = New System.Drawing.Point(11, 84)
-        Me.textBoxRestrictPrefixValue.Name = "textBoxRestrictPrefixValue"
-        Me.textBoxRestrictPrefixValue.Size = New System.Drawing.Size(158, 20)
-        Me.textBoxRestrictPrefixValue.TabIndex = 28
-        '
-        'checkBoxIncludeExisting
-        '
-        Me.checkBoxIncludeExisting.AutoSize = True
-        Me.checkBoxIncludeExisting.Location = New System.Drawing.Point(11, 19)
-        Me.checkBoxIncludeExisting.Name = "checkBoxIncludeExisting"
-        Me.checkBoxIncludeExisting.Size = New System.Drawing.Size(145, 17)
-        Me.checkBoxIncludeExisting.TabIndex = 31
-        Me.checkBoxIncludeExisting.Text = "List and Replace Existing"
-        Me.checkBoxIncludeExisting.UseVisualStyleBackColor = True
-        '
-        'checkBoxListReverse
-        '
-        Me.checkBoxListReverse.AutoSize = True
-        Me.checkBoxListReverse.Location = New System.Drawing.Point(11, 132)
-        Me.checkBoxListReverse.Name = "checkBoxListReverse"
-        Me.checkBoxListReverse.Size = New System.Drawing.Size(114, 17)
-        Me.checkBoxListReverse.TabIndex = 24
-        Me.checkBoxListReverse.Text = "Reverse List Order"
-        Me.checkBoxListReverse.UseVisualStyleBackColor = True
-        '
-        'buttonBrowse
-        '
-        Me.buttonBrowse.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.buttonBrowse.Location = New System.Drawing.Point(477, 22)
-        Me.buttonBrowse.Name = "buttonBrowse"
-        Me.buttonBrowse.Size = New System.Drawing.Size(29, 26)
-        Me.buttonBrowse.TabIndex = 41
-        Me.buttonBrowse.Text = "..."
-        Me.buttonBrowse.UseVisualStyleBackColor = True
-        '
-        'textBoxFolderPath
-        '
-        Me.textBoxFolderPath.Location = New System.Drawing.Point(14, 25)
-        Me.textBoxFolderPath.Name = "textBoxFolderPath"
-        Me.textBoxFolderPath.Size = New System.Drawing.Size(457, 20)
-        Me.textBoxFolderPath.TabIndex = 39
-        '
-        'buttonCreate
-        '
-        Me.buttonCreate.Location = New System.Drawing.Point(14, 445)
-        Me.buttonCreate.Name = "buttonCreate"
-        Me.buttonCreate.Size = New System.Drawing.Size(178, 29)
-        Me.buttonCreate.TabIndex = 38
-        Me.buttonCreate.Text = "Create Images"
-        Me.buttonCreate.UseVisualStyleBackColor = True
-        '
-        'listBoxViews
-        '
-        Me.listBoxViews.FormattingEnabled = True
-        Me.listBoxViews.Location = New System.Drawing.Point(14, 75)
-        Me.listBoxViews.Name = "listBoxViews"
-        Me.listBoxViews.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.listBoxViews.Size = New System.Drawing.Size(300, 355)
-        Me.listBoxViews.TabIndex = 36
-        '
-        'buttonClose
-        '
-        Me.buttonClose.Location = New System.Drawing.Point(327, 445)
-        Me.buttonClose.Name = "buttonClose"
-        Me.buttonClose.Size = New System.Drawing.Size(178, 29)
-        Me.buttonClose.TabIndex = 35
-        Me.buttonClose.Text = "Close"
-        Me.buttonClose.UseVisualStyleBackColor = True
-        '
-        'label4
-        '
-        Me.label4.AutoSize = True
-        Me.label4.Location = New System.Drawing.Point(14, 59)
-        Me.label4.Name = "label4"
-        Me.label4.Size = New System.Drawing.Size(216, 13)
-        Me.label4.TabIndex = 37
-        Me.label4.Text = "Select Views For Which to Create an Image:"
-        '
-        'label1
-        '
-        Me.label1.AutoSize = True
-        Me.label1.Location = New System.Drawing.Point(12, 9)
-        Me.label1.Name = "label1"
-        Me.label1.Size = New System.Drawing.Size(164, 13)
-        Me.label1.TabIndex = 40
-        Me.label1.Text = "Folder In Which to Place Images:"
-        '
-        'StatusStrip1
-        '
-        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripProgressBar1, Me.ToolStripStatusLabel1})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 482)
-        Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(515, 22)
-        Me.StatusStrip1.TabIndex = 43
-        Me.StatusStrip1.Text = "StatusStrip1"
-        '
-        'ToolStripProgressBar1
-        '
-        Me.ToolStripProgressBar1.Name = "ToolStripProgressBar1"
-        Me.ToolStripProgressBar1.Size = New System.Drawing.Size(150, 16)
-        Me.ToolStripProgressBar1.Visible = False
-        '
-        'ToolStripStatusLabel1
-        '
-        Me.ToolStripStatusLabel1.Name = "ToolStripStatusLabel1"
-        Me.ToolStripStatusLabel1.Size = New System.Drawing.Size(39, 17)
-        Me.ToolStripStatusLabel1.Text = "Ready"
-        '
-        'form_ElemImagesFromViews
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(515, 504)
-        Me.Controls.Add(Me.StatusStrip1)
-        Me.Controls.Add(Me.groupBox1)
-        Me.Controls.Add(Me.buttonBrowse)
-        Me.Controls.Add(Me.textBoxFolderPath)
-        Me.Controls.Add(Me.buttonCreate)
-        Me.Controls.Add(Me.listBoxViews)
-        Me.Controls.Add(Me.buttonClose)
-        Me.Controls.Add(Me.label4)
-        Me.Controls.Add(Me.label1)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.MaximizeBox = False
-        Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(531, 522)
-        Me.Name = "form_ElemImagesFromViews"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Export Images From Views"
-        Me.TopMost = True
-        Me.groupBox1.ResumeLayout(False)
-        Me.groupBox1.PerformLayout()
-        Me.StatusStrip1.ResumeLayout(False)
-        Me.StatusStrip1.PerformLayout()
-        Me.ResumeLayout(False)
-        Me.PerformLayout()
+        groupBox1 = New System.Windows.Forms.GroupBox()
+        checkBoxRestrictPrefix = New System.Windows.Forms.CheckBox()
+        textBoxRestrictPrefixValue = New System.Windows.Forms.TextBox()
+        checkBoxIncludeExisting = New System.Windows.Forms.CheckBox()
+        checkBoxListReverse = New System.Windows.Forms.CheckBox()
+        buttonBrowse = New System.Windows.Forms.Button()
+        folderBrowserDialogImages = New System.Windows.Forms.FolderBrowserDialog()
+        textBoxFolderPath = New System.Windows.Forms.TextBox()
+        buttonCreate = New System.Windows.Forms.Button()
+        listBoxViews = New System.Windows.Forms.ListBox()
+        buttonClose = New System.Windows.Forms.Button()
+        label4 = New System.Windows.Forms.Label()
+        label1 = New System.Windows.Forms.Label()
+        StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        ToolStripProgressBar1 = New System.Windows.Forms.ToolStripProgressBar()
+        ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
+        groupBox1.SuspendLayout()
+        StatusStrip1.SuspendLayout()
+        SuspendLayout()
+        ' 
+        ' groupBox1
+        ' 
+        groupBox1.Controls.Add(checkBoxRestrictPrefix)
+        groupBox1.Controls.Add(textBoxRestrictPrefixValue)
+        groupBox1.Controls.Add(checkBoxIncludeExisting)
+        groupBox1.Controls.Add(checkBoxListReverse)
+        groupBox1.ForeColor = Drawing.SystemColors.ControlText
+        groupBox1.Location = New System.Drawing.Point(382, 80)
+        groupBox1.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        groupBox1.Name = "groupBox1"
+        groupBox1.Padding = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        groupBox1.Size = New System.Drawing.Size(206, 179)
+        groupBox1.TabIndex = 42
+        groupBox1.TabStop = False
+        groupBox1.Text = "List Selection Options"
+        ' 
+        ' checkBoxRestrictPrefix
+        ' 
+        checkBoxRestrictPrefix.AutoSize = True
+        checkBoxRestrictPrefix.Location = New System.Drawing.Point(13, 74)
+        checkBoxRestrictPrefix.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        checkBoxRestrictPrefix.Name = "checkBoxRestrictPrefix"
+        checkBoxRestrictPrefix.Size = New System.Drawing.Size(172, 19)
+        checkBoxRestrictPrefix.TabIndex = 29
+        checkBoxRestrictPrefix.Text = "Restrict to Names w/ Prefix:"
+        checkBoxRestrictPrefix.UseVisualStyleBackColor = True
+        ' 
+        ' textBoxRestrictPrefixValue
+        ' 
+        textBoxRestrictPrefixValue.Location = New System.Drawing.Point(13, 97)
+        textBoxRestrictPrefixValue.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        textBoxRestrictPrefixValue.Name = "textBoxRestrictPrefixValue"
+        textBoxRestrictPrefixValue.Size = New System.Drawing.Size(184, 23)
+        textBoxRestrictPrefixValue.TabIndex = 28
+        ' 
+        ' checkBoxIncludeExisting
+        ' 
+        checkBoxIncludeExisting.AutoSize = True
+        checkBoxIncludeExisting.Location = New System.Drawing.Point(13, 22)
+        checkBoxIncludeExisting.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        checkBoxIncludeExisting.Name = "checkBoxIncludeExisting"
+        checkBoxIncludeExisting.Size = New System.Drawing.Size(155, 19)
+        checkBoxIncludeExisting.TabIndex = 31
+        checkBoxIncludeExisting.Text = "List and Replace Existing"
+        checkBoxIncludeExisting.UseVisualStyleBackColor = True
+        ' 
+        ' checkBoxListReverse
+        ' 
+        checkBoxListReverse.AutoSize = True
+        checkBoxListReverse.Location = New System.Drawing.Point(13, 152)
+        checkBoxListReverse.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        checkBoxListReverse.Name = "checkBoxListReverse"
+        checkBoxListReverse.Size = New System.Drawing.Size(120, 19)
+        checkBoxListReverse.TabIndex = 24
+        checkBoxListReverse.Text = "Reverse List Order"
+        checkBoxListReverse.UseVisualStyleBackColor = True
+        ' 
+        ' buttonBrowse
+        ' 
+        buttonBrowse.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25F, Drawing.FontStyle.Bold, Drawing.GraphicsUnit.Point, CByte(0))
+        buttonBrowse.Location = New System.Drawing.Point(556, 25)
+        buttonBrowse.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        buttonBrowse.Name = "buttonBrowse"
+        buttonBrowse.Size = New System.Drawing.Size(34, 30)
+        buttonBrowse.TabIndex = 41
+        buttonBrowse.Text = "..."
+        buttonBrowse.UseVisualStyleBackColor = True
+        ' 
+        ' textBoxFolderPath
+        ' 
+        textBoxFolderPath.Location = New System.Drawing.Point(16, 29)
+        textBoxFolderPath.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        textBoxFolderPath.Name = "textBoxFolderPath"
+        textBoxFolderPath.Size = New System.Drawing.Size(532, 23)
+        textBoxFolderPath.TabIndex = 39
+        ' 
+        ' buttonCreate
+        ' 
+        buttonCreate.Location = New System.Drawing.Point(16, 513)
+        buttonCreate.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        buttonCreate.Name = "buttonCreate"
+        buttonCreate.Size = New System.Drawing.Size(208, 33)
+        buttonCreate.TabIndex = 38
+        buttonCreate.Text = "Create Images"
+        buttonCreate.UseVisualStyleBackColor = True
+        ' 
+        ' listBoxViews
+        ' 
+        listBoxViews.FormattingEnabled = True
+        listBoxViews.ItemHeight = 15
+        listBoxViews.Location = New System.Drawing.Point(16, 87)
+        listBoxViews.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        listBoxViews.Name = "listBoxViews"
+        listBoxViews.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
+        listBoxViews.Size = New System.Drawing.Size(349, 409)
+        listBoxViews.TabIndex = 36
+        ' 
+        ' buttonClose
+        ' 
+        buttonClose.Location = New System.Drawing.Point(382, 513)
+        buttonClose.Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        buttonClose.Name = "buttonClose"
+        buttonClose.Size = New System.Drawing.Size(208, 33)
+        buttonClose.TabIndex = 35
+        buttonClose.Text = "Close"
+        buttonClose.UseVisualStyleBackColor = True
+        ' 
+        ' label4
+        ' 
+        label4.AutoSize = True
+        label4.Location = New System.Drawing.Point(16, 68)
+        label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        label4.Name = "label4"
+        label4.Size = New System.Drawing.Size(234, 15)
+        label4.TabIndex = 37
+        label4.Text = "Select Views For Which to Create an Image:"
+        ' 
+        ' label1
+        ' 
+        label1.AutoSize = True
+        label1.Location = New System.Drawing.Point(14, 10)
+        label1.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        label1.Name = "label1"
+        label1.Size = New System.Drawing.Size(179, 15)
+        label1.TabIndex = 40
+        label1.Text = "Folder In Which to Place Images:"
+        ' 
+        ' StatusStrip1
+        ' 
+        StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {ToolStripProgressBar1, ToolStripStatusLabel1})
+        StatusStrip1.Location = New System.Drawing.Point(0, 739)
+        StatusStrip1.Name = "StatusStrip1"
+        StatusStrip1.Padding = New System.Windows.Forms.Padding(1, 0, 16, 0)
+        StatusStrip1.Size = New System.Drawing.Size(601, 22)
+        StatusStrip1.TabIndex = 43
+        ' 
+        ' ToolStripProgressBar1
+        ' 
+        ToolStripProgressBar1.Name = "ToolStripProgressBar1"
+        ToolStripProgressBar1.Size = New System.Drawing.Size(175, 18)
+        ToolStripProgressBar1.Visible = False
+        ' 
+        ' ToolStripStatusLabel1
+        ' 
+        ToolStripStatusLabel1.Name = "ToolStripStatusLabel1"
+        ToolStripStatusLabel1.Size = New System.Drawing.Size(39, 17)
+        ToolStripStatusLabel1.Text = "Ready"
+        ' 
+        ' form_ElemImagesFromViews
+        ' 
+        AutoScaleDimensions = New System.Drawing.SizeF(7F, 15F)
+        AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        ClientSize = New System.Drawing.Size(601, 761)
+        Controls.Add(StatusStrip1)
+        Controls.Add(groupBox1)
+        Controls.Add(buttonBrowse)
+        Controls.Add(textBoxFolderPath)
+        Controls.Add(buttonCreate)
+        Controls.Add(listBoxViews)
+        Controls.Add(buttonClose)
+        Controls.Add(label4)
+        Controls.Add(label1)
+        Icon = CType(resources.GetObject("$this.Icon"), Drawing.Icon)
+        Margin = New System.Windows.Forms.Padding(4, 3, 4, 3)
+        MaximizeBox = False
+        MinimizeBox = False
+        MinimumSize = New System.Drawing.Size(617, 800)
+        Name = "form_ElemImagesFromViews"
+        StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
+        Text = "Export Images From Views"
+        TopMost = True
+        groupBox1.ResumeLayout(False)
+        groupBox1.PerformLayout()
+        StatusStrip1.ResumeLayout(False)
+        StatusStrip1.PerformLayout()
+        ResumeLayout(False)
+        PerformLayout()
 
     End Sub
     Private WithEvents groupBox1 As System.Windows.Forms.GroupBox

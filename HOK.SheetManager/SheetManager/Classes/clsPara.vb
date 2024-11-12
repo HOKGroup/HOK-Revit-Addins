@@ -52,7 +52,7 @@ Public Class clsPara
     Public ReadOnly Property DisplayUnitType() As String
         Get
             Try
-#If REVIT2022_OR_GREATER
+#If REVIT2022_OR_GREATER Then
                 Return m_parameter.Definition.GetDataType().ToString
 #Else
                 Return m_parameter.Definition.ParameterType.ToString
@@ -192,7 +192,7 @@ Public Class clsPara
             Case StorageType.Double
                 Return parameter.AsDouble.ToString
             Case StorageType.ElementId
-#If REVIT2024_OR_GREATER
+#If REVIT2024_OR_GREATER Then
                 Return parameter.AsElementId.Value.ToString
 #Else
                 Return parameter.AsElementId.IntegerValue.ToString

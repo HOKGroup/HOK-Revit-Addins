@@ -165,6 +165,7 @@ namespace HOK.FinishCreator
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                Result = Result.Failed;
             }
         }
     }

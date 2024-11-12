@@ -49,6 +49,8 @@ namespace HOK.MissionControl.FamilyPublish
                     };
                     dialog.ShowDialog();
 
+                    Result = Result.Failed;
+                    return;
                 }
 
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
@@ -64,7 +66,8 @@ namespace HOK.MissionControl.FamilyPublish
                     };
                     dialog.ShowDialog();
 
-                    //return Result.Failed;
+                    Result = Result.Failed;
+                    return;
                 }
 
                 if (!MissionControlSetup.Projects.ContainsKey(centralPath) || 
@@ -81,7 +84,8 @@ namespace HOK.MissionControl.FamilyPublish
                     };
                     dialog.ShowDialog();
 
-                    //return Result.Failed;
+                    Result = Result.Failed;
+                    return;
                 }
 
                 uiApp.Application.FailuresProcessing += FailureProcessing;

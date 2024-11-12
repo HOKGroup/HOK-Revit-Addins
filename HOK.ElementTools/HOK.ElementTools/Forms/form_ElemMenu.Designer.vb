@@ -22,186 +22,204 @@ Partial Class form_ElemMenu
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
+        components = New ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(form_ElemMenu))
-        Me.GroupBox3 = New System.Windows.Forms.GroupBox()
-        Me.ButtonManageAttachmentLinks = New System.Windows.Forms.Button()
-        Me.ButtonCreateSheetsFromViews = New System.Windows.Forms.Button()
-        Me.ButtonCreateTaggedViewsFromRooms = New System.Windows.Forms.Button()
-        Me.ButtonCreateViewsFromRooms = New System.Windows.Forms.Button()
-        Me.ToolTipFormMain = New System.Windows.Forms.ToolTip(Me.components)
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
-        Me.ButtonCreateRoomsFromAreas = New System.Windows.Forms.Button()
-        Me.ButtonPlaceUnplacedRooms = New System.Windows.Forms.Button()
-        Me.ButtonPlaceUnplacedAreas = New System.Windows.Forms.Button()
-        Me.buttonReloadSettings = New System.Windows.Forms.Button()
-        Me.ButtonCancel = New System.Windows.Forms.Button()
-        Me.ButtonCreateTaggedViewsFromAreas = New System.Windows.Forms.Button()
-        Me.ButtonCreateViewsFromAreas = New System.Windows.Forms.Button()
-        Me.GroupBox3.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
-        Me.SuspendLayout()
-        '
-        'GroupBox3
-        '
-        Me.GroupBox3.Controls.Add(Me.ButtonManageAttachmentLinks)
-        Me.GroupBox3.Location = New System.Drawing.Point(12, 307)
-        Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(310, 59)
-        Me.GroupBox3.TabIndex = 27
-        Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Linked Elements"
-        '
-        'ButtonManageAttachmentLinks
-        '
-        Me.ButtonManageAttachmentLinks.Location = New System.Drawing.Point(6, 19)
-        Me.ButtonManageAttachmentLinks.Name = "ButtonManageAttachmentLinks"
-        Me.ButtonManageAttachmentLinks.Size = New System.Drawing.Size(298, 23)
-        Me.ButtonManageAttachmentLinks.TabIndex = 28
-        Me.ButtonManageAttachmentLinks.Text = "Manage Attachment Links"
-        Me.ButtonManageAttachmentLinks.UseVisualStyleBackColor = True
-        '
-        'ButtonCreateSheetsFromViews
-        '
-        Me.ButtonCreateSheetsFromViews.Location = New System.Drawing.Point(6, 135)
-        Me.ButtonCreateSheetsFromViews.Name = "ButtonCreateSheetsFromViews"
-        Me.ButtonCreateSheetsFromViews.Size = New System.Drawing.Size(298, 23)
-        Me.ButtonCreateSheetsFromViews.TabIndex = 27
-        Me.ButtonCreateSheetsFromViews.Text = "Create Sheets from Views"
-        Me.ButtonCreateSheetsFromViews.UseVisualStyleBackColor = True
-        '
-        'ButtonCreateTaggedViewsFromRooms
-        '
-        Me.ButtonCreateTaggedViewsFromRooms.Location = New System.Drawing.Point(6, 48)
-        Me.ButtonCreateTaggedViewsFromRooms.Name = "ButtonCreateTaggedViewsFromRooms"
-        Me.ButtonCreateTaggedViewsFromRooms.Size = New System.Drawing.Size(298, 23)
-        Me.ButtonCreateTaggedViewsFromRooms.TabIndex = 26
-        Me.ButtonCreateTaggedViewsFromRooms.Text = "Create Tagged Views from Rooms"
-        Me.ButtonCreateTaggedViewsFromRooms.UseVisualStyleBackColor = True
-        '
-        'ButtonCreateViewsFromRooms
-        '
-        Me.ButtonCreateViewsFromRooms.Location = New System.Drawing.Point(6, 19)
-        Me.ButtonCreateViewsFromRooms.Name = "ButtonCreateViewsFromRooms"
-        Me.ButtonCreateViewsFromRooms.Size = New System.Drawing.Size(298, 23)
-        Me.ButtonCreateViewsFromRooms.TabIndex = 25
-        Me.ButtonCreateViewsFromRooms.Text = "Create Views from Rooms"
-        Me.ButtonCreateViewsFromRooms.UseVisualStyleBackColor = True
-        '
-        'GroupBox2
-        '
-        Me.GroupBox2.Controls.Add(Me.ButtonCreateTaggedViewsFromAreas)
-        Me.GroupBox2.Controls.Add(Me.ButtonCreateViewsFromAreas)
-        Me.GroupBox2.Controls.Add(Me.ButtonCreateSheetsFromViews)
-        Me.GroupBox2.Controls.Add(Me.ButtonCreateTaggedViewsFromRooms)
-        Me.GroupBox2.Controls.Add(Me.ButtonCreateViewsFromRooms)
-        Me.GroupBox2.Location = New System.Drawing.Point(12, 129)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(310, 172)
-        Me.GroupBox2.TabIndex = 26
-        Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "View and Sheet Elements"
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Controls.Add(Me.ButtonCreateRoomsFromAreas)
-        Me.GroupBox1.Controls.Add(Me.ButtonPlaceUnplacedRooms)
-        Me.GroupBox1.Controls.Add(Me.ButtonPlaceUnplacedAreas)
-        Me.GroupBox1.Location = New System.Drawing.Point(12, 12)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(310, 111)
-        Me.GroupBox1.TabIndex = 25
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Room and Area Elements"
-        '
-        'ButtonCreateRoomsFromAreas
-        '
-        Me.ButtonCreateRoomsFromAreas.Location = New System.Drawing.Point(6, 77)
-        Me.ButtonCreateRoomsFromAreas.Name = "ButtonCreateRoomsFromAreas"
-        Me.ButtonCreateRoomsFromAreas.Size = New System.Drawing.Size(298, 23)
-        Me.ButtonCreateRoomsFromAreas.TabIndex = 24
-        Me.ButtonCreateRoomsFromAreas.Text = "Create Rooms from Areas"
-        Me.ButtonCreateRoomsFromAreas.UseVisualStyleBackColor = True
-        '
-        'ButtonPlaceUnplacedRooms
-        '
-        Me.ButtonPlaceUnplacedRooms.Location = New System.Drawing.Point(6, 48)
-        Me.ButtonPlaceUnplacedRooms.Name = "ButtonPlaceUnplacedRooms"
-        Me.ButtonPlaceUnplacedRooms.Size = New System.Drawing.Size(298, 23)
-        Me.ButtonPlaceUnplacedRooms.TabIndex = 23
-        Me.ButtonPlaceUnplacedRooms.Text = "Place Unplaced Rooms"
-        Me.ButtonPlaceUnplacedRooms.UseVisualStyleBackColor = True
-        '
-        'ButtonPlaceUnplacedAreas
-        '
-        Me.ButtonPlaceUnplacedAreas.Location = New System.Drawing.Point(6, 19)
-        Me.ButtonPlaceUnplacedAreas.Name = "ButtonPlaceUnplacedAreas"
-        Me.ButtonPlaceUnplacedAreas.Size = New System.Drawing.Size(298, 23)
-        Me.ButtonPlaceUnplacedAreas.TabIndex = 22
-        Me.ButtonPlaceUnplacedAreas.Text = "Place Unplaced Areas"
-        Me.ButtonPlaceUnplacedAreas.UseVisualStyleBackColor = True
-        '
-        'buttonReloadSettings
-        '
-        Me.buttonReloadSettings.Location = New System.Drawing.Point(18, 372)
-        Me.buttonReloadSettings.Name = "buttonReloadSettings"
-        Me.buttonReloadSettings.Size = New System.Drawing.Size(170, 23)
-        Me.buttonReloadSettings.TabIndex = 24
-        Me.buttonReloadSettings.Text = "Reload Default Settings"
-        Me.buttonReloadSettings.UseVisualStyleBackColor = True
-        '
-        'ButtonCancel
-        '
-        Me.ButtonCancel.Location = New System.Drawing.Point(241, 372)
-        Me.ButtonCancel.Name = "ButtonCancel"
-        Me.ButtonCancel.Size = New System.Drawing.Size(75, 23)
-        Me.ButtonCancel.TabIndex = 23
-        Me.ButtonCancel.Text = "Cancel"
-        Me.ButtonCancel.UseVisualStyleBackColor = True
-        '
-        'ButtonCreateTaggedViewsFromAreas
-        '
-        Me.ButtonCreateTaggedViewsFromAreas.Location = New System.Drawing.Point(6, 106)
-        Me.ButtonCreateTaggedViewsFromAreas.Name = "ButtonCreateTaggedViewsFromAreas"
-        Me.ButtonCreateTaggedViewsFromAreas.Size = New System.Drawing.Size(298, 23)
-        Me.ButtonCreateTaggedViewsFromAreas.TabIndex = 29
-        Me.ButtonCreateTaggedViewsFromAreas.Text = "Create Tagged Views from Areas"
-        Me.ButtonCreateTaggedViewsFromAreas.UseVisualStyleBackColor = True
-        '
-        'ButtonCreateViewsFromAreas
-        '
-        Me.ButtonCreateViewsFromAreas.Location = New System.Drawing.Point(6, 77)
-        Me.ButtonCreateViewsFromAreas.Name = "ButtonCreateViewsFromAreas"
-        Me.ButtonCreateViewsFromAreas.Size = New System.Drawing.Size(298, 23)
-        Me.ButtonCreateViewsFromAreas.TabIndex = 28
-        Me.ButtonCreateViewsFromAreas.Text = "Create Views from Areas"
-        Me.ButtonCreateViewsFromAreas.UseVisualStyleBackColor = True
-        '
-        'form_ElemMenu
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(335, 407)
-        Me.Controls.Add(Me.GroupBox3)
-        Me.Controls.Add(Me.GroupBox2)
-        Me.Controls.Add(Me.GroupBox1)
-        Me.Controls.Add(Me.buttonReloadSettings)
-        Me.Controls.Add(Me.ButtonCancel)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.MaximizeBox = False
-        Me.MaximumSize = New System.Drawing.Size(351, 445)
-        Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(351, 445)
-        Me.Name = "form_ElemMenu"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Element Tools"
-        Me.TopMost = True
-        Me.GroupBox3.ResumeLayout(False)
-        Me.GroupBox2.ResumeLayout(False)
-        Me.GroupBox1.ResumeLayout(False)
-        Me.ResumeLayout(False)
+        GroupBox3 = New System.Windows.Forms.GroupBox()
+        ButtonManageAttachmentLinks = New System.Windows.Forms.Button()
+        ButtonCreateSheetsFromViews = New System.Windows.Forms.Button()
+        ButtonCreateTaggedViewsFromRooms = New System.Windows.Forms.Button()
+        ButtonCreateViewsFromRooms = New System.Windows.Forms.Button()
+        ToolTipFormMain = New System.Windows.Forms.ToolTip(components)
+        GroupBox2 = New System.Windows.Forms.GroupBox()
+        ButtonCreateTaggedViewsFromAreas = New System.Windows.Forms.Button()
+        ButtonCreateViewsFromAreas = New System.Windows.Forms.Button()
+        GroupBox1 = New System.Windows.Forms.GroupBox()
+        ButtonCreateRoomsFromAreas = New System.Windows.Forms.Button()
+        ButtonPlaceUnplacedRooms = New System.Windows.Forms.Button()
+        ButtonPlaceUnplacedAreas = New System.Windows.Forms.Button()
+        buttonReloadSettings = New System.Windows.Forms.Button()
+        ButtonCancel = New System.Windows.Forms.Button()
+        GroupBox3.SuspendLayout()
+        GroupBox2.SuspendLayout()
+        GroupBox1.SuspendLayout()
+        SuspendLayout()
+        ' 
+        ' GroupBox3
+        ' 
+        GroupBox3.Controls.Add(ButtonManageAttachmentLinks)
+        GroupBox3.Location = New System.Drawing.Point(15, 859)
+        GroupBox3.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        GroupBox3.Name = "GroupBox3"
+        GroupBox3.Padding = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        GroupBox3.Size = New System.Drawing.Size(775, 168)
+        GroupBox3.TabIndex = 27
+        GroupBox3.TabStop = False
+        GroupBox3.Text = "Linked Elements"
+        ' 
+        ' ButtonManageAttachmentLinks
+        ' 
+        ButtonManageAttachmentLinks.Location = New System.Drawing.Point(15, 54)
+        ButtonManageAttachmentLinks.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonManageAttachmentLinks.Name = "ButtonManageAttachmentLinks"
+        ButtonManageAttachmentLinks.Size = New System.Drawing.Size(745, 65)
+        ButtonManageAttachmentLinks.TabIndex = 28
+        ButtonManageAttachmentLinks.Text = "Manage Attachment Links"
+        ButtonManageAttachmentLinks.UseVisualStyleBackColor = True
+        ' 
+        ' ButtonCreateSheetsFromViews
+        ' 
+        ButtonCreateSheetsFromViews.Location = New System.Drawing.Point(15, 384)
+        ButtonCreateSheetsFromViews.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonCreateSheetsFromViews.Name = "ButtonCreateSheetsFromViews"
+        ButtonCreateSheetsFromViews.Size = New System.Drawing.Size(745, 65)
+        ButtonCreateSheetsFromViews.TabIndex = 27
+        ButtonCreateSheetsFromViews.Text = "Create Sheets from Views"
+        ButtonCreateSheetsFromViews.UseVisualStyleBackColor = True
+        ' 
+        ' ButtonCreateTaggedViewsFromRooms
+        ' 
+        ButtonCreateTaggedViewsFromRooms.Location = New System.Drawing.Point(15, 137)
+        ButtonCreateTaggedViewsFromRooms.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonCreateTaggedViewsFromRooms.Name = "ButtonCreateTaggedViewsFromRooms"
+        ButtonCreateTaggedViewsFromRooms.Size = New System.Drawing.Size(745, 65)
+        ButtonCreateTaggedViewsFromRooms.TabIndex = 26
+        ButtonCreateTaggedViewsFromRooms.Text = "Create Tagged Views from Rooms"
+        ButtonCreateTaggedViewsFromRooms.UseVisualStyleBackColor = True
+        ' 
+        ' ButtonCreateViewsFromRooms
+        ' 
+        ButtonCreateViewsFromRooms.Location = New System.Drawing.Point(15, 54)
+        ButtonCreateViewsFromRooms.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonCreateViewsFromRooms.Name = "ButtonCreateViewsFromRooms"
+        ButtonCreateViewsFromRooms.Size = New System.Drawing.Size(745, 65)
+        ButtonCreateViewsFromRooms.TabIndex = 25
+        ButtonCreateViewsFromRooms.Text = "Create Views from Rooms"
+        ButtonCreateViewsFromRooms.UseVisualStyleBackColor = True
+        ' 
+        ' GroupBox2
+        ' 
+        GroupBox2.Controls.Add(ButtonCreateTaggedViewsFromAreas)
+        GroupBox2.Controls.Add(ButtonCreateViewsFromAreas)
+        GroupBox2.Controls.Add(ButtonCreateSheetsFromViews)
+        GroupBox2.Controls.Add(ButtonCreateTaggedViewsFromRooms)
+        GroupBox2.Controls.Add(ButtonCreateViewsFromRooms)
+        GroupBox2.Location = New System.Drawing.Point(15, 352)
+        GroupBox2.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        GroupBox2.Name = "GroupBox2"
+        GroupBox2.Padding = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        GroupBox2.Size = New System.Drawing.Size(775, 490)
+        GroupBox2.TabIndex = 26
+        GroupBox2.TabStop = False
+        GroupBox2.Text = "View and Sheet Elements"
+        ' 
+        ' ButtonCreateTaggedViewsFromAreas
+        ' 
+        ButtonCreateTaggedViewsFromAreas.Location = New System.Drawing.Point(15, 302)
+        ButtonCreateTaggedViewsFromAreas.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonCreateTaggedViewsFromAreas.Name = "ButtonCreateTaggedViewsFromAreas"
+        ButtonCreateTaggedViewsFromAreas.Size = New System.Drawing.Size(745, 65)
+        ButtonCreateTaggedViewsFromAreas.TabIndex = 29
+        ButtonCreateTaggedViewsFromAreas.Text = "Create Tagged Views from Areas"
+        ButtonCreateTaggedViewsFromAreas.UseVisualStyleBackColor = True
+        ' 
+        ' ButtonCreateViewsFromAreas
+        ' 
+        ButtonCreateViewsFromAreas.Location = New System.Drawing.Point(15, 219)
+        ButtonCreateViewsFromAreas.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonCreateViewsFromAreas.Name = "ButtonCreateViewsFromAreas"
+        ButtonCreateViewsFromAreas.Size = New System.Drawing.Size(745, 65)
+        ButtonCreateViewsFromAreas.TabIndex = 28
+        ButtonCreateViewsFromAreas.Text = "Create Views from Areas"
+        ButtonCreateViewsFromAreas.UseVisualStyleBackColor = True
+        ' 
+        ' GroupBox1
+        ' 
+        GroupBox1.Controls.Add(ButtonCreateRoomsFromAreas)
+        GroupBox1.Controls.Add(ButtonPlaceUnplacedRooms)
+        GroupBox1.Controls.Add(ButtonPlaceUnplacedAreas)
+        GroupBox1.Location = New System.Drawing.Point(15, 19)
+        GroupBox1.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        GroupBox1.Name = "GroupBox1"
+        GroupBox1.Padding = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        GroupBox1.Size = New System.Drawing.Size(775, 316)
+        GroupBox1.TabIndex = 25
+        GroupBox1.TabStop = False
+        GroupBox1.Text = "Room and Area Elements"
+        ' 
+        ' ButtonCreateRoomsFromAreas
+        ' 
+        ButtonCreateRoomsFromAreas.Location = New System.Drawing.Point(15, 219)
+        ButtonCreateRoomsFromAreas.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonCreateRoomsFromAreas.Name = "ButtonCreateRoomsFromAreas"
+        ButtonCreateRoomsFromAreas.Size = New System.Drawing.Size(745, 65)
+        ButtonCreateRoomsFromAreas.TabIndex = 24
+        ButtonCreateRoomsFromAreas.Text = "Create Rooms from Areas"
+        ButtonCreateRoomsFromAreas.UseVisualStyleBackColor = True
+        ' 
+        ' ButtonPlaceUnplacedRooms
+        ' 
+        ButtonPlaceUnplacedRooms.Location = New System.Drawing.Point(15, 137)
+        ButtonPlaceUnplacedRooms.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonPlaceUnplacedRooms.Name = "ButtonPlaceUnplacedRooms"
+        ButtonPlaceUnplacedRooms.Size = New System.Drawing.Size(745, 65)
+        ButtonPlaceUnplacedRooms.TabIndex = 23
+        ButtonPlaceUnplacedRooms.Text = "Place Unplaced Rooms"
+        ButtonPlaceUnplacedRooms.UseVisualStyleBackColor = True
+        ' 
+        ' ButtonPlaceUnplacedAreas
+        ' 
+        ButtonPlaceUnplacedAreas.Location = New System.Drawing.Point(15, 54)
+        ButtonPlaceUnplacedAreas.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonPlaceUnplacedAreas.Name = "ButtonPlaceUnplacedAreas"
+        ButtonPlaceUnplacedAreas.Size = New System.Drawing.Size(745, 65)
+        ButtonPlaceUnplacedAreas.TabIndex = 22
+        ButtonPlaceUnplacedAreas.Text = "Place Unplaced Areas"
+        ButtonPlaceUnplacedAreas.UseVisualStyleBackColor = True
+        ' 
+        ' buttonReloadSettings
+        ' 
+        buttonReloadSettings.Location = New System.Drawing.Point(45, 1059)
+        buttonReloadSettings.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        buttonReloadSettings.Name = "buttonReloadSettings"
+        buttonReloadSettings.Size = New System.Drawing.Size(425, 65)
+        buttonReloadSettings.TabIndex = 24
+        buttonReloadSettings.Text = "Reload Default Settings"
+        buttonReloadSettings.UseVisualStyleBackColor = True
+        ' 
+        ' ButtonCancel
+        ' 
+        ButtonCancel.Location = New System.Drawing.Point(602, 1059)
+        ButtonCancel.Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        ButtonCancel.Name = "ButtonCancel"
+        ButtonCancel.Size = New System.Drawing.Size(188, 65)
+        ButtonCancel.TabIndex = 23
+        ButtonCancel.Text = "Cancel"
+        ButtonCancel.UseVisualStyleBackColor = True
+        ' 
+        ' form_ElemMenu
+        ' 
+        AutoScaleDimensions = New System.Drawing.SizeF(15F, 37F)
+        AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        ClientSize = New System.Drawing.Size(808, 1042)
+        Controls.Add(GroupBox3)
+        Controls.Add(GroupBox2)
+        Controls.Add(GroupBox1)
+        Controls.Add(buttonReloadSettings)
+        Controls.Add(ButtonCancel)
+        Icon = CType(resources.GetObject("$this.Icon"), Drawing.Icon)
+        Margin = New System.Windows.Forms.Padding(8, 9, 8, 9)
+        MaximizeBox = False
+        MaximumSize = New System.Drawing.Size(836, 1121)
+        MinimizeBox = False
+        MinimumSize = New System.Drawing.Size(836, 1121)
+        Name = "form_ElemMenu"
+        StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
+        Text = "Element Tools"
+        TopMost = True
+        GroupBox3.ResumeLayout(False)
+        GroupBox2.ResumeLayout(False)
+        GroupBox1.ResumeLayout(False)
+        ResumeLayout(False)
 
     End Sub
     Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox

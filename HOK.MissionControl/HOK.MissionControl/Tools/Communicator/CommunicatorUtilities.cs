@@ -56,7 +56,6 @@ namespace HOK.MissionControl.Tools.Communicator
                     foreach (var ti in tabItems)
                     {
                         var content = ((UserControl)((TabItem)ti).Content).DataContext as ObservableRecipient;
-                        // content?.OnDeactivated();
                     }
                 }
 

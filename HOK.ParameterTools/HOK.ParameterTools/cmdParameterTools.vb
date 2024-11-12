@@ -15,7 +15,7 @@ Imports Autodesk.Revit.Attributes
 <Regeneration(RegenerationOption.Manual)> _
 Public Class cmdParameterTools
 
-    Implements IExternalCommand
+    Implements ExternalCommand
 
     Public Const appVer As String = "V2011.03.30"
 

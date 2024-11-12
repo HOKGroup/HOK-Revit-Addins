@@ -58,13 +58,13 @@ namespace HOK.ViewAnalysis
                     MessageBoxButtons.OKCancel, 
                     MessageBoxIcon.Information);
 
-                //if (result != DialogResult.OK) return Result.Succeeded;
+                if (result != DialogResult.OK) return;
 
                 var selectedElements = uidoc.Selection.PickObjects(ObjectType.Element, 
                     new RoomElementFilter(), 
                     "Select rooms to calculate the area with views. Click Finish on the options bar when you're done selecting rooms.");
 
-                //if (!selectedElements.Any()) return Result.Succeeded;
+                if (!selectedElements.Any()) return;
 
                 var selectedRooms = new List<Room>();
                 //ray tracing is only available in 3d views
@@ -77,7 +77,7 @@ namespace HOK.ViewAnalysis
                     }
                 }
 
-                //if (!selectedRooms.Any()) return Result.Succeeded;
+                if (!selectedRooms.Any()) return;
 
                 var mainWindow = new MainWindow(m_app, selectedRooms);
                 if (mainWindow.ShowDialog() == true)
@@ -97,7 +97,6 @@ namespace HOK.ViewAnalysis
             }
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
-            //return Result.Succeeded;
         }
 
         private bool IsViewForAnalysis(Autodesk.Revit.DB.View activeView)

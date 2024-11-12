@@ -23,82 +23,87 @@ Partial Class form_ElemAttachmentManager
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(form_ElemAttachmentManager))
-        Me.labelMessage = New System.Windows.Forms.Label()
-        Me.listBoxDwg = New System.Windows.Forms.ListBox()
-        Me.buttonSelect = New System.Windows.Forms.Button()
-        Me.buttonClose = New System.Windows.Forms.Button()
-        Me.label4 = New System.Windows.Forms.Label()
-        Me.SuspendLayout()
-        '
-        'labelMessage
-        '
-        Me.labelMessage.AutoSize = True
-        Me.labelMessage.Location = New System.Drawing.Point(14, 416)
-        Me.labelMessage.Name = "labelMessage"
-        Me.labelMessage.Size = New System.Drawing.Size(72, 13)
-        Me.labelMessage.TabIndex = 15
-        Me.labelMessage.Text = "labelMessage"
-        '
-        'listBoxDwg
-        '
-        Me.listBoxDwg.Font = New System.Drawing.Font("Monospac821 BT", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.listBoxDwg.FormattingEnabled = True
-        Me.listBoxDwg.ItemHeight = 14
-        Me.listBoxDwg.Location = New System.Drawing.Point(10, 25)
-        Me.listBoxDwg.Name = "listBoxDwg"
-        Me.listBoxDwg.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
-        Me.listBoxDwg.Size = New System.Drawing.Size(491, 382)
-        Me.listBoxDwg.TabIndex = 13
-        '
-        'buttonSelect
-        '
-        Me.buttonSelect.Location = New System.Drawing.Point(10, 449)
-        Me.buttonSelect.Name = "buttonSelect"
-        Me.buttonSelect.Size = New System.Drawing.Size(178, 29)
-        Me.buttonSelect.TabIndex = 12
-        Me.buttonSelect.Text = "Select in Revit"
-        Me.buttonSelect.UseVisualStyleBackColor = True
-        '
-        'buttonClose
-        '
-        Me.buttonClose.Location = New System.Drawing.Point(323, 449)
-        Me.buttonClose.Name = "buttonClose"
-        Me.buttonClose.Size = New System.Drawing.Size(178, 29)
-        Me.buttonClose.TabIndex = 11
-        Me.buttonClose.Text = "Close"
-        Me.buttonClose.UseVisualStyleBackColor = True
-        '
-        'label4
-        '
-        Me.label4.AutoSize = True
-        Me.label4.Font = New System.Drawing.Font("Monospac821 BT", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.label4.Location = New System.Drawing.Point(12, 9)
-        Me.label4.Name = "label4"
-        Me.label4.Size = New System.Drawing.Size(504, 14)
-        Me.label4.TabIndex = 14
-        Me.label4.Text = "ElementId  Type         Name                                Workset No."
-        '
-        'form_ElemAttachmentManager
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(511, 489)
-        Me.Controls.Add(Me.labelMessage)
-        Me.Controls.Add(Me.listBoxDwg)
-        Me.Controls.Add(Me.buttonSelect)
-        Me.Controls.Add(Me.buttonClose)
-        Me.Controls.Add(Me.label4)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.MaximizeBox = False
-        Me.MaximumSize = New System.Drawing.Size(527, 527)
-        Me.MinimizeBox = False
-        Me.MinimumSize = New System.Drawing.Size(527, 527)
-        Me.Name = "form_ElemAttachmentManager"
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Attachment Link Manager"
-        Me.TopMost = True
-        Me.ResumeLayout(False)
-        Me.PerformLayout()
+        labelMessage = New System.Windows.Forms.Label()
+        listBoxDwg = New System.Windows.Forms.ListBox()
+        buttonSelect = New System.Windows.Forms.Button()
+        buttonClose = New System.Windows.Forms.Button()
+        label4 = New System.Windows.Forms.Label()
+        SuspendLayout()
+        ' 
+        ' labelMessage
+        ' 
+        labelMessage.AutoSize = True
+        labelMessage.Location = New System.Drawing.Point(16, 480)
+        labelMessage.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        labelMessage.Name = "labelMessage"
+        labelMessage.Size = New System.Drawing.Size(0, 15)
+        labelMessage.TabIndex = 15
+        ' 
+        ' listBoxDwg
+        ' 
+        listBoxDwg.Font = New System.Drawing.Font("Monospac821 BT", 8.25F, Drawing.FontStyle.Regular, Drawing.GraphicsUnit.Point, CByte(0))
+        listBoxDwg.FormattingEnabled = True
+        listBoxDwg.ItemHeight = 14
+        listBoxDwg.Location = New System.Drawing.Point(12, 29)
+        listBoxDwg.Margin = New System.Windows.Forms.Padding(4)
+        listBoxDwg.Name = "listBoxDwg"
+        listBoxDwg.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
+        listBoxDwg.Size = New System.Drawing.Size(572, 438)
+        listBoxDwg.TabIndex = 13
+        ' 
+        ' buttonSelect
+        ' 
+        buttonSelect.Location = New System.Drawing.Point(12, 518)
+        buttonSelect.Margin = New System.Windows.Forms.Padding(4)
+        buttonSelect.Name = "buttonSelect"
+        buttonSelect.Size = New System.Drawing.Size(208, 34)
+        buttonSelect.TabIndex = 12
+        buttonSelect.Text = "Select in Revit"
+        buttonSelect.UseVisualStyleBackColor = True
+        ' 
+        ' buttonClose
+        ' 
+        buttonClose.Location = New System.Drawing.Point(377, 518)
+        buttonClose.Margin = New System.Windows.Forms.Padding(4)
+        buttonClose.Name = "buttonClose"
+        buttonClose.Size = New System.Drawing.Size(208, 34)
+        buttonClose.TabIndex = 11
+        buttonClose.Text = "Close"
+        buttonClose.UseVisualStyleBackColor = True
+        ' 
+        ' label4
+        ' 
+        label4.AutoSize = True
+        label4.Font = New System.Drawing.Font("Monospac821 BT", 8.25F, Drawing.FontStyle.Regular, Drawing.GraphicsUnit.Point, CByte(0))
+        label4.Location = New System.Drawing.Point(14, 10)
+        label4.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        label4.Name = "label4"
+        label4.Size = New System.Drawing.Size(504, 14)
+        label4.TabIndex = 14
+        label4.Text = "ElementId  Type         Name                                Workset No."
+        ' 
+        ' form_ElemAttachmentManager
+        ' 
+        AutoScaleDimensions = New System.Drawing.SizeF(7F, 15F)
+        AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        ClientSize = New System.Drawing.Size(603, 564)
+        Controls.Add(labelMessage)
+        Controls.Add(listBoxDwg)
+        Controls.Add(buttonSelect)
+        Controls.Add(buttonClose)
+        Controls.Add(label4)
+        Icon = CType(resources.GetObject("$this.Icon"), Drawing.Icon)
+        Margin = New System.Windows.Forms.Padding(4)
+        MaximizeBox = False
+        MaximumSize = New System.Drawing.Size(619, 800)
+        MinimizeBox = False
+        MinimumSize = New System.Drawing.Size(619, 603)
+        Name = "form_ElemAttachmentManager"
+        StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
+        Text = "Attachment Link Manager"
+        TopMost = True
+        ResumeLayout(False)
+        PerformLayout()
 
     End Sub
     Private WithEvents labelMessage As System.Windows.Forms.Label

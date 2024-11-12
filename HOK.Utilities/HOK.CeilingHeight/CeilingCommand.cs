@@ -39,6 +39,8 @@ namespace HOK.CeilingHeight
                 if (null == room)
                 {
                     MessageBox.Show("There are no rooms in the model. Add one to use this tool.", "Find Parameters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Result = Result.Failed;
+                    return;
                 }
 #if REVIT2022_OR_GREATER
                 var parameterRequirements = new Dictionary<string, ForgeTypeId>
@@ -134,6 +136,7 @@ namespace HOK.CeilingHeight
             catch (Exception ex)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                Result = Result.Failed;
             }
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
