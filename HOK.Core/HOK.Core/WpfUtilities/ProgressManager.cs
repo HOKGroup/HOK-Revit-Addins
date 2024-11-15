@@ -33,7 +33,7 @@ namespace HOK.Core.WpfUtilities
         {
             if (null == ProgressBar || null == StatusLabel) return;
 
-            ProgressBar.Visibility = Visibility.Visible;
+            ProgressBar.Visibility = System.Windows.Visibility.Visible;
             ProgressValue = 0;
 
             _updateLabelDelegate = StatusLabel.SetValue;
@@ -72,7 +72,7 @@ namespace HOK.Core.WpfUtilities
             if (null == ProgressBar || null == StatusLabel) return;
 
             ProgressValue = 0;
-            ProgressBar.Visibility = Visibility.Hidden;
+            ProgressBar.Visibility = System.Windows.Visibility.Hidden;
             StatusLabel.Text = "Ready";
         }
     }

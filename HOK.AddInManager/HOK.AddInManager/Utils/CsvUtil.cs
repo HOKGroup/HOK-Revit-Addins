@@ -12,7 +12,7 @@ namespace HOK.AddInManager.Utils
     {
         public static string[] ColumnNames =
         {
-            "icon", "name", "addin", "order", "tooltip", "url", "requiresRestart"
+            "icon", "name", "addin", "order", "tooltip", "url", "dropdownOptionsFlag"
         };
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace HOK.AddInManager.Utils
                         }
                         else if (formatMatched)
                         {
-                            var restart = bool.Parse(fields[6]);
+                            var restart = int.Parse(fields[6]);
                             var addinInfo = new AddinInfo
                             {
                                 IconName = fields[0],
@@ -61,9 +61,9 @@ namespace HOK.AddInManager.Utils
                                 Index = int.Parse(fields[3]),
                                 Tooltip = fields[4],
                                 Url = fields[5],
-                                RequiresRestart = restart,
-                                LoadTypes = restart 
-                                    ? new[]{LoadType.Always, LoadType.Never} 
+                                DropdownOptionsFlag = restart,
+                                LoadTypes = restart == 1
+                                    ? new[]{LoadType.Never, LoadType.Always } 
                                     : new[]{LoadType.Never, LoadType.Always, LoadType.ThisSessionOnly} 
                             };
 

@@ -1,12 +1,11 @@
-﻿using System;
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 
 namespace HOK.Core.Utilities
 {
     public static class ElementIdExtension
     {
 
-#if RELEASE2024
+#if REVIT2024_OR_GREATER
         public static long GetElementIdValue(ElementId id)
         {
             return id.Value;

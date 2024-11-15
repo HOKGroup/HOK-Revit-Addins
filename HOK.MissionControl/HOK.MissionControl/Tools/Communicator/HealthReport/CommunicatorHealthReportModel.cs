@@ -362,7 +362,7 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
                 Title = "Model:",
                 ToolName = string.Empty,
                 Score = "0/0",
-                FillColor = Color.FromRgb(119, 119, 119)
+                FillColor = System.Windows.Media.Color.FromRgb(119, 119, 119)
             };
 
             return vm;
@@ -371,24 +371,24 @@ namespace HOK.MissionControl.Tools.Communicator.HealthReport
         #region Utilities 
 
         /// <summary>
-        /// Returns a Color based on score and max value.
+        /// Returns a System.Windows.Media based on score and max value.
         /// </summary>
         /// <param name="score">Passing Checks score.</param>
         /// <param name="newMax">Max value that can be scored.</param>
         /// <returns></returns>
-        private static Color GetColor(int score, int newMax)
+        private static System.Windows.Media.Color GetColor(int score, int newMax)
         {
             var remapedScore = Math.Round(
                 (double)((score * 6) / newMax));
             if (remapedScore <= 2)
             {
-                return Color.FromRgb(217, 83, 79);
+                return System.Windows.Media.Color.FromRgb(217, 83, 79);
             }
             if (remapedScore >= 2 && remapedScore <= 4)
             {
-                return Color.FromRgb(240, 173, 78);
+                return System.Windows.Media.Color.FromRgb(240, 173, 78);
             }
-            return Color.FromRgb(92, 182, 92);
+            return System.Windows.Media.Color.FromRgb(92, 182, 92);
         }
 
         #endregion

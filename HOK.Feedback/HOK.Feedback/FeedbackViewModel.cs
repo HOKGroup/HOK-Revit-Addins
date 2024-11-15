@@ -4,14 +4,14 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 
 namespace HOK.Feedback
 {
-    public class FeedbackViewModel : ViewModelBase
+    public class FeedbackViewModel : ObservableRecipient
     {
         public string ToolName { get; set; }
         public string Title { get; set; }
@@ -20,7 +20,7 @@ namespace HOK.Feedback
         public RelayCommand<KeyEventArgs> WindowKeyDown { get; }
         public RelayCommand<Window> Submit { get; }
         public RelayCommand<Window> Cancel { get; }
-        public GalaSoft.MvvmLight.Command.RelayCommand ChooseFile { get; }
+        public CommunityToolkit.Mvvm.Input.RelayCommand ChooseFile { get; }
         public ObservableCollection<AttachmentViewModel> Attachments { get; set; } = new ObservableCollection<AttachmentViewModel>();
 
         public FeedbackViewModel(FeedbackModel model, string toolname)
@@ -32,7 +32,7 @@ namespace HOK.Feedback
             WindowKeyDown = new RelayCommand<KeyEventArgs>(OnWindowKeyDown);
             Submit = new RelayCommand<Window>(OnSubmit);
             Cancel = new RelayCommand<Window>(OnCancel);
-            ChooseFile = new GalaSoft.MvvmLight.Command.RelayCommand(OnChooseFile);
+            ChooseFile = new CommunityToolkit.Mvvm.Input.RelayCommand(OnChooseFile);
         }
 
         private static void OnWindowLoaded(Window win)
@@ -43,7 +43,7 @@ namespace HOK.Feedback
         public async void DeleteAttachment(AttachmentViewModel vm)
         {
             Attachments.Remove(vm);
-            var currentState = string.Copy(Feedback);
+            var currentState = "" + Feedback;
             Feedback = Feedback.Replace(vm.HtmlLink.Replace(Environment.NewLine, ""), "");
 
             var response = await Model.RemoveImage<Response>(vm);
@@ -163,21 +163,21 @@ namespace HOK.Feedback
         public string Feedback
         {
             get { return _feedback; }
-            set { _feedback = value; RaisePropertyChanged(() => Feedback); }
+            set { _feedback = value; OnPropertyChanged(nameof(Feedback)); }
         }
 
         private string _email = Environment.UserName.ToLower() + "@hok.com";
         public string Email
         {
             get { return _email; }
-            set { _email = value; RaisePropertyChanged(() => Email); }
+            set { _email = value; OnPropertyChanged(nameof(Email)); }
         }
 
         private string _name = Environment.UserName.ToLower().Replace('.', ' ');
         public string Name
         {
             get { return _name; }
-            set { _name = value; RaisePropertyChanged(() => Name); }
+            set { _name = value; OnPropertyChanged(nameof(Name)); }
         }
     }
 }

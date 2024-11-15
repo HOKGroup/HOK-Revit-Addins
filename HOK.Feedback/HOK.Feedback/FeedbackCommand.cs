@@ -7,15 +7,16 @@ using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.Feedback
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class FeedbackCommand : IExternalCommand
+    public class FeedbackCommand : ExternalCommand
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public override void Execute()
         {
             Log.AppendLog(LogMessageType.INFO, "Started");
 
@@ -24,7 +25,7 @@ namespace HOK.Feedback
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontinue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("Feedback Tool", commandData.Application.Application.VersionNumber));
+                    new AddinLog("Feedback Tool", Application.VersionNumber));
 
                 var title = "HOK Feedback Tool v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 var model = new FeedbackModel();
@@ -47,7 +48,6 @@ namespace HOK.Feedback
             }
 
             Log.AppendLog(LogMessageType.INFO, "Ended");
-            return Result.Succeeded;
         }
     }
 }

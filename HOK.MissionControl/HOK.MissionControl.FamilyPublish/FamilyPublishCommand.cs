@@ -12,6 +12,7 @@ using HOK.MissionControl.Core.Schemas;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.FamilyPublish.Utilities;
 using Visibility = System.Windows.Visibility;
+using Nice3point.Revit.Toolkit.External;
 
 #endregion
 
@@ -20,12 +21,12 @@ namespace HOK.MissionControl.FamilyPublish
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class FamilyPublishCommand : IExternalCommand
+    public class FamilyPublishCommand : ExternalCommand
     {
-        public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
+        public override void Execute()
         {
-            var uiApp = commandData.Application;
-            var doc = uiApp.ActiveUIDocument.Document;
+            var uiApp = Context.UiApplication;
+            var doc = Context.ActiveDocument;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
@@ -33,7 +34,7 @@ namespace HOK.MissionControl.FamilyPublish
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("MissionControl-PublishFamilyData", commandData.Application.Application.VersionNumber));
+                    new AddinLog("MissionControl-PublishFamilyData", Context.Application.VersionNumber));
 
                 var pathName = doc.PathName;
                 if (string.IsNullOrEmpty(pathName))
@@ -48,7 +49,8 @@ namespace HOK.MissionControl.FamilyPublish
                     };
                     dialog.ShowDialog();
 
-                    return Result.Failed;
+                    Result = Result.Failed;
+                    return;
                 }
 
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
@@ -64,7 +66,8 @@ namespace HOK.MissionControl.FamilyPublish
                     };
                     dialog.ShowDialog();
 
-                    return Result.Failed;
+                    Result = Result.Failed;
+                    return;
                 }
 
                 if (!MissionControlSetup.Projects.ContainsKey(centralPath) || 
@@ -81,7 +84,8 @@ namespace HOK.MissionControl.FamilyPublish
                     };
                     dialog.ShowDialog();
 
-                    return Result.Failed;
+                    Result = Result.Failed;
+                    return;
                 }
 
                 uiApp.Application.FailuresProcessing += FailureProcessing;
@@ -109,7 +113,6 @@ namespace HOK.MissionControl.FamilyPublish
 
             uiApp.Application.FailuresProcessing -= FailureProcessing;
             Log.AppendLog(LogMessageType.INFO, "Ended");
-            return Result.Succeeded;
         }
 
         /// <summary>

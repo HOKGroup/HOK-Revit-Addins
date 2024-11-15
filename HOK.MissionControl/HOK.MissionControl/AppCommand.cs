@@ -1,16 +1,11 @@
 ﻿#region References
 
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
-using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using HOK.MissionControl.Core.Schemas.Families;
@@ -22,12 +17,13 @@ using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
 using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.MissionControl;
+using Nice3point.Revit.Toolkit.External;
 
 #endregion
 
 namespace HOK.MissionControl
 {
-    public class AppCommand : IExternalApplication
+    public class AppCommand : ExternalApplication
     {
         #region Properties
 
@@ -53,28 +49,28 @@ namespace HOK.MissionControl
 
         #endregion
 
-        public Result OnStartup(UIControlledApplication application)
+        public override void OnStartup()
         {
             try
             {
                 Instance = this;
-                var appId = application.ActiveAddInId;
+                var appId = Application.ActiveAddInId;
                 DoorUpdaterInstance = new DoorUpdater(appId);
                 DtmUpdaterInstance = new DtmUpdater(appId);
                 Tasks = new Queue<Action<UIApplication>>();
 
-                application.Idling += OnIdling;
-                application.ControlledApplication.DocumentOpening += OnDocumentOpening;
-                application.ControlledApplication.DocumentOpened += OnDocumentOpened;
-                application.ControlledApplication.FailuresProcessing += FailureProcessor.CheckFailure;
-                application.ControlledApplication.DocumentClosing += OnDocumentClosing;
-                application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
-                application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
-                application.ControlledApplication.DocumentCreated += OnDocumentCreated;
-                application.ControlledApplication.FailuresProcessing += OnFailureProcessing;
+                Application.Idling += OnIdling;
+                Application.ControlledApplication.DocumentOpening += OnDocumentOpening;
+                Application.ControlledApplication.DocumentOpened += OnDocumentOpened;
+                Application.ControlledApplication.FailuresProcessing += FailureProcessor.CheckFailure;
+                Application.ControlledApplication.DocumentClosing += OnDocumentClosing;
+                Application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
+                Application.ControlledApplication.DocumentSynchronizedWithCentral += OnDocumentSynchronized;
+                Application.ControlledApplication.DocumentCreated += OnDocumentCreated;
+                Application.ControlledApplication.FailuresProcessing += OnFailureProcessing;
                 // (Konrad) Create buttons and register dockable panel.
-                CommunicatorUtilities.RegisterCommunicator(application);
-                CreateButtons(application);
+                CommunicatorUtilities.RegisterCommunicator(Application);
+                CreateButtons(Application);
 
                 // (Konrad) Since Communicator Task Assistant offers to open Families for editing,
                 // it requires an External Event because new document cannot be opened from Idling Event
@@ -85,7 +81,6 @@ namespace HOK.MissionControl
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return Result.Succeeded;
         }
         private static void OnFailureProcessing(object sender, FailuresProcessingEventArgs e)
         {
@@ -101,18 +96,17 @@ namespace HOK.MissionControl
             }
         }
 
-        public Result OnShutdown(UIControlledApplication application)
+        public override void OnShutdown()
         {
-            application.Idling -= OnIdling;
-            application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
-            application.ControlledApplication.DocumentOpened -= OnDocumentOpened;
-            application.ControlledApplication.FailuresProcessing -= FailureProcessor.CheckFailure;
-            application.ControlledApplication.DocumentClosing -= OnDocumentClosing;
-            application.ControlledApplication.DocumentSynchronizingWithCentral -= OnDocumentSynchronizing;
-            application.ControlledApplication.DocumentSynchronizedWithCentral -= OnDocumentSynchronized;
-            application.ControlledApplication.DocumentCreated -= OnDocumentCreated;
-            application.ControlledApplication.FailuresProcessing -= OnFailureProcessing;
-            return Result.Succeeded;
+            Application.Idling -= OnIdling;
+            Application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
+            Application.ControlledApplication.DocumentOpened -= OnDocumentOpened;
+            Application.ControlledApplication.FailuresProcessing -= FailureProcessor.CheckFailure;
+            Application.ControlledApplication.DocumentClosing -= OnDocumentClosing;
+            Application.ControlledApplication.DocumentSynchronizingWithCentral -= OnDocumentSynchronizing;
+            Application.ControlledApplication.DocumentSynchronizedWithCentral -= OnDocumentSynchronized;
+            Application.ControlledApplication.DocumentCreated -= OnDocumentCreated;
+            Application.ControlledApplication.FailuresProcessing -= OnFailureProcessing;
         }
 
         private static void OnDocumentOpening(object source, DocumentOpeningEventArgs args)
@@ -166,7 +160,7 @@ namespace HOK.MissionControl
                 Socket?.Kill();
 
                 // (Konrad) If any task windows are still open, let's shut them down.
-                Messenger.Default.Send(new DocumentClosed { CloseWindow = true });
+                WeakReferenceMessenger.Default.Send(new DocumentClosed { CloseWindow = true });
             }
             catch (Exception ex)
             {
@@ -277,9 +271,6 @@ namespace HOK.MissionControl
             var assembly = Assembly.GetAssembly(GetType());
             var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
                         ?? application.CreateRibbonPanel(tabName, "Mission Control");
-            CommunicatorButton = (PushButton)panel.AddItem(new PushButtonData("Communicator_Command",
-                "Show/Hide" + Environment.NewLine + "Communicator",
-                assembly.Location, "HOK.MissionControl.Tools.Communicator.CommunicatorCommand"));
 
             WebsiteButton = (PushButton)panel.AddItem(new PushButtonData("WebsiteLink_Command",
                 "Launch" + Environment.NewLine + "MissionControl",

@@ -8,10 +8,11 @@ using Autodesk.Revit.UI.Events;
 using HOK.AddInManager.Classes;
 using HOK.AddInManager.Utils;
 using HOK.Core.Utilities;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.AddInManager
 {
-    public class AppCommand : IExternalApplication
+    public class AppCommand : ExternalApplication
     {
         internal static AppCommand thisApp;
         private UIControlledApplication m_app;
@@ -27,10 +28,10 @@ namespace HOK.AddInManager
         private const string settingFile = "HOKAddinSettings.xml";
         public string settingPath = "";
 
-        public Result OnStartup(UIControlledApplication application)
+        public override void OnStartup()
         {
             thisApp = this;
-            m_app = application;
+            m_app = Application;
             try
             {
                 try
@@ -47,8 +48,8 @@ namespace HOK.AddInManager
                 installDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber;
                 addinResources = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\Autodesk\\REVIT\\Addins\\" + versionNumber + "\\HOK-Addin.bundle\\Contents\\Resources";
 
-                application.ControlledApplication.ApplicationInitialized += ReadAddinSettingsOnInitialized;
-                application.ApplicationClosing += ApplicationOnClosing;
+                Application.ControlledApplication.ApplicationInitialized += async (source, args) => { await ReadAddinSettingsOnInitialized(source, args); };
+                Application.ApplicationClosing += ApplicationOnClosing;
 
                 //ribbon panel
                  var toolTipText = Path.Combine(addinResources, "HOK.Tooltip.txt");
@@ -69,20 +70,18 @@ namespace HOK.AddInManager
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
             }
-            return Result.Succeeded;
         }
 
-        public Result OnShutdown(UIControlledApplication application)
+        public override void OnShutdown()
         {
-            application.ControlledApplication.ApplicationInitialized -= ReadAddinSettingsOnInitialized;
-            application.ApplicationClosing -= ApplicationOnClosing;
-            return Result.Succeeded;
+            Application.ControlledApplication.ApplicationInitialized -= async (source, args) => { await ReadAddinSettingsOnInitialized(source, args); };
+            Application.ApplicationClosing -= ApplicationOnClosing;
         }
 
         /// <summary>
         /// Reads in the XML Settings file.
         /// </summary>
-        private void ReadAddinSettingsOnInitialized(object source, ApplicationInitializedEventArgs args)
+        private async Task ReadAddinSettingsOnInitialized(object source, ApplicationInitializedEventArgs args)
         {
             try
             {
@@ -99,7 +98,23 @@ namespace HOK.AddInManager
                 SettingUtil.ReadConfig(settingPath, ref addins);
 
                 //add addins
-                addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Always).ToList().ForEach(AddPlugin);
+                addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Always && x.DropdownOptionsFlag == 1).ToList().ForEach(AddPlugin);
+                var addinsToLoad = addins.AddinCollection.Where(x => x.ToolLoadType == LoadType.Always && x.DropdownOptionsFlag == 2).ToList();
+                foreach (var addin in addinsToLoad)
+                {
+                    foreach (var addinPath in addin.AddInPaths)
+                    {
+                        try
+                        {
+                            await Task.Delay(2500);
+                            m_app.LoadAddIn(addinPath);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -136,7 +151,21 @@ namespace HOK.AddInManager
                         }
                         break;
                     case LoadType.Always:
-                        AddPlugin(addin);
+                        if (addin.DropdownOptionsFlag == 2) {
+                            foreach (var addinPath in addin.AddInPaths)
+                            {
+                                try
+                                {
+                                    m_app.LoadAddIn(addinPath);
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.AppendLog(LogMessageType.EXCEPTION, e.Message);
+                                }
+                            }
+                        } else {
+                            AddPlugin(addin); // Copy to user profile method
+                        }
                         break;
                 }
             }

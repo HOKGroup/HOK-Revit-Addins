@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
 using HOK.MissionControl.GroupsManager.Utilities;
@@ -186,7 +186,7 @@ namespace HOK.MissionControl.GroupsManager
                 trans.Commit();
             }
 
-            Messenger.Default.Send(new GroupsDeleted { Groups = deleted });
+            WeakReferenceMessenger.Default.Send(new GroupsDeleted { Groups = deleted });
         }
 
         /// <summary>
@@ -242,7 +242,7 @@ namespace HOK.MissionControl.GroupsManager
                 trans.Commit();
             }
 
-            Messenger.Default.Send(new GroupsDeleted { Groups = deleted });
+            WeakReferenceMessenger.Default.Send(new GroupsDeleted { Groups = deleted });
         }
     }
 
