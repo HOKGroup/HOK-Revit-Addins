@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using HOK.AddInManager.Classes;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
@@ -35,6 +36,7 @@ namespace HOK.AddInManager.UserControls
                         {
                             StatusBarManager.StatusLabel.Text =
                                 "One/more selected Addins will need Revit restart.";
+                            StatusBarManager.StatusLabel.Foreground = new SolidColorBrush(Colors.Red);
                         }
                     }
 
@@ -64,6 +66,9 @@ namespace HOK.AddInManager.UserControls
                 StatusBarManager.StatusLabel.Text = postMessage 
                     ? "One/more selected Addins will need Revit restart."
                     : "Ready";
+                StatusBarManager.StatusLabel.Foreground = postMessage
+                    ? new SolidColorBrush(Colors.Red)
+                    : new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 118, 116, 116));
             }
             catch (Exception ex)
             {
