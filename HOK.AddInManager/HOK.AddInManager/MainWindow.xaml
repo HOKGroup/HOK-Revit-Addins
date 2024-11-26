@@ -5,15 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:uc ="clr-namespace:HOK.AddInManager.UserControls"
-        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d" 
         Height="700" Width="500" MinHeight="300" MinWidth="500" Icon="Resources/hoklogo.ico"
         Title="{Binding Title}" WindowStartupLocation="CenterScreen" BorderThickness="0,5,0,0" BorderBrush="#C45C44">
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
+    <Behaviors:Interaction.Triggers>
+        <Behaviors:EventTrigger EventName="Loaded">
+            <Behaviors:InvokeCommandAction Command="{Binding WindowLoaded}" CommandParameter="{Binding ElementName=Win}"/>
+        </Behaviors:EventTrigger>
+    </Behaviors:Interaction.Triggers>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="80"/>

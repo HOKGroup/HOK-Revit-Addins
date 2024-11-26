@@ -6,14 +6,14 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.Core.ElementWrapers;
 using HOK.Feedback;
 
 namespace HOK.MissionControl.LinksManager.ImportsTab
 {
-    public class ImportsViewModel : ViewModelBase
+    public class ImportsViewModel : ObservableRecipient
     {
         public ImportsModel Model { get; set; }
         public ObservableCollection<CadLinkTypeWrapper> Imports { get; set; }

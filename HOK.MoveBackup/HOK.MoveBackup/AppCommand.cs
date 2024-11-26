@@ -4,10 +4,11 @@ using System.Threading;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.MoveBackup
 {
-    public class AppCommand : IExternalApplication
+    public class AppCommand : ExternalApplication
     {
         public static readonly string[] extensions = {
             ".rvt",
@@ -15,12 +16,10 @@ namespace HOK.MoveBackup
             ".rte"
         };
 
-        public Result OnStartup(UIControlledApplication application)
+        public override void OnStartup()
         {
-            application.ControlledApplication.DocumentSaved += OnDocumentSaved;
-            application.ControlledApplication.DocumentSavedAs += OnDocumentSavedAs;
-
-            return Result.Succeeded;
+            Application.ControlledApplication.DocumentSaved += OnDocumentSaved;
+            Application.ControlledApplication.DocumentSavedAs += OnDocumentSavedAs;
         }
 
         private static void OnDocumentSavedAs(object sender, DocumentSavedAsEventArgs e)
@@ -52,11 +51,6 @@ namespace HOK.MoveBackup
             {
                 Priority = ThreadPriority.BelowNormal
             }.Start();
-        }
-
-        public Result OnShutdown(UIControlledApplication application)
-        {
-            return Result.Succeeded;
         }
     }
 }

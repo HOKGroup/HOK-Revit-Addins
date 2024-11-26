@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using HOK.AddInManager.Classes;
 using HOK.Core.Utilities;
 using HOK.Core.WpfUtilities;
@@ -31,10 +32,11 @@ namespace HOK.AddInManager.UserControls
                 {
                     foreach (AddinInfo info in dataGridAddins.SelectedItems)
                     {
-                        if (info.RequiresRestart && selectedValue == LoadType.Always)
+                        if (info.DropdownOptionsFlag == 1 && selectedValue == LoadType.Always)
                         {
                             StatusBarManager.StatusLabel.Text =
                                 "One/more selected Addins will need Revit restart.";
+                            StatusBarManager.StatusLabel.Foreground = new SolidColorBrush(Colors.Red);
                         }
                     }
 
@@ -44,7 +46,7 @@ namespace HOK.AddInManager.UserControls
                 _userSelection = false;
                 foreach (AddinInfo info in dataGridAddins.SelectedItems)
                 {
-                    if (info.RequiresRestart && selectedValue == LoadType.Always) postMessage = true;
+                    if (info.DropdownOptionsFlag == 1 && selectedValue == LoadType.Always) postMessage = true;
                     var rowIndex = dataGridAddins.Items.IndexOf(info);
                     var row = (DataGridRow)dataGridAddins.ItemContainerGenerator.ContainerFromIndex(rowIndex);
                     var rowComboBox = DataGridUtilities.FindVisualChild<ComboBox>(row);
@@ -64,6 +66,9 @@ namespace HOK.AddInManager.UserControls
                 StatusBarManager.StatusLabel.Text = postMessage 
                     ? "One/more selected Addins will need Revit restart."
                     : "Ready";
+                StatusBarManager.StatusLabel.Foreground = postMessage
+                    ? new SolidColorBrush(Colors.Red)
+                    : new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 118, 116, 116));
             }
             catch (Exception ex)
             {

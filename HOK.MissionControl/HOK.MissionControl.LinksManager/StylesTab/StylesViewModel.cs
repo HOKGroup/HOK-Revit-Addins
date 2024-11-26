@@ -8,8 +8,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Data;
 using System.Windows.Interop;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.Core.ElementWrapers;
 using HOK.Feedback;
 
@@ -17,7 +17,7 @@ using HOK.Feedback;
 
 namespace HOK.MissionControl.LinksManager.StylesTab
 {
-    public class StylesViewModel : ViewModelBase
+    public class StylesViewModel : ObservableRecipient
     {
         public IList SelectedRows { get; set; }
         public StylesModel Model { get; set; }
@@ -33,7 +33,7 @@ namespace HOK.MissionControl.LinksManager.StylesTab
         public bool Expanded
         {
             get { return _expanded; }
-            set { _expanded = value; RaisePropertyChanged(() => Expanded); }
+            set { _expanded = value; OnPropertyChanged(nameof(Expanded)); }
         }
 
         public StylesViewModel(StylesModel model)

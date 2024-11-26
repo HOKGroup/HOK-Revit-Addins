@@ -15,9 +15,9 @@ namespace HOK.MissionControl.Tools.Communicator.Tasks.SheetTaskAssistant
             var first = values[0] as string;
             var second = values[1] as string;
 
-            if (first == null || second == null) return new SolidColorBrush(Color.FromRgb(217, 83, 79));
+            if (first == null || second == null) return new SolidColorBrush(System.Windows.Media.Color.FromRgb(217, 83, 79));
 
-            return first == second ? new SolidColorBrush(Colors.DarkGray) : new SolidColorBrush(Color.FromRgb(217, 83, 79));
+            return first == second ? new SolidColorBrush(Colors.DarkGray) : new SolidColorBrush(System.Windows.Media.Color.FromRgb(217, 83, 79));
         }
 
         public object[] ConvertBack(object value, Type[] targetType, object parameter, System.Globalization.CultureInfo culture)

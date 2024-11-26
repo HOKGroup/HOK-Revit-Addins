@@ -4,31 +4,32 @@ using System.Reflection;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
-using GalaSoft.MvvmLight.Messaging;
+using CommunityToolkit.Mvvm.Messaging;
 using HOK.Core.Utilities;
 using HOK.MissionControl.GroupsManager.Utilities;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.MissionControl.GroupsManager
 {
-    public class AppCommand : IExternalApplication
+    public class AppCommand : ExternalApplication
     {
         private const string tabName = "   HOK   ";
         public static GroupManagerRequestHandler GroupManagerHandler { get; set; }
         public static ExternalEvent GroupManagerEvent { get; set; }
 
-        public Result OnStartup(UIControlledApplication application)
+        public override void OnStartup()
         {
             try
             {
-                application.CreateRibbonTab(tabName);
+                Application.CreateRibbonTab(tabName);
             }
             catch
             {
                 Log.AppendLog(LogMessageType.INFO, "Ribbon tab was not created because it already exists: " + tabName);
             }
             var assembly = Assembly.GetAssembly(GetType());
-            var panel = application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
-                        ?? application.CreateRibbonPanel(tabName, "Mission Control");
+            var panel = Application.GetRibbonPanels(tabName).FirstOrDefault(x => x.Name == "Mission Control")
+                        ?? Application.CreateRibbonPanel(tabName, "Mission Control");
             var unused = (PushButton)panel.AddItem(new PushButtonData("GroupManager_Command", "  Groups  " + Environment.NewLine + "Manager",
                 assembly.Location, "HOK.MissionControl.GroupsManager.GroupsManagerCommand")
             {
@@ -36,23 +37,21 @@ namespace HOK.MissionControl.GroupsManager
                 ToolTip = Properties.Resources.GroupsManager_Description
             });
 
-            application.ControlledApplication.DocumentChanged += OnDocumentChanged;
+            Application.ControlledApplication.DocumentChanged += OnDocumentChanged;
 
             GroupManagerHandler = new GroupManagerRequestHandler();
             GroupManagerEvent = ExternalEvent.Create(GroupManagerHandler);
 
-            return Result.Succeeded;
         }
 
         private void OnDocumentChanged(object sender, DocumentChangedEventArgs e)
         {
-            Messenger.Default.Send(new DocumentChanged(e.GetDeletedElementIds(), e.GetAddedElementIds(), e.GetDocument()));
+            WeakReferenceMessenger.Default.Send(new DocumentChanged(e.GetDeletedElementIds(), e.GetAddedElementIds(), e.GetDocument()));
         }
 
-        public Result OnShutdown(UIControlledApplication application)
+        public override void OnShutdown()
         {
-            application.ControlledApplication.DocumentChanged -= OnDocumentChanged;
-            return Result.Succeeded;
+            Application.ControlledApplication.DocumentChanged -= OnDocumentChanged;
         }
     }
 }

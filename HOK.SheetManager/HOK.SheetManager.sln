@@ -1,0 +1,61 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HOK.SheetManager", "SheetManager\HOK.SheetManager.vbproj", "{04F9F82F-782D-48B7-89D1-34F21D329352}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug R19|x64 = Debug R19|x64
+		Debug R20|x64 = Debug R20|x64
+		Debug R21|x64 = Debug R21|x64
+		Debug R22|x64 = Debug R22|x64
+		Debug R23|x64 = Debug R23|x64
+		Debug R24|x64 = Debug R24|x64
+		Debug R25|x64 = Debug R25|x64
+		Release R19|x64 = Release R19|x64
+		Release R20|x64 = Release R20|x64
+		Release R21|x64 = Release R21|x64
+		Release R22|x64 = Release R22|x64
+		Release R23|x64 = Release R23|x64
+		Release R24|x64 = Release R24|x64
+		Release R25|x64 = Release R25|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R19|x64.ActiveCfg = Debug R19|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R19|x64.Build.0 = Debug R19|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R20|x64.ActiveCfg = Debug R20|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R20|x64.Build.0 = Debug R20|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R21|x64.ActiveCfg = Debug R21|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R21|x64.Build.0 = Debug R21|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R22|x64.ActiveCfg = Debug R22|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R22|x64.Build.0 = Debug R22|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R23|x64.ActiveCfg = Debug R23|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R23|x64.Build.0 = Debug R23|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R24|x64.ActiveCfg = Debug R24|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R24|x64.Build.0 = Debug R24|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R25|x64.ActiveCfg = Debug R25|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Debug R25|x64.Build.0 = Debug R25|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R19|x64.ActiveCfg = Release R19|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R19|x64.Build.0 = Release R19|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R20|x64.ActiveCfg = Release R20|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R20|x64.Build.0 = Release R20|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R21|x64.ActiveCfg = Release R21|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R21|x64.Build.0 = Release R21|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R22|x64.ActiveCfg = Release R22|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R22|x64.Build.0 = Release R22|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R23|x64.ActiveCfg = Release R23|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R23|x64.Build.0 = Release R23|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R24|x64.ActiveCfg = Release R24|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R24|x64.Build.0 = Release R24|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R25|x64.ActiveCfg = Release R25|x64
+		{04F9F82F-782D-48B7-89D1-34F21D329352}.Release R25|x64.Build.0 = Release R25|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FEAF789A-40B4-4795-8DC1-EFE4641B2D2B}
+	EndGlobalSection
+EndGlobal

@@ -6,14 +6,14 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
+using CommunityToolkit.Mvvm;
+using CommunityToolkit.Mvvm.Input;
 using HOK.Core.ElementWrapers;
 using HOK.Feedback;
 
 namespace HOK.MissionControl.LinksManager.ImagesTab
 {
-    public class ImagesViewModel : ViewModelBase
+    public class ImagesViewModel : ObservableRecipient
     {
         public IList SelectedRows { get; set; }
         public ImagesModel Model { get; set; }
