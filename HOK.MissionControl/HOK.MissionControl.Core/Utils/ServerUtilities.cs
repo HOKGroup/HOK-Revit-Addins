@@ -6,7 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using RestSharp;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using HOK.Core.Utilities;
 // ReSharper disable InconsistentNaming
 
@@ -50,7 +51,7 @@ namespace HOK.MissionControl.Core.Utils
 
                 if (!string.IsNullOrWhiteSpace(response.Content))
                 {
-                    var data = JsonConvert.DeserializeObject<T>(response.Content);
+                    var data = JsonSerializer.Deserialize<T>(response.Content);
                     if (data != null)
                     {
                         result = data;
@@ -88,7 +89,7 @@ namespace HOK.MissionControl.Core.Utils
 
                 if (!string.IsNullOrWhiteSpace(response.Content))
                 {
-                    var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
+                    var data = JsonSerializer.Deserialize<List<T>>(response.Content).FirstOrDefault();
                     if (data != null)
                     {
                         result = data;
@@ -140,7 +141,7 @@ namespace HOK.MissionControl.Core.Utils
                 if (response.StatusCode != HttpStatusCode.OK) return false;
                 if (!string.IsNullOrEmpty(response.Content))
                 {
-                    var data = JsonConvert.DeserializeObject<List<T>>(response.Content).FirstOrDefault();
+                    var data = JsonSerializer.Deserialize<List<T>>(response.Content).FirstOrDefault();
                     if (data != null)
                     {
                         result = data;
@@ -304,13 +305,13 @@ namespace HOK.MissionControl.Core.Utils
 
     public class ResponseCreated
     {
-        [JsonProperty("n")]
+        [JsonPropertyName("n")]
         public int N { get; set; }
 
-        [JsonProperty("nModified")]
+        [JsonPropertyName("nModified")]
         public int NModified { get; set; }
 
-        [JsonProperty("ok")]
+        [JsonPropertyName("ok")]
         public int Ok { get; set; }
     }
 

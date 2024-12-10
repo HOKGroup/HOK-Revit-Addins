@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
 
 namespace HOK.MissionControl.Core.Schemas.Styles
 {
@@ -12,13 +12,14 @@ namespace HOK.MissionControl.Core.Schemas.Styles
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Id { get; set; }
 
-        [JsonProperty("centralPath")]
+        [JsonPropertyName("centralPath")]
         public string CentralPath { get; set; }
 
-        [JsonProperty("styleStats")]
+        [JsonPropertyName("styleStats")]
         public List<StylesDataItem> StyleStats { get; set; } = new List<StylesDataItem>();
     }
 }

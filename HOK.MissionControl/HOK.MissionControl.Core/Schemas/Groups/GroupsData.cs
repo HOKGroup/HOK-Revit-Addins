@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Groups
 {
@@ -12,13 +13,13 @@ namespace HOK.MissionControl.Core.Schemas.Groups
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("centralPath")]
+        [JsonPropertyName("centralPath")]
         public string CentralPath { get; set; }
 
-        [JsonProperty("groupStats")]
+        [JsonPropertyName("groupStats")]
         public List<GroupDataItem> GroupStats { get; set; } = new List<GroupDataItem>();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Configurations
 {
@@ -11,25 +12,25 @@ namespace HOK.MissionControl.Core.Schemas.Configurations
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("monitorId")]
+        [JsonPropertyName("monitorId")]
         public string MonitorId { get; set; }
 
-        [JsonProperty("monitorName")]
+        [JsonPropertyName("monitorName")]
         public string MonitorName { get; set; }
 
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        [JsonProperty("addInName")]
+        [JsonPropertyName("addInName")]
         public string AddInName { get; set; }
 
-        [JsonProperty("filePath")]
+        [JsonPropertyName("filePath")]
         public string FilePath { get; set; }
 
-        [JsonProperty("isMonitorOn")]
+        [JsonPropertyName("isMonitorOn")]
         public bool IsMonitorOn { get; set; }
     }
 }

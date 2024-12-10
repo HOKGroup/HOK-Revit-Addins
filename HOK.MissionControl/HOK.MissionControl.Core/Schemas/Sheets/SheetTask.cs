@@ -3,7 +3,8 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Sheets
 {
@@ -16,56 +17,56 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [DataMember(Name = "_id")]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
         [DataMember(Name = "isNewSheet")]
-        [JsonProperty("isNewSheet")]
+        [JsonPropertyName("isNewSheet")]
         public bool IsNewSheet { get; set; }
 
         [DataMember(Name = "sheetId")]
-        [JsonProperty("sheetId")]
+        [JsonPropertyName("sheetId")]
         public string SheetId { get; set; }
 
         [DataMember(Name = "uniqueId")]
-        [JsonProperty("uniqueId")]
+        [JsonPropertyName("uniqueId")]
         public string UniqueId { get; set; }
 
         [DataMember(Name = "revisionNumber")]
-        [JsonProperty("revisionNumber")]
+        [JsonPropertyName("revisionNumber")]
         public string RevisionNumber { get; set; }
 
         [DataMember(Name = "assignedTo")]
-        [JsonProperty("assignedTo")]
+        [JsonPropertyName("assignedTo")]
         public string AssignedTo { get; set; }
 
         [DataMember(Name = "submittedOn")]
-        [JsonProperty("submittedOn")]
+        [JsonPropertyName("submittedOn")]
         public DateTime? SubmittedOn { get; set; }
 
         [DataMember(Name = "completedOn")]
-        [JsonProperty("completedOn")]
+        [JsonPropertyName("completedOn")]
         public DateTime? CompletedOn { get; set; }
 
         [DataMember(Name = "submittedBy")]
-        [JsonProperty("submittedBy")]
+        [JsonPropertyName("submittedBy")]
         public string SubmittedBy { get; set; }
 
         [DataMember(Name = "completedBy")]
-        [JsonProperty("completedBy")]
+        [JsonPropertyName("completedBy")]
         public string CompletedBy { get; set; }
 
         [DataMember(Name = "collectionId")]
-        [JsonProperty("collectionId")]
+        [JsonPropertyName("collectionId")]
         public string CollectionId { get; set; }
 
         [DataMember(Name = "centralPath")]
-        [JsonProperty("centralPath")]
+        [JsonPropertyName("centralPath")]
         public string CentralPath { get; set; }
 
         private string _name;
         [DataMember(Name = "name")]
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name
         {
             get { return _name; }
@@ -74,7 +75,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private string _number;
         [DataMember(Name = "number")]
-        [JsonProperty("number")]
+        [JsonPropertyName("number")]
         public string Number
         {
             get { return _number; }
@@ -83,7 +84,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private bool _isSelected;
         [DataMember(Name = "isSelected")]
-        [JsonProperty("isSelected")]
+        [JsonPropertyName("isSelected")]
         public bool IsSelected
         {
             get { return _isSelected; }
@@ -92,7 +93,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private bool _isPlaceholder;
         [DataMember(Name = "isPlaceholder")]
-        [JsonProperty("isPlaceholder")]
+        [JsonPropertyName("isPlaceholder")]
         public bool IsPlaceholder
         {
             get { return _isPlaceholder; }
@@ -101,7 +102,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private bool _isDeleted;
         [DataMember(Name = "isDeleted")]
-        [JsonProperty("isDeleted")]
+        [JsonPropertyName("isDeleted")]
         public bool IsDeleted
         {
             get { return _isDeleted; }
@@ -110,7 +111,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private string _message;
         [DataMember(Name = "message")]
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public string Message
         {
             get { return _message; }
@@ -119,7 +120,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private string _comments;
         [DataMember(Name = "comments")]
-        [JsonProperty("comments")]
+        [JsonPropertyName("comments")]
         public string Comments
         {
             get { return _comments; }

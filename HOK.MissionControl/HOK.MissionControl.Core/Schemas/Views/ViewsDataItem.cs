@@ -1,7 +1,8 @@
 ﻿using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Views
 {
@@ -12,31 +13,31 @@ namespace HOK.MissionControl.Core.Schemas.Views
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("totalViews")]
+        [JsonPropertyName("totalViews")]
         public int TotalViews { get; set; }
 
-        [JsonProperty("totalSheets")]
+        [JsonPropertyName("totalSheets")]
         public int TotalSheets { get; set; }
 
-        [JsonProperty("totalSchedules")]
+        [JsonPropertyName("totalSchedules")]
         public int TotalSchedules { get; set; }
 
-        [JsonProperty("viewsOnSheet")]
+        [JsonPropertyName("viewsOnSheet")]
         public int ViewsOnSheet { get; set; }
 
-        [JsonProperty("viewsOnSheetWithTemplate")]
+        [JsonPropertyName("viewsOnSheetWithTemplate")]
         public int ViewsOnSheetWithTemplate { get; set; }
 
-        [JsonProperty("schedulesOnSheet")]
+        [JsonPropertyName("schedulesOnSheet")]
         public int SchedulesOnSheet { get; set; }
 
-        [JsonProperty("unclippedViews")]
+        [JsonPropertyName("unclippedViews")]
         public int UnclippedViews { get; set; }
 
-        [JsonProperty("createdOn")]
+        [JsonPropertyName("createdOn")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     }
 }

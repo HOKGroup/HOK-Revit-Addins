@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -7,31 +8,31 @@ namespace HOK.MissionControl.Core.Schemas
     /// </summary>
     public class ProjectAddress
     {
-        [JsonProperty("formattedAddress")]
+        [JsonPropertyName("formattedAddress")]
         public string FormattedAddress { get; set; }
 
-        [JsonProperty("street1")]
+        [JsonPropertyName("street1")]
         public string Street1 { get; set; }
 
-        [JsonProperty("street2")]
+        [JsonPropertyName("street2")]
         public string Street2 { get; set; }
 
-        [JsonProperty("city")]
+        [JsonPropertyName("city")]
         public string City { get; set; }
 
-        [JsonProperty("state")]
+        [JsonPropertyName("state")]
         public string State { get; set; }
 
-        [JsonProperty("country")]
+        [JsonPropertyName("country")]
         public string Country { get; set; }
 
-        [JsonProperty("zipCode")]
+        [JsonPropertyName("zipCode")]
         public string ZipCode { get; set; }
 
-        [JsonProperty("placeId")]
+        [JsonPropertyName("placeId")]
         public string PlaceId { get; set; }
 
-        [JsonProperty("geoLocation")]
+        [JsonPropertyName("geoLocation")]
         public GeometryLocation GeoLocation { get; set; } = new GeometryLocation();
     }
 
@@ -40,10 +41,10 @@ namespace HOK.MissionControl.Core.Schemas
     /// </summary>
     public class GeometryLocation
     {
-        [JsonProperty("latitude")]
+        [JsonPropertyName("latitude")]
         public double Latitude { get; set; }
 
-        [JsonProperty("longitude")]
+        [JsonPropertyName("longitude")]
         public double Longitude { get; set; }
     }
 }

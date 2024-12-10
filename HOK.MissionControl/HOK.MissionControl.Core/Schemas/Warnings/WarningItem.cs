@@ -8,7 +8,8 @@ using Autodesk.Revit.DB;
 using HOK.MissionControl.Utils;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 #endregion
 
@@ -16,10 +17,10 @@ namespace HOK.MissionControl.Core.Schemas.Warnings
 {
     public class WarningData
     {
-        [JsonProperty("closedBy")] public string ClosedBy { get; set; }
-        [JsonProperty("centralPath")] public string CentralPath { get; set; }
-        [JsonProperty("newWarnings")] public IEnumerable<WarningItem> NewWarnings { get; set; }
-        [JsonProperty("existingWarningIds")] public IEnumerable<string> ExistingWarningIds { get; set; }
+        [JsonPropertyName("closedBy")] public string ClosedBy { get; set; }
+        [JsonPropertyName("centralPath")] public string CentralPath { get; set; }
+        [JsonPropertyName("newWarnings")] public IEnumerable<WarningItem> NewWarnings { get; set; }
+        [JsonPropertyName("existingWarningIds")] public IEnumerable<string> ExistingWarningIds { get; set; }
 
         [JsonConstructor]
         public WarningData()
@@ -41,23 +42,23 @@ namespace HOK.MissionControl.Core.Schemas.Warnings
 
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
         /// <summary>
         /// This is a special construct that helps compare warnings.
         /// UniqueId = FailureDefinitionId + string.Join(FailingElements)
         /// </summary>
-        [JsonProperty("uniqueId")] public string UniqueId { get; set; }
-        [JsonProperty("centralPath")]public string CentralPath { get; set; }
-        [JsonProperty("failingElements")] public List<string> FailingElements { get; set; }
-        [JsonProperty("descriptionText")] public string DescriptionText { get; set; }
-        [JsonProperty("createdBy")] public string CreatedBy { get; set; } = "";
-        [JsonProperty("createdAt")] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        [JsonProperty("closedBy")] public string ClosedBy { get; set; } = "";
-        [JsonProperty("closedAt")] public DateTime ClosedAt { get; set; }
-        [JsonProperty("isOpen")] public bool IsOpen { get; set; } = true;
-        [JsonProperty("updatedAt")] public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        [JsonPropertyName("uniqueId")] public string UniqueId { get; set; }
+        [JsonPropertyName("centralPath")]public string CentralPath { get; set; }
+        [JsonPropertyName("failingElements")] public List<string> FailingElements { get; set; }
+        [JsonPropertyName("descriptionText")] public string DescriptionText { get; set; }
+        [JsonPropertyName("createdBy")] public string CreatedBy { get; set; } = "";
+        [JsonPropertyName("createdAt")] public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        [JsonPropertyName("closedBy")] public string ClosedBy { get; set; } = "";
+        [JsonPropertyName("closedAt")] public DateTime ClosedAt { get; set; }
+        [JsonPropertyName("isOpen")] public bool IsOpen { get; set; } = true;
+        [JsonPropertyName("updatedAt")] public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         #endregion
 

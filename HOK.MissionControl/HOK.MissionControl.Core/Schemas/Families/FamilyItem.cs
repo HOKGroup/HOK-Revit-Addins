@@ -2,7 +2,8 @@
 using System.Runtime.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Families
 {
@@ -15,63 +16,63 @@ namespace HOK.MissionControl.Core.Schemas.Families
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [DataMember(Name = "_id")]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
         [DataMember(Name = "name")]
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
         [DataMember(Name = "size")]
-        [JsonProperty("size")]
+        [JsonPropertyName("size")]
         public string Size { get; set; }
 
         [DataMember(Name = "sizeValue")]
-        [JsonProperty("sizeValue")]
+        [JsonPropertyName("sizeValue")]
         public long SizeValue { get; set; }
 
         [DataMember(Name = "instances")]
-        [JsonProperty("instances")]
+        [JsonPropertyName("instances")]
         public int Instances { get; set; }
 
         [DataMember(Name = "elementId")]
-        [JsonProperty("elementId")]
+        [JsonPropertyName("elementId")]
         public long ElementId { get; set; }
 
         [DataMember(Name = "refPlaneCount")]
-        [JsonProperty("refPlaneCount")]
+        [JsonPropertyName("refPlaneCount")]
         public int RefPlaneCount { get; set; }
 
         [DataMember(Name = "arrayCount")]
-        [JsonProperty("arrayCount")]
+        [JsonPropertyName("arrayCount")]
         public int ArrayCount { get; set; }
 
         [DataMember(Name = "imageCount")]
-        [JsonProperty("imageCount")]
+        [JsonPropertyName("imageCount")]
         public int ImageCount { get; set; }
 
         [DataMember(Name = "voidCount")]
-        [JsonProperty("voidCount")]
+        [JsonPropertyName("voidCount")]
         public int VoidCount { get; set; }
 
         [DataMember(Name = "nestedFamilyCount")]
-        [JsonProperty("nestedFamilyCount")]
+        [JsonPropertyName("nestedFamilyCount")]
         public int NestedFamilyCount { get; set; }
 
         [DataMember(Name = "parametersCount")]
-        [JsonProperty("parametersCount")]
+        [JsonPropertyName("parametersCount")]
         public int ParametersCount { get; set; }
 
         [DataMember(Name = "isFailingChecks")]
-        [JsonProperty("isFailingChecks")]
+        [JsonPropertyName("isFailingChecks")]
         public bool IsFailingChecks { get; set; }
 
         [DataMember(Name = "isDeleted")]
-        [JsonProperty("isDeleted")]
+        [JsonPropertyName("isDeleted")]
         public bool IsDeleted { get; set; }
 
         [DataMember(Name = "tasks")]
-        [JsonProperty("tasks")]
+        [JsonPropertyName("tasks")]
         public List<FamilyTask> Tasks { get; set; } = new List<FamilyTask>();
     }
 }

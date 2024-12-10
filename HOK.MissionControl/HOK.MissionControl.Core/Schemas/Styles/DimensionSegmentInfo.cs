@@ -4,8 +4,8 @@ using Autodesk.Revit.DB;
 using HOK.Core.Utilities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Styles
 {
@@ -16,28 +16,28 @@ namespace HOK.MissionControl.Core.Schemas.Styles
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("createdOn")]
+        [JsonPropertyName("createdOn")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
-        [JsonProperty("isOverriden")]
+        [JsonPropertyName("isOverriden")]
         public bool IsOverriden { get; set; }
 
-        [JsonProperty("value")]
+        [JsonPropertyName("value")]
         public double? Value { get; set; }
 
-        [JsonProperty("valueString")]
+        [JsonPropertyName("valueString")]
         public string ValueString { get; set; } //not set in constructor
 
-        [JsonProperty("valueOverride")]
+        [JsonPropertyName("valueOverride")]
         public string ValueOverride { get; set; }
 
-        [JsonProperty("ownerViewId")]
+        [JsonPropertyName("ownerViewId")]
         public long OwnerViewId { get; set; } //not set in constructor
 
-        [JsonProperty("ownerViewType")]
+        [JsonPropertyName("ownerViewType")]
         public string OwnerViewType { get; set; } //not set in constructor
 
         [JsonConstructor]
@@ -59,11 +59,11 @@ namespace HOK.MissionControl.Core.Schemas.Styles
             ValueOverride = dim.ValueOverride;
         }
 
-        [OnError]
-        internal void OnError(StreamingContext context, ErrorContext errorContext)
-        {
-            Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
-            errorContext.Handled = true;
-        }
+        //[OnError]
+        //internal void OnError(StreamingContext context, ErrorContext errorContext)
+        //{
+        //    Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
+        //    errorContext.Handled = true;
+        //}
     }
 }

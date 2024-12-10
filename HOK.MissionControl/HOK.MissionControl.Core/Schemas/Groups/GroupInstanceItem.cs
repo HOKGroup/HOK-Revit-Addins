@@ -2,7 +2,8 @@
 using Autodesk.Revit.DB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using static HOK.Core.Utilities.ElementIdExtension;
 
 namespace HOK.MissionControl.Core.Schemas.Groups
@@ -14,16 +15,16 @@ namespace HOK.MissionControl.Core.Schemas.Groups
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("createdBy")]
+        [JsonPropertyName("createdBy")]
         public string CreatedBy { get; set; }
 
-        [JsonProperty("ownerViewId")]
+        [JsonPropertyName("ownerViewId")]
         public long OwnerViewId { get; set; }
 
-        [JsonProperty("level")]
+        [JsonPropertyName("level")]
         public string Level { get; set; }
 
         [JsonConstructor]

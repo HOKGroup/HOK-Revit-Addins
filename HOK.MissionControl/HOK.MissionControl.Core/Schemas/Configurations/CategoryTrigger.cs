@@ -1,7 +1,8 @@
 ﻿using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Configurations
 {
@@ -12,25 +13,25 @@ namespace HOK.MissionControl.Core.Schemas.Configurations
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("categoryName")]
+        [JsonPropertyName("categoryName")]
         public string CategoryName { get; set; }
 
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        [JsonProperty("isEnabled")]
+        [JsonPropertyName("isEnabled")]
         public bool IsEnabled { get; set; }
 
-        [JsonProperty("locked")]
+        [JsonPropertyName("locked")]
         public bool Locked { get; set; }
 
-        [JsonProperty("modifiedBy")]
+        [JsonPropertyName("modifiedBy")]
         public string ModifiedBy { get; set; }
 
-        [JsonProperty("modified")]
+        [JsonPropertyName("modified")]
         public DateTime Modified { get; set; } = DateTime.UtcNow;
     }
 }

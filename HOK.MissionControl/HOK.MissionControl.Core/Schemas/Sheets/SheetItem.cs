@@ -4,7 +4,8 @@ using System.Runtime.Serialization;
 using Autodesk.Revit.DB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Sheets
 {
@@ -17,24 +18,24 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [DataMember(Name = "_id")]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
         [DataMember(Name = "collectionId")]
-        [JsonProperty("collectionId")]
+        [JsonPropertyName("collectionId")]
         public string CollectionId { get; set; }
 
         [DataMember(Name = "centralPath")]
-        [JsonProperty("centralPath")]
+        [JsonPropertyName("centralPath")]
         public string CentralPath { get; set; }
 
         [DataMember(Name = "isNewSheet")]
-        [JsonProperty("isNewSheet")]
+        [JsonPropertyName("isNewSheet")]
         public bool IsNewSheet { get; set; }
 
         private string _name;
         [DataMember(Name = "name")]
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name
         {
             get { return _name; }
@@ -43,7 +44,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private string _number;
         [DataMember(Name = "number")]
-        [JsonProperty("number")]
+        [JsonPropertyName("number")]
         public string Number
         {
             get { return _number; }
@@ -52,7 +53,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private string _uniqueId;
         [DataMember(Name = "uniqueId")]
-        [JsonProperty("uniqueId")]
+        [JsonPropertyName("uniqueId")]
         public string UniqueId
         {
             get { return _uniqueId; }
@@ -61,7 +62,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private string _revisionNumber;
         [DataMember(Name = "revisionNumber")]
-        [JsonProperty("revisionNumber")]
+        [JsonPropertyName("revisionNumber")]
         public string RevisionNumber
         {
             get { return _revisionNumber; }
@@ -70,7 +71,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private bool _isSelected;
         [DataMember(Name = "isSelected")]
-        [JsonProperty("isSelected")]
+        [JsonPropertyName("isSelected")]
         public bool IsSelected
         {
             get { return _isSelected; }
@@ -79,7 +80,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private bool _isPlaceholder;
         [DataMember(Name = "isPlaceholder")]
-        [JsonProperty("isPlaceholder")]
+        [JsonPropertyName("isPlaceholder")]
         public bool IsPlaceholder
         {
             get { return _isPlaceholder; }
@@ -88,7 +89,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
 
         private bool _isDeleted;
         [DataMember(Name = "isDeleted")]
-        [JsonProperty("isDeleted")]
+        [JsonPropertyName("isDeleted")]
         public bool IsDeleted
         {
             get { return _isDeleted; }
@@ -96,7 +97,7 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         }
 
         [DataMember(Name = "tasks")]
-        [JsonProperty("tasks")]
+        [JsonPropertyName("tasks")]
         public List<SheetTask> Tasks { get; set; } = new List<SheetTask>();
 
         [JsonConstructor]

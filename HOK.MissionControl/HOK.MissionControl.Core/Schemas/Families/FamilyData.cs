@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Families
 {
@@ -16,39 +17,39 @@ namespace HOK.MissionControl.Core.Schemas.Families
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [DataMember(Name = "_id")]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
         [DataMember(Name = "centralPath")]
-        [JsonProperty("centralPath")]
+        [JsonPropertyName("centralPath")]
         public string CentralPath { get; set; }
 
         [DataMember(Name = "totalFamilies")]
-        [JsonProperty("totalFamilies")]
+        [JsonPropertyName("totalFamilies")]
         public int TotalFamilies { get; set; }
 
         [DataMember(Name = "unusedFamilies")]
-        [JsonProperty("unusedFamilies")]
+        [JsonPropertyName("unusedFamilies")]
         public int UnusedFamilies { get; set; }
 
         [DataMember(Name = "oversizedFamilies")]
-        [JsonProperty("oversizedFamilies")]
+        [JsonPropertyName("oversizedFamilies")]
         public int OversizedFamilies { get; set; }
 
         [DataMember(Name = "inPlaceFamilies")]
-        [JsonProperty("inPlaceFamilies")]
+        [JsonPropertyName("inPlaceFamilies")]
         public int InPlaceFamilies { get; set; }
 
         [DataMember(Name = "createdBy")]
-        [JsonProperty("createdBy")]
+        [JsonPropertyName("createdBy")]
         public string CreatedBy { get; set; }
 
         [DataMember(Name = "createdOn")]
-        [JsonProperty("createdOn")]
+        [JsonPropertyName("createdOn")]
         public DateTime? CreatedOn { get; set; }
 
         [DataMember(Name = "families")]
-        [JsonProperty("families")]
+        [JsonPropertyName("families")]
         public List<FamilyItem> Families { get; set; } = new List<FamilyItem>();
     }
 }

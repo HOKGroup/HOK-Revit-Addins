@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Core.Schemas.Settings;
 using HOK.MissionControl.Core.Utils;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 #endregion
 
@@ -19,29 +20,29 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("centralPath")]
+        [JsonPropertyName("centralPath")]
         public string CentralPath { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("projectId")]
+        [JsonPropertyName("projectId")]
         public string ProjectId { get; set; }
 
-        [JsonProperty("isDisabled")]
+        [JsonPropertyName("isDisabled")]
         public bool IsDisabled { get; set; }
 
-        [JsonProperty("revitVersion")]
+        [JsonPropertyName("revitVersion")]
         public string RevitVersion { get; set; } = string.Empty;
 
-        [JsonProperty("projectNumber")]
+        [JsonPropertyName("projectNumber")]
         public string ProjectNumber { get; set; } = "00.00000.00";
 
-        [JsonProperty("projectName")]
+        [JsonPropertyName("projectName")]
         public string ProjectName { get; set; } = string.Empty;
 
-        [JsonProperty("fileLocation")]
+        [JsonPropertyName("fileLocation")]
         public string FileLocation { get; set; } = string.Empty;
 
         [JsonConstructor]
@@ -86,13 +87,13 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
                         else return;
 
                         var nameObject = settingsName.ContainsKey(key) 
-                            ? JObject.FromObject(settingsName[key]) 
+                            ? (JsonObject)JsonSerializer.SerializeToNode(settingsName[key]) 
                             : null;
                         var numberObject = settingsNumber.ContainsKey(key) 
-                            ? JObject.FromObject(settingsNumber[key]) 
+                            ? (JsonObject)JsonSerializer.SerializeToNode(settingsNumber[key]) 
                             : null;
                         var locationObject = settingsLocation.ContainsKey(key) 
-                            ? JObject.FromObject(settingsLocation[key]) 
+                            ? (JsonObject)JsonSerializer.SerializeToNode(settingsLocation[key]) 
                             : null;
 
                         ProjectName = GetValueFromObject(nameObject);
@@ -114,17 +115,17 @@ namespace HOK.MissionControl.Core.Schemas.FilePaths
         /// </summary>
         /// <param name="obj">JSON object that contains regex pattern, match, group info.</param>
         /// <returns>Value extracted using Regex or empty string.</returns>
-        private string GetValueFromObject(JObject obj)
+        private string GetValueFromObject(JsonObject obj)
         {
             var result = string.Empty;
-            var pattern = obj?.Property("pattern") != null
-                ? obj["pattern"].ToObject<string>()
+            var pattern = obj?["pattern"] != null
+                ? obj["pattern"].Deserialize<string>()
                 : string.Empty;
-            var match = obj?.Property("match") != null
-                ? obj["match"].ToObject<int>()
+            var match = obj?["match"] != null
+                ? obj["match"].Deserialize<int>()
                 : -1;
-            var group = obj?.Property("group") != null
-                ? obj["group"].ToObject<int>()
+            var group = obj?["group"] != null
+                ? obj["group"].Deserialize<int>()
                 : -1;
             if (string.IsNullOrWhiteSpace(pattern) || group == -1) return result;
 

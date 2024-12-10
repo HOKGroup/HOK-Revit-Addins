@@ -3,7 +3,8 @@ using System.ComponentModel;
 using System.Runtime.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Families
 {
@@ -16,12 +17,12 @@ namespace HOK.MissionControl.Core.Schemas.Families
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [DataMember(Name = "_id")]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
         private string _name;
         [DataMember(Name = "name")]
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name {
             get { return _name; }
             set { _name = value; RaisePropertyChanged("Name"); }
@@ -29,7 +30,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
 
         private string _assignedTo;
         [DataMember(Name = "assignedTo")]
-        [JsonProperty("assignedTo")]
+        [JsonPropertyName("assignedTo")]
         public string AssignedTo
         {
             get { return _assignedTo; }
@@ -38,7 +39,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
 
         private string _message;
         [DataMember(Name = "message")]
-        [JsonProperty("message")]
+        [JsonPropertyName("message")]
         public string Message
         {
             get { return _message; }
@@ -47,7 +48,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
 
         private string _comments;
         [DataMember(Name = "comments")]
-        [JsonProperty("comments")]
+        [JsonPropertyName("comments")]
         public string Comments
         {
             get { return _comments; }
@@ -56,7 +57,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
 
         private string _submittedBy;
         [DataMember(Name = "submittedBy")]
-        [JsonProperty("submittedBy")]
+        [JsonPropertyName("submittedBy")]
         public string SubmittedBy
         {
             get { return _submittedBy; }
@@ -65,7 +66,7 @@ namespace HOK.MissionControl.Core.Schemas.Families
 
         private string _completedBy;
         [DataMember(Name = "completedBy")]
-        [JsonProperty("completedBy")]
+        [JsonPropertyName("completedBy")]
         public string CompletedBy
         {
             get { return _completedBy; }
@@ -73,11 +74,11 @@ namespace HOK.MissionControl.Core.Schemas.Families
         }
 
         [DataMember(Name = "submittedOn")]
-        [JsonProperty("submittedOn")]
+        [JsonPropertyName("submittedOn")]
         public DateTime? SubmittedOn { get; set; }
 
         [DataMember(Name = "completedOn")]
-        [JsonProperty("completedOn")]
+        [JsonPropertyName("completedOn")]
         public DateTime? CompletedOn { get; set; }
 
         /// <summary>

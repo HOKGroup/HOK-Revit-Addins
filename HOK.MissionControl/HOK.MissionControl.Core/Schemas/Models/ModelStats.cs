@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Models
 {
     public class ModelStats
     {
-        [JsonProperty("opentimes")]
+        [JsonPropertyName("opentimes")]
         public List<ModelEventData> OpenTimes { get; set; }
 
-        [JsonProperty("synchtimes")]
+        [JsonPropertyName("synchtimes")]
         public List<ModelEventData> SynchTimes { get; set; }
 
-        [JsonProperty("modelsizes")]
+        [JsonPropertyName("modelsizes")]
         public List<ModelEventData> ModelSizes { get; set; }
     }
 }

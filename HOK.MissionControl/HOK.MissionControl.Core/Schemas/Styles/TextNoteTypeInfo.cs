@@ -6,8 +6,8 @@ using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Styles
 {
@@ -18,43 +18,43 @@ namespace HOK.MissionControl.Core.Schemas.Styles
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("createdOn")]
+        [JsonPropertyName("createdOn")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("instances")]
+        [JsonPropertyName("instances")]
         public int Instances { get; set; }
 
-        [JsonProperty("bold")]
+        [JsonPropertyName("bold")]
         public bool Bold { get; set; }
 
-        [JsonProperty("color")]
+        [JsonPropertyName("color")]
         public List<int> Color { get; set; }
 
-        [JsonProperty("italic")]
+        [JsonPropertyName("italic")]
         public bool Italic { get; set; }
 
-        [JsonProperty("leaderArrowhead")]
+        [JsonPropertyName("leaderArrowhead")]
         public string LeaderArrowhead { get; set; }
 
-        [JsonProperty("lineWeight")]
+        [JsonPropertyName("lineWeight")]
         public int LineWeight { get; set; }
 
-        [JsonProperty("textFont")]
+        [JsonPropertyName("textFont")]
         public string TextFont { get; set; }
 
-        [JsonProperty("textSize")]
+        [JsonPropertyName("textSize")]
         public double TextSize { get; set; }
 
-        [JsonProperty("textSizeString")]
+        [JsonPropertyName("textSizeString")]
         public string TextSizeString { get; set; }
 
-        [JsonProperty("underline")]
+        [JsonPropertyName("underline")]
         public bool Underline { get; set; }
 
         [JsonConstructor]
@@ -79,11 +79,11 @@ namespace HOK.MissionControl.Core.Schemas.Styles
                 (int)ElementUtilities.GetParameterValue(tnt.get_Parameter(BuiltInParameter.TEXT_STYLE_UNDERLINE)));
         }
 
-        [OnError]
-        internal void OnError(StreamingContext context, ErrorContext errorContext)
-        {
-            Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
-            errorContext.Handled = true;
-        }
+        //[OnError]
+        //internal void OnError(StreamingContext context, ErrorContext errorContext)
+        //{
+        //    Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
+        //    errorContext.Handled = true;
+        //}
     }
 }

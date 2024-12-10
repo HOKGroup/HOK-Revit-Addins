@@ -38,7 +38,6 @@ HOK.Utilities\HOK.WorksetView\bin\,HOK.WorksetView.dll,HOK-Addin.bundle\Contents
 HOK.Utilities\HOK.XYZLocator\bin\,HOK.XYZLocator.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,Microsoft.Practices.ServiceLocation.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,MongoDB.Bson.dll,HOK-Addin.bundle\Contents\
-HOK.MissionControl\HOK.MissionControl\bin\,Newtonsoft.Json.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,RestSharp.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,SocketIoClientDotNet.dll,HOK-Addin.bundle\Contents\
 HOK.MissionControl\HOK.MissionControl\bin\,System.Windows.Interactivity.dll,HOK-Addin.bundle\Contents\

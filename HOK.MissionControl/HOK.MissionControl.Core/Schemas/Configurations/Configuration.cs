@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Configurations
 {
@@ -12,22 +13,22 @@ namespace HOK.MissionControl.Core.Schemas.Configurations
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("files")]
+        [JsonPropertyName("files")]
         public List<RvtFile> Files { get; set; } = new List<RvtFile>();
 
-        [JsonProperty("sheetDatabase")]
+        [JsonPropertyName("sheetDatabase")]
         public string SheetDatabase { get; set; }
 
-        [JsonProperty("sharedParamMonitor")]
+        [JsonPropertyName("sharedParamMonitor")]
         public SharedParameterMonitor SharedParamMonitor { get; set; }
 
-        [JsonProperty("updaters")]
+        [JsonPropertyName("updaters")]
         public List<ProjectUpdater> Updaters { get; set; } = new List<ProjectUpdater>();
     }
 }
