@@ -18,7 +18,7 @@
     <Copyright>Copyright © HOK Group 2024</Copyright>
     <RepositoryUrl>https://github.com/HOKGroup/HOK-Revit-Addins</RepositoryUrl>
     <PackageProjectUrl>https://github.com/HOKGroup/HOK-Revit-Addins</PackageProjectUrl>
-    <Version>0.1.0.24</Version>
+    <Version>0.1.0.26</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Contains('R19'))">
@@ -111,6 +111,7 @@
     <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
   </ItemGroup>
 
   <!-- Revit APIs -->
