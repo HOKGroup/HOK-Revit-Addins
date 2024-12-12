@@ -51,7 +51,7 @@ namespace HOK.MissionControl.Core.Utils
 
                 if (!string.IsNullOrWhiteSpace(response.Content))
                 {
-                    var data = JsonSerializer.Deserialize<T>(response.Content);
+                    var data = Json.Deserialize<T>(response.Content);
                     if (data != null)
                     {
                         result = data;
@@ -89,7 +89,7 @@ namespace HOK.MissionControl.Core.Utils
 
                 if (!string.IsNullOrWhiteSpace(response.Content))
                 {
-                    var data = JsonSerializer.Deserialize<List<T>>(response.Content).FirstOrDefault();
+                    var data = Json.Deserialize<List<T>>(response.Content).FirstOrDefault();
                     if (data != null)
                     {
                         result = data;
@@ -141,7 +141,7 @@ namespace HOK.MissionControl.Core.Utils
                 if (response.StatusCode != HttpStatusCode.OK) return false;
                 if (!string.IsNullOrEmpty(response.Content))
                 {
-                    var data = JsonSerializer.Deserialize<List<T>>(response.Content).FirstOrDefault();
+                    var data = Json.Deserialize<List<T>>(response.Content).FirstOrDefault();
                     if (data != null)
                     {
                         result = data;

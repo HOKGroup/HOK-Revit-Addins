@@ -1,24 +1,21 @@
-﻿using Newtonsoft.Json;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace HOK.Core.Utilities
 {
     public static class Json
     {
-        public static JsonSerializerSettings Settings { get; set; }
+        public static JsonSerializerOptions Options { get; set; }
 
         /// <summary>
         /// Static constructor, used to initialise settings.
         /// </summary>
         static Json()
         {
-            Settings = new JsonSerializerSettings
+
+            Options = new JsonSerializerOptions
             {
-                NullValueHandling = NullValueHandling.Ignore,
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                CheckAdditionalContent = true,
-                Formatting = Formatting.Indented
+                UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
             };
         }
 
@@ -32,7 +29,12 @@ namespace HOK.Core.Utilities
         {
             try
             {
-                var obj = JsonConvert.DeserializeObject<T>(json, Settings);
+                var options = new JsonSerializerOptions
+                {
+                    UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
+                };
+                options.Converters.Add(new JsonStringEnumConverter());
+                var obj = JsonSerializer.Deserialize<T>(json, options);
                 return obj;
             }
             catch (Exception)

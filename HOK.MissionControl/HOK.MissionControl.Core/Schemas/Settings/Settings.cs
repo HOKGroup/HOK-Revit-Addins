@@ -5,7 +5,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Newtonsoft.Json.Converters;
 
 // ReSharper disable UnusedMember.Global
 
@@ -48,7 +47,6 @@ namespace HOK.MissionControl.Core.Schemas.Settings
     public class ProjectInfo
     {
         [JsonPropertyName("source")]
-        [JsonConverter(typeof(StringEnumConverter))]
         public ProjectInfoSources Source { get; set; }
 
         [JsonPropertyName("projectName")]
@@ -64,7 +62,6 @@ namespace HOK.MissionControl.Core.Schemas.Settings
     public class UserLocation
     {
         [JsonPropertyName("source")]
-        [JsonConverter(typeof(StringEnumConverter))]
         public UserLocationSources Source { get; set; }
 
         [JsonPropertyName("pattern")]
@@ -80,7 +77,6 @@ namespace HOK.MissionControl.Core.Schemas.Settings
     public class TempLocation
     {
         [JsonPropertyName("source")]
-        [JsonConverter(typeof(StringEnumConverter))]
         public TempLocationSources Source { get; set; }
 
         [JsonPropertyName("pattern")]
