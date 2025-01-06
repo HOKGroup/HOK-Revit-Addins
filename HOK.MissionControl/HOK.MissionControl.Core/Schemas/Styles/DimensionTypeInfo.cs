@@ -86,12 +86,5 @@ namespace HOK.MissionControl.Core.Schemas.Styles
                 (int)ElementUtilities.GetParameterValue(dt.get_Parameter(BuiltInParameter.TEXT_STYLE_UNDERLINE)));
             StyleType = dt.StyleType.ToString();
         }
-
-        //[OnError]
-        //internal void OnError(StreamingContext context, ErrorContext errorContext)
-        //{
-        //    Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
-        //    errorContext.Handled = true;
-        //}
     }
 }

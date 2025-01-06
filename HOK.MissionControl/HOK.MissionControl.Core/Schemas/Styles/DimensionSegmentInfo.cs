@@ -58,12 +58,5 @@ namespace HOK.MissionControl.Core.Schemas.Styles
             Value = dim.Value;
             ValueOverride = dim.ValueOverride;
         }
-
-        //[OnError]
-        //internal void OnError(StreamingContext context, ErrorContext errorContext)
-        //{
-        //    Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
-        //    errorContext.Handled = true;
-        //}
     }
 }
