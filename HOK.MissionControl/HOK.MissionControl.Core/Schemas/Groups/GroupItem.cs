@@ -1,20 +1,21 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Groups
 {
     public class GroupItem
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
 
-        [JsonProperty("type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; } = string.Empty;
 
-        [JsonProperty("memberCount")]
+        [JsonPropertyName("memberCount")]
         public int MemberCount { get; set; } = 0;
 
-        [JsonProperty("instances")]
+        [JsonPropertyName("instances")]
         public List<GroupInstanceItem> Instances { get; set; } = new List<GroupInstanceItem>();
     }
 }

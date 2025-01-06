@@ -8,7 +8,8 @@ using HOK.MissionControl.Core.Schemas.Settings;
 using HOK.MissionControl.Core.Utils;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 #endregion
 
@@ -18,13 +19,13 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("value")]
+        [JsonPropertyName("value")]
         public string Value { get; set; }
     }
 
@@ -32,25 +33,25 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("pluginName")]
+        [JsonPropertyName("pluginName")]
         public string PluginName { get; set; }
 
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public string User { get; set; }
 
-        [JsonProperty("revitVersion")]
+        [JsonPropertyName("revitVersion")]
         public string RevitVersion { get; set; }
 
-        [JsonProperty("office")]
+        [JsonPropertyName("office")]
         public string Office { get; set; }
 
-        [JsonProperty("createdOn")]
+        [JsonPropertyName("createdOn")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
-        [JsonProperty("detailInfo")]
+        [JsonPropertyName("detailInfo")]
         public List<InfoItem> DetailInfo { get; set; } = new List<InfoItem>();
 
         public AddinLog()

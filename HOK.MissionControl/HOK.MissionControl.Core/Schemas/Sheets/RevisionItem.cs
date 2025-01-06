@@ -2,7 +2,8 @@
 using Autodesk.Revit.DB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Sheets
 {
@@ -15,35 +16,35 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [DataMember(Name = "_id")]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
         [DataMember(Name = "description")]
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
 
         [DataMember(Name = "sequence")]
-        [JsonProperty("sequence")]
+        [JsonPropertyName("sequence")]
         public int Sequence { get; set; }
 
         [DataMember(Name = "number")]
-        [JsonProperty("number")]
+        [JsonPropertyName("number")]
         public string Number { get; set; }
 
         [DataMember(Name = "date")]
-        [JsonProperty("date")]
+        [JsonPropertyName("date")]
         public string Date { get; set; }
 
         [DataMember(Name = "issuedTo")]
-        [JsonProperty("issuedTo")]
+        [JsonPropertyName("issuedTo")]
         public string IssuedTo { get; set; }
 
         [DataMember(Name = "issuedBy")]
-        [JsonProperty("issuedBy")]
+        [JsonPropertyName("issuedBy")]
         public string IssuedBy { get; set; }
 
         [DataMember(Name = "uniqueId")]
-        [JsonProperty("uniqueId")]
+        [JsonPropertyName("uniqueId")]
         public string UniqueId { get; set; }
 
         [JsonConstructor]

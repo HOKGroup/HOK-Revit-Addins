@@ -3,8 +3,8 @@
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 // ReSharper disable UnusedMember.Global
 
@@ -19,73 +19,70 @@ namespace HOK.MissionControl.Core.Schemas.Settings
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; } = "Settings";
 
-        [JsonProperty("offices")]
+        [JsonPropertyName("offices")]
         public List<Office> Offices { get; set; } = new List<Office>();
 
-        [JsonProperty("states")]
+        [JsonPropertyName("states")]
         public List<string> States { get; set; } = new List<string>();
 
-        [JsonProperty("localPathRgx")]
+        [JsonPropertyName("localPathRgx")]
         public List<string> LocalPathRgx { get; set; } = new List<string>();
 
-        [JsonProperty("userLocation")]
+        [JsonPropertyName("userLocation")]
         public UserLocation UserLocation { get; set; } = new UserLocation();
 
-        [JsonProperty("projectInfo")]
+        [JsonPropertyName("projectInfo")]
         public ProjectInfo ProjectInfo { get; set; } = new ProjectInfo();
 
-        [JsonProperty("tempLocation")]
+        [JsonPropertyName("tempLocation")]
         public TempLocation TempLocation { get; set; } = new TempLocation();
     }
 
     public class ProjectInfo
     {
-        [JsonProperty("source")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("source")]
         public ProjectInfoSources Source { get; set; }
 
-        [JsonProperty("projectName")]
+        [JsonPropertyName("projectName")]
         public Dictionary<string, object> ProjectName { get; set; }
 
-        [JsonProperty("projectNumber")]
+        [JsonPropertyName("projectNumber")]
         public Dictionary<string, object> ProjectNumber { get; set; }
 
-        [JsonProperty("projectLocation")]
+        [JsonPropertyName("projectLocation")]
         public Dictionary<string, object> ProjectLocation { get; set; }
     }
 
     public class UserLocation
     {
-        [JsonProperty("source")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("source")]
         public UserLocationSources Source { get; set; }
 
-        [JsonProperty("pattern")]
+        [JsonPropertyName("pattern")]
         public string Pattern { get; set; }
 
-        [JsonProperty("match")]
+        [JsonPropertyName("match")]
         public int Match { get; set; }
 
-        [JsonProperty("group")]
+        [JsonPropertyName("group")]
         public int Group { get; set; }
     }
 
     public class TempLocation
     {
-        [JsonProperty("source")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        [JsonPropertyName("source")]
         public TempLocationSources Source { get; set; }
 
-        [JsonProperty("pattern")]
+        [JsonPropertyName("pattern")]
         public string Pattern { get; set; }
 
-        [JsonProperty("tempPath")]
+        [JsonPropertyName("tempPath")]
         public string TempPath { get; set; }
     }
 
@@ -106,10 +103,10 @@ namespace HOK.MissionControl.Core.Schemas.Settings
 
     public class Office
     {
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; } = string.Empty;
 
-        [JsonProperty("code")]
+        [JsonPropertyName("code")]
         public List<string> Code { get; set; } = new List<string>();
     }
 }

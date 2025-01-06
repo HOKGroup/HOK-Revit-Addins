@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -12,13 +13,13 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("centralPath")]
+        [JsonPropertyName("centralPath")]
         public string CentralPath { get; set; }
 
-        [JsonProperty("triggerRecords")]
+        [JsonPropertyName("triggerRecords")]
         public List<TriggerRecordItem> TriggerRecords { get; set; } = new List<TriggerRecordItem>();
     }
 }

@@ -18,7 +18,7 @@
     <Copyright>Copyright © HOK Group 2024</Copyright>
     <RepositoryUrl>https://github.com/HOKGroup/HOK-Revit-Addins</RepositoryUrl>
     <PackageProjectUrl>https://github.com/HOKGroup/HOK-Revit-Addins</PackageProjectUrl>
-    <Version>0.1.0.24</Version>
+    <Version>0.1.0.26</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Contains('R19'))">
@@ -76,7 +76,7 @@
     <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="2.0.2" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="MongoDB.Bson" Version="2.29.0" />
-
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <!-- Revit APIs -->

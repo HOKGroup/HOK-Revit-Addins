@@ -1,17 +1,18 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas
 {
     public class DataRangeRequest
     {
-        [JsonProperty("from")]
+        [JsonPropertyName("from")]
         public DateTime? From { get; set; }
 
-        [JsonProperty("to")]
+        [JsonPropertyName("to")]
         public DateTime? To { get; set; }
 
-        [JsonProperty("centralPath")]
+        [JsonPropertyName("centralPath")]
         public string CentralPath { get; set; }
 
         [JsonConstructor]

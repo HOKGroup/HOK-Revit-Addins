@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Configurations
 {
@@ -12,31 +13,31 @@ namespace HOK.MissionControl.Core.Schemas.Configurations
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("updaterId")]
+        [JsonPropertyName("updaterId")]
         public string UpdaterId { get; set; }
 
-        [JsonProperty("updaterName")]
+        [JsonPropertyName("updaterName")]
         public string UpdaterName { get; set; }
 
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        [JsonProperty("addInId")]
+        [JsonPropertyName("addInId")]
         public string AddInId { get; set; }
 
-        [JsonProperty("addInName")]
+        [JsonPropertyName("addInName")]
         public string AddInName { get; set; }
 
-        [JsonProperty("isUpdaterOn")]
+        [JsonPropertyName("isUpdaterOn")]
         public bool IsUpdaterOn { get; set; }
 
-        [JsonProperty("categoryTriggers")]
+        [JsonPropertyName("categoryTriggers")]
         public List<CategoryTrigger> CategoryTriggers { get; set; } = new List<CategoryTrigger>();
 
-        [JsonProperty("userOverrides")]
+        [JsonPropertyName("userOverrides")]
         public UserOverrides UserOverrides { get; set; }
     }
 }

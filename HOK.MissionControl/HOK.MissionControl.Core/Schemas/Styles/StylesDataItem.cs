@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Styles
 {
@@ -13,22 +14,22 @@ namespace HOK.MissionControl.Core.Schemas.Styles
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("createdOn")]
+        [JsonPropertyName("createdOn")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
-        [JsonProperty("user")]
+        [JsonPropertyName("user")]
         public string User { get; set; }
 
-        [JsonProperty("textStats")]
+        [JsonPropertyName("textStats")]
         public List<TextNoteTypeInfo> TextStats { get; set; } = new List<TextNoteTypeInfo>();
 
-        [JsonProperty("dimStats")]
+        [JsonPropertyName("dimStats")]
         public List<DimensionTypeInfo> DimStats { get; set; } = new List<DimensionTypeInfo>();
 
-        [JsonProperty("dimSegmentStats")]
+        [JsonPropertyName("dimSegmentStats")]
         public List<DimensionSegmentInfo> DimSegmentStats { get; set; } = new List<DimensionSegmentInfo>();
     }
 }

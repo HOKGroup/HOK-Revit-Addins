@@ -2,7 +2,8 @@
 using System.Runtime.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Sheets
 {
@@ -15,19 +16,19 @@ namespace HOK.MissionControl.Core.Schemas.Sheets
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [DataMember(Name = "_id")]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
         [DataMember(Name = "centralPath")]
-        [JsonProperty("centralPath")]
+        [JsonPropertyName("centralPath")]
         public string CentralPath { get; set; }
 
         [DataMember(Name = "sheets")]
-        [JsonProperty("sheets")]
+        [JsonPropertyName("sheets")]
         public List<SheetItem> Sheets { get; set; } = new List<SheetItem>();
 
         [DataMember(Name = "revisions")]
-        [JsonProperty("revisions")]
+        [JsonPropertyName("revisions")]
         public List<RevisionItem> Revisions { get; set; } = new List<RevisionItem>();
     }
 }

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas
 {
@@ -12,59 +13,59 @@ namespace HOK.MissionControl.Core.Schemas
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("number")]
+        [JsonPropertyName("number")]
         public string Number { get; set; } = "";
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; } = "";
 
-        [JsonProperty("office")]
+        [JsonPropertyName("office")]
         public string Office { get; set; } = "";
 
-        [JsonProperty("address")]
+        [JsonPropertyName("address")]
         public ProjectAddress Address { get; set; } = new ProjectAddress();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("configurations")]
+        [JsonPropertyName("configurations")]
         public List<string> Configurations { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("triggerRecords")]
+        [JsonPropertyName("triggerRecords")]
         public List<string> TriggerRecords { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("sheets")]
+        [JsonPropertyName("sheets")]
         public List<string> Sheets { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("modelStats")]
+        [JsonPropertyName("modelStats")]
         public List<string> ModelStats { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("linkStats")]
+        [JsonPropertyName("linkStats")]
         public List<string> LinkStats { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("styleStats")]
+        [JsonPropertyName("styleStats")]
         public List<string> StyleStats { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("familyStats")]
+        [JsonPropertyName("familyStats")]
         public List<string> FamilyStats { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("worksetStats")]
+        [JsonPropertyName("worksetStats")]
         public List<string> WorksetStats { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("viewStats")]
+        [JsonPropertyName("viewStats")]
         public List<string> ViewStats { get; set; } = new List<string>();
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("groupStats")]
+        [JsonPropertyName("groupStats")]
         public List<string> GroupStats { get; set; } = new List<string>();
     }
 }

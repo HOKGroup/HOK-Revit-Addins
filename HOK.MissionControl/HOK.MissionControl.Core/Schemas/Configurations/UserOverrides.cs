@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Configurations
 {
@@ -8,10 +9,10 @@ namespace HOK.MissionControl.Core.Schemas.Configurations
     /// </summary>
     public class UserOverrides
     {
-        [JsonProperty("dimensionValueCheck")]
+        [JsonPropertyName("dimensionValueCheck")]
         public DimensionValueCheck DimensionValueCheck { get; set; }
 
-        [JsonProperty("familyNameCheck")]
+        [JsonPropertyName("familyNameCheck")]
         public FamilyNameCheck FamilyNameCheck { get; set; }
     }
 
@@ -20,10 +21,10 @@ namespace HOK.MissionControl.Core.Schemas.Configurations
     /// </summary>
     public class DimensionValueCheck
     {
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        [JsonProperty("values")]
+        [JsonPropertyName("values")]
         public List<string> Values { get; set; } = new List<string>();
     }
 
@@ -32,10 +33,10 @@ namespace HOK.MissionControl.Core.Schemas.Configurations
     /// </summary>
     public class FamilyNameCheck
     {
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; }
 
-        [JsonProperty("values")]
+        [JsonPropertyName("values")]
         public List<string> Values { get; set; } = new List<string>();
     }
 }

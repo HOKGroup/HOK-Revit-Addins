@@ -17,7 +17,7 @@
     <Copyright>Copyright © HOK Group 2024</Copyright>
     <RepositoryUrl>https://github.com/HOKGroup/HOK-Revit-Addins</RepositoryUrl>
     <PackageProjectUrl>https://github.com/HOKGroup/HOK-Revit-Addins</PackageProjectUrl>
-    <Version>0.1.0.24</Version>
+    <Version>0.1.0.26</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Contains('R19'))">
@@ -90,6 +90,7 @@
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
     <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*"/>
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">

@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Links
 {
@@ -8,22 +9,22 @@ namespace HOK.MissionControl.Core.Schemas.Links
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty("elementId")]
+        [JsonPropertyName("elementId")]
         public long ElementId { get; set; }
 
-        [JsonProperty("instances")]
+        [JsonPropertyName("instances")]
         public int Instances { get; set; }
 
-        [JsonProperty("isViewSpecific")]
+        [JsonPropertyName("isViewSpecific")]
         public bool IsViewSpecific { get; set; }
 
-        [JsonProperty("isLinked")]
+        [JsonPropertyName("isLinked")]
         public bool IsLinked { get; set; }
     }
 }

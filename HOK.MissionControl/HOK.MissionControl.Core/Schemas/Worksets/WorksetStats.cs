@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Worksets
 {
     public class WorksetStats
     {
-        [JsonProperty("onOpened")]
+        [JsonPropertyName("onOpened")]
         public List<WorksetEvent> OnOpened { get; set; }
 
-        [JsonProperty("onSynched")]
+        [JsonPropertyName("onSynched")]
         public List<WorksetEvent> OnSynched { get; set; }
 
-        [JsonProperty("itemCount")]
+        [JsonPropertyName("itemCount")]
         public List<WorksetItemData> ItemCount { get; set; }
     }
 }

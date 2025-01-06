@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Links
 {
@@ -10,31 +11,31 @@ namespace HOK.MissionControl.Core.Schemas.Links
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
         public string Id { get; set; }
 
-        [JsonProperty("totalImportedDwg")]
+        [JsonPropertyName("totalImportedDwg")]
         public int TotalImportedDwg { get; set; }
 
-        [JsonProperty("importedDwgFiles")]
+        [JsonPropertyName("importedDwgFiles")]
         public List<DwgFileInfo> ImportedDwgFiles { get; set; }
 
-        [JsonProperty("unusedLinkedImages")]
+        [JsonPropertyName("unusedLinkedImages")]
         public int UnusedLinkedImages { get; set; }
 
-        [JsonProperty("totalDwgStyles")]
+        [JsonPropertyName("totalDwgStyles")]
         public int TotalDwgStyles { get; set; }
 
-        [JsonProperty("totalImportedStyles")]
+        [JsonPropertyName("totalImportedStyles")]
         public int TotalImportedStyles { get; set; }
 
-        [JsonProperty("totalLinkedModels")]
+        [JsonPropertyName("totalLinkedModels")]
         public int TotalLinkedModels { get; set; }
 
-        [JsonProperty("totalLinkedDwg")]
+        [JsonPropertyName("totalLinkedDwg")]
         public int TotalLinkedDwg { get; set; }
 
-        [JsonProperty("createdOn")]
+        [JsonPropertyName("createdOn")]
         public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     }
 }
