@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using Autodesk.Revit.DB;
+﻿using System.Runtime.Serialization;
 using HOK.Core.Utilities;
 using HOK.MissionControl.Utils;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace HOK.MissionControl.Core.Schemas.Styles
@@ -78,12 +74,5 @@ namespace HOK.MissionControl.Core.Schemas.Styles
             Underline = ElementUtilities.RevitBoolToBool(
                 (int)ElementUtilities.GetParameterValue(tnt.get_Parameter(BuiltInParameter.TEXT_STYLE_UNDERLINE)));
         }
-
-        //[OnError]
-        //internal void OnError(StreamingContext context, ErrorContext errorContext)
-        //{
-        //    Log.AppendLog(LogMessageType.EXCEPTION, errorContext.Error.Message);
-        //    errorContext.Handled = true;
-        //}
     }
 }
