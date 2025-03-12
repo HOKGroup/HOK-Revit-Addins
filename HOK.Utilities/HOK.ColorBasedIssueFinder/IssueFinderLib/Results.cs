@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ColorBasedIssueFinder.IssueFinderLib
+namespace HOK.ColorBasedIssueFinder.IssueFinderLib
 {
     public class Results
     {

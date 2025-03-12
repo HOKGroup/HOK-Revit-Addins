@@ -7,7 +7,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 #endregion
 
-namespace ColorBasedIssueFinder
+namespace HOK.ColorBasedIssueFinder
 {
   class App : IExternalApplication
   {

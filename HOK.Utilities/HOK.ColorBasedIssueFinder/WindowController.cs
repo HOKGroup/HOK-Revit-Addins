@@ -3,7 +3,7 @@ using Visibility = System.Windows.Visibility;
 using System.Collections.Generic;
 using System;
 
-namespace ColorBasedIssueFinder
+namespace HOK.ColorBasedIssueFinder
 {
     public static class WindowController
     {

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ColorBasedIssueFinder")]
-[assembly: AssemblyDescription( "Revit Add-In Description for ColorBasedIssueFinder" )]
+[assembly: AssemblyTitle("HOK.ColorBasedIssueFinder")]
+[assembly: AssemblyDescription( "Revit Add-In Description for HOK.ColorBasedIssueFinder" )]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Autodesk Inc.")]
-[assembly: AssemblyProduct( "ColorBasedIssueFinder Revit C# .NET Add-In" )]
+[assembly: AssemblyProduct( "HOK.ColorBasedIssueFinder Revit C# .NET Add-In" )]
 [assembly: AssemblyCopyright( "Copyright (C) 2023 by Jeremy Tammik, Autodesk Inc." )]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

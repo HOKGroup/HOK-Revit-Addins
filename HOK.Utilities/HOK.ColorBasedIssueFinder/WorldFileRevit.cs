@@ -1,7 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using System.IO;
 
-namespace ColorBasedIssueFinder
+namespace HOK.ColorBasedIssueFinder
 {
     public class WorldFileRevit
     {

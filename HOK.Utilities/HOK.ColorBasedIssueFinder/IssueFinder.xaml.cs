@@ -1,6 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using ColorBasedIssueFinder.IssueFinderLib;
+using HOK.ColorBasedIssueFinder.IssueFinderLib;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
 using Nice3point.Revit.Toolkit.External.Handlers;
@@ -17,7 +17,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace ColorBasedIssueFinder
+namespace HOK.ColorBasedIssueFinder
 {
     /// <summary>
     /// Interaction logic for IssueFinderWindow.xaml

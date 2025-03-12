@@ -274,6 +274,14 @@ namespace HOK.RibbonTab
                         AddToolTips(pb28);
                         utilityExist = true;
                     }
+                    if (File.Exists(currentDirectory + "/HOK.ColorBasedIssueFinder.dll"))
+                    {
+                        var pb28 = splitButton.AddPushButton(new PushButtonData("Color Based Issue Finder", "Color Based Issue Finder", currentDirectory + "/HOK.ColorBasedIssueFinder.dll", "HOK.ColorBasedIssueFinder.Command"));
+                        pb28.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "colorBasedIssueFinder_32.png");
+                        pb28.ToolTip = "Locate mismatched areas in overlapping floor plans";
+                        AddToolTips(pb28);
+                        utilityExist = true;
+                    }
 
                 }
                 if (!utilityExist)

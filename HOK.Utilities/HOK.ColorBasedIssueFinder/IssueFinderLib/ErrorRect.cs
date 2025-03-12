@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace ColorBasedIssueFinder.IssueFinderLib
+namespace HOK.ColorBasedIssueFinder.IssueFinderLib
 {
     public class ErrorRect
     {

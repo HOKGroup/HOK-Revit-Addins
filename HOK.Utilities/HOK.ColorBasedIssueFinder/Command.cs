@@ -5,7 +5,7 @@ using Nice3point.Revit.Toolkit.External;
 using JetBrains.Annotations;
 #endregion
 
-namespace ColorBasedIssueFinder
+namespace HOK.ColorBasedIssueFinder
 {
     [UsedImplicitly]
     [Transaction(TransactionMode.Manual)]

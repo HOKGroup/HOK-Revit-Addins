@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Autodesk.Revit.DB;
-using ColorBasedIssueFinder.IssueFinderLib;
+using HOK.ColorBasedIssueFinder.IssueFinderLib;
 
-namespace ColorBasedIssueFinder
+namespace HOK.ColorBasedIssueFinder
 {
     class ErrorArea
     {

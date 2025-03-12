@@ -15,8 +15,8 @@
     <ProjectGuid>{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ColorBasedIssueFinder</RootNamespace>
-    <AssemblyName>ColorBasedIssueFinder</AssemblyName>
+    <RootNamespace>HOK.ColorBasedIssueFinder</RootNamespace>
+    <AssemblyName>HOK.ColorBasedIssueFinder</AssemblyName>
     <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
