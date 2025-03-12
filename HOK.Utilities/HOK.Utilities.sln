@@ -1,7 +1,6 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35818.85 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.Arrowhead", "HOK.Arrowhead\HOK.Arrowhead.csproj", "{611BDFBF-0B25-45EB-9967-04C53CCEB8E7}"
 EndProject
@@ -28,6 +27,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.RoomMeasure", "HOK.RoomMeasure\HOK.RoomMeasure.csproj", "{D964BC45-F47F-4135-9F5A-3F393F1F3177}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.XYZLocator", "HOK.XYZLocator\HOK.XYZLocator.csproj", "{7761A3DE-B348-4F97-BEF1-1E3352174C34}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.ColorBasedIssueFinder", "HOK.ColorBasedIssueFinder\HOK.ColorBasedIssueFinder.csproj", "{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -411,6 +412,34 @@ Global
 		{7761A3DE-B348-4F97-BEF1-1E3352174C34}.Release R24|x64.Build.0 = Release R24|x64
 		{7761A3DE-B348-4F97-BEF1-1E3352174C34}.Release R25|x64.ActiveCfg = Release R25|x64
 		{7761A3DE-B348-4F97-BEF1-1E3352174C34}.Release R25|x64.Build.0 = Release R25|x64
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R19|x64.ActiveCfg = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R19|x64.Build.0 = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R20|x64.ActiveCfg = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R20|x64.Build.0 = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R21|x64.ActiveCfg = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R21|x64.Build.0 = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R22|x64.ActiveCfg = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R22|x64.Build.0 = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R23|x64.ActiveCfg = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R23|x64.Build.0 = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R24|x64.ActiveCfg = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R24|x64.Build.0 = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R25|x64.ActiveCfg = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R25|x64.Build.0 = Debug|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R19|x64.ActiveCfg = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R19|x64.Build.0 = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R20|x64.ActiveCfg = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R20|x64.Build.0 = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R21|x64.ActiveCfg = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R21|x64.Build.0 = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R22|x64.ActiveCfg = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R22|x64.Build.0 = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R23|x64.ActiveCfg = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R23|x64.Build.0 = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R24|x64.ActiveCfg = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R24|x64.Build.0 = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R25|x64.ActiveCfg = Release|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R25|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
