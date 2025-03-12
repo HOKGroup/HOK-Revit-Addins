@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Command ColorBasedIssueFinder</Text>
+    <Description>Some description for ColorBasedIssueFinder</Description>
+    <Assembly>ColorBasedIssueFinder.dll</Assembly>
+    <FullClassName>ColorBasedIssueFinder.Command</FullClassName>
+    <ClientId>999da13c-460e-423e-97f7-407bca86231c</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>Application ColorBasedIssueFinder</Name>
+    <Assembly>ColorBasedIssueFinder.dll</Assembly>
+    <FullClassName>ColorBasedIssueFinder.App</FullClassName>
+    <ClientId>ba554bbb-cabc-457f-8e8d-18db8736c780</ClientId>
+    <VendorId>com.typepad.thebuildingcoder</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>
