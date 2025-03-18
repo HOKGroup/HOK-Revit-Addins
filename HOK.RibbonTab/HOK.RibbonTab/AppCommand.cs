@@ -276,10 +276,10 @@ namespace HOK.RibbonTab
                     }
                     if (File.Exists(currentDirectory + "/HOK.ColorBasedIssueFinder.dll"))
                     {
-                        var pb28 = splitButton.AddPushButton(new PushButtonData("Color Based Issue Finder", "Color Based Issue Finder", currentDirectory + "/HOK.ColorBasedIssueFinder.dll", "HOK.ColorBasedIssueFinder.Command"));
-                        pb28.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "colorBasedIssueFinder_32.png");
-                        pb28.ToolTip = "Locate mismatched areas in overlapping floor plans";
-                        AddToolTips(pb28);
+                        var pb29 = splitButton.AddPushButton(new PushButtonData("Color Based Issue Finder", "Color Based Issue Finder", currentDirectory + "/HOK.ColorBasedIssueFinder.dll", "HOK.ColorBasedIssueFinder.Command"));
+                        pb29.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "colorBasedIssueFinder_32.png");
+                        pb29.ToolTip = "Locate mismatched areas in overlapping floor plans";
+                        AddToolTips(pb29);
                         utilityExist = true;
                     }
 

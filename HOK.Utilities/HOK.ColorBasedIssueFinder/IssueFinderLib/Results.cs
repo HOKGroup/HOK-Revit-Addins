@@ -9,6 +9,6 @@ namespace HOK.ColorBasedIssueFinder.IssueFinderLib
     public class Results
     {
         public string DocName { get; set; }
-        public List<ErrorRect> ErrorRects { get; set; }
+        public List<ErrorArea> ErrorRects { get; set; }
     }
 }

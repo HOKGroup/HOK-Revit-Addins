@@ -5,20 +5,17 @@ using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Nice3point.Revit.Toolkit.External;
 #endregion
 
 namespace HOK.ColorBasedIssueFinder
 {
-  class App : IExternalApplication
-  {
-    public Result OnStartup( UIControlledApplication a )
+    class App : ExternalApplication
     {
-      return Result.Succeeded;
-    }
 
-    public Result OnShutdown( UIControlledApplication a )
-    {
-      return Result.Succeeded;
+        public override void OnStartup()
+        {
+            throw new NotImplementedException();
+        }
     }
-  }
 }

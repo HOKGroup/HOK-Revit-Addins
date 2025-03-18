@@ -4,7 +4,7 @@ using HOK.ColorBasedIssueFinder.IssueFinderLib;
 
 namespace HOK.ColorBasedIssueFinder
 {
-    class ErrorArea
+    public class ErrorArea
     {
         public string AreaName;
         public System.Windows.Rect Rectangle;
@@ -19,7 +19,7 @@ namespace HOK.ColorBasedIssueFinder
             WorldFile = worldFile;
         }
 
-        public ErrorArea(ErrorRect errorRect, WorldFileRevit worldFile)
+        public ErrorArea(ErrorArea errorRect, WorldFileRevit worldFile)
         {
             AreaName = errorRect.AreaName;
             Rectangle = new System.Windows.Rect(errorRect.Rectangle.X, errorRect.Rectangle.Y, errorRect.Rectangle.Width, errorRect.Rectangle.Height);

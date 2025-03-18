@@ -355,7 +355,8 @@ namespace HOK.ColorBasedIssueFinder
                         activeView.CropBox = cropBox;
                         UIView currUIView = uiApp.ActiveUIDocument.GetOpenUIViews().FirstOrDefault(v => v.ViewId == activeView.Id);
                         currUIView.ZoomToFit();
-                        currUIView.Zoom(Convert.ToDouble(txtBxZoomScale.Text.ToString()) / 100.00);
+                        var zoomValue = Convert.ToDouble(txtBxZoomScale.Text.ToString());
+                        currUIView.Zoom(1.0 / (zoomValue / 100.00));
                         if (!cropBoxActive)
                         {
                             activeView.CropBoxActive = false;
