@@ -184,7 +184,7 @@ namespace HOK.ColorBasedIssueFinder
 
         private void btnExport_Click(object sender, RoutedEventArgs e)
         {
-            if(directoryPath != "" && Path.Exists(directoryPath))
+            if(directoryPath != "" && Directory.Exists(directoryPath))
             {
                 var viewExportOptions = new ImageExportOptions()
                 {
@@ -264,7 +264,7 @@ namespace HOK.ColorBasedIssueFinder
             lstBxErrors.Items.Clear();
             if(openFilePath.EndsWith(".bmp"))
             {
-                if (!Path.Exists(openFilePath))
+                if (!Directory.Exists(openFilePath))
                 {
                     System.Windows.Forms.MessageBox.Show("File does not exist.");
                     return;
@@ -302,7 +302,7 @@ namespace HOK.ColorBasedIssueFinder
             }
             else if (openFilePath.EndsWith(".json"))
             {
-                if (!Path.Exists(openFilePath))
+                if (!Directory.Exists(openFilePath))
                 {
                     System.Windows.Forms.MessageBox.Show("File does not exist.");
                     return;
