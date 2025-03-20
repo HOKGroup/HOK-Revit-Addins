@@ -1,4 +1,4 @@
-﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using HOK.ColorBasedIssueFinder.IssueFinderLib;
 using CommunityToolkit.Mvvm.Input;
@@ -16,12 +16,16 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Runtime.Versioning;
 
 namespace HOK.ColorBasedIssueFinder
 {
     /// <summary>
     /// Interaction logic for IssueFinderWindow.xaml
     /// </summary>
+#if REVIT2025_OR_GREATER
+    [SupportedOSPlatform("windows")]
+#endif
     public partial class IssueFinder : Window
     {
         public string directoryPath;
