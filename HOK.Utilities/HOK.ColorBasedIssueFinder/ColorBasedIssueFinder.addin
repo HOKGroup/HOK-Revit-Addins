@@ -3,17 +3,9 @@
   <AddIn Type="Command">
     <Text>Command HOK.ColorBasedIssueFinder</Text>
     <Description>Some description for HOK.ColorBasedIssueFinder</Description>
-    <Assembly>HOK.ColorBasedIssueFinder.dll</Assembly>
+    <Assembly>HOK-Addin.bundle\Contents\HOK.ColorBasedIssueFinder.dll</Assembly>
     <FullClassName>HOK.ColorBasedIssueFinder.Command</FullClassName>
     <ClientId>999da13c-460e-423e-97f7-407bca86231c</ClientId>
-    <VendorId>Mohsen Assaqqaf</VendorId>
-    <VendorDescription>HOK DesignTech AppDev</VendorDescription>
-  </AddIn>
-  <AddIn Type="Application">
-    <Name>Application HOK.ColorBasedIssueFinder</Name>
-    <Assembly>HOK.ColorBasedIssueFinder.dll</Assembly>
-    <FullClassName>HOK.ColorBasedIssueFinder.App</FullClassName>
-    <ClientId>ba554bbb-cabc-457f-8e8d-18db8736c780</ClientId>
     <VendorId>Mohsen Assaqqaf</VendorId>
     <VendorDescription>HOK DesignTech AppDev</VendorDescription>
   </AddIn>

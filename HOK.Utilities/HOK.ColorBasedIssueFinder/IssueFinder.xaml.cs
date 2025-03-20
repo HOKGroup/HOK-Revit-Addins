@@ -1,4 +1,4 @@
-using Autodesk.Revit.DB;
+﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using HOK.ColorBasedIssueFinder.IssueFinderLib;
 using CommunityToolkit.Mvvm.Input;
@@ -184,7 +184,7 @@ namespace HOK.ColorBasedIssueFinder
 
         private void btnExport_Click(object sender, RoutedEventArgs e)
         {
-            if(directoryPath != "")
+            if(directoryPath != "" && Path.Exists(directoryPath))
             {
                 var viewExportOptions = new ImageExportOptions()
                 {
@@ -212,7 +212,7 @@ namespace HOK.ColorBasedIssueFinder
             }
             else
             {
-                MessageBox.Show("Please select a folder to export the image to");
+                MessageBox.Show("Please select an existing folder to export the image to");
             }
         }
 
@@ -255,10 +255,20 @@ namespace HOK.ColorBasedIssueFinder
 
         private void btnAnalyze_Click(object sender, RoutedEventArgs e)
         {
+            if (openFilePath == null || openFilePath == "")
+            {
+                System.Windows.Forms.MessageBox.Show("Please select a file to analyze.");
+                return;
+            }
             // Ensure that the list is cleared first
             lstBxErrors.Items.Clear();
             if(openFilePath.EndsWith(".bmp"))
             {
+                if (!Path.Exists(openFilePath))
+                {
+                    System.Windows.Forms.MessageBox.Show("File does not exist.");
+                    return;
+                }
                 bitmapImage = (Bitmap)System.Drawing.Image.FromFile(openFilePath);
                 WorldFileRevit wFile = new WorldFileRevit(openFilePath.Replace(".bmp", "_revit_world.wld"));
                 // Get the rectangles for both error colors
@@ -292,6 +302,11 @@ namespace HOK.ColorBasedIssueFinder
             }
             else if (openFilePath.EndsWith(".json"))
             {
+                if (!Path.Exists(openFilePath))
+                {
+                    System.Windows.Forms.MessageBox.Show("File does not exist.");
+                    return;
+                }
                 // Deserialize the json file to IssueFinderLib.Results and convert it to error areas
                 WorldFileRevit wFile = new WorldFileRevit(openFilePath.Replace("_results.json", "_revit_world.wld"));
                 var resultsJson = File.ReadAllText(openFilePath);
@@ -392,16 +407,16 @@ namespace HOK.ColorBasedIssueFinder
             }
         }
 
-        private void colPkErrorColor1_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
+        private void colPkErrorColor1_SelectedColorChanged(object sender, RoutedEventArgs e)
         {
             // Set the color for error color 1
-            errorColor1 = System.Drawing.Color.FromArgb(colPkErrorColor1.SelectedColor.Value.R, colPkErrorColor1.SelectedColor.Value.G, colPkErrorColor1.SelectedColor.Value.B);
+            errorColor1 = System.Drawing.Color.FromArgb(colPkErrorColor1.SelectedColor.R, colPkErrorColor1.SelectedColor.G, colPkErrorColor1.SelectedColor.B);
         }
 
-        private void colPkErrorColor2_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<System.Windows.Media.Color?> e)
+        private void colPkErrorColor2_SelectedColorChanged(object sender, RoutedEventArgs e)
         {
             // Set the color for error color 2
-            errorColor2 = System.Drawing.Color.FromArgb(colPkErrorColor2.SelectedColor.Value.R, colPkErrorColor2.SelectedColor.Value.G, colPkErrorColor2.SelectedColor.Value.B);
+            errorColor2 = System.Drawing.Color.FromArgb(colPkErrorColor2.SelectedColor.R, colPkErrorColor2.SelectedColor.G, colPkErrorColor2.SelectedColor.B);
         }
 
         private void txtBxZoomScale_PreviewTextInput(object sender, TextCompositionEventArgs e)

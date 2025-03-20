@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:HOK.ColorBasedIssueFinder" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
+             xmlns:local="clr-namespace:HOK.ColorBasedIssueFinder" 
         Height="277" Width="942">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -19,9 +20,9 @@
                 <Button x:Name="btnAnalyze" Content="Analyze" Margin="415,0,0,10" VerticalAlignment="Bottom" Height="25" HorizontalAlignment="Left" Width="63" Click="btnAnalyze_Click"/>
                 <Label Content="Load Image or Results: " HorizontalAlignment="Left" Margin="10,0,0,34" VerticalAlignment="Bottom"/>
 
-                <xctk:ColorPicker x:Name="colPkErrorColor1" HorizontalAlignment="Left" Margin="10,12,0,0" VerticalAlignment="Top" Width="43" SelectedColorChanged="colPkErrorColor1_SelectedColorChanged"/>
+                <colorpicker:PortableColorPicker x:Name="colPkErrorColor1" HorizontalAlignment="Left" Margin="10,12,0,0" VerticalAlignment="Top" Width="43" Height="20" ColorChanged="colPkErrorColor1_SelectedColorChanged"/>
                 <Label x:Name="lblErrorColor1" Content="Error Color 1" HorizontalAlignment="Left" Margin="58,10,0,0" VerticalAlignment="Top"/>
-                <xctk:ColorPicker x:Name="colPkErrorColor2" HorizontalAlignment="Left" Margin="10,43,0,0" VerticalAlignment="Top" Width="43" SelectedColorChanged="colPkErrorColor2_SelectedColorChanged"/>
+                <colorpicker:PortableColorPicker x:Name="colPkErrorColor2" HorizontalAlignment="Left" Margin="10,43,0,0" VerticalAlignment="Top" Width="43" Height="20"  ColorChanged="colPkErrorColor2_SelectedColorChanged"/>
                 <Label x:Name="lblErrorColor2" Content="Error Color 2 " HorizontalAlignment="Left" Margin="58,41,0,0" VerticalAlignment="Top"/>
 
             </Grid>
