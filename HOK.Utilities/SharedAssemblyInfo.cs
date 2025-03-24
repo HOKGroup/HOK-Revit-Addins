@@ -2,7 +2,7 @@ using System.Reflection;
 
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HOK Group")]
-[assembly: AssemblyCopyright("Copyright © HOK Group 2021")]
+[assembly: AssemblyCopyright("Copyright © HOK Group 2025")]
 [assembly: AssemblyTrademark("Jinsol Kim, Konrad K Sobon")]
 [assembly: AssemblyCulture("")]
 
@@ -15,5 +15,5 @@ using System.Reflection;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("2024.1.0.22")]
-[assembly: AssemblyFileVersion("2024.1.0.22")]
+[assembly: AssemblyVersion("2025.1.0.26")]
+[assembly: AssemblyFileVersion("2025.1.0.26")]
