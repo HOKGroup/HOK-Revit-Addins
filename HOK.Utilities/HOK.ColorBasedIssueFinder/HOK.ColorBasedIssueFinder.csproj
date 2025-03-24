@@ -25,9 +25,8 @@
     <Description>Revit Add-In Description for HOK.ColorBasedIssueFinder</Description>
     <Company>Autodesk Inc.</Company>
     <Product>HOK.ColorBasedIssueFinder Revit C# .NET Add-In</Product>
-    <Copyright>Copyright %28C%29 2023 by Jeremy Tammik, Autodesk Inc.</Copyright>
-    <AssemblyVersion>2023.0.0.0</AssemblyVersion>
-    <FileVersion>2023.0.0.0</FileVersion>
+    <Copyright>Copyright © HOK Group 2025</Copyright>
+    <Version>0.1.0.26</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Contains('R19'))">

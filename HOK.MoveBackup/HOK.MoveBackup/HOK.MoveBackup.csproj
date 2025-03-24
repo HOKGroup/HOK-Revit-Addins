@@ -14,10 +14,10 @@
     <Platforms>x64</Platforms>
     <Product>HOK Revit Add-ins</Product>
     <Company>HOK Group</Company>
-    <Copyright>Copyright © HOK Group 2024</Copyright>
+    <Copyright>Copyright © HOK Group 2025</Copyright>
     <RepositoryUrl>https://github.com/HOKGroup/HOK-Revit-Addins</RepositoryUrl>
     <PackageProjectUrl>https://github.com/HOKGroup/HOK-Revit-Addins</PackageProjectUrl>
-    <Version>0.1.0.24</Version>
+    <Version>0.1.0.26</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Contains('R19'))">
