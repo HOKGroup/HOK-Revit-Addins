@@ -264,7 +264,7 @@ namespace HOK.ColorBasedIssueFinder
             lstBxErrors.Items.Clear();
             if(openFilePath.EndsWith(".bmp"))
             {
-                if (!Directory.Exists(openFilePath))
+                if (!File.Exists(openFilePath))
                 {
                     System.Windows.Forms.MessageBox.Show("File does not exist.");
                     return;
@@ -302,7 +302,7 @@ namespace HOK.ColorBasedIssueFinder
             }
             else if (openFilePath.EndsWith(".json"))
             {
-                if (!Directory.Exists(openFilePath))
+                if (!File.Exists(openFilePath))
                 {
                     System.Windows.Forms.MessageBox.Show("File does not exist.");
                     return;
