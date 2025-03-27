@@ -83,8 +83,6 @@
     <Resource Include="Tools\DTMTool\Images\hoklogo.ico" />
     <Resource Include="Tools\DTMTool\Images\video.png" />
     <EmbeddedResource Include="Resources\missionControl_32x32.png" />
-    <EmbeddedResource Include="Resources\communicatorOff_32x32.png" />
-    <EmbeddedResource Include="Resources\communicatorOn_32x32.png" />
     <Resource Include="Resources\taskComplete_24x24.png" />
     <Resource Include="Resources\taskIncomplete_24x24.png" />
     <Resource Include="Resources\taskInfo_24x24.png" />

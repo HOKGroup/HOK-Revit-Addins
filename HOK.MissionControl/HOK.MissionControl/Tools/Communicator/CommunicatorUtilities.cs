@@ -67,28 +67,5 @@ namespace HOK.MissionControl.Tools.Communicator
                 }
             }, DispatcherPriority.Normal);
         }
-
-        /// <summary>
-        /// Communicator Image can only be set when we are done loading the app.
-        /// </summary>
-        public static void SetCommunicatorImage()
-        {
-            // (Konrad) This needs to run after the doc is opened, because UI elements don't get created until then.
-            AppCommand.EnqueueTask(app =>
-            {
-                var dpid = new DockablePaneId(new Guid(Properties.Resources.CommunicatorGuid));
-                var dp = app.GetDockablePane(dpid);
-                var assembly = Assembly.GetExecutingAssembly();
-                if (dp != null)
-                {
-                    AppCommand.Instance.CommunicatorButton.LargeImage = ButtonUtil.LoadBitmapImage(assembly, "HOK.MissionControl", dp.IsShown()
-                        ? "communicatorOn_32x32.png"
-                        : "communicatorOff_32x32.png");
-                    AppCommand.Instance.CommunicatorButton.ItemText = dp.IsShown()
-                        ? "Hide" + Environment.NewLine + "Communicator"
-                        : "Show" + Environment.NewLine + "Communicator";
-                }
-            });
-        }
     }
 }
