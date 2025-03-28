@@ -39,7 +39,6 @@ namespace HOK.MissionControl
         public static CommunicatorRequestHandler CommunicatorHandler { get; set; }
         public static ExternalEvent CommunicatorEvent { get; set; }
         public static Dictionary<string, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<string, FamilyItem>();
-        public PushButton CommunicatorButton { get; set; }
         public PushButton WebsiteButton { get; set; }
         public PushButton FamilyPublishButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
@@ -160,7 +159,6 @@ namespace HOK.MissionControl
                 Socket?.Kill();
 
                 // (Konrad) If any task windows are still open, let's shut them down.
-                WeakReferenceMessenger.Default.Send(new DocumentClosed { CloseWindow = true });
             }
             catch (Exception ex)
             {
@@ -311,8 +309,6 @@ namespace HOK.MissionControl
         /// <param name="doc"></param>
         private static void CheckIn(Document doc)
         {
-            CommunicatorUtilities.SetCommunicatorImage();
-
             new Thread(() => new Tools.MissionControl.MissionControl().CheckIn(doc))
             {
                 Priority = ThreadPriority.BelowNormal,

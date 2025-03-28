@@ -121,55 +121,63 @@ namespace HOK.MissionControl.Tools.MissionControl
                 {
                     if (!updater.IsUpdaterOn) continue;
 
-                    if (string.Equals(updater.UpdaterId, AppCommand.Instance.DoorUpdaterInstance.UpdaterGuid.ToString(),
-                        StringComparison.OrdinalIgnoreCase))
+                    try
                     {
-                        // (Konrad) We need to register updaters from within Revit context.
-                        // That's why we are running this in the Idling Event.
-                        AppCommand.EnqueueTask(app =>
+                        if (string.Equals(updater.UpdaterId, AppCommand.Instance.DoorUpdaterInstance.UpdaterGuid.ToString(),
+                            StringComparison.OrdinalIgnoreCase))
                         {
-                            AppCommand.Instance.DoorUpdaterInstance.Register(doc, updater);
-                        });
-                    }
-                    else if (string.Equals(updater.UpdaterId, AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(),
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        ProcessTriggerRecords(centralPath);
-
-                        AppCommand.EnqueueTask(app =>
+                            // (Konrad) We need to register updaters from within Revit context.
+                            // That's why we are running this in the Idling Event.
+                            AppCommand.EnqueueTask(app =>
+                            {
+                                AppCommand.Instance.DoorUpdaterInstance.Register(doc, updater);
+                            });
+                        }
+                        else if (string.Equals(updater.UpdaterId, AppCommand.Instance.DtmUpdaterInstance.UpdaterGuid.ToString(),
+                            StringComparison.OrdinalIgnoreCase))
                         {
-                            AppCommand.Instance.DtmUpdaterInstance.Register(doc, updater);
-                        });
+                            ProcessTriggerRecords(centralPath);
 
-                        DTMTool.DtmSynchOverrides.CreateReloadLatestOverride();
-                        DTMTool.DtmSynchOverrides.CreateSynchToCentralOverride();
-                    }
-                    else if (string.Equals(updater.UpdaterId, Properties.Resources.LinkUnloadTrackerGuid,
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        AppCommand.EnqueueTask(LinkUnloadMonitor.LinkUnloadMonitor.CreateLinkUnloadOverride);
-                    }
-                    else if (string.Equals(updater.UpdaterId, Properties.Resources.SheetsTrackerGuid,
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        ProcessSheets(ActionType.CheckIn, doc, centralPath);
+                            AppCommand.EnqueueTask(app =>
+                            {
+                                AppCommand.Instance.DtmUpdaterInstance.Register(doc, updater);
+                            });
 
-                        launchSockets = true;
-                    }
-                    else if (string.Equals(updater.UpdaterId, Properties.Resources.HealthReportTrackerGuid,
-                        StringComparison.OrdinalIgnoreCase))
-                    {
-                        // (Konrad) These are read-only methods so they don't need to run in Revit context.
-                        ProcessModels(ActionType.CheckIn, doc, centralPath);
-                        ProcessWorksets(ActionType.CheckIn, doc, centralPath);
-                        ProcessWarnings(ActionType.CheckIn, doc, centralPath);
-                        ProcessFamilies(centralPath);
-                        ProcessStyle(doc, centralPath);
-                        ProcessLinks(doc, centralPath);
-                        ProcessViews(doc, centralPath);
-                        ProcessGroups(doc, centralPath);
+                            DTMTool.DtmSynchOverrides.CreateReloadLatestOverride();
+                            DTMTool.DtmSynchOverrides.CreateSynchToCentralOverride();
+                        }
+                        else if (string.Equals(updater.UpdaterId, Properties.Resources.LinkUnloadTrackerGuid,
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            AppCommand.EnqueueTask(LinkUnloadMonitor.LinkUnloadMonitor.CreateLinkUnloadOverride);
+                        }
+                        else if (string.Equals(updater.UpdaterId, Properties.Resources.SheetsTrackerGuid,
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            ProcessSheets(ActionType.CheckIn, doc, centralPath);
 
-                        launchSockets = true;
+                            launchSockets = true;
+                        }
+                        else if (string.Equals(updater.UpdaterId, Properties.Resources.HealthReportTrackerGuid,
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            // (Konrad) These are read-only methods so they don't need to run in Revit context.
+                            ProcessModels(ActionType.CheckIn, doc, centralPath);
+                            ProcessWorksets(ActionType.CheckIn, doc, centralPath);
+                            ProcessWarnings(ActionType.CheckIn, doc, centralPath);
+                            ProcessFamilies(centralPath);
+                            ProcessStyle(doc, centralPath);
+                            ProcessLinks(doc, centralPath);
+                            ProcessViews(doc, centralPath);
+                            ProcessGroups(doc, centralPath);
+
+                            launchSockets = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.AppendLog(LogMessageType.EXCEPTION, ex.Message);
+                        continue;
                     }
                 }
 
@@ -267,12 +275,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                             MissionControlSetup.SheetsData.Remove(centralPath);
                         MissionControlSetup.SheetsData.Add(centralPath, sData); // store sheets record
 
-                        WeakReferenceMessenger.Default.Send(new CommunicatorDataDownloaded
-                        {
-                            CentralPath = centralPath,
-                            Type = DataType.Sheets
-                        });
-
                         new Thread(() => new SheetTracker.SheetTracker().SynchSheets(doc))
                         {
                             Priority = ThreadPriority.BelowNormal,
@@ -318,7 +320,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.ViewsData.Remove(centralPath);
                 MissionControlSetup.ViewsData.Add(centralPath, vData); // store views record
 
-                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = vData, Type = SummaryType.Views });
 
                 new Thread(() => new ViewMonitor().PublishData(doc, vData.Id))
                 {
@@ -382,7 +383,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.GroupsData.Remove(centralPath);
                 MissionControlSetup.GroupsData.Add(centralPath, gData); // store groups record
 
-                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = gData, Type = SummaryType.Groups });
 
                 new Thread(() => new GroupMonitor().PublishData(doc, gData.Id))
                 {
@@ -418,8 +418,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.FamilyData.Remove(centralPath);
                 MissionControlSetup.FamilyData.Add(centralPath, fData); // store families record
 
-                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = fData, Type = SummaryType.Families });
-                WeakReferenceMessenger.Default.Send(new CommunicatorDataDownloaded { CentralPath = centralPath, Type = DataType.Families });
             }
         }
 
@@ -447,7 +445,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.StylesData.Remove(centralPath);
                 MissionControlSetup.StylesData.Add(centralPath, sData); // store styles record
 
-                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = sData, Type = SummaryType.Styles });
 
                 new Thread(() => new StylesMonitor().PublishData(doc, sData.Id))
                 {
@@ -481,7 +478,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                     MissionControlSetup.LinksData.Remove(centralPath);
                 MissionControlSetup.LinksData.Add(centralPath, lData); // store links record
 
-                WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = lData, Type = SummaryType.Links });
 
                 new Thread(() => new LinkMonitor().PublishData(doc, lData.Id))
                 {
@@ -511,7 +507,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                             MissionControlSetup.WorksetsData.Remove(centralPath);
                         MissionControlSetup.WorksetsData.Add(centralPath, wData.First()); // store workset record
 
-                        WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = wData.First(), Type = SummaryType.Worksets });
 
                         new Thread(() => new WorksetItemCount().PublishData(doc, centralPath))
                         {
@@ -558,7 +553,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                             MissionControlSetup.ModelsData.Remove(centralPath);
                         MissionControlSetup.ModelsData.Add(centralPath, mData.First()); // store model record
 
-                        WeakReferenceMessenger.Default.Send(new HealthReportSummaryAdded { Data = mData.First(), Type = SummaryType.Models });
 
                         new Thread(() => new ModelMonitor().PublishModelSize(doc, centralPath, doc.Application.VersionNumber))
                         {
