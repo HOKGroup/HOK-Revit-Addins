@@ -21,34 +21,43 @@ namespace HOK.MissionControl.Tools.HealthReport
                 var gTypes = new FilteredElementCollector(doc)
                     .OfClass(typeof(GroupType))
                     .Cast<GroupType>()
-                    .ToDictionary(x => x.Id, x => new GroupItem
-                    {
-                        Name = x.Name,
+                    .ToDictionary(
+                        x => x.Id,
+                        x =>
+                            new GroupItem
+                            {
+                                Name = x.Name,
+                                // (Konrad) If there is a Detail Group attached to Model Group
+                                // it will have the same name as Model Group but different Category.
+                                Type =
+                                    x.Category.Name == "Attached Detail Groups"
+                                        ? "Attached Detail Group"
+                                        : x.FamilyName
+                            }
+                    );
 
-                        // (Konrad) If there is a Detail Group attached to Model Group
-                        // it will have the same name as Model Group but different Category.
-                        Type = x.Category.Name == "Attached Detail Groups" 
-                            ? "Attached Detail Group"
-                            : x.FamilyName
-                    });
-
-                foreach (var gi in new FilteredElementCollector(doc).OfClass(typeof(Group)).Cast<Group>())
+                foreach (
+                    var gi in new FilteredElementCollector(doc).OfClass(typeof(Group)).Cast<Group>()
+                )
                 {
                     var gTypeId = gi.GroupType.Id;
-                    if (!gTypes.ContainsKey(gTypeId)) continue;
+                    if (!gTypes.ContainsKey(gTypeId))
+                        continue;
 
                     var gType = gTypes[gTypeId];
                     gType.Instances.Add(new GroupInstanceItem(gi));
                     gType.MemberCount = gi.GetMemberIds().Count;
                 }
 
-                var groupStats = new GroupDataItem
-                {
-                    Groups = gTypes.Values.ToList()
-                };
+                var groupStats = new GroupDataItem { Groups = gTypes.Values.ToList() };
 
-                if (!ServerUtilities.Post(groupStats, "groups/" + groupsId + "/groupstats",
-                    out GroupsData unused))
+                if (
+                    !ServerUtilities.Post(
+                        groupStats,
+                        "groups/" + groupsId + "/groupstats",
+                        out object unused
+                    )
+                )
                 {
                     Log.AppendLog(LogMessageType.ERROR, "Failed to publish Groups Data.");
                 }

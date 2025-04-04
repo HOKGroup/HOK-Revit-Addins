@@ -24,8 +24,12 @@ namespace HOK.MissionControl.Core.Utils
 
         static ServerUtilities()
         {
-            var settingsString = Resources.StreamEmbeddedResource("HOK.Core.Resources.Settings.json");
-            RestApiBaseUrl = Json.Deserialize<HOK.Core.Utilities.Settings>(settingsString)?.HttpAddress; //production
+            var settingsString = Resources.StreamEmbeddedResource(
+                "HOK.Core.Resources.Settings.json"
+            );
+            RestApiBaseUrl = Json.Deserialize<HOK.Core.Utilities.Settings>(
+                settingsString
+            )?.HttpAddress; //production
             //RestApiBaseUrl = Json.Deserialize<Settings>(settingsString)?.HttpAddressDebug; //debug
             Settings = Json.Deserialize<HOK.Core.Utilities.Settings>(settingsString);
         }
@@ -33,13 +37,14 @@ namespace HOK.MissionControl.Core.Utils
         #region GET
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public static bool GetOne<T>(string path, out T result) where T : new()
+        public static bool GetOne<T>(string path, out T result)
+            where T : new()
         {
             result = default(T);
             try
@@ -47,7 +52,8 @@ namespace HOK.MissionControl.Core.Utils
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(ApiVersion + "/" + path, Method.Get);
                 var response = client.Execute(request);
-                if (response.StatusCode != HttpStatusCode.OK) return false;
+                if (response.StatusCode != HttpStatusCode.OK)
+                    return false;
 
                 if (!string.IsNullOrWhiteSpace(response.Content))
                 {
@@ -58,7 +64,10 @@ namespace HOK.MissionControl.Core.Utils
                         return true;
                     }
 
-                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document matching the query.");
+                    Log.AppendLog(
+                        LogMessageType.ERROR,
+                        "Could not find a document matching the query."
+                    );
                 }
 
                 return false;
@@ -77,7 +86,8 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="path">HTTP request url.</param>
         /// <param name="result">Resulting Asset.</param>
         /// <returns>True if success, otherwise false.</returns>
-        public static bool Get<T>(string path, out T result) where T : new()
+        public static bool Get<T>(string path, out T result)
+            where T : new()
         {
             result = default(T);
             try
@@ -85,7 +95,8 @@ namespace HOK.MissionControl.Core.Utils
                 var client = new RestClient(RestApiBaseUrl);
                 var request = new RestRequest(ApiVersion + "/" + path, Method.Get);
                 var response = client.Execute(request);
-                if (response.StatusCode != HttpStatusCode.OK) return false;
+                if (response.StatusCode != HttpStatusCode.OK)
+                    return false;
 
                 if (!string.IsNullOrWhiteSpace(response.Content))
                 {
@@ -96,7 +107,10 @@ namespace HOK.MissionControl.Core.Utils
                         return true;
                     }
 
-                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document matching the query.");
+                    Log.AppendLog(
+                        LogMessageType.ERROR,
+                        "Could not find a document matching the query."
+                    );
                 }
 
                 return false;
@@ -115,7 +129,8 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="path">HTTP request url.</param>
         /// <param name="result"></param>
         /// <returns>Document if found matching central path or type.</returns>
-        public static bool GetByCentralPath<T>(string centralPath, string path, out T result) where T : new()
+        public static bool GetByCentralPath<T>(string centralPath, string path, out T result)
+            where T : new()
         {
             result = new T();
             try
@@ -124,11 +139,16 @@ namespace HOK.MissionControl.Core.Utils
                 // Since pipe cannot be used in a legal file path, it's a good placeholder to use.
                 // File path can also contain forward slashes for RSN and BIM 360 paths ex: RSN:// and BIM 360://
                 string filePath;
-                if (centralPath.Contains(@"\")) filePath = centralPath.Replace(@"\", "|");
-                else if (centralPath.Contains(@"/")) filePath = centralPath.Replace(@"/", "|");
+                if (centralPath.Contains(@"\"))
+                    filePath = centralPath.Replace(@"\", "|");
+                else if (centralPath.Contains(@"/"))
+                    filePath = centralPath.Replace(@"/", "|");
                 else
                 {
-                    Log.AppendLog(LogMessageType.ERROR, "Could not replace \\ or / with | in the file path. Exiting.");
+                    Log.AppendLog(
+                        LogMessageType.ERROR,
+                        "Could not replace \\ or / with | in the file path. Exiting."
+                    );
                     return false;
                 }
 
@@ -138,7 +158,8 @@ namespace HOK.MissionControl.Core.Utils
                 request.RequestFormat = DataFormat.Json;
 
                 var response = client.Execute(request);
-                if (response.StatusCode != HttpStatusCode.OK) return false;
+                if (response.StatusCode != HttpStatusCode.OK)
+                    return false;
                 if (!string.IsNullOrEmpty(response.Content))
                 {
                     var data = Json.Deserialize<List<T>>(response.Content).FirstOrDefault();
@@ -148,7 +169,10 @@ namespace HOK.MissionControl.Core.Utils
                         return true;
                     }
 
-                    Log.AppendLog(LogMessageType.ERROR, "Could not find a document with matching central path.");
+                    Log.AppendLog(
+                        LogMessageType.ERROR,
+                        "Could not find a document with matching central path."
+                    );
                 }
                 return false;
             }
@@ -168,7 +192,8 @@ namespace HOK.MissionControl.Core.Utils
         /// </summary>
         /// <param name="body"></param>
         /// <param name="route"></param>
-        public static bool Put<T>(T body, string route) where T : class
+        public static bool Put<T>(T body, string route)
+            where T : class
         {
             try
             {
@@ -184,7 +209,7 @@ namespace HOK.MissionControl.Core.Utils
                     Log.AppendLog(LogMessageType.INFO, response.ResponseStatus + route);
                     return false;
                 }
-                
+
                 return true;
             }
             catch (Exception ex)
@@ -201,7 +226,8 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="body">Body of rest call.</param>
         /// <param name="route">Route to be called.</param>
         /// <returns>Newly created Collection Schema with MongoDB assigned Id.</returns>
-        public static async Task<T> PostAsync<T>(object body, string route) where T : new()
+        public static async Task<T> PostAsync<T>(object body, string route)
+            where T : new()
         {
             var client = new RestClient(RestApiBaseUrl);
 
@@ -209,27 +235,35 @@ namespace HOK.MissionControl.Core.Utils
             request.RequestFormat = DataFormat.Json;
             request.AddJsonBody(body);
 
-            var response = await client.ExecuteAsync<T>(request);
+            var response = await client.ExecuteAsync(request);
             if (response.StatusCode != HttpStatusCode.Created)
             {
                 Log.AppendLog(LogMessageType.EXCEPTION, response.StatusDescription);
                 return new T();
             }
 
+            if (!string.IsNullOrEmpty(response.Content))
+            {
+                var data = Json.Deserialize<T>(response.Content);
+                if (data != null)
+                {
+                    return data;
+                }
+            }
             Log.AppendLog(LogMessageType.INFO, response.StatusDescription + "-" + route);
-            return response.Data;
+            return new T();
         }
 
-
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="body"></param>
         /// <param name="route"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public static bool Post<T>(object body, string route, out T result) where T : new()
+        public static bool Post<T>(object body, string route, out T result)
+            where T : new()
         {
             result = default(T);
             try
@@ -240,12 +274,17 @@ namespace HOK.MissionControl.Core.Utils
                 request.RequestFormat = DataFormat.Json;
                 request.AddJsonBody(body);
 
-                var response = client.Execute<T>(request);
-                if (response.StatusCode != HttpStatusCode.Created) return false;
-                if (response.Data != null)
+                var response = client.Execute(request);
+                if (response.StatusCode != HttpStatusCode.Created)
+                    return false;
+                if (!string.IsNullOrEmpty(response.Content))
                 {
-                    result = response.Data;
-                    return true;
+                    var data = Json.Deserialize<T>(response.Content);
+                    if (data != null)
+                    {
+                        result = data;
+                        return true;
+                    }
                 }
                 return false;
             }
@@ -266,7 +305,8 @@ namespace HOK.MissionControl.Core.Utils
         /// <param name="clientPath">Base URL to the Revit Server.</param>
         /// <param name="requestPath">Request string.</param>
         /// <returns>File size in bytes.</returns>
-        public static T GetFileInfoFromRevitServer<T>(string clientPath, string requestPath) where T : new()
+        public static T GetFileInfoFromRevitServer<T>(string clientPath, string requestPath)
+            where T : new()
         {
             var result = default(T);
             try
@@ -276,14 +316,17 @@ namespace HOK.MissionControl.Core.Utils
                 request.AddHeader("User-Name", Environment.UserName);
                 request.AddHeader("Operation-GUID", Guid.NewGuid().ToString());
                 string[] clarityServers = Settings.ClarityServers;
-                if (clarityServers.Any(clientPath.Contains)) {
+                if (clarityServers.Any(clientPath.Contains))
+                {
                     string clarityId = Settings.ClarityUserId;
                     request.AddHeader("ClarityUserId", clarityId);
                     string securityToken = Settings.ClarityToken;
                     request.AddHeader("SecurityToken", securityToken);
                     string clarityMachine = Settings.ClarityMachine;
-                    request.AddHeader("User-Machine-Name", clarityMachine); 
-                } else {
+                    request.AddHeader("User-Machine-Name", clarityMachine);
+                }
+                else
+                {
                     request.AddHeader("User-Machine-Name", Environment.UserName + "PC");
                 }
 

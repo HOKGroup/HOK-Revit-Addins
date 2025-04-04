@@ -24,7 +24,6 @@ using HOK.MissionControl.Core.Schemas.Worksets;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.Communicator.Messaging;
-using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.HealthReport;
 using HOK.MissionControl.Utils;
 
@@ -116,7 +115,6 @@ namespace HOK.MissionControl.Tools.MissionControl
             {
                 var centralPath = FileInfoUtil.GetCentralFilePath(doc);
                 var config = MissionControlSetup.Configurations[centralPath];
-                var launchSockets = false;
                 foreach (var updater in config.Updaters)
                 {
                     if (!updater.IsUpdaterOn) continue;
@@ -156,7 +154,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                         {
                             ProcessSheets(ActionType.CheckIn, doc, centralPath);
 
-                            launchSockets = true;
                         }
                         else if (string.Equals(updater.UpdaterId, Properties.Resources.HealthReportTrackerGuid,
                             StringComparison.OrdinalIgnoreCase))
@@ -170,8 +167,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                             ProcessLinks(doc, centralPath);
                             ProcessViews(doc, centralPath);
                             ProcessGroups(doc, centralPath);
-
-                            launchSockets = true;
                         }
                     }
                     catch (Exception ex)
@@ -193,15 +188,6 @@ namespace HOK.MissionControl.Tools.MissionControl
                     {
                         Log.AppendLog(LogMessageType.ERROR, "Failed to reset Shared Parameter location. Could not find file specified.");
                     }
-                }
-
-                if (launchSockets)
-                {
-                    // (Konrad) in order not to become out of synch with the database we need a way
-                    // to communicate live updates from the database to task assistant/communicator
-                    var socket = new MissionControlSocket(doc);
-                    socket.Start();
-                    AppCommand.Socket = socket;
                 }
 
                 // Publish user/machine info to be used by Zombie

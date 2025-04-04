@@ -59,6 +59,16 @@ jobs:
       Contents: '$(SettingsFileName)'
       TargetFolder: '$(Build.SourcesDirectory)/HOK.Core/HOK.Core/Resources'
 
+  - task: DownloadSecureFile@1
+    inputs:
+      secureFile: 'nuget.config'
+
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(Agent.TempDirectory)'
+      Contents: 'nuget.config'
+      TargetFolder: '$(Build.SourcesDirectory)/HOK.MissonControl'
+
   - task: PowerShell@2
     inputs:
       targetType: 'inline'
