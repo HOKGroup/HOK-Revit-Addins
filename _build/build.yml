@@ -78,8 +78,8 @@ jobs:
   - task: DotNetCoreCLI@2
     inputs:
       command: 'custom'
-      custom: 'nuget add source'
-      arguments: '--username dan.siroky --password $(DEVOPS_PAT) --store-password-in-clear-text --name HOK.Revit.Nuget  "https://pkgs.dev.azure.com/hok-appdev/HOK-Revit-Addins/_packaging/HOK.Revit.Nuget/nuget/v3/index.json"'
+      custom: 'nuget'
+      arguments: 'add source --username dan.siroky --password $(DEVOPS_PAT) --store-password-in-clear-text --name HOK.Revit.Nuget  "https://pkgs.dev.azure.com/hok-appdev/HOK-Revit-Addins/_packaging/HOK.Revit.Nuget/nuget/v3/index.json"'
 
   - task: DotNetCoreCLI@2
     inputs:
