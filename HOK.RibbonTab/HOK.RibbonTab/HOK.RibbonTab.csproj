@@ -84,13 +84,6 @@
     <None Remove="Resources\colorBasedIssueFinder_32.png" />
   </ItemGroup>
 
-  <!-- Revit APIs -->
-  <ItemGroup>
-    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
-    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
-    <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*" />
-  </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources\colorBasedIssueFinder_32.png" />
     <EmbeddedResource Include="Resources\parameter.ico" />
