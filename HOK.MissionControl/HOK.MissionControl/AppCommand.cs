@@ -15,7 +15,6 @@ using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
-using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.MissionControl;
 using Nice3point.Revit.Toolkit.External;
 
@@ -32,7 +31,6 @@ namespace HOK.MissionControl
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, WarningItem> Warnings { get; set; } = new Dictionary<string, WarningItem>();
         public static CommunicatorView CommunicatorWindow { get; set; }
-        public static MissionControlSocket Socket { get; set; }
         public static bool IsSynching { get; set; }
         public static bool IsSynchOverriden { get; set; }
         public static bool IsSynchNowOverriden { get; set; }
@@ -154,11 +152,6 @@ namespace HOK.MissionControl
 
                 // (Konrad) Cleanup updaters.
                 Tools.MissionControl.MissionControl.UnregisterUpdaters(doc);
-
-                // (Konrad) Disconnect from Sockets.
-                Socket?.Kill();
-
-                // (Konrad) If any task windows are still open, let's shut them down.
             }
             catch (Exception ex)
             {
