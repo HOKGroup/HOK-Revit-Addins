@@ -21,12 +21,13 @@ dotnet build "HOK.Feedback\HOK.Feedback.sln" -c "$buildConfiguration" --artifact
 
 dotnet build "HOK.MissionControl\HOK.MissionControl.sln" -c "$buildConfiguration" --artifacts-path "$sourceDir/_artifacts" --property:OutputPath="$sourceDir/_artifacts/$revitVersion"
 
-$solutions = Get-ChildItem . -Filter "HOK.*.sln" -Recurse -Depth 2 -Exclude HOK.MissionControl*,HOK.Core*,HOK.Feedback*,HOK.ParameterTools*,HOK.FileOpeningMonitor*,HOK.ModelReporting*
+$solutions = Get-ChildItem . -Filter "HOK.*.sln" -Recurse -Depth 2 -Exclude HOK.MissionControl*,HOK.Core*,HOK.Feedback*,HOK.ParameterTools*,HOK.FileOpeningMonitor*,HOK.ModelReporting*,HOK.SheetManager*
 
 foreach ($solution in $solutions) {
     dotnet build $solution.FullName -c "$buildConfiguration" --artifacts-path "$sourceDir/_artifacts" --property:OutputPath="$sourceDir/_artifacts/$revitVersion"
 
 }
+# TODO: Use MSBuild for  HOK.SheetManager
 
 & "$sourceDir/_build/copy_artifacts.ps1"
 

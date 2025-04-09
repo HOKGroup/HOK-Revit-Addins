@@ -11,7 +11,7 @@ $files = Get-ChildItem $addinFolder | Where-Object {!$_.PSIsContainer -and $_.Na
 
 # Copy each file to the library folder
 foreach ($file in $files) {
-    Move-Item $file.FullName -Destination $libraryFolder
+    Move-Item $file.FullName -Destination $libraryFolder -Force
 }
 
 # Code sign all HOK DLLs
