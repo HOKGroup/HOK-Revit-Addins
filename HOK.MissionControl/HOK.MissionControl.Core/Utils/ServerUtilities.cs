@@ -201,7 +201,8 @@ namespace HOK.MissionControl.Core.Utils
 
                 var request = new RestRequest(ApiVersion + "/" + route, Method.Put);
                 request.RequestFormat = DataFormat.Json;
-                request.AddJsonBody(body);
+                var jsonBody = Json.Serialize<T>(body);
+                request.AddBody(jsonBody, "application/json");
 
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.Created)
@@ -233,7 +234,8 @@ namespace HOK.MissionControl.Core.Utils
 
             var request = new RestRequest(ApiVersion + "/" + route, Method.Post);
             request.RequestFormat = DataFormat.Json;
-            request.AddJsonBody(body);
+            var jsonBody = Json.Serialize(body);
+            request.AddBody(jsonBody, "application/json");
 
             var response = await client.ExecuteAsync(request);
             if (response.StatusCode != HttpStatusCode.Created)
@@ -272,7 +274,8 @@ namespace HOK.MissionControl.Core.Utils
 
                 var request = new RestRequest(ApiVersion + "/" + route, Method.Post);
                 request.RequestFormat = DataFormat.Json;
-                request.AddJsonBody(body);
+                var jsonBody = Json.Serialize(body);
+                request.AddBody(jsonBody, "application/json");
 
                 var response = client.Execute(request);
                 if (response.StatusCode != HttpStatusCode.Created)
