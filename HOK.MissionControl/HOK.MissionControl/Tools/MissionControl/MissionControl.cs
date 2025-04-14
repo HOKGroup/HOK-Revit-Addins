@@ -159,9 +159,9 @@ namespace HOK.MissionControl.Tools.MissionControl
                             StringComparison.OrdinalIgnoreCase))
                         {
                             // (Konrad) These are read-only methods so they don't need to run in Revit context.
+                            ProcessFamilies(centralPath);
                             ProcessModels(ActionType.CheckIn, doc, centralPath);
                             ProcessWorksets(ActionType.CheckIn, doc, centralPath);
-                            ProcessFamilies(centralPath);
                             ProcessLinks(doc, centralPath);
                             ProcessViews(doc, centralPath);
                             ProcessGroups(doc, centralPath);
