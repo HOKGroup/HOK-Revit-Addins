@@ -161,12 +161,12 @@ namespace HOK.MissionControl.Tools.MissionControl
                             // (Konrad) These are read-only methods so they don't need to run in Revit context.
                             ProcessModels(ActionType.CheckIn, doc, centralPath);
                             ProcessWorksets(ActionType.CheckIn, doc, centralPath);
-                            ProcessWarnings(ActionType.CheckIn, doc, centralPath);
                             ProcessFamilies(centralPath);
-                            ProcessStyle(doc, centralPath);
                             ProcessLinks(doc, centralPath);
                             ProcessViews(doc, centralPath);
                             ProcessGroups(doc, centralPath);
+                            ProcessWarnings(ActionType.CheckIn, doc, centralPath);
+                            ProcessStyle(doc, centralPath);
                         }
                     }
                     catch (Exception ex)
