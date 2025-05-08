@@ -10,7 +10,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 
-namespace HOK.Core.IDCRevit
+namespace HOK.Core.BackgroundTasks
 {
     public static class Rules
     {

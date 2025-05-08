@@ -27,6 +27,7 @@ namespace HOK.RibbonTab
         {
             Application.ControlledApplication.DocumentOpening += OnDocumentOpening;
             Application.ControlledApplication.DocumentCreating += OnDocumentCreating;
+            Application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
             m_app = Application;
             tabName = "   HOK   ";
             
@@ -51,6 +52,11 @@ namespace HOK.RibbonTab
             //CreateDataPushButtons();
             CreateAvfPushButtons();
             //CreateMissionControlPushButtons();
+        }
+
+        private void OnDocumentSynchronizing(object sender, DocumentSynchronizingWithCentralEventArgs e)
+        {
+            HOK.Core.BackgroundTasks.Rules.AddAllSheetsToPrintSet(e.Document);
         }
 
         private static void OnDocumentCreating(object sender, DocumentCreatingEventArgs args)
