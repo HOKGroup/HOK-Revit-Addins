@@ -50,6 +50,23 @@
 		<Delete ContinueOnError="true" Files="$(AppData)\Autodesk\REVIT\Addins\2025\HOK.ProjectSheetManager.dll" />
 	</Target>
 
+	<ItemGroup>
+	  <None Remove="Resources\AddViewsToSheets.png" />
+	  <None Remove="Resources\CreateSheets.png" />
+	  <None Remove="Resources\export.png" />
+	  <None Remove="Resources\hoklogo.png" />
+	  <None Remove="Resources\rename.png" />
+	  <None Remove="Resources\renumber.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\AddViewsToSheets.png" />
+	  <Resource Include="Resources\CreateSheets.png" />
+	  <Resource Include="Resources\export.png" />
+	  <Resource Include="Resources\rename.png" />
+	  <Resource Include="Resources\renumber.png" />
+	</ItemGroup>
+
   <!-- Revit APIs -->
 
   <!-- Other Packages -->
@@ -77,10 +94,10 @@
     </Reference>
   </ItemGroup>
 
-  <PropertyGroup>
-    <PostBuildEvent>
-      "powershell.exe" '$(ProjectDir)..\..\_postBuild\codeSigning.ps1' $(TargetPath)
-    </PostBuildEvent>
-  </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Resources\hoklogo.png" />
+  </ItemGroup>
+
+  <PropertyGroup />
 
 </Project>
