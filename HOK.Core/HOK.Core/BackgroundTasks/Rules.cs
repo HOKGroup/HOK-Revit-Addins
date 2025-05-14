@@ -33,7 +33,11 @@ namespace HOK.Core.BackgroundTasks
                         GlobalParameter hokPrintSetParam = GlobalParameter.Create(
                             doc,
                             "Add ALL Sheets to HOK Print Set",
+#if REVIT2022_OR_GREATER
                             SpecTypeId.Boolean.YesNo
+#else
+                            ParameterType.YesNo
+#endif
                         );
                         // Set the default value to off/false
                         hokPrintSetParam.SetValue(new IntegerParameterValue(1));
@@ -44,7 +48,11 @@ namespace HOK.Core.BackgroundTasks
                         GlobalParameter hokPrintSetParam = GlobalParameter.Create(
                             doc,
                             "Add ALL Sheets to HOK Print Set",
+#if REVIT2022_OR_GREATER
                             SpecTypeId.Boolean.YesNo
+#else
+                            ParameterType.YesNo
+#endif
                         );
                         // Set the default value to off/false
                         hokPrintSetParam.SetValue(new IntegerParameterValue(1));
@@ -66,7 +74,7 @@ namespace HOK.Core.BackgroundTasks
                 return;
             }
 
-        AddAllSheets:
+            AddAllSheets:
             PrintManager pm = doc.PrintManager;
 
             // Ensure that the print manager setting is set to selected views

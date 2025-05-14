@@ -27,9 +27,7 @@ namespace HOK.RibbonTab
         {
             Application.ControlledApplication.DocumentOpening += OnDocumentOpening;
             Application.ControlledApplication.DocumentCreating += OnDocumentCreating;
-#if REVIT2022_OR_GREATER
             Application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
-#endif
             m_app = Application;
             tabName = "   HOK   ";
             
@@ -56,12 +54,10 @@ namespace HOK.RibbonTab
             //CreateMissionControlPushButtons();
         }
 
-#if REVIT2022_OR_GREATER
         private void OnDocumentSynchronizing(object sender, DocumentSynchronizingWithCentralEventArgs e)
         {
             HOK.Core.BackgroundTasks.Rules.AddAllSheetsToPrintSet(e.Document);
         }
-#endif
 
         private static void OnDocumentCreating(object sender, DocumentCreatingEventArgs args)
         {
