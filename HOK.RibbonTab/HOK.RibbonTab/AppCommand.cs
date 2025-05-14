@@ -56,7 +56,14 @@ namespace HOK.RibbonTab
 
         private void OnDocumentSynchronizing(object sender, DocumentSynchronizingWithCentralEventArgs e)
         {
-            HOK.Core.BackgroundTasks.Rules.AddAllSheetsToPrintSet(e.Document);
+            try
+            {
+                HOK.Core.BackgroundTasks.Rules.AddAllSheetsToPrintSet(e.Document);
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, "Failed to execute method in OnDocumentSynchronizing." + ex.Message);
+            }
         }
 
         private static void OnDocumentCreating(object sender, DocumentCreatingEventArgs args)

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
+using HOK.Core.Utilities;
 
 namespace HOK.Core.BackgroundTasks
 {
@@ -39,7 +40,7 @@ namespace HOK.Core.BackgroundTasks
                             ParameterType.YesNo
 #endif
                         );
-                        // Set the default value to off/false
+                        // Set the default value to on/true
                         hokPrintSetParam.SetValue(new IntegerParameterValue(1));
                     }
                     else
@@ -54,7 +55,7 @@ namespace HOK.Core.BackgroundTasks
                             ParameterType.YesNo
 #endif
                         );
-                        // Set the default value to off/false
+                        // Set the default value to on/true
                         hokPrintSetParam.SetValue(new IntegerParameterValue(1));
                         tr.Commit();
                     }
@@ -64,17 +65,19 @@ namespace HOK.Core.BackgroundTasks
                 doc,
                 "Add ALL Sheets to HOK Print Set"
             );
-            var hokPrintSetParameter = doc.GetElement(hokPrintSetParamId) as GlobalParameter;
-            if ((hokPrintSetParameter.GetValue() as IntegerParameterValue).Value == 1)
+            try
             {
-                goto AddAllSheets;
+                GlobalParameter hokPrintSetParameter = doc.GetElement(hokPrintSetParamId) as GlobalParameter;
+                if ((hokPrintSetParameter.GetValue() as IntegerParameterValue).Value != 1)
+                {
+                    return;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return;
+                Log.AppendLog(LogMessageType.EXCEPTION, "Failed to get Global Parameter \"Add ALL Sheets to HOK Print Set\". Exception message: " + ex.Message);
             }
 
-            AddAllSheets:
             PrintManager pm = doc.PrintManager;
 
             // Ensure that the print manager setting is set to selected views
@@ -112,10 +115,6 @@ namespace HOK.Core.BackgroundTasks
                 {
                     newVSS.Insert(currView);
                 }
-                else
-                {
-                    continue;
-                }
             }
             using (Transaction tr = new Transaction(doc, "Add Sheets to View Sheet Set"))
             {
@@ -132,7 +131,10 @@ namespace HOK.Core.BackgroundTasks
                             existingVSS.CurrentViewSheetSet.Views = newVSS;
                             existingVSS.Save();
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            Log.AppendLog(LogMessageType.EXCEPTION, "Failed to set sheets to print set \"_HOK Automated Print Set\". Exception message: " + ex.Message);
+                        }
                     }
                     else
                     {
