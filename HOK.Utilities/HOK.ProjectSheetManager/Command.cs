@@ -2,8 +2,7 @@
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using HOK.MissionControl.Core.Schemas;
-using HOK.MissionControl.Core.Utils;
+using HOK.ProjectSheetManager.Forms;
 #endregion
 
 namespace HOK.ProjectSheetManager
@@ -16,21 +15,19 @@ namespace HOK.ProjectSheetManager
           ref string message,
           ElementSet elements)
         {
-            AddinUtilities.PublishAddinLog(new AddinLog("Sheet Manager-Excel", commandData.Application.Application.VersionNumber));
 
-            var m_Settings = new clsSettings(commandData);
+            //var m_Settings = new clsSettings(commandData);
 
             try
             {
-                using m_dlg = new ProjectSheetManager(m_Settings);
-                {
-                    m_dlg.ShowDialog();
-                    return Result.Succeeded;
-                }
+                var m_dlg = new ProjectSheetManagerForm();
+                m_dlg.ShowDialog();
+                return Result.Succeeded;
             }
             catch (Exception ex)
             {
                 message = ex.Message;
+                TaskDialog.Show("Failed To Load", message);
                 return Result.Failed;
             }
         }
