@@ -26,17 +26,24 @@ namespace HOK.ProjectSheetManager.Forms
         private Classes.Settings addinSettings;
         private UtilitySQL utilitySql;
         private FamilySymbol TitleBlock;
-        private IList<Element> TitleBlocks;
-        private List<Element> Sheets;
-        private DataTable DataTable;
-        private ImageList System.Windows.Forms.ImageList;
+        private IList<FamilySymbol> TitleBlocks;
+        private List<ViewSheet> Sheets;
+        private bool excelActivated;
         private string excelFilePath = "";
 
-        public ProjectSheetManagerForm()
+        public ProjectSheetManagerForm(Classes.Settings settings)
         {
             InitializeComponent();
             List<string> selectionModes = new List<string>() { "Select All Sheets", "New Sheets Only", "Existing Sheets Only" };
             this.cmbBxSelectionFilter.ItemsSource = selectionModes;
+
+            // Button Visibility Setup
+            btnCreateUpdateSheets.IsEnabled = false;
+            btnExportSheetData.IsEnabled = false;
+            btnRenumSheets.IsEnabled = false;
+            btnRenameViews.IsEnabled = false;
+            btnAddViewsSheets.IsEnabled = false;
+
         }
 
         private void txtBxIOFilePath_MouseDoubleClick(object sender, MouseButtonEventArgs e)

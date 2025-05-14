@@ -16,11 +16,11 @@ namespace HOK.ProjectSheetManager
           ElementSet elements)
         {
 
-            //var m_Settings = new clsSettings(commandData);
+            var m_Settings = new Classes.Settings(commandData);
 
             try
             {
-                var m_dlg = new ProjectSheetManagerForm();
+                var m_dlg = new ProjectSheetManagerForm(m_Settings);
                 m_dlg.ShowDialog();
                 return Result.Succeeded;
             }
