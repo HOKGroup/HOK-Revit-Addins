@@ -15,12 +15,15 @@ namespace HOK.Core.BackgroundTasks
 {
     public static class Rules
     {
+        const string HOK_PRINT_SET_PARAM_NAME = "Add ALL Sheets to HOK Print Set";
+        const string HOK_PRINT_SET_NAME = "_HOK Automated Print Set";
+
         public static void AddAllSheetsToPrintSet(Document doc)
         {
-            // First ensure that the "Add ALL Sheets to HOK Print Set" parameter exists and is enabled
+            // First ensure that the HOK_PRINT_SET_PARAM_NAME parameter exists and is enabled
             var hokPrintSetParamId = GlobalParametersManager.FindByName(
                 doc,
-                "Add ALL Sheets to HOK Print Set"
+                HOK_PRINT_SET_PARAM_NAME
             );
 
             // If parameter is not found, create it
@@ -33,7 +36,7 @@ namespace HOK.Core.BackgroundTasks
                     {
                         GlobalParameter hokPrintSetParam = GlobalParameter.Create(
                             doc,
-                            "Add ALL Sheets to HOK Print Set",
+                            HOK_PRINT_SET_PARAM_NAME,
 #if REVIT2022_OR_GREATER
                             SpecTypeId.Boolean.YesNo
 #else
@@ -48,7 +51,7 @@ namespace HOK.Core.BackgroundTasks
                         tr.Start();
                         GlobalParameter hokPrintSetParam = GlobalParameter.Create(
                             doc,
-                            "Add ALL Sheets to HOK Print Set",
+                            HOK_PRINT_SET_PARAM_NAME,
 #if REVIT2022_OR_GREATER
                             SpecTypeId.Boolean.YesNo
 #else
@@ -63,7 +66,7 @@ namespace HOK.Core.BackgroundTasks
             }
             hokPrintSetParamId = GlobalParametersManager.FindByName(
                 doc,
-                "Add ALL Sheets to HOK Print Set"
+                HOK_PRINT_SET_PARAM_NAME
             );
             try
             {
@@ -94,9 +97,9 @@ namespace HOK.Core.BackgroundTasks
                 .OfClass(typeof(ViewSheetSet))
                 .Cast<ViewSheetSet>();
 
-            if (hokSheetSet.Select(ss => ss.Name).Contains("_HOK Automated Print Set"))
+            if (hokSheetSet.Select(ss => ss.Name).Contains(HOK_PRINT_SET_NAME))
                 existingVSS.CurrentViewSheetSet = hokSheetSet.First(
-                    ss => ss.Name == "_HOK Automated Print Set"
+                    ss => ss.Name == HOK_PRINT_SET_NAME
                 );
 
             List<ElementId> sheetsInModel = new FilteredElementCollector(doc)
@@ -123,7 +126,7 @@ namespace HOK.Core.BackgroundTasks
                     if (
                         hokSheetSet != null
                         && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                            == "_HOK Automated Print Set"
+                            == HOK_PRINT_SET_NAME
                     )
                     {
                         try
@@ -139,7 +142,7 @@ namespace HOK.Core.BackgroundTasks
                     else
                     {
                         existingVSS.CurrentViewSheetSet.Views = newVSS;
-                        existingVSS.SaveAs("_HOK Automated Print Set");
+                        existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                     }
                 }
                 else
@@ -148,7 +151,7 @@ namespace HOK.Core.BackgroundTasks
                     if (
                         hokSheetSet != null
                         && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                            == "_HOK Automated Print Set"
+                            == HOK_PRINT_SET_NAME
                     )
                     {
                         try
@@ -161,7 +164,7 @@ namespace HOK.Core.BackgroundTasks
                     else
                     {
                         existingVSS.CurrentViewSheetSet.Views = newVSS;
-                        existingVSS.SaveAs("_HOK Automated Print Set");
+                        existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                     }
                     tr.Commit();
                 }
