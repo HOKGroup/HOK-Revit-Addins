@@ -27,6 +27,7 @@ namespace HOK.RibbonTab
         {
             Application.ControlledApplication.DocumentOpening += OnDocumentOpening;
             Application.ControlledApplication.DocumentCreating += OnDocumentCreating;
+            Application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
             m_app = Application;
             tabName = "   HOK   ";
             
@@ -51,6 +52,18 @@ namespace HOK.RibbonTab
             //CreateDataPushButtons();
             CreateAvfPushButtons();
             //CreateMissionControlPushButtons();
+        }
+
+        private void OnDocumentSynchronizing(object sender, DocumentSynchronizingWithCentralEventArgs e)
+        {
+            try
+            {
+                HOK.Core.BackgroundTasks.Rules.AddAllSheetsToPrintSet(e.Document);
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, "Failed to execute method in OnDocumentSynchronizing." + ex.Message);
+            }
         }
 
         private static void OnDocumentCreating(object sender, DocumentCreatingEventArgs args)
