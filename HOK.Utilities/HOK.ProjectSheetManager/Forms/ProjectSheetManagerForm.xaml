@@ -9,7 +9,7 @@
     <Grid>
         <GroupBox Header="Sheet Manager Input/Output File Path" Margin="10,10,10,0" Height="66" VerticalAlignment="Top" FontFamily="HOK Sans">
             <Grid>
-                <Button x:Name="btnConnectExcel" Content="Disconnected Excel" Margin="0,10,10,10" FontFamily="HOK Sans" Background="#FFDF3E35" HorizontalAlignment="Right" Width="146" Click="btnConnectExcel_Click"/>
+                <Button x:Name="btnConnectExcel" Content="Disconnected Excel" Margin="0,10,10,10" FontFamily="HOK Sans" Background="#FFDF3E35" HorizontalAlignment="Right" Width="146"/>
                 <TextBox x:Name="txtBxIOFilePath" Margin="10,10,161,10" TextWrapping="Wrap" FontFamily="HOK Sans" MouseDoubleClick="txtBxIOFilePath_MouseDoubleClick" TextChanged="txtBxIOFilePath_TextChanged"/>
             </Grid>
         </GroupBox>
@@ -23,14 +23,14 @@
             </Grid>
 
         </GroupBox>
-        <GroupBox Header="Select Sheet Data Source Table or Worksheet" Margin="497,81,10,0" FontFamily="HOK Sans" Height="220" VerticalAlignment="Top">
+        <GroupBox Header="Select Sheet Data Source Table or Worksheet" Margin="497,81,10,0" FontFamily="HOK Sans" Height="200" VerticalAlignment="Top">
             <Grid>
-                <ListBox x:Name="lstBxSheetSource" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="10"/>
+                <ListBox x:Name="lstBxSheetSource" Margin="10"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="Select a Titleblock for New Sheets" Margin="497,306,10,102" FontFamily="HOK Sans">
             <Grid>
-                <ListBox x:Name="lstBxTitleblocks" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="10"/>
+                <TreeView x:Name="trViewTitleblocks" Margin="10"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="Sheet Type" Margin="10,0,580,10" FontFamily="HOK Sans" Height="87" VerticalAlignment="Bottom">
@@ -69,5 +69,6 @@
                 <TextBox Text="Create/Update Sheets" Height="36" Width="105" Background="{x:Null}" BorderBrush="{x:Null}" TextWrapping="Wrap" TextAlignment="Center"/>
             </StackPanel>
         </Button>
+        <CheckBox x:Name="chkBxUpdateExistingValues" Content="Update Existing Values" HorizontalAlignment="Left" Margin="497,286,0,0" VerticalAlignment="Top" IsChecked="True" FontFamily="HOK Sans"/>
     </Grid>
 </Window>

@@ -71,6 +71,7 @@
 
   <!-- Other Packages -->
   <ItemGroup>
+    <PackageReference Include="MiniExcel" Version="1.41.1" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2025.4.0" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2025.4.0" />
     <PackageReference Include="Nice3point.Revit.Toolkit" Version="2025.1.0" />
