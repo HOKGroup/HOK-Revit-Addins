@@ -1,22 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net;
-using System.Runtime.ExceptionServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HOK.Core.Utilities;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
-using HOK.Core.Utilities;
+using Autodesk.Revit.DB.ExtensibleStorage;
 
 namespace HOK.Core.BackgroundTasks
 {
     public static class Rules
     {
         const string HOK_PRINT_SET_PARAM_NAME = "Add ALL Sheets to HOK Print Set";
-        const string HOK_PRINT_SET_NAME = "_HOK Automated Print Set";
+        const string HOK_PRINT_SET_NAME = "zz_HOK Automated Print Set";
 
         public static void AddAllSheetsToPrintSet(Document doc)
         {
@@ -168,6 +160,57 @@ namespace HOK.Core.BackgroundTasks
                     }
                     tr.Commit();
                 }
+            }
+
+            // Part 2: Automatically enable the additional workset so that it's included in the published set list
+
+            // Get the schema ExportViewSheetSetListWith64BitId
+            var exportListSchema = Schema.ListSchemas().First(s => s.SchemaName == "ExportViewSheetSetListSchemaWith64BitId");
+
+            // Get the ExportViewViewSheetSetIdList field
+            var exportSheetSetIdList = exportListSchema.GetField("ExportViewViewSheetSetIdList");
+
+            // Get the entity
+            var entity = doc.ProjectInformation.GetEntity(exportListSchema);
+
+            // Get the enabled view sheets sets for publishing
+            var viewSheetSetIds = entity.Get<IList<ElementId>>(exportSheetSetIdList);
+
+            // Add the additional view sheet set, first get the view sheet set id
+            var existingViewSheetSetId = new FilteredElementCollector(doc)
+                .OfClass(typeof(ViewSheetSet))
+                .Cast<ViewSheetSet>()
+                .FirstOrDefault(vs => vs.Name == HOK_PRINT_SET_NAME)
+                .Id;
+
+            // Add the new sheet set to the published list if it isn't in already
+            if (!viewSheetSetIds.Contains(existingViewSheetSetId))
+            {
+                viewSheetSetIds.Add(existingViewSheetSetId);
+            }
+
+            try
+            {
+                // Set it in a transaction
+                if (!doc.IsModifiable)
+                {
+                    using (Transaction tr = new Transaction(doc, "Set Published Export Sheet Set List"))
+                    {
+                        tr.Start();
+                        entity.Set(exportSheetSetIdList, viewSheetSetIds);
+                        doc.ProjectInformation.SetEntity(entity);
+                        tr.Commit();
+                    }
+                }
+                else
+                {
+                    entity.Set(exportSheetSetIdList, viewSheetSetIds);
+                    doc.ProjectInformation.SetEntity(entity);
+                }
+            }
+            catch(Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, "Failed to set published sheet set list. Exception message: " + ex.Message);
             }
         }
     }
