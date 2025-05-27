@@ -6,15 +6,15 @@
     <Assembly>HOK.ProjectSheetManager.dll</Assembly>
     <FullClassName>HOK.ProjectSheetManager.Command</FullClassName>
     <ClientId>a4830dfc-deef-494a-a3ce-4e04def1ad50</ClientId>
-    <VendorId>com.typepad.thebuildingcoder</VendorId>
-    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+    <VendorId></VendorId>
+    <VendorDescription></VendorDescription>
   </AddIn>
   <AddIn Type="Application">
     <Name>Application HOK.ProjectSheetManager</Name>
     <Assembly>HOK.ProjectSheetManager.dll</Assembly>
     <FullClassName>HOK.ProjectSheetManager.App</FullClassName>
     <ClientId>ed2e244b-70e0-48a0-bcdd-594a33c56561</ClientId>
-    <VendorId>com.typepad.thebuildingcoder</VendorId>
-    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+    <VendorId></VendorId>
+    <VendorDescription></VendorDescription>
   </AddIn>
 </RevitAddIns>
