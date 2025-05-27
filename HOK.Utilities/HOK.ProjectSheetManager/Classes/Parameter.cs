@@ -150,6 +150,14 @@ namespace HOK.ProjectSheetManager.Classes
                     return "";
                 }
             }
+            set
+            {
+                try
+                {
+                    SetParameterValue(RevitParameter, value);
+                }
+                catch { }
+            }
         }
         public string GetParameterValue(Autodesk.Revit.DB.Parameter parameter)
         {
