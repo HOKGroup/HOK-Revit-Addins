@@ -11,9 +11,6 @@ namespace HOK.ProjectSheetManager.Classes
     public class Settings
     {
         private ExternalCommandData cmdData;
-        private string iniFileName = "SheetMaker.ini";
-        private string iniPath;
-        private string accessFilePath;
         private string excelFilePath;
         private UIApplication uiApp;
         private Document doc;
@@ -22,86 +19,34 @@ namespace HOK.ProjectSheetManager.Classes
         private Dictionary<string, Sheet> m_AddinSheets;
         private Dictionary<string, Tblk> m_Tblks;
 
+        const string HOK_EXCEL_PATH_PARAM_NAME = "Sheet Manager Excel File Path";
+
         public Settings(ExternalCommandData commandData)
         {
             cmdData = commandData;
             doc = cmdData.Application.ActiveUIDocument.Document;
+            m_Tblks = new Dictionary<string, Tblk>();
+            m_Sheets = new Dictionary<string, ViewSheet>();
+            m_AddinSheets = new Dictionary<string, Sheet>();
+            m_Views = new Dictionary<string, Autodesk.Revit.DB.View>();
 
-            string dirName = string.Empty;
-            string masterFilePath = doc.PathName;
+            // Get the global parameter, create it if it doesn't exist
+            ElementId hokExcelFilePathParamId = GlobalParametersManager.FindByName(doc, HOK_EXCEL_PATH_PARAM_NAME);
 
-            if (doc.IsWorkshared)
+            // If it doesn't exist, create it
+            if (hokExcelFilePathParamId == ElementId.InvalidElementId)
             {
-                ModelPath modelPath = doc.GetWorksharingCentralModelPath();
-                if (modelPath != null)
-                {
-                    masterFilePath = ModelPathUtils.ConvertModelPathToUserVisiblePath(modelPath);
-                    if(string.IsNullOrEmpty(masterFilePath))
-                    {
-                        masterFilePath = doc.PathName;
-                    }
-                    dirName = Path.GetDirectoryName(masterFilePath);
-                }
+                CreateGlobalParamExcelPath(HOK_EXCEL_PATH_PARAM_NAME);
+                excelFilePath = "";
             }
-            else if (!string.IsNullOrEmpty(doc.PathName))
+            else
             {
-                dirName = Path.GetDirectoryName(doc.PathName);
-            }
+                GlobalParameter hokExcelFilePathParam = doc.GetElement(hokExcelFilePathParamId) as GlobalParameter;
 
-            if(string.IsNullOrEmpty(dirName) == false)
-            {
-                iniPath = Path.Combine(dirName, iniFileName);
-            }
+                string paramValue = (hokExcelFilePathParam.GetValue() as StringParameterValue).Value;
 
-            if(!File.Exists(iniPath))
-            {
-                TaskDialog dlg = new TaskDialog("Sheet Manager");
-                dlg.MainInstruction = "SheetMaker.ini File Not Found";
-                dlg.MainContent = "Failed to find INI file.\nPlease create a new INI file or open an existing file.";
-                dlg.AllowCancellation = true;
-                dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Create a New INI File.");
-                dlg.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Open an Existing INI File.");
-
-                TaskDialogResult result = dlg.Show();
-                switch(result)
-                {
-                    case TaskDialogResult.CommandLink1:
-                        FolderBrowserDialog folderDialog = new FolderBrowserDialog();
-                        folderDialog.Description = "Select the directory that you want to use as the default.";
-                        if(Directory.Exists(dirName))
-                        {
-                            folderDialog.SelectedPath = dirName;
-                        }
-                        DialogResult fdr = folderDialog.ShowDialog();
-                        if(fdr == DialogResult.OK)
-                        {
-                            iniPath = folderDialog.SelectedPath + "\\" + iniFileName;
-                            WriteIniFile();
-                        }
-                        return;
-                    case TaskDialogResult.CommandLink2:
-                        OpenFileDialog openFileDialog = new OpenFileDialog();
-                        openFileDialog.DefaultExt = "ini";
-                        openFileDialog.Filter = "ini files (*.ini)|*.ini";
-                        DialogResult odr = openFileDialog.ShowDialog();
-                        if(odr == DialogResult.OK)
-                        {
-                            string openFileName = openFileDialog.FileName;
-                            if(openFileName.Contains(iniFileName))
-                            {
-                                iniPath = openFileName;
-                            }
-                            else
-                            {
-                                MessageBox.Show("Please select a valid ini file.\nThe  file name should be SheetMaker.ini", "File Name: SheetMaker.ini", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                                odr = openFileDialog.ShowDialog();
-                            }
-                        }
-                        return;
-                }
+                excelFilePath = paramValue;
             }
-            string currentFolder = Assembly.GetExecutingAssembly().Location.Substring(0, Assembly.GetExecutingAssembly().Location.LastIndexOf("\\"));
-            excelFilePath = currentFolder + "\\SheetMakerSampleData.xlsx";
 
             // List Sheets and Titleblocks
             GetSheetsAndTitleblockInstances();
@@ -141,9 +86,16 @@ namespace HOK.ProjectSheetManager.Classes
                     m_Views.Add(schedule.Name, schedule);
                 }
             }
+        }
 
-            // Reading ini overrides defaults
-            ReadIniFile();
+        private void CreateGlobalParamExcelPath(string paramName)
+        {
+            using (Transaction tr = new Transaction(doc, "Create Sheet Manager Excel Path Parameter"))
+            {
+                tr.Start();
+                GlobalParameter.Create(doc, paramName, SpecTypeId.String.Text);
+                tr.Commit();
+            }
         }
 
         public void GetSheetsAndTitleblockInstances()
@@ -232,58 +184,6 @@ namespace HOK.ProjectSheetManager.Classes
             }
         }
 
-        public void WriteIniFile() // Add info for views
-        {
-            try
-            {
-                // Note, if file doesn't exist it is created
-                // The using statement also closes the StreamWriter.
-                if (iniPath != "")
-                {
-                    // incase project has not been saved yet
-                    using (StreamWriter sw = new StreamWriter(iniPath))
-                    {
-                        sw.WriteLine(excelFilePath);
-                        sw.WriteLine("");
-                        sw.WriteLine("*** Only the first line of this file is read ***");
-                        sw.WriteLine("    Format:");
-                        sw.WriteLine("    String - Path and filename of Excel file");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-
-        public void ReadIniFile()
-        {
-            // Read the ini file if possible if not it will get written later when the user sets the path
-            try
-            {
-                if(File.Exists(iniPath))
-                {
-                    string input = "";
-                    using(StreamReader sr = File.OpenText(iniPath))
-                    {
-                        if(InlineAssignHelper(ref input, sr.ReadLine()) == "") {
-                            MessageBox.Show("Unable to read Excel file path from file: \n" + iniPath, "Error Reading ini file", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            excelFilePath = input;
-                        }
-                        sr.Close();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message , "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-
         private static T InlineAssignHelper<T>(ref T target, T value)
         {
             target = value;
@@ -338,10 +238,6 @@ namespace HOK.ProjectSheetManager.Classes
             {
                 return m_Views;
             }
-        }
-        public string IniPath()
-        {
-            return iniPath;
         }
         public string ExcelPath()
         {

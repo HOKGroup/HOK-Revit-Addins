@@ -48,16 +48,21 @@ namespace HOK.ProjectSheetManager.Forms
 
             this.Title = "Sheet Manager - " + addinSettings.ApplicationVersion();
 
-            if (File.Exists(addinSettings.ExcelPath()))
+            try
             {
-                try
+                if (addinSettings.ExcelPath() == "")
                 {
-                    txtBxIOFilePath.Text = addinSettings.ExcelPath();
+                    lblExcelPath.Text = "No Excel file path set.";
                 }
-                catch (Exception ex)
+                else
                 {
-                    Log.AppendLog(LogMessageType.WARNING, "Failed to set Excel file path. Message: " + ex.Message);
+                    lblExcelPath.Text = addinSettings.ExcelPath();
+                    FillTemplateList();
                 }
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.WARNING, "Failed to set Excel file path. Message: " + ex.Message);
             }
 
             // Get all titleblock families
@@ -107,24 +112,6 @@ namespace HOK.ProjectSheetManager.Forms
 
             }
         }
-
-        private void txtBxIOFilePath_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            var openFileDlg = new System.Windows.Forms.OpenFileDialog();
-            openFileDlg.Filter = "Excel File|*.xlsx";
-            openFileDlg.Multiselect = false;
-            var result = openFileDlg.ShowDialog();
-            if (result.ToString() != string.Empty)
-            {
-                txtBxIOFilePath.Text = openFileDlg.FileName;
-            }
-            excelFilePath = txtBxIOFilePath.Text;
-        }
-
-        private void txtBxIOFilePath_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            excelFilePath = txtBxIOFilePath.Text;
-        }
         private void ScanSheets()
         {
             // Fill the datatable
@@ -160,8 +147,8 @@ namespace HOK.ProjectSheetManager.Forms
                 else
                 {
                     // Create the tree parent node
-                    TreeViewItem treeItem = new TreeViewItem();
-                    treeItem.Header = sheetNumber + ": " + sheetName;
+                    ListViewItem treeItem = new ListViewItem();
+                    treeItem.Content = sheetNumber + ": " + sheetName;
                     treeItem.Tag = sheetNumber;
                     treeItem.Foreground = System.Windows.Media.Brushes.Black;
                     treeItem.IsSelected = false;
@@ -200,7 +187,7 @@ namespace HOK.ProjectSheetManager.Forms
                         if (sheetItem.IsPlaceholder)
                         {
                             isPlaceholderSheet = true;
-                            treeItem.Header = sheetNumber + ": " + sheetName + " (Placeholder)";
+                            treeItem.Content = sheetNumber + ": " + sheetName + " (Placeholder)";
                         }
 
                         // The Titleblock Instance
@@ -303,7 +290,10 @@ namespace HOK.ProjectSheetManager.Forms
                     }
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                _ = ex.Message;
+            }
         }
 
         private void lstBxSheetSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -363,7 +353,7 @@ namespace HOK.ProjectSheetManager.Forms
 
                 if (trViewSheetElements.Items.Contains(sheetNumber))
                 {
-                    TreeViewItem trSheetItem = (trViewSheetElements.Items[trViewSheetElements.Items.IndexOf(sheetNumber)] as TreeViewItem);
+                    ListViewItem trSheetItem = (trViewSheetElements.Items[trViewSheetElements.Items.IndexOf(sheetNumber)] as ListViewItem);
                     if (trSheetItem != null && trSheetItem.IsSelected)
                     {
                         // Get the sheet and view and place the view on the sheet
@@ -402,7 +392,7 @@ namespace HOK.ProjectSheetManager.Forms
                                     placed = true;
                                     placedViews += selectedViewSheet.SheetNumber + " : " + selectedView.Name + "\n";
                                 }
-                                
+
                                 // Case for if the selected view is a schedule
                                 else if ((selectedView as ViewSchedule) != null)
                                 {
@@ -427,15 +417,19 @@ namespace HOK.ProjectSheetManager.Forms
                         }
                     }
                 }
+
+                addinSettings.GetSheetsAndTitleblockInstances();
+                ScanSheets();
+                this.Focus();
             }
             // Commit and clear the datatable
             trAddViewsToSheets.Commit();
             dataTableLocal.Clear();
 
             // Completed message
-            if(placed == false)
+            if (placed == false)
             {
-                if(unplacedViews.Length > 0)
+                if (unplacedViews.Length > 0)
                 {
                     viewsNotPlaced = "Unplaced Views: The following views already exist on sheets\n\n";
                     viewsNotPlaced += unplacedViews;
@@ -473,28 +467,46 @@ namespace HOK.ProjectSheetManager.Forms
             excelUtility.FillDataTableFromExcelWorksheet("Renumber Sheets");
             DataTable dataTable = excelUtility.DataTable;
 
+            if (dataTable == null)
+            {
+                TaskDialog msgBox = new TaskDialog("Sheet Manager - Renumber Sheets");
+                msgBox.MainInstruction = "Processing Cancelled";
+                msgBox.MainContent = "No worksheet named \"Renumber Views\" found in excel file.";
+                msgBox.Show();
+                return;
+            }
+
             // Make sure the correct columns are present
             if (!CheckColumnPresent(dataTable, "OldNumber"))
                 return;
             if (!CheckColumnPresent(dataTable, "NewNumber"))
                 return;
 
-            // Check for login errors in rename
-            foreach(string sheetNumber in addinSettings.Sheets.Keys)
+            // Get the list of sheet numbers from the listbox
+            List<string> docSheetNumbers = new List<string>();
+            List<string> selectedSheets = new List<string>();
+            foreach (ListViewItem item in trViewSheetElements.Items)
             {
-                if (trViewSheetElements.Items.Contains(sheetNumber))
+                docSheetNumbers.Add(item.Content.ToString().Split(':')[0]);
+                if (item.IsSelected)
+                    selectedSheets.Add(item.Content.ToString().Split(':')[0]);
+            }
+
+            // Check for login errors in rename
+            foreach (string sheetNumber in addinSettings.Sheets.Keys)
+            {
+                if (docSheetNumbers.Contains(sheetNumber) && selectedSheets.Contains(sheetNumber))
                 {
-                    if (((TreeViewItem)trViewSheetElements.Items[trViewSheetElements.Items.IndexOf(sheetNumber)]).IsSelected)
-                        listTestRenumber.Add(sheetNumber);
+                    listTestRenumber.Add(sheetNumber);
                 }
             }
 
-            using(Transaction tr = new Transaction(addinSettings.Document, "HOK Sheet Renumber"))
+            using (Transaction tr = new Transaction(addinSettings.Document, "HOK Sheet Renumber"))
             {
                 tr.Start();
                 try
                 {
-                    foreach(DataRow row in dataTable.Rows)
+                    foreach (DataRow row in dataTable.Rows)
                     {
                         // Check for missing values and ignore them
                         if (row["OldNumber"].ToString() == "")
@@ -523,7 +535,7 @@ namespace HOK.ProjectSheetManager.Forms
                     }
 
                     // Process each row in rename table
-                    foreach(DataRow row in dataTable.Rows)
+                    foreach (DataRow row in dataTable.Rows)
                     {
                         string oldNumber = row["OldNumber"].ToString();
                         string newNumber = row["NewNumber"].ToString();
@@ -535,18 +547,15 @@ namespace HOK.ProjectSheetManager.Forms
                             continue;
 
                         // See if sheet exists, otherwise ignore it. If found renumber and update dictionary
-                        if (addinSettings.Sheets.ContainsKey(oldNumber) && trViewSheetElements.Items.Contains(oldNumber) && !addinSettings.Sheets.ContainsKey(newNumber))
+                        if (addinSettings.Sheets.ContainsKey(oldNumber) && docSheetNumbers.Contains(oldNumber) && !addinSettings.Sheets.ContainsKey(newNumber))
                         {
-                            if (trViewSheetElements.Items.Contains(oldNumber))
+                            if (docSheetNumbers.Contains(oldNumber) && selectedSheets.Contains(oldNumber))
                             {
-                                if (((TreeViewItem)trViewSheetElements.Items[trViewSheetElements.Items.IndexOf(oldNumber)]).IsSelected)
-                                {
-                                    ViewSheet viewSheet = addinSettings.Sheets[oldNumber];
-                                    viewSheet.SheetNumber = newNumber;
-                                    addinSettings.Sheets.Add(newNumber, addinSettings.Sheets[oldNumber]);
-                                    addinSettings.Sheets.Remove(oldNumber);
-                                    viewSheet.SheetNumber = newNumber;
-                                }
+                                ViewSheet viewSheet = addinSettings.Sheets[oldNumber];
+                                viewSheet.SheetNumber = newNumber;
+                                addinSettings.Sheets.Add(newNumber, addinSettings.Sheets[oldNumber]);
+                                addinSettings.Sheets.Remove(oldNumber);
+                                viewSheet.SheetNumber = newNumber;
                             }
                         }
                     }
@@ -566,6 +575,11 @@ namespace HOK.ProjectSheetManager.Forms
             TaskDialog td = new TaskDialog("Sheet Manager - Renumber Sheets");
             td.MainInstruction = "Processing Completed";
             td.MainContent = "Old sheet numbers were replaced with new numbers";
+            td.Show();
+
+            addinSettings.GetSheetsAndTitleblockInstances();
+            ScanSheets();
+            this.Focus();
         }
 
         private void btnRenameViews_Click(object sender, RoutedEventArgs e)
@@ -576,6 +590,15 @@ namespace HOK.ProjectSheetManager.Forms
             excelUtility.FillDataTableFromExcelWorksheet("Rename Views");
             DataTable dataTable = excelUtility.DataTable;
 
+            if (dataTable == null)
+            {
+                TaskDialog msgBox = new TaskDialog("Sheet Manager - Rename Views");
+                msgBox.MainInstruction = "Processing Cancelled";
+                msgBox.MainContent = "No worksheet named \"Rename Views\" found in excel file.";
+                msgBox.Show();
+                return;
+            }
+
             // Make sure correct columns are present
             if (!CheckColumnPresent(dataTable, "OldName"))
                 return;
@@ -584,12 +607,12 @@ namespace HOK.ProjectSheetManager.Forms
 
             int countView = 0;
 
-            using(Transaction tr = new Transaction(addinSettings.Document, "HOK View Rename"))
+            using (Transaction tr = new Transaction(addinSettings.Document, "HOK View Rename"))
             {
                 tr.Start();
                 try
                 {
-                    foreach(DataRow row in dataTable.Rows)
+                    foreach (DataRow row in dataTable.Rows)
                     {
                         // Check for missing values and ignore them
                         if (row["OldName"].ToString() == "")
@@ -622,7 +645,7 @@ namespace HOK.ProjectSheetManager.Forms
 
             // Empty the datatable
             dataTable.Clear();
-            if(excelUtility.DataTable != null)
+            if (excelUtility.DataTable != null)
             {
                 excelUtility.DataTable.Clear();
             }
@@ -631,13 +654,21 @@ namespace HOK.ProjectSheetManager.Forms
             td.MainInstruction = "Processing Completed";
             td.MainContent = countView.ToString() + " old view names were replaced with new names.";
             td.Show();
+
+
+            addinSettings.GetSheetsAndTitleblockInstances();
+            ScanSheets();
+            this.Focus();
         }
 
         private void btnExportSheetData_Click(object sender, RoutedEventArgs e)
         {
             // First test if there are any sheets. If no sheets, then nothing to export
             if (addinSettings.Sheets.Count < 1)
+            {
+                this.Focus();
                 return;
+            }
 
             // Get the first sheet
             ViewSheet viewSheet = addinSettings.Sheets.First().Value;
@@ -652,15 +683,16 @@ namespace HOK.ProjectSheetManager.Forms
             td.MainContent = "This command will overwrite data.\n\nBe sure that the proper data table is selected before proceeding";
             td.AllowCancellation = true;
             td.AddCommandLink(TaskDialogCommandLinkId.CommandLink1, "Continue with Export");
-            td.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Cancel and do Nother");
+            td.AddCommandLink(TaskDialogCommandLinkId.CommandLink2, "Cancel and do Nothing");
 
             TaskDialogResult result = td.Show();
-            switch(result)
+            switch (result)
             {
                 case TaskDialogResult.CommandLink1:
                     break;
                 case TaskDialogResult.CommandLink2:
                     TaskDialog.Show("Cancelling Export", "Cancelling", TaskDialogCommonButtons.Ok);
+                    this.Focus();
                     return;
             }
 
@@ -680,7 +712,7 @@ namespace HOK.ProjectSheetManager.Forms
             foreach (DataColumn dataColumn in dataTable.Columns)
             {
                 Autodesk.Revit.DB.Parameter paramTblk = viewSheet.LookupParameter(dataColumn.ColumnName);
-                
+
 
                 if (paramTblk != null)
                 {
@@ -692,29 +724,32 @@ namespace HOK.ProjectSheetManager.Forms
             {
                 viewSheet = addinSettings.Sheets[sheetNumber];
 
-                Autodesk.Revit.DB.Parameter paramTblk = viewSheet.LookupParameter(sheetNumber);
+                Autodesk.Revit.DB.Parameter paramTblk = viewSheet.LookupParameter("Sheet Number");
 
                 dataRowArray = dataTable.Select("[Sheet Number] = '" + paramTblk.AsString() + "'");
 
-                if(dataRowArray.Length > 1)
+                if (dataRowArray.Length > 1)
                 {
                     // Duplicate record found
                     td = new TaskDialog("Sheet Manager - Export Sheet Data");
                     td.MainInstruction = "Processing Stopped";
                     td.MainContent = "Duplicate Sheet Number in Table: " + sheetNumber;
                     td.Show();
+                    addinSettings.GetSheetsAndTitleblockInstances();
+                    ScanSheets();
+                    this.Focus();
                     return;
                 }
                 if (dataRowArray.Length == 0)
                 {
                     // No record, make a new one
                     dataRow = dataTable.NewRow();
-                    foreach(string parameterName in parameterList)
+                    foreach (string parameterName in parameterList)
                     {
                         paramTblk = viewSheet.LookupParameter(parameterName);
 
                         Classes.Parameter para = new Classes.Parameter(paramTblk);
-                        if(paramTblk == null)
+                        if (paramTblk == null)
                         {
                             continue;
                         }
@@ -726,14 +761,14 @@ namespace HOK.ProjectSheetManager.Forms
                 {
                     // Existing record
                     dataRow = dataRowArray[0];
-                    foreach(string paramName in parameterList)
+                    foreach (string paramName in parameterList)
                     {
                         paramTblk = viewSheet.LookupParameter(paramName);
 
                         Classes.Parameter param = new Classes.Parameter(paramTblk);
                         if (paramTblk == null)
                             continue;
-                        if(paramTblk.AsString() != dataRow[paramName].ToString())
+                        if (paramTblk.AsString() != dataRow[paramName].ToString())
                         {
                             dataRow[paramName] = param.Value;
                         }
@@ -742,14 +777,45 @@ namespace HOK.ProjectSheetManager.Forms
             }
 
             // Write the changes back to the excel file
-            excelUtility.FillExcelWorksheetFromDataTable(lstBxSheetSource.SelectedItem.ToString());
-            excelUtility.DataTable.Clear();
+            if (lstBxSheetSource.SelectedItem != null)
+            {
+                excelUtility.DataTable = dataTable;
+                try
+                {
+                    excelUtility.FillExcelWorksheetFromDataTable(lstBxSheetSource.SelectedItem.ToString());
+                }
+                catch (Exception ex)
+                {
+                    // Excel file is still open in the background, must be closed for export
+                    td = new TaskDialog("Sheet Manager - Export Sheet Data");
+                    td.MainInstruction = "Processing Cancelled";
+                    td.MainContent = ex.Message;
+                    td.Show();
+                    addinSettings.GetSheetsAndTitleblockInstances();
+                    ScanSheets();
+                    this.Focus();
+                    return;
+                }
+                excelUtility.DataTable.Clear();
+            }
+            else
+            {
+                // Completed Message
+                td = new TaskDialog("Sheet Manager - Export Sheet Data");
+                td.MainInstruction = "Processing Cancelled";
+                td.MainContent = "Please select a worksheet to save to.";
+                td.Show();
+            }
 
             // Completed Message
             td = new TaskDialog("Sheet Manager - Export Sheet Data");
             td.MainInstruction = "Processing Completed";
             td.MainContent = "All data in Revit is successfully exported to Excel";
             td.Show();
+
+            addinSettings.GetSheetsAndTitleblockInstances();
+            ScanSheets();
+            this.Focus();
         }
 
         private void FillTemplateList()
@@ -763,7 +829,7 @@ namespace HOK.ProjectSheetManager.Forms
                 excelUtility.FillDataTableFromExcelSheetNames("TemplateId");
                 dataTableLocal = excelUtility.DataTable;
 
-                foreach(DataRow row in dataTableLocal.Rows)
+                foreach (DataRow row in dataTableLocal.Rows)
                 {
                     lstBxSheetSource.Items.Add(row["TemplateId"].ToString());
                 }
@@ -774,7 +840,7 @@ namespace HOK.ProjectSheetManager.Forms
                 }
                 lstBxSheetSource.SelectedIndex = 0;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string message = ex.Message;
             }
@@ -785,7 +851,7 @@ namespace HOK.ProjectSheetManager.Forms
                                         .WhereElementIsElementType()
                                         .ToElements();
 
-            if(titleBlocks.Count == 0)
+            if (titleBlocks.Count == 0)
             {
                 TaskDialog.Show("Sheet Manager", "Please add a titleblock to your model before using this application.", TaskDialogCommonButtons.Ok);
                 return;
@@ -796,14 +862,14 @@ namespace HOK.ProjectSheetManager.Forms
                 btnRenumSheets.IsEnabled = true;
                 btnAddViewsSheets.IsEnabled = true;
                 btnExportSheetData.IsEnabled = true;
+                btnRenameViews.IsEnabled = true;
             }
         }
 
-        private bool DoSheet(DataRow infoRow, List<string> paramNames)
+        private bool DoSheet(DataRow infoRow, List<string> paramNames, ElementId selectedTitleBlock)
         {
             bool sheetExists = false;
             ViewSheet sheetView = null;
-            Element sheetTitleBlock = null;
 
             string sheetNumber = infoRow["Sheet Number"].ToString();
             string sheetName = infoRow["Sheet Name"].ToString();
@@ -815,22 +881,40 @@ namespace HOK.ProjectSheetManager.Forms
                 sheetView = addinSettings.Sheets[sheetNumber];
 
                 // Do we want to update values?
-                if(chkBxUpdateExistingValues.IsChecked == true)
+                if (chkBxUpdateExistingValues.IsChecked == false)
                 {
                     return true;
                 }
-                return UpdateExistingElement(infoRow, paramNames, sheetView, sheetTitleBlock, sheetExists);
+                Element titleBlockElement = addinSettings.Document.GetElement(selectedTitleBlock);
+                return UpdateExistingElement(infoRow, paramNames, sheetView, titleBlockElement, sheetExists);
             }
             else
             {
-                using(Transaction tr = new Transaction(addinSettings.Document, "HOK Sheet Manager, Created: " + sheetNumber))
+                using (Transaction tr = new Transaction(addinSettings.Document, "HOK Sheet Manager, Created: " + sheetNumber))
                 {
                     tr.Start();
                     try
                     {
+                        // Create it
+                        Autodesk.Revit.Creation.Document docCreate = addinSettings.Application.ActiveUIDocument.Document.Create;
+                        if (radCreateViewSheets.IsChecked == true)
+                        {
+                            sheetView = ViewSheet.Create(addinSettings.Application.ActiveUIDocument.Document, selectedTitleBlock);
+                        }
+                        if (radCreatePlaceholderSheets.IsChecked == true)
+                        {
+                            sheetView = ViewSheet.CreatePlaceholder(addinSettings.Application.ActiveUIDocument.Document);
+                        }
 
+                        sheetView.SheetNumber = sheetNumber;
+                        sheetView.Name = sheetName;
+
+                        tr.Commit();
+
+                        // Increment the new sheet integer
+                        NewSheetCount++;
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         tr.RollBack();
                         CreateFailCount++;
@@ -838,6 +922,9 @@ namespace HOK.ProjectSheetManager.Forms
                         return false;
                     }
                 }
+                sheetExists = true;
+                Element titleBlockElement = addinSettings.Document.GetElement(selectedTitleBlock);
+                UpdateExistingElement(infoRow, paramNames, sheetView, titleBlockElement, sheetExists);
             }
             return false;
         }
@@ -846,7 +933,7 @@ namespace HOK.ProjectSheetManager.Forms
         {
             using (Transaction tr = new Transaction(addinSettings.Document))
             {
-                if(tr.Start("HOK Sheet Manager - Updated: " + infoRow["Sheet Number"].ToString()) == TransactionStatus.Started)
+                if (tr.Start("HOK Sheet Manager - Updated: " + infoRow["Sheet Number"].ToString()) == TransactionStatus.Started)
                 {
                     try
                     {
@@ -854,7 +941,7 @@ namespace HOK.ProjectSheetManager.Forms
                         bool isDiscrepancy = false;
 
                         // Iterate all parameter names
-                        foreach(string x in paramNames)
+                        foreach (string x in paramNames)
                         {
                             // Skip sheet number and sheet name
                             if (x.ToUpper() == "SHEET NUMBER" || x.ToUpper() == "NAME")
@@ -864,23 +951,23 @@ namespace HOK.ProjectSheetManager.Forms
                             bool paramFoundInSheet = false;
 
                             // If the param is in the sheet, update it and continue for
-                            if(sheetView != null)
+                            if (sheetView != null)
                             {
                                 // Does the param exist?
                                 Autodesk.Revit.DB.Parameter param = sheetView.LookupParameter(x);
 
-                                if(param != null)
+                                if (param != null)
                                 {
                                     // No need to search the TB element
                                     paramFoundInSheet = true;
 
                                     Classes.Parameter clsParam = new Classes.Parameter(param);
-                                    if(clsParam != null)
+                                    if (clsParam != null)
                                     {
                                         // Special Handling for YesNo
-                                        if(clsParam.DisplayUnitType.ToUpper() == "YESNO")
+                                        if (clsParam.DisplayUnitType.ToUpper() == "YESNO")
                                         {
-                                            switch(infoRow[clsParam.Name].ToString().ToUpper())
+                                            switch (infoRow[clsParam.Name].ToString().ToUpper())
                                             {
                                                 case "1":
                                                     if (double.Parse(clsParam.Value) != 1)
@@ -916,7 +1003,7 @@ namespace HOK.ProjectSheetManager.Forms
                                                     break;
                                             }
 
-                                            if(isDiscrepancy == true)
+                                            if (isDiscrepancy == true)
                                             {
                                                 clsParam.Value = infoRow[clsParam.Name].ToString();
 
@@ -941,7 +1028,7 @@ namespace HOK.ProjectSheetManager.Forms
                             if (sheetView.IsPlaceholder == false && paramFoundInSheet == false)
                             {
                                 // Do we have a valid titleblock element
-                                if(sheetTitleBlock == null)
+                                if (sheetTitleBlock == null)
                                 {
                                     // Is it already collected?
                                     if (addinSettings.clsTblksList.ContainsKey(infoRow["Sheet Number"].ToString()))
@@ -954,19 +1041,19 @@ namespace HOK.ProjectSheetManager.Forms
                                                                             .ToElements();
 
                                         // Find the right one
-                                        foreach(Element tb in docTitleblocks)
+                                        foreach (Element tb in docTitleblocks)
                                         {
                                             // Identify by sheet number
                                             Autodesk.Revit.DB.Parameter sheetNumberParam = tb.LookupParameter("Sheet Number");
 
-                                            if(sheetNumberParam != null)
+                                            if (sheetNumberParam != null)
                                             {
                                                 // Try and get the sheet number param
                                                 Classes.Parameter snParam = new Classes.Parameter(sheetNumberParam);
-                                                if(snParam != null)
+                                                if (snParam != null)
                                                 {
                                                     // Does the sheet number match what we're after
-                                                    if(snParam.Value.ToUpper() == infoRow["Sheet Number"].ToString().ToUpper())
+                                                    if (snParam.Value.ToUpper() == infoRow["Sheet Number"].ToString().ToUpper())
                                                     {
                                                         // This is the element we need
                                                         sheetTitleBlock = tb;
@@ -985,7 +1072,7 @@ namespace HOK.ProjectSheetManager.Forms
                                     if (param != null)
                                     {
                                         Classes.Parameter clsParam = new Classes.Parameter(param);
-                                        if(clsParam != null)
+                                        if (clsParam != null)
                                         {
                                             // Special handling for YesNo
                                             // Special Handling for YesNo
@@ -1051,7 +1138,7 @@ namespace HOK.ProjectSheetManager.Forms
                         }
 
                         tr.Commit();
-                        if(sheetExists == true)
+                        if (sheetExists == true)
                         {
                             UpdatedSheetCount++;
                         }
@@ -1081,7 +1168,7 @@ namespace HOK.ProjectSheetManager.Forms
             }
 
             // If no titleblock selection, do not allow this command
-            if(trViewTitleblocks.SelectedItem == null)
+            if (trViewTitleblocks.SelectedItem == null)
             {
                 TaskDialog.Show("Sheet Manager", "Select a titleblock prior to running this command.");
                 return false;
@@ -1094,6 +1181,16 @@ namespace HOK.ProjectSheetManager.Forms
             // Requirements
             if (CheckCreationPrerequisites() == false)
                 return;
+
+            // Get the list of sheet numbers from the listbox
+            List<string> docSheetNumbers = new List<string>();
+            List<string> selectedSheets = new List<string>();
+            foreach (ListViewItem item in trViewSheetElements.Items)
+            {
+                docSheetNumbers.Add(item.Content.ToString().Split(':')[0]);
+                if (item.IsSelected)
+                    selectedSheets.Add(item.Content.ToString().Split(':')[0]);
+            }
 
             // Get the datatable
             excelUtility.FillDataTableFromExcelWorksheet(lstBxSheetSource.SelectedItem.ToString());
@@ -1118,8 +1215,16 @@ namespace HOK.ProjectSheetManager.Forms
                 paramNameList.Add(dataColumn.ColumnName);
             }
 
+            // Get the selected titleblock
+            var selectedTitleBlockItem = ((TreeViewItem)trViewTitleblocks.SelectedItem).Parent as TreeViewItem;
+            List<FamilySymbol> docTitleBlocks = new FilteredElementCollector(addinSettings.Document)
+                                  .WhereElementIsElementType()
+                                  .OfCategory(BuiltInCategory.OST_TitleBlocks).ToElements().Cast<FamilySymbol>().ToList();
+
+            ElementId selectedTBElementId = docTitleBlocks.FirstOrDefault(t => t.Family.Name.ToString() == selectedTitleBlockItem.Header.ToString()).Id;
+
             // Process each row in the template table
-            foreach(DataRow row in dataTable.Rows)
+            foreach (DataRow row in dataTable.Rows)
             {
                 string sheetNumber = row["Sheet Number"].ToString();
 
@@ -1127,13 +1232,10 @@ namespace HOK.ProjectSheetManager.Forms
                 if (string.IsNullOrEmpty(sheetNumber))
                     continue;
 
-                if (trViewSheetElements.Items.Contains(sheetNumber))
+                if (docSheetNumbers.Contains(sheetNumber) && selectedSheets.Contains(sheetNumber))
                 {
-                    if (((TreeViewItem)trViewSheetElements.Items[trViewSheetElements.Items.IndexOf(sheetNumber)]).IsSelected == true)
-                    {
-                        // Process the sheet
-                        DoSheet(row, paramNameList);
-                    }
+                    // Process the sheet
+                    DoSheet(row, paramNameList, selectedTBElementId);
                 }
             }
 
@@ -1142,10 +1244,10 @@ namespace HOK.ProjectSheetManager.Forms
             if (excelUtility.DataTable != null)
                 excelUtility.DataTable.Clear();
 
-            
+
 
             // Completed message
-            if(CreateFailCount > 0)
+            if (CreateFailCount > 0)
             {
                 TaskDialog td = new TaskDialog("Sheet Manager");
                 td.MainInstruction = "Processing Completed";
@@ -1170,6 +1272,69 @@ namespace HOK.ProjectSheetManager.Forms
 
             addinSettings.GetSheetsAndTitleblockInstances();
             ScanSheets();
+            this.Focus();
+        }
+
+        private void cmbBxSelectionFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string selectionMode = cmbBxSelectionFilter.SelectedValue.ToString();
+
+            switch (selectionMode)
+            {
+                case "Select All Sheets":
+                    foreach (ListViewItem sheet in trViewSheetElements.Items)
+                    {
+                        sheet.IsSelected = true;
+                    }
+                    trViewSheetElements.Focus();
+                    break;
+                case "New Sheets Only":
+                    foreach (ListViewItem sheet in trViewSheetElements.Items)
+                    {
+                        sheet.IsSelected = false;
+                    }
+                    foreach (ListViewItem sheet in trViewSheetElements.Items)
+                    {
+                        if (sheet.Foreground == System.Windows.Media.Brushes.Black)
+                        {
+                            sheet.IsSelected = true;
+                        }
+                    }
+                    trViewSheetElements.Focus();
+                    break;
+                case "Existing Sheets Only":
+                    foreach (ListViewItem sheet in trViewSheetElements.Items)
+                    {
+                        sheet.IsSelected = false;
+                    }
+                    foreach (ListViewItem sheet in trViewSheetElements.Items)
+                    {
+                        if (sheet.Foreground == System.Windows.Media.Brushes.Gray)
+                        {
+                            sheet.IsSelected = true;
+                        }
+                    }
+                    trViewSheetElements.Focus();
+                    break;
+            }
+        }
+
+        private void btnCheckAll_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (ListViewItem sheet in trViewSheetElements.Items)
+            {
+                sheet.IsSelected = true;
+            }
+            trViewSheetElements.Focus();
+        }
+
+        private void btnCheckNone_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (ListViewItem sheet in trViewSheetElements.Items)
+            {
+                sheet.IsSelected = false;
+            }
+            trViewSheetElements.Focus();
         }
     }
 }
