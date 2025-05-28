@@ -27,7 +27,7 @@ namespace HOK.ProjectSheetManager.Classes
                 m_DataTable.Columns.Add(nameColumn, typeof(string));
                 for(int i = 0; i < sheets.Count; i++)
                 {
-                    string worksheetName = sheets[0].Name;
+                    string worksheetName = sheets[i].Name;
                     if(worksheetName != "Renumber Sheets" && worksheetName != "Rename Views")
                     {
                         row = m_DataTable.NewRow();
@@ -52,17 +52,19 @@ namespace HOK.ProjectSheetManager.Classes
 
         public void FillExcelWorksheetFromDataTable(string nameWorksheet)
         {
-            var values = new List<Dictionary<string, object>>();
-
-            foreach(DataRow dataRow in m_DataTable.Rows)
+            var sheets = new DataSet();
+            foreach(SheetInfo sheet in MiniExcel.GetSheetInformations(m_Settings.ExcelPath()))
             {
-                for(int i = 0; i < m_DataTable.Columns.Count; i ++)
+                if(sheet.Name == nameWorksheet)
                 {
-                    values.Add(new Dictionary<string, object> { { m_DataTable.Columns[i].ColumnName.ToString(), dataRow.ItemArray[i].ToString() } });
+                    sheets.Tables.Add(this.DataTable);
+                }
+                else
+                {
+                    sheets.Tables.Add(MiniExcel.QueryAsDataTable(m_Settings.ExcelPath(), sheetName: sheet.Name));
                 }
             }
-
-            MiniExcel.SaveAs(m_Settings.ExcelPath(), values, sheetName: nameWorksheet);
+            MiniExcel.SaveAs(m_Settings.ExcelPath(), sheets, overwriteFile: true, excelType: ExcelType.XLSX);
         }
 
         public DataTable DataTable
@@ -70,6 +72,10 @@ namespace HOK.ProjectSheetManager.Classes
             get
             {
                 return m_DataTable;
+            }
+            set
+            {
+                m_DataTable = value;
             }
         }
     }
