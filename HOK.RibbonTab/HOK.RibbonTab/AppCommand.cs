@@ -311,6 +311,16 @@ namespace HOK.RibbonTab
                     AddToolTips(pb6);
                     fileExist = true;
                 }
+                
+                // Revit 2025 Sheet Manager
+                if (File.Exists(currentDirectory + "/HOK.ProjectSheetManager.dll"))
+                {
+                    var pb7 = (PushButton)hokPanel.AddItem(new PushButtonData("Sheet Manager", "Sheet" + Environment.NewLine + " Manager", currentDirectory + "/HOK.ProjectSheetManager.dll", "HOK.ProjectSheetManager.Command"));
+                    pb7.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "sheetManager_32.png");
+                    pb7.ToolTip = "Sheet Manager";
+                    AddToolTips(pb7);
+                    fileExist = true;
+                }
 
                 if (File.Exists(currentDirectory + "/HOK.ElementFlatter.dll"))
                 {
