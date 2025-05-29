@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HOK.ProjectSheetManager.Forms"
         mc:Ignorable="d"
-        Title="Sheet Management" Height="670" Width="824" Icon="/HOK.ProjectSheetManager;component/Resources/hoklogo.png">
+        Title="Sheet Management" Height="670" Width="956" Icon="/HOK.ProjectSheetManager;component/Resources/hoklogo.png">
     <Grid>
         <GroupBox Header="Sheet Manager Input/Output File Path" Margin="10,10,10,0" Height="85" VerticalAlignment="Top" FontFamily="HOK Sans">
             <Grid>

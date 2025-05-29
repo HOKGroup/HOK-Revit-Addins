@@ -279,7 +279,7 @@ namespace HOK.ProjectSheetManager.Forms
             // If a parent node is selected, select it's first child node instead
             try
             {
-                if (treeViewItem != null && (treeViewItem.Parent as System.Windows.Controls.TreeView).Name == "trViewTitleblocks")
+                if (treeViewItem != null && (treeViewItem.Parent as System.Windows.Controls.TreeView) != null && (treeViewItem.Parent as System.Windows.Controls.TreeView).Name == "trViewTitleblocks")
                 {
                     foreach (TreeViewItem parentNode in trViewTitleblocks.Items)
                     {
@@ -290,6 +290,10 @@ namespace HOK.ProjectSheetManager.Forms
                             lblSelectedTitleBlock.Content = "Selected Titleblock: " + parentNode.Header + ": " + (parentNode.Items[0] as TreeViewItem).Header;
                         }
                     }
+                }
+                else
+                {
+                    lblSelectedTitleBlock.Content = "Selected Titleblock: " + (treeViewItem.Parent as TreeViewItem).Header + ": " + treeViewItem.Header;
                 }
             }
             catch (Exception ex)
@@ -1219,12 +1223,15 @@ namespace HOK.ProjectSheetManager.Forms
             }
 
             // Get the selected titleblock
-            var selectedTitleBlockItem = ((TreeViewItem)trViewTitleblocks.SelectedItem).Parent as TreeViewItem;
+            var selectedTitleBlockItem = ((TreeViewItem)trViewTitleblocks.SelectedItem);
             List<FamilySymbol> docTitleBlocks = new FilteredElementCollector(addinSettings.Document)
                                   .WhereElementIsElementType()
                                   .OfCategory(BuiltInCategory.OST_TitleBlocks).ToElements().Cast<FamilySymbol>().ToList();
 
-            ElementId selectedTBElementId = docTitleBlocks.FirstOrDefault(t => t.Family.Name.ToString() == selectedTitleBlockItem.Header.ToString()).Id;
+
+
+            ElementId selectedTBElementId = docTitleBlocks.FirstOrDefault(t => t.FamilyName.ToString() == (selectedTitleBlockItem.Parent as TreeViewItem).Header.ToString() &&
+                                                                               t.Name.ToString() == selectedTitleBlockItem.Header.ToString()).Id;
 
             // Process each row in the template table
             foreach (DataRow row in dataTable.Rows)
