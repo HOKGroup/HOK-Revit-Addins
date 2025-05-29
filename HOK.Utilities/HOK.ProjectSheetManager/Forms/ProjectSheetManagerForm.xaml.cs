@@ -3,6 +3,7 @@ using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.ProjectSheetManager.Classes;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -286,6 +287,7 @@ namespace HOK.ProjectSheetManager.Forms
                         {
                             parentNode.IsExpanded = true;
                             (parentNode.Items[0] as TreeViewItem).IsSelected = true;
+                            lblSelectedTitleBlock.Content = "Selected Titleblock: " + parentNode.Header + ": " + (parentNode.Items[0] as TreeViewItem).Header;
                         }
                     }
                 }
@@ -299,6 +301,7 @@ namespace HOK.ProjectSheetManager.Forms
         private void lstBxSheetSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ScanSheets();
+            lblSelectedWorksheet.Content = "Selected Worksheet: " + lstBxSheetSource.SelectedItem.ToString();
         }
 
         private void btnAddViewsSheets_Click(object sender, RoutedEventArgs e)
@@ -1335,6 +1338,28 @@ namespace HOK.ProjectSheetManager.Forms
                 sheet.IsSelected = false;
             }
             trViewSheetElements.Focus();
+        }
+
+        private void trViewSheetElements_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int countSelectedSheets = trViewSheetElements.SelectedItems.Count;
+
+            lblSelectedSheets.Content = "Number of Selected Sheets: " + countSelectedSheets;
+        }
+
+        private void lblExcelPath_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                var ps = new ProcessStartInfo("excel.exe", lblExcelPath.Text);
+                ps.UseShellExecute = true;
+                Process.Start(ps);
+                e.Handled = true;
+            }
+            catch (Exception ex)
+            {
+                TaskDialog.Show("Failed to Open Excel File!", ex.Message);
+            }
         }
     }
 }
