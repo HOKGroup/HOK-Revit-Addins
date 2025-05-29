@@ -7,22 +7,29 @@
         mc:Ignorable="d"
         Title="Sheet Management" Height="670" Width="824" Icon="/HOK.ProjectSheetManager;component/Resources/hoklogo.png">
     <Grid>
-        <GroupBox Header="Sheet Manager Input/Output File Path" Margin="10,10,10,0" Height="66" VerticalAlignment="Top" FontFamily="HOK Sans">
-            <Grid/>
-        </GroupBox>
-        <GroupBox Header="Sheet Elements" Margin="10,81,0,102" HorizontalAlignment="Left" Width="482" FontFamily="HOK Sans">
+        <GroupBox Header="Sheet Manager Input/Output File Path" Margin="10,10,10,0" Height="85" VerticalAlignment="Top" FontFamily="HOK Sans">
             <Grid>
-                <TreeView x:Name="trViewSheetElements" Margin="10,40,10,10" FontFamily="HOK Sans"/>
-                <Button x:Name="btnCheckAll" Content="Check All" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontFamily="HOK Sans" Height="25" Width="80"/>
-                <Button x:Name="btnCheckNone" Content="Check None" HorizontalAlignment="Left" Margin="95,10,0,0" VerticalAlignment="Top" FontFamily="HOK Sans" Height="25" Width="80"/>
+                <TextBlock x:Name="lblExcelPath" HorizontalAlignment="Left" VerticalAlignment="Center" Height="41" Width="772"
+                       ToolTip="This path is set in the Global Parameter named &quot;Sheet Manager Excel File Path&quot;." TextWrapping="WrapWithOverflow" Margin="10,0,0,0" FontWeight="Bold" FontSize="14"/>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Sheet Elements" Margin="10,100,0,102" HorizontalAlignment="Left" Width="482" FontFamily="HOK Sans">
+            <Grid>
+                <ListView x:Name="trViewSheetElements" Margin="10,40,10,10" FontFamily="HOK Sans" SelectionMode="Extended"/>
+                <Button x:Name="btnCheckAll" Content="Check All" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontFamily="HOK Sans" Height="25" Width="80" Click="btnCheckAll_Click"/>
+                <Button x:Name="btnCheckNone" Content="Check None" HorizontalAlignment="Left" Margin="95,10,0,0" VerticalAlignment="Top" FontFamily="HOK Sans" Height="25" Width="80" Click="btnCheckNone_Click"/>
                 <Label Content="Selection Options:" HorizontalAlignment="Left" Margin="180,9,0,0" VerticalAlignment="Top" FontFamily="HOK Sans"/>
-                <ComboBox x:Name="cmbBxSelectionFilter" HorizontalAlignment="Left" Margin="301,11,0,0" VerticalAlignment="Top" Width="159" FontFamily="HOK Sans"/>
+                <ComboBox x:Name="cmbBxSelectionFilter" HorizontalAlignment="Left" Margin="301,11,0,0" VerticalAlignment="Top" Width="159" FontFamily="HOK Sans" SelectionChanged="cmbBxSelectionFilter_SelectionChanged"/>
             </Grid>
 
         </GroupBox>
-        <GroupBox Header="Select Sheet Data Source Table or Worksheet" Margin="497,81,10,0" FontFamily="HOK Sans" Height="200" VerticalAlignment="Top">
+        <GroupBox Header="Select Sheet Data Source Table or Worksheet" Margin="497,100,10,0" FontFamily="HOK Sans" Height="181" VerticalAlignment="Top">
             <Grid>
-                <ListBox x:Name="lstBxSheetSource" Margin="10" SelectionChanged="lstBxSheetSource_SelectionChanged"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="287*"/>
+                    <ColumnDefinition Width="18*"/>
+                </Grid.ColumnDefinitions>
+                <ListBox x:Name="lstBxSheetSource" Margin="10,10,10,10" SelectionChanged="lstBxSheetSource_SelectionChanged" Grid.ColumnSpan="2"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="Select a Titleblock for New Sheets" Margin="497,306,10,102" FontFamily="HOK Sans">
@@ -32,7 +39,7 @@
         </GroupBox>
         <GroupBox Header="Sheet Type" Margin="10,0,580,10" FontFamily="HOK Sans" Height="87" VerticalAlignment="Bottom">
             <Grid>
-                <RadioButton x:Name="radCreateViewSheets" GroupName="SheetType" Content="Create View Sheets" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontFamily="HOK Sans"/>
+                <RadioButton x:Name="radCreateViewSheets" GroupName="SheetType" Content="Create View Sheets" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontFamily="HOK Sans" IsChecked="True"/>
                 <RadioButton x:Name="radCreatePlaceholderSheets" GroupName="SheetType" Content="Create Placeholder Sheets" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" FontFamily="HOK Sans"/>
             </Grid>
         </GroupBox>
@@ -63,7 +70,7 @@
         <Button x:Name="btnCreateUpdateSheets" Margin="0,0,12,10" HorizontalContentAlignment="Left" HorizontalAlignment="Right" Width="193" Height="87" VerticalAlignment="Bottom" FontFamily="HOK Sans" Click="btnCreateUpdateSheets_Click">
             <StackPanel Orientation="Horizontal">
                 <Image Source="/HOK.ProjectSheetManager;component/Resources/CreateSheets.png" Stretch="Fill" Margin="5,15,5,15"></Image>
-                <TextBox Text="Create/Update Sheets" Height="36" Width="105" Background="{x:Null}" BorderBrush="{x:Null}" TextWrapping="Wrap" TextAlignment="Center"/>
+                <TextBlock Text="Create/Update Sheets" Height="36" Width="105" Background="{x:Null}" TextWrapping="Wrap" TextAlignment="Center"/>
             </StackPanel>
         </Button>
         <CheckBox x:Name="chkBxUpdateExistingValues" Content="Update Existing Values" HorizontalAlignment="Left" Margin="497,286,0,0" VerticalAlignment="Top" IsChecked="True" FontFamily="HOK Sans"/>
