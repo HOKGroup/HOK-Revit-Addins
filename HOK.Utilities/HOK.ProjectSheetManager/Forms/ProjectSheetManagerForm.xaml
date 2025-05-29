@@ -10,31 +10,31 @@
         <GroupBox Header="Sheet Manager Input/Output File Path" Margin="10,10,10,0" Height="85" VerticalAlignment="Top" FontFamily="HOK Sans">
             <Grid>
                 <TextBlock x:Name="lblExcelPath" HorizontalAlignment="Left" VerticalAlignment="Center" Height="41" Width="772"
-                       ToolTip="This path is set in the Global Parameter named &quot;Sheet Manager Excel File Path&quot;." TextWrapping="WrapWithOverflow" Margin="10,0,0,0" FontWeight="Bold" FontSize="14"/>
+                       ToolTip="This path is set in the Global Parameter named &quot;Sheet Manager Excel File Path&quot;." TextWrapping="WrapWithOverflow" Margin="10,0,0,0" FontWeight="Bold" FontSize="14"
+                           PreviewMouseDown="lblExcelPath_PreviewMouseDown"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="Sheet Elements" Margin="10,100,0,102" HorizontalAlignment="Left" Width="482" FontFamily="HOK Sans">
             <Grid>
-                <ListView x:Name="trViewSheetElements" Margin="10,40,10,10" FontFamily="HOK Sans" SelectionMode="Extended"/>
+                <ListView x:Name="trViewSheetElements" Margin="10,40,10,25" FontFamily="HOK Sans" SelectionMode="Extended" SelectionChanged="trViewSheetElements_SelectionChanged"/>
                 <Button x:Name="btnCheckAll" Content="Check All" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" FontFamily="HOK Sans" Height="25" Width="80" Click="btnCheckAll_Click"/>
                 <Button x:Name="btnCheckNone" Content="Check None" HorizontalAlignment="Left" Margin="95,10,0,0" VerticalAlignment="Top" FontFamily="HOK Sans" Height="25" Width="80" Click="btnCheckNone_Click"/>
                 <Label Content="Selection Options:" HorizontalAlignment="Left" Margin="180,9,0,0" VerticalAlignment="Top" FontFamily="HOK Sans"/>
                 <ComboBox x:Name="cmbBxSelectionFilter" HorizontalAlignment="Left" Margin="301,11,0,0" VerticalAlignment="Top" Width="159" FontFamily="HOK Sans" SelectionChanged="cmbBxSelectionFilter_SelectionChanged"/>
+                <Label x:Name="lblSelectedSheets" Content="Number of Selected Sheets: " HorizontalAlignment="Left" Margin="10,0,0,0" FontFamily="HOK Sans" FontSize="10" Height="25" VerticalAlignment="Bottom" FontStyle="Italic"/>
             </Grid>
 
         </GroupBox>
         <GroupBox Header="Select Sheet Data Source Table or Worksheet" Margin="497,100,10,0" FontFamily="HOK Sans" Height="181" VerticalAlignment="Top">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="287*"/>
-                    <ColumnDefinition Width="18*"/>
-                </Grid.ColumnDefinitions>
-                <ListBox x:Name="lstBxSheetSource" Margin="10,10,10,10" SelectionChanged="lstBxSheetSource_SelectionChanged" Grid.ColumnSpan="2"/>
+                <ListBox x:Name="lstBxSheetSource" Margin="10,10,10,25" SelectionChanged="lstBxSheetSource_SelectionChanged"/>
+                <Label x:Name="lblSelectedWorksheet" Content="Selected Worksheet: " HorizontalAlignment="Left" Margin="10,0,0,0" FontFamily="HOK Sans" FontSize="10" Height="25" VerticalAlignment="Bottom" FontStyle="Italic"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="Select a Titleblock for New Sheets" Margin="497,306,10,102" FontFamily="HOK Sans">
             <Grid>
-                <TreeView x:Name="trViewTitleblocks" Margin="10" SelectedItemChanged="trViewTitleblocks_SelectedItemChanged"/>
+                <TreeView x:Name="trViewTitleblocks" Margin="10,10,10,25" SelectedItemChanged="trViewTitleblocks_SelectedItemChanged"/>
+                <Label x:Name="lblSelectedTitleBlock" Content="Selected Titleblock: " HorizontalAlignment="Left" Margin="10,0,0,0" FontFamily="HOK Sans" FontSize="10" Height="25" VerticalAlignment="Bottom" FontStyle="Italic"/>
             </Grid>
         </GroupBox>
         <GroupBox Header="Sheet Type" Margin="10,0,580,10" FontFamily="HOK Sans" Height="87" VerticalAlignment="Bottom">
