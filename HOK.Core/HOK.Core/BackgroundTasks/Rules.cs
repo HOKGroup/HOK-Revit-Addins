@@ -189,7 +189,16 @@ namespace HOK.Core.BackgroundTasks
             var entity = doc.ProjectInformation.GetEntity(exportListSchema);
 
             // Get the enabled view sheets sets for publishing
-            var viewSheetSetIds = entity.Get<IList<ElementId>>(exportSheetSetIdList);
+            IList<ElementId> viewSheetSetIds;
+            try
+            {
+                viewSheetSetIds = entity.Get<IList<ElementId>>(exportSheetSetIdList);
+            }
+            catch
+            {
+                viewSheetSetIds = new List<ElementId>();
+            }
+            
 
             // Add the additional view sheet set, first get the view sheet set id
             var existingViewSheetSetId = new FilteredElementCollector(doc)
