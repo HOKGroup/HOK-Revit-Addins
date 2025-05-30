@@ -2,12 +2,16 @@
 using Autodesk.Revit.UI;
 using HOK.Core.Utilities;
 using HOK.ProjectSheetManager.Classes;
+using System;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Shapes;
 
 namespace HOK.ProjectSheetManager.Forms
 {
@@ -787,6 +791,22 @@ namespace HOK.ProjectSheetManager.Forms
             if (lstBxSheetSource.SelectedItem != null)
             {
                 excelUtility.DataTable = dataTable;
+
+                // Checking file write permissions
+                if (!HasWritePermission(addinSettings.ExcelPath()))
+                {
+                    // Excel file does not have write permissions
+                    td = new TaskDialog("Sheet Manager - Export Sheet Data");
+                    td.MainInstruction = "Processing Cancelled";
+                    td.MainContent = "You do not have the proper permissions to write to the excel file at " + addinSettings.ExcelPath();
+                    td.Show();
+                    addinSettings.GetSheetsAndTitleblockInstances();
+                    ScanSheets();
+                    this.Focus();
+                    return;
+                }
+
+                addinSettings.ExcelPath();
                 try
                 {
                     excelUtility.FillExcelWorksheetFromDataTable(lstBxSheetSource.SelectedItem.ToString());
@@ -823,6 +843,18 @@ namespace HOK.ProjectSheetManager.Forms
             addinSettings.GetSheetsAndTitleblockInstances();
             ScanSheets();
             this.Focus();
+        }
+
+        private bool HasWritePermission(string excelPath)
+        {
+            var fInfo = new FileInfo(excelPath);
+            FileSecurity fSecurity = fInfo.GetAccessControl();
+
+            SecurityIdentifier usersSid = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+            FileSystemRights fileRights = FileSystemRights.Read | FileSystemRights.Synchronize;
+
+            var rules = fSecurity.GetAccessRules(true, true, usersSid.GetType()).OfType<FileSystemAccessRule>();
+            return rules.Where(r => r.FileSystemRights == fileRights).Any();
         }
 
         private void FillTemplateList()
