@@ -115,23 +115,28 @@ namespace HOK.Core.BackgroundTasks
             {
                 if (doc.IsModifiable)
                 {
-                    if (
-                        hokSheetSet != null
-                        && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                            == HOK_PRINT_SET_NAME
-                    )
+                    try
                     {
-                        try
+                        if (
+                            hokSheetSet != null
+                            && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
+                                == HOK_PRINT_SET_NAME
+                        )
+                        {
+                            try
+                            {
+                                existingVSS.CurrentViewSheetSet.Views = newVSS;
+                                existingVSS.Save();
+                            }
+                            catch (Exception ex) { }
+                        }
+                        else
                         {
                             existingVSS.CurrentViewSheetSet.Views = newVSS;
-                            existingVSS.Save();
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.AppendLog(LogMessageType.EXCEPTION, "Failed to set sheets to print set \"_HOK Automated Print Set\". Exception message: " + ex.Message);
+                            existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
                         existingVSS.CurrentViewSheetSet.Views = newVSS;
                         existingVSS.SaveAs(HOK_PRINT_SET_NAME);
@@ -140,41 +145,67 @@ namespace HOK.Core.BackgroundTasks
                 else
                 {
                     tr.Start();
-                    if (
-                        hokSheetSet != null
-                        && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                            == HOK_PRINT_SET_NAME
-                    )
+                    try
                     {
-                        try
+                        if (
+                            hokSheetSet != null
+                            && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
+                                == HOK_PRINT_SET_NAME
+                        )
+                        {
+                            try
+                            {
+                                existingVSS.CurrentViewSheetSet.Views = newVSS;
+                                existingVSS.Save();
+                            }
+                            catch { }
+                        }
+                        else
                         {
                             existingVSS.CurrentViewSheetSet.Views = newVSS;
-                            existingVSS.Save();
+                            existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                         }
-                        catch { }
                     }
-                    else
+                    catch (Exception ex)
                     {
                         existingVSS.CurrentViewSheetSet.Views = newVSS;
                         existingVSS.SaveAs(HOK_PRINT_SET_NAME);
+                        tr.Commit();
                     }
-                    tr.Commit();
+                    if (tr.GetStatus() == TransactionStatus.Started)
+                        tr.Commit();
                 }
             }
 
             // Part 2: Automatically enable the additional workset so that it's included in the published set list
 
             // Get the schema ExportViewSheetSetListWith64BitId
+
+            var schemas = Schema.ListSchemas();
+
             var exportListSchema = Schema.ListSchemas().First(s => s.SchemaName == "ExportViewSheetSetListSchemaWith64BitId");
 
             // Get the ExportViewViewSheetSetIdList field
             var exportSheetSetIdList = exportListSchema.GetField("ExportViewViewSheetSetIdList");
 
             // Get the entity
-            var entity = doc.ProjectInformation.GetEntity(exportListSchema);
+            Entity entity = doc.ProjectInformation.GetEntity(exportListSchema);
+            if(entity.Schema == null)
+            {
+                entity = new Entity(exportListSchema);
+            }
 
             // Get the enabled view sheets sets for publishing
-            var viewSheetSetIds = entity.Get<IList<ElementId>>(exportSheetSetIdList);
+            IList<ElementId> viewSheetSetIds;
+            try
+            {
+                viewSheetSetIds = entity.Get<IList<ElementId>>(exportSheetSetIdList);
+            }
+            catch
+            {
+                viewSheetSetIds = new List<ElementId>();
+            }
+
 
             // Add the additional view sheet set, first get the view sheet set id
             var existingViewSheetSetId = new FilteredElementCollector(doc)
@@ -189,28 +220,35 @@ namespace HOK.Core.BackgroundTasks
                 viewSheetSetIds.Add(existingViewSheetSetId);
             }
 
-            try
+            // Set it in a transaction
+            if (!doc.IsModifiable)
             {
-                // Set it in a transaction
-                if (!doc.IsModifiable)
+                using (Transaction tr = new Transaction(doc, "Set Published Export Sheet Set List"))
                 {
-                    using (Transaction tr = new Transaction(doc, "Set Published Export Sheet Set List"))
+                    tr.Start();
+                    try
                     {
-                        tr.Start();
                         entity.Set(exportSheetSetIdList, viewSheetSetIds);
                         doc.ProjectInformation.SetEntity(entity);
-                        tr.Commit();
                     }
+                    catch (Exception ex)
+                    {
+                        _ = ex.Message;
+                    }
+                    tr.Commit();
                 }
-                else
+            }
+            else
+            {
+                try
                 {
                     entity.Set(exportSheetSetIdList, viewSheetSetIds);
                     doc.ProjectInformation.SetEntity(entity);
                 }
-            }
-            catch(Exception ex)
-            {
-                Log.AppendLog(LogMessageType.EXCEPTION, "Failed to set published sheet set list. Exception message: " + ex.Message);
+                catch (Exception ex)
+                {
+                    _ = ex.Message;
+                }
             }
         }
     }
