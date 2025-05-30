@@ -172,7 +172,7 @@ namespace HOK.Core.BackgroundTasks
                         existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                         tr.Commit();
                     }
-                    if(tr.GetStatus() != TransactionStatus.Committed)
+                    if(tr.GetStatus() == TransactionStatus.Started)
                         tr.Commit();
                 }
             }
