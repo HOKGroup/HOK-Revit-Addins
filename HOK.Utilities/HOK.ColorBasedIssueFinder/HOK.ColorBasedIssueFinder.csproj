@@ -68,9 +68,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ColorBasedIssueFinder.addin" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
