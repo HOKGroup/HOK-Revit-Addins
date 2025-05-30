@@ -115,23 +115,28 @@ namespace HOK.Core.BackgroundTasks
             {
                 if (doc.IsModifiable)
                 {
-                    if (
-                        hokSheetSet != null
-                        && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                            == HOK_PRINT_SET_NAME
-                    )
+                    try
                     {
-                        try
+                        if (
+                            hokSheetSet != null
+                            && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
+                                == HOK_PRINT_SET_NAME
+                        )
+                        {
+                            try
+                            {
+                                existingVSS.CurrentViewSheetSet.Views = newVSS;
+                                existingVSS.Save();
+                            }
+                            catch (Exception ex) { }
+                        }
+                        else
                         {
                             existingVSS.CurrentViewSheetSet.Views = newVSS;
-                            existingVSS.Save();
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.AppendLog(LogMessageType.EXCEPTION, "Failed to set sheets to print set \"_HOK Automated Print Set\". Exception message: " + ex.Message);
+                            existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                         }
                     }
-                    else
+                    catch (Exception ex)
                     {
                         existingVSS.CurrentViewSheetSet.Views = newVSS;
                         existingVSS.SaveAs(HOK_PRINT_SET_NAME);
@@ -140,25 +145,35 @@ namespace HOK.Core.BackgroundTasks
                 else
                 {
                     tr.Start();
-                    if (
-                        hokSheetSet != null
-                        && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                            == HOK_PRINT_SET_NAME
-                    )
+                    try
                     {
-                        try
+                        if (
+                            hokSheetSet != null
+                            && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
+                                == HOK_PRINT_SET_NAME
+                        )
+                        {
+                            try
+                            {
+                                existingVSS.CurrentViewSheetSet.Views = newVSS;
+                                existingVSS.Save();
+                            }
+                            catch { }
+                        }
+                        else
                         {
                             existingVSS.CurrentViewSheetSet.Views = newVSS;
-                            existingVSS.Save();
+                            existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                         }
-                        catch { }
                     }
-                    else
+                    catch (Exception ex)
                     {
                         existingVSS.CurrentViewSheetSet.Views = newVSS;
                         existingVSS.SaveAs(HOK_PRINT_SET_NAME);
+                        tr.Commit();
                     }
-                    tr.Commit();
+                    if(tr.GetStatus() != TransactionStatus.Committed)
+                        tr.Commit();
                 }
             }
 
