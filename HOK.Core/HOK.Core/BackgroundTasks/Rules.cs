@@ -74,6 +74,8 @@ namespace HOK.Core.BackgroundTasks
             }
 
             PrintManager pm = doc.PrintManager;
+            // Store the original settings to restore later
+            PrintRange origRange = pm.PrintRange;
 
             // Ensure that the print manager setting is set to selected views
             if (pm.PrintRange != PrintRange.Select)
@@ -81,6 +83,7 @@ namespace HOK.Core.BackgroundTasks
                 pm.PrintRange = PrintRange.Select;
             }
 
+            ViewSheetSetting origVSS = pm.ViewSheetSetting;
             ViewSheetSetting existingVSS = pm.ViewSheetSetting;
             // Save the previously selected viewsheet set so we can set it back to the original at the end
             var existingViewSheetSet = existingVSS.CurrentViewSheetSet;
@@ -90,9 +93,24 @@ namespace HOK.Core.BackgroundTasks
                 .Cast<ViewSheetSet>();
 
             if (hokSheetSet.Select(ss => ss.Name).Contains(HOK_PRINT_SET_NAME))
-                existingVSS.CurrentViewSheetSet = hokSheetSet.First(
-                    ss => ss.Name == HOK_PRINT_SET_NAME
-                );
+            {
+                if (doc.IsModifiable)
+                {
+                    existingVSS.CurrentViewSheetSet = hokSheetSet.First(
+                    ss => ss.Name == HOK_PRINT_SET_NAME);
+                }
+                else
+                {
+                    using (Transaction tr = new Transaction(doc, "Set Current View Sheet Set"))
+                    {
+                        tr.Start();
+                        existingVSS.CurrentViewSheetSet = hokSheetSet.First(
+                        ss => ss.Name == HOK_PRINT_SET_NAME);
+                        tr.Commit();
+                    }
+                }
+            }
+
 
             List<ElementId> sheetsInModel = new FilteredElementCollector(doc)
                 .OfClass(typeof(ViewSheet))
@@ -190,7 +208,7 @@ namespace HOK.Core.BackgroundTasks
 
             // Get the entity
             Entity entity = doc.ProjectInformation.GetEntity(exportListSchema);
-            if(entity.Schema == null)
+            if (entity.Schema == null)
             {
                 entity = new Entity(exportListSchema);
             }
@@ -248,6 +266,23 @@ namespace HOK.Core.BackgroundTasks
                 catch (Exception ex)
                 {
                     _ = ex.Message;
+                }
+            }
+
+            // Reset the original print range settings in the print manager
+            if (doc.IsModifiable)
+            {
+                pm.ViewSheetSetting.CurrentViewSheetSet = origVSS.CurrentViewSheetSet;
+                pm.PrintRange = origRange;
+            }
+            else
+            {
+                using(Transaction tr = new Transaction(doc, "Reset Original Print Settings"))
+                {
+                    tr.Start();
+                    pm.ViewSheetSetting.CurrentViewSheetSet = origVSS.CurrentViewSheetSet;
+                    pm.PrintRange = origRange;
+                    tr.Commit();
                 }
             }
         }
