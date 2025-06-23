@@ -22,12 +22,38 @@ namespace HOK.RibbonTab
         private const string tooltipFileName = "HOK.Tooltip.txt";
         private readonly Dictionary<string, ButtonData> buttonDictionary = new Dictionary<string, ButtonData>();
 
+        AddInCommandBinding partialCADExplodeBinding;
+        AddInCommandBinding fullCADExplodeBinding;
 
         public override void OnStartup()
         {
             Application.ControlledApplication.DocumentOpening += OnDocumentOpening;
             Application.ControlledApplication.DocumentCreating += OnDocumentCreating;
             Application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
+
+            // Preventing CAD explosions through right-click menu
+            UIApplication uiapp = this.UiApplication;
+
+            RevitCommandId partialExplodeCommandId = RevitCommandId.LookupCommandId(
+                "ID_IMPORT_INST_PARTIAL_EXPLODE"
+            );
+            RevitCommandId fullExplodeCommandId = RevitCommandId.LookupCommandId(
+                "ID_IMPORT_INSTANCE_EXPLODE"
+            );
+
+            try
+            {
+                partialCADExplodeBinding = uiapp.CreateAddInCommandBinding(partialExplodeCommandId);
+                fullCADExplodeBinding = uiapp.CreateAddInCommandBinding(fullExplodeCommandId);
+
+                partialCADExplodeBinding.Executed += HOK.Core.BackgroundTasks.Rules.PreventPartialCADExplosions;
+                fullCADExplodeBinding.Executed += HOK.Core.BackgroundTasks.Rules.PreventFullCADExplosions;
+            }
+            catch (Exception ex)
+            {
+                
+            }
+
             m_app = Application;
             tabName = "   HOK   ";
             

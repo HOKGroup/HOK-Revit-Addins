@@ -286,5 +286,20 @@ namespace HOK.Core.BackgroundTasks
                 }
             }
         }
+
+        public static void PreventPartialCADExplosions(object sender, Autodesk.Revit.UI.Events.ExecutedEventArgs arg)
+        {
+            TaskDialog.Show(
+                "Partial Explode Cancelled",
+                "Exploding a CAD file can drastically increase file size and is not recommended."
+            );
+        }
+        public static void PreventFullCADExplosions(object sender, Autodesk.Revit.UI.Events.ExecutedEventArgs arg)
+        {
+            TaskDialog.Show(
+                "Full Explode Cancelled",
+                "Exploding a CAD file can drastically increase file size and is not recommended."
+            );
+        }
     }
 }
