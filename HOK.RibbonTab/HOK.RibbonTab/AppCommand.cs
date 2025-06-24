@@ -31,9 +31,6 @@ namespace HOK.RibbonTab
             Application.ControlledApplication.DocumentCreating += OnDocumentCreating;
             Application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
 
-            // Preventing CAD explosions through right-click menu
-            UIApplication uiapp = this.UiApplication;
-
             RevitCommandId partialExplodeCommandId = RevitCommandId.LookupCommandId(
                 "ID_IMPORT_INST_PARTIAL_EXPLODE"
             );
@@ -43,8 +40,8 @@ namespace HOK.RibbonTab
 
             try
             {
-                partialCADExplodeBinding = uiapp.CreateAddInCommandBinding(partialExplodeCommandId);
-                fullCADExplodeBinding = uiapp.CreateAddInCommandBinding(fullExplodeCommandId);
+                partialCADExplodeBinding = this.UiApplication.CreateAddInCommandBinding(partialExplodeCommandId);
+                fullCADExplodeBinding = this.UiApplication.CreateAddInCommandBinding(fullExplodeCommandId);
 
                 partialCADExplodeBinding.Executed += HOK.Core.BackgroundTasks.Rules.PreventPartialCADExplosions;
                 fullCADExplodeBinding.Executed += HOK.Core.BackgroundTasks.Rules.PreventFullCADExplosions;
