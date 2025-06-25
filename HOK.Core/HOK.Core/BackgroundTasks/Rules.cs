@@ -134,13 +134,15 @@ namespace HOK.Core.BackgroundTasks
                         existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     existingVSS.CurrentViewSheetSet.Views = newVSS;
                     existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                 }
                 if (tr.GetStatus() == TransactionStatus.Started)
+                {
                     tr.Commit();
+                }
             }
 
             // Part 2: Automatically enable the additional workset so that it's included in the published set list
@@ -187,27 +189,24 @@ namespace HOK.Core.BackgroundTasks
             }
 
             // Set it in a transaction
-            
+            using (Transaction tr = new Transaction(doc, "Set Published Export Sheet Set List"))
             {
-                using (Transaction tr = new Transaction(doc, "Set Published Export Sheet Set List"))
+                if (!doc.IsModifiable)
+                { 
+                    tr.Start();
+                }
+                try
                 {
-                    if (!doc.IsModifiable)
-                    { 
-                        tr.Start();
-                    }
-                    try
-                    {
-                        entity.Set(exportSheetSetIdList, viewSheetSetIds);
-                        doc.ProjectInformation.SetEntity(entity);
-                    }
-                    catch (Exception ex)
-                    {
-                        _ = ex.Message;
-                    }
-                    if (tr.GetStatus() == TransactionStatus.Started)
-                    {
-                        tr.Commit();
-                    }
+                    entity.Set(exportSheetSetIdList, viewSheetSetIds);
+                    doc.ProjectInformation.SetEntity(entity);
+                }
+                catch (Exception ex)
+                {
+                    _ = ex.Message;
+                }
+                if (tr.GetStatus() == TransactionStatus.Started)
+                {
+                    tr.Commit();
                 }
             }
 
