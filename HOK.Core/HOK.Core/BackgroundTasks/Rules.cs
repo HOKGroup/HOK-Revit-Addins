@@ -24,24 +24,11 @@ namespace HOK.Core.BackgroundTasks
                 // Creating the parameter
                 using (Transaction tr = new Transaction(doc, "Create HOK Print Set Parameter"))
                 {
-                    if (doc.IsModifiable)
-                    {
-                        GlobalParameter hokPrintSetParam = GlobalParameter.Create(
-                            doc,
-                            HOK_PRINT_SET_PARAM_NAME,
-#if REVIT2022_OR_GREATER
-                            SpecTypeId.Boolean.YesNo
-#else
-                            ParameterType.YesNo
-#endif
-                        );
-                        // Set the default value to on/true
-                        hokPrintSetParam.SetValue(new IntegerParameterValue(1));
-                    }
-                    else
+                    if (!doc.IsModifiable)
                     {
                         tr.Start();
-                        GlobalParameter hokPrintSetParam = GlobalParameter.Create(
+                    }
+                    GlobalParameter hokPrintSetParam = GlobalParameter.Create(
                             doc,
                             HOK_PRINT_SET_PARAM_NAME,
 #if REVIT2022_OR_GREATER
@@ -50,8 +37,10 @@ namespace HOK.Core.BackgroundTasks
                             ParameterType.YesNo
 #endif
                         );
-                        // Set the default value to on/true
-                        hokPrintSetParam.SetValue(new IntegerParameterValue(1));
+                    // Set the default value to on/true
+                    hokPrintSetParam.SetValue(new IntegerParameterValue(1));
+                    if (tr.GetStatus() == TransactionStatus.Started)
+                    {
                         tr.Commit();
                     }
                 }
@@ -94,23 +83,20 @@ namespace HOK.Core.BackgroundTasks
 
             if (hokSheetSet.Select(ss => ss.Name).Contains(HOK_PRINT_SET_NAME))
             {
-                if (doc.IsModifiable)
+                using (Transaction tr = new Transaction(doc, "Set Current View Sheet Set"))
                 {
-                    existingVSS.CurrentViewSheetSet = hokSheetSet.First(
-                    ss => ss.Name == HOK_PRINT_SET_NAME);
-                }
-                else
-                {
-                    using (Transaction tr = new Transaction(doc, "Set Current View Sheet Set"))
+                    if (!doc.IsModifiable)
                     {
                         tr.Start();
-                        existingVSS.CurrentViewSheetSet = hokSheetSet.First(
-                        ss => ss.Name == HOK_PRINT_SET_NAME);
+                    }
+                    existingVSS.CurrentViewSheetSet = hokSheetSet.First(
+                    ss => ss.Name == HOK_PRINT_SET_NAME);
+                    if (tr.GetStatus() == TransactionStatus.Started)
+                    {
                         tr.Commit();
                     }
                 }
             }
-
 
             List<ElementId> sheetsInModel = new FilteredElementCollector(doc)
                 .OfClass(typeof(ViewSheet))
@@ -131,68 +117,30 @@ namespace HOK.Core.BackgroundTasks
             }
             using (Transaction tr = new Transaction(doc, "Add Sheets to View Sheet Set"))
             {
-                if (doc.IsModifiable)
-                {
-                    try
-                    {
-                        if (
-                            hokSheetSet != null
-                            && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                                == HOK_PRINT_SET_NAME
-                        )
-                        {
-                            try
-                            {
-                                existingVSS.CurrentViewSheetSet.Views = newVSS;
-                                existingVSS.Save();
-                            }
-                            catch (Exception ex) { }
-                        }
-                        else
-                        {
-                            existingVSS.CurrentViewSheetSet.Views = newVSS;
-                            existingVSS.SaveAs(HOK_PRINT_SET_NAME);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        existingVSS.CurrentViewSheetSet.Views = newVSS;
-                        existingVSS.SaveAs(HOK_PRINT_SET_NAME);
-                    }
-                }
-                else
+                if (!doc.IsModifiable)
                 {
                     tr.Start();
-                    try
+                }
+                try
+                {
+                    if (hokSheetSet != null && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name == HOK_PRINT_SET_NAME)
                     {
-                        if (
-                            hokSheetSet != null
-                            && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                                == HOK_PRINT_SET_NAME
-                        )
-                        {
-                            try
-                            {
-                                existingVSS.CurrentViewSheetSet.Views = newVSS;
-                                existingVSS.Save();
-                            }
-                            catch { }
-                        }
-                        else
-                        {
-                            existingVSS.CurrentViewSheetSet.Views = newVSS;
-                            existingVSS.SaveAs(HOK_PRINT_SET_NAME);
-                        }
+                        existingVSS.CurrentViewSheetSet.Views = newVSS;
+                        existingVSS.Save();
                     }
-                    catch (Exception ex)
+                    else
                     {
                         existingVSS.CurrentViewSheetSet.Views = newVSS;
                         existingVSS.SaveAs(HOK_PRINT_SET_NAME);
-                        tr.Commit();
                     }
-                    if (tr.GetStatus() == TransactionStatus.Started)
-                        tr.Commit();
                 }
+                catch (Exception ex)
+                {
+                    existingVSS.CurrentViewSheetSet.Views = newVSS;
+                    existingVSS.SaveAs(HOK_PRINT_SET_NAME);
+                }
+                if (tr.GetStatus() == TransactionStatus.Started)
+                    tr.Commit();
             }
 
             // Part 2: Automatically enable the additional workset so that it's included in the published set list
@@ -239,11 +187,14 @@ namespace HOK.Core.BackgroundTasks
             }
 
             // Set it in a transaction
-            if (!doc.IsModifiable)
+            
             {
                 using (Transaction tr = new Transaction(doc, "Set Published Export Sheet Set List"))
                 {
-                    tr.Start();
+                    if (!doc.IsModifiable)
+                    { 
+                        tr.Start();
+                    }
                     try
                     {
                         entity.Set(exportSheetSetIdList, viewSheetSetIds);
@@ -253,35 +204,24 @@ namespace HOK.Core.BackgroundTasks
                     {
                         _ = ex.Message;
                     }
-                    tr.Commit();
-                }
-            }
-            else
-            {
-                try
-                {
-                    entity.Set(exportSheetSetIdList, viewSheetSetIds);
-                    doc.ProjectInformation.SetEntity(entity);
-                }
-                catch (Exception ex)
-                {
-                    _ = ex.Message;
+                    if (tr.GetStatus() == TransactionStatus.Started)
+                    {
+                        tr.Commit();
+                    }
                 }
             }
 
             // Reset the original print range settings in the print manager
-            if (doc.IsModifiable)
+            using (Transaction tr = new Transaction(doc, "Reset Original Print Settings"))
             {
-                pm.ViewSheetSetting.CurrentViewSheetSet = origVSS.CurrentViewSheetSet;
-                pm.PrintRange = origRange;
-            }
-            else
-            {
-                using(Transaction tr = new Transaction(doc, "Reset Original Print Settings"))
+                if (!doc.IsModifiable)
                 {
                     tr.Start();
-                    pm.ViewSheetSetting.CurrentViewSheetSet = origVSS.CurrentViewSheetSet;
-                    pm.PrintRange = origRange;
+                }
+                pm.ViewSheetSetting.CurrentViewSheetSet = origVSS.CurrentViewSheetSet;
+                pm.PrintRange = origRange;
+                if (tr.GetStatus() == TransactionStatus.Started)
+                {
                     tr.Commit();
                 }
             }

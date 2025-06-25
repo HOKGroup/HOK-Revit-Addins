@@ -22,34 +22,11 @@ namespace HOK.RibbonTab
         private const string tooltipFileName = "HOK.Tooltip.txt";
         private readonly Dictionary<string, ButtonData> buttonDictionary = new Dictionary<string, ButtonData>();
 
-        AddInCommandBinding partialCADExplodeBinding;
-        AddInCommandBinding fullCADExplodeBinding;
-
         public override void OnStartup()
         {
             Application.ControlledApplication.DocumentOpening += OnDocumentOpening;
             Application.ControlledApplication.DocumentCreating += OnDocumentCreating;
             Application.ControlledApplication.DocumentSynchronizingWithCentral += OnDocumentSynchronizing;
-
-            RevitCommandId partialExplodeCommandId = RevitCommandId.LookupCommandId(
-                "ID_IMPORT_INST_PARTIAL_EXPLODE"
-            );
-            RevitCommandId fullExplodeCommandId = RevitCommandId.LookupCommandId(
-                "ID_IMPORT_INSTANCE_EXPLODE"
-            );
-
-            try
-            {
-                partialCADExplodeBinding = this.UiApplication.CreateAddInCommandBinding(partialExplodeCommandId);
-                fullCADExplodeBinding = this.UiApplication.CreateAddInCommandBinding(fullExplodeCommandId);
-
-                partialCADExplodeBinding.Executed += HOK.Core.BackgroundTasks.Rules.PreventPartialCADExplosions;
-                fullCADExplodeBinding.Executed += HOK.Core.BackgroundTasks.Rules.PreventFullCADExplosions;
-            }
-            catch (Exception ex)
-            {
-                
-            }
 
             m_app = Application;
             tabName = "   HOK   ";
@@ -75,6 +52,7 @@ namespace HOK.RibbonTab
             //CreateDataPushButtons();
             CreateAvfPushButtons();
             //CreateMissionControlPushButtons();
+            PreventCADExplode();
         }
 
         private void OnDocumentSynchronizing(object sender, DocumentSynchronizingWithCentralEventArgs e)
@@ -123,6 +101,33 @@ namespace HOK.RibbonTab
             Application.ControlledApplication.DocumentOpening -= OnDocumentOpening;
 
             Log.WriteLog();
+        }
+
+        private void PreventCADExplode()
+        {
+
+            AddInCommandBinding partialCADExplodeBinding;
+            AddInCommandBinding fullCADExplodeBinding;
+
+            RevitCommandId partialExplodeCommandId = RevitCommandId.LookupCommandId(
+                "ID_IMPORT_INST_PARTIAL_EXPLODE"
+            );
+            RevitCommandId fullExplodeCommandId = RevitCommandId.LookupCommandId(
+                "ID_IMPORT_INSTANCE_EXPLODE"
+            );
+
+            try
+            {
+                partialCADExplodeBinding = Application.CreateAddInCommandBinding(partialExplodeCommandId);
+                fullCADExplodeBinding = Application.CreateAddInCommandBinding(fullExplodeCommandId);
+
+                partialCADExplodeBinding.Executed += HOK.Core.BackgroundTasks.Rules.PreventPartialCADExplosions;
+                fullCADExplodeBinding.Executed += HOK.Core.BackgroundTasks.Rules.PreventFullCADExplosions;
+            }
+            catch (Exception ex)
+            {
+                Log.AppendLog(LogMessageType.EXCEPTION, "Error when trying to bind to CAD explode functions: " + ex.Message);
+            }
         }
 
         /// <summary>
