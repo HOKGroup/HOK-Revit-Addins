@@ -24,24 +24,11 @@ namespace HOK.Core.BackgroundTasks
                 // Creating the parameter
                 using (Transaction tr = new Transaction(doc, "Create HOK Print Set Parameter"))
                 {
-                    if (doc.IsModifiable)
-                    {
-                        GlobalParameter hokPrintSetParam = GlobalParameter.Create(
-                            doc,
-                            HOK_PRINT_SET_PARAM_NAME,
-#if REVIT2022_OR_GREATER
-                            SpecTypeId.Boolean.YesNo
-#else
-                            ParameterType.YesNo
-#endif
-                        );
-                        // Set the default value to on/true
-                        hokPrintSetParam.SetValue(new IntegerParameterValue(1));
-                    }
-                    else
+                    if (!doc.IsModifiable)
                     {
                         tr.Start();
-                        GlobalParameter hokPrintSetParam = GlobalParameter.Create(
+                    }
+                    GlobalParameter hokPrintSetParam = GlobalParameter.Create(
                             doc,
                             HOK_PRINT_SET_PARAM_NAME,
 #if REVIT2022_OR_GREATER
@@ -50,8 +37,10 @@ namespace HOK.Core.BackgroundTasks
                             ParameterType.YesNo
 #endif
                         );
-                        // Set the default value to on/true
-                        hokPrintSetParam.SetValue(new IntegerParameterValue(1));
+                    // Set the default value to on/true
+                    hokPrintSetParam.SetValue(new IntegerParameterValue(1));
+                    if (tr.GetStatus() == TransactionStatus.Started)
+                    {
                         tr.Commit();
                     }
                 }
@@ -74,6 +63,8 @@ namespace HOK.Core.BackgroundTasks
             }
 
             PrintManager pm = doc.PrintManager;
+            // Store the original settings to restore later
+            PrintRange origRange = pm.PrintRange;
 
             // Ensure that the print manager setting is set to selected views
             if (pm.PrintRange != PrintRange.Select)
@@ -81,6 +72,7 @@ namespace HOK.Core.BackgroundTasks
                 pm.PrintRange = PrintRange.Select;
             }
 
+            ViewSheetSetting origVSS = pm.ViewSheetSetting;
             ViewSheetSetting existingVSS = pm.ViewSheetSetting;
             // Save the previously selected viewsheet set so we can set it back to the original at the end
             var existingViewSheetSet = existingVSS.CurrentViewSheetSet;
@@ -90,9 +82,21 @@ namespace HOK.Core.BackgroundTasks
                 .Cast<ViewSheetSet>();
 
             if (hokSheetSet.Select(ss => ss.Name).Contains(HOK_PRINT_SET_NAME))
-                existingVSS.CurrentViewSheetSet = hokSheetSet.First(
-                    ss => ss.Name == HOK_PRINT_SET_NAME
-                );
+            {
+                using (Transaction tr = new Transaction(doc, "Set Current View Sheet Set"))
+                {
+                    if (!doc.IsModifiable)
+                    {
+                        tr.Start();
+                    }
+                    existingVSS.CurrentViewSheetSet = hokSheetSet.First(
+                    ss => ss.Name == HOK_PRINT_SET_NAME);
+                    if (tr.GetStatus() == TransactionStatus.Started)
+                    {
+                        tr.Commit();
+                    }
+                }
+            }
 
             List<ElementId> sheetsInModel = new FilteredElementCollector(doc)
                 .OfClass(typeof(ViewSheet))
@@ -113,23 +117,16 @@ namespace HOK.Core.BackgroundTasks
             }
             using (Transaction tr = new Transaction(doc, "Add Sheets to View Sheet Set"))
             {
-                if (doc.IsModifiable)
+                if (!doc.IsModifiable)
                 {
-                    if (
-                        hokSheetSet != null
-                        && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                            == HOK_PRINT_SET_NAME
-                    )
+                    tr.Start();
+                }
+                try
+                {
+                    if (hokSheetSet != null && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name == HOK_PRINT_SET_NAME)
                     {
-                        try
-                        {
-                            existingVSS.CurrentViewSheetSet.Views = newVSS;
-                            existingVSS.Save();
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.AppendLog(LogMessageType.EXCEPTION, "Failed to set sheets to print set \"_HOK Automated Print Set\". Exception message: " + ex.Message);
-                        }
+                        existingVSS.CurrentViewSheetSet.Views = newVSS;
+                        existingVSS.Save();
                     }
                     else
                     {
@@ -137,27 +134,13 @@ namespace HOK.Core.BackgroundTasks
                         existingVSS.SaveAs(HOK_PRINT_SET_NAME);
                     }
                 }
-                else
+                catch
                 {
-                    tr.Start();
-                    if (
-                        hokSheetSet != null
-                        && ((ViewSheetSet)existingVSS.CurrentViewSheetSet).Name
-                            == HOK_PRINT_SET_NAME
-                    )
-                    {
-                        try
-                        {
-                            existingVSS.CurrentViewSheetSet.Views = newVSS;
-                            existingVSS.Save();
-                        }
-                        catch { }
-                    }
-                    else
-                    {
-                        existingVSS.CurrentViewSheetSet.Views = newVSS;
-                        existingVSS.SaveAs(HOK_PRINT_SET_NAME);
-                    }
+                    existingVSS.CurrentViewSheetSet.Views = newVSS;
+                    existingVSS.SaveAs(HOK_PRINT_SET_NAME);
+                }
+                if (tr.GetStatus() == TransactionStatus.Started)
+                {
                     tr.Commit();
                 }
             }
@@ -165,16 +148,32 @@ namespace HOK.Core.BackgroundTasks
             // Part 2: Automatically enable the additional workset so that it's included in the published set list
 
             // Get the schema ExportViewSheetSetListWith64BitId
+
+            var schemas = Schema.ListSchemas();
+
             var exportListSchema = Schema.ListSchemas().First(s => s.SchemaName == "ExportViewSheetSetListSchemaWith64BitId");
 
             // Get the ExportViewViewSheetSetIdList field
             var exportSheetSetIdList = exportListSchema.GetField("ExportViewViewSheetSetIdList");
 
             // Get the entity
-            var entity = doc.ProjectInformation.GetEntity(exportListSchema);
+            Entity entity = doc.ProjectInformation.GetEntity(exportListSchema);
+            if (entity.Schema == null)
+            {
+                entity = new Entity(exportListSchema);
+            }
 
             // Get the enabled view sheets sets for publishing
-            var viewSheetSetIds = entity.Get<IList<ElementId>>(exportSheetSetIdList);
+            IList<ElementId> viewSheetSetIds;
+            try
+            {
+                viewSheetSetIds = entity.Get<IList<ElementId>>(exportSheetSetIdList);
+            }
+            catch
+            {
+                viewSheetSetIds = new List<ElementId>();
+            }
+
 
             // Add the additional view sheet set, first get the view sheet set id
             var existingViewSheetSetId = new FilteredElementCollector(doc)
@@ -189,29 +188,57 @@ namespace HOK.Core.BackgroundTasks
                 viewSheetSetIds.Add(existingViewSheetSetId);
             }
 
-            try
+            // Set it in a transaction
+            using (Transaction tr = new Transaction(doc, "Set Published Export Sheet Set List"))
             {
-                // Set it in a transaction
                 if (!doc.IsModifiable)
-                {
-                    using (Transaction tr = new Transaction(doc, "Set Published Export Sheet Set List"))
-                    {
-                        tr.Start();
-                        entity.Set(exportSheetSetIdList, viewSheetSetIds);
-                        doc.ProjectInformation.SetEntity(entity);
-                        tr.Commit();
-                    }
+                { 
+                    tr.Start();
                 }
-                else
+                try
                 {
                     entity.Set(exportSheetSetIdList, viewSheetSetIds);
                     doc.ProjectInformation.SetEntity(entity);
                 }
+                catch (Exception ex)
+                {
+                    _ = ex.Message;
+                }
+                if (tr.GetStatus() == TransactionStatus.Started)
+                {
+                    tr.Commit();
+                }
             }
-            catch(Exception ex)
+
+            // Reset the original print range settings in the print manager
+            using (Transaction tr = new Transaction(doc, "Reset Original Print Settings"))
             {
-                Log.AppendLog(LogMessageType.EXCEPTION, "Failed to set published sheet set list. Exception message: " + ex.Message);
+                if (!doc.IsModifiable)
+                {
+                    tr.Start();
+                }
+                pm.ViewSheetSetting.CurrentViewSheetSet = origVSS.CurrentViewSheetSet;
+                pm.PrintRange = origRange;
+                if (tr.GetStatus() == TransactionStatus.Started)
+                {
+                    tr.Commit();
+                }
             }
+        }
+
+        public static void PreventPartialCADExplosions(object sender, Autodesk.Revit.UI.Events.ExecutedEventArgs arg)
+        {
+            TaskDialog.Show(
+                "Partial Explode Cancelled",
+                "Exploding a CAD file can drastically increase file size and is not recommended."
+            );
+        }
+        public static void PreventFullCADExplosions(object sender, Autodesk.Revit.UI.Events.ExecutedEventArgs arg)
+        {
+            TaskDialog.Show(
+                "Full Explode Cancelled",
+                "Exploding a CAD file can drastically increase file size and is not recommended."
+            );
         }
     }
 }
