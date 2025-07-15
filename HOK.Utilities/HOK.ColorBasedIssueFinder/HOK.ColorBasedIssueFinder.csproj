@@ -26,7 +26,7 @@
     <Company>Autodesk Inc.</Company>
     <Product>HOK.ColorBasedIssueFinder Revit C# .NET Add-In</Product>
     <Copyright>Copyright © HOK Group 2025</Copyright>
-    <Version>0.1.0.26</Version>
+    <Version>0.1.0.29</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(Configuration.Contains('R19'))">

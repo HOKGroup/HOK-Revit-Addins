@@ -13,6 +13,7 @@ jobs:
 
   variables:
   - group: code-signing
+  - group: artifacts-feed
   - name: solution
     value: '**/HOK.!(Core|MissionControl|Feedback|ParameterTools|FileOpeningMonitor|ModelReporting|SheetManager).sln'
   - name: coreSolution
@@ -73,6 +74,12 @@ jobs:
       SourceFolder: '$(Agent.TempDirectory)'
       Contents: 'CISign.pfx'
       TargetFolder: '$(Build.SourcesDirectory)/_cert'
+
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'custom'
+      custom: 'nuget'
+      arguments: 'add source --username dan.siroky --password $(DEVOPS_PAT) --store-password-in-clear-text --name HOK.Revit.Nuget  "https://pkgs.dev.azure.com/hok-appdev/HOK-Revit-Addins/_packaging/HOK.Revit.Nuget/nuget/v3/index.json"'
 
   - task: DotNetCoreCLI@2
     inputs:

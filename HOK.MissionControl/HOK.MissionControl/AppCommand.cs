@@ -15,7 +15,6 @@ using HOK.MissionControl.Tools.Communicator;
 using HOK.MissionControl.Tools.DTMTool;
 using HOK.MissionControl.Core.Utils;
 using HOK.MissionControl.Tools.Communicator.Messaging;
-using HOK.MissionControl.Tools.Communicator.Socket;
 using HOK.MissionControl.Tools.MissionControl;
 using Nice3point.Revit.Toolkit.External;
 
@@ -32,14 +31,12 @@ namespace HOK.MissionControl
         public static Dictionary<string, DateTime> OpenTime { get; set; } = new Dictionary<string, DateTime>();
         public static Dictionary<string, WarningItem> Warnings { get; set; } = new Dictionary<string, WarningItem>();
         public static CommunicatorView CommunicatorWindow { get; set; }
-        public static MissionControlSocket Socket { get; set; }
         public static bool IsSynching { get; set; }
         public static bool IsSynchOverriden { get; set; }
         public static bool IsSynchNowOverriden { get; set; }
         public static CommunicatorRequestHandler CommunicatorHandler { get; set; }
         public static ExternalEvent CommunicatorEvent { get; set; }
         public static Dictionary<string, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<string, FamilyItem>();
-        public PushButton CommunicatorButton { get; set; }
         public PushButton WebsiteButton { get; set; }
         public PushButton FamilyPublishButton { get; set; }
         public DoorUpdater DoorUpdaterInstance { get; set; }
@@ -155,12 +152,6 @@ namespace HOK.MissionControl
 
                 // (Konrad) Cleanup updaters.
                 Tools.MissionControl.MissionControl.UnregisterUpdaters(doc);
-
-                // (Konrad) Disconnect from Sockets.
-                Socket?.Kill();
-
-                // (Konrad) If any task windows are still open, let's shut them down.
-                WeakReferenceMessenger.Default.Send(new DocumentClosed { CloseWindow = true });
             }
             catch (Exception ex)
             {
@@ -311,8 +302,6 @@ namespace HOK.MissionControl
         /// <param name="doc"></param>
         private static void CheckIn(Document doc)
         {
-            CommunicatorUtilities.SetCommunicatorImage();
-
             new Thread(() => new Tools.MissionControl.MissionControl().CheckIn(doc))
             {
                 Priority = ThreadPriority.BelowNormal,
