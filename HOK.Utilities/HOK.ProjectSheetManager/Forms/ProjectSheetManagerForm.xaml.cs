@@ -983,8 +983,8 @@ namespace HOK.ProjectSheetManager.Forms
                         foreach (string x in paramNames)
                         {
                             // Skip sheet number and sheet name
-                            if (x.ToUpper() == "SHEET NUMBER" || x.ToUpper() == "NAME")
-                                continue;
+                            //if (x.ToUpper() == "SHEET NUMBER" || x.ToUpper() == "NAME")
+                            //    continue;
 
                             // Avoid double searching in titleblock family later
                             bool paramFoundInSheet = false;
