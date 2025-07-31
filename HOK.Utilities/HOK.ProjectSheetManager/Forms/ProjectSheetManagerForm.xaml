@@ -12,6 +12,12 @@
                 <TextBlock x:Name="lblExcelPath" HorizontalAlignment="Left" VerticalAlignment="Center" Height="41" Width="772"
                        ToolTip="This path is set in the Global Parameter named &quot;Sheet Manager Excel File Path&quot;." TextWrapping="WrapWithOverflow" Margin="10,0,0,0" FontWeight="Bold" FontSize="14"
                            PreviewMouseDown="lblExcelPath_PreviewMouseDown"/>
+                <Button x:Name="btnSetExcelPath" Margin="787,10,10,10" Click="btnSetExcelPath_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/HOK.ProjectSheetManager;component/Resources/excel.png" Stretch="Fill" Margin="2" Height="26" Width="28"></Image>
+                        <TextBlock Text="   Set Path" VerticalAlignment="Center"></TextBlock>
+                    </StackPanel>
+                </Button>
             </Grid>
         </GroupBox>
         <GroupBox Header="Sheet Elements" Margin="10,100,0,102" HorizontalAlignment="Left" Width="482" FontFamily="HOK Sans">

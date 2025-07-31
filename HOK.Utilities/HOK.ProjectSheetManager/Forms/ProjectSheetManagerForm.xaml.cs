@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using CommunityToolkit.Mvvm.Input;
 using HOK.Core.Utilities;
 using HOK.ProjectSheetManager.Classes;
 using System;
@@ -55,13 +56,13 @@ namespace HOK.ProjectSheetManager.Forms
 
             try
             {
-                if (addinSettings.ExcelPath() == "")
+                if (addinSettings.ExcelPath == "")
                 {
                     lblExcelPath.Text = "No Excel file path set.";
                 }
                 else
                 {
-                    lblExcelPath.Text = addinSettings.ExcelPath();
+                    lblExcelPath.Text = addinSettings.ExcelPath;
                     FillTemplateList();
                 }
             }
@@ -308,8 +309,11 @@ namespace HOK.ProjectSheetManager.Forms
 
         private void lstBxSheetSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ScanSheets();
-            lblSelectedWorksheet.Content = "Selected Worksheet: " + lstBxSheetSource.SelectedItem.ToString();
+            if(lstBxSheetSource.Items.Count != 0)
+            {
+                ScanSheets();
+                lblSelectedWorksheet.Content = "Selected Worksheet: " + lstBxSheetSource.SelectedItem.ToString();
+            }
         }
 
         private void btnAddViewsSheets_Click(object sender, RoutedEventArgs e)
@@ -793,20 +797,18 @@ namespace HOK.ProjectSheetManager.Forms
                 excelUtility.DataTable = dataTable;
 
                 // Checking file write permissions
-                if (!HasWritePermission(addinSettings.ExcelPath()))
+                if (!HasWritePermission(addinSettings.ExcelPath))
                 {
                     // Excel file does not have write permissions
                     td = new TaskDialog("Sheet Manager - Export Sheet Data");
                     td.MainInstruction = "Processing Cancelled";
-                    td.MainContent = "You do not have the proper permissions to write to the excel file at " + addinSettings.ExcelPath();
+                    td.MainContent = "You do not have the proper permissions to write to the excel file at " + addinSettings.ExcelPath;
                     td.Show();
                     addinSettings.GetSheetsAndTitleblockInstances();
                     ScanSheets();
                     this.Focus();
                     return;
                 }
-
-                addinSettings.ExcelPath();
                 try
                 {
                     excelUtility.FillExcelWorksheetFromDataTable(lstBxSheetSource.SelectedItem.ToString());
@@ -1399,6 +1401,48 @@ namespace HOK.ProjectSheetManager.Forms
             {
                 TaskDialog.Show("Failed to Open Excel File!", ex.Message);
             }
+        }
+
+        private void btnSetExcelPath_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Task task = SetExcelPath();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message);
+            }
+        }
+        [RelayCommand]
+        private async Task SetExcelPath()
+        {
+            var openFileDlg = new System.Windows.Forms.OpenFileDialog();
+            openFileDlg.Filter = "Excel Files|*.xlsx";
+            openFileDlg.Multiselect = false;
+            var result = openFileDlg.ShowDialog();
+            if (result.ToString() != string.Empty)
+            {
+                lblExcelPath.Text = openFileDlg.FileName;
+                // Set the global parameter
+                const string HOK_EXCEL_PATH_PARAM_NAME = "Sheet Manager Excel File Path";
+                ElementId hokExcelFilePathParamId = GlobalParametersManager.FindByName(addinSettings.Document, HOK_EXCEL_PATH_PARAM_NAME);
+
+                GlobalParameter hokExcelFilePathParam = this.addinSettings.Document.GetElement(hokExcelFilePathParamId) as GlobalParameter;
+
+                using (Transaction tr = new Transaction(addinSettings.Document, "Set Excel Path"))
+                {
+                    tr.Start();
+                    hokExcelFilePathParam.SetValue(new StringParameterValue(openFileDlg.FileName.Replace('"', ' ').Trim()));
+                    tr.Commit();
+                }
+
+                addinSettings.ExcelPath = (hokExcelFilePathParam.GetValue() as StringParameterValue).Value;
+                addinSettings.GetSheetsAndTitleblockInstances();
+            }
+            Thread.Sleep(100);
+            FillTemplateList();
+            this.Focus();
         }
     }
 }

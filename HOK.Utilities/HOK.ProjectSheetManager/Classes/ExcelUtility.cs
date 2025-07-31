@@ -19,7 +19,7 @@ namespace HOK.ProjectSheetManager.Classes
 
         public bool FillDataTableFromExcelSheetNames(string nameColumn)
         {
-            List<SheetInfo> sheets = MiniExcel.GetSheetInformations(m_Settings.ExcelPath());
+            List<SheetInfo> sheets = MiniExcel.GetSheetInformations(m_Settings.ExcelPath);
             DataRow row = null;
             try
             {
@@ -46,14 +46,14 @@ namespace HOK.ProjectSheetManager.Classes
         public void FillDataTableFromExcelWorksheet(string nameWorksheet)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
-            m_DataTable = MiniExcel.QueryAsDataTable(m_Settings.ExcelPath(), sheetName: nameWorksheet);
+            m_DataTable = MiniExcel.QueryAsDataTable(m_Settings.ExcelPath, sheetName: nameWorksheet);
 #pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public void FillExcelWorksheetFromDataTable(string nameWorksheet)
         {
             var sheets = new DataSet();
-            foreach(SheetInfo sheet in MiniExcel.GetSheetInformations(m_Settings.ExcelPath()))
+            foreach(SheetInfo sheet in MiniExcel.GetSheetInformations(m_Settings.ExcelPath))
             {
                 if(sheet.Name == nameWorksheet)
                 {
@@ -61,10 +61,10 @@ namespace HOK.ProjectSheetManager.Classes
                 }
                 else
                 {
-                    sheets.Tables.Add(MiniExcel.QueryAsDataTable(m_Settings.ExcelPath(), sheetName: sheet.Name));
+                    sheets.Tables.Add(MiniExcel.QueryAsDataTable(m_Settings.ExcelPath, sheetName: sheet.Name));
                 }
             }
-            MiniExcel.SaveAs(m_Settings.ExcelPath(), sheets, overwriteFile: true, excelType: ExcelType.XLSX);
+            MiniExcel.SaveAs(m_Settings.ExcelPath, sheets, overwriteFile: true, excelType: ExcelType.XLSX);
         }
 
         public DataTable DataTable

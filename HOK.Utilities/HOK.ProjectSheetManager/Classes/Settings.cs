@@ -239,9 +239,15 @@ namespace HOK.ProjectSheetManager.Classes
                 return m_Views;
             }
         }
-        public string ExcelPath()
+        public string ExcelPath
         {
-            return excelFilePath;
+            get {
+                return excelFilePath;
+            }
+            set
+            {
+                excelFilePath = value;
+            }
         }
     }
 }
