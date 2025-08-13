@@ -22,7 +22,6 @@ namespace HOK.ProjectSheetManager.Forms
     public partial class ProjectSheetManagerForm : Window
     {
         private Classes.Settings addinSettings;
-        private UtilitySQL utilitySql;
         private FamilySymbol TitleBlock;
         private IList<FamilySymbol> TitleBlocks;
         private List<ViewSheet> Sheets;

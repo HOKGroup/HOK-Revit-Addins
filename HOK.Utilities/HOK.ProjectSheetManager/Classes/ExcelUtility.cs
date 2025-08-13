@@ -45,6 +45,8 @@ namespace HOK.ProjectSheetManager.Classes
 
         public void FillDataTableFromExcelWorksheet(string nameWorksheet)
         {
+            // This may need to be updated in the future once it's no longer supported in a future release
+            // Until then, this was how it was implemented in the previous version of the add-in
 #pragma warning disable CS0618 // Type or member is obsolete
             m_DataTable = MiniExcel.QueryAsDataTable(m_Settings.ExcelPath, sheetName: nameWorksheet);
 #pragma warning restore CS0618 // Type or member is obsolete
