@@ -1,48 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<UseWPF>true</UseWPF>
+    <LangVersion>latest</LangVersion>
 		<TargetFramework>net8.0-windows</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>AnyCPU;x64</Platforms>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>warnings</Nullable>
-		<UseWPF>true</UseWPF>
+    <DisableAddinBundleGeneration>true</DisableAddinBundleGeneration>
+    <Configurations>Debug R24;Debug R25</Configurations>
+    <Configurations>$(Configurations);Release R24;Release R25</Configurations>
+    <Product>HOK Revit Add-ins</Product>
+    <Company>HOK Group</Company>
+    <Copyright>Copyright © HOK Group 2025</Copyright>
+    <RepositoryUrl>https://github.com/HOKGroup/HOK-Revit-Addins</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/HOKGroup/HOK-Revit-Addins</PackageProjectUrl>
+    <Version>0.1.0.29</Version>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<RootNamespace>HOK.ProjectSheetManager</RootNamespace>
 		<AssemblyName>HOK.ProjectSheetManager</AssemblyName>
 	</PropertyGroup>
 
-  <PropertyGroup Condition="$(Configuration.Contains('R19'))">
-    <RevitVersion>2019</RevitVersion>
-    <TargetFramework>net471</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.Contains('R20'))">
-    <RevitVersion>2020</RevitVersion>
-    <TargetFramework>net472</TargetFramework>
-    <DefineConstants>REVIT2020_OR_GREATER</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.Contains('R21'))">
-    <RevitVersion>2021</RevitVersion>
-    <TargetFramework>net48</TargetFramework>
-    <DefineConstants>REVIT2020_OR_GREATER,REVIT2021_OR_GREATER</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.Contains('R22'))">
-    <RevitVersion>2022</RevitVersion>
-    <TargetFramework>net48</TargetFramework>
-    <DefineConstants>REVIT2020_OR_GREATER,REVIT2021_OR_GREATER,REVIT2022_OR_GREATER</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.Contains('R23'))">
-    <RevitVersion>2023</RevitVersion>
-    <TargetFramework>net48</TargetFramework>
-    <DefineConstants>REVIT2020_OR_GREATER,REVIT2021_OR_GREATER,REVIT2022_OR_GREATER,REVIT2023_OR_GREATER</DefineConstants>
-  </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R24'))">
-    <RevitVersion>2024</RevitVersion>
-    <TargetFramework>net48</TargetFramework>
-    <DefineConstants>REVIT2020_OR_GREATER,REVIT2021_OR_GREATER,REVIT2022_OR_GREATER,REVIT2023_OR_GREATER,REVIT2024_OR_GREATER</DefineConstants>
+      <RevitVersion>2024</RevitVersion>
+      <TargetFramework>net48</TargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R25'))">
-    <RevitVersion>2025</RevitVersion>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <DefineConstants>REVIT2020_OR_GREATER,REVIT2021_OR_GREATER,REVIT2022_OR_GREATER,REVIT2023_OR_GREATER,REVIT2024_OR_GREATER,REVIT2025_OR_GREATER</DefineConstants>
+      <RevitVersion>2025</RevitVersion>
+      <TargetFramework>net8.0-windows</TargetFramework>
   </PropertyGroup>
 
 	<Target Name="DeleteAddinAndDll" AfterTargets="Clean">
@@ -70,14 +56,16 @@
 	</ItemGroup>
 
   <!-- Revit APIs -->
+  <ItemGroup>
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
+    <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*" />
+  </ItemGroup>
 
   <!-- Other Packages -->
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="MiniExcel" Version="1.41.1" />
-    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2025.4.0" />
-    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2025.4.0" />
-    <PackageReference Include="Nice3point.Revit.Toolkit" Version="2025.1.0" />
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
   </ItemGroup>
@@ -88,13 +76,16 @@
 
   <ItemGroup>
     <Reference Include="HOK.Core">
-      <HintPath>..\..\HOK.Core\HOK.Core\bin\x64\Release R24\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
     </Reference>
     <Reference Include="HOK.Feedback">
-      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\x64\Debug R19\HOK.Feedback.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Feedback.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Feedback\HOK.Feedback\bin\x64\$(Configuration)\HOK.Feedback.dll</HintPath>
     </Reference>
     <Reference Include="HOK.MissionControl.Core">
-      <HintPath>..\..\HOK.Feedback\HOK.Feedback\bin\x64\Debug R19\HOK.MissionControl.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Core.dll</HintPath>
+      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -2,35 +2,35 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35818.85
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.Arrowhead", "HOK.Arrowhead\HOK.Arrowhead.csproj", "{611BDFBF-0B25-45EB-9967-04C53CCEB8E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.Arrowhead", "HOK.Arrowhead\HOK.Arrowhead.csproj", "{611BDFBF-0B25-45EB-9967-04C53CCEB8E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.CeilingHeight", "HOK.CeilingHeight\HOK.CeilingHeight.csproj", "{CB161CFF-BCF3-485C-A56F-A68D2D3B7178}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.CeilingHeight", "HOK.CeilingHeight\HOK.CeilingHeight.csproj", "{CB161CFF-BCF3-485C-A56F-A68D2D3B7178}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.DoorRoom", "HOK.DoorRoom\HOK.DoorRoom.csproj", "{86541396-B954-4474-B5A1-81757F1DB5F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.DoorRoom", "HOK.DoorRoom\HOK.DoorRoom.csproj", "{86541396-B954-4474-B5A1-81757F1DB5F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.FinishCreator", "HOK.FinishCreator\HOK.FinishCreator.csproj", "{C3748B4A-E35D-402B-926F-80396346CC17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.FinishCreator", "HOK.FinishCreator\HOK.FinishCreator.csproj", "{C3748B4A-E35D-402B-926F-80396346CC17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.LevelManager", "HOK.LevelManager\HOK.LevelManager.csproj", "{5369AAE4-02AB-4231-A693-7C2D6DCB554A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.LevelManager", "HOK.LevelManager\HOK.LevelManager.csproj", "{5369AAE4-02AB-4231-A693-7C2D6DCB554A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.RoomElevation", "HOK.RoomElevation\HOK.RoomElevation.csproj", "{5CD479FD-6FB8-4BE1-BDE6-B6F33EB9B525}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.RoomElevation", "HOK.RoomElevation\HOK.RoomElevation.csproj", "{5CD479FD-6FB8-4BE1-BDE6-B6F33EB9B525}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.RoomUpdater", "HOK.RoomUpdater\HOK.RoomUpdater.csproj", "{0EBAD4EE-6203-4D86-A8F4-B9EEF4AC926F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.RoomUpdater", "HOK.RoomUpdater\HOK.RoomUpdater.csproj", "{0EBAD4EE-6203-4D86-A8F4-B9EEF4AC926F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.ViewDepth", "HOK.ViewDepth\HOK.ViewDepth.csproj", "{DB2ABEFF-28C2-422E-ACD0-C73D804B418F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.ViewDepth", "HOK.ViewDepth\HOK.ViewDepth.csproj", "{DB2ABEFF-28C2-422E-ACD0-C73D804B418F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.WorksetView", "HOK.WorksetView\HOK.WorksetView.csproj", "{76018814-D587-4951-85E2-1EECC2EF86EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.WorksetView", "HOK.WorksetView\HOK.WorksetView.csproj", "{76018814-D587-4951-85E2-1EECC2EF86EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.CameraDuplicator", "HOK.CameraDuplicator\HOK.CameraDuplicator.csproj", "{068558B8-5372-418D-B53E-7EFF3EB071FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.CameraDuplicator", "HOK.CameraDuplicator\HOK.CameraDuplicator.csproj", "{068558B8-5372-418D-B53E-7EFF3EB071FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.RenameFamily", "HOK.RenameFamily\HOK.RenameFamily.csproj", "{86CCC14B-D1B4-4536-9017-CE11B3C8EF62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.RenameFamily", "HOK.RenameFamily\HOK.RenameFamily.csproj", "{86CCC14B-D1B4-4536-9017-CE11B3C8EF62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.RoomMeasure", "HOK.RoomMeasure\HOK.RoomMeasure.csproj", "{D964BC45-F47F-4135-9F5A-3F393F1F3177}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.RoomMeasure", "HOK.RoomMeasure\HOK.RoomMeasure.csproj", "{D964BC45-F47F-4135-9F5A-3F393F1F3177}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.XYZLocator", "HOK.XYZLocator\HOK.XYZLocator.csproj", "{7761A3DE-B348-4F97-BEF1-1E3352174C34}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.XYZLocator", "HOK.XYZLocator\HOK.XYZLocator.csproj", "{7761A3DE-B348-4F97-BEF1-1E3352174C34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.ColorBasedIssueFinder", "HOK.ColorBasedIssueFinder\HOK.ColorBasedIssueFinder.csproj", "{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.ColorBasedIssueFinder", "HOK.ColorBasedIssueFinder\HOK.ColorBasedIssueFinder.csproj", "{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.ProjectSheetManager", "HOK.ProjectSheetManager\HOK.ProjectSheetManager.csproj", "{9A6F6526-01D7-4372-BBDE-A70DF35DF598}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HOK.ProjectSheetManager", "HOK.ProjectSheetManager\HOK.ProjectSheetManager.csproj", "{9A6F6526-01D7-4372-BBDE-A70DF35DF598}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -426,8 +426,8 @@ Global
 		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R23|x64.Build.0 = Debug R23|Any CPU
 		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R24|x64.ActiveCfg = Debug R24|Any CPU
 		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R24|x64.Build.0 = Debug R24|Any CPU
-		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R25|x64.ActiveCfg = Debug R25|Any CPU
-		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R25|x64.Build.0 = Debug R25|Any CPU
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R25|x64.ActiveCfg = Debug R25|x64
+		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Debug R25|x64.Build.0 = Debug R25|x64
 		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R19|x64.ActiveCfg = Release R19|Any CPU
 		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R19|x64.Build.0 = Release R19|Any CPU
 		{E39B5060-9ACC-082A-7DE9-F1E918ECD7C3}.Release R20|x64.ActiveCfg = Release R20|Any CPU
@@ -454,8 +454,8 @@ Global
 		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Debug R23|x64.Build.0 = Debug|Any CPU
 		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Debug R24|x64.ActiveCfg = Debug|Any CPU
 		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Debug R24|x64.Build.0 = Debug|Any CPU
-		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Debug R25|x64.ActiveCfg = Debug|Any CPU
-		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Debug R25|x64.Build.0 = Debug|Any CPU
+		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Debug R25|x64.ActiveCfg = Debug R25|x64
+		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Debug R25|x64.Build.0 = Debug R25|x64
 		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Release R19|x64.ActiveCfg = Release|Any CPU
 		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Release R19|x64.Build.0 = Release|Any CPU
 		{9A6F6526-01D7-4372-BBDE-A70DF35DF598}.Release R20|x64.ActiveCfg = Release|Any CPU
