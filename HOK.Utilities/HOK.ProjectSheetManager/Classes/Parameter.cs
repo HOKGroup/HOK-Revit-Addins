@@ -5,34 +5,10 @@ namespace HOK.ProjectSheetManager.Classes
     public class Parameter
     {
         private Autodesk.Revit.DB.Parameter RevitParameter;
-        private string PropName;
-        private string PropValue;
 
         public Parameter(Autodesk.Revit.DB.Parameter Parameter)
         {
             RevitParameter = Parameter;
-        }
-
-        public Parameter(string PropertyName, string PropertyValue)
-        {
-            PropName = PropertyName;
-            PropValue = PropertyValue;
-        }
-
-        public string DataSourceName
-        {
-            get
-            {
-                return PropName;
-            }
-        }
-
-        public string DataSourceValue
-        {
-            get
-            {
-                return PropValue;
-            }
         }
 
         public string DisplayUnitType
@@ -50,65 +26,6 @@ namespace HOK.ProjectSheetManager.Classes
             }
         }
 
-        public Autodesk.Revit.DB.Parameter ParameterObject
-        {
-            get
-            {
-                try
-                {
-                    return RevitParameter;
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-        }
-
-        public bool ParameterIsReadOnly
-        {
-            get
-            {
-                try
-                {
-                    return RevitParameter.IsReadOnly;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        public bool ParameterIsShared
-        {
-            get
-            {
-                try
-                {
-                    return RevitParameter.IsShared;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        }
-
-        public string Type
-        {
-            get
-            {
-                try
-                {
-                    return RevitParameter.GetType().Name;
-                }
-                catch
-                {
-                    return "";
-                }
-            }
-        }
         public string Name
         {
             get
@@ -116,20 +33,6 @@ namespace HOK.ProjectSheetManager.Classes
                 try
                 {
                     return RevitParameter.Definition.Name;
-                }
-                catch
-                {
-                    return "";
-                }
-            }
-        }
-        public string Format
-        {
-            get
-            {
-                try
-                {
-                    return RevitParameter.StorageType.ToString();
                 }
                 catch
                 {
@@ -161,7 +64,7 @@ namespace HOK.ProjectSheetManager.Classes
         }
         public string GetParameterValue(Autodesk.Revit.DB.Parameter parameter)
         {
-            switch(parameter.StorageType)
+            switch (parameter.StorageType)
             {
                 case StorageType.Double:
                     return parameter.AsDouble().ToString();
@@ -183,7 +86,7 @@ namespace HOK.ProjectSheetManager.Classes
                 return;
             try
             {
-                switch(parameter.StorageType)
+                switch (parameter.StorageType)
                 {
                     case StorageType.Double:
                         double doubleValue;
@@ -196,11 +99,11 @@ namespace HOK.ProjectSheetManager.Classes
                         {
                             ElementId elementId = new ElementId(elemId);
                             parameter.Set(elementId);
-                        }                           
+                        }
                         break;
                     case StorageType.Integer:
                         int intValue;
-                        switch(value.ToString().ToUpper())
+                        switch (value?.ToString()?.ToUpper())
                         {
                             case "0":
                                 intValue = 0;
@@ -230,6 +133,7 @@ namespace HOK.ProjectSheetManager.Classes
                                 intValue = 0;
                                 break;
                         }
+                        parameter.Set(intValue);
                         break;
                     case StorageType.String:
                         parameter.Set((string)value);

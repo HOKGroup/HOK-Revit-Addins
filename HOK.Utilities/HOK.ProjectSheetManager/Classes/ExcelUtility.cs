@@ -1,11 +1,4 @@
-﻿using System.Data;
-using System.IO;
-using System.Windows.Shapes;
-using MiniExcelLibs;
-using MiniExcelLibs.OpenXml;
-using MiniExcelLibs.OpenXml.Models;
-
-namespace HOK.ProjectSheetManager.Classes
+﻿namespace HOK.ProjectSheetManager.Classes
 {
     class ExcelUtility
     {
@@ -25,10 +18,10 @@ namespace HOK.ProjectSheetManager.Classes
             {
                 m_DataTable = new DataTable();
                 m_DataTable.Columns.Add(nameColumn, typeof(string));
-                for(int i = 0; i < sheets.Count; i++)
+                for (int i = 0; i < sheets.Count; i++)
                 {
                     string worksheetName = sheets[i].Name;
-                    if(worksheetName != "Renumber Sheets" && worksheetName != "Rename Views")
+                    if (worksheetName != "Renumber Sheets" && worksheetName != "Rename Views")
                     {
                         row = m_DataTable.NewRow();
                         row[0] = worksheetName;
@@ -47,17 +40,15 @@ namespace HOK.ProjectSheetManager.Classes
         {
             // This may need to be updated in the future once it's no longer supported in a future release
             // Until then, this was how it was implemented in the previous version of the add-in
-#pragma warning disable CS0618 // Type or member is obsolete
             m_DataTable = MiniExcel.QueryAsDataTable(m_Settings.ExcelPath, sheetName: nameWorksheet);
-#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public void FillExcelWorksheetFromDataTable(string nameWorksheet)
         {
             var sheets = new DataSet();
-            foreach(SheetInfo sheet in MiniExcel.GetSheetInformations(m_Settings.ExcelPath))
+            foreach (SheetInfo sheet in MiniExcel.GetSheetInformations(m_Settings.ExcelPath))
             {
-                if(sheet.Name == nameWorksheet)
+                if (sheet.Name == nameWorksheet)
                 {
                     sheets.Tables.Add(this.DataTable);
                 }
@@ -71,14 +62,8 @@ namespace HOK.ProjectSheetManager.Classes
 
         public DataTable DataTable
         {
-            get
-            {
-                return m_DataTable;
-            }
-            set
-            {
-                m_DataTable = value;
-            }
+            get { return m_DataTable; }
+            set { m_DataTable = value; }
         }
     }
 }

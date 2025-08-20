@@ -93,6 +93,29 @@
     <Resource Include="Resources\hoklogo.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Autodesk.Revit.Attributes" />
+    <Using Include="Autodesk.Revit.DB" />
+    <Using Include="Autodesk.Revit.UI" />
+    <Using Include="CommunityToolkit.Mvvm.Input" />
+    <Using Include="HOK.Core.Utilities" />
+    <Using Include="HOK.ProjectSheetManager.Classes" />
+    <Using Include="HOK.ProjectSheetManager.Forms" />
+    <Using Include="MiniExcelLibs" />
+    <Using Include="MiniExcelLibs.OpenXml" />
+    <Using Include="Nice3point.Revit.Toolkit" />
+    <Using Include="Nice3point.Revit.Toolkit.External" />
+    <Using Include="System.Data" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.IO" />
+    <Using Include="System.Reflection" />
+    <Using Include="System.Security.AccessControl" />
+    <Using Include="System.Security.Principal" />
+    <Using Include="System.Windows" />
+    <Using Include="System.Windows.Controls" />
+    <Using Include="System.Windows.Input" />
+  </ItemGroup>
+
   <PropertyGroup />
 
 </Project>
