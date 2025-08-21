@@ -135,13 +135,25 @@ jobs:
       PFX_PASS: $(CERT_SIGNING_PASS)
       PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
-  - task: VSBuild@1
-    inputs:
-      solution: '$(sheetManagerSolution)'
-      msbuildArgs: '/t:Restore /property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
-      platform: '$(buildPlatform)'
-      configuration: '$(buildConfiguration)'
-      msbuildArchitecture: 'x64'
+  - ${{ if neq( parameters.revitVersion, '2025' ) }}:
+    - task: VSBuild@1
+      condition: neq(parameters.revitVersion, '2025')
+      inputs:
+        solution: '$(sheetManagerSolution)'
+        msbuildArgs: '/t:Restore /property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+        msbuildArchitecture: 'x64'
+  - ${{ else }}:
+    - task: DotNetCoreCLI@2
+      condition: eq(parameters.revitVersion, '2025')
+      inputs:
+        command: 'build'
+        projects: './HOK.Utilities/HOK.ProjectSheetManager/HOK.ProjectSheetManager.csproj'
+        arguments: '-c "$(buildConfiguration)" --artifacts-path "$(Build.SourcesDirectory)/_artifacts" --property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
+      env:
+        PFX_PASS: $(CERT_SIGNING_PASS)
+        PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
   - task: PowerShell@2
     inputs:
