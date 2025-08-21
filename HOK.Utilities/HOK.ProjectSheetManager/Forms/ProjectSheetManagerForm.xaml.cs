@@ -57,7 +57,7 @@
 
             // Get all titleblock families
             var titleBlocks = new FilteredElementCollector(addinSettings.Document)
-                                  .WhereElementIsElementType()
+                .WhereElementIsElementType()
                 .OfCategory(BuiltInCategory.OST_TitleBlocks)
                 .ToElements();
 
@@ -642,6 +642,11 @@
             }
 
             // Get the sheet values
+            if (lstBxSheetSource.SelectedItem == null)
+            {
+                TaskDialog.Show("Sheet Manager - Export Sheet Data", "Unable to read sheets from Excel file. Please verify permissions.");
+                return;
+            }
             excelUtility.FillDataTableFromExcelWorksheet(lstBxSheetSource.SelectedItem.ToString());
             DataTable dataTable = excelUtility.DataTable;
 
@@ -726,19 +731,6 @@
             {
                 excelUtility.DataTable = dataTable;
 
-                // Checking file write permissions
-                if (!HasWritePermission(addinSettings.ExcelPath))
-                {
-                    // Excel file does not have write permissions
-                    td = new TaskDialog("Sheet Manager - Export Sheet Data");
-                    td.MainInstruction = "Processing Cancelled";
-                    td.MainContent = "You do not have the proper permissions to write to the excel file at " + addinSettings.ExcelPath;
-                    td.Show();
-                    addinSettings.GetSheetsAndTitleblockInstances();
-                    ScanSheets();
-                    this.Focus();
-                    return;
-                }
                 try
                 {
                     excelUtility.FillExcelWorksheetFromDataTable(lstBxSheetSource.SelectedItem.ToString());
@@ -777,18 +769,6 @@
             this.Focus();
         }
 
-        private bool HasWritePermission(string excelPath)
-        {
-            var fInfo = new FileInfo(excelPath);
-            FileSecurity fSecurity = fInfo.GetAccessControl();
-
-            SecurityIdentifier usersSid = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
-            FileSystemRights fileRights = FileSystemRights.Read | FileSystemRights.Synchronize;
-
-            var rules = fSecurity.GetAccessRules(true, true, usersSid.GetType()).OfType<FileSystemAccessRule>();
-            return rules.Where(r => r.FileSystemRights == fileRights).Any();
-        }
-
         private void FillTemplateList()
         {
             DataTable dataTableLocal = new DataTable();
@@ -818,9 +798,9 @@
 
             // Enable command buttons if we have titleblock in the model
             IList<Element> titleBlocks = new FilteredElementCollector(addinSettings.Document)
-                                        .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                                        .WhereElementIsElementType()
-                                        .ToElements();
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                .WhereElementIsElementType()
+                .ToElements();
 
             if (titleBlocks.Count == 0)
             {
@@ -1014,8 +994,8 @@
                                     {
                                         // Find the titleblock family
                                         IList<Element> docTitleblocks = new FilteredElementCollector(addinSettings.Document)
-                                                                            .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                                                                            .ToElements();
+                                            .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                                            .ToElements();
 
                                         // Find the right one
                                         foreach (Element tb in docTitleblocks)
@@ -1135,9 +1115,9 @@
         {
             // If no titleblock in model, do not allow this command
             IList<Element> titleblocks = new FilteredElementCollector(addinSettings.Document)
-                                            .OfCategory(BuiltInCategory.OST_TitleBlocks)
-                                            .WhereElementIsElementType()
-                                            .ToElements();
+                .OfCategory(BuiltInCategory.OST_TitleBlocks)
+                .WhereElementIsElementType()
+                .ToElements();
             if (titleblocks.Count == 0)
             {
                 TaskDialog.Show("Sheet Manager", "Add a titleblock prior to running this command.");
@@ -1197,8 +1177,8 @@
             // Get the selected titleblock
             var selectedTitleBlockItem = (TreeViewItem)trViewTitleblocks.SelectedItem;
             List<FamilySymbol> docTitleBlocks = new FilteredElementCollector(addinSettings.Document)
-                                  .WhereElementIsElementType()
-                                  .OfCategory(BuiltInCategory.OST_TitleBlocks).ToElements().Cast<FamilySymbol>().ToList();
+                .WhereElementIsElementType()
+                .OfCategory(BuiltInCategory.OST_TitleBlocks).ToElements().Cast<FamilySymbol>().ToList();
 
 
 
@@ -1338,6 +1318,10 @@
         {
             try
             {
+                if (!Path.Exists(lblExcelPath.Text))
+                {
+                    throw new FileNotFoundException();
+                }
                 var ps = new ProcessStartInfo("excel.exe", lblExcelPath.Text);
                 ps.UseShellExecute = true;
                 Process.Start(ps);
