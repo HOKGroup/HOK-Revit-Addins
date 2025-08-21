@@ -137,7 +137,6 @@ jobs:
 
   - ${{ if ne( parameters.revitVersion, '2025' ) }}:
     - task: VSBuild@1
-      condition: neq(parameters.revitVersion, '2025')
       inputs:
         solution: '$(sheetManagerSolution)'
         msbuildArgs: '/t:Restore /property:OutputPath="$(Build.SourcesDirectory)/_artifacts/$(revitVersion)"'
@@ -146,7 +145,6 @@ jobs:
         msbuildArchitecture: 'x64'
   - ${{ else }}:
     - task: DotNetCoreCLI@2
-      condition: eq(parameters.revitVersion, '2025')
       inputs:
         command: 'build'
         projects: './HOK.Utilities/HOK.ProjectSheetManager/HOK.ProjectSheetManager.csproj'
