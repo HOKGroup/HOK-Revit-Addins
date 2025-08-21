@@ -87,9 +87,9 @@
                 try
                 {
                     var titleBlockNodeParent = trViewTitleblockItems.First(item => item.Header.ToString() == x.Family.Name);
-                    if (trViewTitleblockItems.Any(item => item.Header.ToString() == x.Name) == false)
+                    if (titleBlockNodeParent.Items.Cast<TreeViewItem>().Any(item => item.Header.ToString() == x.Name) == false)
                     {
-                        trViewTitleblockItems.First(item => item.Header.ToString() == x.Family.Name).Items.Add(nodeChild);
+                        titleBlockNodeParent.Items.Add(nodeChild);
                     }
                 }
                 catch { }
