@@ -30,6 +30,10 @@
       <RevitVersion>2025</RevitVersion>
       <TargetFramework>net8.0-windows</TargetFramework>
   </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R26'))">
+      <RevitVersion>2026</RevitVersion>
+      <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
 
 	<Target Name="DeleteAddinAndDll" AfterTargets="Clean">
 		<Delete ContinueOnError="true" Files="$(AppData)\Autodesk\REVIT\Addins\2025\HOK.ProjectSheetManager.addin" />

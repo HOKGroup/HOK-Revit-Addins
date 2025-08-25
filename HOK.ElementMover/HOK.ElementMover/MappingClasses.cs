@@ -381,11 +381,19 @@ namespace HOK.ElementMover
                         var targetLocation = linkedElement.Location as LocationCurve;
                         var sourceCurve = sourceLocation.Curve.CreateTransformed(transform);
                         var targetCurve = targetLocation.Curve;
+#if REVIT2026_OR_GREATER
+                        var result = sourceCurve.Intersect(targetCurve, CurveIntersectResultOption.Simple);
+                        if (result.Result == SetComparisonResult.Equal)
+                        {
+                            identical = true;
+                        }
+#else
                         var result = sourceCurve.Intersect(targetCurve);
                         if (result == SetComparisonResult.Equal)
                         {
                             identical = true;
                         }
+#endif
                     }
                     else
                     {

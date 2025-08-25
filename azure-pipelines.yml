@@ -13,6 +13,10 @@ trigger:
     - 0.*
 
 parameters:
+- name: 'Build2026'
+  type: boolean
+  default: true
+  displayName: '2026'
 - name: 'Build2025'
   type: boolean
   default: true
@@ -51,6 +55,11 @@ parameters:
 
 
 jobs:
+- ${{ if eq(parameters.Build2026, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R26'
+      revitVersion: '2026'
 - ${{ if eq(parameters.Build2025, 'true') }}:
   - template: _build/build.yml
     parameters:

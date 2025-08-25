@@ -135,7 +135,7 @@ jobs:
       PFX_PASS: $(CERT_SIGNING_PASS)
       PFX_PATH: $(Build.SourcesDirectory)/_cert/CISign.pfx
 
-  - ${{ if ne( parameters.revitVersion, '2025' ) }}:
+  - ${{ if or(ne( parameters.revitVersion, '2025' ), ne( parameters.revitVersion, '2026' )) }}:
     - task: VSBuild@1
       inputs:
         solution: '$(sheetManagerSolution)'
