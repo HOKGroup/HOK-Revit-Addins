@@ -10,7 +10,7 @@
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
     <DisableAddinBundleGeneration>true</DisableAddinBundleGeneration>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <Configurations>Debug R19; Debug R20;Debug R21;Debug R22;Debug R23;Debug R24;Debug R25</Configurations>
+    <Configurations>Debug R19;Debug R20;Debug R21;Debug R22;Debug R23;Debug R24;Debug R25;Debug R26;Release R19;Release R20;Release R21;Release R22;Release R23;Release R24;Release R25;Release R26</Configurations>
     <Configurations>$(Configurations);Release R19; Release R20;Release R21;Release R22;Release R23;Release R24;Release R25</Configurations>
     <Platforms>x64</Platforms>
     <Product>HOK Revit Add-ins</Product>
@@ -55,6 +55,11 @@
       <TargetFramework>net8.0-windows</TargetFramework>
       <DefineConstants>REVIT2020_OR_GREATER,REVIT2021_OR_GREATER,REVIT2022_OR_GREATER,REVIT2023_OR_GREATER,REVIT2024_OR_GREATER,REVIT2025_OR_GREATER</DefineConstants>
   </PropertyGroup>
+   <PropertyGroup Condition="$(Configuration.Contains('R26'))">
+     <RevitVersion>2026</RevitVersion>
+     <TargetFramework>net8.0-windows</TargetFramework>
+     <DefineConstants>REVIT2020_OR_GREATER,REVIT2021_OR_GREATER,REVIT2022_OR_GREATER,REVIT2023_OR_GREATER,REVIT2024_OR_GREATER,REVIT2025_OR_GREATER</DefineConstants>
+   </PropertyGroup>
 
   <ItemGroup>
     <Reference Include="HOK.Core">
@@ -72,7 +77,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq"/>
+    <Reference Include="System.Xml.Linq" />
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
@@ -93,7 +98,7 @@
   <ItemGroup>
     <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
     <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
-    <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*"/>
+    <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*" />
   </ItemGroup>
 
   <!-- Other Packages -->
