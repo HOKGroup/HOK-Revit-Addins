@@ -140,7 +140,10 @@
                 {
                     // Create the tree parent node
                     ListViewItem treeItem = new ListViewItem();
-                    treeItem.Content = sheetNumber + ": " + sheetName;
+                    if (dataTable.Columns.Contains("Sheet Name"))
+                        treeItem.Content = sheetNumber + ": " + sheetName;
+                    else
+                        treeItem.Content = sheetNumber;
                     treeItem.Tag = sheetNumber;
                     treeItem.Foreground = System.Windows.Media.Brushes.Black;
                     treeItem.IsSelected = false;
@@ -293,9 +296,20 @@
                 if (!addinSettings.Views.ContainsKey(viewName))
                     continue;
 
-                if (trViewSheetElements.Items.Contains(sheetNumber))
+                if (trViewSheetElements.Items.OfType<ListViewItem>()
+                                             .Any(item => item.Content.ToString() == sheetNumber))
                 {
-                    ListViewItem trSheetItem = (ListViewItem)trViewSheetElements.Items[trViewSheetElements.Items.IndexOf(sheetNumber)];
+                    int index = -1;
+                    for (int i = 0; i < trViewSheetElements.Items.Count; i++)
+                    {
+                        if (trViewSheetElements.Items[i] is ListViewItem item &&
+                            item.Content.ToString() == sheetNumber)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+                    ListViewItem trSheetItem = (ListViewItem)trViewSheetElements.Items[index];
                     if (trSheetItem != null && trSheetItem.IsSelected)
                     {
                         // Get the sheet and view and place the view on the sheet
