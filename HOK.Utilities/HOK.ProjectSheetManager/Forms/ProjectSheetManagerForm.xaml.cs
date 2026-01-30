@@ -374,11 +374,11 @@
                     }
                 }
 
-                addinSettings.GetSheetsAndTitleblockInstances();
-                ScanSheets();
-                this.Focus();
             }
             // Commit and clear the datatable
+            addinSettings.GetSheetsAndTitleblockInstances();
+            ScanSheets();
+            this.Focus();
             trAddViewsToSheets.Commit();
             dataTableLocal.Clear();
 
@@ -1308,6 +1308,7 @@
             foreach (ListViewItem sheet in trViewSheetElements.Items)
             {
                 sheet.IsSelected = true;
+                trViewSheetElements.IsSynchronizedWithCurrentItem = true;
             }
             trViewSheetElements.Focus();
         }
@@ -1317,6 +1318,7 @@
             foreach (ListViewItem sheet in trViewSheetElements.Items)
             {
                 sheet.IsSelected = false;
+                trViewSheetElements.IsSynchronizedWithCurrentItem = true;
             }
             trViewSheetElements.Focus();
         }
@@ -1324,6 +1326,7 @@
         private void trViewSheetElements_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int countSelectedSheets = trViewSheetElements.SelectedItems.Count;
+            trViewSheetElements.IsSynchronizedWithCurrentItem = true;
 
             lblSelectedSheets.Content = "Number of Selected Sheets: " + countSelectedSheets;
         }
