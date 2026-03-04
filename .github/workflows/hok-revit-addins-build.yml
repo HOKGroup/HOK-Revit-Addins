@@ -1,0 +1,311 @@
+#Github Actions workflow to build HOK Revit Addins for Revit 2020-2025
+
+name: HOK Revit Addins Build Workflow
+
+on:
+  push:
+    branches: [" "]
+  pull_request:
+    branches: [" "]
+  workflow_dispatch:
+    inputs:
+      revitVersion:
+        description: "Revit Version to build (e.g., 2025). Leave empty to run matrix build for all versions."
+        required: false
+        default: ""
+      buildConfiguration:
+        description: 'Build Configuration prefix (e.g., Release). Scripts append the year (e.g. "Release 25").'
+        required: true
+        default: "Release"
+
+env:
+  # NOTE: Set to 'AzureDevOps' intentionally — all .csproj files use this value in HintPath
+  # conditions to locate shared assemblies (HOK.Core, HOK.MissionControl.Core, etc.) from the
+  # _artifacts folder. Changing this would require updating 90+ project files.
+  BUILD_ENV: AzureDevOps
+  SOURCE_DIR: ${{ github.workspace }}
+
+jobs:
+  build:
+    name: Build Revit ${{ matrix.revitVersion }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Define the default matrix
+        revitVersion: ["2020", "2021", "2022", "2023", "2024", "2025"]
+        # If a specific version is requested via workflow_dispatch, we can override or filter in the steps,
+        # but GitHub Actions matrix doesn't support dynamic matrix adjustment easily without a setup job.
+        # For simplicity in this direct migration, we'll run the matrix.
+        # If the user input 'revitVersion' is set, we will use an 'if' condition on the steps
+        # or we can use a hack to filter.
+        # However, to keep it clean strictly following the request for a matrix build:
+
+    steps:
+      # Filter for manual runs: If manual input is provided and doesn't match current matrix item, skip.
+      # This effectively allows "Run All" or "Run Specific"
+      - name: Check Matrix Filter
+        id: check_matrix
+        shell: pwsh
+        run: |
+          $inputVer = "${{ inputs.revitVersion }}"
+          $matrixVer = "${{ matrix.revitVersion }}"
+          if (-not [string]::IsNullOrEmpty($inputVer) -and $inputVer -ne $matrixVer) {
+            Write-Host "Skipping matrix job for $matrixVer because input requested $inputVer"
+            echo "skip_job=true" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "skip_job=false" >> $env:GITHUB_OUTPUT
+          }
+
+      - name: Checkout Code
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        uses: actions/checkout@v4
+
+      # Revit 2025+ targets net8.0-windows — install .NET 8 SDK explicitly
+      - name: Setup .NET 8 SDK (Revit 2025+)
+        if: steps.check_matrix.outputs.skip_job != 'true' && matrix.revitVersion >= '2025'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # Revit 2020-2024 targets .NET Framework 4.7/4.8 — ensure MSBuild is on PATH.
+      # The pre-installed dotnet CLI on windows-latest handles `dotnet build` for .NET Framework projects.
+      - name: Setup MSBuild (Revit 2020-2024)
+        if: steps.check_matrix.outputs.skip_job != 'true' && matrix.revitVersion < '2025'
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Set Build Environment Variables
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          # Construct the configuration string expected by the scripts, e.g., "Release 25"
+          # Extract the last two digits of the year
+          $year = "${{ matrix.revitVersion }}"
+          $shortYear = "R" + $year.Substring(2)
+          $prefix = "${{ inputs.buildConfiguration || 'Release' }}"
+          $configName = "$prefix $shortYear"
+
+          echo "BUILD_CONFIGURATION=$configName" >> $env:GITHUB_ENV
+          echo "REVIT_VERSION=${{ matrix.revitVersion }}" >> $env:GITHUB_ENV
+
+          # Pass the version as the build configuration env var for the scripts that use it
+          # In local_build.ps1 logic: $env:BUILD_CONFIGURATION = $revitVersion
+          # But in build.yml logic: BUILD_CONFIGURATION: $(revitVersion)
+          # We will stick to the pattern established in the scripts
+          # Note: copy_resources.ps1 uses $Env:BUILD_CONFIGURATION as the version folder name (e.g., 2025)
+          # So we actually need BUILD_CONFIGURATION to be the VERSION number for the scripts to work as currently written.
+          echo "BUILD_CONFIGURATION=${{ matrix.revitVersion }}" >> $env:GITHUB_ENV
+
+          # We also need the actual VS/MSBuild configuration name
+          echo "VS_CONFIGURATION=$configName" >> $env:GITHUB_ENV
+
+      - name: Decode and Save Settings.json
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          if ("${{ secrets.SETTINGS_JSON }}" -ne "") {
+            $settingsJson = [System.Convert]::FromBase64String("${{ secrets.SETTINGS_JSON }}")
+            [System.IO.File]::WriteAllBytes("${{ github.workspace }}/HOK.Core/HOK.Core/Resources/Settings.json", $settingsJson)
+          } else {
+            Write-Warning "SETTINGS_JSON secret not found. Build may fail or use defaults."
+          }
+
+      - name: Decode and Save Code Signing Certificate
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path "${{ github.workspace }}/_cert" -Force
+          if ("${{ secrets.CODE_SIGNING_CERT }}" -ne "") {
+            $cert = [System.Convert]::FromBase64String("${{ secrets.CODE_SIGNING_CERT }}")
+            [System.IO.File]::WriteAllBytes("${{ github.workspace }}/_cert/CISign.pfx", $cert)
+          } else {
+            Write-Warning "CODE_SIGNING_CERT secret not found. Signing steps will likely fail."
+          }
+
+      - name: Copy Resources to Artifacts
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          # Expects $Env:BUILD_CONFIGURATION to be set to the Revit Version (e.g. 2025)
+          & "${{ github.workspace }}/_build/copy_resources.ps1"
+
+      - name: Add Azure Artifacts NuGet Source
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          dotnet nuget add source `
+            --username github-actions `
+            --password "${{ secrets.NUGET_PAT }}" `
+            --store-password-in-clear-text `
+            --name HOK.Revit.Nuget `
+            "${{ secrets.NUGET_FEED_URL }}"
+
+      # ------------------------------------------------------------------
+      # BUILD STEPS
+      # ------------------------------------------------------------------
+
+      - name: Build HOK.Core.sln
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          dotnet build "HOK.Core\HOK.Core.sln" `
+            -c "$env:VS_CONFIGURATION" `
+            --artifacts-path "${{ github.workspace }}/_artifacts" `
+            --property:OutputPath="${{ github.workspace }}/_artifacts/${{ matrix.revitVersion }}"
+        env:
+          PFX_PASS: ${{ secrets.CERT_SIGNING_PASS }}
+          PFX_PATH: ${{ github.workspace }}/_cert/CISign.pfx
+
+      - name: Build HOK.MissionControl.Core
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          dotnet build "HOK.MissionControl\HOK.MissionControl.Core\HOK.MissionControl.Core.csproj" `
+            -c "$env:VS_CONFIGURATION" `
+            --artifacts-path "${{ github.workspace }}/_artifacts" `
+            --property:OutputPath="${{ github.workspace }}/_artifacts/${{ matrix.revitVersion }}"
+        env:
+          PFX_PASS: ${{ secrets.CERT_SIGNING_PASS }}
+          PFX_PATH: ${{ github.workspace }}/_cert/CISign.pfx
+
+      - name: Build HOK.Feedback.sln
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          dotnet build "HOK.Feedback\HOK.Feedback.sln" `
+            -c "$env:VS_CONFIGURATION" `
+            --artifacts-path "${{ github.workspace }}/_artifacts" `
+            --property:OutputPath="${{ github.workspace }}/_artifacts/${{ matrix.revitVersion }}"
+        env:
+          PFX_PASS: ${{ secrets.CERT_SIGNING_PASS }}
+          PFX_PATH: ${{ github.workspace }}/_cert/CISign.pfx
+
+      - name: Build HOK.MissionControl Components
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          dotnet build "HOK.MissionControl\HOK.MissionControl\HOK.MissionControl.csproj" `
+            -c "$env:VS_CONFIGURATION" `
+            --artifacts-path "${{ github.workspace }}/_artifacts" `
+            --property:OutputPath="${{ github.workspace }}/_artifacts/${{ matrix.revitVersion }}"
+
+          dotnet build "HOK.MissionControl\HOK.MissionControl.sln" `
+            -c "$env:VS_CONFIGURATION" `
+            --artifacts-path "${{ github.workspace }}/_artifacts" `
+            --property:OutputPath="${{ github.workspace }}/_artifacts/${{ matrix.revitVersion }}"
+        env:
+          PFX_PASS: ${{ secrets.CERT_SIGNING_PASS }}
+          PFX_PATH: ${{ github.workspace }}/_cert/CISign.pfx
+
+      - name: Build Other Solutions
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          $solutions = Get-ChildItem . -Filter "HOK.*.sln" -Recurse -Depth 2 -Exclude HOK.MissionControl*,HOK.Core*,HOK.Feedback*,HOK.ParameterTools*,HOK.FileOpeningMonitor*,HOK.ModelReporting*,HOK.SheetManager*
+          foreach ($solution in $solutions) {
+              dotnet build $solution.FullName `
+                -c "$env:VS_CONFIGURATION" `
+                --artifacts-path "${{ github.workspace }}/_artifacts" `
+                --property:OutputPath="${{ github.workspace }}/_artifacts/${{ matrix.revitVersion }}"
+          }
+        env:
+          PFX_PASS: ${{ secrets.CERT_SIGNING_PASS }}
+          PFX_PATH: ${{ github.workspace }}/_cert/CISign.pfx
+
+      # Version Specific Logic for SheetManager
+      - name: Build HOK.SheetManager (Pre-2025)
+        if: steps.check_matrix.outputs.skip_job != 'true' && matrix.revitVersion < '2025'
+        shell: pwsh
+        run: |
+          # Use MSBuild for older projects if needed, or dotnet build if converted
+          # The original yaml used VSBuild@1 for non-2025
+          # We need to ensure msbuild is in path or use dotnet build if sln supports it.
+          # Assuming standard dotnet build works or Setup-Date handles msbuild locator.
+          # If pure .NET Framework, might need setup-msbuild action.
+          dotnet build "HOK.SheetManager\HOK.SheetManager.sln" `
+            /t:Restore `
+            /p:Configuration="$env:VS_CONFIGURATION" `
+            /p:Platform="x64" `
+            /p:OutputPath="${{ github.workspace }}/_artifacts/${{ matrix.revitVersion }}"
+
+      - name: Build HOK.SheetManager (2025+)
+        if: steps.check_matrix.outputs.skip_job != 'true' && matrix.revitVersion >= '2025'
+        shell: pwsh
+        run: |
+          dotnet build "HOK.Utilities\HOK.ProjectSheetManager\HOK.ProjectSheetManager.csproj" `
+           -c "$env:VS_CONFIGURATION" `
+           --artifacts-path "${{ github.workspace }}/_artifacts" `
+           --property:OutputPath="${{ github.workspace }}/_artifacts/${{ matrix.revitVersion }}"
+        env:
+          PFX_PASS: ${{ secrets.CERT_SIGNING_PASS }}
+          PFX_PATH: ${{ github.workspace }}/_cert/CISign.pfx
+
+      # ------------------------------------------------------------------
+      # POST BUILD & CLEANUP
+      # ------------------------------------------------------------------
+
+      - name: Copy Build Artifacts
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          & "${{ github.workspace }}/_build/copy_artifacts.ps1"
+
+      - name: Cleanup and Code Sign Artifacts
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          $env:PFX_PASS = "${{ secrets.CERT_SIGNING_PASS }}"
+          $env:PFX_PATH = "${{ github.workspace }}/_cert/CISign.pfx"
+          & "${{ github.workspace }}/_build/cleanup_artifacts.ps1"
+
+      - name: List Artifact Files (Debug)
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path "${{ github.workspace }}/_artifacts" -Recurse
+
+      - name: Zip Build Artifacts
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        shell: pwsh
+        run: |
+          $revitVer = "${{ matrix.revitVersion }}"
+          Compress-Archive `
+            -Path "${{ github.workspace }}/_artifacts/$revitVer/*" `
+            -DestinationPath "${{ github.workspace }}/HOK-Revit-Addins-$revitVer.zip"
+
+      - name: Upload Build Artifacts
+        if: steps.check_matrix.outputs.skip_job != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: HOK-Revit-Addins-${{ matrix.revitVersion }}
+          path: ${{ github.workspace }}/HOK-Revit-Addins-${{ matrix.revitVersion }}.zip
+  # Trigger Release only on push to "main" or "master"
+  release:
+    name: Create Release
+    needs: build
+    runs-on: windows-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display Downloaded Artifacts
+        run: ls -R artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: HOK Revit Addins - ${{ github.run_number }}
+          tag_name: v${{ github.run_number }}
+          body: |
+            Automated release build for HOK Revit Addins.
+
+            **Build ID:** ${{ github.run_id }}
+            **Commit:** ${{ github.sha }}
+          files: |
+            artifacts/**/*.zip
+          make_latest: true
+          token: ${{ secrets.GITHUB_TOKEN }}
