@@ -328,7 +328,7 @@ namespace HOK.RibbonTab
                     if (File.Exists(currentDirectory + "/HOK.FamilyMatrixGenerator2023"))
                     {
                         var pbFamMtxGen = splitButton.AddPushButton(new PushButtonData("Family Matrix Generator", "Family" + Environment.NewLine + " Matrix Generator", currentDirectory + "/HOK.FamilyMatrixGenerator2023", "HOK.FamilyMatrixGenerator2023.Command"));
-                        pbFamMtxGen.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "");
+                        pbFamMtxGen.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "dot_matrix.png");
                         pbFamMtxGen.ToolTip = "Family Matrix Generator";
                         AddToolTips(pbFamMtxGen);
                         utilityExist = true;
