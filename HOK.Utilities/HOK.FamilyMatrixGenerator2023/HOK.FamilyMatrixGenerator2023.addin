@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Command HOK.FamilyMatrixGenerator2023</Text>
+    <Description>Place unplaced Revit families on a grid format in a container file.</Description>
+    <Assembly>HOK.FamilyMatrixGenerator2023.dll</Assembly>
+    <FullClassName>HOK.FamilyMatrixGenerator2023.Command</FullClassName>
+    <ClientId>b71c2fb4-70f0-41d1-a311-02a13a08b17a</ClientId>
+    <VendorId>HOK</VendorId>
+    <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>Application HOK.FamilyMatrixGenerator2023</Name>
+    <Assembly>HOK.FamilyMatrixGenerator2023.dll</Assembly>
+    <FullClassName>HOK.FamilyMatrixGenerator2023.App</FullClassName>
+    <ClientId>4ffd95d9-1c4d-4cb6-9c8d-a7f14a462956</ClientId>
+    <VendorId>HOK</VendorId>
+    <VendorDescription></VendorDescription>
+  </AddIn>
+</RevitAddIns>
