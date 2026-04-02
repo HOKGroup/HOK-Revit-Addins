@@ -38,6 +38,7 @@ namespace HOK.FamilyMatrixGenerator2023.Forms
                 .OfClass(typeof(FamilySymbol))
                 .Cast<FamilySymbol>()
                 .Where(fs => !placedSymbolIds.Contains(fs.Id))
+                .OrderBy(f => f.FamilyName)
                 .ToList();
 
             foreach(var familyInstance in familyCollection)
@@ -48,7 +49,7 @@ namespace HOK.FamilyMatrixGenerator2023.Forms
             DocFamilySymbols = familyCollection;
 
             // Add the category filters
-            var categories = familyCollection.Select(fi => fi.Category);
+            var categories = familyCollection.Select(fi => fi.Category).OrderBy(c => c.Name);
             foreach (var category in categories)
             {
                 if(!cmbBxSelectionFilter.Items.Contains(category.Name))
@@ -158,7 +159,7 @@ namespace HOK.FamilyMatrixGenerator2023.Forms
         private void cmbBxSelectionFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Filtered family symbols
-            var filteredFamilies = DocFamilySymbols.Where(f => f.Category.Name == cmbBxSelectionFilter.SelectedItem.ToString()).ToList();
+            var filteredFamilies = DocFamilySymbols.Where(f => f.Category.Name == cmbBxSelectionFilter.SelectedItem.ToString()).OrderBy(f => f.FamilyName).ToList();
             lstViewRevitFamilies.Items.Clear();
             foreach (var familyInstance in filteredFamilies)
             {
