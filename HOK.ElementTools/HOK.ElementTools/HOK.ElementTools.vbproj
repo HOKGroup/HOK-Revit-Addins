@@ -3,7 +3,7 @@
   <PropertyGroup>
     <UseWinForms>true</UseWinForms>
     <LangVersion>latest</LangVersion>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <ImplicitUsings>true</ImplicitUsings>
     <Nullable>disable</Nullable>
@@ -53,12 +53,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R25'))">
       <RevitVersion>2025</RevitVersion>
-      <TargetFramework>net8.0-windows</TargetFramework>
+      <TargetFramework>net10.0-windows</TargetFramework>
       <DefineConstants>REVIT2020_OR_GREATER,REVIT2021_OR_GREATER,REVIT2022_OR_GREATER,REVIT2023_OR_GREATER,REVIT2024_OR_GREATER,REVIT2025_OR_GREATER</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R26'))">
       <RevitVersion>2026</RevitVersion>
-      <TargetFramework>net8.0-windows</TargetFramework>
+      <TargetFramework>net10.0-windows</TargetFramework>
       <DefineConstants>REVIT2020_OR_GREATER,REVIT2021_OR_GREATER,REVIT2022_OR_GREATER,REVIT2023_OR_GREATER,REVIT2024_OR_GREATER,REVIT2025_OR_GREATER,REVIT2026_OR_GREATER</DefineConstants>
   </PropertyGroup>
 
@@ -83,12 +83,7 @@
     <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*"/>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0-windows'">
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -105,7 +100,7 @@
     <Folder Include="Project\" />
     <Folder Include="Forms\Place Unplaced Stuff\" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
     <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
   </ItemGroup>
 

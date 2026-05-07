@@ -3,7 +3,7 @@
   <PropertyGroup>
     <UseWPF>true</UseWPF>
     <LangVersion>latest</LangVersion>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <Platforms>AnyCPU;x64</Platforms>
     <ImplicitUsings>true</ImplicitUsings>
@@ -47,11 +47,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R25'))">
       <RevitVersion>2025</RevitVersion>
-      <TargetFramework>net8.0-windows</TargetFramework>
+      <TargetFramework>net10.0-windows</TargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R26'))">
       <RevitVersion>2026</RevitVersion>
-      <TargetFramework>net8.0-windows</TargetFramework>
+      <TargetFramework>net10.0-windows</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -64,7 +64,7 @@
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0-windows'">
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Xaml" />
@@ -110,10 +110,7 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="2.0.2" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.10" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
-    <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
-    <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 
   <!-- Revit APIs -->
@@ -123,7 +120,7 @@
     <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
     <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
   </ItemGroup>
 

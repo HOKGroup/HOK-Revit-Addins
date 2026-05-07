@@ -18,6 +18,7 @@ namespace HOK.LevelManager
         private Dictionary<string/*catName*/, List<Element>> elementDictionary = new Dictionary<string, List<Element>>();
         private Dictionary<string/*catName*/, List<Element>> selectedElements = new Dictionary<string, List<Element>>();
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<string, List<Element>> SelectedElements { get { return selectedElements; } set { selectedElements = value; } }
 
         private BuiltInCategory[] systemCategories = new BuiltInCategory[]

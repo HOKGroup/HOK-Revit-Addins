@@ -26,19 +26,19 @@ namespace HOK.RoomsToMass
         private Dictionary<string, RoomProperties> roomDictionary = new Dictionary<string, RoomProperties>();
         private Dictionary<string, AreaProperties> areaDictionary = new Dictionary<string, AreaProperties>();
         private Dictionary<string, FloorProperties> floorDictionary = new Dictionary<string, FloorProperties>();
-      
+
         public override void Execute()
         {
             try
             {
-                m_app = Context.UiApplication;
-                m_doc = Context.ActiveDocument;
+                m_app = RevitContext.UiApplication;
+                m_doc = RevitContext.ActiveDocument;
                 Log.AppendLog(LogMessageType.INFO, "Started");
 
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("MassTools-CreateMass", Application.VersionNumber));
+                    new AddinLog("MassTools-CreateMass", RevitContext.Application.VersionNumber));
 
                 GetModelInformation();
                 var sourceWindow = new MassSourceWindow(m_app, modelDictionary);

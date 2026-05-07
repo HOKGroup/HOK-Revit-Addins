@@ -15,7 +15,7 @@ namespace HOK.ElementFlatter
 
         public override void Execute()
         {
-            m_app = Context.UiApplication;
+            m_app = RevitContext.UiApplication;
             Log.AppendLog(LogMessageType.INFO, "Started.");
 
             // (Konrad) We are gathering information about the addin use. This allows us to

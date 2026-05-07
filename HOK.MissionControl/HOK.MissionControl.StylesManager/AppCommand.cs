@@ -11,7 +11,7 @@ namespace HOK.MissionControl.StylesManager
     {
         private const string tabName = "   HOK   ";
         public static StylesManagerRequestHandler StylesManagerHandler { get; set; }
-        public static ExternalEvent StylesManagerEvent { get; set; }
+        public static Autodesk.Revit.UI.ExternalEvent StylesManagerEvent { get; set; }
 
         public override void OnStartup()
         {
@@ -35,7 +35,7 @@ namespace HOK.MissionControl.StylesManager
             });
 
             StylesManagerHandler = new StylesManagerRequestHandler();
-            StylesManagerEvent = ExternalEvent.Create(StylesManagerHandler);
+            StylesManagerEvent = Autodesk.Revit.UI.ExternalEvent.Create(StylesManagerHandler);
         }
 
     }

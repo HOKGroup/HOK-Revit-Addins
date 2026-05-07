@@ -28,12 +28,6 @@ namespace HOK.Feedback
         /// <returns>Response object.</returns>
         public async Task<T> RemoveImage<T>(AttachmentViewModel att) where T : new()
         {
-            // (Konrad) Apparently it's possible that new Windows updates change the standard 
-            // SSL protocol to SSL3. RestSharp uses whatever current one is while GitHub server 
-            // is not ready for it yet, so we have to use TLS1.2 explicitly.
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
             var client = new RestClient(baseUrl);
             var request = new RestRequest(Settings.FeedbackPath + "contents/" + att.UploadImageContent.path, Method.Delete);
             request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
@@ -96,12 +90,6 @@ namespace HOK.Feedback
                 branch = "master"
             };
 
-            // (Konrad) Apparently it's possible that new Windows updates change the standard 
-            // SSL protocol to SSL3. RestSharp uses whatever current one is while GitHub server 
-            // is not ready for it yet, so we have to use TLS1.2 explicitly.
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
             var client = new RestClient(baseUrl);
             var request = new RestRequest(Settings.FeedbackPath + "contents/" + body.path, Method.Put);
             request.AddHeader("Authorization", "Token " + Settings.FeedbackToken);
@@ -153,12 +141,6 @@ namespace HOK.Feedback
                 assignees = new List<string>(),
                 labels = new List<string>()
             };
-
-            // (Konrad) Apparently it's possible that new Windows updates change the standard 
-            // SSL protocol to SSL3. RestSharp uses whatever current one is while GitHub server 
-            // is not ready for it yet, so we have to use TLS1.2 explicitly.
-            ServicePointManager.Expect100Continue = true;
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             var client = new RestClient(baseUrl);
             var request = new RestRequest(Settings.FeedbackPath + "issues", Method.Post);

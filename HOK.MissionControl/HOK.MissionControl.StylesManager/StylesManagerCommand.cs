@@ -18,8 +18,8 @@ namespace HOK.MissionControl.StylesManager
     {
         public override void Execute()
         {
-            var uiApp = Context.Application;
-            var doc = Context.ActiveDocument;
+            var uiApp = RevitContext.Application;
+            var doc = RevitContext.ActiveDocument;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
@@ -27,7 +27,7 @@ namespace HOK.MissionControl.StylesManager
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("MissionControl-StylesManager", Application.VersionNumber));
+                    new AddinLog("MissionControl-StylesManager", RevitContext.Application.VersionNumber));
 
                 var vm = new StylesManagerViewModel(doc);
                 var v = new StylesManagerView

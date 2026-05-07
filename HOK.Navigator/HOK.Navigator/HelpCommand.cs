@@ -22,7 +22,7 @@ namespace HOK.Navigator
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("HOK Navigator", Application.VersionNumber));
+                    new AddinLog("HOK Navigator", RevitContext.Application.VersionNumber));
 
                 var helpForm = new HelpForm();
                 helpForm.ShowDialog();

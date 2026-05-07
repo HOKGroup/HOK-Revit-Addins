@@ -1,8 +1,10 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
-using HOK.ColorBasedIssueFinder.IssueFinderLib;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using HOK.ColorBasedIssueFinder.IssueFinderLib;
 using Newtonsoft.Json;
+using Nice3point.Revit.Toolkit.External;
 using Nice3point.Revit.Toolkit.External.Handlers;
 using System;
 using System.Collections.Generic;
@@ -11,12 +13,12 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Runtime.Versioning;
 
 namespace HOK.ColorBasedIssueFinder
 {
@@ -38,8 +40,12 @@ namespace HOK.ColorBasedIssueFinder
         private System.Drawing.Color errorColor1 = System.Drawing.Color.FromArgb(127, 191, 255);
         private System.Drawing.Color errorColor2 = System.Drawing.Color.FromArgb(255, 127, 127);
 
-        private readonly ActionEventHandler _externalHandler = new ActionEventHandler();
-        private readonly AsyncEventHandler _asyncExternalHandler = new AsyncEventHandler();
+        // Async external event - initialize in constructor to avoid referencing instance members in field initializer
+        private readonly AsyncExternalEvent _asyncExternalHandler;
+
+        // Fields to hold crop box coordinates for the external event handler
+        private XYZ cropBoxMin;
+        private XYZ cropBoxMax;
 
         #region Helper Functions
 
@@ -169,6 +175,48 @@ namespace HOK.ColorBasedIssueFinder
             // Setting the default colors
             colPkErrorColor1.SelectedColor = new System.Windows.Media.Color() { R = errorColor1.R, G = errorColor1.G, B = errorColor1.B, A = 255};
             colPkErrorColor2.SelectedColor = new System.Windows.Media.Color() { R = errorColor2.R, G = errorColor2.G, B = errorColor2.B, A = 255 };
+
+            // Initialize the async external event here (after InitializeComponent and uiApp set)
+            _asyncExternalHandler = new(application =>
+            {
+                // Set the view to the error area
+                var doc = application.ActiveUIDocument.Document;
+                using (Transaction tr = new Transaction(doc, "Set View for " + doc.ActiveView.Name))
+                {
+                    tr.Start();
+                    try
+                    {
+                        ViewPlan activeView = GetActiveViewPlan(doc);
+                        bool cropBoxActive = activeView.CropBoxActive;
+                        activeView.CropBoxActive = true;
+
+                        var cropBox = activeView.CropBox;
+                        if (cropBox == null)
+                        {
+                            TaskDialog.Show("Error", "CropBox is not available.");
+                            return;
+                        }
+                        cropBox.Min = cropBoxMin;
+                        cropBox.Max = cropBoxMax;
+                        activeView.CropBox = cropBox;
+                        UIView currUIView = uiApp.ActiveUIDocument.GetOpenUIViews().FirstOrDefault(v => v.ViewId == activeView.Id);
+                        currUIView.ZoomToFit();
+                        var zoomValue = Convert.ToDouble(txtBxZoomScale.Text.ToString());
+                        currUIView.Zoom(1.0 / (zoomValue / 100.00));
+                        if (!cropBoxActive)
+                        {
+                            activeView.CropBoxActive = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Windows.Forms.MessageBox.Show(ex.Message);
+                        tr.RollBack();
+                        return;
+                    }
+                    tr.Commit();
+                }
+            });
         }
 
         private void DirectoryBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -348,51 +396,10 @@ namespace HOK.ColorBasedIssueFinder
             var topRight = selectedRect.TopRight; //Max of bounding box
 
             // Convert the cropBox Min and Max to Revit Coords
-            var cropBoxMin = selectedArea.WorldFile.PixelToWorld(new System.Windows.Point(bottomLeft.X, bottomLeft.Y));
-            var cropBoxMax = selectedArea.WorldFile.PixelToWorld(new System.Windows.Point(topRight.X, topRight.Y));
+            cropBoxMin = selectedArea.WorldFile.PixelToWorld(new System.Windows.Point(bottomLeft.X, bottomLeft.Y));
+            cropBoxMax = selectedArea.WorldFile.PixelToWorld(new System.Windows.Point(topRight.X, topRight.Y));
 
-            await _asyncExternalHandler.RaiseAsync(application =>
-            {
-                // Set the view to the error area
-                using (Transaction tr = new Transaction(doc, "Set View for " + doc.ActiveView.Name))
-                {
-                    tr.Start();
-                    try
-                    {
-                        ViewPlan activeView = GetActiveViewPlan(doc);
-                        bool cropBoxActive = activeView.CropBoxActive;
-                        activeView.CropBoxActive = true;
-
-                        var cropBox = activeView.CropBox;
-                        if (cropBox == null)
-                        {
-                            TaskDialog.Show("Error", "CropBox is not available.");
-                            return;
-                        }
-                        cropBox.Min = cropBoxMin;
-                        cropBox.Max = cropBoxMax;
-                        activeView.CropBox = cropBox;
-                        UIView currUIView = uiApp.ActiveUIDocument.GetOpenUIViews().FirstOrDefault(v => v.ViewId == activeView.Id);
-                        currUIView.ZoomToFit();
-                        var zoomValue = Convert.ToDouble(txtBxZoomScale.Text.ToString());
-                        currUIView.Zoom(1.0 / (zoomValue / 100.00));
-                        if (!cropBoxActive)
-                        {
-                            activeView.CropBoxActive = false;
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Windows.Forms.MessageBox.Show(ex.Message);
-                        tr.RollBack();
-                        return;
-                    }
-                    tr.Commit();
-                }
-            });
-
-            
-
+            await _asyncExternalHandler.RaiseAsync();
 
         }
         private void btnLoadErrorArea_Click(object sender, RoutedEventArgs e)

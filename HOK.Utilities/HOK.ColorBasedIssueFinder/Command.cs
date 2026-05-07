@@ -20,10 +20,10 @@ namespace HOK.ColorBasedIssueFinder
             if (WindowController.Focus<IssueFinder>())
                 return;
             var title = "Color Based Issue Finder";
-            var view = new IssueFinder(this.UiApplication);
+            var view = new IssueFinder(Application);
             view.Title = title;
 
-            WindowController.Show(view, this.UiApplication.MainWindowHandle);
+            WindowController.Show(view, Application.MainWindowHandle);
         }
     }
 }

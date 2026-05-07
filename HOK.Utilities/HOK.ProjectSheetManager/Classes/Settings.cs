@@ -2,7 +2,6 @@
 {
     public class Settings
     {
-        private ExternalCommandData cmdData;
         private string excelFilePath;
         private Document doc;
         private Dictionary<string, Autodesk.Revit.DB.View> m_Views;
@@ -12,10 +11,9 @@
 
         const string HOK_EXCEL_PATH_PARAM_NAME = "Sheet Manager Excel File Path";
 
-        public Settings(ExternalCommandData commandData)
+        public Settings()
         {
-            cmdData = commandData;
-            doc = Context.ActiveDocument;
+            doc = RevitContext.ActiveDocument;
             if (doc == null)
             {
                 throw new Exception(
@@ -205,7 +203,7 @@
             return "SheetManager";
         }
 
-        public UIApplication Application => cmdData.Application;
+        public UIApplication Application => RevitContext.UiApplication;
         public Document Document => doc;
         public Dictionary<string, ViewSheet> Sheets => m_Sheets;
         public Dictionary<string, Autodesk.Revit.DB.View> Views => m_Views;

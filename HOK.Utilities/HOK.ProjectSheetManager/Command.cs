@@ -7,7 +7,7 @@ namespace HOK.ProjectSheetManager
         {
             try
             {
-                var m_Settings = new Classes.Settings(ExternalCommandData);
+                var m_Settings = new Classes.Settings();
                 var m_dlg = new ProjectSheetManagerForm(m_Settings);
                 m_dlg.ShowDialog();
             }

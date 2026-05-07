@@ -41,7 +41,7 @@ jobs:
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
-      version: '8.x'
+      version: '10.x'
 
   - task: PowerShell@2
     inputs:

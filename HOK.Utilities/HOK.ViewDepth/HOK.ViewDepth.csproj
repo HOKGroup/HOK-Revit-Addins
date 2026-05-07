@@ -3,7 +3,7 @@
   <PropertyGroup>
     <UseWPF>true</UseWPF>
     <LangVersion>latest</LangVersion>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>
     <Platforms>AnyCPU;x64</Platforms>
     <ImplicitUsings>true</ImplicitUsings>
@@ -47,11 +47,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R25'))">
       <RevitVersion>2025</RevitVersion>
-      <TargetFramework>net8.0-windows</TargetFramework>
+      <TargetFramework>net10.0-windows</TargetFramework>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R26'))">
       <RevitVersion>2026</RevitVersion>
-      <TargetFramework>net8.0-windows</TargetFramework>
+      <TargetFramework>net10.0-windows</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -64,7 +64,7 @@
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0-windows'">
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -91,7 +91,7 @@
   </ItemGroup>
 
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
     <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
   </ItemGroup>
 

@@ -35,7 +35,7 @@ namespace HOK.MissionControl
         public static bool IsSynchOverriden { get; set; }
         public static bool IsSynchNowOverriden { get; set; }
         public static CommunicatorRequestHandler CommunicatorHandler { get; set; }
-        public static ExternalEvent CommunicatorEvent { get; set; }
+        public static Autodesk.Revit.UI.ExternalEvent CommunicatorEvent { get; set; }
         public static Dictionary<string, FamilyItem> FamiliesToWatch { get; set; } = new Dictionary<string, FamilyItem>();
         public PushButton WebsiteButton { get; set; }
         public PushButton FamilyPublishButton { get; set; }
@@ -72,7 +72,8 @@ namespace HOK.MissionControl
                 // (Konrad) Since Communicator Task Assistant offers to open Families for editing,
                 // it requires an External Event because new document cannot be opened from Idling Event
                 CommunicatorHandler = new CommunicatorRequestHandler();
-                CommunicatorEvent = ExternalEvent.Create(CommunicatorHandler);
+
+                CommunicatorEvent = Autodesk.Revit.UI.ExternalEvent.Create(CommunicatorHandler);
             }
             catch (Exception ex)
             {

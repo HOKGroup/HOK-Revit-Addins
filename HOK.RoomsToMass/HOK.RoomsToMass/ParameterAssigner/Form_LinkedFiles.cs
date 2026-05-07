@@ -33,13 +33,21 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private List<long> categoryIds = new List<long>();
         private Dictionary<long/*categoryId*/, Dictionary<long, ParameterProperties>> parameterMaps = new Dictionary<long, Dictionary<long, ParameterProperties>>();
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<string, int> WorksetDictionary { get { return worksetDictionary; } set { worksetDictionary = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<MassProperties> IntegratedMassList { get { return integratedMassList; } set { integratedMassList = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<long, LinkedInstanceProperties> LinkedMassDictionary { get { return linkedMassDictionary; } set { linkedMassDictionary = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<long, ElementProperties> ElementDictionary { get { return elementDictionary; } set { elementDictionary = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<Category, bool> ElementCategories { get { return elementCategories; } set { elementCategories = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<string> MassParameters { get { return massParameters; } set { massParameters = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public MassSource SelectedSourceType { get { return selectedSourceType; } set { selectedSourceType = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<long, Dictionary<long, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
         
 

@@ -38,7 +38,7 @@ namespace HOK.AddInManager
                         // (Konrad) We are gathering information about the addin use. This allows us to
                         // better maintain the most used plug-ins or discontiue the unused ones.
                         // If Window was closed using the OK button we can collect more details about the app to publish.
-                        var log = new AddinLog("AddinManager", Application.VersionNumber)
+                        var log = new AddinLog("AddinManager", RevitContext.Application.VersionNumber)
                         {
                             DetailInfo = vm.AddinsObj.AddinCollection
                                 .Select(x => new InfoItem { Name = x.ToolName, Value = x.ToolLoadType.ToString() })
@@ -58,7 +58,7 @@ namespace HOK.AddInManager
                 else
                 {
                     // If user cancelled out of this window, we don't need to log all the details, other than that it was opened.
-                    AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", Application.VersionNumber));
+                    AddinUtilities.PublishAddinLog(new AddinLog("AddinManager", RevitContext.Application.VersionNumber));
 
                     OverrideTempSettings();
                 }

@@ -25,8 +25,8 @@ namespace HOK.MissionControl.FamilyPublish
     {
         public override void Execute()
         {
-            var uiApp = Context.UiApplication;
-            var doc = Context.ActiveDocument;
+            var uiApp = RevitContext.UiApplication;
+            var doc = RevitContext.ActiveDocument;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
@@ -34,7 +34,7 @@ namespace HOK.MissionControl.FamilyPublish
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontiue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("MissionControl-PublishFamilyData", Context.Application.VersionNumber));
+                    new AddinLog("MissionControl-PublishFamilyData", RevitContext.Application.VersionNumber));
 
                 var pathName = doc.PathName;
                 if (string.IsNullOrEmpty(pathName))

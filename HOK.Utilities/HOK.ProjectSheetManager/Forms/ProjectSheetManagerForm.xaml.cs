@@ -244,7 +244,7 @@
 
         private void btnAddViewsSheets_Click(object sender, RoutedEventArgs e)
         {
-            Transaction trAddViewsToSheets = new Transaction(Context.ActiveDocument, "HOK Add Views to Sheets");
+            Transaction trAddViewsToSheets = new(RevitContext.ActiveDocument, "HOK Add Views to Sheets");
             trAddViewsToSheets.Start();
 
             System.Data.DataTable dataTableLocal;
