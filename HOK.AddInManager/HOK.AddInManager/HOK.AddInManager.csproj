@@ -106,6 +106,9 @@
     <PackageReference Include="Nice3point.Revit.Build.Tasks" Version="2.0.2" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0-windows'">
+    <PackageReference Include="System.Text.Json" Version="10.0.0" />
+  </ItemGroup>
 
   <!-- Revit APIs -->
   <ItemGroup>

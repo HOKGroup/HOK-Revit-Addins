@@ -120,6 +120,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Office.Interop.Access.Dao" Version="15.0.4420.1018" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0-windows'">
+    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <COMReference Include="Microsoft.Office.Interop.Excel">

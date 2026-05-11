@@ -105,6 +105,9 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
   </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net10.0-windows'">
+    <PackageReference Include="System.Text.Json" Version="10.0.0" />
+  </ItemGroup>
 
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
