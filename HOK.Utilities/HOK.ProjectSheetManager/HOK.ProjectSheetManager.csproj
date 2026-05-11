@@ -21,10 +21,6 @@
 		<AssemblyName>HOK.ProjectSheetManager</AssemblyName>
 	</PropertyGroup>
 
-  <PropertyGroup Condition="$(Configuration.Contains('R24'))">
-      <RevitVersion>2024</RevitVersion>
-      <TargetFramework>net48</TargetFramework>
-  </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.Contains('R25'))">
       <RevitVersion>2025</RevitVersion>
       <TargetFramework>net10.0-windows</TargetFramework>
@@ -83,14 +79,6 @@
     <Reference Include="HOK.Core">
       <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Core.dll</HintPath>
       <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Core\HOK.Core\bin\x64\$(Configuration)\HOK.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="HOK.Feedback">
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Feedback.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.Feedback\HOK.Feedback\bin\x64\$(Configuration)\HOK.Feedback.dll</HintPath>
-    </Reference>
-    <Reference Include="HOK.MissionControl.Core">
-      <HintPath Condition="'$(BUILD_ENV)'=='AzureDevOps'">$(SOURCE_DIR)\_artifacts\$(RevitVersion)\HOK.Core.dll</HintPath>
-      <HintPath Condition="'$(BUILD_ENV)'!='AzureDevOps'">..\..\HOK.MissionControl\HOK.MissionControl.Core\bin\x64\$(Configuration)\HOK.MissionControl.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 
