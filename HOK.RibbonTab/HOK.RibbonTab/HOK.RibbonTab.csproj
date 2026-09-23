@@ -115,6 +115,7 @@
     <EmbeddedResource Include="Resources\kruler.png" />
     <EmbeddedResource Include="Resources\location.ico" />
     <EmbeddedResource Include="Resources\update.png" />
+    <EmbeddedResource Include="Resources\dot_matrix.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="HOK.RibbonTab.addin">

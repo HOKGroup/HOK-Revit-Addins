@@ -324,6 +324,16 @@ namespace HOK.RibbonTab
                         utilityExist = true;
                     }
 
+                    // Family Matrix Generator
+                    if (File.Exists(currentDirectory + "/HOK.FamilyMatrixGenerator.dll"))
+                    {
+                        var pbFamMtxGen = splitButton.AddPushButton(new PushButtonData("Family Matrix Generator", "Family Matrix Generator", currentDirectory + "/HOK.FamilyMatrixGenerator.dll", "HOK.FamilyMatrixGenerator.Command"));
+                        pbFamMtxGen.LargeImage = ButtonUtil.LoadBitmapImage(assembly, typeof(AppCommand).Namespace, "dot_matrix.png");
+                        pbFamMtxGen.ToolTip = "Family Matrix Generator";
+                        AddToolTips(pbFamMtxGen);
+                        utilityExist = true;
+                    }
+
                 }
                 if (!utilityExist)
                 {
