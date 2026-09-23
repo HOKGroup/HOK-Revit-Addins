@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 #endregion
 
-namespace HOK.FamilyMatrixGenerator2023
+namespace HOK.FamilyMatrixGenerator
 {
     [Transaction(TransactionMode.Manual)]
     public class Command : IExternalCommand

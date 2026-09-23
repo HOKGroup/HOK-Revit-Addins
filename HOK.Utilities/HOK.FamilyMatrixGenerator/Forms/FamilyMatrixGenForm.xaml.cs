@@ -10,7 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace HOK.FamilyMatrixGenerator2023.Forms
+namespace HOK.FamilyMatrixGenerator.Forms
 {
     /// <summary>
     /// Interaction logic for FamilyMatrixGenForm.xaml
