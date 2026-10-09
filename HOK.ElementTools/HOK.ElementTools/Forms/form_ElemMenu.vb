@@ -1,7 +1,7 @@
-﻿Imports Autodesk.Revit.DB
-Imports Autodesk.Revit.UI
-
+﻿Imports System.ComponentModel
 Imports System.Windows.Forms
+Imports Autodesk.Revit.DB
+Imports Autodesk.Revit.UI
 
 Public Class form_ElemMenu
 
@@ -9,6 +9,8 @@ Public Class form_ElemMenu
     Private m_Settings As clsSettings
     Private m_command As cmdElementTools.ToolType = cmdElementTools.ToolType.None
 
+    <Browsable(False)>
+    <DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)>
     Property CommandToolType() As cmdElementTools.ToolType
         Get
             Return m_command

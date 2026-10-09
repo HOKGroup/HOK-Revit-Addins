@@ -15,7 +15,7 @@ namespace HOK.MissionControl.GroupsManager
     {
         private const string tabName = "   HOK   ";
         public static GroupManagerRequestHandler GroupManagerHandler { get; set; }
-        public static ExternalEvent GroupManagerEvent { get; set; }
+        public static Autodesk.Revit.UI.ExternalEvent GroupManagerEvent { get; set; }
 
         public override void OnStartup()
         {
@@ -40,7 +40,7 @@ namespace HOK.MissionControl.GroupsManager
             Application.ControlledApplication.DocumentChanged += OnDocumentChanged;
 
             GroupManagerHandler = new GroupManagerRequestHandler();
-            GroupManagerEvent = ExternalEvent.Create(GroupManagerHandler);
+            GroupManagerEvent = Autodesk.Revit.UI.ExternalEvent.Create(GroupManagerHandler);
 
         }
 

@@ -23,8 +23,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private Dictionary<long/*phaseId*/, Phase> phases = new Dictionary<long, Phase>();
         private Dictionary<int/*worksetId*/, Workset> worksets = new Dictionary<int, Workset>();
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<MassProperties> IntegratedMassDictionary { get { return integratedMassList; } set { integratedMassList = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<Category, bool> ElementCategories { get { return elementCategories; } set { elementCategories = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<long, Dictionary<long, ParameterProperties>> ParameterMaps { get { return parameterMaps; } set { parameterMaps = value; } }
 
         public Form_ElementFilter(Document document, List<MassProperties> integratedMass, Dictionary<Category, bool> categories, Dictionary<long, Dictionary<long, ParameterProperties>> paramMaps)

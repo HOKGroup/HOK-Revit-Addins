@@ -14,6 +14,7 @@ Global
 		Debug R23|x64 = Debug R23|x64
 		Debug R24|x64 = Debug R24|x64
 		Debug R25|x64 = Debug R25|x64
+		Debug R26|x64 = Debug R26|x64
 		Release R19|x64 = Release R19|x64
 		Release R20|x64 = Release R20|x64
 		Release R21|x64 = Release R21|x64
@@ -21,6 +22,7 @@ Global
 		Release R23|x64 = Release R23|x64
 		Release R24|x64 = Release R24|x64
 		Release R25|x64 = Release R25|x64
+		Release R26|x64 = Release R26|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Debug R19|x64.ActiveCfg = Debug R19|x64
@@ -37,6 +39,8 @@ Global
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Debug R24|x64.Build.0 = Debug R24|x64
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Debug R25|x64.ActiveCfg = Debug R25|x64
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Debug R25|x64.Build.0 = Debug R25|x64
+		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Debug R26|x64.ActiveCfg = Debug R26|x64
+		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Debug R26|x64.Build.0= Debug R26|x64
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Release R19|x64.ActiveCfg = Release R19|x64
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Release R19|x64.Build.0 = Release R19|x64
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Release R20|x64.ActiveCfg = Release R20|x64
@@ -51,6 +55,8 @@ Global
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Release R24|x64.Build.0 = Release R24|x64
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Release R25|x64.ActiveCfg = Release R25|x64
 		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Release R25|x64.Build.0 = Release R25|x64
+		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Release R26|x64.ActiveCfg = Release R26|x64
+		{73F980B7-AA1F-4B42-8A59-0E52F5F513F8}.Release R26|x64.Build.0= Release R26|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

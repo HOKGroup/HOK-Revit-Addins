@@ -16,6 +16,7 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private List<string> parameters = new List<string>();
         private Dictionary<string/*massParam*/, string/*elemParam*/> selectedParam = new Dictionary<string, string>();
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<string, string> SelectedParam { get { return selectedParam; } set { selectedParam = value; } }
 
         public Form_Parameters(List<string> param, Dictionary<string, string> selParam)

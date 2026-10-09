@@ -25,7 +25,7 @@ namespace HOK.Feedback
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontinue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("Feedback Tool", Application.VersionNumber));
+                    new AddinLog("Feedback Tool", RevitContext.Application.VersionNumber));
 
                 var title = "HOK Feedback Tool v." + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 var model = new FeedbackModel();

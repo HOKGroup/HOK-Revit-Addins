@@ -18,9 +18,13 @@ namespace HOK.LevelManager
         private string logFileName = "";
         private bool logEnabled = false;
 
+        [DefaultValue("")]
         public string FormTitle { get { return formTitle; } set { formTitle = value; } }
+        [DefaultValue("")]
         public string MessageContents { get { return messageContents; } set { messageContents = value; } }
+        [DefaultValue("")]
         public string LogFileName { get { return logFileName; } set { logFileName = value; } }
+        [DefaultValue(false)]
         public bool LogEnabled { get { return logEnabled; } set { logEnabled = value; } }
 
         public MessageBoxForm(string title, string message, string logFile, bool log)

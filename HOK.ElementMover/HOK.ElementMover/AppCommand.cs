@@ -68,7 +68,7 @@ namespace HOK.ElementMover
             if (mainWindow == null)
             {
                 handler = new MoverHandler(uiapp);
-                var exEvent = ExternalEvent.Create(handler);
+                var exEvent = Autodesk.Revit.UI.ExternalEvent.Create(handler);
 
                 mainWindow = new MainWindow(exEvent, handler);
                 mainWindow.Closed += WindowClosed;

@@ -19,10 +19,15 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private bool logEnabled = false;
         private bool logVisible = true;
 
+        [DefaultValue("")]
         public string FormTitle { get { return formTitle; } set { formTitle = value; } }
+        [DefaultValue("")]
         public string MessageContents { get { return messageContents; } set { messageContents = value; } }
+        [DefaultValue("")]
         public string LogFileName { get { return logFileName; } set { logFileName = value; } }
+        [DefaultValue(false)]
         public bool LogEnabled { get { return logEnabled; } set { logEnabled = value; } }
+        [DefaultValue(true)]
         public bool LogVisible { get { return logVisible; } set { logVisible = value; } }
 
         public MessageBoxForm(string title, string message, string logFile, bool log, bool visibleLog)

@@ -27,15 +27,15 @@ namespace HOK.MissionControl.GroupsManager
     {
         public override void Execute()
         {
-            var uiApp = Context.Application;
-            var doc = Context.ActiveDocument;
+            var uiApp = RevitContext.Application;
+            var doc = RevitContext.ActiveDocument;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
             {
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontinue the unused ones.
-                AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-GroupsManager", Application.VersionNumber));
+                AddinUtilities.PublishAddinLog(new AddinLog("MissionControl-GroupsManager", RevitContext.Application.VersionNumber));
 
                 var model = new GroupsManagerModel(doc);
                 var viewModel = new GroupsManagerViewModel(model);
