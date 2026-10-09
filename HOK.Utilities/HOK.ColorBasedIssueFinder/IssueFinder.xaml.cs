@@ -3,7 +3,6 @@ using Autodesk.Revit.UI;
 using HOK.ColorBasedIssueFinder.IssueFinderLib;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
-using Nice3point.Revit.Toolkit.External.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,6 +16,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Runtime.Versioning;
+using Nice3point.Revit.Toolkit.External;
 
 namespace HOK.ColorBasedIssueFinder
 {

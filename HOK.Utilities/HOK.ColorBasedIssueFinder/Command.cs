@@ -15,6 +15,7 @@ namespace HOK.ColorBasedIssueFinder
     [Transaction(TransactionMode.Manual)]
     public class Command : ExternalCommand
     {
+        // Test Comment
         public override void Execute()
         {
             if (WindowController.Focus<IssueFinder>())

@@ -140,7 +140,10 @@
                 {
                     // Create the tree parent node
                     ListViewItem treeItem = new ListViewItem();
-                    treeItem.Content = sheetNumber + ": " + sheetName;
+                    if (dataTable.Columns.Contains("Sheet Name"))
+                        treeItem.Content = sheetNumber + ": " + sheetName;
+                    else
+                        treeItem.Content = sheetNumber;
                     treeItem.Tag = sheetNumber;
                     treeItem.Foreground = System.Windows.Media.Brushes.Black;
                     treeItem.IsSelected = false;
@@ -293,9 +296,20 @@
                 if (!addinSettings.Views.ContainsKey(viewName))
                     continue;
 
-                if (trViewSheetElements.Items.Contains(sheetNumber))
+                if (trViewSheetElements.Items.OfType<ListViewItem>()
+                                             .Any(item => item.Content.ToString() == sheetNumber))
                 {
-                    ListViewItem trSheetItem = (ListViewItem)trViewSheetElements.Items[trViewSheetElements.Items.IndexOf(sheetNumber)];
+                    int index = -1;
+                    for (int i = 0; i < trViewSheetElements.Items.Count; i++)
+                    {
+                        if (trViewSheetElements.Items[i] is ListViewItem item &&
+                            item.Content.ToString() == sheetNumber)
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+                    ListViewItem trSheetItem = (ListViewItem)trViewSheetElements.Items[index];
                     if (trSheetItem != null && trSheetItem.IsSelected)
                     {
                         // Get the sheet and view and place the view on the sheet
@@ -360,11 +374,11 @@
                     }
                 }
 
-                addinSettings.GetSheetsAndTitleblockInstances();
-                ScanSheets();
-                this.Focus();
             }
             // Commit and clear the datatable
+            addinSettings.GetSheetsAndTitleblockInstances();
+            ScanSheets();
+            this.Focus();
             trAddViewsToSheets.Commit();
             dataTableLocal.Clear();
 
@@ -1294,6 +1308,7 @@
             foreach (ListViewItem sheet in trViewSheetElements.Items)
             {
                 sheet.IsSelected = true;
+                trViewSheetElements.IsSynchronizedWithCurrentItem = true;
             }
             trViewSheetElements.Focus();
         }
@@ -1303,6 +1318,7 @@
             foreach (ListViewItem sheet in trViewSheetElements.Items)
             {
                 sheet.IsSelected = false;
+                trViewSheetElements.IsSynchronizedWithCurrentItem = true;
             }
             trViewSheetElements.Focus();
         }
@@ -1310,6 +1326,7 @@
         private void trViewSheetElements_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int countSelectedSheets = trViewSheetElements.SelectedItems.Count;
+            trViewSheetElements.IsSynchronizedWithCurrentItem = true;
 
             lblSelectedSheets.Content = "Number of Selected Sheets: " + countSelectedSheets;
         }
