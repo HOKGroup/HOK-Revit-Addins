@@ -72,7 +72,6 @@ namespace HOK.MissionControl
                 // (Konrad) Since Communicator Task Assistant offers to open Families for editing,
                 // it requires an External Event because new document cannot be opened from Idling Event
                 CommunicatorHandler = new CommunicatorRequestHandler();
-
                 CommunicatorEvent = Autodesk.Revit.UI.ExternalEvent.Create(CommunicatorHandler);
             }
             catch (Exception ex)

@@ -9,7 +9,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>warnings</Nullable>
     <DisableAddinBundleGeneration>true</DisableAddinBundleGeneration>
-    <Configurations>Debug R25;Debug R26;Release R25;Release R26</Configurations>
+    <Configurations>Debug R25;Debug R26;Debug R27;Release R25;Release R26;Release R27</Configurations>
     <Product>HOK Revit Add-ins</Product>
     <Company>HOK Group</Company>
     <Copyright>Copyright © HOK Group 2025</Copyright>
@@ -29,11 +29,10 @@
       <RevitVersion>2026</RevitVersion>
       <TargetFramework>net10.0-windows</TargetFramework>
   </PropertyGroup>
-
-	<Target Name="DeleteAddinAndDll" AfterTargets="Clean">
-		<Delete ContinueOnError="true" Files="$(AppData)\Autodesk\REVIT\Addins\2025\HOK.ProjectSheetManager.addin" />
-		<Delete ContinueOnError="true" Files="$(AppData)\Autodesk\REVIT\Addins\2025\HOK.ProjectSheetManager.dll" />
-	</Target>
+  <PropertyGroup Condition="$(Configuration.Contains('R27'))">
+      <RevitVersion>2027</RevitVersion>
+      <TargetFramework>net10.0-windows</TargetFramework>
+  </PropertyGroup>
 
 	<ItemGroup>
 	  <None Remove="Resources\AddViewsToSheets.png" />

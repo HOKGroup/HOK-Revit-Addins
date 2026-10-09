@@ -7,28 +7,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HOK.Feedback", "HOK.Feedbac
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug R19|x64 = Debug R19|x64
-		Debug R20|x64 = Debug R20|x64
 		Debug R21|x64 = Debug R21|x64
 		Debug R22|x64 = Debug R22|x64
 		Debug R23|x64 = Debug R23|x64
 		Debug R24|x64 = Debug R24|x64
 		Debug R25|x64 = Debug R25|x64
 		Debug R26|x64 = Debug R26|x64
-		Release R19|x64 = Release R19|x64
-		Release R20|x64 = Release R20|x64
+		Debug R27|x64 = Debug R27|x64
 		Release R21|x64 = Release R21|x64
 		Release R22|x64 = Release R22|x64
 		Release R23|x64 = Release R23|x64
 		Release R24|x64 = Release R24|x64
 		Release R25|x64 = Release R25|x64
 		Release R26|x64 = Release R26|x64
+		Release R27|x64 = Release R27|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R19|x64.ActiveCfg = Debug R19|x64
-		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R19|x64.Build.0 = Debug R19|x64
-		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R20|x64.ActiveCfg = Debug R20|x64
-		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R20|x64.Build.0 = Debug R20|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R21|x64.ActiveCfg = Debug R21|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R21|x64.Build.0 = Debug R21|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R22|x64.ActiveCfg = Debug R22|x64
@@ -41,10 +35,8 @@ Global
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R25|x64.Build.0 = Debug R25|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R26|x64.ActiveCfg = Debug R26|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R26|x64.Build.0= Debug R26|x64
-		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R19|x64.ActiveCfg = Release R19|x64
-		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R19|x64.Build.0 = Release R19|x64
-		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R20|x64.ActiveCfg = Release R20|x64
-		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R20|x64.Build.0 = Release R20|x64
+		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R27|x64.ActiveCfg = Debug R27|x64
+		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Debug R27|x64.Build.0= Debug R27|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R21|x64.ActiveCfg = Release R21|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R21|x64.Build.0 = Release R21|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R22|x64.ActiveCfg = Release R22|x64
@@ -57,6 +49,8 @@ Global
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R25|x64.Build.0 = Release R25|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R26|x64.ActiveCfg = Release R26|x64
 		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R26|x64.Build.0= Release R26|x64
+		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R27|x64.ActiveCfg = Release R27|x64
+		{0D88A8C5-88B1-47D5-BD40-9B77D56F30B9}.Release R27|x64.Build.0= Release R27|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
