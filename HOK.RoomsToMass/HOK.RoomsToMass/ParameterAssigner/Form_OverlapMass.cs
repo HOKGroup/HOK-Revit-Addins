@@ -28,8 +28,11 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private Dictionary<long/*hostId*/, Dictionary<long/*elementId*/, int/*index*/>> hostMaps = new Dictionary<long, Dictionary<long, int>>();
         private Dictionary<long/*elemntId*/, ElementProperties> unassignedElements = new Dictionary<long, ElementProperties>();
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<long, ElementProperties> IntersectingElements { get { return intersectingElements; } set { intersectingElements = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<string> CategoriesToSplit { get { return categoriesToSplit; } set { categoriesToSplit = value; } }
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Dictionary<long, ElementProperties> UnassignedElements { get { return unassignedElements; } set { unassignedElements = value; } }
 
         public Form_OverlapMass(UIApplication uiapp, bool splitOn, Dictionary<long, ElementProperties> elements, Dictionary<long, MassProperties> masses, List<long> massIdList, List<string> categoryList)

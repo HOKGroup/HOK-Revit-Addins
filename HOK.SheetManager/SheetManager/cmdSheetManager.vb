@@ -33,7 +33,7 @@ Public Class cmdSheetManager
                             ByRef message As String,
                             ByVal elements As ElementSet) As Result Implements IExternalCommand.Execute
         Try
-            AddinUtilities.PublishAddinLog(New AddinLog("Sheet Manager-Excel", Application.VersionNumber))
+            AddinUtilities.PublishAddinLog(New AddinLog("Sheet Manager-Excel", RevitContext.Application.VersionNumber))
 
             ' Construct the settings class used to manage the Revit environment and document
             Dim m_Settings As New clsSettings(commandData)

@@ -16,7 +16,9 @@ namespace HOK.RoomsToMass.ParameterAssigner
         private double ratio = 0;
         private bool followHost = false;
 
+        [DefaultValue(0)]
         public double Ratio { get { return ratio; } set { ratio = value; } }
+        [DefaultValue(false)]
         public bool FollowHost { get { return followHost; } set { followHost = value; } }
 
         public Form_Settings(double overlappingRatio, bool follow)

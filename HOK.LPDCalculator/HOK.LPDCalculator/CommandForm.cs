@@ -1,8 +1,9 @@
-﻿using System.Data;
+﻿using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.UI;
+using System.ComponentModel;
+using System.Data;
 using System.Text;
 using System.Windows.Forms;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.DB.Architecture;
 
 
 namespace HOK.LPDCalculator
@@ -16,7 +17,11 @@ namespace HOK.LPDCalculator
         private FamilySymbol spaceAnnotation = null;
         private ModelSelection spaceModel;
 
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public FamilySymbol SpaceAnnotationSymbol { get { return spaceAnnotation; } set { spaceAnnotation = value; } }
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ModelSelection SpaceModelSelection { get { return spaceModel; } set { spaceModel = value; } }
 
         public CommandForm(UIApplication uiapp)

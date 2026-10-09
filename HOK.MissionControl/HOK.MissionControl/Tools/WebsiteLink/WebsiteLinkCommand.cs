@@ -23,7 +23,7 @@ namespace HOK.MissionControl.Tools.WebsiteLink
     {
         public override void Execute()
         {
-            var doc = Context.ActiveDocument;
+            var doc = RevitContext.ActiveDocument;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             try
@@ -31,7 +31,7 @@ namespace HOK.MissionControl.Tools.WebsiteLink
                 // (Konrad) We are gathering information about the addin use. This allows us to
                 // better maintain the most used plug-ins or discontinue the unused ones.
                 AddinUtilities.PublishAddinLog(
-                    new AddinLog("MissionControl-WebsiteLink", Context.Application.VersionNumber));
+                    new AddinLog("MissionControl-WebsiteLink", RevitContext.Application.VersionNumber));
 
                 var launchHome = false;
                 if (!string.IsNullOrWhiteSpace(doc.PathName))

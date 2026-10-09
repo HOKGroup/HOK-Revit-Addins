@@ -13,6 +13,14 @@ trigger:
     - 0.*
 
 parameters:
+- name: 'Build2027'
+  type: boolean
+  default: true
+  displayName: '2027'
+- name: 'Build2026'
+  type: boolean
+  default: true
+  displayName: '2026'
 - name: 'Build2025'
   type: boolean
   default: true
@@ -33,14 +41,6 @@ parameters:
   type: boolean
   default: false
   displayName: '2021'
-- name: 'Build2020'
-  type: boolean
-  default: false
-  displayName: '2020'
-- name: 'Build2019'
-  type: boolean
-  default: false
-  displayName: '2019'
 - name: 'buildConfig'
   type: string
   default: 'Release'
@@ -51,6 +51,16 @@ parameters:
 
 
 jobs:
+- ${{ if eq(parameters.Build2027, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R27'
+      revitVersion: '2027'
+- ${{ if eq(parameters.Build2026, 'true') }}:
+  - template: _build/build.yml
+    parameters:
+      buildConfiguration: '${{ parameters.buildConfig }} R26'
+      revitVersion: '2026'
 - ${{ if eq(parameters.Build2025, 'true') }}:
   - template: _build/build.yml
     parameters:
@@ -76,13 +86,3 @@ jobs:
     parameters:
       buildConfiguration: '${{ parameters.buildConfig }} R21'
       revitVersion: '2021'
-- ${{ if eq(parameters.Build2020, 'true') }}:
-  - template: _build/build.yml
-    parameters:
-      buildConfiguration: '${{ parameters.buildConfig }} R20'
-      revitVersion: '2020'
-- ${{ if eq(parameters.Build2019, 'true') }}:
-  - template: _build/build.yml
-    parameters:
-      buildConfiguration: '${{ parameters.buildConfig }} R19'
-      revitVersion: '2019'

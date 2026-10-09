@@ -27,13 +27,13 @@ namespace HOK.RoomMeasure
 
         public override void Execute()
         {
-            m_app = Context.UiApplication;
+            m_app = RevitContext.UiApplication;
             m_doc = m_app.ActiveUIDocument.Document;
             Log.AppendLog(LogMessageType.INFO, "Started");
 
             // (Konrad) We are gathering information about the addin use. This allows us to
             // better maintain the most used plug-ins or discontiue the unused ones.
-            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-RoomMeasure", Application.VersionNumber));
+            AddinUtilities.PublishAddinLog(new AddinLog("Utilities-RoomMeasure", RevitContext.Application.VersionNumber));
 
             try
             {
